@@ -18,43 +18,66 @@ def _parse_json_response(text: str) -> dict:
     cleaned = re.sub(r"\n?```\s*$", "", cleaned)
 
     try:
-        return json.loads(cleaned)
+        data = json.loads(cleaned)
     except json.JSONDecodeError:
-        pass
+        # Remove trailing commas before } or ]
+        cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
+        data = json.loads(cleaned)
 
-    # Remove trailing commas before } or ]
-    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
-    return json.loads(cleaned)
+    return _normalize_structure(data)
 
-EXTRACTION_PROMPT = """You are a medical bill parser. Extract every line item from this medical bill image.
 
-For each line item, extract:
-- date_of_service: date the service was performed (YYYY-MM-DD)
-- cpt_code: the CPT or HCPCS code (5-digit alphanumeric, e.g., "99283", "J0170")
-- description: the text description of the service
-- quantity: number of units billed (default 1 if not shown)
-- charged_amount: the amount billed by the provider
-- insurance_paid: amount the insurance company paid (if visible, null otherwise)
-- insurance_adjustment: amount written off by insurance (if visible, null otherwise)
-- patient_responsibility: amount the patient owes (if visible, null otherwise)
+def _normalize_structure(data) -> dict:
+    """Ensure Gemini response has the expected {line_items: [...]} shape."""
+    # Gemini returned a bare list — wrap it
+    if isinstance(data, list):
+        return {"line_items": data}
 
-Also extract:
-- provider_name: hospital or doctor name
-- provider_address: address (for geographic rate comparison)
-- patient_name: (will be redacted, extract for verification only)
-- bill_date: date the bill was issued
-- account_number: (for reference)
-- total_charged: total amount billed
-- total_patient_owes: total patient responsibility
+    if not isinstance(data, dict):
+        return {"line_items": []}
 
-If a field is not visible or unclear, return null.
-If you see multiple pages, process all of them.
+    # line_items is a single object instead of a list
+    items = data.get("line_items")
+    if isinstance(items, dict):
+        data["line_items"] = [items]
+    elif not isinstance(items, list):
+        data["line_items"] = []
 
-IMPORTANT:
-- Medical bills format varies widely. Look for tables, grids, or lists of services.
-- CPT codes may be labeled as "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
+    return data
+
+EXTRACTION_PROMPT = """You are a medical bill parser. Extract EVERY line item from this medical bill image.
+
+Return a JSON object with this exact structure:
+{
+  "provider_name": "Hospital or doctor name",
+  "provider_address": "Full address",
+  "patient_name": "Patient name (will be redacted)",
+  "bill_date": "YYYY-MM-DD",
+  "account_number": "Account or invoice number",
+  "total_charged": 1234.56,
+  "total_patient_owes": 567.89,
+  "line_items": [
+    {
+      "date_of_service": "YYYY-MM-DD",
+      "cpt_code": "99283",
+      "description": "Service description",
+      "quantity": 1,
+      "charged_amount": 500.00,
+      "insurance_paid": 300.00,
+      "insurance_adjustment": 100.00,
+      "patient_responsibility": 100.00
+    }
+  ]
+}
+
+CRITICAL RULES:
+- The "line_items" field MUST be an array containing ALL line items from the bill.
+- Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
+- If a field is not visible or unclear, use null.
+- CPT codes may be labeled "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
 - Some bills show only descriptions without codes — still extract those items.
-- EOBs (Explanation of Benefits) from insurance have a different layout than hospital bills — handle both.
+- EOBs (Explanation of Benefits) have a different layout than hospital bills — handle both.
+- Medical bills format varies widely. Look for tables, grids, or lists of services.
 
 Return valid JSON only. No markdown, no preamble."""
 
