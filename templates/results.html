@@ -214,6 +214,38 @@
         </button>
     </div>
     {% endif %}
+
+    <!-- Message Script -->
+    {% if message_script %}
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-gray-900">Your Message Script</h2>
+                <p class="text-sm text-gray-500">Send this via patient portal, secure message, or text</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 sm:p-5">
+            <div class="prose prose-sm max-w-none text-gray-700 whitespace-pre-line" id="message-script-text">{{ message_script }}</div>
+        </div>
+
+        <button type="button"
+                id="copy-message-btn"
+                class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+            </svg>
+            <span id="copy-message-btn-text">Copy to Clipboard</span>
+        </button>
+    </div>
+    {% endif %}
     {% endif %}
 
     <!-- Email Report CTA -->
@@ -268,6 +300,23 @@
             if (scriptText) {
                 navigator.clipboard.writeText(scriptText.textContent.trim()).then(function() {
                     var btnText = document.getElementById('copy-btn-text');
+                    btnText.textContent = 'Copied!';
+                    setTimeout(function() {
+                        btnText.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                });
+            }
+        });
+    }
+
+    // Copy message script to clipboard
+    var copyMsgBtn = document.getElementById('copy-message-btn');
+    if (copyMsgBtn) {
+        copyMsgBtn.addEventListener('click', function() {
+            var msgText = document.getElementById('message-script-text');
+            if (msgText) {
+                navigator.clipboard.writeText(msgText.textContent.trim()).then(function() {
+                    var btnText = document.getElementById('copy-message-btn-text');
                     btnText.textContent = 'Copied!';
                     setTimeout(function() {
                         btnText.textContent = 'Copy to Clipboard';

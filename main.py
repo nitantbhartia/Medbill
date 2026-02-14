@@ -58,12 +58,13 @@ async def results_page(request: Request, bill_id: int):
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
 
-    from negotiation import generate_phone_script
-    script = generate_phone_script(bill_id)
+    from negotiation import generate_phone_script, generate_message_script
+    phone_script = generate_phone_script(bill_id)
+    message_script = generate_message_script(bill_id)
 
     return templates.TemplateResponse(
         "results.html",
-        {"request": request, "data": results, "phone_script": script},
+        {"request": request, "data": results, "phone_script": phone_script, "message_script": message_script},
     )
 
 

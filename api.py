@@ -173,6 +173,15 @@ async def get_phone_script(bill_id: int):
     return {"status": "ok", "data": {"script": script}}
 
 
+@router.get("/message-script/{bill_id}")
+async def get_message_script(bill_id: int):
+    """Generate a written message script for portal/text disputes."""
+    script = negotiation.generate_message_script(bill_id)
+    if not script:
+        raise HTTPException(404, "Bill not found or no findings")
+    return {"status": "ok", "data": {"script": script}}
+
+
 # --- Negotiation endpoints ---
 
 

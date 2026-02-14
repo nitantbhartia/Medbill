@@ -318,3 +318,80 @@ def generate_phone_script(bill_id: int) -> str:
     )
 
     return "\n".join(lines)
+
+
+def generate_message_script(bill_id: int) -> str:
+    """Generate a written message for sending via patient portal, text, or secure message."""
+    with get_db() as db:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        findings = db.execute(
+            "SELECT * FROM findings WHERE bill_id = ? ORDER BY "
+            "CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END",
+            (bill_id,),
+        ).fetchall()
+
+    if not bill or not findings:
+        return ""
+
+    bill = dict(bill)
+    findings = [dict(f) for f in findings]
+    total_savings = sum(
+        json.loads(f["details"]).get("potential_savings", 0)
+        for f in findings if f.get("details")
+    )
+
+    lines = [
+        "Subject: Billing Inquiry - Request for Itemized Review",
+        "",
+        "Dear Billing Department,",
+        "",
+        f"I am writing regarding my account with {bill.get('provider_name', 'your facility')}. "
+        "After reviewing my itemized bill, I found the following issues:",
+        "",
+    ]
+
+    for i, finding in enumerate(findings[:5], 1):
+        details = json.loads(finding["details"]) if finding.get("details") else {}
+        li = details.get("line_item", {})
+
+        if finding["finding_type"] == "duplicate_charge":
+            lines.append(
+                f"{i}. Possible duplicate: {li.get('description', 'A service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}) appears billed more than once "
+                f"on {li.get('date_of_service', 'the same date')}."
+            )
+        elif finding["finding_type"] == "price_markup":
+            lines.append(
+                f"{i}. Pricing concern: {li.get('description', 'A service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
+                f"${details.get('charged', 0):,.2f}, while the Medicare rate "
+                f"for my area is ${details.get('medicare_rate', 0):,.2f} "
+                f"({details.get('markup_multiple', 0)}x markup)."
+            )
+        elif finding["finding_type"] == "upcoding":
+            lines.append(
+                f"{i}. Coding question: I was billed for a Level "
+                f"{details.get('billed_level', '')} visit, but my visit "
+                f"may qualify as Level {details.get('likely_level', '')}."
+            )
+        else:
+            lines.append(f"{i}. {finding['message']}")
+
+    lines.append("")
+    lines.append(
+        "I respectfully request a line-by-line review of these charges "
+        "and a corrected bill. I would also appreciate information about "
+        "any financial assistance or prompt-pay discount programs available."
+    )
+
+    if total_savings > 0:
+        lines.append("")
+        lines.append(
+            f"Based on my review, the potential adjustment is approximately "
+            f"${total_savings:,.2f}."
+        )
+
+    lines.append("")
+    lines.append("Thank you for your time. I look forward to your response.")
+
+    return "\n".join(lines)

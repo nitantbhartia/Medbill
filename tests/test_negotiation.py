@@ -14,6 +14,7 @@ from negotiation import (  # noqa: E402
     create_negotiation,
     approve_and_send,
     generate_phone_script,
+    generate_message_script,
     PROHIBITED_PATTERNS,
     NEGOTIATION_STAGES,
 )
@@ -170,6 +171,39 @@ class TestGeneratePhoneScript:
 
     def test_nonexistent_bill_returns_empty(self):
         assert generate_phone_script(99999) == ""
+
+
+class TestGenerateMessageScript:
+    def test_script_generated(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert len(script) > 0
+        assert "Billing Department" in script
+
+    def test_script_includes_findings(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert "$" in script or "CPT" in script
+
+    def test_script_is_professional(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert "respectfully" in script.lower() or "request" in script.lower()
+        assert "Subject:" in script
+
+    def test_no_findings_returns_empty(self):
+        with get_db() as db:
+            cursor = db.execute(
+                "INSERT INTO bills (provider_name, total_charged, total_patient_owes, "
+                "total_findings, status) VALUES ('Test', 100, 100, 0, 'analyzed')"
+            )
+        assert generate_message_script(cursor.lastrowid) == ""
+
+    def test_nonexistent_bill_returns_empty(self):
+        assert generate_message_script(99999) == ""
 
 
 class TestNegotiationStages:
