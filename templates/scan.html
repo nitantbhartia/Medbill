@@ -246,14 +246,19 @@
         .then(function(response) {
             statusText.textContent = 'Analyzing line items...';
             if (!response.ok) {
-                return response.json().then(function(data) {
-                    throw new Error(data.detail || 'Upload failed. Please try again.');
+                return response.text().then(function(text) {
+                    var detail = 'Upload failed. Please try again.';
+                    try {
+                        var data = JSON.parse(text);
+                        detail = data.detail || detail;
+                    } catch (e) {}
+                    throw new Error(detail);
                 });
             }
             return response.json();
         })
         .then(function(data) {
-            var billId = data.bill_id || (data.data && data.data.bill_id);
+            var billId = data.data && data.data.bill_id;
             if (billId) {
                 statusText.textContent = 'Done! Redirecting...';
                 window.location.href = '/confirm/' + billId;

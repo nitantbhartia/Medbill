@@ -50,14 +50,16 @@ async def scan_bill(
                 image_list.append((img, f.content_type or "image/jpeg"))
             extracted = scanner.process_multi_page_bill(image_list)
     except Exception as e:
-        log.error("Scan failed: %s", e)
-        raise HTTPException(500, f"Failed to process bill image: {e}")
+        log.error("Scan extraction failed: %s", e, exc_info=True)
+        raise HTTPException(500, f"Failed to extract bill data: {e}")
 
-    # Analyze
-    analysis = analyzer.analyze_bill(extracted, zip_code)
-
-    # Persist
-    bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis)
+    # Analyze and persist
+    try:
+        analysis = analyzer.analyze_bill(extracted, zip_code)
+        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis)
+    except Exception as e:
+        log.error("Analysis/save failed: %s", e, exc_info=True)
+        raise HTTPException(500, f"Failed to analyze bill: {e}")
 
     return {
         "status": "ok",
