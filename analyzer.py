@@ -154,18 +154,19 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     }
 
 
-def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict) -> int:
+def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict, zip_code: str = "") -> int:
     """Persist a scanned bill, its line items, and findings to the database."""
     with get_db() as db:
         cursor = db.execute(
-            "INSERT INTO bills (user_id, provider_name, provider_address, bill_date, "
+            "INSERT INTO bills (user_id, provider_name, provider_address, bill_date, zip_code, "
             "total_charged, total_patient_owes, total_findings, total_potential_savings, status) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'analyzed')",
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'analyzed')",
             (
                 user_id,
                 extracted.get("provider_name"),
                 extracted.get("provider_address"),
                 extracted.get("bill_date"),
+                zip_code,
                 extracted.get("total_charged"),
                 extracted.get("total_patient_owes"),
                 analysis["total_findings"],

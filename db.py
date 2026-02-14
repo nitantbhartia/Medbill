@@ -34,6 +34,14 @@ def get_db():
 def init_db():
     with get_db() as db:
         db.executescript(SCHEMA)
+        _run_migrations(db)
+
+
+def _run_migrations(db):
+    """Add columns that may be missing from older databases."""
+    existing = {row[1] for row in db.execute("PRAGMA table_info(bills)").fetchall()}
+    if "zip_code" not in existing:
+        db.execute("ALTER TABLE bills ADD COLUMN zip_code TEXT")
 
 
 SCHEMA = """
@@ -53,6 +61,7 @@ CREATE TABLE IF NOT EXISTS bills (
     provider_name TEXT,
     provider_address TEXT,
     bill_date DATE,
+    zip_code TEXT,
     total_charged REAL,
     total_patient_owes REAL,
     total_findings INTEGER DEFAULT 0,

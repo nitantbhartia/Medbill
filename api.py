@@ -56,7 +56,7 @@ async def scan_bill(
     # Analyze and persist
     try:
         analysis = analyzer.analyze_bill(extracted, zip_code)
-        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis)
+        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
     except Exception as e:
         log.error("Analysis/save failed: %s", e, exc_info=True)
         raise HTTPException(500, f"Failed to analyze bill: {e}")
@@ -69,6 +69,83 @@ async def scan_bill(
             "analysis": analysis,
         },
     }
+
+
+@router.post("/analyze/{bill_id}")
+async def analyze_confirmed(bill_id: int, payload: dict):
+    """Re-analyze a bill after user confirms/edits line items."""
+    with get_db() as db:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        if not bill:
+            raise HTTPException(404, "Bill not found")
+
+        zip_code = bill["zip_code"] or "00000"
+
+        # Update line items with user-confirmed data
+        db.execute("DELETE FROM line_items WHERE bill_id = ?", (bill_id,))
+        db.execute("DELETE FROM findings WHERE bill_id = ?", (bill_id,))
+
+        items = payload.get("line_items", [])
+        for item in items:
+            db.execute(
+                "INSERT INTO line_items (bill_id, cpt_code, description, "
+                "charged_amount, quantity, extraction_confidence) "
+                "VALUES (?, ?, ?, ?, ?, 'high')",
+                (
+                    bill_id,
+                    item.get("cpt_code"),
+                    item.get("description"),
+                    item.get("billed_amount"),
+                    item.get("quantity", 1),
+                ),
+            )
+
+    # Re-analyze with confirmed items
+    extracted = {
+        "provider_name": bill["provider_name"],
+        "provider_address": bill["provider_address"],
+        "bill_date": bill["bill_date"],
+        "total_charged": bill["total_charged"],
+        "total_patient_owes": bill["total_patient_owes"],
+        "line_items": [
+            {
+                "cpt_code": item.get("cpt_code"),
+                "description": item.get("description"),
+                "charged_amount": item.get("billed_amount"),
+                "quantity": item.get("quantity", 1),
+            }
+            for item in items
+        ],
+    }
+
+    try:
+        analysis = analyzer.analyze_bill(extracted, zip_code)
+    except Exception as e:
+        log.error("Re-analysis failed: %s", e, exc_info=True)
+        raise HTTPException(500, f"Analysis failed: {e}")
+
+    # Save findings and update bill totals
+    with get_db() as db:
+        for finding in analysis.get("findings", []):
+            db.execute(
+                "INSERT INTO findings (bill_id, finding_type, severity, "
+                "potential_savings, message, details) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    bill_id,
+                    finding["type"],
+                    finding["severity"],
+                    finding.get("potential_savings", 0),
+                    finding["message"],
+                    json.dumps(finding),
+                ),
+            )
+        db.execute(
+            "UPDATE bills SET total_findings = ?, total_potential_savings = ?, status = 'analyzed' "
+            "WHERE id = ?",
+            (analysis["total_findings"], analysis["total_potential_savings"], bill_id),
+        )
+
+    return {"status": "ok", "data": {"bill_id": bill_id}}
 
 
 @router.get("/results/{bill_id}")
