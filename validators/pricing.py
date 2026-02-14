@@ -1,10 +1,34 @@
+import re
+from datetime import datetime
+
 from db import get_db
 import config
 
 
-def get_medicare_rate(cpt_code: str, locality: str = "0000000") -> float | None:
-    """Look up the Medicare facility rate for a CPT code and locality."""
+def get_medicare_rate(cpt_code: str, locality: str = "0000000", date_of_service: str | None = None) -> float | None:
+    """
+    Look up the Medicare facility rate for a CPT code and locality.
+    If date_of_service is provided, match rates by that year first.
+    """
+    target_year = None
+    if date_of_service:
+        try:
+            target_year = datetime.strptime(date_of_service, "%Y-%m-%d").year
+        except ValueError:
+            pass
+
     with get_db() as db:
+        # Try exact locality + year match
+        if target_year:
+            row = db.execute(
+                "SELECT facility_rate FROM medicare_rates "
+                "WHERE cpt_code = ? AND locality = ? AND effective_year = ?",
+                (cpt_code, locality, target_year),
+            ).fetchone()
+            if row and row["facility_rate"]:
+                return row["facility_rate"]
+
+        # Try exact locality, most recent year
         row = db.execute(
             "SELECT facility_rate FROM medicare_rates "
             "WHERE cpt_code = ? AND locality = ? "
@@ -14,7 +38,18 @@ def get_medicare_rate(cpt_code: str, locality: str = "0000000") -> float | None:
         if row and row["facility_rate"]:
             return row["facility_rate"]
 
-        # Fall back to any locality
+        # Fall back to any locality, match year if available
+        if target_year:
+            row = db.execute(
+                "SELECT facility_rate FROM medicare_rates "
+                "WHERE cpt_code = ? AND effective_year = ? AND facility_rate IS NOT NULL "
+                "LIMIT 1",
+                (cpt_code, target_year),
+            ).fetchone()
+            if row and row["facility_rate"]:
+                return row["facility_rate"]
+
+        # Final fallback: any locality, most recent year
         row = db.execute(
             "SELECT facility_rate FROM medicare_rates "
             "WHERE cpt_code = ? AND facility_rate IS NOT NULL "
@@ -35,12 +70,37 @@ def get_medicare_locality(zip_code: str) -> str:
     return row["locality"] if row else "0000000"
 
 
+def validate_geo_match(user_zip: str, provider_address: str | None) -> str | None:
+    """
+    Check if the user's zip code and provider address are in different areas.
+    Returns a warning string if mismatch, else None.
+    """
+    if not provider_address or not user_zip:
+        return None
+
+    zip_match = re.search(r"\b(\d{5})\b", provider_address)
+    if not zip_match:
+        return None
+
+    provider_zip = zip_match.group(1)
+    if provider_zip[:3] == user_zip[:3]:
+        return None  # same 3-digit prefix = same metro area
+
+    return (
+        f"Your zip code ({user_zip}) and the provider's address appear to be "
+        f"in different areas. Medicare rates vary by location — make sure "
+        f"your zip code is correct for the most accurate comparison."
+    )
+
+
 def check_pricing(item: dict, locality: str) -> dict | None:
     """Compare a line item's charge against Medicare rates."""
     if not item.get("cpt_code") or not item.get("charged_amount"):
         return None
 
-    medicare_rate = get_medicare_rate(item["cpt_code"], locality)
+    medicare_rate = get_medicare_rate(
+        item["cpt_code"], locality, item.get("date_of_service")
+    )
     if not medicare_rate:
         return None
 

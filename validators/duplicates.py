@@ -20,9 +20,10 @@ def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
         return None
 
     # Only report from the first occurrence (by position in list) to avoid dupes
-    first_index = all_items.index(item)
+    first_index = next(i for i, x in enumerate(all_items) if x is item)
     for match in matches:
-        if all_items.index(match) < first_index:
+        match_index = next(i for i, x in enumerate(all_items) if x is match)
+        if match_index < first_index:
             return None  # already reported from the earlier item
 
     return {

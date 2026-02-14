@@ -2,27 +2,93 @@ import json
 import logging
 
 from db import get_db
-from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate
+from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
 from validators.duplicates import find_duplicates
 from validators.unbundling import check_unbundling
 from validators.upcoding import check_upcoding
 from validators.nsa import check_no_surprises_act
+from validators.extraction import validate_extraction, validate_cpt_description
+from data_freshness import get_data_freshness_warnings
 
 log = logging.getLogger(__name__)
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
 
+# Confidence scoring rules for findings
+CONFIDENCE_RULES = {
+    "duplicate_charge": "high",  # same code, date, amount — very reliable
+    "price_markup": None,  # depends on markup level
+    "unbundling": None,  # depends on modifier indicator
+    "upcoding": "medium",  # can't confirm without medical record
+    "quantity_flag": "low",  # might be correct
+    "no_surprises_act": "low",  # needs more context to confirm
+}
+
+
+def _assign_confidence(finding: dict) -> str:
+    """Assign a confidence level to a finding based on type and details."""
+    ftype = finding.get("type")
+
+    if ftype == "duplicate_charge":
+        return "high"
+
+    if ftype == "price_markup":
+        markup = finding.get("markup_multiple", 0)
+        if markup > 5:
+            return "high"
+        return "medium"
+
+    if ftype == "unbundling":
+        mod = finding.get("modifier_indicator")
+        if mod == "0":
+            return "high"
+        if mod == "1":
+            return "medium"
+        return "medium"
+
+    if ftype == "upcoding":
+        return "medium"
+
+    return "low"
+
 
 def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     """
     Run all analysis checks against extracted bill data.
-    Returns findings sorted by severity.
+    Returns findings sorted by severity, with confidence scoring,
+    extraction validation, geo checks, and data freshness warnings.
     """
     findings = []
+    warnings = []
     total_potential_savings = 0.0
     locality = get_medicare_locality(zip_code)
 
     line_items = extracted_data.get("line_items", [])
+
+    # Pre-analysis: validate extraction quality
+    extraction_issues = validate_extraction(extracted_data)
+    if extraction_issues:
+        warnings.extend(extraction_issues)
+
+    # Pre-analysis: geo match check
+    geo_warning = validate_geo_match(zip_code, extracted_data.get("provider_address"))
+    if geo_warning:
+        warnings.append(geo_warning)
+
+    # Pre-analysis: data freshness check
+    dos_dates = [item.get("date_of_service") for item in line_items if item.get("date_of_service")]
+    if dos_dates:
+        freshness_warnings = get_data_freshness_warnings(dos_dates[0])
+        warnings.extend(freshness_warnings)
+
+    # Pre-analysis: CPT description cross-check
+    for item in line_items:
+        if item.get("cpt_code") and item.get("description"):
+            if not validate_cpt_description(item["cpt_code"], item["description"]):
+                warnings.append(
+                    f"CPT {item['cpt_code']} description doesn't match our records "
+                    f"for '{item['description']}'. The code may be misread."
+                )
 
     for item in line_items:
         # CHECK 1: Price vs Medicare rate
@@ -72,12 +138,17 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         findings.append(nsa_finding)
         total_potential_savings += nsa_finding.get("potential_savings", 0)
 
+    # Assign confidence to each finding
+    for finding in findings:
+        finding["confidence"] = _assign_confidence(finding)
+
     findings.sort(key=lambda f: SEVERITY_ORDER.get(f.get("severity", "low"), 2))
 
     return {
         "total_findings": len(findings),
         "total_potential_savings": round(total_potential_savings, 2),
         "findings": findings,
+        "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
     }

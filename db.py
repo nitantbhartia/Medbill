@@ -10,7 +10,9 @@ _connection = None
 def get_connection() -> sqlite3.Connection:
     global _connection
     if _connection is None:
-        os.makedirs(os.path.dirname(config.DB_PATH), exist_ok=True)
+        db_dir = os.path.dirname(config.DB_PATH)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
         _connection = sqlite3.connect(config.DB_PATH, check_same_thread=False)
         _connection.row_factory = sqlite3.Row
         _connection.execute("PRAGMA journal_mode=WAL")

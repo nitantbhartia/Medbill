@@ -37,3 +37,7 @@ STRIPE_PRICE_REPORT = os.getenv("STRIPE_PRICE_REPORT", "")  # $19 report
 
 # Stats cache TTL
 STATS_CACHE_TTL_SECONDS = 60
+
+# Extraction validation
+DOUBLE_EXTRACTION_THRESHOLD = 5000  # double-extract bills over $5k
+MAX_REASONABLE_CHARGE = 500000
