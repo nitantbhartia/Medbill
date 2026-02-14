@@ -1,4 +1,5 @@
 import json
+import re
 import base64
 import logging
 
@@ -8,6 +9,22 @@ from google.genai import types
 import config
 
 log = logging.getLogger(__name__)
+
+
+def _parse_json_response(text: str) -> dict:
+    """Parse JSON from Gemini, handling common formatting quirks."""
+    # Strip markdown code fences
+    cleaned = re.sub(r"^```(?:json)?\s*\n?", "", text.strip())
+    cleaned = re.sub(r"\n?```\s*$", "", cleaned)
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Remove trailing commas before } or ]
+    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
+    return json.loads(cleaned)
 
 EXTRACTION_PROMPT = """You are a medical bill parser. Extract every line item from this medical bill image.
 
@@ -104,7 +121,7 @@ def process_bill_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dic
         ),
     )
 
-    extracted = json.loads(response.text)
+    extracted = _parse_json_response(response.text)
     return _add_confidence_flags(extracted)
 
 
@@ -132,7 +149,7 @@ def process_bill_with_verification(image_bytes: bytes, mime_type: str = "image/j
         contents=[image_part, verification_prompt],
         config=types.GenerateContentConfig(response_mime_type="application/json"),
     )
-    extracted_2 = json.loads(response.text)
+    extracted_2 = _parse_json_response(response.text)
 
     # Compare line item counts
     count_1 = len(extracted_1.get("line_items", []))
@@ -195,5 +212,5 @@ def process_multi_page_bill(images: list[tuple[bytes, str]]) -> dict:
         ),
     )
 
-    extracted = json.loads(response.text)
+    extracted = _parse_json_response(response.text)
     return _add_confidence_flags(extracted)
