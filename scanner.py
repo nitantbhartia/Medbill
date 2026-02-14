@@ -46,22 +46,43 @@ def _get_client() -> genai.Client:
     return genai.Client(api_key=config.GEMINI_API_KEY)
 
 
+def _coerce_numeric(value):
+    """Safely convert a value to float. Gemini sometimes returns numbers as strings."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
+
+
 def _add_confidence_flags(extracted: dict) -> dict:
-    """Flag items that need user confirmation."""
+    """Normalize numeric fields and flag items that need user confirmation."""
     for item in extracted.get("line_items", []):
+        # Normalize numeric fields that Gemini may return as strings
+        for field in ("charged_amount", "insurance_paid", "insurance_adjustment",
+                      "patient_responsibility"):
+            item[field] = _coerce_numeric(item.get(field))
+        qty = _coerce_numeric(item.get("quantity"))
+        item["quantity"] = int(qty) if qty else 1
+
         item["confidence"] = "high"
 
         if item.get("cpt_code") is None:
             item["confidence"] = "low"
             item["flag"] = "No procedure code found. Can you find a 5-digit code on this line?"
 
-        if item.get("charged_amount") and item["charged_amount"] > config.HIGH_CHARGE_FLAG:
+        if item["charged_amount"] and item["charged_amount"] > config.HIGH_CHARGE_FLAG:
             item["confidence"] = "medium"
             item["flag"] = "This charge seems very high. Please verify."
 
-        if item.get("quantity") and item["quantity"] > config.HIGH_QUANTITY_FLAG:
+        if item["quantity"] > config.HIGH_QUANTITY_FLAG:
             item["confidence"] = "medium"
             item["flag"] = f"Billed for {item['quantity']} units. Is that correct?"
+
+    # Normalize bill-level totals
+    extracted["total_charged"] = _coerce_numeric(extracted.get("total_charged"))
+    extracted["total_patient_owes"] = _coerce_numeric(extracted.get("total_patient_owes"))
 
     return extracted
 
