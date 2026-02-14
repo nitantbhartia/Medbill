@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Your Bill - BillScan{% endblock %}
+
+{% block content %}
+<section class="max-w-2xl mx-auto px-4 py-8 sm:py-12">
+    <div class="text-center mb-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Scan Your Medical Bill</h1>
+        <p class="text-gray-600">Take a photo or upload an image of your bill. We'll extract every charge automatically.</p>
+    </div>
+
+    <form id="scan-form" class="space-y-6" enctype="multipart/form-data">
+        <!-- Image Upload Area -->
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Bill Image(s)
+                <span class="text-red-500">*</span>
+            </label>
+
+            <div id="upload-area"
+                 class="relative border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-brand-400 hover:bg-brand-50/50 transition-colors duration-200">
+                <input type="file"
+                       id="file-input"
+                       name="images"
+                       accept="image/*"
+                       multiple
+                       capture="environment"
+                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"/>
+
+                <div id="upload-placeholder">
+                    <div class="w-16 h-16 bg-brand-100 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-700 font-medium">Tap to take a photo or choose a file</p>
+                    <p class="text-sm text-gray-500 mt-1">Supports JPG, PNG, HEIC. Multiple pages OK.</p>
+                </div>
+            </div>
+
+            <!-- Image Preview Area -->
+            <div id="preview-area" class="mt-4 grid grid-cols-3 gap-3 hidden"></div>
+
+            <!-- Add More Pages -->
+            <button type="button"
+                    id="add-more-btn"
+                    class="mt-3 hidden inline-flex items-center gap-1.5 text-sm text-brand-600 font-medium hover:text-brand-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add more pages
+            </button>
+        </div>
+
+        <!-- Zip Code -->
+        <div>
+            <label for="zip-code" class="block text-sm font-semibold text-gray-700 mb-2">
+                Zip Code
+                <span class="text-red-500">*</span>
+            </label>
+            <p class="text-xs text-gray-500 mb-2">Medicare rates vary by location. Enter your zip code for accurate pricing.</p>
+            <input type="text"
+                   id="zip-code"
+                   name="zip_code"
+                   inputmode="numeric"
+                   pattern="[0-9]{5}"
+                   maxlength="5"
+                   placeholder="e.g. 10001"
+                   required
+                   class="w-full sm:w-48 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"/>
+        </div>
+
+        <!-- Email (Optional) -->
+        <div>
+            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address
+                <span class="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <p class="text-xs text-gray-500 mb-2">We'll send you a copy of your report. No spam, ever.</p>
+            <input type="email"
+                   id="email"
+                   name="email"
+                   placeholder="you@example.com"
+                   class="w-full sm:w-80 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"/>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+            <button type="submit"
+                    id="submit-btn"
+                    disabled
+                    class="w-full sm:w-auto px-8 py-4 bg-brand-600 text-white text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/25 hover:bg-brand-700 disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
+                <span id="submit-text">Analyze My Bill</span>
+                <svg id="submit-spinner" class="hidden animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Processing Status -->
+        <div id="processing-status" class="hidden">
+            <div class="bg-brand-50 border border-brand-200 rounded-lg p-4 flex items-center gap-3">
+                <svg class="animate-spin w-5 h-5 text-brand-600 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                <div>
+                    <p class="text-sm font-medium text-brand-800" id="status-text">Uploading your bill...</p>
+                    <p class="text-xs text-brand-600 mt-0.5">This usually takes 15-30 seconds.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error-display" class="hidden">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <p class="text-sm font-medium text-red-800" id="error-text">Something went wrong.</p>
+                    <p class="text-xs text-red-600 mt-0.5">Please try again or use a clearer image.</p>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const fileInput = document.getElementById('file-input');
+    const previewArea = document.getElementById('preview-area');
+    const addMoreBtn = document.getElementById('add-more-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const processingStatus = document.getElementById('processing-status');
+    const statusText = document.getElementById('status-text');
+    const errorDisplay = document.getElementById('error-display');
+    const errorText = document.getElementById('error-text');
+    const scanForm = document.getElementById('scan-form');
+    const zipCode = document.getElementById('zip-code');
+
+    let selectedFiles = [];
+
+    function updateSubmitState() {
+        const hasFiles = selectedFiles.length > 0;
+        const hasZip = zipCode.value.trim().length === 5;
+        submitBtn.disabled = !(hasFiles && hasZip);
+    }
+
+    function renderPreviews() {
+        previewArea.innerHTML = '';
+
+        if (selectedFiles.length === 0) {
+            previewArea.classList.add('hidden');
+            addMoreBtn.classList.add('hidden');
+            return;
+        }
+
+        previewArea.classList.remove('hidden');
+        addMoreBtn.classList.remove('hidden');
+
+        selectedFiles.forEach(function(file, index) {
+            const div = document.createElement('div');
+            div.className = 'relative group';
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-24 sm:h-32 object-cover rounded-lg border border-gray-200';
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Page ' + (index + 1);
+
+            const badge = document.createElement('span');
+            badge.className = 'absolute top-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded';
+            badge.textContent = 'Page ' + (index + 1);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.addEventListener('click', function() {
+                selectedFiles.splice(index, 1);
+                renderPreviews();
+                updateSubmitState();
+            });
+
+            div.appendChild(img);
+            div.appendChild(badge);
+            div.appendChild(removeBtn);
+            previewArea.appendChild(div);
+        });
+    }
+
+    fileInput.addEventListener('change', function(e) {
+        var files = Array.from(e.target.files || []);
+        files.forEach(function(f) { selectedFiles.push(f); });
+        renderPreviews();
+        updateSubmitState();
+        // Reset file input so same file can be re-selected
+        fileInput.value = '';
+    });
+
+    addMoreBtn.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    zipCode.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        updateSubmitState();
+    });
+
+    scanForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (selectedFiles.length === 0) return;
+
+        // Update UI
+        submitBtn.disabled = true;
+        submitText.textContent = 'Processing...';
+        submitSpinner.classList.remove('hidden');
+        processingStatus.classList.remove('hidden');
+        errorDisplay.classList.add('hidden');
+
+        var formData = new FormData();
+        selectedFiles.forEach(function(file, i) {
+            formData.append('images', file);
+        });
+        formData.append('zip_code', zipCode.value.trim());
+
+        var emailVal = document.getElementById('email').value.trim();
+        if (emailVal) {
+            formData.append('email', emailVal);
+        }
+
+        statusText.textContent = 'Uploading your bill...';
+
+        fetch('/api/scan', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) {
+            statusText.textContent = 'Analyzing line items...';
+            if (!response.ok) {
+                return response.json().then(function(data) {
+                    throw new Error(data.detail || 'Upload failed. Please try again.');
+                });
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.bill_id) {
+                statusText.textContent = 'Done! Redirecting...';
+                window.location.href = '/confirm/' + data.bill_id;
+            } else {
+                throw new Error('No bill ID returned. Please try again.');
+            }
+        })
+        .catch(function(err) {
+            submitBtn.disabled = false;
+            submitText.textContent = 'Analyze My Bill';
+            submitSpinner.classList.add('hidden');
+            processingStatus.classList.add('hidden');
+            errorDisplay.classList.remove('hidden');
+            errorText.textContent = err.message || 'Something went wrong. Please try again.';
+        });
+    });
+})();
+</script>
+{% endblock %}

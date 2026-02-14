@@ -1,0 +1,39 @@
+def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
+    """
+    Find duplicate charges: same CPT code + same date + same quantity + same amount.
+    Only report the first occurrence to avoid double-reporting.
+    """
+    if not item.get("cpt_code"):
+        return None
+
+    matches = [
+        other
+        for other in all_items
+        if other is not item
+        and other.get("cpt_code") == item["cpt_code"]
+        and other.get("date_of_service") == item["date_of_service"]
+        and other.get("quantity") == item["quantity"]
+        and other.get("charged_amount") == item["charged_amount"]
+    ]
+
+    if not matches:
+        return None
+
+    # Only report from the first occurrence (by position in list) to avoid dupes
+    first_index = all_items.index(item)
+    for match in matches:
+        if all_items.index(match) < first_index:
+            return None  # already reported from the earlier item
+
+    return {
+        "type": "duplicate_charge",
+        "severity": "high",
+        "line_item": item,
+        "duplicate_of": matches,
+        "potential_savings": item["charged_amount"],
+        "message": (
+            f"'{item['description']}' appears to be billed {len(matches) + 1} times "
+            f"on {item['date_of_service']}. "
+            f"This could save you ${item['charged_amount']:,.2f}."
+        ),
+    }

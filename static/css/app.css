@@ -1,0 +1,565 @@
+/* ============================================================
+   BillScan - Custom Styles (complement Tailwind CSS)
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   CSS Custom Properties
+   ---------------------------------------------------------- */
+:root {
+  --color-high: #dc2626;       /* red-600 */
+  --color-high-bg: #fef2f2;    /* red-50 */
+  --color-high-border: #fca5a5; /* red-300 */
+
+  --color-medium: #d97706;     /* amber-600 */
+  --color-medium-bg: #fffbeb;  /* amber-50 */
+  --color-medium-border: #fcd34d; /* amber-300 */
+
+  --color-low: #2563eb;        /* blue-600 */
+  --color-low-bg: #eff6ff;     /* blue-50 */
+  --color-low-border: #93c5fd; /* blue-300 */
+
+  --scanner-accent: #6366f1;   /* indigo-500 */
+}
+
+/* ----------------------------------------------------------
+   Loading / Analyzing State Animations
+   ---------------------------------------------------------- */
+
+/* Full-screen overlay shown while the bill is being analyzed */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.loading-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Spinning ring */
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid #e5e7eb;
+  border-top-color: var(--scanner-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pulsing dots ("analyzing" indicator) */
+.analyzing-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.analyzing-dots span {
+  width: 10px;
+  height: 10px;
+  background: var(--scanner-accent);
+  border-radius: 50%;
+  animation: dot-pulse 1.4s ease-in-out infinite both;
+}
+
+.analyzing-dots span:nth-child(2) { animation-delay: 0.16s; }
+.analyzing-dots span:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Skeleton shimmer for placeholder content while loading */
+.skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Fade-in for results once loaded */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide-up entrance for cards */
+.slide-up {
+  animation: slideUp 0.4s ease forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------
+   Severity Badges
+   ---------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-high {
+  color: var(--color-high);
+  background: var(--color-high-bg);
+  border-color: var(--color-high-border);
+}
+
+.badge-medium {
+  color: var(--color-medium);
+  background: var(--color-medium-bg);
+  border-color: var(--color-medium-border);
+}
+
+.badge-low {
+  color: var(--color-low);
+  background: var(--color-low-bg);
+  border-color: var(--color-low-border);
+}
+
+/* Dot indicator inside badge */
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-high .badge-dot { background: var(--color-high); }
+.badge-medium .badge-dot { background: var(--color-medium); }
+.badge-low .badge-dot { background: var(--color-low); }
+
+/* ----------------------------------------------------------
+   Camera Viewfinder Overlay
+   ---------------------------------------------------------- */
+.viewfinder {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+}
+
+.viewfinder video,
+.viewfinder img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Corner brackets */
+.viewfinder-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.viewfinder-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: #fff;
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.85;
+}
+
+.viewfinder-corner--tl { top: 12px; left: 12px;  border-top-width: 3px; border-left-width: 3px;  border-top-left-radius: 8px; }
+.viewfinder-corner--tr { top: 12px; right: 12px; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 8px; }
+.viewfinder-corner--bl { bottom: 12px; left: 12px;  border-bottom-width: 3px; border-left-width: 3px;  border-bottom-left-radius: 8px; }
+.viewfinder-corner--br { bottom: 12px; right: 12px; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 8px; }
+
+/* Scanning line animation */
+.viewfinder-scanline {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--scanner-accent), transparent);
+  opacity: 0.7;
+  animation: scanline 2.5s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0%   { top: 12px; }
+  50%  { top: calc(100% - 14px); }
+  100% { top: 12px; }
+}
+
+/* Upload drop zone */
+.drop-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--scanner-accent);
+  background: #eef2ff;
+}
+
+/* Page thumbnail in multi-page upload */
+.page-thumb {
+  position: relative;
+  display: inline-block;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.page-thumb:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.page-thumb img {
+  display: block;
+  width: 120px;
+  height: 160px;
+  object-fit: cover;
+}
+
+.page-thumb .remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.page-thumb:hover .remove-btn {
+  opacity: 1;
+}
+
+.page-thumb .page-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+/* ----------------------------------------------------------
+   Live Counter - Pulse Animation
+   ---------------------------------------------------------- */
+.live-counter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.live-counter .counter-value {
+  font-weight: 700;
+  transition: transform 0.2s ease;
+}
+
+.live-counter .counter-value.counting {
+  animation: counter-pulse 0.6s ease;
+}
+
+@keyframes counter-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Pulsing live dot next to counter */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: live-pulse 2s ease-in-out infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+  }
+}
+
+/* ----------------------------------------------------------
+   Confirm Page - Inline Editable Line Items
+   ---------------------------------------------------------- */
+.line-item-row {
+  transition: background-color 0.15s ease;
+}
+
+.line-item-row:hover {
+  background-color: #f9fafb;
+}
+
+.line-item-row.editing {
+  background-color: #eef2ff;
+}
+
+.editable-cell {
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.editable-cell:hover {
+  background: #e5e7eb;
+}
+
+.editable-cell input {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--scanner-accent);
+  border-radius: 4px;
+  font-size: inherit;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Confidence indicator */
+.confidence-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.confidence-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.confidence-high   .confidence-bar-fill { background: #22c55e; }
+.confidence-medium .confidence-bar-fill { background: #f59e0b; }
+.confidence-low    .confidence-bar-fill { background: #ef4444; }
+
+/* ----------------------------------------------------------
+   Toast / Flash Messages
+   ---------------------------------------------------------- */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 60;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-success { background: #16a34a; }
+.toast-error   { background: #dc2626; }
+.toast-info    { background: #2563eb; }
+
+/* ----------------------------------------------------------
+   Error Message in Scanner
+   ---------------------------------------------------------- */
+.error-message {
+  background: var(--color-high-bg);
+  border: 1px solid var(--color-high-border);
+  color: var(--color-high);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message.visible {
+  display: flex;
+}
+
+/* ----------------------------------------------------------
+   Print-Friendly Styles
+   ---------------------------------------------------------- */
+@media print {
+  /* Hide non-essential UI */
+  nav,
+  footer,
+  .no-print,
+  .loading-overlay,
+  .toast,
+  button:not(.print-visible),
+  .drop-zone,
+  .page-thumb .remove-btn {
+    display: none !important;
+  }
+
+  /* Reset backgrounds for ink saving */
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Ensure results container fills the page */
+  .results-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Keep badges visible but simplify */
+  .badge {
+    border: 1px solid currentColor !important;
+    background: transparent !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .badge-high  { color: #b91c1c !important; }
+  .badge-medium { color: #b45309 !important; }
+  .badge-low   { color: #1d4ed8 !important; }
+
+  /* Ensure tables don't break across pages awkwardly */
+  table {
+    page-break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Show full URLs for links */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #6b7280;
+  }
+
+  /* Phone script section - keep together */
+  .phone-script {
+    page-break-inside: avoid;
+    border: 1px solid #d1d5db;
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  /* Findings cards */
+  .finding-card {
+    page-break-inside: avoid;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+
+  /* Savings summary */
+  .savings-summary {
+    border: 2px solid #000;
+    padding: 16px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+
+  /* Page footer */
+  @page {
+    margin: 1.5cm;
+  }
+}
+
+/* ----------------------------------------------------------
+   Responsive Tweaks (supplement Tailwind)
+   ---------------------------------------------------------- */
+@media (max-width: 640px) {
+  .page-thumb img {
+    width: 90px;
+    height: 120px;
+  }
+
+  .drop-zone {
+    padding: 1.25rem;
+  }
+
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+}

@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Your Results - BillScan{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <a href="/scan" class="hover:text-brand-600 transition-colors">Scan</a>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-gray-400">Confirm</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-gray-900 font-medium">Results</span>
+    </div>
+
+    <!-- Summary Card -->
+    {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
+    {% set issue_count = data.findings | length if data.findings else 0 %}
+
+    <div class="bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl p-6 sm:p-8 text-white shadow-xl shadow-brand-700/20 mb-8">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                {% if issue_count > 0 %}
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                {% else %}
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {% endif %}
+            </div>
+            <div>
+                {% if issue_count > 0 %}
+                <h1 class="text-2xl sm:text-3xl font-bold mb-1">
+                    We found {{ issue_count }} issue{{ 's' if issue_count != 1 else '' }}.
+                </h1>
+                <p class="text-brand-100 text-lg">
+                    You may be overcharged by
+                    <span class="text-white font-bold text-2xl" id="savings-amount">
+                        $<span id="savings-number">{{ "%.2f" | format(total_savings) }}</span>
+                    </span>
+                </p>
+                {% else %}
+                <h1 class="text-2xl sm:text-3xl font-bold mb-1">
+                    Your bill looks clean.
+                </h1>
+                <p class="text-brand-100 text-lg">
+                    We did not find significant overcharges compared to Medicare rates.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if data.findings and data.findings | length > 0 %}
+    <!-- Finding Cards -->
+    <div class="mb-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Detailed Findings</h2>
+        <div class="space-y-4">
+            {% for finding in data.findings %}
+            <div class="bg-white border rounded-xl p-5 shadow-sm
+                {% if finding.severity == 'high' %}
+                    border-red-200
+                {% elif finding.severity == 'medium' %}
+                    border-yellow-200
+                {% else %}
+                    border-blue-200
+                {% endif %}
+            ">
+                <div class="flex items-start gap-3">
+                    <!-- Severity Badge -->
+                    <div class="flex-shrink-0 mt-0.5">
+                        {% if finding.severity == 'high' %}
+                        <span class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            High
+                        </span>
+                        {% elif finding.severity == 'medium' %}
+                        <span class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-yellow-700 bg-yellow-100 border border-yellow-200 px-2.5 py-1 rounded-full">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            Medium
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-blue-700 bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-full">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            Low
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Finding Content -->
+                    <div class="flex-1 min-w-0">
+                        <p class="text-gray-900 font-medium text-sm sm:text-base">
+                            {{ finding.message }}
+                        </p>
+
+                        {% if finding.details %}
+                        <p class="text-gray-500 text-sm mt-1">{{ finding.details }}</p>
+                        {% endif %}
+
+                        {% if finding.cpt_code %}
+                        <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">CPT: {{ finding.cpt_code }}</span>
+                            {% if finding.billed_amount is defined %}
+                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Billed: ${{ "%.2f" | format(finding.billed_amount) }}</span>
+                            {% endif %}
+                            {% if finding.medicare_rate is defined %}
+                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Medicare: ${{ "%.2f" | format(finding.medicare_rate) }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Potential Savings -->
+                    {% if finding.potential_savings %}
+                    <div class="flex-shrink-0 text-right">
+                        <div class="text-xs text-gray-500">Potential Savings</div>
+                        <div class="text-lg font-bold
+                            {% if finding.severity == 'high' %}
+                                text-red-600
+                            {% elif finding.severity == 'medium' %}
+                                text-yellow-600
+                            {% else %}
+                                text-blue-600
+                            {% endif %}
+                        ">
+                            ${{ "%.2f" | format(finding.potential_savings) }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- What To Do Next -->
+    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mb-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">What To Do Next</h2>
+        <ol class="space-y-4">
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                <div>
+                    <p class="font-medium text-gray-900">Request an itemized bill</p>
+                    <p class="text-sm text-gray-600 mt-0.5">
+                        Call your provider's billing department and ask for a fully itemized bill with CPT codes.
+                        You have the legal right to this document.
+                    </p>
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                <div>
+                    <p class="font-medium text-gray-900">Call and negotiate using the script below</p>
+                    <p class="text-sm text-gray-600 mt-0.5">
+                        Use our ready-made phone script tailored to your specific findings. Be polite but firm, and reference Medicare rates.
+                    </p>
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                <div>
+                    <p class="font-medium text-gray-900">If unresolved, file a complaint</p>
+                    <p class="text-sm text-gray-600 mt-0.5">
+                        Contact your state's Attorney General or Insurance Commissioner. You can also submit a complaint
+                        to the <a href="https://www.cms.gov" target="_blank" rel="noopener" class="text-brand-600 underline hover:text-brand-700">CMS No Surprises Help Desk</a>.
+                    </p>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Phone Script -->
+    {% if phone_script %}
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-lg font-bold text-gray-900">Your Phone Script</h2>
+                <p class="text-sm text-gray-500">Read this when you call the billing department</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 sm:p-5">
+            <div class="prose prose-sm max-w-none text-gray-700 whitespace-pre-line" id="phone-script-text">{{ phone_script }}</div>
+        </div>
+
+        <button type="button"
+                id="copy-script-btn"
+                class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+            </svg>
+            <span id="copy-btn-text">Copy to Clipboard</span>
+        </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Email Report CTA -->
+    <div class="bg-brand-50 border border-brand-200 rounded-2xl p-6 sm:p-8 text-center">
+        <h2 class="text-lg font-bold text-gray-900 mb-2">Get a copy of this report</h2>
+        <p class="text-sm text-gray-600 mb-4">
+            We'll email you a PDF with all findings, the phone script, and action steps.
+        </p>
+        <form id="email-report-form" class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <input type="email"
+                   id="report-email"
+                   name="email"
+                   placeholder="you@example.com"
+                   required
+                   class="w-full sm:w-72 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"/>
+            <button type="submit"
+                    id="send-report-btn"
+                    class="w-full sm:w-auto px-6 py-3 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span id="send-report-text">Email My Report</span>
+            </button>
+        </form>
+        <div id="email-success" class="hidden mt-3 text-sm text-green-700 font-medium">
+            Report sent! Check your inbox.
+        </div>
+        <div id="email-error" class="hidden mt-3 text-sm text-red-600 font-medium">
+            Could not send report. Please try again.
+        </div>
+    </div>
+
+    <!-- Scan Another -->
+    <div class="text-center mt-8">
+        <a href="/scan"
+           class="text-brand-600 font-medium hover:text-brand-700 transition-colors text-sm">
+            Scan another bill
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // Copy phone script to clipboard
+    var copyBtn = document.getElementById('copy-script-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            var scriptText = document.getElementById('phone-script-text');
+            if (scriptText) {
+                navigator.clipboard.writeText(scriptText.textContent.trim()).then(function() {
+                    var btnText = document.getElementById('copy-btn-text');
+                    btnText.textContent = 'Copied!';
+                    setTimeout(function() {
+                        btnText.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                });
+            }
+        });
+    }
+
+    // Email report
+    var emailForm = document.getElementById('email-report-form');
+    if (emailForm) {
+        emailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var email = document.getElementById('report-email').value.trim();
+            var sendBtn = document.getElementById('send-report-btn');
+            var sendText = document.getElementById('send-report-text');
+            var successMsg = document.getElementById('email-success');
+            var errorMsg = document.getElementById('email-error');
+
+            sendBtn.disabled = true;
+            sendText.textContent = 'Sending...';
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+
+            fetch('/api/email-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bill_id: '{{ data.bill.id if data and data.bill else "" }}',
+                    email: email
+                })
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Send failed');
+                return response.json();
+            })
+            .then(function() {
+                successMsg.classList.remove('hidden');
+                sendText.textContent = 'Sent!';
+            })
+            .catch(function() {
+                errorMsg.classList.remove('hidden');
+                sendBtn.disabled = false;
+                sendText.textContent = 'Email My Report';
+            });
+        });
+    }
+})();
+</script>
+{% endblock %}

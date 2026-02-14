@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}BillScan - See What's Overcharged on Your Medical Bill{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-b from-brand-50 to-white">
+    <div class="max-w-4xl mx-auto px-4 py-12 sm:py-20 text-center">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+            Scan your medical bill with your phone.
+            <span class="text-brand-600">See what's overcharged in 30 seconds.</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            We compare every line item on your bill against Medicare rates from CMS.gov
+            to find billing errors and overcharges.
+        </p>
+
+        <!-- CTA Button -->
+        <a href="/scan"
+           class="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 text-white text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/25 hover:bg-brand-700 hover:shadow-xl hover:shadow-brand-700/25 transform hover:-translate-y-0.5 transition-all duration-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Scan Your Bill Now
+        </a>
+        <p class="mt-3 text-sm text-gray-500">Free to use. No account required.</p>
+    </div>
+</section>
+
+<!-- Live Stats Counter -->
+<section class="bg-white border-y border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+                <div class="text-2xl sm:text-3xl font-bold text-brand-700" id="stat-scanned">
+                    {{ stats.bills_scanned | int | default(0) }}
+                </div>
+                <div class="text-xs sm:text-sm text-gray-500 mt-1">Bills Scanned</div>
+            </div>
+            <div>
+                <div class="text-2xl sm:text-3xl font-bold text-brand-700" id="stat-found">
+                    ${{ stats.total_found | int | default(0) }}
+                </div>
+                <div class="text-xs sm:text-sm text-gray-500 mt-1">In Overcharges Found</div>
+            </div>
+            <div>
+                <div class="text-2xl sm:text-3xl font-bold text-brand-700" id="stat-savings">
+                    ${{ stats.avg_savings | int | default(0) }}
+                </div>
+                <div class="text-xs sm:text-sm text-gray-500 mt-1">Avg. Savings per Bill</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="bg-gray-50 py-12 sm:py-16">
+    <div class="max-w-4xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-10">
+            How It Works
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
+                <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <div class="text-sm font-semibold text-brand-600 mb-1">Step 1</div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Snap a Photo</h3>
+                <p class="text-sm text-gray-600">
+                    Take a picture of your medical bill or upload a photo from your gallery. We support multi-page bills.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
+                <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                </div>
+                <div class="text-sm font-semibold text-brand-600 mb-1">Step 2</div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">We Analyze It</h3>
+                <p class="text-sm text-gray-600">
+                    Our system extracts every charge and compares it against Medicare reimbursement rates from CMS.gov.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
+                <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="text-sm font-semibold text-brand-600 mb-1">Step 3</div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">See Your Savings</h3>
+                <p class="text-sm text-gray-600">
+                    Get a clear report of overcharges with a ready-to-use phone script to negotiate your bill down.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Signals -->
+<section class="bg-white py-12 sm:py-16">
+    <div class="max-w-4xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-10">
+            Why Trust BillScan?
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="flex gap-4 p-4 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Official Government Data</h3>
+                    <p class="text-sm text-gray-600 mt-1">
+                        We use Medicare Physician Fee Schedule data published by CMS.gov, the same data hospitals use.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-4 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Your Privacy is Protected</h3>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Bill images are processed securely and are never stored permanently. We do not sell your data.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-4 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Results in 30 Seconds</h3>
+                    <p class="text-sm text-gray-600 mt-1">
+                        No waiting. Snap your bill and get an instant analysis with actionable savings opportunities.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-4 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Negotiation Scripts Included</h3>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Get a personalized phone script so you know exactly what to say when calling your provider.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom CTA -->
+        <div class="text-center mt-12">
+            <a href="/scan"
+               class="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 text-white text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/25 hover:bg-brand-700 hover:shadow-xl transition-all duration-200">
+                Scan Your Bill Now
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animate stat counters on page load
+    function animateCounter(elementId, target, prefix) {
+        prefix = prefix || '';
+        const el = document.getElementById(elementId);
+        if (!el || target <= 0) return;
+
+        const duration = 1500;
+        const startTime = performance.now();
+
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(eased * target);
+            el.textContent = prefix + current.toLocaleString();
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        animateCounter('stat-scanned', {{ stats.bills_scanned | int | default(0) }});
+        animateCounter('stat-found', {{ stats.total_found | int | default(0) }}, '$');
+        animateCounter('stat-savings', {{ stats.avg_savings | int | default(0) }}, '$');
+    });
+</script>
+{% endblock %}
