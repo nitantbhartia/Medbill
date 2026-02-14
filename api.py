@@ -15,12 +15,12 @@ router = APIRouter(prefix="/api")
 
 @router.post("/scan")
 async def scan_bill(
-    files: list[UploadFile] = File(...),
+    images: list[UploadFile] = File(...),
     zip_code: str = Form("00000"),
     email: str = Form(""),
 ):
     """Scan one or more bill images, extract line items, and analyze."""
-    if not files:
+    if not images:
         raise HTTPException(400, "No files uploaded")
 
     # Get or create user
@@ -38,16 +38,20 @@ async def scan_bill(
                 user_id = cursor.lastrowid
 
     # Extract bill data
-    if len(files) == 1:
-        image_bytes = await files[0].read()
-        mime_type = files[0].content_type or "image/jpeg"
-        extracted = scanner.process_bill_image(image_bytes, mime_type)
-    else:
-        images = []
-        for f in files:
-            img = await f.read()
-            images.append((img, f.content_type or "image/jpeg"))
-        extracted = scanner.process_multi_page_bill(images)
+    try:
+        if len(images) == 1:
+            image_bytes = await images[0].read()
+            mime_type = images[0].content_type or "image/jpeg"
+            extracted = scanner.process_bill_image(image_bytes, mime_type)
+        else:
+            image_list = []
+            for f in images:
+                img = await f.read()
+                image_list.append((img, f.content_type or "image/jpeg"))
+            extracted = scanner.process_multi_page_bill(image_list)
+    except Exception as e:
+        log.error("Scan failed: %s", e)
+        raise HTTPException(500, f"Failed to process bill image: {e}")
 
     # Analyze
     analysis = analyzer.analyze_bill(extracted, zip_code)

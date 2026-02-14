@@ -253,9 +253,10 @@
             return response.json();
         })
         .then(function(data) {
-            if (data.bill_id) {
+            var billId = data.bill_id || (data.data && data.data.bill_id);
+            if (billId) {
                 statusText.textContent = 'Done! Redirecting...';
-                window.location.href = '/confirm/' + data.bill_id;
+                window.location.href = '/confirm/' + billId;
             } else {
                 throw new Error('No bill ID returned. Please try again.');
             }
