@@ -53,6 +53,32 @@ def get_data_freshness() -> dict:
             ),
         }
 
+        # OPPS rates
+        row = db.execute("SELECT MAX(effective_year) as yr FROM hospital_opps_rates").fetchone()
+        latest_opps_year = row["yr"] if row else None
+        opps_fresh = latest_opps_year is not None and latest_opps_year >= current_year
+        sources["opps_rates"] = {
+            "name": "Medicare OPPS Rates",
+            "latest_year": latest_opps_year,
+            "expected_frequency": "Annual (January 1)",
+            "fresh": opps_fresh,
+            "warning": None if opps_fresh else (
+                f"OPPS rates are from {latest_opps_year or 'N/A'}. "
+                f"Current year is {current_year}. Hospital rates may be outdated."
+            ),
+        }
+
+        # Procedure benchmarks
+        row = db.execute("SELECT COUNT(*) as cnt FROM procedure_benchmarks").fetchone()
+        benchmark_count = row["cnt"] if row else 0
+        sources["procedure_benchmarks"] = {
+            "name": "Procedure Benchmarks",
+            "count": benchmark_count,
+            "expected_frequency": "As new data becomes available",
+            "fresh": benchmark_count > 0,
+            "warning": None if benchmark_count > 0 else "No procedure benchmarks loaded.",
+        }
+
         # Hospital profiles
         row = db.execute("SELECT COUNT(*) as cnt FROM hospital_profiles").fetchone()
         profile_count = row["cnt"] if row else 0
@@ -70,6 +96,12 @@ def get_data_freshness() -> dict:
 
         row = db.execute("SELECT COUNT(*) as cnt FROM ncci_edits").fetchone()
         sources["ncci_row_count"] = row["cnt"] if row else 0
+
+        row = db.execute("SELECT COUNT(*) as cnt FROM hospital_opps_rates").fetchone()
+        sources["opps_row_count"] = row["cnt"] if row else 0
+
+        row = db.execute("SELECT COUNT(*) as cnt FROM procedure_benchmarks").fetchone()
+        sources["benchmark_row_count"] = row["cnt"] if row else 0
 
     return sources
 

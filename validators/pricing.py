@@ -93,6 +93,34 @@ def validate_geo_match(user_zip: str, provider_address: str | None) -> str | Non
     )
 
 
+def get_opps_rate(cpt_code: str, date_of_service: str | None = None) -> float | None:
+    """Look up the Medicare OPPS (hospital outpatient) rate for a CPT code."""
+    target_year = None
+    if date_of_service:
+        try:
+            target_year = datetime.strptime(date_of_service, "%Y-%m-%d").year
+        except ValueError:
+            pass
+
+    with get_db() as db:
+        if target_year:
+            row = db.execute(
+                "SELECT national_payment_rate FROM hospital_opps_rates "
+                "WHERE cpt_code = ? AND effective_year = ?",
+                (cpt_code, target_year),
+            ).fetchone()
+            if row and row["national_payment_rate"]:
+                return row["national_payment_rate"]
+
+        row = db.execute(
+            "SELECT national_payment_rate FROM hospital_opps_rates "
+            "WHERE cpt_code = ? AND national_payment_rate IS NOT NULL "
+            "ORDER BY effective_year DESC LIMIT 1",
+            (cpt_code,),
+        ).fetchone()
+        return row["national_payment_rate"] if row else None
+
+
 def check_pricing(item: dict, locality: str) -> dict | None:
     """Compare a line item's charge against Medicare rates."""
     if not item.get("cpt_code") or not item.get("charged_amount"):
@@ -115,7 +143,20 @@ def check_pricing(item: dict, locality: str) -> dict | None:
 
     savings = item["charged_amount"] - (medicare_rate * config.MEDICARE_MARKUP_THRESHOLD)
 
-    return {
+    opps_rate = get_opps_rate(item["cpt_code"], item.get("date_of_service"))
+
+    message = (
+        f"You were charged ${item['charged_amount']:,.2f} for {item['description']}. "
+        f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
+        f"That's a {markup:.1f}x markup."
+    )
+    if opps_rate:
+        total_medicare = medicare_rate + opps_rate
+        message += (
+            f" (Medicare total with hospital fee: ${total_medicare:,.2f})"
+        )
+
+    result = {
         "type": "price_markup",
         "severity": severity,
         "line_item": item,
@@ -123,9 +164,10 @@ def check_pricing(item: dict, locality: str) -> dict | None:
         "medicare_rate": medicare_rate,
         "markup_multiple": round(markup, 1),
         "potential_savings": max(0, round(savings, 2)),
-        "message": (
-            f"You were charged ${item['charged_amount']:,.2f} for {item['description']}. "
-            f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
-            f"That's a {markup:.1f}x markup."
-        ),
+        "message": message,
     }
+    if opps_rate:
+        result["opps_rate"] = opps_rate
+        result["total_medicare"] = round(medicare_rate + opps_rate, 2)
+
+    return result

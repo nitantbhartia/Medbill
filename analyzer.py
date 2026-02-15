@@ -8,6 +8,7 @@ from validators.unbundling import check_unbundling
 from validators.upcoding import check_upcoding
 from validators.nsa import check_no_surprises_act
 from validators.extraction import validate_extraction, validate_cpt_description
+from validators.benchmarks import check_benchmark
 from data_freshness import get_data_freshness_warnings
 
 log = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ CONFIDENCE_RULES = {
     "upcoding": "medium",  # can't confirm without medical record
     "quantity_flag": "low",  # might be correct
     "no_surprises_act": "low",  # needs more context to confirm
+    "benchmark_outlier": "medium",  # statistical comparison, informational
 }
 
 
@@ -47,6 +49,9 @@ def _assign_confidence(finding: dict) -> str:
         return "medium"
 
     if ftype == "upcoding":
+        return "medium"
+
+    if ftype == "benchmark_outlier":
         return "medium"
 
     return "low"
@@ -132,7 +137,12 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
                 }
             )
 
-    # CHECK 6: No Surprises Act
+        # CHECK 6: Regional benchmark comparison
+        benchmark_finding = check_benchmark(item, zip_code)
+        if benchmark_finding:
+            findings.append(benchmark_finding)
+
+    # CHECK 7: No Surprises Act
     nsa_finding = check_no_surprises_act(extracted_data)
     if nsa_finding:
         findings.append(nsa_finding)
