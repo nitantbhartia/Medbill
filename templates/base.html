@@ -1,112 +1,65 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}BillScan - Medical Bill Analyzer{% endblock %}</title>
+    <title>{% block title %}BillScan{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
+                        accent: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
                         }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                        mono: ['SF Mono', 'Menlo', 'Consolas', 'monospace'],
                     }
                 }
             }
         }
     </script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="/static/css/app.css"/>
     {% block head %}{% endblock %}
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col antialiased">
+<body class="bg-white text-gray-900 min-h-screen flex flex-col antialiased">
 
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 no-underline">
-                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="text-xl font-bold text-brand-700 leading-tight block">BillScan</span>
-                    <span class="text-xs text-gray-500 leading-tight block">Medical Bill Analyzer</span>
-                </div>
+    <header class="border-b border-gray-100">
+        <div class="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
+            <a href="/" class="text-lg font-semibold tracking-tight text-gray-900 no-underline">
+                BillScan
             </a>
-            <nav class="hidden sm:flex items-center gap-4 text-sm text-gray-600">
-                <a href="/" class="hover:text-brand-600 transition-colors">Home</a>
-                <a href="/scan" class="hover:text-brand-600 transition-colors">Scan a Bill</a>
-            </nav>
-            <a href="/scan" class="sm:hidden inline-flex items-center px-3 py-1.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors">
-                Scan
+            <a href="/scan"
+               class="text-sm font-medium text-accent-700 hover:text-accent-800 transition-colors">
+                Scan a bill
             </a>
         </div>
     </header>
 
-    <!-- Credibility Bar -->
-    <div class="bg-brand-900 text-brand-200 text-xs text-center py-1.5 px-4">
-        <span class="inline-flex items-center gap-1.5 flex-wrap justify-center">
-            <svg class="w-3.5 h-3.5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
-            Data from CMS.gov &bull; Medicare rates updated Jan 2026
-        </span>
-    </div>
-
-    <!-- Main Content -->
     <main class="flex-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-4xl mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
-                <div>
-                    <div class="font-semibold text-gray-900 mb-2">BillScan</div>
-                    <p class="text-gray-500 text-xs leading-relaxed">
-                        Helping patients understand and negotiate their medical bills using
-                        publicly available Medicare pricing data.
-                    </p>
-                </div>
-                <div>
-                    <div class="font-semibold text-gray-900 mb-2">Resources</div>
-                    <ul class="space-y-1 text-gray-500 text-xs">
-                        <li><a href="https://www.cms.gov" target="_blank" rel="noopener" class="hover:text-brand-600 transition-colors">CMS.gov</a></li>
-                        <li><a href="#" class="hover:text-brand-600 transition-colors">How It Works</a></li>
-                        <li><a href="#" class="hover:text-brand-600 transition-colors">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="font-semibold text-gray-900 mb-2">Disclaimer</div>
-                    <p class="text-gray-500 text-xs leading-relaxed">
-                        BillScan is an informational tool and does not provide medical, legal,
-                        or financial advice. Always verify findings with your provider.
-                    </p>
-                </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-100 text-center text-xs text-gray-400">
-                &copy; 2026 BillScan. All rights reserved.
-            </div>
+    <footer class="border-t border-gray-100 mt-auto">
+        <div class="max-w-3xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+            <span>&copy; 2026 BillScan. Not medical or legal advice.</span>
+            <span>Data from <a href="https://www.cms.gov" target="_blank" rel="noopener" class="underline hover:text-gray-600">CMS.gov</a></span>
         </div>
     </footer>
 
+    <script src="/static/js/app.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
