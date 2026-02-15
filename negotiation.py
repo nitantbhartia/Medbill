@@ -257,71 +257,8 @@ Return JSON:
 
 
 def generate_phone_script(bill_id: int) -> str:
-    """Generate a phone script from bill findings."""
-    with get_db() as db:
-        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
-        findings = db.execute(
-            "SELECT * FROM findings WHERE bill_id = ? ORDER BY "
-            "CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END",
-            (bill_id,),
-        ).fetchall()
-
-    if not bill or not findings:
-        return ""
-
-    bill = dict(bill)
-    findings = [dict(f) for f in findings]
-
-    lines = [
-        f'"Hi, I\'m calling about my account.',
-        f"I've reviewed my itemized bill and I have a few questions.",
-        "",
-    ]
-
-    for i, finding in enumerate(findings[:3], 1):
-        details = json.loads(finding["details"]) if finding.get("details") else {}
-
-        if finding["finding_type"] == "duplicate_charge":
-            li = details.get("line_item", {})
-            lines.append(
-                f"First, I see {li.get('description', 'a charge')} "
-                f"(CPT {li.get('cpt_code', 'N/A')}) appears to be billed twice "
-                f"on {li.get('date_of_service', 'the same date')}. "
-                f"Can you confirm whether this service was actually performed twice?"
-            )
-        elif finding["finding_type"] == "price_markup":
-            li = details.get("line_item", {})
-            lines.append(
-                f"I was charged ${details.get('charged', 0):,.2f} for "
-                f"{li.get('description', 'a service')} (CPT {li.get('cpt_code', 'N/A')}). "
-                f"The Medicare reimbursement rate for this in my area is "
-                f"${details.get('medicare_rate', 0):,.2f}. "
-                f"That's a {details.get('markup_multiple', 0)}x markup. "
-                f"Can you explain this charge?"
-            )
-        elif finding["finding_type"] == "upcoding":
-            li = details.get("line_item", {})
-            lines.append(
-                f"I was billed for a Level {details.get('billed_level', '')} visit, "
-                f"but my visit may have been a Level {details.get('likely_level', '')}. "
-                f"Can you review the documentation for this visit level?"
-            )
-        else:
-            lines.append(finding["message"])
-
-        lines.append("")
-
-    lines.append(
-        "I'd like to request a corrected bill that addresses these items. "
-        "If we can't resolve this, I'll be filing a complaint with my state's "
-        'Attorney General\'s office and the hospital\'s patient advocate."'
-    )
-
-    return "\n".join(lines)
-
-
-def generate_message_script(bill_id: int) -> str:
-    """Generate a written message for sending via patient portal, text, or secure message."""
+    """Generate a phone script with prep tips, finding-specific talking points,
+    benchmark/OPPS context, and objection-handling guidance."""
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
         findings = db.execute(
@@ -340,58 +277,279 @@ def generate_message_script(bill_id: int) -> str:
         for f in findings if f.get("details")
     )
 
+    provider = bill.get("provider_name", "the provider")
+
     lines = [
-        "Subject: Billing Inquiry - Request for Itemized Review",
+        "BEFORE YOU CALL",
+        "---------------",
+        "Have ready: your itemized bill, insurance EOB, and a pen to take notes.",
+        "Ask for: the billing department, then a supervisor if the first person can't help.",
+        "Record: the name of everyone you speak with and any reference numbers.",
         "",
-        "Dear Billing Department,",
-        "",
-        f"I am writing regarding my account with {bill.get('provider_name', 'your facility')}. "
-        "After reviewing my itemized bill, I found the following issues:",
+        "WHAT TO SAY",
+        "-----------",
+        f"\"Hi, I'm calling about my account with {provider}. "
+        "I've reviewed my itemized bill and I have some specific questions.",
         "",
     ]
 
     for i, finding in enumerate(findings[:5], 1):
         details = json.loads(finding["details"]) if finding.get("details") else {}
         li = details.get("line_item", {})
+        lines.append(f"POINT {i}:")
+        lines.extend(_phone_lines_for_finding(finding, details, li))
+        lines.append("")
 
-        if finding["finding_type"] == "duplicate_charge":
-            lines.append(
-                f"{i}. Possible duplicate: {li.get('description', 'A service')} "
-                f"(CPT {li.get('cpt_code', 'N/A')}) appears billed more than once "
-                f"on {li.get('date_of_service', 'the same date')}."
+    if total_savings > 0:
+        lines.append(
+            f"Altogether, I believe these adjustments total approximately "
+            f"${total_savings:,.2f}. I'd like to request a corrected bill.\""
+        )
+    else:
+        lines.append(
+            "I'd like to request a corrected bill that addresses these items.\""
+        )
+    lines.append("")
+
+    lines.extend([
+        "IF THEY PUSH BACK",
+        "------------------",
+        "If they say \"that's our standard rate\":",
+        "  \"I understand, but I've compared this to Medicare rates and what other "
+        "hospitals charge. Can we discuss a fair-price adjustment?\"",
+        "",
+        "If they say they can't adjust:",
+        "  \"Can I speak with a supervisor? I'd also like to know about any "
+        "financial assistance or prompt-pay discount programs.\"",
+        "",
+        "If they refuse entirely:",
+        "  \"I'll be requesting this in writing and filing a complaint with "
+        "my state Attorney General's office and your patient advocate.\"",
+    ])
+
+    return "\n".join(lines)
+
+
+def _phone_lines_for_finding(finding: dict, details: dict, li: dict) -> list[str]:
+    """Return talking-point lines for a single finding."""
+    ftype = finding["finding_type"]
+
+    if ftype == "duplicate_charge":
+        return [
+            f"I see {li.get('description', 'a charge')} "
+            f"(CPT {li.get('cpt_code', 'N/A')}) appears to be billed twice "
+            f"on {li.get('date_of_service', 'the same date')}. "
+            f"Can you confirm whether this was actually performed twice? "
+            f"If not, that's ${details.get('potential_savings', 0):,.2f} that should be removed.",
+        ]
+
+    if ftype == "price_markup":
+        point = (
+            f"I was charged ${details.get('charged', 0):,.2f} for "
+            f"{li.get('description', 'a service')} (CPT {li.get('cpt_code', 'N/A')}). "
+            f"The Medicare rate for this is ${details.get('medicare_rate', 0):,.2f} "
+            f"-- that's a {details.get('markup_multiple', 0)}x markup."
+        )
+        if details.get("total_medicare"):
+            point += (
+                f" Even including the hospital facility fee, Medicare's total is "
+                f"${details['total_medicare']:,.2f}."
             )
-        elif finding["finding_type"] == "price_markup":
-            lines.append(
-                f"{i}. Pricing concern: {li.get('description', 'A service')} "
-                f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
-                f"${details.get('charged', 0):,.2f}, while the Medicare rate "
-                f"for my area is ${details.get('medicare_rate', 0):,.2f} "
-                f"({details.get('markup_multiple', 0)}x markup)."
-            )
-        elif finding["finding_type"] == "upcoding":
-            lines.append(
-                f"{i}. Coding question: I was billed for a Level "
-                f"{details.get('billed_level', '')} visit, but my visit "
-                f"may qualify as Level {details.get('likely_level', '')}."
-            )
-        else:
-            lines.append(f"{i}. {finding['message']}")
+        point += " Can you explain this charge or offer a fair-price adjustment?"
+        return [point]
+
+    if ftype == "unbundling":
+        return [
+            f"I see both {details.get('code_1', 'a comprehensive code')} and "
+            f"{details.get('code_2', 'a component code')} were billed together. "
+            f"Under NCCI coding rules, {details.get('code_2', 'the component code')} "
+            f"is included in {details.get('code_1', 'the comprehensive code')} "
+            f"and shouldn't be billed separately. "
+            f"That's ${details.get('potential_savings', 0):,.2f} that should be removed.",
+        ]
+
+    if ftype == "upcoding":
+        return [
+            f"I was billed for a Level {details.get('billed_level', '')} ER visit, "
+            f"but my symptoms and treatment may be more consistent with "
+            f"Level {details.get('likely_level', '')}. "
+            f"The difference is ${details.get('potential_savings', 0):,.2f}. "
+            f"Can you review the documentation to confirm the visit level?",
+        ]
+
+    if ftype == "quantity_flag":
+        return [
+            f"I'm seeing {li.get('quantity', '')} units of "
+            f"'{li.get('description', 'a service')}' on my bill. "
+            f"Can you confirm that quantity is correct? "
+            f"If only 1 was administered, the extra charges should be removed.",
+        ]
+
+    if ftype == "benchmark_outlier":
+        return [
+            f"My charge of ${details.get('charged', 0):,.2f} for "
+            f"{li.get('description', 'this service')} is above what most hospitals charge. "
+            f"The median charge nationally is ${details.get('median_charged', 0):,.2f} "
+            f"based on {details.get('sample_size', 'thousands of')} bills. "
+            f"Can we discuss a more reasonable price?",
+        ]
+
+    if ftype == "no_surprises_act":
+        return [
+            "I believe this bill may be subject to the No Surprises Act. "
+            "If I received emergency care or care from an out-of-network provider "
+            "at an in-network facility, I should not be balance-billed above "
+            "the in-network rate. Can you review this?",
+        ]
+
+    return [finding["message"]]
+
+
+def generate_message_script(bill_id: int) -> str:
+    """Generate a written message for patient portal, text, or secure message.
+
+    Covers all finding types with specific language, includes benchmark and
+    OPPS context, and references applicable regulations.
+    """
+    with get_db() as db:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        findings = db.execute(
+            "SELECT * FROM findings WHERE bill_id = ? ORDER BY "
+            "CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END",
+            (bill_id,),
+        ).fetchall()
+
+    if not bill or not findings:
+        return ""
+
+    bill = dict(bill)
+    findings = [dict(f) for f in findings]
+    total_savings = sum(
+        json.loads(f["details"]).get("potential_savings", 0)
+        for f in findings if f.get("details")
+    )
+    has_nsa = any(f["finding_type"] == "no_surprises_act" for f in findings)
+
+    lines = [
+        "Subject: Billing Inquiry - Request for Itemized Review",
+        "",
+        "Dear Billing Department,",
+        "",
+        f"I am writing regarding my account with {bill.get('provider_name', 'your facility')}. "
+        "After carefully reviewing my itemized bill, I have identified the "
+        "following concerns that I believe require correction:",
+        "",
+    ]
+
+    for i, finding in enumerate(findings[:5], 1):
+        details = json.loads(finding["details"]) if finding.get("details") else {}
+        li = details.get("line_item", {})
+        lines.append(_message_line_for_finding(i, finding, details, li))
 
     lines.append("")
+
+    if has_nsa:
+        lines.append(
+            "I would also like to note that under the No Surprises Act (effective "
+            "January 1, 2022), patients who receive emergency services or care "
+            "from out-of-network providers at in-network facilities are protected "
+            "from balance billing above the in-network rate."
+        )
+        lines.append("")
+
     lines.append(
-        "I respectfully request a line-by-line review of these charges "
-        "and a corrected bill. I would also appreciate information about "
-        "any financial assistance or prompt-pay discount programs available."
+        "I respectfully request a line-by-line review of these charges and a "
+        "corrected bill. I would also appreciate information about any financial "
+        "assistance programs, prompt-pay discounts, or payment plan options."
     )
 
     if total_savings > 0:
         lines.append("")
         lines.append(
-            f"Based on my review, the potential adjustment is approximately "
+            f"Based on my review, the total potential adjustment is approximately "
             f"${total_savings:,.2f}."
         )
 
     lines.append("")
-    lines.append("Thank you for your time. I look forward to your response.")
+    lines.append(
+        "Thank you for your attention to this matter. I look forward to your "
+        "response within 30 days."
+    )
 
     return "\n".join(lines)
+
+
+def _message_line_for_finding(num: int, finding: dict, details: dict, li: dict) -> str:
+    """Return a single numbered line for a written message."""
+    ftype = finding["finding_type"]
+
+    if ftype == "duplicate_charge":
+        return (
+            f"{num}. Possible duplicate: {li.get('description', 'A service')} "
+            f"(CPT {li.get('cpt_code', 'N/A')}) appears billed more than once "
+            f"on {li.get('date_of_service', 'the same date')}. "
+            f"If this is an error, the adjustment would be "
+            f"${details.get('potential_savings', 0):,.2f}."
+        )
+
+    if ftype == "price_markup":
+        line = (
+            f"{num}. Pricing concern: {li.get('description', 'A service')} "
+            f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
+            f"${details.get('charged', 0):,.2f}, while the Medicare rate "
+            f"for my area is ${details.get('medicare_rate', 0):,.2f} "
+            f"({details.get('markup_multiple', 0)}x markup)."
+        )
+        if details.get("total_medicare"):
+            line += (
+                f" Including the OPPS facility fee, Medicare's total allowable "
+                f"is ${details['total_medicare']:,.2f}."
+            )
+        return line
+
+    if ftype == "unbundling":
+        return (
+            f"{num}. Coding concern: {details.get('code_1', 'A comprehensive code')} "
+            f"and {details.get('code_2', 'a component code')} were billed together. "
+            f"Per NCCI Procedure-to-Procedure edits, "
+            f"{details.get('code_2', 'the component code')} is included in "
+            f"{details.get('code_1', 'the comprehensive code')} and should "
+            f"not be separately reimbursed. Adjustment: "
+            f"${details.get('potential_savings', 0):,.2f}."
+        )
+
+    if ftype == "upcoding":
+        return (
+            f"{num}. Coding question: I was billed for a Level "
+            f"{details.get('billed_level', '')} visit (CPT {li.get('cpt_code', 'N/A')}), "
+            f"but my visit may qualify as Level {details.get('likely_level', '')}. "
+            f"I request a review of the clinical documentation to confirm "
+            f"the visit level."
+        )
+
+    if ftype == "quantity_flag":
+        return (
+            f"{num}. Quantity question: {li.get('description', 'A service')} "
+            f"was billed for {li.get('quantity', '')} units. Please confirm "
+            f"this quantity is accurate."
+        )
+
+    if ftype == "benchmark_outlier":
+        return (
+            f"{num}. Above-market pricing: {li.get('description', 'A service')} "
+            f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
+            f"${details.get('charged', 0):,.2f}. The national median hospital "
+            f"charge for this procedure is ${details.get('median_charged', 0):,.2f} "
+            f"(based on {details.get('sample_size', 'N/A')} claims). I request "
+            f"a fair-price adjustment."
+        )
+
+    if ftype == "no_surprises_act":
+        return (
+            f"{num}. No Surprises Act: This bill may include balance billing "
+            f"for emergency or out-of-network services at an in-network facility. "
+            f"Under federal law, I should not owe more than my in-network "
+            f"cost-sharing amount."
+        )
+
+    return f"{num}. {finding['message']}"

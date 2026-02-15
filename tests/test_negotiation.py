@@ -15,12 +15,19 @@ from negotiation import (  # noqa: E402
     approve_and_send,
     generate_phone_script,
     generate_message_script,
+    _phone_lines_for_finding,
+    _message_line_for_finding,
     PROHIBITED_PATTERNS,
     NEGOTIATION_STAGES,
 )
 from analyzer import analyze_bill, save_bill_and_findings  # noqa: E402
 from db import get_db  # noqa: E402
-from tests.conftest import SAMPLE_BILL  # noqa: E402
+from tests.conftest import (  # noqa: E402
+    SAMPLE_BILL,
+    SAMPLE_BILL_WITH_DUPLICATES,
+    SAMPLE_BILL_WITH_UNBUNDLING,
+    SAMPLE_BILL_EMERGENCY_HIGH_OOP,
+)
 
 
 class TestValidateOutboundEmail:
@@ -160,6 +167,45 @@ class TestGeneratePhoneScript:
         script = generate_phone_script(bill_id)
         assert "$" in script or "CPT" in script
 
+    def test_script_has_prep_section(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "BEFORE YOU CALL" in script
+        assert "itemized bill" in script.lower()
+
+    def test_script_has_objection_handling(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "IF THEY PUSH BACK" in script
+        assert "supervisor" in script.lower()
+
+    def test_script_includes_provider_name(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "Memorial Regional Hospital" in script
+
+    def test_script_includes_total_savings(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "adjustments total approximately" in script
+
+    def test_script_shows_up_to_five_findings(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        # Should have numbered POINT markers
+        assert "POINT 1:" in script
+
+    def test_duplicate_bill_mentions_billed_twice(self):
+        analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
+        script = generate_phone_script(bill_id)
+        assert "billed twice" in script.lower() or "performed twice" in script.lower()
+
     def test_no_findings_returns_empty(self):
         with get_db() as db:
             cursor = db.execute(
@@ -194,6 +240,30 @@ class TestGenerateMessageScript:
         assert "respectfully" in script.lower() or "request" in script.lower()
         assert "Subject:" in script
 
+    def test_script_requests_response_deadline(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert "30 days" in script
+
+    def test_script_mentions_financial_assistance(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert "financial assistance" in script.lower()
+
+    def test_duplicate_bill_mentions_duplicate(self):
+        analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
+        script = generate_message_script(bill_id)
+        assert "duplicate" in script.lower()
+
+    def test_unbundling_bill_mentions_ncci(self):
+        analysis = analyze_bill(SAMPLE_BILL_WITH_UNBUNDLING, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_UNBUNDLING, analysis)
+        script = generate_message_script(bill_id)
+        assert "NCCI" in script
+
     def test_no_findings_returns_empty(self):
         with get_db() as db:
             cursor = db.execute(
@@ -204,6 +274,150 @@ class TestGenerateMessageScript:
 
     def test_nonexistent_bill_returns_empty(self):
         assert generate_message_script(99999) == ""
+
+
+class TestPhoneLinesForFinding:
+    """Unit tests for _phone_lines_for_finding with all 7 finding types."""
+
+    def test_duplicate_charge(self):
+        finding = {"finding_type": "duplicate_charge", "message": "dup"}
+        details = {"potential_savings": 850.00}
+        li = {"description": "Chest X-ray", "cpt_code": "71046", "date_of_service": "2026-01-10"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        assert any("billed twice" in l for l in lines)
+        assert any("$850.00" in l for l in lines)
+
+    def test_price_markup_with_opps(self):
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {
+            "charged": 4500.00, "medicare_rate": 227.00,
+            "markup_multiple": 19.8, "total_medicare": 1000.00,
+        }
+        li = {"description": "ED visit", "cpt_code": "99285"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "19.8x" in text
+        assert "$1,000.00" in text
+        assert "facility fee" in text
+
+    def test_price_markup_without_opps(self):
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {"charged": 350.00, "medicare_rate": 14.49, "markup_multiple": 24.2}
+        li = {"description": "CMP", "cpt_code": "80053"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "24.2x" in text
+        assert "facility fee" not in text
+
+    def test_unbundling(self):
+        finding = {"finding_type": "unbundling", "message": "unbundle"}
+        details = {"code_1": "80053", "code_2": "80048", "potential_savings": 250.00}
+        li = {}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "NCCI" in text
+        assert "80053" in text
+        assert "80048" in text
+
+    def test_upcoding(self):
+        finding = {"finding_type": "upcoding", "message": "upcode"}
+        details = {"billed_level": "5", "likely_level": "3", "potential_savings": 200.00}
+        li = {}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "Level 5" in text
+        assert "Level 3" in text
+
+    def test_quantity_flag(self):
+        finding = {"finding_type": "quantity_flag", "message": "qty"}
+        details = {}
+        li = {"description": "CBC", "quantity": 3}
+        lines = _phone_lines_for_finding(finding, details, li)
+        assert any("3 units" in l for l in lines)
+
+    def test_benchmark_outlier(self):
+        finding = {"finding_type": "benchmark_outlier", "message": "bench"}
+        details = {"charged": 8000.00, "median_charged": 2500.00, "sample_size": 3800}
+        li = {"description": "ED visit"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "median" in text
+        assert "3800" in text
+
+    def test_no_surprises_act(self):
+        finding = {"finding_type": "no_surprises_act", "message": "nsa"}
+        lines = _phone_lines_for_finding(finding, {}, {})
+        text = " ".join(lines)
+        assert "No Surprises Act" in text
+
+    def test_unknown_type_uses_message(self):
+        finding = {"finding_type": "something_new", "message": "custom message here"}
+        lines = _phone_lines_for_finding(finding, {}, {})
+        assert lines == ["custom message here"]
+
+
+class TestMessageLineForFinding:
+    """Unit tests for _message_line_for_finding with all 7 finding types."""
+
+    def test_duplicate_charge(self):
+        finding = {"finding_type": "duplicate_charge", "message": "dup"}
+        details = {"potential_savings": 850.00}
+        li = {"description": "Chest X-ray", "cpt_code": "71046", "date_of_service": "2026-01-10"}
+        line = _message_line_for_finding(1, finding, details, li)
+        assert line.startswith("1.")
+        assert "duplicate" in line.lower()
+        assert "$850.00" in line
+
+    def test_price_markup_with_opps(self):
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {
+            "charged": 4500.00, "medicare_rate": 227.00,
+            "markup_multiple": 19.8, "total_medicare": 1000.00,
+        }
+        li = {"description": "ED visit", "cpt_code": "99285"}
+        line = _message_line_for_finding(2, finding, details, li)
+        assert "OPPS" in line
+        assert "$1,000.00" in line
+
+    def test_unbundling_references_ncci(self):
+        finding = {"finding_type": "unbundling", "message": "unbundle"}
+        details = {"code_1": "80053", "code_2": "80048", "potential_savings": 250.00}
+        line = _message_line_for_finding(3, finding, details, {})
+        assert "NCCI" in line
+        assert "$250.00" in line
+
+    def test_upcoding(self):
+        finding = {"finding_type": "upcoding", "message": "upcode"}
+        details = {"billed_level": "5", "likely_level": "3"}
+        li = {"cpt_code": "99285"}
+        line = _message_line_for_finding(1, finding, details, li)
+        assert "Level 5" in line
+        assert "documentation" in line.lower()
+
+    def test_quantity_flag(self):
+        finding = {"finding_type": "quantity_flag", "message": "qty"}
+        li = {"description": "CBC", "quantity": 3}
+        line = _message_line_for_finding(1, finding, {}, li)
+        assert "3 units" in line
+
+    def test_benchmark_outlier(self):
+        finding = {"finding_type": "benchmark_outlier", "message": "bench"}
+        details = {"charged": 8000.00, "median_charged": 2500.00, "sample_size": 3800}
+        li = {"description": "ED visit", "cpt_code": "99285"}
+        line = _message_line_for_finding(1, finding, details, li)
+        assert "median" in line
+        assert "fair-price" in line.lower()
+
+    def test_no_surprises_act(self):
+        finding = {"finding_type": "no_surprises_act", "message": "nsa"}
+        line = _message_line_for_finding(1, finding, {}, {})
+        assert "No Surprises Act" in line
+        assert "federal law" in line.lower()
+
+    def test_unknown_type_uses_message(self):
+        finding = {"finding_type": "other", "message": "custom issue"}
+        line = _message_line_for_finding(4, finding, {}, {})
+        assert line == "4. custom issue"
 
 
 class TestNegotiationStages:
