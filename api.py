@@ -388,7 +388,14 @@ async def delete_bill(bill_id: int):
     deleted = delete_bill_data(bill_id)
     if not deleted:
         raise HTTPException(404, "Bill not found")
-    log_audit(action="delete_bill", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    # Bill row is deleted above, so avoid FK violations in audit_logs.bill_id.
+    log_audit(
+        action="delete_bill",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=None,
+        metadata={"deleted_bill_id": bill_id},
+    )
     return {"status": "ok", "data": {"deleted": True}}
 
 
