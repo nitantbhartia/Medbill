@@ -72,7 +72,26 @@ def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
     if charged > p75 * 1.5:
         severity = "medium"
 
-    return {
+    patient_resp = item.get("patient_responsibility")
+
+    if patient_resp is not None:
+        message = (
+            f"Your provider charged ${charged:,.2f} for "
+            f"{item.get('description', 'this service')}; after insurance, "
+            f"your responsibility is ${patient_resp:,.2f}. "
+            f"The median hospital charge nationally is ${median:,.2f} "
+            f"(based on {benchmark.get('sample_size', 'N/A')} bills)."
+        )
+    else:
+        message = (
+            f"Your charge of ${charged:,.2f} for "
+            f"{item.get('description', 'this service')} "
+            f"is {percentile_label} nationally. "
+            f"The median hospital charge is ${median:,.2f} "
+            f"(based on {benchmark.get('sample_size', 'N/A')} bills)."
+        )
+
+    result = {
         "type": "benchmark_outlier",
         "severity": severity,
         "line_item": item,
@@ -83,10 +102,8 @@ def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
         "sample_size": benchmark.get("sample_size", 0),
         "region": benchmark.get("region", "national"),
         "potential_savings": round(max(0, charged - median), 2),
-        "message": (
-            f"Your charge of ${charged:,.2f} for {item.get('description', 'this service')} "
-            f"is {percentile_label} nationally. "
-            f"The median hospital charge is ${median:,.2f} "
-            f"(based on {benchmark.get('sample_size', 'N/A')} bills)."
-        ),
+        "message": message,
     }
+    if patient_resp is not None:
+        result["patient_responsibility"] = patient_resp
+    return result

@@ -81,26 +81,49 @@ async def analyze_confirmed(bill_id: int, payload: dict):
 
         zip_code = bill["zip_code"] or "00000"
 
+        # Preserve insurance data from original line items before replacing
+        original_items = db.execute(
+            "SELECT cpt_code, date_of_service, insurance_paid, "
+            "insurance_adjustment, patient_responsibility "
+            "FROM line_items WHERE bill_id = ?",
+            (bill_id,),
+        ).fetchall()
+        insurance_by_cpt = {}
+        for orig in original_items:
+            if orig["cpt_code"]:
+                insurance_by_cpt[orig["cpt_code"]] = {
+                    "insurance_paid": orig["insurance_paid"],
+                    "insurance_adjustment": orig["insurance_adjustment"],
+                    "patient_responsibility": orig["patient_responsibility"],
+                    "date_of_service": orig["date_of_service"],
+                }
+
         # Update line items with user-confirmed data
         db.execute("DELETE FROM line_items WHERE bill_id = ?", (bill_id,))
         db.execute("DELETE FROM findings WHERE bill_id = ?", (bill_id,))
 
         items = payload.get("line_items", [])
         for item in items:
+            ins = insurance_by_cpt.get(item.get("cpt_code"), {})
             db.execute(
                 "INSERT INTO line_items (bill_id, cpt_code, description, "
-                "charged_amount, quantity, extraction_confidence) "
-                "VALUES (?, ?, ?, ?, ?, 'high')",
+                "charged_amount, quantity, date_of_service, insurance_paid, "
+                "insurance_adjustment, patient_responsibility, extraction_confidence) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'high')",
                 (
                     bill_id,
                     item.get("cpt_code"),
                     item.get("description"),
                     item.get("billed_amount"),
                     item.get("quantity", 1),
+                    ins.get("date_of_service"),
+                    ins.get("insurance_paid"),
+                    ins.get("insurance_adjustment"),
+                    ins.get("patient_responsibility"),
                 ),
             )
 
-    # Re-analyze with confirmed items
+    # Re-analyze with confirmed items, including insurance context
     extracted = {
         "provider_name": bill["provider_name"],
         "provider_address": bill["provider_address"],
@@ -113,6 +136,7 @@ async def analyze_confirmed(bill_id: int, payload: dict):
                 "description": item.get("description"),
                 "charged_amount": item.get("billed_amount"),
                 "quantity": item.get("quantity", 1),
+                **insurance_by_cpt.get(item.get("cpt_code"), {}),
             }
             for item in items
         ],

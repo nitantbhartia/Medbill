@@ -90,6 +90,10 @@ def generate_dispute_email(negotiation_id: int) -> dict:
             "SELECT * FROM findings WHERE bill_id = ?", (neg["bill_id"],)
         ).fetchall()
 
+        line_items = db.execute(
+            "SELECT * FROM line_items WHERE bill_id = ?", (neg["bill_id"],)
+        ).fetchall()
+
         previous_messages = db.execute(
             "SELECT * FROM negotiation_messages WHERE negotiation_id = ? ORDER BY id",
             (negotiation_id,),
@@ -97,6 +101,7 @@ def generate_dispute_email(negotiation_id: int) -> dict:
 
     neg = dict(neg)
     findings = [dict(f) for f in findings]
+    items = [dict(li) for li in line_items]
     stage = neg["current_stage"]
     stage_config = NEGOTIATION_STAGES.get(stage, NEGOTIATION_STAGES["stage_1"])
 
@@ -104,6 +109,31 @@ def generate_dispute_email(negotiation_id: int) -> dict:
         dict(m) for m in previous_messages if m["direction"] == "inbound"
     ]
     last_response = hospital_responses[-1]["body"] if hospital_responses else None
+
+    insured = _is_insurance_processed(items)
+
+    insurance_context = ""
+    if insured:
+        insurance_context = """
+INSURANCE STATUS: Insurance has already processed this claim. The patient's
+responsibility (deductible/copay/coinsurance) has been determined.
+
+IMPORTANT FRAMING:
+- Do NOT argue that the hospital should charge the Medicare rate
+- Do NOT compare the billed amount to the Medicare rate as the main argument
+- DO acknowledge that insurance has processed the claim
+- DO reference the patient's actual out-of-pocket responsibility
+- DO ask for billing errors to be corrected and resubmitted to insurance
+- DO ask about prompt-pay discounts and financial assistance programs
+- DO use Medicare rates only as context for what is reasonable, not as a demand
+"""
+    else:
+        insurance_context = """
+INSURANCE STATUS: Self-pay / no insurance processing detected.
+- DO compare charges to Medicare rates and median hospital prices
+- DO ask for a self-pay or cash rate
+- DO request specific dollar adjustments based on fair pricing
+"""
 
     prompt = f"""You are a medical billing advocate writing on behalf of a patient.
 
@@ -115,8 +145,8 @@ TONE: {stage_config['tone']}
 
 PATIENT ACCOUNT: {neg['account_number']}
 HOSPITAL: {neg['hospital_name']}
-ORIGINAL BILL: ${neg['original_amount']:,.2f}
-
+PATIENT BALANCE: ${neg['original_amount']:,.2f}
+{insurance_context}
 FINDINGS:
 {json.dumps(findings, indent=2, default=str)}
 
@@ -126,9 +156,8 @@ RULES:
 - NEVER threaten lawsuits or legal action
 - NEVER give medical opinions or dispute medical necessity
 - NEVER use words: illegal, fraud, scam, criminal, demand, require
-- DO cite specific CPT codes and Medicare rates
+- DO cite specific CPT codes and Medicare rates as context
 - DO reference applicable regulations (informational, not threatening)
-- DO request specific dollar adjustments
 - DO ask about financial assistance programs
 - Keep under 400 words, professional and specific
 

@@ -5,6 +5,9 @@
 {% block content %}
 {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
 {% set issue_count = data.findings | length if data.findings else 0 %}
+{% set insured = (data.line_items | selectattr('insurance_paid') | list | length > 0) or
+                 (data.line_items | selectattr('patient_responsibility') | list | length > 0) %}
+{% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
 
 <section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
     <!-- Breadcrumb -->
@@ -22,10 +25,18 @@
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">
             {{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} found
         </h1>
+        {% if insured and patient_balance > 0 %}
+        <p class="text-lg tabular-nums">
+            <span class="text-gray-500">Your balance:</span>
+            <span class="font-semibold text-gray-900">${{ "%.2f" | format(patient_balance) }}</span>
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Correcting billing errors or requesting discounts could reduce this amount.</p>
+        {% else %}
         <p class="text-lg tabular-nums">
             <span class="text-gray-500">Potential savings:</span>
             <span class="font-semibold text-gray-900">${{ "%.2f" | format(total_savings) }}</span>
         </p>
+        {% endif %}
         {% else %}
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">
             Your bill looks clean
@@ -95,6 +106,29 @@
     <div class="mb-10 border border-gray-200 rounded-md p-5">
         <h2 class="text-sm font-semibold text-gray-900 mb-3">Next steps</h2>
         <ol class="space-y-3 text-sm text-gray-600">
+            {% if insured %}
+            <li class="flex gap-2.5">
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">1</span>
+                <div>
+                    <span class="font-medium text-gray-900">Review your EOB</span>
+                    &mdash; compare your insurance Explanation of Benefits with the itemized bill to spot any errors.
+                </div>
+            </li>
+            <li class="flex gap-2.5">
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">2</span>
+                <div>
+                    <span class="font-medium text-gray-900">Call billing</span>
+                    &mdash; use the phone script below. Ask them to verify charges and about prompt-pay discounts.
+                </div>
+            </li>
+            <li class="flex gap-2.5">
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">3</span>
+                <div>
+                    <span class="font-medium text-gray-900">Escalate if needed</span>
+                    &mdash; ask for a supervisor, patient advocate, or file a complaint with your state Attorney General.
+                </div>
+            </li>
+            {% else %}
             <li class="flex gap-2.5">
                 <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">1</span>
                 <div>
@@ -106,7 +140,7 @@
                 <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">2</span>
                 <div>
                     <span class="font-medium text-gray-900">Call and negotiate</span>
-                    &mdash; use the phone script below. Reference Medicare rates and be polite but firm.
+                    &mdash; use the phone script below. Ask for the self-pay or cash rate.
                 </div>
             </li>
             <li class="flex gap-2.5">
@@ -117,6 +151,7 @@
                     <a href="https://www.cms.gov" target="_blank" rel="noopener" class="text-accent-700 underline hover:text-accent-800">CMS No Surprises Help Desk</a>.
                 </div>
             </li>
+            {% endif %}
         </ol>
     </div>
 
