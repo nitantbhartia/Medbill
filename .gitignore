@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 *.pyo
 data/app.db
+data/cms/raw/
+data/cms/processed/
 .env
 *.egg-info/
 dist/
