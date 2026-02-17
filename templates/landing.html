@@ -138,6 +138,49 @@
             gap: 20px;
         }
 
+        .cta-row {
+            margin-top: 28px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .primary-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 0;
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 12px 20px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .primary-cta:hover {
+            transform: scale(1.03);
+        }
+
+        .secondary-note {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .proof-note {
+            margin-top: 14px;
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            max-width: 58ch;
+        }
+
         .metric {
             display: flex;
             flex-direction: column;
@@ -216,6 +259,13 @@
             transform: scale(1.02);
         }
 
+        .upload-zone.drag-active,
+        .upload-zone:focus-within {
+            border-color: var(--text-black);
+            background: #EDEDED;
+            transform: scale(1.02);
+        }
+
         .upload-icon {
             width: 72px;
             height: 72px;
@@ -253,6 +303,58 @@
             inset: 0;
             opacity: 0;
             cursor: pointer;
+        }
+
+        .upload-actions {
+            margin-top: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 0;
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 14px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-guidance {
+            margin-top: 12px;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .trust-strip {
+            margin-top: 18px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .trust-pill {
+            background: var(--accent-grey);
+            color: var(--text-black);
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            padding: 7px 10px;
+        }
+
+        .status-text {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            min-height: 1.2rem;
+            text-align: center;
         }
 
         .analysis-preview {
@@ -392,6 +494,15 @@
                 right: 24px;
             }
             .blob--1 { opacity: 0.5; }
+            .upload-card {
+                padding: 28px 20px;
+            }
+            .upload-zone {
+                height: 220px;
+            }
+            .metric-block {
+                margin-top: 36px;
+            }
         }
     </style>
 </head>
@@ -418,6 +529,10 @@
             </div>
             <h1>your health is personal. your debt shouldn't be.</h1>
             <p>We automatically compare every line item against federal Medicare rates (CMS.gov) to expose overcharging.</p>
+            <div class="cta-row">
+                <button type="button" class="primary-cta" id="startAudit">Start Free Audit</button>
+                <span class="secondary-note">No credit card required</span>
+            </div>
 
             <div class="metric-block">
                 <div class="metric">
@@ -429,11 +544,12 @@
                     <span class="metric-lbl">avg. detected markup</span>
                 </div>
             </div>
+            <p class="proof-note">Metrics based on recent internal analyses. Results vary by provider, region, and bill complexity.</p>
         </section>
 
         <section class="col-interaction">
             <div class="upload-card">
-                <div class="upload-zone" id="dropZone">
+                <div class="upload-zone" id="dropZone" role="button" tabindex="0" aria-label="Upload medical bill files">
                     <input id="fileInput" class="upload-file-input" type="file" accept="image/*,.pdf" multiple>
                     <div class="upload-icon">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -443,6 +559,9 @@
                     </div>
                     <div class="upload-text-main">Drop your bill here</div>
                     <div class="upload-text-sub">PDF or Image (max 20MB)</div>
+                    <button type="button" class="upload-actions" id="browseFiles">Browse Files</button>
+                    <div class="upload-guidance">We extract line items, compare to CMS rates, then generate a dispute-ready summary.</div>
+                    <div class="status-text" id="uploadStatus" aria-live="polite"></div>
                 </div>
 
                 <div class="analysis-preview">
@@ -480,6 +599,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="trust-strip">
+                    <span class="trust-pill">PHI Redaction Enabled</span>
+                    <span class="trust-pill">CMS Rates Referenced</span>
+                    <span class="trust-pill">Encrypted In Transit</span>
+                </div>
             </div>
         </section>
     </main>
@@ -488,6 +612,13 @@
         (function () {
             var dropZone = document.getElementById("dropZone");
             var fileInput = document.getElementById("fileInput");
+            var browseFiles = document.getElementById("browseFiles");
+            var startAudit = document.getElementById("startAudit");
+            var uploadStatus = document.getElementById("uploadStatus");
+
+            function setStatus(message) {
+                uploadStatus.textContent = message || "";
+            }
 
             function updateDropzoneAnalyzing() {
                 dropZone.style.borderColor = "var(--accent-lime)";
@@ -499,6 +630,7 @@
                         </svg>
                     </div>
                     <div class="upload-text-main">Analyzing...</div>
+                    <div class="upload-text-sub">OCR and validation in progress</div>
                 `;
             }
 
@@ -513,6 +645,7 @@
                     formData.append("images", files[i]);
                 }
                 formData.append("zip_code", "00000");
+                setStatus("Uploading and parsing files...");
 
                 updateDropzoneAnalyzing();
 
@@ -533,31 +666,47 @@
                         throw new Error("No bill ID returned.");
                     })
                     .catch(function () {
+                        setStatus("Upload failed. Please try again.");
                         window.location.reload();
                     });
             }
 
             dropZone.addEventListener("dragover", function (e) {
                 e.preventDefault();
-                dropZone.style.borderColor = "var(--text-black)";
-                dropZone.style.background = "#EDEDED";
-                dropZone.style.transform = "scale(1.02)";
+                dropZone.classList.add("drag-active");
+                setStatus("Release to upload");
             });
 
             dropZone.addEventListener("dragleave", function (e) {
                 e.preventDefault();
-                dropZone.style.borderColor = "#D1D5DB";
-                dropZone.style.background = "var(--accent-grey)";
-                dropZone.style.transform = "scale(1)";
+                dropZone.classList.remove("drag-active");
+                setStatus("");
             });
 
             dropZone.addEventListener("drop", function (e) {
                 e.preventDefault();
+                dropZone.classList.remove("drag-active");
                 uploadFiles(e.dataTransfer.files);
             });
 
             fileInput.addEventListener("change", function (e) {
                 uploadFiles(e.target.files);
+            });
+
+            browseFiles.addEventListener("click", function (e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+
+            startAudit.addEventListener("click", function () {
+                fileInput.click();
+            });
+
+            dropZone.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    fileInput.click();
+                }
             });
         })();
     </script>
