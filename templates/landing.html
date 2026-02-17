@@ -1,138 +1,565 @@
-{% extends "base.html" %}
-
-{% block title %}BillScan - Check Your Medical Bill{% endblock %}
-
-{% block content %}
-<section class="max-w-3xl mx-auto px-5 pt-16 sm:pt-24 pb-12">
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-snug max-w-xl">
-        Upload your medical bill.<br>
-        See if you're overpaying.
-    </h1>
-    <p class="mt-4 text-lg text-gray-500 max-w-lg leading-relaxed">
-        We compare every charge against Medicare rates published by CMS.gov
-        and flag anything that looks off. Takes about 30 seconds.
-    </p>
-
-    <div class="mt-8 flex flex-col sm:flex-row items-start gap-3">
-        <a href="/scan"
-           class="inline-flex items-center px-5 py-2.5 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-            Scan your bill
-        </a>
-        <span class="text-sm text-gray-400 self-center">Free. No account needed.</span>
-    </div>
-</section>
-
-<section class="border-t border-gray-100">
-    <div class="max-w-3xl mx-auto px-5 py-14 sm:py-20">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
-            <div>
-                <div class="text-sm font-semibold text-accent-700 mb-1.5">1. Upload</div>
-                <p class="text-sm text-gray-600 leading-relaxed">
-                    Take a photo of your bill or upload a file. We extract every line item automatically using AI.
-                </p>
-            </div>
-            <div>
-                <div class="text-sm font-semibold text-accent-700 mb-1.5">2. Compare</div>
-                <p class="text-sm text-gray-600 leading-relaxed">
-                    Each charge is compared against Medicare reimbursement rates, regional benchmarks, and known billing patterns.
-                </p>
-            </div>
-            <div>
-                <div class="text-sm font-semibold text-accent-700 mb-1.5">3. Negotiate</div>
-                <p class="text-sm text-gray-600 leading-relaxed">
-                    Get a report with specific findings and a ready-to-use phone script to call your provider.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% if stats and stats.bills_scanned %}
-<section class="border-t border-gray-100">
-    <div class="max-w-3xl mx-auto px-5 py-10">
-        <div class="flex flex-wrap gap-8 sm:gap-16 text-sm">
-            <div>
-                <span class="text-2xl font-semibold text-gray-900 tabular-nums" id="stat-scanned">{{ stats.bills_scanned | int }}</span>
-                <span class="text-gray-400 ml-1.5">bills scanned</span>
-            </div>
-            <div>
-                <span class="text-2xl font-semibold text-gray-900 tabular-nums" id="stat-found">${{ stats.total_found | int }}</span>
-                <span class="text-gray-400 ml-1.5">in overcharges found</span>
-            </div>
-            <div>
-                <span class="text-2xl font-semibold text-gray-900 tabular-nums" id="stat-savings">${{ stats.avg_savings | int }}</span>
-                <span class="text-gray-400 ml-1.5">avg savings</span>
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<section class="border-t border-gray-100 bg-gray-50">
-    <div class="max-w-3xl mx-auto px-5 py-14 sm:py-20">
-        <h2 class="text-lg font-semibold text-gray-900 mb-6">What we check</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-sm text-gray-600">
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>Price markup vs. Medicare Physician Fee Schedule rates</span>
-            </div>
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>Duplicate charges for the same service</span>
-            </div>
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>Unbundling (procedures split to inflate cost)</span>
-            </div>
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>Upcoding (billing a more expensive code than performed)</span>
-            </div>
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>Regional benchmarks (how your charge compares to others)</span>
-            </div>
-            <div class="flex gap-3 items-baseline">
-                <span class="text-accent-600 flex-shrink-0">&bull;</span>
-                <span>No Surprises Act protections</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="border-t border-gray-100">
-    <div class="max-w-3xl mx-auto px-5 py-14 text-center">
-        <p class="text-gray-500 text-sm mb-4">Your data stays private. Bill images are processed and never stored permanently.</p>
-        <a href="/scan"
-           class="inline-flex items-center px-5 py-2.5 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-            Scan your bill
-        </a>
-    </div>
-</section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-{% if stats and stats.bills_scanned %}
-(function() {
-    function animateCounter(id, target, prefix) {
-        prefix = prefix || '';
-        var el = document.getElementById(id);
-        if (!el || target <= 0) return;
-        var duration = 1200;
-        var start = performance.now();
-        function tick(now) {
-            var p = Math.min((now - start) / duration, 1);
-            var eased = 1 - Math.pow(1 - p, 3);
-            el.textContent = prefix + Math.floor(eased * target).toLocaleString();
-            if (p < 1) requestAnimationFrame(tick);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Bill Audit</title>
+    <style>
+        :root {
+            --bg-canvas: #E0E2E5;
+            --card-white: #FFFFFF;
+            --text-black: #1A1A1A;
+            --accent-lime: #D2F635;
+            --accent-grey: #F4F5F7;
+            --text-secondary: #6B7280;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-xl: 48px;
+            --radius-lg: 32px;
+            --radius-md: 24px;
+            --radius-sm: 100px;
         }
-        requestAnimationFrame(tick);
-    }
-    animateCounter('stat-scanned', {{ stats.bills_scanned | int | default(0) }});
-    animateCounter('stat-found', {{ stats.total_found | int | default(0) }}, '$');
-    animateCounter('stat-savings', {{ stats.avg_savings | int | default(0) }}, '$');
-})();
-{% endif %}
-</script>
-{% endblock %}
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-black);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            width: 100vw;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .blob-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.8;
+        }
+
+        .blob--1 {
+            width: 50vw;
+            height: 50vw;
+            background: var(--card-white);
+            top: -20%;
+            left: -10%;
+        }
+
+        .blob--2 {
+            width: 40vw;
+            height: 40vw;
+            background: #CED3D9;
+            bottom: -10%;
+            right: -10%;
+        }
+
+        .layout-grid {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px;
+            gap: 80px;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 5rem;
+            line-height: 0.95;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 40px;
+            color: var(--text-black);
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 120px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='10' viewBox='0 0 40 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 10 0 20 5 T 40 5' stroke='%231A1A1A' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            margin-top: 24px;
+            opacity: 0.8;
+        }
+
+        p {
+            font-size: 1.25rem;
+            line-height: 1.5;
+            font-weight: 500;
+            max-width: 40ch;
+            color: var(--text-secondary);
+        }
+
+        .label-micro {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+            display: inline-block;
+            font-weight: 700;
+            color: var(--text-black);
+            background: var(--accent-lime);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .col-narrative {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric-block {
+            margin-top: 60px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            background: var(--card-white);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            min-width: 160px;
+        }
+
+        .metric-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 1;
+            color: var(--text-black);
+        }
+
+        .metric-lbl {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .col-interaction {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .upload-card {
+            background: var(--card-white);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid var(--card-white);
+        }
+
+        .upload-card::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: var(--accent-lime);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            filter: blur(40px);
+            opacity: 0.2;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .upload-zone {
+            background: var(--accent-grey);
+            border: 2px dashed #D1D5DB;
+            border-radius: var(--radius-lg);
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--text-black);
+            background: #EDEDED;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--text-black);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--card-white);
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-zone:hover .upload-icon {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .upload-text-main {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-black);
+            letter-spacing: -0.02em;
+        }
+
+        .upload-text-sub {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .upload-file-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .analysis-preview {
+            margin-top: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--accent-grey);
+            border-radius: var(--radius-md);
+            transition: transform 0.2s;
+        }
+
+        .list-item:hover {
+            transform: translateX(5px);
+            background: #EDEDED;
+        }
+
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-left {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .item-index {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-black);
+            background: var(--card-white);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-name {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text-black);
+        }
+
+        .item-status {
+            font-size: 0.75rem;
+            padding: 6px 14px;
+            background: var(--card-white);
+            color: var(--text-black);
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-status.alert {
+            background: var(--accent-lime);
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-black);
+            border-radius: 50%;
+        }
+
+        .nav-bar {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-black);
+        }
+
+        .logo svg {
+            width: 24px;
+            height: auto;
+            color: var(--text-black);
+        }
+
+        .menu-trigger {
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--text-black);
+            color: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+
+        .menu-trigger:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 1024px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+                padding: 100px 24px 40px 24px;
+                gap: 40px;
+            }
+            h1 { font-size: 3.5rem; }
+            .nav-bar {
+                left: 24px;
+                right: 24px;
+            }
+            .blob--1 { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob-container">
+        <div class="blob blob--1"></div>
+        <div class="blob blob--2"></div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="/" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            fairbill.
+        </a>
+        <a href="/scan" class="menu-trigger">menu</a>
+    </nav>
+
+    <main class="layout-grid">
+        <section class="col-narrative">
+            <div>
+                <span class="label-micro">Medical Bill Audit</span>
+            </div>
+            <h1>your health is personal. your debt shouldn't be.</h1>
+            <p>We automatically compare every line item against federal Medicare rates (CMS.gov) to expose overcharging.</p>
+
+            <div class="metric-block">
+                <div class="metric">
+                    <span class="metric-val">30s</span>
+                    <span class="metric-lbl">avg. analysis time</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-val">40%</span>
+                    <span class="metric-lbl">avg. detected markup</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-interaction">
+            <div class="upload-card">
+                <div class="upload-zone" id="dropZone">
+                    <input id="fileInput" class="upload-file-input" type="file" accept="image/*,.pdf" multiple>
+                    <div class="upload-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="upload-text-main">Drop your bill here</div>
+                    <div class="upload-text-sub">PDF or Image (max 20MB)</div>
+                </div>
+
+                <div class="analysis-preview">
+                    <span class="label-micro" style="margin-bottom: 16px; background: transparent; padding: 0;">Live Detection Preview</span>
+
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-index">1</span>
+                            <span class="item-name">CT Scan / Chest</span>
+                        </div>
+                        <div class="item-status alert">
+                            <span class="dot"></span>
+                            4x Markup
+                        </div>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-index">2</span>
+                            <span class="item-name">Tylenol (Acetaminophen)</span>
+                        </div>
+                        <div class="item-status alert">
+                            <span class="dot"></span>
+                            Flagged
+                        </div>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-index">3</span>
+                            <span class="item-name">Room &amp; Board / ICU</span>
+                        </div>
+                        <div class="item-status">
+                            Fair Price
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            var dropZone = document.getElementById("dropZone");
+            var fileInput = document.getElementById("fileInput");
+
+            function updateDropzoneAnalyzing() {
+                dropZone.style.borderColor = "var(--accent-lime)";
+                dropZone.style.background = "var(--accent-lime)";
+                dropZone.innerHTML = `
+                    <div class="upload-icon" style="background: var(--text-black); color: var(--accent-lime)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="upload-text-main">Analyzing...</div>
+                `;
+            }
+
+            function uploadFiles(files) {
+                if (!files || files.length === 0) return;
+                var formData = new FormData();
+                for (var i = 0; i < files.length; i++) {
+                    if (files[i].size > (20 * 1024 * 1024)) {
+                        window.alert("Each file must be 20MB or less.");
+                        return;
+                    }
+                    formData.append("images", files[i]);
+                }
+                formData.append("zip_code", "00000");
+
+                updateDropzoneAnalyzing();
+
+                fetch("/api/scan", { method: "POST", body: formData })
+                    .then(function (res) {
+                        if (!res.ok) {
+                            return res.text().then(function (txt) {
+                                throw new Error(txt || "Upload failed");
+                            });
+                        }
+                        return res.json();
+                    })
+                    .then(function (json) {
+                        if (json.status === "ok" && json.data && json.data.bill_id) {
+                            window.location.href = "/confirm/" + json.data.bill_id;
+                            return;
+                        }
+                        throw new Error("No bill ID returned.");
+                    })
+                    .catch(function () {
+                        window.location.reload();
+                    });
+            }
+
+            dropZone.addEventListener("dragover", function (e) {
+                e.preventDefault();
+                dropZone.style.borderColor = "var(--text-black)";
+                dropZone.style.background = "#EDEDED";
+                dropZone.style.transform = "scale(1.02)";
+            });
+
+            dropZone.addEventListener("dragleave", function (e) {
+                e.preventDefault();
+                dropZone.style.borderColor = "#D1D5DB";
+                dropZone.style.background = "var(--accent-grey)";
+                dropZone.style.transform = "scale(1)";
+            });
+
+            dropZone.addEventListener("drop", function (e) {
+                e.preventDefault();
+                uploadFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener("change", function (e) {
+                uploadFiles(e.target.files);
+            });
+        })();
+    </script>
+</body>
+</html>
