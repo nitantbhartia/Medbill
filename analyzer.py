@@ -9,11 +9,11 @@ from validators.upcoding import check_upcoding
 from validators.nsa import check_no_surprises_act
 from validators.extraction import validate_extraction, validate_cpt_description
 from validators.benchmarks import check_benchmark
-from data_freshness import get_data_freshness_warnings
+from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
 
-SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
+SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2, "informational": 3}
 
 # Confidence scoring rules for findings
 CONFIDENCE_RULES = {
@@ -29,6 +29,9 @@ CONFIDENCE_RULES = {
 
 def _assign_confidence(finding: dict) -> str:
     """Assign a confidence level to a finding based on type and details."""
+    if finding.get("evidence_level") == "low":
+        return "low"
+
     ftype = finding.get("type")
 
     if ftype == "duplicate_charge":
@@ -57,6 +60,81 @@ def _assign_confidence(finding: dict) -> str:
     return "low"
 
 
+def _downgrade_severity(severity: str) -> str:
+    if severity == "high":
+        return "medium"
+    if severity == "medium":
+        return "low"
+    if severity == "low":
+        return "informational"
+    return severity
+
+
+def _sum_patient_responsibility(items: list[dict]) -> float | None:
+    values = []
+    for it in items:
+        val = it.get("patient_responsibility")
+        if val is not None:
+            values.append(float(val))
+    if not values:
+        return None
+    return max(0.0, round(sum(values), 2))
+
+
+def _apply_patient_impact_savings(finding: dict, bill_patient_owes: float | None) -> None:
+    """Convert raw savings into patient-impact estimate when possible."""
+    gross = float(finding.get("potential_savings") or 0.0)
+    finding["gross_potential_savings"] = round(gross, 2)
+
+    line_items = []
+    if isinstance(finding.get("line_item"), dict):
+        line_items.append(finding["line_item"])
+    if isinstance(finding.get("related_items"), list):
+        line_items.extend([i for i in finding["related_items"] if isinstance(i, dict)])
+
+    patient_cap = _sum_patient_responsibility(line_items)
+    if patient_cap is None and bill_patient_owes is not None:
+        patient_cap = max(0.0, float(bill_patient_owes))
+
+    if patient_cap is None:
+        finding["estimated_patient_savings"] = round(gross, 2)
+        return
+
+    patient_est = min(gross, patient_cap)
+    finding["estimated_patient_savings"] = round(patient_est, 2)
+    finding["potential_savings"] = round(patient_est, 2)
+
+
+def _apply_evidence_policy(finding: dict, freshness: dict) -> None:
+    """Adjust severity when supporting evidence is sparse or stale."""
+    ftype = finding.get("type")
+    finding["evidence_level"] = "medium"
+
+    if ftype == "benchmark_outlier":
+        sample_size = int(finding.get("sample_size") or 0)
+        if sample_size < 500:
+            finding["evidence_level"] = "low"
+            finding["severity"] = _downgrade_severity(finding.get("severity", "low"))
+            finding["message"] += " Benchmark sample size is limited for this comparison."
+        elif sample_size >= 2000:
+            finding["evidence_level"] = "high"
+
+    if ftype == "upcoding":
+        # Without clinical documentation, this should remain a softer signal.
+        finding["evidence_level"] = "low"
+        finding["severity"] = _downgrade_severity(finding.get("severity", "medium"))
+        finding["message"] += " This is an informational flag and requires chart-level review."
+
+    stale_rate_data = not freshness.get("medicare_pfs", {}).get("fresh", True)
+    stale_ncci = not freshness.get("ncci_edits", {}).get("fresh", True)
+    if ftype in ("price_markup", "benchmark_outlier") and stale_rate_data:
+        finding["evidence_level"] = "low"
+        finding["severity"] = _downgrade_severity(finding.get("severity", "low"))
+    if ftype == "unbundling" and stale_ncci:
+        finding["evidence_level"] = "low"
+        finding["severity"] = _downgrade_severity(finding.get("severity", "low"))
+
+
 def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     """
     Run all analysis checks against extracted bill data.
@@ -66,7 +144,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     findings = []
     warnings = []
     total_potential_savings = 0.0
-    locality = get_medicare_locality(zip_code)
+    locality = get_medicare_locality(zip_code, extracted_data.get("provider_address"))
+    freshness = get_data_freshness()
 
     line_items = extracted_data.get("line_items", [])
 
@@ -99,24 +178,32 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         # CHECK 1: Price vs Medicare rate
         pricing_finding = check_pricing(item, locality)
         if pricing_finding:
+            _apply_evidence_policy(pricing_finding, freshness)
+            _apply_patient_impact_savings(pricing_finding, extracted_data.get("total_patient_owes"))
             findings.append(pricing_finding)
             total_potential_savings += pricing_finding["potential_savings"]
 
         # CHECK 2: Duplicate charges
         dup_finding = find_duplicates(item, line_items)
         if dup_finding:
+            _apply_evidence_policy(dup_finding, freshness)
+            _apply_patient_impact_savings(dup_finding, extracted_data.get("total_patient_owes"))
             findings.append(dup_finding)
             total_potential_savings += dup_finding["potential_savings"]
 
         # CHECK 3: Unbundling detection
         unbundle_finding = check_unbundling(item, line_items)
         if unbundle_finding:
+            _apply_evidence_policy(unbundle_finding, freshness)
+            _apply_patient_impact_savings(unbundle_finding, extracted_data.get("total_patient_owes"))
             findings.append(unbundle_finding)
             total_potential_savings += unbundle_finding["potential_savings"]
 
         # CHECK 4: Upcoding detection
         upcode_finding = check_upcoding(item)
         if upcode_finding:
+            _apply_evidence_policy(upcode_finding, freshness)
+            _apply_patient_impact_savings(upcode_finding, extracted_data.get("total_patient_owes"))
             findings.append(upcode_finding)
             total_potential_savings += upcode_finding["potential_savings"]
 
@@ -136,17 +223,29 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
                     ),
                 }
             )
+            _apply_evidence_policy(findings[-1], freshness)
+            _apply_patient_impact_savings(findings[-1], extracted_data.get("total_patient_owes"))
+            total_potential_savings += findings[-1]["potential_savings"]
 
         # CHECK 6: Regional benchmark comparison
-        benchmark_finding = check_benchmark(item, zip_code)
+        benchmark_finding = check_benchmark(item, zip_code, extracted_data.get("provider_address"))
         if benchmark_finding:
+            _apply_evidence_policy(benchmark_finding, freshness)
+            _apply_patient_impact_savings(benchmark_finding, extracted_data.get("total_patient_owes"))
             findings.append(benchmark_finding)
+            total_potential_savings += benchmark_finding["potential_savings"]
 
     # CHECK 7: No Surprises Act
     nsa_finding = check_no_surprises_act(extracted_data)
     if nsa_finding:
+        _apply_evidence_policy(nsa_finding, freshness)
+        _apply_patient_impact_savings(nsa_finding, extracted_data.get("total_patient_owes"))
         findings.append(nsa_finding)
         total_potential_savings += nsa_finding.get("potential_savings", 0)
+
+    bill_patient_owes = extracted_data.get("total_patient_owes")
+    if bill_patient_owes is not None:
+        total_potential_savings = min(total_potential_savings, float(bill_patient_owes))
 
     # Assign confidence to each finding
     for finding in findings:
@@ -157,6 +256,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     return {
         "total_findings": len(findings),
         "total_potential_savings": round(total_potential_savings, 2),
+        "total_gross_potential_savings": round(
+            sum(float(f.get("gross_potential_savings", f.get("potential_savings", 0) or 0)) for f in findings), 2
+        ),
         "findings": findings,
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
@@ -261,7 +363,57 @@ def get_stats() -> dict:
         row = db.execute(
             "SELECT COUNT(*) as bills_scanned, "
             "COALESCE(SUM(total_potential_savings), 0) as total_found, "
-            "COALESCE(AVG(total_potential_savings), 0) as avg_savings "
+            "COALESCE(AVG(total_potential_savings), 0) as avg_savings, "
+            "(SELECT COALESCE(SUM(actual_savings), 0) FROM dispute_outcomes) as realized_savings, "
+            "(SELECT COUNT(*) FROM dispute_outcomes) as dispute_outcomes_count "
             "FROM bills WHERE total_findings > 0"
         ).fetchone()
     return dict(row)
+
+
+def get_effectiveness_metrics() -> dict:
+    """
+    Evaluate historical finding effectiveness using dispute outcomes.
+    Precision here is a proxy: percentage of outcomes with realized savings.
+    """
+    with get_db() as db:
+        overall = db.execute(
+            "SELECT "
+            "COUNT(DISTINCT d.id) AS outcomes, "
+            "SUM(CASE WHEN COALESCE(d.actual_savings, d.original_patient_owes - d.final_patient_owes, 0) > 0 "
+            "THEN 1 ELSE 0 END) AS successful_outcomes, "
+            "COALESCE(AVG(CASE WHEN d.original_patient_owes > 0 "
+            "THEN COALESCE(d.actual_savings, d.original_patient_owes - d.final_patient_owes, 0) / d.original_patient_owes "
+            "END), 0) AS avg_recovery_rate "
+            "FROM dispute_outcomes d"
+        ).fetchone()
+
+        by_type = db.execute(
+            "SELECT f.finding_type, "
+            "COUNT(DISTINCT d.id) AS outcomes, "
+            "SUM(CASE WHEN COALESCE(d.actual_savings, d.original_patient_owes - d.final_patient_owes, 0) > 0 "
+            "THEN 1 ELSE 0 END) AS successful_outcomes, "
+            "COALESCE(AVG(CASE WHEN d.original_patient_owes > 0 "
+            "THEN COALESCE(d.actual_savings, d.original_patient_owes - d.final_patient_owes, 0) / d.original_patient_owes "
+            "END), 0) AS avg_recovery_rate "
+            "FROM dispute_outcomes d "
+            "JOIN findings f ON f.bill_id = d.bill_id "
+            "GROUP BY f.finding_type "
+            "ORDER BY outcomes DESC"
+        ).fetchall()
+
+    overall_dict = dict(overall)
+    outcomes = int(overall_dict.get("outcomes") or 0)
+    success = int(overall_dict.get("successful_outcomes") or 0)
+    precision = (success / outcomes) if outcomes else 0.0
+    overall_dict["precision_proxy"] = round(precision, 4)
+
+    type_metrics = []
+    for row in by_type:
+        d = dict(row)
+        o = int(d.get("outcomes") or 0)
+        s = int(d.get("successful_outcomes") or 0)
+        d["precision_proxy"] = round((s / o), 4) if o else 0.0
+        type_metrics.append(d)
+
+    return {"overall": overall_dict, "by_finding_type": type_metrics}

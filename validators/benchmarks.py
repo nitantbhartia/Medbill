@@ -1,24 +1,16 @@
 """Compare charges against regional procedure benchmarks."""
 
 from db import get_db
-
-# Zip prefix → region mapping (simplified)
-ZIP_TO_REGION = {
-    "0": "northeast", "1": "northeast", "2": "southeast",
-    "3": "southeast", "4": "midwest", "5": "midwest",
-    "6": "midwest", "7": "southeast", "8": "west", "9": "west",
-}
+from validators.geo import get_region
 
 
 def _get_region(zip_code: str) -> str:
-    if not zip_code:
-        return "national"
-    return ZIP_TO_REGION.get(zip_code[0], "national")
+    return get_region(zip_code, None)
 
 
-def get_benchmark(cpt_code: str, zip_code: str = "") -> dict | None:
+def get_benchmark(cpt_code: str, zip_code: str = "", provider_address: str | None = None) -> dict | None:
     """Look up benchmark data for a CPT code, preferring regional data."""
-    region = _get_region(zip_code)
+    region = get_region(zip_code, provider_address)
 
     with get_db() as db:
         # Try regional first
@@ -38,7 +30,7 @@ def get_benchmark(cpt_code: str, zip_code: str = "") -> dict | None:
         return dict(row) if row else None
 
 
-def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
+def check_benchmark(item: dict, zip_code: str = "", provider_address: str | None = None) -> dict | None:
     """Compare a line item's charge against regional benchmarks.
 
     Flags charges above the 75th percentile as noteworthy context.
@@ -48,7 +40,7 @@ def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
     if not item.get("cpt_code") or not item.get("charged_amount"):
         return None
 
-    benchmark = get_benchmark(item["cpt_code"], zip_code)
+    benchmark = get_benchmark(item["cpt_code"], zip_code, provider_address)
     if not benchmark or not benchmark.get("median_charged"):
         return None
 
@@ -73,20 +65,21 @@ def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
         severity = "medium"
 
     patient_resp = item.get("patient_responsibility")
+    region_label = benchmark.get("region", "national")
 
     if patient_resp is not None:
         message = (
             f"Your provider charged ${charged:,.2f} for "
             f"{item.get('description', 'this service')}; after insurance, "
             f"your responsibility is ${patient_resp:,.2f}. "
-            f"The median hospital charge nationally is ${median:,.2f} "
+            f"The median hospital charge in the {region_label} dataset is ${median:,.2f} "
             f"(based on {benchmark.get('sample_size', 'N/A')} bills)."
         )
     else:
         message = (
             f"Your charge of ${charged:,.2f} for "
             f"{item.get('description', 'this service')} "
-            f"is {percentile_label} nationally. "
+            f"is {percentile_label} in the {region_label} dataset. "
             f"The median hospital charge is ${median:,.2f} "
             f"(based on {benchmark.get('sample_size', 'N/A')} bills)."
         )
@@ -101,6 +94,10 @@ def check_benchmark(item: dict, zip_code: str = "") -> dict | None:
         "p75_charged": p75,
         "sample_size": benchmark.get("sample_size", 0),
         "region": benchmark.get("region", "national"),
+        "evidence": {
+            "sample_size": benchmark.get("sample_size", 0),
+            "region_source": benchmark.get("region", "national"),
+        },
         "potential_savings": round(max(0, charged - median), 2),
         "message": message,
     }

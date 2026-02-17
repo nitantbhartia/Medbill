@@ -43,6 +43,22 @@ def _run_migrations(db):
     if "zip_code" not in existing:
         db.execute("ALTER TABLE bills ADD COLUMN zip_code TEXT")
 
+    # Geo mapping table (for ZIP -> Medicare locality/region)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS zip_locality_map (
+            zip_prefix TEXT PRIMARY KEY,
+            locality TEXT,
+            state TEXT,
+            region TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_zip_locality_state ON zip_locality_map(state)"
+    )
+
 
 SCHEMA = """
 -- Users
@@ -162,6 +178,17 @@ CREATE TABLE IF NOT EXISTS hospital_profiles (
 
 CREATE INDEX IF NOT EXISTS idx_hospital_state ON hospital_profiles(state);
 CREATE INDEX IF NOT EXISTS idx_hospital_city ON hospital_profiles(city, state);
+
+-- ZIP to locality/region mapping
+CREATE TABLE IF NOT EXISTS zip_locality_map (
+    zip_prefix TEXT PRIMARY KEY,
+    locality TEXT,
+    state TEXT,
+    region TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_zip_locality_state ON zip_locality_map(state);
 
 -- Dispute outcomes
 CREATE TABLE IF NOT EXISTS dispute_outcomes (

@@ -7,10 +7,12 @@ Schedule:
   Medicare OPPS rates       — annually, January 5
   NCCI PTP edits            — quarterly, Jan/Apr/Jul/Oct 5th
   Procedure benchmarks      — as new data becomes available
+  ZIP locality map          — as CMS locality mappings update
   Hospital chargemasters    — check monthly
 """
 
 import logging
+import os
 from datetime import date
 
 from db import get_db
@@ -194,6 +196,71 @@ def refresh_benchmarks(csv_path: str) -> int:
     return count
 
 
+def refresh_zip_localities(csv_path: str) -> int:
+    """
+    Load ZIP prefix -> locality/region mapping from a CSV file.
+    Returns number of rows inserted.
+
+    Expected CSV columns: ZIP_PREFIX, LOCALITY, STATE, REGION
+    """
+    import csv
+
+    count = 0
+    rows = []
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                prefix = row["ZIP_PREFIX"].strip()
+                if not prefix:
+                    continue
+                rows.append((
+                    prefix,
+                    row.get("LOCALITY", "0000000").strip() or "0000000",
+                    row.get("STATE", "").strip() or None,
+                    row.get("REGION", "").strip() or None,
+                ))
+                count += 1
+            except (ValueError, KeyError) as e:
+                log.warning("Skipping bad ZIP locality row: %s — %s", row, e)
+
+    if not rows:
+        log.warning("No ZIP locality rows parsed from %s", csv_path)
+        return 0
+
+    with get_db() as db:
+        db.executemany(
+            "INSERT OR REPLACE INTO zip_locality_map "
+            "(zip_prefix, locality, state, region) VALUES (?, ?, ?, ?)",
+            rows,
+        )
+
+    log.info("Loaded %d ZIP locality rows from %s", count, csv_path)
+    return count
+
+
+def refresh_all_from_directory(data_dir: str) -> dict:
+    """
+    Refresh all known data sources from a directory of CSV files.
+    Missing files are skipped.
+    """
+    loaders = {
+        "medicare_pfs.csv": refresh_medicare_rates,
+        "opps_rates.csv": refresh_opps_rates,
+        "ncci_edits.csv": refresh_ncci_edits,
+        "procedure_benchmarks.csv": refresh_benchmarks,
+        "zip_locality_map.csv": refresh_zip_localities,
+    }
+    loaded = {}
+    for filename, loader in loaders.items():
+        path = os.path.join(data_dir, filename)
+        if not os.path.exists(path):
+            loaded[filename] = 0
+            continue
+        loaded[filename] = loader(path)
+    return loaded
+
+
 def data_health_check() -> dict:
     """
     Run a health check on all data sources.
@@ -224,6 +291,10 @@ def data_health_check() -> dict:
             "passed": freshness["hospital_profiles"]["fresh"],
             "detail": f"Count: {freshness['hospital_profiles']['count']}",
         },
+        "zip_locality_map": {
+            "passed": freshness["zip_locality_map"]["fresh"],
+            "detail": f"Count: {freshness['zip_locality_map']['count']}",
+        },
     }
 
     all_passed = all(c["passed"] for c in checks.values())
@@ -250,7 +321,10 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Usage: python data_refresh.py <command> [csv_path]")
-        print("Commands: health-check, refresh-pfs, refresh-opps, refresh-ncci, refresh-benchmarks")
+        print(
+            "Commands: health-check, refresh-pfs, refresh-opps, refresh-ncci, "
+            "refresh-benchmarks, refresh-zip-localities, refresh-all"
+        )
         sys.exit(1)
 
     from db import init_db
@@ -280,6 +354,19 @@ if __name__ == "__main__":
         count = refresh_benchmarks(sys.argv[2])
         print(f"Loaded {count} procedure benchmarks.")
 
+    elif cmd == "refresh-zip-localities" and len(sys.argv) == 3:
+        count = refresh_zip_localities(sys.argv[2])
+        print(f"Loaded {count} ZIP locality rows.")
+
+    elif cmd == "refresh-all" and len(sys.argv) == 3:
+        result = refresh_all_from_directory(sys.argv[2])
+        print("Loaded data files:")
+        for name, cnt in result.items():
+            print(f"  - {name}: {cnt}")
+
     else:
-        print("Unknown command. Use: health-check, refresh-pfs, refresh-opps, refresh-ncci, refresh-benchmarks")
+        print(
+            "Unknown command. Use: health-check, refresh-pfs, refresh-opps, "
+            "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-all"
+        )
         sys.exit(1)

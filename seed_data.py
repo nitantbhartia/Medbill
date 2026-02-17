@@ -156,6 +156,41 @@ NCCI_EDITS = [
     ("36415",  "36416", "2010-01-01", None,    "0"),   # Venipuncture includes capillary draw
 ]
 
+# ---------------------------------------------------------------------------
+# ZIP to locality/region map
+#
+# Prefix rows allow progressively-specific matching:
+# - 5-digit exact ZIP when available
+# - 3-digit ZIP prefix for metro/locality grouping
+# - 1-digit fallback for broad region
+# ---------------------------------------------------------------------------
+
+ZIP_LOCALITY_MAP = [
+    # Exact ZIPs used in tests and sample data
+    ("33021", "0000000", "FL", "southeast"),
+    ("33101", "0000000", "FL", "southeast"),
+    ("90210", "0000000", "CA", "west"),
+    ("10001", "0000000", "NY", "northeast"),
+    ("60601", "0000000", "IL", "midwest"),
+    # Common 3-digit prefixes
+    ("330", "0000000", "FL", "southeast"),
+    ("331", "0000000", "FL", "southeast"),
+    ("902", "0000000", "CA", "west"),
+    ("100", "0000000", "NY", "northeast"),
+    ("606", "0000000", "IL", "midwest"),
+    # Broad 1-digit fallback coverage
+    ("0", "0000000", None, "northeast"),
+    ("1", "0000000", None, "northeast"),
+    ("2", "0000000", None, "southeast"),
+    ("3", "0000000", None, "southeast"),
+    ("4", "0000000", None, "midwest"),
+    ("5", "0000000", None, "midwest"),
+    ("6", "0000000", None, "midwest"),
+    ("7", "0000000", None, "southeast"),
+    ("8", "0000000", None, "west"),
+    ("9", "0000000", None, "west"),
+]
+
 
 def seed_if_empty() -> None:
     """Check if the medicare_rates table is empty; if so, seed it with
@@ -228,3 +263,19 @@ def seed_if_empty() -> None:
             logger.info("Procedure benchmark seed complete.")
         else:
             logger.debug("procedure_benchmarks already contains %d rows -- skipping seed.", row["cnt"])
+
+        # ---- ZIP locality map --------------------------------------------------
+        row = db.execute("SELECT COUNT(*) AS cnt FROM zip_locality_map").fetchone()
+        if row["cnt"] == 0:
+            logger.info("zip_locality_map table is empty -- seeding %d rows", len(ZIP_LOCALITY_MAP))
+            db.executemany(
+                """
+                INSERT INTO zip_locality_map
+                    (zip_prefix, locality, state, region)
+                VALUES (?, ?, ?, ?)
+                """,
+                ZIP_LOCALITY_MAP,
+            )
+            logger.info("ZIP locality map seed complete.")
+        else:
+            logger.debug("zip_locality_map already contains %d rows -- skipping seed.", row["cnt"])

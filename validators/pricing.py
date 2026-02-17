@@ -1,8 +1,8 @@
-import re
 from datetime import datetime
 
 from db import get_db
 import config
+from validators.geo import get_medicare_locality as _geo_medicare_locality, extract_zip
 
 
 def get_medicare_rate(cpt_code: str, locality: str = "0000000", date_of_service: str | None = None) -> float | None:
@@ -59,15 +59,9 @@ def get_medicare_rate(cpt_code: str, locality: str = "0000000", date_of_service:
         return row["facility_rate"] if row else None
 
 
-def get_medicare_locality(zip_code: str) -> str:
-    """Map a zip code to a Medicare pricing locality. Simplified lookup."""
-    with get_db() as db:
-        row = db.execute(
-            "SELECT DISTINCT locality FROM medicare_rates "
-            "WHERE state = (SELECT state FROM users WHERE zip_code = ? LIMIT 1) LIMIT 1",
-            (zip_code,),
-        ).fetchone()
-    return row["locality"] if row else "0000000"
+def get_medicare_locality(zip_code: str, provider_address: str | None = None) -> str:
+    """Resolve Medicare pricing locality using ZIP-driven mapping first."""
+    return _geo_medicare_locality(zip_code, provider_address)
 
 
 def validate_geo_match(user_zip: str, provider_address: str | None) -> str | None:
@@ -78,11 +72,10 @@ def validate_geo_match(user_zip: str, provider_address: str | None) -> str | Non
     if not provider_address or not user_zip:
         return None
 
-    zip_match = re.search(r"\b(\d{5})\b", provider_address)
-    if not zip_match:
+    provider_zip = extract_zip(provider_address)
+    if not provider_zip:
         return None
 
-    provider_zip = zip_match.group(1)
     if provider_zip[:3] == user_zip[:3]:
         return None  # same 3-digit prefix = same metro area
 

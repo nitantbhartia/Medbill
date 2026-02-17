@@ -90,6 +90,17 @@ def get_data_freshness() -> dict:
             "warning": None if profile_count > 0 else "No hospital profiles loaded.",
         }
 
+        # ZIP locality map
+        row = db.execute("SELECT COUNT(*) as cnt FROM zip_locality_map").fetchone()
+        zip_map_count = row["cnt"] if row else 0
+        sources["zip_locality_map"] = {
+            "name": "ZIP Locality Mapping",
+            "count": zip_map_count,
+            "expected_frequency": "As CMS locality mappings update",
+            "fresh": zip_map_count > 0,
+            "warning": None if zip_map_count > 0 else "No ZIP locality mapping loaded.",
+        }
+
         # Rate row counts for general health
         row = db.execute("SELECT COUNT(*) as cnt FROM medicare_rates").fetchone()
         sources["medicare_row_count"] = row["cnt"] if row else 0
@@ -102,6 +113,27 @@ def get_data_freshness() -> dict:
 
         row = db.execute("SELECT COUNT(*) as cnt FROM procedure_benchmarks").fetchone()
         sources["benchmark_row_count"] = row["cnt"] if row else 0
+
+        row = db.execute("SELECT COUNT(*) as cnt FROM zip_locality_map").fetchone()
+        sources["zip_locality_row_count"] = row["cnt"] if row else 0
+
+    # Informational depth score so product can communicate confidence limits.
+    depth_points = 0
+    if sources["medicare_row_count"] >= 25:
+        depth_points += 1
+    if sources["ncci_row_count"] >= 5:
+        depth_points += 1
+    if sources["opps_row_count"] >= 15:
+        depth_points += 1
+    if sources["benchmark_row_count"] >= 20:
+        depth_points += 1
+    if sources["zip_locality_row_count"] >= 10:
+        depth_points += 1
+    sources["reference_depth"] = {
+        "score": depth_points,
+        "max_score": 5,
+        "warning": None if depth_points >= 4 else "Reference dataset depth is limited.",
+    }
 
     return sources
 

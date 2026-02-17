@@ -3,7 +3,12 @@
 import os
 import tempfile
 
-from data_refresh import data_health_check, refresh_medicare_rates, refresh_ncci_edits
+from data_refresh import (
+    data_health_check,
+    refresh_medicare_rates,
+    refresh_ncci_edits,
+    refresh_zip_localities,
+)
 from db import get_db
 
 
@@ -64,5 +69,29 @@ class TestRefreshNcciEdits:
                     "WHERE column_1_code = '99999' AND column_2_code = '99998'"
                 ).fetchone()
                 assert row["modifier_indicator"] == "1"
+        finally:
+            os.unlink(path)
+
+
+class TestRefreshZipLocalities:
+    def test_load_csv(self):
+        csv_content = (
+            "ZIP_PREFIX,LOCALITY,STATE,REGION\n"
+            "33021,0000000,FL,southeast\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            f.flush()
+            path = f.name
+
+        try:
+            count = refresh_zip_localities(path)
+            assert count == 1
+
+            with get_db() as db:
+                row = db.execute(
+                    "SELECT region FROM zip_locality_map WHERE zip_prefix = '33021'"
+                ).fetchone()
+                assert row["region"] == "southeast"
         finally:
             os.unlink(path)

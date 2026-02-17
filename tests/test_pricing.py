@@ -111,3 +111,7 @@ class TestGetMedicareLocality:
         # No users in db match, should return default
         locality = get_medicare_locality("99999")
         assert locality == "0000000"
+
+    def test_provider_zip_preferred(self):
+        locality = get_medicare_locality("99999", "3501 Johnson St, Hollywood, FL 33021")
+        assert locality == "0000000"

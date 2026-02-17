@@ -42,7 +42,7 @@ async def scan_bill(
         if len(images) == 1:
             image_bytes = await images[0].read()
             mime_type = images[0].content_type or "image/jpeg"
-            extracted = scanner.process_bill_image(image_bytes, mime_type)
+            extracted = scanner.process_bill_with_verification(image_bytes, mime_type)
         else:
             image_list = []
             for f in images:
@@ -186,6 +186,13 @@ async def get_stats():
     """Get aggregate stats for the live counter."""
     stats = analyzer.get_stats()
     return {"status": "ok", "data": stats}
+
+
+@router.get("/stats/effectiveness")
+async def get_effectiveness_stats():
+    """Get historical effectiveness metrics from dispute outcomes."""
+    metrics = analyzer.get_effectiveness_metrics()
+    return {"status": "ok", "data": metrics}
 
 
 @router.get("/phone-script/{bill_id}")

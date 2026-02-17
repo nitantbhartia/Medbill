@@ -52,6 +52,38 @@ class TestStatsEndpoint:
         assert resp.json()["data"]["bills_scanned"] >= 1
 
 
+class TestEffectivenessStatsEndpoint:
+    def test_effectiveness_empty(self):
+        resp = client.get("/api/stats/effectiveness")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["overall"]["outcomes"] == 0
+        assert data["overall"]["precision_proxy"] == 0.0
+
+    def test_effectiveness_after_outcome(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+
+        with _db.get_db() as db:
+            cursor = db.execute(
+                "INSERT INTO users (email, zip_code) VALUES (?, ?)",
+                ("eff_test@test.com", "33021"),
+            )
+            user_id = cursor.lastrowid
+            db.execute(
+                "INSERT INTO dispute_outcomes (bill_id, user_id, hospital_name, called_billing, "
+                "outcome, original_patient_owes, final_patient_owes, actual_savings) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (bill_id, user_id, "Test Hospital", 1, "reduced", 1000.0, 600.0, 400.0),
+            )
+
+        resp = client.get("/api/stats/effectiveness")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["overall"]["outcomes"] >= 1
+        assert data["overall"]["precision_proxy"] > 0
+
+
 class TestResultsEndpoint:
     def test_get_results(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
