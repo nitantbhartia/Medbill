@@ -145,11 +145,20 @@ def check_pricing(item: dict, locality: str) -> dict | None:
 
     opps_rate = get_opps_rate(item["cpt_code"], item.get("date_of_service"))
 
-    message = (
-        f"You were charged ${item['charged_amount']:,.2f} for {item['description']}. "
-        f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
-        f"That's a {markup:.1f}x markup."
-    )
+    patient_resp = item.get("patient_responsibility")
+
+    if patient_resp is not None:
+        message = (
+            f"Your provider billed ${item['charged_amount']:,.2f} for {item['description']}. "
+            f"After insurance, your responsibility is ${patient_resp:,.2f}. "
+            f"Medicare pays ${medicare_rate:,.2f} for this service."
+        )
+    else:
+        message = (
+            f"You were charged ${item['charged_amount']:,.2f} for {item['description']}. "
+            f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
+            f"That's a {markup:.1f}x markup."
+        )
     if opps_rate:
         total_medicare = medicare_rate + opps_rate
         message += (
@@ -166,6 +175,8 @@ def check_pricing(item: dict, locality: str) -> dict | None:
         "potential_savings": max(0, round(savings, 2)),
         "message": message,
     }
+    if patient_resp is not None:
+        result["patient_responsibility"] = patient_resp
     if opps_rate:
         result["opps_rate"] = opps_rate
         result["total_medicare"] = round(medicare_rate + opps_rate, 2)

@@ -17,6 +17,7 @@ from negotiation import (  # noqa: E402
     generate_message_script,
     _phone_lines_for_finding,
     _message_line_for_finding,
+    _is_insurance_processed,
     PROHIBITED_PATTERNS,
     NEGOTIATION_STAGES,
 )
@@ -187,11 +188,20 @@ class TestGeneratePhoneScript:
         script = generate_phone_script(bill_id)
         assert "Memorial Regional Hospital" in script
 
-    def test_script_includes_total_savings(self):
+    def test_insured_script_asks_for_resubmission(self):
+        """SAMPLE_BILL has insurance data, so script should ask to resubmit."""
         analysis = analyze_bill(SAMPLE_BILL, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
         script = generate_phone_script(bill_id)
-        assert "adjustments total approximately" in script
+        assert "resubmitted to my insurance" in script
+        assert "patient responsibility" in script
+
+    def test_uninsured_script_shows_total_savings(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has no insurance data, keeps old framing."""
+        analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
+        script = generate_phone_script(bill_id)
+        assert "adjustments total approximately" in script or "corrected bill" in script
 
     def test_script_shows_up_to_five_findings(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -418,6 +428,112 @@ class TestMessageLineForFinding:
         finding = {"finding_type": "other", "message": "custom issue"}
         line = _message_line_for_finding(4, finding, {}, {})
         assert line == "4. custom issue"
+
+
+class TestInsuranceAwareness:
+    """Tests for insurance-processed vs self-pay script differences."""
+
+    def test_is_insurance_processed_with_insurance(self):
+        items = [{"insurance_paid": 500, "patient_responsibility": 100}]
+        assert _is_insurance_processed(items) is True
+
+    def test_is_insurance_processed_without_insurance(self):
+        items = [{"charged_amount": 500}]
+        assert _is_insurance_processed(items) is False
+
+    def test_is_insurance_processed_patient_resp_only(self):
+        items = [{"patient_responsibility": 200}]
+        assert _is_insurance_processed(items) is True
+
+    def test_phone_insured_mentions_patient_responsibility(self):
+        """Full integration: SAMPLE_BILL has insurance, script should reference patient resp."""
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "$4,215.00" in script
+        assert "insurance has processed" in script
+
+    def test_phone_uninsured_mentions_standard_rate(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has no insurance, script uses self-pay language."""
+        analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
+        script = generate_phone_script(bill_id)
+        assert "self-pay" in script.lower() or "standard rate" in script.lower()
+
+    def test_message_insured_asks_resubmit(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_message_script(bill_id)
+        assert "resubmitted to my insurance" in script
+        assert "$4,215.00" in script
+
+    def test_message_uninsured_shows_total_savings(self):
+        analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
+        script = generate_message_script(bill_id)
+        assert "corrected bill" in script or "potential adjustment" in script
+
+    def test_phone_markup_insured_uses_patient_resp(self):
+        """When line item has patient_responsibility, phone line references it."""
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {"charged": 4500.00, "medicare_rate": 227.00, "markup_multiple": 19.8}
+        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "$1,200.00" in text
+        assert "patient responsibility" in text
+        assert "prompt-pay" in text.lower() or "fair-price" in text.lower()
+
+    def test_phone_markup_uninsured_uses_charged(self):
+        """When no patient_responsibility, phone line references charged amount."""
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {"charged": 4500.00, "medicare_rate": 227.00, "markup_multiple": 19.8}
+        li = {"description": "ED visit", "cpt_code": "99285"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "$4,500.00" in text
+        assert "19.8x" in text
+
+    def test_phone_duplicate_insured_asks_resubmit(self):
+        finding = {"finding_type": "duplicate_charge", "message": "dup"}
+        details = {"potential_savings": 850.00}
+        li = {"description": "X-ray", "cpt_code": "71046", "date_of_service": "2026-01-10",
+              "insurance_paid": 180.00}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "resubmitted" in text
+
+    def test_phone_duplicate_uninsured_shows_savings(self):
+        finding = {"finding_type": "duplicate_charge", "message": "dup"}
+        details = {"potential_savings": 850.00}
+        li = {"description": "X-ray", "cpt_code": "71046", "date_of_service": "2026-01-10"}
+        lines = _phone_lines_for_finding(finding, details, li)
+        text = " ".join(lines)
+        assert "$850.00" in text
+        assert "removed" in text
+
+    def test_message_markup_insured_uses_patient_resp(self):
+        finding = {"finding_type": "price_markup", "message": "markup"}
+        details = {"charged": 4500.00, "medicare_rate": 227.00, "markup_multiple": 19.8}
+        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00}
+        line = _message_line_for_finding(1, finding, details, li)
+        assert "$1,200.00" in line
+        assert "patient responsibility" in line
+
+    def test_message_unbundling_insured_asks_resubmit(self):
+        finding = {"finding_type": "unbundling", "message": "unbundle"}
+        details = {"code_1": "80053", "code_2": "80048", "potential_savings": 250.00}
+        li = {"insurance_paid": 100.00}
+        line = _message_line_for_finding(1, finding, details, li)
+        assert "resubmit" in line.lower()
+
+    def test_insured_objection_handling_different(self):
+        """Insured script has different objection handling."""
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        script = generate_phone_script(bill_id)
+        assert "your insurance determined what you owe" in script
+        assert "prompt-pay discount" in script
 
 
 class TestNegotiationStages:

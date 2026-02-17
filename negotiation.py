@@ -256,9 +256,22 @@ Return JSON:
     return analysis
 
 
+def _is_insurance_processed(items: list[dict]) -> bool:
+    """Return True if any line item shows insurance has processed the claim."""
+    return any(
+        li.get("insurance_paid") or li.get("patient_responsibility")
+        for li in items
+    )
+
+
 def generate_phone_script(bill_id: int) -> str:
-    """Generate a phone script with prep tips, finding-specific talking points,
-    benchmark/OPPS context, and objection-handling guidance."""
+    """Generate a phone script aware of whether insurance has already processed.
+
+    When insurance has processed, the script frames arguments around the
+    patient's actual responsibility — not the billed charge — and asks for
+    corrections to be resubmitted, plus prompt-pay / financial-assistance
+    options.  When no insurance info exists, it negotiates as self-pay.
+    """
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
         findings = db.execute(
@@ -266,32 +279,50 @@ def generate_phone_script(bill_id: int) -> str:
             "CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END",
             (bill_id,),
         ).fetchall()
+        line_items = db.execute(
+            "SELECT * FROM line_items WHERE bill_id = ?", (bill_id,)
+        ).fetchall()
 
     if not bill or not findings:
         return ""
 
     bill = dict(bill)
     findings = [dict(f) for f in findings]
+    items = [dict(li) for li in line_items]
+
     total_savings = sum(
         json.loads(f["details"]).get("potential_savings", 0)
         for f in findings if f.get("details")
     )
 
     provider = bill.get("provider_name", "the provider")
+    insured = _is_insurance_processed(items)
+    total_patient_owes = bill.get("total_patient_owes") or 0
 
     lines = [
         "BEFORE YOU CALL",
         "---------------",
-        "Have ready: your itemized bill, insurance EOB, and a pen to take notes.",
+        "Have ready: your itemized bill, your insurance Explanation of Benefits (EOB), and a pen.",
         "Ask for: the billing department, then a supervisor if the first person can't help.",
         "Record: the name of everyone you speak with and any reference numbers.",
         "",
         "WHAT TO SAY",
         "-----------",
-        f"\"Hi, I'm calling about my account with {provider}. "
-        "I've reviewed my itemized bill and I have some specific questions.",
-        "",
     ]
+
+    if insured and total_patient_owes > 0:
+        lines.append(
+            f"\"Hi, I'm calling about my account with {provider}. "
+            f"I see my insurance has processed this claim and my "
+            f"patient responsibility is ${total_patient_owes:,.2f}. "
+            f"Before I pay, I have a few questions about the charges."
+        )
+    else:
+        lines.append(
+            f"\"Hi, I'm calling about my account with {provider}. "
+            "I've reviewed my itemized bill and have some specific questions."
+        )
+    lines.append("")
 
     for i, finding in enumerate(findings[:5], 1):
         details = json.loads(finding["details"]) if finding.get("details") else {}
@@ -300,7 +331,14 @@ def generate_phone_script(bill_id: int) -> str:
         lines.extend(_phone_lines_for_finding(finding, details, li))
         lines.append("")
 
-    if total_savings > 0:
+    if insured:
+        lines.append(
+            "If any of these charges are incorrect, I'd appreciate them being "
+            "corrected and resubmitted to my insurance so my patient responsibility "
+            "is recalculated. I'd also like to ask about any prompt-pay discounts "
+            "or financial assistance programs.\""
+        )
+    elif total_savings > 0:
         lines.append(
             f"Altogether, I believe these adjustments total approximately "
             f"${total_savings:,.2f}. I'd like to request a corrected bill.\""
@@ -311,87 +349,164 @@ def generate_phone_script(bill_id: int) -> str:
         )
     lines.append("")
 
-    lines.extend([
-        "IF THEY PUSH BACK",
-        "------------------",
-        "If they say \"that's our standard rate\":",
-        "  \"I understand, but I've compared this to Medicare rates and what other "
-        "hospitals charge. Can we discuss a fair-price adjustment?\"",
-        "",
-        "If they say they can't adjust:",
-        "  \"Can I speak with a supervisor? I'd also like to know about any "
-        "financial assistance or prompt-pay discount programs.\"",
-        "",
-        "If they refuse entirely:",
-        "  \"I'll be requesting this in writing and filing a complaint with "
-        "my state Attorney General's office and your patient advocate.\"",
-    ])
+    lines.append("IF THEY PUSH BACK")
+    lines.append("------------------")
+
+    if insured:
+        lines.extend([
+            "If they say \"your insurance determined what you owe\":",
+            "  \"I understand, but I want to verify the charges are correct first. "
+            "If there's a billing error, it should be corrected and resubmitted "
+            "to my insurance. Can someone review these specific items?\"",
+            "",
+            "If they say the charges are correct:",
+            "  \"OK. Do you offer a prompt-pay discount if I pay today? "
+            "I'd also like information about your financial assistance program "
+            "and any payment plan options.\"",
+            "",
+            "If they refuse any help:",
+            "  \"I'd like to speak with a supervisor or patient advocate. "
+            "I'll also be sending this request in writing for your records.\"",
+        ])
+    else:
+        lines.extend([
+            "If they say \"that's our standard rate\":",
+            "  \"I understand, but these charges are well above Medicare rates. "
+            "What is your self-pay or cash price for these services?\"",
+            "",
+            "If they say they can't adjust:",
+            "  \"Can I speak with a supervisor? I'd also like to know about any "
+            "financial assistance or prompt-pay discount programs.\"",
+            "",
+            "If they refuse entirely:",
+            "  \"I'll be requesting this in writing and filing a complaint with "
+            "my state Attorney General's office and your patient advocate.\"",
+        ])
 
     return "\n".join(lines)
 
 
 def _phone_lines_for_finding(finding: dict, details: dict, li: dict) -> list[str]:
-    """Return talking-point lines for a single finding."""
+    """Return talking-point lines for a single finding.
+
+    Automatically adapts language when the line item has patient_responsibility
+    or insurance_paid (i.e. insurance already processed).
+    """
     ftype = finding["finding_type"]
+    patient_resp = li.get("patient_responsibility")
+    has_insurance = patient_resp is not None or li.get("insurance_paid") is not None
 
     if ftype == "duplicate_charge":
-        return [
+        line = (
             f"I see {li.get('description', 'a charge')} "
             f"(CPT {li.get('cpt_code', 'N/A')}) appears to be billed twice "
             f"on {li.get('date_of_service', 'the same date')}. "
-            f"Can you confirm whether this was actually performed twice? "
-            f"If not, that's ${details.get('potential_savings', 0):,.2f} that should be removed.",
-        ]
+            f"Can you confirm whether this was actually performed twice?"
+        )
+        if has_insurance:
+            line += (
+                " If this is an error, it should be corrected and resubmitted "
+                "to my insurance so my responsibility is recalculated."
+            )
+        else:
+            line += (
+                f" If not, that's ${details.get('potential_savings', 0):,.2f} "
+                f"that should be removed."
+            )
+        return [line]
 
     if ftype == "price_markup":
-        point = (
-            f"I was charged ${details.get('charged', 0):,.2f} for "
-            f"{li.get('description', 'a service')} (CPT {li.get('cpt_code', 'N/A')}). "
-            f"The Medicare rate for this is ${details.get('medicare_rate', 0):,.2f} "
-            f"-- that's a {details.get('markup_multiple', 0)}x markup."
-        )
-        if details.get("total_medicare"):
-            point += (
-                f" Even including the hospital facility fee, Medicare's total is "
-                f"${details['total_medicare']:,.2f}."
+        if has_insurance and patient_resp:
+            point = (
+                f"For {li.get('description', 'a service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}), my patient responsibility "
+                f"is ${patient_resp:,.2f}. I've looked into this and Medicare "
+                f"reimburses ${details.get('medicare_rate', 0):,.2f} for this service."
             )
-        point += " Can you explain this charge or offer a fair-price adjustment?"
+            if details.get("total_medicare"):
+                point += (
+                    f" Even including the facility fee, Medicare's total is "
+                    f"${details['total_medicare']:,.2f}."
+                )
+            point += (
+                " I'd appreciate any options to reduce my out-of-pocket, "
+                "such as a prompt-pay discount or fair-price adjustment."
+            )
+        else:
+            point = (
+                f"I was charged ${details.get('charged', 0):,.2f} for "
+                f"{li.get('description', 'a service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}). "
+                f"The Medicare rate is ${details.get('medicare_rate', 0):,.2f} "
+                f"-- that's a {details.get('markup_multiple', 0)}x markup."
+            )
+            if details.get("total_medicare"):
+                point += (
+                    f" Even including the hospital facility fee, Medicare's total is "
+                    f"${details['total_medicare']:,.2f}."
+                )
+            point += " What is your self-pay or fair-price rate for this?"
         return [point]
 
     if ftype == "unbundling":
-        return [
+        line = (
             f"I see both {details.get('code_1', 'a comprehensive code')} and "
             f"{details.get('code_2', 'a component code')} were billed together. "
             f"Under NCCI coding rules, {details.get('code_2', 'the component code')} "
             f"is included in {details.get('code_1', 'the comprehensive code')} "
-            f"and shouldn't be billed separately. "
-            f"That's ${details.get('potential_savings', 0):,.2f} that should be removed.",
-        ]
+            f"and shouldn't be billed separately."
+        )
+        if has_insurance:
+            line += (
+                " If corrected, this should be resubmitted to my insurance."
+            )
+        else:
+            line += (
+                f" That's ${details.get('potential_savings', 0):,.2f} "
+                f"that should be removed."
+            )
+        return [line]
 
     if ftype == "upcoding":
-        return [
-            f"I was billed for a Level {details.get('billed_level', '')} ER visit, "
+        line = (
+            f"I was billed for a Level {details.get('billed_level', '')} visit, "
             f"but my symptoms and treatment may be more consistent with "
             f"Level {details.get('likely_level', '')}. "
-            f"The difference is ${details.get('potential_savings', 0):,.2f}. "
-            f"Can you review the documentation to confirm the visit level?",
-        ]
+        )
+        if has_insurance:
+            line += (
+                "Can you review the documentation? If the level is adjusted, "
+                "it should be resubmitted to my insurance."
+            )
+        else:
+            line += (
+                f"The difference is ${details.get('potential_savings', 0):,.2f}. "
+                f"Can you review the documentation to confirm the visit level?"
+            )
+        return [line]
 
     if ftype == "quantity_flag":
         return [
             f"I'm seeing {li.get('quantity', '')} units of "
             f"'{li.get('description', 'a service')}' on my bill. "
-            f"Can you confirm that quantity is correct? "
-            f"If only 1 was administered, the extra charges should be removed.",
+            f"Can you confirm that quantity is correct?"
         ]
 
     if ftype == "benchmark_outlier":
+        if has_insurance and patient_resp:
+            return [
+                f"For {li.get('description', 'this service')}, my out-of-pocket "
+                f"is ${patient_resp:,.2f}. The median hospital charge nationally "
+                f"is ${details.get('median_charged', 0):,.2f} "
+                f"(based on {details.get('sample_size', 'thousands of')} claims). "
+                f"Given that, are there any options to reduce my balance?"
+            ]
         return [
             f"My charge of ${details.get('charged', 0):,.2f} for "
             f"{li.get('description', 'this service')} is above what most hospitals charge. "
             f"The median charge nationally is ${details.get('median_charged', 0):,.2f} "
             f"based on {details.get('sample_size', 'thousands of')} bills. "
-            f"Can we discuss a more reasonable price?",
+            f"Can we discuss a more reasonable price?"
         ]
 
     if ftype == "no_surprises_act":
@@ -406,10 +521,11 @@ def _phone_lines_for_finding(finding: dict, details: dict, li: dict) -> list[str
 
 
 def generate_message_script(bill_id: int) -> str:
-    """Generate a written message for patient portal, text, or secure message.
+    """Generate a written message aware of insurance processing status.
 
-    Covers all finding types with specific language, includes benchmark and
-    OPPS context, and references applicable regulations.
+    When insurance has processed, the letter acknowledges the patient's
+    responsibility amount and asks for corrections to be resubmitted plus
+    discount options — instead of arguing about the billed charge.
     """
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
@@ -418,28 +534,49 @@ def generate_message_script(bill_id: int) -> str:
             "CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END",
             (bill_id,),
         ).fetchall()
+        line_items = db.execute(
+            "SELECT * FROM line_items WHERE bill_id = ?", (bill_id,)
+        ).fetchall()
 
     if not bill or not findings:
         return ""
 
     bill = dict(bill)
     findings = [dict(f) for f in findings]
+    items = [dict(li) for li in line_items]
+
     total_savings = sum(
         json.loads(f["details"]).get("potential_savings", 0)
         for f in findings if f.get("details")
     )
     has_nsa = any(f["finding_type"] == "no_surprises_act" for f in findings)
 
+    insured = _is_insurance_processed(items)
+    total_patient_owes = bill.get("total_patient_owes") or 0
+
     lines = [
         "Subject: Billing Inquiry - Request for Itemized Review",
         "",
         "Dear Billing Department,",
         "",
-        f"I am writing regarding my account with {bill.get('provider_name', 'your facility')}. "
-        "After carefully reviewing my itemized bill, I have identified the "
-        "following concerns that I believe require correction:",
-        "",
     ]
+
+    if insured and total_patient_owes > 0:
+        lines.append(
+            f"I am writing regarding my account with "
+            f"{bill.get('provider_name', 'your facility')}. I understand my "
+            f"insurance has processed this claim and my patient responsibility "
+            f"is ${total_patient_owes:,.2f}. Before making payment, I would like "
+            f"to raise the following questions about the underlying charges:"
+        )
+    else:
+        lines.append(
+            f"I am writing regarding my account with "
+            f"{bill.get('provider_name', 'your facility')}. After carefully "
+            f"reviewing my itemized bill, I have identified the following "
+            f"concerns that I believe require correction:"
+        )
+    lines.append("")
 
     for i, finding in enumerate(findings[:5], 1):
         details = json.loads(finding["details"]) if finding.get("details") else {}
@@ -457,13 +594,22 @@ def generate_message_script(bill_id: int) -> str:
         )
         lines.append("")
 
-    lines.append(
-        "I respectfully request a line-by-line review of these charges and a "
-        "corrected bill. I would also appreciate information about any financial "
-        "assistance programs, prompt-pay discounts, or payment plan options."
-    )
+    if insured:
+        lines.append(
+            "If any of the above items are billing or coding errors, I respectfully "
+            "request they be corrected and the claim resubmitted to my insurance "
+            "so my patient responsibility is recalculated. I would also appreciate "
+            "information about any prompt-pay discounts, financial assistance "
+            "programs, or payment plan options available to me."
+        )
+    else:
+        lines.append(
+            "I respectfully request a line-by-line review of these charges and a "
+            "corrected bill. I would also appreciate information about any financial "
+            "assistance programs, prompt-pay discounts, or payment plan options."
+        )
 
-    if total_savings > 0:
+    if not insured and total_savings > 0:
         lines.append("")
         lines.append(
             f"Based on my review, the total potential adjustment is approximately "
@@ -480,26 +626,48 @@ def generate_message_script(bill_id: int) -> str:
 
 
 def _message_line_for_finding(num: int, finding: dict, details: dict, li: dict) -> str:
-    """Return a single numbered line for a written message."""
+    """Return a single numbered line for a written message.
+
+    Adapts language when insurance has processed (patient_responsibility
+    present) versus self-pay.
+    """
     ftype = finding["finding_type"]
+    patient_resp = li.get("patient_responsibility")
+    has_insurance = patient_resp is not None or li.get("insurance_paid") is not None
 
     if ftype == "duplicate_charge":
-        return (
+        line = (
             f"{num}. Possible duplicate: {li.get('description', 'A service')} "
             f"(CPT {li.get('cpt_code', 'N/A')}) appears billed more than once "
-            f"on {li.get('date_of_service', 'the same date')}. "
-            f"If this is an error, the adjustment would be "
-            f"${details.get('potential_savings', 0):,.2f}."
+            f"on {li.get('date_of_service', 'the same date')}."
         )
+        if has_insurance:
+            line += (
+                " If this is an error, please correct and resubmit to my insurance."
+            )
+        else:
+            line += (
+                f" If this is an error, the adjustment would be "
+                f"${details.get('potential_savings', 0):,.2f}."
+            )
+        return line
 
     if ftype == "price_markup":
-        line = (
-            f"{num}. Pricing concern: {li.get('description', 'A service')} "
-            f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
-            f"${details.get('charged', 0):,.2f}, while the Medicare rate "
-            f"for my area is ${details.get('medicare_rate', 0):,.2f} "
-            f"({details.get('markup_multiple', 0)}x markup)."
-        )
+        if has_insurance and patient_resp:
+            line = (
+                f"{num}. Pricing question: For {li.get('description', 'a service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}), my patient responsibility is "
+                f"${patient_resp:,.2f}. Medicare reimburses "
+                f"${details.get('medicare_rate', 0):,.2f} for this service."
+            )
+        else:
+            line = (
+                f"{num}. Pricing concern: {li.get('description', 'A service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
+                f"${details.get('charged', 0):,.2f}, while the Medicare rate "
+                f"for my area is ${details.get('medicare_rate', 0):,.2f} "
+                f"({details.get('markup_multiple', 0)}x markup)."
+            )
         if details.get("total_medicare"):
             line += (
                 f" Including the OPPS facility fee, Medicare's total allowable "
@@ -508,24 +676,33 @@ def _message_line_for_finding(num: int, finding: dict, details: dict, li: dict) 
         return line
 
     if ftype == "unbundling":
-        return (
+        line = (
             f"{num}. Coding concern: {details.get('code_1', 'A comprehensive code')} "
             f"and {details.get('code_2', 'a component code')} were billed together. "
             f"Per NCCI Procedure-to-Procedure edits, "
             f"{details.get('code_2', 'the component code')} is included in "
             f"{details.get('code_1', 'the comprehensive code')} and should "
-            f"not be separately reimbursed. Adjustment: "
-            f"${details.get('potential_savings', 0):,.2f}."
+            f"not be separately reimbursed."
         )
+        if has_insurance:
+            line += " Please correct and resubmit to my insurance."
+        else:
+            line += (
+                f" Adjustment: ${details.get('potential_savings', 0):,.2f}."
+            )
+        return line
 
     if ftype == "upcoding":
-        return (
+        line = (
             f"{num}. Coding question: I was billed for a Level "
-            f"{details.get('billed_level', '')} visit (CPT {li.get('cpt_code', 'N/A')}), "
+            f"{details.get('billed_level', '')} visit "
+            f"(CPT {li.get('cpt_code', 'N/A')}), "
             f"but my visit may qualify as Level {details.get('likely_level', '')}. "
-            f"I request a review of the clinical documentation to confirm "
-            f"the visit level."
+            f"I request a review of the clinical documentation."
         )
+        if has_insurance:
+            line += " If adjusted, please resubmit to my insurance."
+        return line
 
     if ftype == "quantity_flag":
         return (
@@ -535,6 +712,15 @@ def _message_line_for_finding(num: int, finding: dict, details: dict, li: dict) 
         )
 
     if ftype == "benchmark_outlier":
+        if has_insurance and patient_resp:
+            return (
+                f"{num}. Pricing context: For {li.get('description', 'a service')} "
+                f"(CPT {li.get('cpt_code', 'N/A')}), my out-of-pocket is "
+                f"${patient_resp:,.2f}. The national median hospital charge "
+                f"is ${details.get('median_charged', 0):,.2f} "
+                f"(based on {details.get('sample_size', 'N/A')} claims). "
+                f"I would appreciate any available discount."
+            )
         return (
             f"{num}. Above-market pricing: {li.get('description', 'A service')} "
             f"(CPT {li.get('cpt_code', 'N/A')}) was charged at "
