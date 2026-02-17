@@ -30,7 +30,12 @@ def get_benchmark(cpt_code: str, zip_code: str = "", provider_address: str | Non
         return dict(row) if row else None
 
 
-def check_benchmark(item: dict, zip_code: str = "", provider_address: str | None = None) -> dict | None:
+def check_benchmark(
+    item: dict,
+    zip_code: str = "",
+    provider_address: str | None = None,
+    percentile_multiplier: float = 1.0,
+) -> dict | None:
     """Compare a line item's charge against regional benchmarks.
 
     Flags charges above the 75th percentile as noteworthy context.
@@ -49,13 +54,13 @@ def check_benchmark(item: dict, zip_code: str = "", provider_address: str | None
     p75 = benchmark.get("p75_charged") or median
     p25 = benchmark.get("p25_charged") or median
 
-    if charged <= p75:
+    if charged <= (p75 * percentile_multiplier):
         return None
 
     # Determine percentile bucket
     if charged > benchmark.get("max_charged", charged):
         percentile_label = "above the highest reported price"
-    elif charged > p75:
+    elif charged > (p75 * percentile_multiplier):
         percentile_label = "above the 75th percentile"
     else:
         return None

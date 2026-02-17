@@ -114,7 +114,12 @@ def get_opps_rate(cpt_code: str, date_of_service: str | None = None) -> float | 
         return row["national_payment_rate"] if row else None
 
 
-def check_pricing(item: dict, locality: str) -> dict | None:
+def check_pricing(
+    item: dict,
+    locality: str,
+    markup_threshold: float | None = None,
+    high_markup_threshold: float | None = None,
+) -> dict | None:
     """Compare a line item's charge against Medicare rates."""
     if not item.get("cpt_code") or not item.get("charged_amount"):
         return None
@@ -127,14 +132,21 @@ def check_pricing(item: dict, locality: str) -> dict | None:
 
     markup = item["charged_amount"] / medicare_rate
 
-    if markup > config.HIGH_MARKUP_THRESHOLD:
+    markup_threshold = (
+        config.MEDICARE_MARKUP_THRESHOLD if markup_threshold is None else markup_threshold
+    )
+    high_markup_threshold = (
+        config.HIGH_MARKUP_THRESHOLD if high_markup_threshold is None else high_markup_threshold
+    )
+
+    if markup > high_markup_threshold:
         severity = "high"
-    elif markup > config.MEDICARE_MARKUP_THRESHOLD:
+    elif markup > markup_threshold:
         severity = "medium"
     else:
         return None
 
-    savings = item["charged_amount"] - (medicare_rate * config.MEDICARE_MARKUP_THRESHOLD)
+    savings = item["charged_amount"] - (medicare_rate * markup_threshold)
 
     opps_rate = get_opps_rate(item["cpt_code"], item.get("date_of_service"))
 

@@ -1,13 +1,24 @@
 import json
 import logging
 
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 import scanner
 import analyzer
 import negotiation
 from db import get_db
+from dispute_packet import generate_dispute_packet
+from appeal_playbooks import generate_appeal_playbook
+from provider_intelligence import get_provider_intelligence
+from compliance import (
+    scrub_extracted_data,
+    record_consent,
+    log_audit,
+    export_bill_data,
+    delete_bill_data,
+    purge_old_data,
+)
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
@@ -55,8 +66,17 @@ async def scan_bill(
 
     # Analyze and persist
     try:
+        extracted = scrub_extracted_data(extracted)
         analysis = analyzer.analyze_bill(extracted, zip_code)
         bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
+        log_audit(
+            action="scan_and_analyze",
+            resource_type="bill",
+            resource_id=str(bill_id),
+            user_id=user_id,
+            bill_id=bill_id,
+            metadata={"zip_code": zip_code, "findings": analysis.get("total_findings", 0)},
+        )
     except Exception as e:
         log.error("Analysis/save failed: %s", e, exc_info=True)
         raise HTTPException(500, f"Failed to analyze bill: {e}")
@@ -178,6 +198,7 @@ async def get_results(bill_id: int):
     results = analyzer.get_bill_results(bill_id)
     if not results:
         raise HTTPException(404, "Bill not found")
+    log_audit(action="view_results", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
     return {"status": "ok", "data": results}
 
 
@@ -193,6 +214,25 @@ async def get_effectiveness_stats():
     """Get historical effectiveness metrics from dispute outcomes."""
     metrics = analyzer.get_effectiveness_metrics()
     return {"status": "ok", "data": metrics}
+
+
+@router.get("/dispute-packet/{bill_id}")
+async def get_dispute_packet(bill_id: int):
+    """Generate a full dispute packet."""
+    packet = generate_dispute_packet(bill_id)
+    if not packet:
+        raise HTTPException(404, "Bill not found")
+    log_audit(action="generate_dispute_packet", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return {"status": "ok", "data": packet}
+
+
+@router.get("/appeal-playbook/{bill_id}")
+async def get_appeal_playbook(bill_id: int):
+    """Generate issue-specific appeal steps."""
+    playbook = generate_appeal_playbook(bill_id)
+    if not playbook:
+        raise HTTPException(404, "Bill not found")
+    return {"status": "ok", "data": playbook}
 
 
 @router.get("/phone-script/{bill_id}")
@@ -249,6 +289,15 @@ async def record_response(negotiation_id: int, body: str = Form(...)):
     return {"status": "ok", "data": analysis}
 
 
+@router.get("/negotiate/{negotiation_id}/copilot")
+async def negotiation_copilot(negotiation_id: int):
+    """Return stage tracking and recommended next reply."""
+    data = negotiation.get_copilot_summary(negotiation_id)
+    if not data:
+        raise HTTPException(404, "Negotiation not found")
+    return {"status": "ok", "data": data}
+
+
 # --- Dispute outcome tracking ---
 
 
@@ -290,6 +339,64 @@ async def record_dispute_outcome(
         )
 
     return {"status": "ok", "data": {"actual_savings": actual_savings}}
+
+
+@router.get("/provider-intelligence/{provider_name}")
+async def provider_intel(provider_name: str):
+    """Provider-level issue and outcomes intelligence."""
+    return {"status": "ok", "data": get_provider_intelligence(provider_name)}
+
+
+@router.post("/consent")
+async def capture_consent(
+    request: Request,
+    user_id: int = Form(None),
+    bill_id: int = Form(None),
+    consent_type: str = Form(...),
+    consent_version: str = Form(...),
+):
+    consent_id = record_consent(
+        user_id=user_id,
+        bill_id=bill_id,
+        consent_type=consent_type,
+        consent_version=consent_version,
+        ip_address=(request.client.host if request.client else ""),
+        user_agent=request.headers.get("user-agent", ""),
+    )
+    log_audit(
+        action="capture_consent",
+        resource_type="consent",
+        resource_id=str(consent_id),
+        user_id=user_id,
+        bill_id=bill_id,
+        metadata={"consent_type": consent_type, "consent_version": consent_version},
+    )
+    return {"status": "ok", "data": {"consent_id": consent_id}}
+
+
+@router.get("/bills/{bill_id}/export")
+async def export_bill(bill_id: int):
+    payload = export_bill_data(bill_id)
+    if not payload:
+        raise HTTPException(404, "Bill not found")
+    log_audit(action="export_bill", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return {"status": "ok", "data": payload}
+
+
+@router.delete("/bills/{bill_id}")
+async def delete_bill(bill_id: int):
+    deleted = delete_bill_data(bill_id)
+    if not deleted:
+        raise HTTPException(404, "Bill not found")
+    log_audit(action="delete_bill", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return {"status": "ok", "data": {"deleted": True}}
+
+
+@router.post("/compliance/purge-old")
+async def purge_old(days: int = Form(365)):
+    deleted = purge_old_data(days=days)
+    log_audit(action="purge_old_data", resource_type="compliance", resource_id=str(days), metadata={"deleted": deleted})
+    return {"status": "ok", "data": {"deleted_bills": deleted, "days": days}}
 
 
 @router.post("/confirm-items")

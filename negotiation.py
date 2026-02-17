@@ -285,6 +285,64 @@ Return JSON:
     return analysis
 
 
+def _classify_inbound(body: str) -> str:
+    text = (body or "").lower()
+    if any(k in text for k in ("approved", "adjusted", "reduced", "waived")):
+        return "partial_adjustment"
+    if any(k in text for k in ("need more information", "send documentation", "please provide")):
+        return "info_request"
+    if any(k in text for k in ("payment plan", "installment")):
+        return "payment_plan_offer"
+    if any(k in text for k in ("financial assistance", "charity care")):
+        return "financial_aid_offer"
+    if any(k in text for k in ("denied", "not able", "cannot adjust", "final")):
+        return "rejection"
+    return "awaiting_review"
+
+
+def _recommended_next_action(classification: str, stage: str) -> str:
+    if classification == "info_request":
+        return "Provide requested documentation and reiterate disputed line items."
+    if classification == "partial_adjustment":
+        return "Request written revised statement and verify each corrected line."
+    if classification in ("payment_plan_offer", "financial_aid_offer"):
+        return "Evaluate affordability, request hardship discount before accepting."
+    if classification == "rejection":
+        if stage in ("stage_1", "stage_2"):
+            return "Escalate to supervisor/patient advocate and resend evidence summary."
+        return "Send final escalation notice and consider external complaint channels."
+    return "Wait for response or send follow-up after configured interval."
+
+
+def get_copilot_summary(negotiation_id: int) -> dict | None:
+    """Stage tracking and next-reply recommendation for negotiation copilot."""
+    with get_db() as db:
+        neg = db.execute("SELECT * FROM negotiations WHERE id = ?", (negotiation_id,)).fetchone()
+        if not neg:
+            return None
+        msgs = db.execute(
+            "SELECT id, direction, stage, subject, body, sent_at, created_at "
+            "FROM negotiation_messages WHERE negotiation_id = ? ORDER BY id",
+            (negotiation_id,),
+        ).fetchall()
+    neg = dict(neg)
+    messages = [dict(m) for m in msgs]
+    inbound = [m for m in messages if m["direction"] == "inbound"]
+    last_inbound = inbound[-1] if inbound else None
+    classification = _classify_inbound(last_inbound["body"]) if last_inbound else "no_response_yet"
+    recommendation = _recommended_next_action(classification, neg.get("current_stage", "stage_1"))
+
+    return {
+        "negotiation_id": negotiation_id,
+        "status": neg.get("status"),
+        "current_stage": neg.get("current_stage"),
+        "rounds_completed": neg.get("rounds_completed", 0),
+        "message_count": len(messages),
+        "last_inbound_classification": classification,
+        "recommended_next_action": recommendation,
+    }
+
+
 def _is_insurance_processed(items: list[dict]) -> bool:
     """Return True if any line item shows insurance has processed the claim."""
     return any(

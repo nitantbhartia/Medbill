@@ -58,6 +58,36 @@ def _run_migrations(db):
     db.execute(
         "CREATE INDEX IF NOT EXISTS idx_zip_locality_state ON zip_locality_map(state)"
     )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS consent_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id),
+            bill_id INTEGER REFERENCES bills(id),
+            consent_type TEXT NOT NULL,
+            consent_version TEXT NOT NULL,
+            ip_address TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER REFERENCES users(id),
+            bill_id INTEGER REFERENCES bills(id),
+            action TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            resource_id TEXT,
+            metadata TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_audit_bill ON audit_logs(bill_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_consent_bill ON consent_logs(bill_id)")
 
 
 SCHEMA = """
@@ -189,6 +219,34 @@ CREATE TABLE IF NOT EXISTS zip_locality_map (
 );
 
 CREATE INDEX IF NOT EXISTS idx_zip_locality_state ON zip_locality_map(state);
+
+-- Consent logs
+CREATE TABLE IF NOT EXISTS consent_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id),
+    bill_id INTEGER REFERENCES bills(id),
+    consent_type TEXT NOT NULL,
+    consent_version TEXT NOT NULL,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_consent_bill ON consent_logs(bill_id);
+
+-- Audit logs
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES users(id),
+    bill_id INTEGER REFERENCES bills(id),
+    action TEXT NOT NULL,
+    resource_type TEXT NOT NULL,
+    resource_id TEXT,
+    metadata TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_bill ON audit_logs(bill_id);
 
 -- Dispute outcomes
 CREATE TABLE IF NOT EXISTS dispute_outcomes (

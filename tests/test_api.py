@@ -99,6 +99,28 @@ class TestResultsEndpoint:
         assert resp.status_code == 404
 
 
+class TestDisputePacketEndpoint:
+    def test_get_packet(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        resp = client.get(f"/api/dispute-packet/{bill_id}")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["bill"]["id"] == bill_id
+        assert "cover_letter" in data
+
+
+class TestAppealPlaybookEndpoint:
+    def test_get_playbook(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        resp = client.get(f"/api/appeal-playbook/{bill_id}")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["bill_id"] == bill_id
+        assert len(data["steps"]) > 0
+
+
 class TestPhoneScriptEndpoint:
     def test_get_script(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -193,3 +215,55 @@ class TestNegotiateStartEndpoint:
         )
         assert resp.status_code == 200
         assert resp.json()["data"]["negotiation_id"] > 0
+
+
+class TestNegotiationCopilotEndpoint:
+    def test_copilot_summary(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        with _db.get_db() as db:
+            cursor = db.execute(
+                "INSERT INTO users (email, zip_code) VALUES (?, ?)",
+                ("copilot_test@test.com", "33021"),
+            )
+            user_id = cursor.lastrowid
+        start = client.post(
+            "/api/negotiate/start",
+            data={
+                "bill_id": bill_id,
+                "user_id": user_id,
+                "account_number": "ACC-CP-1",
+                "hospital_email": "billing@test.com",
+            },
+        )
+        negotiation_id = start.json()["data"]["negotiation_id"]
+        resp = client.get(f"/api/negotiate/{negotiation_id}/copilot")
+        assert resp.status_code == 200
+        assert resp.json()["data"]["negotiation_id"] == negotiation_id
+
+
+class TestComplianceEndpoints:
+    def test_capture_consent(self):
+        resp = client.post(
+            "/api/consent",
+            data={
+                "consent_type": "tos",
+                "consent_version": "v1",
+            },
+        )
+        assert resp.status_code == 200
+        assert resp.json()["data"]["consent_id"] > 0
+
+    def test_export_and_delete_bill(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        export = client.get(f"/api/bills/{bill_id}/export")
+        assert export.status_code == 200
+        assert export.json()["data"]["bill"]["id"] == bill_id
+
+        delete = client.delete(f"/api/bills/{bill_id}")
+        assert delete.status_code == 200
+        assert delete.json()["data"]["deleted"] is True
+
+        after = client.get(f"/api/results/{bill_id}")
+        assert after.status_code == 404

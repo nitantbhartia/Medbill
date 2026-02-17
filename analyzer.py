@@ -9,6 +9,7 @@ from validators.upcoding import check_upcoding
 from validators.nsa import check_no_surprises_act
 from validators.extraction import validate_extraction, validate_cpt_description
 from validators.benchmarks import check_benchmark
+from validators.eob import check_eob_reconciliation
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ CONFIDENCE_RULES = {
     "quantity_flag": "low",  # might be correct
     "no_surprises_act": "low",  # needs more context to confirm
     "benchmark_outlier": "medium",  # statistical comparison, informational
+    "eob_mismatch": "high",  # arithmetic consistency check
 }
 
 
@@ -57,7 +59,93 @@ def _assign_confidence(finding: dict) -> str:
     if ftype == "benchmark_outlier":
         return "medium"
 
+    if ftype == "eob_mismatch":
+        return "high"
+
     return "low"
+
+
+def _get_outcome_precision_by_type() -> dict:
+    with get_db() as db:
+        rows = db.execute(
+            "SELECT f.finding_type, "
+            "COUNT(DISTINCT d.id) AS outcomes, "
+            "SUM(CASE WHEN COALESCE(d.actual_savings, d.original_patient_owes - d.final_patient_owes, 0) > 0 "
+            "THEN 1 ELSE 0 END) AS successes "
+            "FROM findings f "
+            "JOIN dispute_outcomes d ON d.bill_id = f.bill_id "
+            "GROUP BY f.finding_type"
+        ).fetchall()
+    precision = {}
+    for row in rows:
+        outcomes = int(row["outcomes"] or 0)
+        successes = int(row["successes"] or 0)
+        precision[row["finding_type"]] = (successes / outcomes) if outcomes else 0.0
+    return precision
+
+
+def _get_adaptive_thresholds() -> dict:
+    """
+    Outcome loop v1:
+    Raise trigger thresholds slightly when precision is weak.
+    """
+    precision = _get_outcome_precision_by_type()
+    pricing_precision = precision.get("price_markup")
+    benchmark_precision = precision.get("benchmark_outlier")
+
+    pricing_markup_threshold = 3.0
+    pricing_high_threshold = 5.0
+    benchmark_multiplier = 1.0
+
+    if pricing_precision is not None and pricing_precision < 0.35:
+        pricing_markup_threshold = 3.5
+        pricing_high_threshold = 5.5
+    if benchmark_precision is not None and benchmark_precision < 0.35:
+        benchmark_multiplier = 1.1
+
+    return {
+        "pricing_markup_threshold": pricing_markup_threshold,
+        "pricing_high_threshold": pricing_high_threshold,
+        "benchmark_multiplier": benchmark_multiplier,
+        "precision_by_type": precision,
+    }
+
+
+def _ensure_evidence_panel(finding: dict, freshness: dict) -> None:
+    """
+    Standard evidence object for UI evidence panels.
+    """
+    existing = finding.get("evidence") if isinstance(finding.get("evidence"), dict) else {}
+    source = existing.get("source")
+    if not source:
+        source = {
+            "price_markup": "cms_medicare_pfs_opps",
+            "benchmark_outlier": "regional_benchmark_dataset",
+            "unbundling": "cms_ncci_ptp",
+            "duplicate_charge": "line_item_identity_match",
+            "upcoding": "er_level_heuristic",
+            "quantity_flag": "line_item_quantity_check",
+            "no_surprises_act": "nsa_rule_heuristic",
+            "eob_mismatch": "insurance_reconciliation",
+        }.get(finding.get("type"), "internal_rule")
+
+    data_date = (
+        str(freshness.get("medicare_pfs", {}).get("latest_year"))
+        if source in ("cms_medicare_pfs_opps", "cms_ncci_ptp")
+        else None
+    )
+    sample_size = existing.get("sample_size", finding.get("sample_size"))
+    limitations = existing.get("limitations")
+    if not limitations:
+        limitations = "This finding may need human review and source document confirmation."
+
+    finding["evidence"] = {
+        "source": source,
+        "data_date": data_date,
+        "sample_size": sample_size,
+        "confidence": finding.get("confidence"),
+        "limitations": limitations,
+    }
 
 
 def _downgrade_severity(severity: str) -> str:
@@ -146,6 +234,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     total_potential_savings = 0.0
     locality = get_medicare_locality(zip_code, extracted_data.get("provider_address"))
     freshness = get_data_freshness()
+    adaptive = _get_adaptive_thresholds()
 
     line_items = extracted_data.get("line_items", [])
 
@@ -176,7 +265,12 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     for item in line_items:
         # CHECK 1: Price vs Medicare rate
-        pricing_finding = check_pricing(item, locality)
+        pricing_finding = check_pricing(
+            item,
+            locality,
+            markup_threshold=adaptive["pricing_markup_threshold"],
+            high_markup_threshold=adaptive["pricing_high_threshold"],
+        )
         if pricing_finding:
             _apply_evidence_policy(pricing_finding, freshness)
             _apply_patient_impact_savings(pricing_finding, extracted_data.get("total_patient_owes"))
@@ -228,7 +322,12 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             total_potential_savings += findings[-1]["potential_savings"]
 
         # CHECK 6: Regional benchmark comparison
-        benchmark_finding = check_benchmark(item, zip_code, extracted_data.get("provider_address"))
+        benchmark_finding = check_benchmark(
+            item,
+            zip_code,
+            extracted_data.get("provider_address"),
+            percentile_multiplier=adaptive["benchmark_multiplier"],
+        )
         if benchmark_finding:
             _apply_evidence_policy(benchmark_finding, freshness)
             _apply_patient_impact_savings(benchmark_finding, extracted_data.get("total_patient_owes"))
@@ -243,6 +342,14 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         findings.append(nsa_finding)
         total_potential_savings += nsa_finding.get("potential_savings", 0)
 
+    # CHECK 8: EOB math reconciliation
+    eob_findings = check_eob_reconciliation(extracted_data)
+    for eob_finding in eob_findings:
+        _apply_evidence_policy(eob_finding, freshness)
+        _apply_patient_impact_savings(eob_finding, extracted_data.get("total_patient_owes"))
+        findings.append(eob_finding)
+        total_potential_savings += eob_finding.get("potential_savings", 0)
+
     bill_patient_owes = extracted_data.get("total_patient_owes")
     if bill_patient_owes is not None:
         total_potential_savings = min(total_potential_savings, float(bill_patient_owes))
@@ -250,6 +357,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     # Assign confidence to each finding
     for finding in findings:
         finding["confidence"] = _assign_confidence(finding)
+        _ensure_evidence_panel(finding, freshness)
 
     findings.sort(key=lambda f: SEVERITY_ORDER.get(f.get("severity", "low"), 2))
 
@@ -263,6 +371,11 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
+        "adaptive_thresholds": {
+            "pricing_markup_threshold": adaptive["pricing_markup_threshold"],
+            "pricing_high_threshold": adaptive["pricing_high_threshold"],
+            "benchmark_percentile_multiplier": adaptive["benchmark_multiplier"],
+        },
     }
 
 

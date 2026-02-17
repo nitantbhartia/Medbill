@@ -78,6 +78,8 @@ class TestAnalyzeBill:
         for finding in result["findings"]:
             assert "confidence" in finding
             assert finding["confidence"] in ("high", "medium", "low")
+            assert "evidence" in finding
+            assert finding["evidence"]["source"]
 
 
 class TestConfidenceScoring:
