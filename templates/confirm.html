@@ -69,7 +69,7 @@
                                placeholder="99213"
                                class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 font-mono"/>
                     </div>
-                    <div class="col-span-6">
+                    <div class="col-span-5">
                         <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">Description</label>
                         <input type="text"
                                name="items[{{ loop.index0 }}][description]"
@@ -77,13 +77,25 @@
                                placeholder="Service description"
                                class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500"/>
                     </div>
-                    <div class="col-span-3">
+                    <div class="col-span-2">
                         <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">Billed</label>
                         <div class="relative">
                             <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
                             <input type="number"
                                    name="items[{{ loop.index0 }}][billed_amount]"
                                    value="{{ item.charged_amount | default('') }}"
+                                   step="0.01" min="0"
+                                   placeholder="0.00"
+                                   class="w-full pl-5 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 tabular-nums"/>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">You owe</label>
+                        <div class="relative">
+                            <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+                            <input type="number"
+                                   name="items[{{ loop.index0 }}][patient_responsibility]"
+                                   value="{{ item.patient_responsibility | default('') }}"
                                    step="0.01" min="0"
                                    placeholder="0.00"
                                    class="w-full pl-5 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 tabular-nums"/>
@@ -157,15 +169,22 @@
             + '    <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">CPT</label>'
             + '    <input type="text" name="items[' + idx + '][cpt_code]" placeholder="99213" class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 font-mono"/>'
             + '  </div>'
-            + '  <div class="col-span-6">'
+            + '  <div class="col-span-5">'
             + '    <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">Description</label>'
             + '    <input type="text" name="items[' + idx + '][description]" placeholder="Service description" class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500"/>'
             + '  </div>'
-            + '  <div class="col-span-3">'
+            + '  <div class="col-span-2">'
             + '    <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">Billed</label>'
             + '    <div class="relative">'
             + '      <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>'
             + '      <input type="number" name="items[' + idx + '][billed_amount]" step="0.01" min="0" placeholder="0.00" class="w-full pl-5 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 tabular-nums"/>'
+            + '    </div>'
+            + '  </div>'
+            + '  <div class="col-span-2">'
+            + '    <label class="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">You owe</label>'
+            + '    <div class="relative">'
+            + '      <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>'
+            + '      <input type="number" name="items[' + idx + '][patient_responsibility]" step="0.01" min="0" placeholder="0.00" class="w-full pl-5 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 tabular-nums"/>'
             + '    </div>'
             + '  </div>'
             + '</div>'
@@ -184,14 +203,23 @@
 
         var cards = container.querySelectorAll('.line-item-card');
         var items = [];
+        function parseMoneyInput(input) {
+            if (!input) return null;
+            if (input.value === '' || input.value == null) return null;
+            var parsed = parseFloat(input.value);
+            return Number.isFinite(parsed) ? parsed : null;
+        }
+
         cards.forEach(function(card) {
             var cpt = card.querySelector('input[name*="cpt_code"]');
             var desc = card.querySelector('input[name*="description"]');
-            var amount = card.querySelector('input[name*="billed_amount"]');
+            var billedAmount = card.querySelector('input[name*="billed_amount"]');
+            var patientResponsibility = card.querySelector('input[name*="patient_responsibility"]');
             items.push({
                 cpt_code: cpt ? cpt.value.trim() : '',
                 description: desc ? desc.value.trim() : '',
-                billed_amount: amount ? parseFloat(amount.value) || 0 : 0
+                billed_amount: parseMoneyInput(billedAmount),
+                patient_responsibility: parseMoneyInput(patientResponsibility)
             });
         });
 

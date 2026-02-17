@@ -17,7 +17,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 import db as _db  # noqa: E402
 from main import app  # noqa: E402
-from analyzer import analyze_bill, save_bill_and_findings  # noqa: E402
+from analyzer import analyze_bill, save_bill_and_findings, get_bill_results  # noqa: E402
 from tests.conftest import SAMPLE_BILL  # noqa: E402
 
 
@@ -149,6 +149,33 @@ class TestConfirmItemsEndpoint:
         )
         assert resp.status_code == 200
         assert resp.json()["data"]["items_confirmed"] == 1
+
+
+class TestAnalyzeConfirmedEndpoint:
+    def test_analyze_confirmed_persists_patient_responsibility(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+
+        resp = client.post(
+            f"/api/analyze/{bill_id}",
+            json={
+                "line_items": [
+                    {
+                        "cpt_code": "99285",
+                        "description": "Emergency department visit, high severity",
+                        "billed_amount": 4500.0,
+                        "patient_responsibility": 321.45,
+                        "quantity": 1,
+                    }
+                ]
+            },
+        )
+        assert resp.status_code == 200
+
+        results = get_bill_results(bill_id)
+        assert results is not None
+        assert len(results["line_items"]) == 1
+        assert float(results["line_items"][0]["patient_responsibility"]) == 321.45
 
 
 class TestDisputeOutcomeEndpoint:

@@ -125,6 +125,12 @@ async def analyze_confirmed(bill_id: int, payload: dict):
         items = payload.get("line_items", [])
         for item in items:
             ins = insurance_by_cpt.get(item.get("cpt_code"), {})
+            patient_responsibility = item.get("patient_responsibility")
+            if patient_responsibility is None:
+                patient_responsibility = ins.get("patient_responsibility")
+            charged_amount = item.get("billed_amount")
+            if charged_amount is None:
+                charged_amount = patient_responsibility
             db.execute(
                 "INSERT INTO line_items (bill_id, cpt_code, description, "
                 "charged_amount, quantity, date_of_service, insurance_paid, "
@@ -134,12 +140,12 @@ async def analyze_confirmed(bill_id: int, payload: dict):
                     bill_id,
                     item.get("cpt_code"),
                     item.get("description"),
-                    item.get("billed_amount"),
+                    charged_amount,
                     item.get("quantity", 1),
                     ins.get("date_of_service"),
                     ins.get("insurance_paid"),
                     ins.get("insurance_adjustment"),
-                    ins.get("patient_responsibility"),
+                    patient_responsibility,
                 ),
             )
 
@@ -154,7 +160,12 @@ async def analyze_confirmed(bill_id: int, payload: dict):
             {
                 "cpt_code": item.get("cpt_code"),
                 "description": item.get("description"),
-                "charged_amount": item.get("billed_amount"),
+                "charged_amount": (
+                    item.get("billed_amount")
+                    if item.get("billed_amount") is not None
+                    else item.get("patient_responsibility")
+                ),
+                "patient_responsibility": item.get("patient_responsibility"),
                 "quantity": item.get("quantity", 1),
                 **insurance_by_cpt.get(item.get("cpt_code"), {}),
             }
