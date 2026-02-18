@@ -24,6 +24,26 @@
         "publisher": {"@type": "Organization", "name": "BillKarma"}
     }
     </script>
+    {% if guide.faqs %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {% for faq in guide.faqs %}
+            {
+                "@type": "Question",
+                "name": "{{ faq.q }}",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "{{ faq.a }}"
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
     <style>
         :root {
             --bg-canvas: #E0E2E5;
@@ -119,6 +139,50 @@
         .article-body .sources-list { list-style: none; padding-left: 0; }
         .article-body .sources-list li { padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 0.95rem; }
         .article-body .sources-list li:last-child { border-bottom: none; }
+
+        .article-body .case-study {
+            background: var(--card-white); border-radius: 18px; padding: 28px 32px;
+            margin: 32px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent-lime);
+        }
+        .article-body .case-study h3 { margin-top: 0; font-size: 1.1rem; }
+        .article-body .case-study p:last-child { margin-bottom: 0; }
+
+        .article-body .bill-example {
+            background: #FAFAFA; border: 1px solid #E5E7EB; border-radius: 14px;
+            padding: 24px; margin: 24px 0; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.88rem; line-height: 1.65; overflow-x: auto;
+        }
+        .article-body .bill-example .bill-header {
+            font-weight: 700; margin-bottom: 12px; font-size: 0.82rem;
+            text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);
+            border-bottom: 2px solid #D1D5DB; padding-bottom: 8px;
+        }
+        .article-body .bill-example .line-item {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px dotted #D1D5DB; flex-wrap: wrap; gap: 4px;
+        }
+        .article-body .bill-example .line-item:last-child { border-bottom: none; }
+        .article-body .bill-example .line-item.flagged { background: #FEF3C7; margin: 0 -12px; padding: 6px 12px; border-radius: 6px; }
+        .article-body .bill-example .line-item.error { background: #FEE2E2; margin: 0 -12px; padding: 6px 12px; border-radius: 6px; }
+        .article-body .bill-example .line-total {
+            font-weight: 700; border-top: 2px solid #1A1A1A; margin-top: 8px; padding-top: 8px;
+            display: flex; justify-content: space-between;
+        }
+
+        .article-body .key-takeaway {
+            background: var(--accent-lime); border-radius: 14px; padding: 20px 24px;
+            margin: 24px 0; font-size: 1rem; font-weight: 600; line-height: 1.6;
+        }
+        .article-body .key-takeaway strong { font-weight: 800; }
+
+        .article-body .faq-section { margin-top: 48px; }
+        .article-body .faq-item {
+            background: var(--card-white); border-radius: 14px; padding: 22px 26px;
+            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .article-body .faq-item h3 { margin-top: 0; font-size: 1.08rem; margin-bottom: 8px; }
+        .article-body .faq-item p { margin-bottom: 0; font-size: 1rem; }
 
         /* CTA at bottom */
         .article-cta {
