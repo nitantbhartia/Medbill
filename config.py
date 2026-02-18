@@ -8,6 +8,7 @@ DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 # Database
 DB_PATH = os.getenv("DB_PATH", "data/app.db")
+AUTO_BOOTSTRAP_HOSPITAL_DATA = os.getenv("AUTO_BOOTSTRAP_HOSPITAL_DATA", "false").lower() == "true"
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

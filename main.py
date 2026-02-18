@@ -32,6 +32,9 @@ templates = Jinja2Templates(directory="templates")
 @app.on_event("startup")
 def startup():
     db.init_db()
+    if config.AUTO_BOOTSTRAP_HOSPITAL_DATA:
+        from hospital_bootstrap import ensure_hospital_data_bootstrap
+        ensure_hospital_data_bootstrap()
     # Seed data if database is empty
     from seed_data import seed_if_empty
     seed_if_empty()
