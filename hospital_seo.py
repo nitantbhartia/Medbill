@@ -49,9 +49,9 @@ def normalize_facility_id(value: str | None) -> str | None:
     return str(value).strip().zfill(6)
 
 
-def _to_bool_int(value: str | int | None) -> int:
+def _to_bool_int(value: str | int | None) -> int | None:
     if value is None:
-        return 0
+        return None
     if isinstance(value, int):
         return 1 if value else 0
     txt = str(value).strip().lower()
@@ -96,7 +96,7 @@ def upsert_hospital_row(row: dict) -> None:
     is_nonprofit = row.get("is_nonprofit")
     if is_nonprofit is None:
         inferred = _looks_nonprofit_from_ownership(ownership)
-        is_nonprofit = 1 if inferred is True else 0 if inferred is False else 0
+        is_nonprofit = 1 if inferred is True else 0 if inferred is False else None
 
     with get_db() as db:
         existing = db.execute(
