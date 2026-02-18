@@ -16,7 +16,8 @@ GRADE_THRESHOLDS = (
     (5.0, "C"),
     (8.0, "D"),
 )
-MIN_COMPARISON_SAMPLE_SIZE = 25
+STATE_COMPARISON_MIN_SAMPLE_SIZE = 25
+NATIONAL_COMPARISON_MIN_SAMPLE_SIZE = 100
 COMPARISON_CACHE_TTL_SECONDS = 900
 CONTENT_TEMPLATE_VERSION = "deterministic-template-v2"
 
@@ -525,15 +526,20 @@ def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | 
     state = _robust_average_markups([r["avg_markup_vs_medicare"] for r in state_rows]) if state_rows else None
     state_n = len(state_rows)
     national_n = len(national_rows)
+    show_state = state_n >= STATE_COMPARISON_MIN_SAMPLE_SIZE
+    show_national = national_n >= NATIONAL_COMPARISON_MIN_SAMPLE_SIZE
     payload: dict[str, float | int | bool | None] = {
-        "state_avg_markup": state,
-        "national_avg_markup": national,
+        "state_avg_markup": state if show_state else None,
+        "national_avg_markup": national if show_national else None,
+        "state_avg_markup_raw": state,
+        "national_avg_markup_raw": national,
         "state_sample_size": state_n,
         "national_sample_size": national_n,
-        "min_sample_size": MIN_COMPARISON_SAMPLE_SIZE,
-        "show_comparison_chart": bool(
-            national_n >= MIN_COMPARISON_SAMPLE_SIZE and state_n >= MIN_COMPARISON_SAMPLE_SIZE
-        ),
+        "state_min_sample_size": STATE_COMPARISON_MIN_SAMPLE_SIZE,
+        "national_min_sample_size": NATIONAL_COMPARISON_MIN_SAMPLE_SIZE,
+        "show_state_comparison": show_state,
+        "show_national_comparison": show_national,
+        "show_comparison_chart": bool(show_state or show_national),
     }
     _comparison_cache[key] = (now, payload)
     return dict(payload)
@@ -610,6 +616,13 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     hospital_d["name"] = _display_name(hospital_d.get("name"), hospital_d.get("facility_id"))
     hospital_d["city"] = _display_city(hospital_d.get("city"))
     hospital_d["state"] = state_display_name(state_code)
+    npct = hospital_d.get("national_percentile")
+    if isinstance(npct, int):
+        hospital_d["aggressiveness_percentile"] = npct
+        hospital_d["fairness_percentile"] = max(1, min(100, 101 - npct))
+    else:
+        hospital_d["aggressiveness_percentile"] = None
+        hospital_d["fairness_percentile"] = None
     nonprofit_flag = hospital_d.get("is_nonprofit")
     ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
     if nonprofit_flag in (None, 0) and ownership_nonprofit is True:
@@ -1032,18 +1045,21 @@ def generate_deterministic_tips(hospital: dict, financials: dict, comparison: di
     cash_discount = hospital.get("cash_discount_avg_pct")
     cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else None
 
-    state_avg = (comparison or {}).get("state_avg_markup")
-    national_avg = (comparison or {}).get("national_avg_markup")
+    cmp_data = comparison or {}
+    state_avg = cmp_data.get("state_avg_markup")
+    national_avg = cmp_data.get("national_avg_markup")
+    show_state = bool(cmp_data.get("show_state_comparison"))
+    show_national = bool(cmp_data.get("show_national_comparison"))
     context_bits = []
-    if isinstance(state_avg, (int, float)):
+    if show_state and isinstance(state_avg, (int, float)):
         relation = "above" if isinstance(markup, (int, float)) and markup > state_avg else "below"
         context_bits.append(f"{relation} the state average ({state_avg:.1f}x)")
-    if isinstance(national_avg, (int, float)):
+    if show_national and isinstance(national_avg, (int, float)):
         relation = "above" if isinstance(markup, (int, float)) and markup > national_avg else "below"
         context_bits.append(f"{relation} the national average ({national_avg:.1f}x)")
     context_txt = ""
     if context_bits:
-        context_txt = " This is " + " and ".join(context_bits) + "."
+        context_txt = " In currently loaded benchmark samples, this is " + " and ".join(context_bits) + "."
 
     para1 = (
         f"{hospital.get('name', 'This hospital')} currently shows a billing grade of {grade} "

@@ -16,7 +16,7 @@ import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
 from hospital_etl import auto_map_columns, first, load_hcahps, normalize_price_rows, upsert_hospital_price  # noqa: E402
-from hospital_seo import get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
+from hospital_seo import clear_comparison_cache, get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
 def test_auto_map_columns_detects_core_fields():
@@ -207,10 +207,12 @@ def test_profile_comparison_averages_stay_realistic_with_normal_seed():
                 (fid.zfill(6), 3.5 + (i % 6) * 0.3, 10, "C"),
             )
 
+    clear_comparison_cache()
     profile = get_hospital_profile("fl", "miami", "target-miami")
     assert profile is not None
     assert 2.0 < profile["comparison"]["state_avg_markup"] < 10.0
-    assert 2.0 < profile["comparison"]["national_avg_markup"] < 10.0
+    # National display can be gated (<100 sample), so assert raw benchmark integrity.
+    assert 2.0 < profile["comparison"]["national_avg_markup_raw"] < 10.0
 
 
 def test_load_hcahps_handles_cms_coded_columns():

@@ -171,12 +171,10 @@ class TestHospitalSeoPages:
         assert "Common Procedure Prices" in resp.text
         assert "Billing Grade Position" in resp.text
         assert "This hospital marker" in resp.text
-        assert "State avg marker" in resp.text
-        assert "National avg marker" in resp.text
         assert "Markup Comparison" in resp.text
         assert (
             "Comparison chart hidden due to limited benchmark sample size." in resp.text
-            or "Based on" in resp.text
+            or "Benchmark samples:" in resp.text
         )
         assert "Last updated:" in resp.text
         assert "Scan My Bill" in resp.text
@@ -386,7 +384,7 @@ class TestHospitalSeoPages:
         clear_comparison_cache()
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
-        assert "Based on" in resp.text
+        assert "Benchmark samples:" in resp.text
         assert "Comparison chart hidden due to limited benchmark sample size." not in resp.text
 
     def test_data_quality_endpoint(self):
@@ -464,8 +462,8 @@ class TestHospitalSeoPages:
         clear_comparison_cache()
         profile = get_hospital_profile("mi", "hollywood", "memorial-regional-hospital-hollywood")
         assert profile is not None
-        assert profile["comparison"]["state_avg_markup"] < 10.0
-        assert profile["comparison"]["national_avg_markup"] < 15.0
+        assert profile["comparison"]["state_avg_markup_raw"] < 10.0
+        assert profile["comparison"]["national_avg_markup_raw"] < 15.0
 
     def test_d_grade_gauge_stays_in_d_band(self):
         _seed_hospital()

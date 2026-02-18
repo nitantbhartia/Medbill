@@ -78,6 +78,9 @@
                 <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-lg font-semibold">{{ grade }}</span>
                 {% endif %}
             </div>
+            {% if data.hospital.fairness_percentile %}
+            <div class="text-xs text-gray-500 mt-2">Relative fairness percentile: <strong>P{{ data.hospital.fairness_percentile }}</strong></div>
+            {% endif %}
         </div>
         <div class="rounded-lg border border-gray-200 p-4">
             <div class="text-xs text-gray-500 uppercase">Avg Markup</div>
@@ -195,9 +198,7 @@
             <h3 class="text-base font-semibold text-gray-900 mb-3">Markup Comparison</h3>
             {% set show_cmp = data.comparison.show_comparison_chart if data.comparison else false %}
             {% if show_cmp %}
-            <p class="text-xs text-gray-500 mb-2">
-                Based on {{ data.comparison.state_sample_size }} hospitals in {{ data.hospital.state }} and {{ data.comparison.national_sample_size }} nationally.
-            </p>
+            <p class="text-xs text-gray-500 mb-2">Benchmark samples: {{ data.comparison.state_sample_size }} state, {{ data.comparison.national_sample_size }} national.</p>
             {% set denom = data.comparison_max if data.comparison_max else 1 %}
             {% set hospital_v = data.hospital.avg_markup_vs_medicare %}
             {% set state_v = data.comparison.state_avg_markup %}
@@ -207,21 +208,29 @@
                     <div class="flex justify-between text-xs text-gray-600 mb-1"><span>This hospital</span><span>{{ "%.1fx"|format(hospital_v) if hospital_v is not none else "N/A" }}</span></div>
                     <div class="h-3 bg-gray-100 rounded"><div class="h-3 bg-red-600 rounded" style="width: {{ ((hospital_v or 0) / denom * 100)|round(1) }}%"></div></div>
                 </div>
+                {% if data.comparison.show_state_comparison %}
                 <div>
                     <div class="flex justify-between text-xs text-gray-600 mb-1"><span>{{ data.hospital.state }} average</span><span>{{ "%.1fx"|format(state_v) if state_v is not none else "N/A" }}</span></div>
                     <div class="h-3 bg-gray-100 rounded"><div class="h-3 bg-amber-500 rounded" style="width: {{ ((state_v or 0) / denom * 100)|round(1) }}%"></div></div>
                 </div>
+                {% else %}
+                <div class="text-xs text-gray-500">{{ data.hospital.state }} average hidden: sample below {{ data.comparison.state_min_sample_size }}.</div>
+                {% endif %}
+                {% if data.comparison.show_national_comparison %}
                 <div>
                     <div class="flex justify-between text-xs text-gray-600 mb-1"><span>National average</span><span>{{ "%.1fx"|format(national_v) if national_v is not none else "N/A" }}</span></div>
                     <div class="h-3 bg-gray-100 rounded"><div class="h-3 bg-emerald-600 rounded" style="width: {{ ((national_v or 0) / denom * 100)|round(1) }}%"></div></div>
                 </div>
+                {% else %}
+                <div class="text-xs text-gray-500">National average hidden: sample below {{ data.comparison.national_min_sample_size }}.</div>
+                {% endif %}
             </div>
             {% else %}
             <p class="text-sm text-gray-600">
                 Comparison chart hidden due to limited benchmark sample size.
                 Current sample: {{ data.comparison.state_sample_size if data.comparison else 0 }} state,
                 {{ data.comparison.national_sample_size if data.comparison else 0 }} national
-                (minimum {{ data.comparison.min_sample_size if data.comparison else 0 }} each).
+                (minimum {{ data.comparison.state_min_sample_size if data.comparison else 0 }} state / {{ data.comparison.national_min_sample_size if data.comparison else 0 }} national).
             </p>
             {% endif %}
         </div>
