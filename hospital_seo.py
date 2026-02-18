@@ -93,6 +93,8 @@ def _display_name(name: str | None) -> str:
     txt = re.sub(r"\s+", " ", txt).strip().strip(",")
     txt = txt.title() if txt.isupper() else txt
     txt = re.sub(r"(?i)\s*(?:,\s*)?(llc|inc|inc\.|corp|corporation|co|company)\s*$", "", txt).strip()
+    # Normalize recurring artifact abbreviations from source/provider strings.
+    txt = re.sub(r"(?i)\bashn\b", "Hospital", txt)
     return txt
 
 
@@ -452,14 +454,49 @@ def _gauge_xy(pct: float | None, radius: float, cx: float = 120.0, cy: float = 1
     }
 
 
-def _circle_xy(pct: float | None, radius: float, cx: float = 110.0, cy: float = 110.0) -> dict | None:
-    if pct is None:
+def _robust_average_markups(markups: list[float], low_q: float = 0.05, high_q: float = 0.95) -> float | None:
+    clean = sorted(
+        float(v)
+        for v in markups
+        if isinstance(v, (int, float)) and 0.5 <= float(v) <= 15.0
+    )
+    if not clean:
         return None
-    p = max(0.0, min(1.0, float(pct)))
-    angle = -math.pi / 2 + (2 * math.pi * p)
+    if len(clean) < 20:
+        return sum(clean) / len(clean)
+    lo = int(len(clean) * low_q)
+    hi = int(len(clean) * high_q)
+    trimmed = clean[lo:max(lo + 1, hi)]
+    if not trimmed:
+        trimmed = clean
+    return sum(trimmed) / len(trimmed)
+
+
+def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | None]:
+    with get_db() as db:
+        national_rows = db.execute(
+            """
+            SELECT avg_markup_vs_medicare
+            FROM billing_metrics
+            WHERE avg_markup_vs_medicare IS NOT NULL
+            """
+        ).fetchall()
+        state_rows = db.execute(
+            """
+            SELECT bm.avg_markup_vs_medicare
+            FROM billing_metrics bm
+            JOIN hospitals h ON h.facility_id = bm.facility_id
+            WHERE bm.avg_markup_vs_medicare IS NOT NULL
+              AND h.state = ?
+            """,
+            (state_code,),
+        ).fetchall() if state_code else []
+
+    national = _robust_average_markups([r["avg_markup_vs_medicare"] for r in national_rows])
+    state = _robust_average_markups([r["avg_markup_vs_medicare"] for r in state_rows]) if state_rows else None
     return {
-        "x": cx + radius * math.cos(angle),
-        "y": cy + radius * math.sin(angle),
+        "state_avg_markup": state,
+        "national_avg_markup": national,
     }
 
 
@@ -467,10 +504,12 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     with get_db() as db:
         hospital = db.execute(
             """
-            SELECT h.*, m.avg_markup_vs_medicare, m.median_markup_vs_medicare, m.max_markup_vs_medicare,
+            SELECT h.*, COALESCE(h.ownership, hd.ownership) AS ownership_fallback,
+                   m.avg_markup_vs_medicare, m.median_markup_vs_medicare, m.max_markup_vs_medicare,
                    m.procedures_compared, m.cash_discount_avg_pct, m.billing_grade, m.state_rank,
                    m.national_percentile, m.computed_at
             FROM hospitals h
+            LEFT JOIN hospital_directory hd ON hd.facility_id = h.facility_id
             LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.state_slug = ? AND h.city_slug = ? AND h.slug = ?
             """,
@@ -521,31 +560,13 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
             """,
             (hospital["state"], hospital["facility_id"]),
         ).fetchall()
-        comparison = db.execute(
-            """
-            SELECT
-                (
-                    SELECT AVG(avg_markup_vs_medicare)
-                    FROM billing_metrics
-                    WHERE facility_id IN (
-                        SELECT facility_id FROM hospitals WHERE state = ?
-                    )
-                    AND avg_markup_vs_medicare IS NOT NULL
-                ) AS state_avg_markup,
-                (
-                    SELECT AVG(avg_markup_vs_medicare)
-                    FROM billing_metrics
-                    WHERE avg_markup_vs_medicare IS NOT NULL
-                ) AS national_avg_markup
-            """,
-            (hospital["state"],),
-        ).fetchone()
-
     hospital_d = dict(hospital)
+    if not hospital_d.get("ownership") and hospital_d.get("ownership_fallback"):
+        hospital_d["ownership"] = hospital_d.get("ownership_fallback")
     quality_d = dict(quality) if quality else {}
     financials_d = dict(financials) if financials else {}
     transparency_d = dict(transparency) if transparency else {}
-    comparison_d = dict(comparison) if comparison else {}
+    comparison_d = _comparison_averages_for_state(hospital_d.get("state"))
     hospital_d["name"] = _display_name(hospital_d.get("name"))
     hospital_d["city"] = _display_city(hospital_d.get("city"))
     hospital_d["state"] = state_display_name(hospital_d.get("state"))
@@ -585,7 +606,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     content = _lookup_content_for_hospital(hospital_d["facility_id"])
     tips = content.get("dispute_tips")
     if not tips or "loaded data" in str(tips).lower():
-        tips = generate_deterministic_tips(hospital_d, financials_d)
+        tips = generate_deterministic_tips(hospital_d, financials_d, comparison_d)
 
     nearby = get_nearby_hospitals(
         state_slug=hospital_d["state_slug"],
@@ -612,16 +633,16 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "state": _gauge_xy(gauge_markers["state"], radius=100),
         "national": _gauge_xy(gauge_markers["national"], radius=90),
     }
-    donut_radius = 74.0
-    donut_circumference = 2 * math.pi * donut_radius
-    donut_progress = donut_circumference * hospital_gauge_pct if hospital_gauge_pct is not None else None
+    donut_radius = 96.0
+    donut_length = math.pi * donut_radius
+    donut_progress = donut_length * hospital_gauge_pct if hospital_gauge_pct is not None else None
     grade_donut = {
         "radius": donut_radius,
-        "circumference": donut_circumference,
+        "length": donut_length,
         "progress": donut_progress,
-        "hospital": _circle_xy(gauge_markers["hospital"], radius=86),
-        "state": _circle_xy(gauge_markers["state"], radius=86),
-        "national": _circle_xy(gauge_markers["national"], radius=86),
+        "hospital": _gauge_xy(gauge_markers["hospital"], radius=96, cx=120, cy=140),
+        "state": _gauge_xy(gauge_markers["state"], radius=96, cx=120, cy=140),
+        "national": _gauge_xy(gauge_markers["national"], radius=96, cx=120, cy=140),
     }
 
     comparison_max = max(
@@ -838,7 +859,26 @@ def recompute_billing_metrics() -> int:
                 upserted += 1
                 continue
 
-            markups = [float(r["markup_vs_medicare"]) for r in rows if r["markup_vs_medicare"] is not None]
+            markups = [
+                float(r["markup_vs_medicare"])
+                for r in rows
+                if r["markup_vs_medicare"] is not None and 0.5 <= float(r["markup_vs_medicare"]) <= 150.0
+            ]
+            if len(markups) < 5:
+                db.execute(
+                    """
+                    INSERT INTO billing_metrics (
+                        facility_id, procedures_compared, billing_grade, computed_at
+                    ) VALUES (?, ?, 'N/A', CURRENT_TIMESTAMP)
+                    ON CONFLICT(facility_id) DO UPDATE SET
+                        procedures_compared=excluded.procedures_compared,
+                        billing_grade='N/A',
+                        computed_at=CURRENT_TIMESTAMP
+                    """,
+                    (f["facility_id"], len(markups)),
+                )
+                upserted += 1
+                continue
             avg_markup = sum(markups) / len(markups)
             med_markup = sorted(markups)[len(markups) // 2]
             max_markup = max(markups)
@@ -909,7 +949,7 @@ def recompute_billing_metrics() -> int:
     return upserted
 
 
-def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
+def generate_deterministic_tips(hospital: dict, financials: dict, comparison: dict | None = None) -> str:
     grade = hospital.get("billing_grade") or "N/A"
     markup = hospital.get("avg_markup_vs_medicare")
     markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
@@ -919,10 +959,23 @@ def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
     cash_discount = hospital.get("cash_discount_avg_pct")
     cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else None
 
+    state_avg = (comparison or {}).get("state_avg_markup")
+    national_avg = (comparison or {}).get("national_avg_markup")
+    context_bits = []
+    if isinstance(state_avg, (int, float)):
+        relation = "above" if isinstance(markup, (int, float)) and markup > state_avg else "below"
+        context_bits.append(f"{relation} the state average ({state_avg:.1f}x)")
+    if isinstance(national_avg, (int, float)):
+        relation = "above" if isinstance(markup, (int, float)) and markup > national_avg else "below"
+        context_bits.append(f"{relation} the national average ({national_avg:.1f}x)")
+    context_txt = ""
+    if context_bits:
+        context_txt = " This is " + " and ".join(context_bits) + "."
+
     para1 = (
         f"{hospital.get('name', 'This hospital')} currently shows a billing grade of {grade} "
-        f"with an average markup around {markup_txt} versus Medicare reference rates. "
-        f"Use that benchmark when asking billing to review line items and justify large gaps."
+        f"with an average markup around {markup_txt} versus Medicare reference rates.{context_txt} "
+        "Use that benchmark when asking billing to review line items and justify large gaps."
     )
 
     if nonprofit:
@@ -943,7 +996,12 @@ def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
                 "If no discount is offered, ask for a supervisor review, payment-plan options, and item-level justification."
             )
 
-    para3 = "Before paying, scan your bill with BillKarma to identify line-item issues and generate a dispute packet."
+    phone = hospital.get("phone")
+    contact_txt = f" Call billing at {phone} and ask for an itemized review plus written adjustment options." if phone else ""
+    para3 = (
+        "Before paying, scan your bill with BillKarma to identify line-item issues and generate a dispute packet."
+        + contact_txt
+    )
     return "\n\n".join((para1, para2, para3))
 
 
@@ -969,7 +1027,7 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
         saved = 0
         for row in rows:
             data = dict(row)
-            tips = generate_deterministic_tips(data, data)
+            tips = generate_deterministic_tips(data, data, None)
             meta = (
                 f"{data['name']} billing review in {data['city']}, {data['state']}. "
                 f"Compare markup vs Medicare, financial assistance, and dispute options before paying."

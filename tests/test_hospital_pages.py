@@ -353,3 +353,73 @@ class TestHospitalSeoPages:
         assert 'property="og:image"' in resp.text
         assert '<meta name="robots" content="index, follow">' in resp.text
         assert '"@type": "FAQPage"' in resp.text
+
+    def test_comparison_averages_exclude_extreme_outliers(self):
+        _seed_hospital()
+        upsert_hospital_row(
+            {
+                "facility_id": "11001",
+                "name": "MI Regular A",
+                "city": "Detroit",
+                "state": "MI",
+                "slug": "mi-regular-a-detroit",
+            }
+        )
+        upsert_hospital_row(
+            {
+                "facility_id": "11002",
+                "name": "MI Regular B",
+                "city": "Lansing",
+                "state": "MI",
+                "slug": "mi-regular-b-lansing",
+            }
+        )
+        with get_db() as db:
+            db.execute("UPDATE hospitals SET state = 'MI', state_slug = 'mi' WHERE facility_id = '010001'")
+            db.execute(
+                "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                ("011001", 3.2, 10, "C"),
+            )
+            db.execute(
+                "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                ("011002", 3.8, 10, "C"),
+            )
+            # Extreme outlier should be filtered from comparison averages.
+            upsert_hospital_row(
+                {
+                    "facility_id": "11003",
+                    "name": "Extreme Outlier",
+                    "city": "Flint",
+                    "state": "MI",
+                    "slug": "extreme-outlier-flint",
+                }
+            )
+            db.execute(
+                "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                ("011003", 80.0, 10, "F"),
+            )
+        profile = get_hospital_profile("mi", "hollywood", "memorial-regional-hospital-hollywood")
+        assert profile is not None
+        assert profile["comparison"]["state_avg_markup"] < 10.0
+        assert profile["comparison"]["national_avg_markup"] < 15.0
+
+    def test_d_grade_gauge_stays_in_d_band(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute(
+                """
+                UPDATE billing_metrics
+                SET avg_markup_vs_medicare = 6.5,
+                    median_markup_vs_medicare = 6.5,
+                    max_markup_vs_medicare = 6.5,
+                    billing_grade = 'D'
+                WHERE facility_id = ?
+                """,
+                ("010001",),
+            )
+        profile = get_hospital_profile("fl", "hollywood", "memorial-regional-hospital-hollywood")
+        assert profile is not None
+        p = profile["grade_gauge_pct"]
+        # D grade band maps to 0.2..0.4 by product scale (5x-8x Medicare).
+        assert p is not None
+        assert 0.2 <= p <= 0.4
