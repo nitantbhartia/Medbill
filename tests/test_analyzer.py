@@ -2,7 +2,10 @@
 
 import json
 
-from analyzer import analyze_bill, save_bill_and_findings, get_bill_results, get_stats, _assign_confidence
+from analyzer import (
+    analyze_bill, save_bill_and_findings, get_bill_results, get_stats,
+    _assign_confidence, _prorate_patient_responsibility,
+)
 from db import get_db
 from tests.conftest import (
     SAMPLE_BILL,
@@ -161,3 +164,48 @@ class TestGetStats:
         assert stats["bills_scanned"] >= 1
         assert stats["total_found"] > 0
         assert stats["avg_savings"] > 0
+
+
+class TestProration:
+    def test_prorates_total_patient_owes_across_items(self):
+        extracted = {
+            "total_patient_owes": 300.0,
+            "line_items": [
+                {"charged_amount": 600.0},
+                {"charged_amount": 400.0},
+            ],
+        }
+        _prorate_patient_responsibility(extracted)
+        assert extracted["line_items"][0]["patient_responsibility"] == 180.0
+        assert extracted["line_items"][1]["patient_responsibility"] == 120.0
+
+    def test_skips_proration_when_per_line_data_exists(self):
+        extracted = {
+            "total_patient_owes": 300.0,
+            "line_items": [
+                {"charged_amount": 600.0, "patient_responsibility": 200.0},
+                {"charged_amount": 400.0},
+            ],
+        }
+        _prorate_patient_responsibility(extracted)
+        assert extracted["line_items"][0]["patient_responsibility"] == 200.0
+        assert extracted["line_items"][1].get("patient_responsibility") is None
+
+    def test_skips_proration_when_no_total_patient_owes(self):
+        extracted = {
+            "line_items": [{"charged_amount": 600.0}],
+        }
+        _prorate_patient_responsibility(extracted)
+        assert extracted["line_items"][0].get("patient_responsibility") is None
+
+    def test_savings_capped_to_prorated_share(self):
+        bill = {
+            "total_charged": 1000.0,
+            "total_patient_owes": 200.0,
+            "line_items": [
+                {"cpt_code": "99285", "description": "ER visit high", "charged_amount": 1000.0, "quantity": 1},
+            ],
+        }
+        result = analyze_bill(bill, "33021")
+        if result["total_findings"] > 0:
+            assert result["total_potential_savings"] <= 200.0

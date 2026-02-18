@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import TypedDict, Any
 
 from db import get_db
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
@@ -14,6 +13,54 @@ from validators.eob import check_eob_reconciliation
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
+
+
+def merge_eob_into_extracted(extracted: dict, eob_data: dict) -> dict:
+    """
+    Enrich bill extraction with insurance fields from an uploaded EOB.
+    Matches by CPT first, then by line index fallback.
+    """
+    merged = dict(extracted or {})
+    bill_items = list(merged.get("line_items") or [])
+    eob_items = list((eob_data or {}).get("line_items") or [])
+    if not bill_items or not eob_items:
+        return merged
+
+    eob_by_cpt: dict[str, list[tuple[int, dict]]] = {}
+    for i, row in enumerate(eob_items):
+        code = (row.get("cpt_code") or "").strip()
+        if not code:
+            continue
+        eob_by_cpt.setdefault(code, []).append((i, row))
+
+    used_indices: set[int] = set()
+    for idx, item in enumerate(bill_items):
+        candidate = None
+        code = (item.get("cpt_code") or "").strip()
+        if code and eob_by_cpt.get(code):
+            for eob_idx, eob in eob_by_cpt[code]:
+                if eob_idx not in used_indices:
+                    candidate = eob
+                    used_indices.add(eob_idx)
+                    break
+        if candidate is None and idx < len(eob_items) and idx not in used_indices:
+            candidate = eob_items[idx]
+
+        if candidate is None:
+            continue
+        for fld in ("insurance_paid", "insurance_adjustment", "patient_responsibility"):
+            if item.get(fld) is None and candidate.get(fld) is not None:
+                item[fld] = candidate[fld]
+        if item.get("date_of_service") is None and candidate.get("date_of_service"):
+            item["date_of_service"] = candidate["date_of_service"]
+
+    merged["line_items"] = bill_items
+    merged["_eob_merge"] = {
+        "bill_lines": len(bill_items),
+        "eob_lines": len(eob_items),
+    }
+    return merged
+
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2, "informational": 3}
 
@@ -39,21 +86,6 @@ RULE_ID_BY_TYPE = {
     "benchmark_outlier": "RULE_REGIONAL_BENCHMARK_OUTLIER",
     "eob_mismatch": "RULE_EOB_RECONCILIATION",
 }
-
-
-class FlagResult(TypedDict, total=False):
-    type: str
-    rule_id: str
-    severity: str
-    confidence: str
-    message: str
-    details: str
-    potential_savings: float
-    gross_potential_savings: float
-    estimated_patient_savings: float
-    line_item: dict[str, Any]
-    related_items: list[dict[str, Any]]
-    evidence: dict[str, Any]
 
 
 def _assign_confidence(finding: dict) -> str:
@@ -251,6 +283,41 @@ def _apply_evidence_policy(finding: dict, freshness: dict) -> None:
         finding["severity"] = _downgrade_severity(finding.get("severity", "low"))
 
 
+def _prorate_patient_responsibility(extracted_data: dict) -> None:
+    """Fill missing per-line patient_responsibility from bill-level total_patient_owes.
+
+    Most hospital bills show a "you owe" total but not per-line patient shares.
+    Without this, savings are computed against the full charge instead of what the
+    patient actually owes. Proration assigns each line item a share proportional
+    to its charged_amount.
+    """
+    line_items = extracted_data.get("line_items", [])
+    total_patient_owes = extracted_data.get("total_patient_owes")
+    if not line_items or not total_patient_owes:
+        return
+
+    total_patient_owes = float(total_patient_owes)
+    if total_patient_owes <= 0:
+        return
+
+    # Skip if any line already has patient_responsibility — the data is already present
+    has_any = any(item.get("patient_responsibility") is not None for item in line_items)
+    if has_any:
+        return
+
+    total_charged = sum(float(item.get("charged_amount") or 0) for item in line_items)
+    if total_charged <= 0:
+        return
+
+    for item in line_items:
+        charged = float(item.get("charged_amount") or 0)
+        if charged > 0:
+            item["patient_responsibility"] = round(
+                total_patient_owes * (charged / total_charged), 2
+            )
+            item["_patient_resp_prorated"] = True
+
+
 def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     """
     Run all analysis checks against extracted bill data.
@@ -265,6 +332,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     adaptive = _get_adaptive_thresholds()
 
     line_items = extracted_data.get("line_items", [])
+
+    # Prorate bill-level patient_owes to line items so savings are patient-centric
+    _prorate_patient_responsibility(extracted_data)
 
     # Pre-analysis: validate extraction quality
     extraction_issues = validate_extraction(extracted_data)
@@ -390,6 +460,13 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     findings.sort(key=lambda f: SEVERITY_ORDER.get(f.get("severity", "low"), 2))
 
+    has_patient_data = any(
+        item.get("patient_responsibility") is not None for item in line_items
+    )
+    savings_prorated = any(
+        item.get("_patient_resp_prorated") for item in line_items
+    )
+
     return {
         "total_findings": len(findings),
         "total_potential_savings": round(total_potential_savings, 2),
@@ -400,6 +477,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
+        "has_patient_data": has_patient_data,
+        "savings_prorated": savings_prorated,
         "adaptive_thresholds": {
             "pricing_markup_threshold": adaptive["pricing_markup_threshold"],
             "pricing_high_threshold": adaptive["pricing_high_threshold"],
@@ -515,10 +594,22 @@ def get_bill_results(bill_id: int) -> dict | None:
         )
         normalized_findings.append(finding)
 
+    li_dicts = [dict(li) for li in line_items]
+    has_patient_data = any(li.get("patient_responsibility") is not None for li in li_dicts)
+    has_insurance_data = any(li.get("insurance_paid") is not None for li in li_dicts)
+
+    total_gross = sum(
+        float(f.get("parsed_details", {}).get("gross_potential_savings") or f.get("potential_savings") or 0)
+        for f in normalized_findings
+    )
+
     return {
         "bill": dict(bill),
-        "line_items": [dict(li) for li in line_items],
+        "line_items": li_dicts,
         "findings": normalized_findings,
+        "has_patient_data": has_patient_data,
+        "has_insurance_data": has_insurance_data,
+        "total_gross_potential_savings": round(total_gross, 2),
     }
 
 
