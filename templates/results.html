@@ -86,9 +86,9 @@
         <div class="space-y-3">
             {% for finding in data.findings %}
             <div class="border border-gray-200 rounded-md p-4">
-                <div class="flex items-start gap-3">
+                <div class="flex flex-wrap sm:flex-nowrap items-start gap-3">
                     <!-- Severity -->
-                    <span class="flex-shrink-0 mt-0.5 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded
+                    <span class="flex-shrink-0 mt-0.5 text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded
                         {% if finding.severity == 'high' %}
                             text-red-700 bg-red-50 border border-red-200
                         {% elif finding.severity == 'medium' %}
@@ -101,7 +101,7 @@
                     <!-- Content -->
                     <div class="flex-1 min-w-0">
                         <p class="text-sm text-gray-900">{{ finding.message }}</p>
-                        <div class="mt-2 flex flex-wrap gap-2 text-[10px]">
+                        <div class="mt-2 flex flex-wrap gap-2 text-xs">
                             {% if finding.confidence %}
                             <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 uppercase tracking-wide">
                                 confidence: {{ finding.confidence }}
@@ -120,7 +120,7 @@
                             {% endif %}
                         </div>
                         {% if finding.cpt_code %}
-                        <div class="mt-2 flex flex-wrap gap-1.5 text-[10px] text-gray-500 font-mono">
+                        <div class="mt-2 flex flex-wrap gap-1.5 text-xs text-gray-500 font-mono">
                             <span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">{{ finding.cpt_code }}</span>
                             {% if finding.billed_amount is defined %}
                             <span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "%.2f" | format(finding.billed_amount) }} billed</span>
@@ -140,7 +140,7 @@
                             {% elif finding.severity == 'medium' %}text-amber-700
                             {% else %}text-blue-700{% endif %}
                         ">${{ "%.2f" | format(finding.potential_savings) }}</div>
-                        <div class="text-[10px] text-gray-400">{% if has_patient_data %}your savings{% else %}overcharge{% endif %}</div>
+                        <div class="text-xs text-gray-400">{% if has_patient_data %}your savings{% else %}overcharge{% endif %}</div>
                     </div>
                     {% endif %}
                 </div>
@@ -159,21 +159,21 @@
         <ol class="space-y-3 text-sm text-gray-600">
             {% if insured %}
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">1</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</span>
                 <div>
                     <span class="font-medium text-gray-900">Review your EOB</span>
                     &mdash; compare your insurance Explanation of Benefits with the itemized bill to spot any errors.
                 </div>
             </li>
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">2</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</span>
                 <div>
                     <span class="font-medium text-gray-900">Call billing</span>
                     &mdash; use the phone script below. Ask them to verify charges and about prompt-pay discounts.
                 </div>
             </li>
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">3</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</span>
                 <div>
                     <span class="font-medium text-gray-900">Escalate if needed</span>
                     &mdash; ask for a supervisor, patient advocate, or file a complaint with your state Attorney General.
@@ -181,21 +181,21 @@
             </li>
             {% else %}
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">1</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</span>
                 <div>
                     <span class="font-medium text-gray-900">Request an itemized bill</span>
                     &mdash; call your provider's billing department. You have the legal right to this.
                 </div>
             </li>
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">2</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</span>
                 <div>
                     <span class="font-medium text-gray-900">Call and negotiate</span>
                     &mdash; use the phone script below. Ask for the self-pay or cash rate.
                 </div>
             </li>
             <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">3</span>
+                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</span>
                 <div>
                     <span class="font-medium text-gray-900">Escalate if needed</span>
                     &mdash; file a complaint with your state Attorney General or the
@@ -212,7 +212,7 @@
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-semibold text-gray-900">Phone script</h2>
             <button type="button" id="copy-script-btn"
-                    class="text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors">
+                    class="text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors px-3 py-1.5">
                 <span id="copy-btn-text">Copy</span>
             </button>
         </div>
@@ -228,7 +228,7 @@
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-semibold text-gray-900">Written message</h2>
             <button type="button" id="copy-message-btn"
-                    class="text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors">
+                    class="text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors px-3 py-1.5">
                 <span id="copy-message-btn-text">Copy</span>
             </button>
         </div>
@@ -262,10 +262,10 @@
             </button>
         </div>
         <div class="flex flex-wrap gap-2 mb-3">
-            <button type="button" data-claim-status="sent" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark sent</button>
-            <button type="button" data-claim-status="acknowledged" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark acknowledged</button>
-            <button type="button" data-claim-status="resolved" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark resolved</button>
-            <button type="button" data-claim-status="denied" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark denied</button>
+            <button type="button" data-claim-status="sent" class="claim-status-btn text-xs px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Mark sent</button>
+            <button type="button" data-claim-status="acknowledged" class="claim-status-btn text-xs px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Mark acknowledged</button>
+            <button type="button" data-claim-status="resolved" class="claim-status-btn text-xs px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Mark resolved</button>
+            <button type="button" data-claim-status="denied" class="claim-status-btn text-xs px-3 py-2 rounded bg-gray-100 hover:bg-gray-200">Mark denied</button>
         </div>
         <div id="claim-status-output" class="text-xs text-gray-500">No claim created yet.</div>
     </div>
@@ -275,7 +275,7 @@
     <div class="border border-gray-200 rounded-md p-5 mb-8">
         <h2 class="text-sm font-semibold text-gray-900 mb-1">Email this report</h2>
         <p class="text-xs text-gray-500 mb-3">We'll send you a PDF with all findings and scripts.</p>
-        <form id="email-report-form" class="flex gap-2">
+        <form id="email-report-form" class="flex flex-col sm:flex-row gap-2">
             <input type="email" id="report-email" name="email" placeholder="you@example.com" required
                    class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500"/>
             <button type="submit" id="send-report-btn"
