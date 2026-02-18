@@ -137,9 +137,7 @@
         <div class="rounded-lg border border-gray-200 p-5">
             <h3 class="text-base font-semibold text-gray-900 mb-3">Billing Grade Position</h3>
             {% if data.grade_gauge_pct is not none %}
-            {% set hospital_x = 20 + (data.grade_gauge_markers.hospital * 200) %}
-            {% set state_x = 20 + (data.grade_gauge_markers.state * 200) if data.grade_gauge_markers and data.grade_gauge_markers.state is not none else none %}
-            {% set national_x = 20 + (data.grade_gauge_markers.national * 200) if data.grade_gauge_markers and data.grade_gauge_markers.national is not none else none %}
+            {% set p = data.grade_gauge_points %}
             <svg viewBox="0 0 240 140" class="w-full max-w-md" aria-label="Billing grade gauge">
                 <defs>
                     <linearGradient id="gradeArc" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -150,16 +148,16 @@
                 </defs>
                 <path d="M20,120 A100,100 0 0 1 220,120" fill="none" stroke="#e5e7eb" stroke-width="16" stroke-linecap="round"></path>
                 <path d="M20,120 A100,100 0 0 1 220,120" fill="none" stroke="url(#gradeArc)" stroke-width="16" stroke-linecap="round"></path>
-                {% if state_x is not none %}
-                <line x1="{{ state_x }}" y1="110" x2="{{ state_x }}" y2="62" stroke="#2563eb" stroke-width="2"></line>
-                <circle cx="{{ state_x }}" cy="110" r="4" fill="#2563eb"></circle>
+                {% if p and p.state %}
+                <circle cx="{{ p.state.x|round(2) }}" cy="{{ p.state.y|round(2) }}" r="4.5" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"></circle>
                 {% endif %}
-                {% if national_x is not none %}
-                <line x1="{{ national_x }}" y1="110" x2="{{ national_x }}" y2="70" stroke="#059669" stroke-width="2"></line>
-                <circle cx="{{ national_x }}" cy="110" r="4" fill="#059669"></circle>
+                {% if p and p.national %}
+                <circle cx="{{ p.national.x|round(2) }}" cy="{{ p.national.y|round(2) }}" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"></circle>
                 {% endif %}
-                <line x1="{{ hospital_x }}" y1="112" x2="{{ hospital_x }}" y2="40" stroke="#111827" stroke-width="3"></line>
-                <circle cx="{{ hospital_x }}" cy="112" r="6" fill="#111827"></circle>
+                {% if p and p.hospital_tip %}
+                <line x1="120" y1="112" x2="{{ p.hospital_tip.x|round(2) }}" y2="{{ p.hospital_tip.y|round(2) }}" stroke="#111827" stroke-width="3.5" stroke-linecap="round"></line>
+                {% endif %}
+                <circle cx="120" cy="112" r="6.8" fill="#111827"></circle>
                 <text x="20" y="133" font-size="12" fill="#6b7280">F</text>
                 <text x="67" y="133" font-size="12" fill="#6b7280">D</text>
                 <text x="114" y="133" font-size="12" fill="#6b7280">C</text>
@@ -168,10 +166,10 @@
             </svg>
             <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-600">
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-900 mr-1"></span>This hospital marker</span>
-                {% if state_x is not none %}
+                {% if p and p.state %}
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-600 mr-1"></span>State avg marker</span>
                 {% endif %}
-                {% if national_x is not none %}
+                {% if p and p.national %}
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1"></span>National avg marker</span>
                 {% endif %}
             </div>

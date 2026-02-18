@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections import defaultdict
 
@@ -440,6 +441,17 @@ def _grade_position_from_markup(markup: float | int | None) -> float | None:
     return max(0.0, 0.2 - (cap - 8.0) / 6.0 * 0.2)
 
 
+def _gauge_xy(pct: float | None, radius: float, cx: float = 120.0, cy: float = 120.0) -> dict | None:
+    if pct is None:
+        return None
+    p = max(0.0, min(1.0, float(pct)))
+    angle = math.pi * (1.0 - p)  # 0..1 maps F(left) -> A(right)
+    return {
+        "x": cx + radius * math.cos(angle),
+        "y": cy - radius * math.sin(angle),
+    }
+
+
 def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) -> dict | None:
     with get_db() as db:
         hospital = db.execute(
@@ -584,6 +596,11 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "state": _grade_position_from_markup(state_markup),
         "national": _grade_position_from_markup(national_markup),
     }
+    gauge_points = {
+        "hospital_tip": _gauge_xy(gauge_markers["hospital"], radius=72),
+        "state": _gauge_xy(gauge_markers["state"], radius=100),
+        "national": _gauge_xy(gauge_markers["national"], radius=90),
+    }
 
     comparison_max = max(
         [
@@ -607,6 +624,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "comparison": comparison_d,
         "grade_gauge_pct": hospital_gauge_pct,
         "grade_gauge_markers": gauge_markers,
+        "grade_gauge_points": gauge_points,
         "comparison_max": comparison_max,
         "prices": prices_d,
         "show_cash_column": show_cash_column,
