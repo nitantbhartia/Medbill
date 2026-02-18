@@ -16,9 +16,8 @@ os.environ["DB_PATH"] = ":memory:"
 from fastapi.testclient import TestClient  # noqa: E402
 
 import db as _db  # noqa: E402
-from api import _merge_eob_into_extracted  # noqa: E402
 from main import app  # noqa: E402
-from analyzer import analyze_bill, save_bill_and_findings, get_bill_results  # noqa: E402
+from analyzer import analyze_bill, save_bill_and_findings, get_bill_results, merge_eob_into_extracted  # noqa: E402
 from tests.conftest import SAMPLE_BILL  # noqa: E402
 
 
@@ -60,9 +59,27 @@ class TestEobMerge:
                 {"cpt_code": "99283", "insurance_paid": 400.0, "insurance_adjustment": 500.0, "patient_responsibility": 100.0},
             ]
         }
-        merged = _merge_eob_into_extracted(extracted, eob)
+        merged = merge_eob_into_extracted(extracted, eob)
         assert merged["line_items"][0]["insurance_paid"] == 400.0
         assert merged["line_items"][1]["insurance_paid"] == 100.0
+
+    def test_merge_eob_falls_back_to_positional_index(self):
+        extracted = {
+            "line_items": [
+                {"cpt_code": "99283", "description": "ER visit", "charged_amount": 1000.0},
+                {"description": "Unknown service", "charged_amount": 200.0},
+            ]
+        }
+        eob = {
+            "line_items": [
+                {"cpt_code": "99283", "insurance_paid": 400.0},
+                {"insurance_paid": 50.0, "patient_responsibility": 150.0},
+            ]
+        }
+        merged = merge_eob_into_extracted(extracted, eob)
+        assert merged["line_items"][0]["insurance_paid"] == 400.0
+        assert merged["line_items"][1]["insurance_paid"] == 50.0
+        assert merged["line_items"][1]["patient_responsibility"] == 150.0
 
     def test_stats_after_bill(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -366,3 +383,17 @@ class TestClaimWorkflowEndpoints:
         )
         assert progressed.status_code == 200
         assert progressed.json()["data"]["to_status"] == "sent"
+
+    def test_invalid_claim_transition_rejected(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+
+        created = client.post("/api/claims", data={"bill_id": bill_id})
+        claim_id = created.json()["data"]["claim_id"]
+
+        resp = client.post(
+            f"/api/claims/{claim_id}/status",
+            data={"status": "resolved"},
+        )
+        assert resp.status_code == 400
+        assert "Cannot transition" in resp.json()["detail"]

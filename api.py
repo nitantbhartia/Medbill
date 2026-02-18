@@ -24,56 +24,13 @@ from ocr_benchmark import run_manifest
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
-CLAIM_STATUSES = {"drafted", "sent", "acknowledged", "resolved", "denied"}
-
-
-def _merge_eob_into_extracted(extracted: dict, eob_data: dict) -> dict:
-    """
-    Enrich bill extraction with insurance fields from an uploaded EOB.
-    Matches by CPT first, then by line index fallback.
-    """
-    merged = dict(extracted or {})
-    bill_items = list(merged.get("line_items") or [])
-    eob_items = list((eob_data or {}).get("line_items") or [])
-    if not bill_items or not eob_items:
-        return merged
-
-    eob_by_cpt: dict[str, list[dict]] = {}
-    for row in eob_items:
-        code = (row.get("cpt_code") or "").strip()
-        if not code:
-            continue
-        eob_by_cpt.setdefault(code, []).append(row)
-
-    used_ids = set()
-    for idx, item in enumerate(bill_items):
-        candidate = None
-        code = (item.get("cpt_code") or "").strip()
-        if code and eob_by_cpt.get(code):
-            pool = eob_by_cpt[code]
-            for eob in pool:
-                marker = id(eob)
-                if marker not in used_ids:
-                    candidate = eob
-                    used_ids.add(marker)
-                    break
-        if candidate is None and idx < len(eob_items):
-            candidate = eob_items[idx]
-
-        if candidate is None:
-            continue
-        for fld in ("insurance_paid", "insurance_adjustment", "patient_responsibility"):
-            if item.get(fld) is None and candidate.get(fld) is not None:
-                item[fld] = candidate.get(fld)
-        if item.get("date_of_service") is None and candidate.get("date_of_service"):
-            item["date_of_service"] = candidate.get("date_of_service")
-
-    merged["line_items"] = bill_items
-    merged["_eob_merge"] = {
-        "bill_lines": len(bill_items),
-        "eob_lines": len(eob_items),
-    }
-    return merged
+CLAIM_TRANSITIONS = {
+    "drafted": {"sent", "denied"},
+    "sent": {"acknowledged", "denied"},
+    "acknowledged": {"resolved", "denied"},
+    "resolved": set(),
+    "denied": set(),
+}
 
 
 @router.post("/scan")
@@ -133,7 +90,7 @@ async def scan_bill(
                     for f in eob_uploads:
                         eob_image_list.append((await f.read(), f.content_type or "image/jpeg"))
                     eob_data = scanner.process_multi_page_bill(eob_image_list)
-                extracted = _merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
+                extracted = analyzer.merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
         analysis = analyzer.analyze_bill(extracted, zip_code)
         bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
         log_audit(
@@ -550,7 +507,7 @@ async def list_claims(bill_id: int):
 async def update_claim_status(claim_id: int, status: str = Form(...), note: str = Form("")):
     """Transition a claim status and append an audit event."""
     target = (status or "").strip().lower()
-    if target not in CLAIM_STATUSES:
+    if target not in CLAIM_TRANSITIONS:
         raise HTTPException(400, f"Invalid status '{status}'")
 
     with get_db() as db:
@@ -559,6 +516,9 @@ async def update_claim_status(claim_id: int, status: str = Form(...), note: str 
             raise HTTPException(404, "Claim not found")
 
         prev = claim["current_status"]
+        allowed = CLAIM_TRANSITIONS.get(prev, set())
+        if target not in allowed:
+            raise HTTPException(400, f"Cannot transition from '{prev}' to '{target}'")
         db.execute(
             "UPDATE dispute_claims SET current_status = ?, updated_at = CURRENT_TIMESTAMP, "
             "notes = CASE WHEN ? != '' THEN COALESCE(notes, '') || '\n' || ? ELSE notes END "
@@ -580,8 +540,9 @@ async def update_claim_status(claim_id: int, status: str = Form(...), note: str 
 
 
 @router.get("/ops/ocr-benchmark")
-async def ocr_benchmark(manifest: str = "data/ocr_benchmark/manifest.json"):
+async def ocr_benchmark():
     """Run OCR benchmark over local fixture manifest."""
+    manifest = "data/ocr_benchmark/manifest.json"
     try:
         result = run_manifest(manifest)
     except FileNotFoundError:

@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 try:
     from PIL import Image, ImageFilter, ImageOps
-except Exception:  # pragma: no cover - optional dependency fallback
+except ImportError:  # pragma: no cover - optional dependency fallback
     Image = None
     ImageFilter = None
     ImageOps = None
@@ -235,17 +235,17 @@ def _quality_score(extracted: dict) -> tuple[float, dict]:
             described_count += 1
 
     score = 0.0
-    score += min(len(items), 25) * 2.0
-    score += cpt_count * 2.5
-    score += amount_count * 2.0
-    score += described_count * 1.0
+    score += min(len(items), 25) * config.OCR_SCORE_PER_LINE_ITEM
+    score += cpt_count * config.OCR_SCORE_PER_CPT
+    score += amount_count * config.OCR_SCORE_PER_AMOUNT
+    score += described_count * config.OCR_SCORE_PER_DESCRIPTION
 
     if extracted.get("provider_name"):
-        score += 4.0
+        score += config.OCR_SCORE_PROVIDER_NAME
     if _to_float(extracted.get("total_charged")) is not None:
-        score += 5.0
+        score += config.OCR_SCORE_TOTAL_CHARGED
     if _to_float(extracted.get("total_patient_owes")) is not None:
-        score += 3.0
+        score += config.OCR_SCORE_TOTAL_PATIENT_OWES
 
     recon_delta = None
     recon_pct = None
@@ -254,7 +254,7 @@ def _quality_score(extracted: dict) -> tuple[float, dict]:
         recon_delta = charged_sum - total
         recon_pct = abs(recon_delta) / total * 100.0 if total else None
         if recon_pct is not None and recon_pct > config.OCR_RECONCILIATION_TOLERANCE_PCT:
-            score -= min(25.0, recon_pct * 1.5)
+            score -= min(config.OCR_SCORE_MAX_RECON_PENALTY, recon_pct * config.OCR_SCORE_RECON_PENALTY_MULTIPLIER)
 
     meta = {
         "line_items": len(items),

@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import TypedDict, Any
 
 from db import get_db
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
@@ -14,6 +13,54 @@ from validators.eob import check_eob_reconciliation
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
+
+
+def merge_eob_into_extracted(extracted: dict, eob_data: dict) -> dict:
+    """
+    Enrich bill extraction with insurance fields from an uploaded EOB.
+    Matches by CPT first, then by line index fallback.
+    """
+    merged = dict(extracted or {})
+    bill_items = list(merged.get("line_items") or [])
+    eob_items = list((eob_data or {}).get("line_items") or [])
+    if not bill_items or not eob_items:
+        return merged
+
+    eob_by_cpt: dict[str, list[tuple[int, dict]]] = {}
+    for i, row in enumerate(eob_items):
+        code = (row.get("cpt_code") or "").strip()
+        if not code:
+            continue
+        eob_by_cpt.setdefault(code, []).append((i, row))
+
+    used_indices: set[int] = set()
+    for idx, item in enumerate(bill_items):
+        candidate = None
+        code = (item.get("cpt_code") or "").strip()
+        if code and eob_by_cpt.get(code):
+            for eob_idx, eob in eob_by_cpt[code]:
+                if eob_idx not in used_indices:
+                    candidate = eob
+                    used_indices.add(eob_idx)
+                    break
+        if candidate is None and idx < len(eob_items) and idx not in used_indices:
+            candidate = eob_items[idx]
+
+        if candidate is None:
+            continue
+        for fld in ("insurance_paid", "insurance_adjustment", "patient_responsibility"):
+            if item.get(fld) is None and candidate.get(fld) is not None:
+                item[fld] = candidate[fld]
+        if item.get("date_of_service") is None and candidate.get("date_of_service"):
+            item["date_of_service"] = candidate["date_of_service"]
+
+    merged["line_items"] = bill_items
+    merged["_eob_merge"] = {
+        "bill_lines": len(bill_items),
+        "eob_lines": len(eob_items),
+    }
+    return merged
+
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2, "informational": 3}
 
@@ -39,21 +86,6 @@ RULE_ID_BY_TYPE = {
     "benchmark_outlier": "RULE_REGIONAL_BENCHMARK_OUTLIER",
     "eob_mismatch": "RULE_EOB_RECONCILIATION",
 }
-
-
-class FlagResult(TypedDict, total=False):
-    type: str
-    rule_id: str
-    severity: str
-    confidence: str
-    message: str
-    details: str
-    potential_savings: float
-    gross_potential_savings: float
-    estimated_patient_savings: float
-    line_item: dict[str, Any]
-    related_items: list[dict[str, Any]]
-    evidence: dict[str, Any]
 
 
 def _assign_confidence(finding: dict) -> str:
