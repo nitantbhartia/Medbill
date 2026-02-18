@@ -95,6 +95,88 @@ async def results_page(request: Request, bill_id: int):
     )
 
 
+@app.get("/calculator", response_class=HTMLResponse)
+async def calculator_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/calculator"
+    return templates.TemplateResponse(
+        "calculator.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+        },
+    )
+
+
+@app.get("/calculator/embed", response_class=HTMLResponse)
+async def calculator_embed(
+    request: Request,
+    mode: str = "cost",
+    cpt: str = "",
+    zip: str = "",
+    title: str = "",
+    subtitle: str = "",
+    btn_text: str = "",
+    cta_text: str = "",
+    cta_url: str = "",
+):
+    """Embeddable calculator widget for iframes in articles."""
+    return templates.TemplateResponse(
+        "calculator_embed.html",
+        {
+            "request": request,
+            "mode": mode,
+            "prefill_cpt": cpt,
+            "prefill_zip": zip,
+            "title": title,
+            "subtitle": subtitle,
+            "btn_text": btn_text or ("Check Markup" if mode == "markup" else "Look Up"),
+            "cta_text": cta_text,
+            "cta_url": cta_url,
+            "base_url": "",
+        },
+    )
+
+
+@app.get("/guides/{slug}", response_class=HTMLResponse)
+async def guide_page(request: Request, slug: str):
+    """Serve a guide article by slug."""
+    from guides import get_guide
+    guide = get_guide(slug)
+    if not guide:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}"
+    return templates.TemplateResponse(
+        "guide.html",
+        {
+            "request": request,
+            "guide": guide,
+            "canonical_url": canonical_url,
+            "og_title": guide["title"] + " | BillKarma",
+            "og_description": guide["meta_description"],
+            "meta_description": guide["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/guides/", response_class=HTMLResponse)
+async def guides_index(request: Request):
+    """List all published guides."""
+    from guides import list_guides
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/"
+    return templates.TemplateResponse(
+        "guides_index.html",
+        {
+            "request": request,
+            "guides": list_guides(),
+            "canonical_url": canonical_url,
+            "og_title": "Medical Billing Guides | BillKarma",
+            "og_description": "Free guides on how to read, dispute, and reduce medical bills.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
 @app.get("/hospital")
 async def hospital_index_redirect():
     return RedirectResponse(url="/hospitals/", status_code=301)

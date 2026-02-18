@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedure Cost Calculator</title>
+    <style>
+        :root {
+            --card-white: #FFFFFF;
+            --text-black: #1A1A1A;
+            --accent-lime: #D2F635;
+            --accent-grey: #F4F5F7;
+            --text-secondary: #6B7280;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-md: 18px;
+            --radius-sm: 100px;
+            --red-bg: #FEE2E2; --red-text: #991B1B;
+            --amber-bg: #FEF3C7; --amber-text: #92400E;
+            --green-bg: #D1FAE5; --green-text: #065F46;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { background: transparent; font-family: var(--font-main); color: var(--text-black); }
+
+        .embed-card {
+            background: var(--card-white);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .embed-card h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .embed-sub { font-size: 0.88rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 18px; }
+
+        .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 110px; }
+        .field label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+        .field input {
+            padding: 10px 14px;
+            border: 2px solid #D1D5DB;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: var(--font-main);
+            outline: none;
+        }
+        .field input:focus { border-color: var(--text-black); }
+
+        .calc-btn {
+            border: 0;
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            white-space: nowrap;
+            height: 42px;
+        }
+        .calc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .results-area { margin-top: 18px; display: none; }
+        .results-area.visible { display: block; }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .result-tile { background: var(--accent-grey); border-radius: 14px; padding: 16px; }
+        .tile-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 4px; }
+        .tile-value { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+        .tile-detail { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+
+        .assessment-badge { display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: var(--radius-sm); }
+        .assessment-badge.fair { background: var(--green-bg); color: var(--green-text); }
+        .assessment-badge.elevated { background: var(--amber-bg); color: var(--amber-text); }
+        .assessment-badge.high { background: var(--red-bg); color: var(--red-text); }
+
+        .result-desc { font-size: 0.92rem; font-weight: 600; margin-bottom: 12px; }
+
+        .embed-note { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; margin-top: 10px; }
+
+        .cta-link {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-black);
+            text-decoration: underline;
+        }
+
+        .error-msg { color: var(--red-text); background: var(--red-bg); padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; margin-top: 12px; display: none; }
+        .error-msg.visible { display: block; }
+
+        @media (max-width: 480px) {
+            .embed-card { padding: 18px; }
+            .form-row { flex-direction: column; }
+            .field { min-width: 0; }
+            .tile-value { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="embed-card">
+        <h3>{{ title or "What should this cost?" }}</h3>
+        <p class="embed-sub">{{ subtitle or "Enter a CPT code from your bill to see fair pricing." }}</p>
+        <form id="embedForm" onsubmit="return false">
+            <div class="form-row">
+                <div class="field">
+                    <label for="eCpt">CPT Code</label>
+                    <input type="text" id="eCpt" placeholder="e.g. 99285" maxlength="10" value="{{ prefill_cpt or '' }}" required>
+                </div>
+                {% if mode == 'markup' %}
+                <div class="field">
+                    <label for="eCharged">Amount Charged ($)</label>
+                    <input type="number" id="eCharged" placeholder="e.g. 1200" min="0.01" step="0.01" required>
+                </div>
+                {% endif %}
+                <div class="field">
+                    <label for="eZip">ZIP Code</label>
+                    <input type="text" id="eZip" placeholder="e.g. 33021" maxlength="5" inputmode="numeric" value="{{ prefill_zip or '' }}">
+                </div>
+                <button type="submit" class="calc-btn" id="eBtn">{{ btn_text or "Look Up" }}</button>
+            </div>
+        </form>
+        <div class="error-msg" id="eError"></div>
+        <div class="results-area" id="eResults">
+            <p class="result-desc" id="eDesc"></p>
+            <div class="result-grid" id="eGrid"></div>
+            <a class="cta-link" href="{{ cta_url or '/scan' }}" target="_top">{{ cta_text or "Upload your full bill for a complete audit" }} &rarr;</a>
+            <p class="embed-note">Source: CMS Medicare Physician Fee Schedule & OPPS (2026). Hospital benchmarks from claims data.</p>
+        </div>
+    </div>
+
+    <script>
+    var MODE = "{{ mode or 'cost' }}";
+    var BASE = "{{ base_url or '' }}";
+
+    function $(id) { return document.getElementById(id); }
+    function fmt(n) { return n == null ? '\u2014' : '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+    function tile(label, value, detail) {
+        return '<div class="result-tile"><div class="tile-label">' + label + '</div><div class="tile-value">' + value + '</div>' + (detail ? '<div class="tile-detail">' + detail + '</div>' : '') + '</div>';
+    }
+
+    $('embedForm').addEventListener('submit', function() {
+        var cpt = $('eCpt').value.trim();
+        var zip = $('eZip').value.trim();
+        if (!cpt) return;
+
+        $('eError').classList.remove('visible');
+        $('eResults').classList.remove('visible');
+        $('eBtn').disabled = true;
+
+        var url;
+        if (MODE === 'markup') {
+            var charged = parseFloat(($('eCharged') || {}).value);
+            if (!charged || charged <= 0) { $('eBtn').disabled = false; return; }
+            url = BASE + '/api/calculator/markup?cpt_code=' + encodeURIComponent(cpt) + '&charged=' + charged + '&zip_code=' + encodeURIComponent(zip);
+        } else {
+            url = BASE + '/api/calculator/cost?cpt_code=' + encodeURIComponent(cpt) + '&zip_code=' + encodeURIComponent(zip);
+        }
+
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(json) {
+                $('eBtn').disabled = false;
+                if (json.status !== 'ok') {
+                    $('eError').textContent = json.detail || 'Error';
+                    $('eError').classList.add('visible');
+                    return;
+                }
+                var d = json.data;
+
+                if (MODE === 'markup') {
+                    if (!d.medicare && !d.benchmark) {
+                        $('eError').textContent = 'No data for CPT ' + d.cpt_code;
+                        $('eError').classList.add('visible');
+                        return;
+                    }
+                    $('eDesc').textContent = d.description ? d.cpt_code + ' \u2014 ' + d.description : 'CPT ' + d.cpt_code;
+                    var html = tile('You Were Charged', fmt(d.charged), '');
+                    if (d.medicare) {
+                        var badge = '<span class="assessment-badge ' + d.medicare.assessment + '">' + d.medicare.markup + 'x Medicare</span>';
+                        html += tile('Markup', badge, '');
+                        html += tile('Medicare Rate', fmt(d.medicare.rate), '');
+                        if (d.medicare.potential_savings > 0) html += tile('Est. Savings', fmt(d.medicare.potential_savings), '');
+                    }
+                    if (d.benchmark) html += tile('Median Charge', fmt(d.benchmark.median_charged), d.benchmark.region);
+                    $('eGrid').innerHTML = html;
+                } else {
+                    if (!d.medicare_rate && !d.benchmark) {
+                        $('eError').textContent = 'No data for CPT ' + d.cpt_code;
+                        $('eError').classList.add('visible');
+                        return;
+                    }
+                    $('eDesc').textContent = d.description ? d.cpt_code + ' \u2014 ' + d.description : 'CPT ' + d.cpt_code;
+                    var html = '';
+                    if (d.medicare_rate) html += tile('Medicare Rate', fmt(d.medicare_rate), '');
+                    if (d.opps_rate) html += tile('Facility Fee', fmt(d.opps_rate), 'OPPS');
+                    if (d.total_medicare) html += tile('Total Medicare', fmt(d.total_medicare), '');
+                    if (d.benchmark) {
+                        html += tile('Median Charge', fmt(d.benchmark.median_charged), d.benchmark.sample_size ? d.benchmark.sample_size.toLocaleString() + ' claims' : '');
+                    }
+                    $('eGrid').innerHTML = html;
+                }
+                $('eResults').classList.add('visible');
+            })
+            .catch(function() {
+                $('eBtn').disabled = false;
+                $('eError').textContent = 'Network error.';
+                $('eError').classList.add('visible');
+            });
+    });
+    </script>
+</body>
+</html>
