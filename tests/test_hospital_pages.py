@@ -33,6 +33,7 @@ def _seed_hospital():
             "zip": "33021",
             "ownership": "Voluntary non-profit",
             "hospital_type": "Acute Care Hospitals",
+            "bed_count": 738,
             "cms_star_rating": 3,
             "slug": "memorial-regional-hospital-hollywood",
             "is_nonprofit": 1,
@@ -182,6 +183,16 @@ class TestHospitalSeoPages:
         resp = client.get("/hospital/fl/memorial-regional-hospital-hollywood", follow_redirects=False)
         assert resp.status_code == 301
         assert resp.headers["location"] == "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"
+
+    def test_top_stat_falls_back_when_hcahps_missing(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute("DELETE FROM hcahps_scores WHERE facility_id = ?", ("010001",))
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert "Would Recommend" not in resp.text
+        assert "Bed Count" in resp.text
+        assert ">738<" in resp.text
 
     def test_sitemap_contains_hospital_paths(self):
         _seed_hospital()

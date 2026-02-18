@@ -56,8 +56,22 @@
             <div class="text-2xl font-semibold mt-1">{{ data.hospital.cms_star_rating if data.hospital.cms_star_rating is not none else "N/A" }}</div>
         </div>
         <div class="rounded-lg border border-gray-200 p-4">
+            {% if data.quality and data.quality.recommend_yes is not none %}
             <div class="text-xs text-gray-500 uppercase">Would Recommend</div>
-            <div class="text-2xl font-semibold mt-1">{{ "%.0f%%"|format(data.quality.recommend_yes) if data.quality and data.quality.recommend_yes is not none else "N/A" }}</div>
+            <div class="text-2xl font-semibold mt-1">{{ "%.0f%%"|format(data.quality.recommend_yes) }}</div>
+            {% elif data.hospital.bed_count %}
+            <div class="text-xs text-gray-500 uppercase">Bed Count</div>
+            <div class="text-2xl font-semibold mt-1">{{ data.hospital.bed_count }}</div>
+            {% elif data.hospital.ownership %}
+            <div class="text-xs text-gray-500 uppercase">Ownership</div>
+            <div class="text-xl font-semibold mt-1">{{ data.hospital.ownership }}</div>
+            {% elif data.hospital.hospital_type %}
+            <div class="text-xs text-gray-500 uppercase">Hospital Type</div>
+            <div class="text-xl font-semibold mt-1">{{ data.hospital.hospital_type }}</div>
+            {% else %}
+            <div class="text-xs text-gray-500 uppercase">Directory Status</div>
+            <div class="text-xl font-semibold mt-1">Loaded</div>
+            {% endif %}
         </div>
     </div>
 
