@@ -3,12 +3,18 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 
 import config
 import db
 from api import router as api_router
 from analyzer import get_bill_results, get_stats
+from hospital_seo import (
+    get_hospital_profile,
+    get_hospital_sitemap_paths,
+    get_state_hospitals,
+    get_state_index_stats,
+)
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -66,6 +72,45 @@ async def results_page(request: Request, bill_id: int):
         "results.html",
         {"request": request, "data": results, "phone_script": phone_script, "message_script": message_script},
     )
+
+
+@app.get("/hospital", response_class=HTMLResponse)
+async def hospital_index_page(request: Request):
+    states = get_state_index_stats()
+    return templates.TemplateResponse("hospital_index.html", {"request": request, "states": states})
+
+
+@app.get("/hospital/{state_slug}", response_class=HTMLResponse)
+async def hospital_state_page(request: Request, state_slug: str):
+    hospitals = get_state_hospitals(state_slug)
+    state_name = hospitals[0]["state"] if hospitals else state_slug.upper()
+    return templates.TemplateResponse(
+        "hospital_state_index.html",
+        {"request": request, "hospitals": hospitals, "state_name": state_name},
+    )
+
+
+@app.get("/hospital/{state_slug}/{hospital_slug}", response_class=HTMLResponse)
+async def hospital_profile_page(request: Request, state_slug: str, hospital_slug: str):
+    profile = get_hospital_profile(state_slug, hospital_slug)
+    if not profile:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"})
+    return templates.TemplateResponse("hospital_profile.html", {"request": request, "data": profile})
+
+
+@app.get("/hospitals/sitemap.xml")
+async def hospital_sitemap():
+    base = config.APP_URL.rstrip("/")
+    urlset = "".join(
+        f"<url><loc>{base}{path}</loc></url>"
+        for path in get_hospital_sitemap_paths()
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{urlset}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
 
 
 if __name__ == "__main__":

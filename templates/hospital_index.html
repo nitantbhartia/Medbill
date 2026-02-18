@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Billing Review Directory | BillScan{% endblock %}
+
+{% block head %}
+<meta name="description" content="Browse hospital billing report-card pages by state. Compare public pricing and quality data before paying your medical bill.">
+{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-5 py-10">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">Hospital Billing Review Directory</h1>
+    <p class="text-sm text-gray-600 mb-8">Select a state to browse hospital-level billing report cards.</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% for row in states %}
+        <a href="/hospital/{{ row.state_slug }}" class="rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+            <div class="text-sm font-semibold text-gray-900">{{ row.state or row.state_slug|upper }}</div>
+            <div class="text-xs text-gray-500 mt-1">{{ row.hospitals }} hospitals</div>
+        </a>
+        {% endfor %}
+        {% if not states %}
+        <div class="text-sm text-gray-500">No hospital data loaded yet.</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

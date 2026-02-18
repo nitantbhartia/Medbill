@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.hospital.name }} Billing Review | BillScan{% endblock %}
+
+{% block head %}
+<meta name="description" content="Billing review for {{ data.hospital.name }} in {{ data.hospital.city }}, {{ data.hospital.state }}. Compare prices vs Medicare, patient experience metrics, and financial assistance options.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalOrganization",
+  "name": "{{ data.hospital.name | e }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ data.hospital.address | default('', true) | e }}",
+    "addressLocality": "{{ data.hospital.city | default('', true) | e }}",
+    "addressRegion": "{{ data.hospital.state | default('', true) | e }}",
+    "postalCode": "{{ data.hospital.zip | default('', true) | e }}"
+  },
+  "telephone": "{{ data.hospital.phone | default('', true) | e }}",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ data.hospital.overall_rating | default('', true) }}",
+    "bestRating": "5"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-5 py-10">
+    <div class="mb-8">
+        <div class="text-xs text-gray-500 mb-2">
+            <a class="underline hover:text-gray-700" href="/hospital/{{ data.hospital.state_slug }}">All {{ data.hospital.state }} hospitals</a>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ data.hospital.name }} Billing Report Card</h1>
+        <p class="text-sm text-gray-600 mt-2">
+            {{ data.hospital.city }}, {{ data.hospital.state }}
+            {% if data.hospital.hospital_type %}&middot; {{ data.hospital.hospital_type }}{% endif %}
+            {% if data.hospital.ownership %}&middot; {{ data.hospital.ownership }}{% endif %}
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs uppercase tracking-wide text-gray-500">CMS Overall Rating</div>
+            <div class="text-2xl font-semibold mt-1">{{ data.hospital.overall_rating if data.hospital.overall_rating is not none else "N/A" }}</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs uppercase tracking-wide text-gray-500">Avg Markup vs Medicare</div>
+            <div class="text-2xl font-semibold mt-1">{{ data.markup_multiple ~ "x" if data.markup_multiple else "N/A" }}</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs uppercase tracking-wide text-gray-500">Charity Care %</div>
+            <div class="text-2xl font-semibold mt-1">
+                {% if data.financials and data.financials.charity_care_pct is not none %}
+                    {{ "%.2f"|format(data.financials.charity_care_pct) }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Billing Profile and Dispute Angles</h2>
+        <ul class="list-disc pl-5 text-sm text-gray-700 space-y-1">
+            {% for issue in data.issues %}
+            <li>{{ issue }}</li>
+            {% endfor %}
+        </ul>
+        <p class="text-sm text-gray-600 mt-3">
+            If your bill is from this hospital, upload it to identify line-item overcharges and generate a dispute packet.
+        </p>
+        <a href="/scan" class="inline-block mt-3 text-sm font-semibold text-accent-700 hover:text-accent-800">Scan your bill now</a>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Patient Experience</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <div>
+                <div class="text-gray-500">HCAHPS Summary</div>
+                <div class="font-medium text-gray-900">{{ data.quality.hcahps_summary if data.quality else "N/A" }}</div>
+            </div>
+            <div>
+                <div class="text-gray-500">Readmission Score</div>
+                <div class="font-medium text-gray-900">{{ data.quality.readmission_score if data.quality and data.quality.readmission_score is not none else "N/A" }}</div>
+            </div>
+            <div>
+                <div class="text-gray-500">Mortality Score</div>
+                <div class="font-medium text-gray-900">{{ data.quality.mortality_score if data.quality and data.quality.mortality_score is not none else "N/A" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Financial Assistance</h2>
+        <div class="text-sm text-gray-700 space-y-2">
+            <p>Nonprofit status: <strong>{{ "Yes" if data.financials and data.financials.nonprofit_status else "Unknown" }}</strong></p>
+            <p>Financial assistance policy:
+                {% if data.financials and data.financials.financial_assistance_url %}
+                    <a class="underline text-accent-700 hover:text-accent-800" href="{{ data.financials.financial_assistance_url }}" target="_blank" rel="noopener">View policy</a>
+                {% else %}
+                    Not listed in loaded data
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="rounded-lg border border-gray-200 p-5 overflow-x-auto">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Common Procedures and Prices</h2>
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 border-b border-gray-200">
+                    <th class="py-2 pr-3">CPT</th>
+                    <th class="py-2 pr-3">Description</th>
+                    <th class="py-2 pr-3">Hospital</th>
+                    <th class="py-2 pr-3">Medicare</th>
+                    <th class="py-2 pr-3">State Avg</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data.prices %}
+                <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-3 font-mono">{{ row.cpt_code }}</td>
+                    <td class="py-2 pr-3">{{ row.description or "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.gross_charge) if row.gross_charge is not none else "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.medicare_rate) if row.medicare_rate is not none else "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.state_avg_rate) if row.state_avg_rate is not none else "N/A" }}</td>
+                </tr>
+                {% endfor %}
+                {% if not data.prices %}
+                <tr>
+                    <td colspan="5" class="py-3 text-gray-500">No procedure pricing data loaded yet for this hospital.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

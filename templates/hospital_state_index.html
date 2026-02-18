@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ state_name }} Hospital Billing Reviews | BillScan{% endblock %}
+
+{% block head %}
+<meta name="description" content="Browse hospital billing review pages for {{ state_name }}. Compare ratings, pricing behavior, and scan your bill before paying.">
+{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-5 py-10">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">{{ state_name }} Hospital Billing Reviews</h1>
+    <p class="text-sm text-gray-600 mb-8">Long-tail billing report cards for hospitals in {{ state_name }}.</p>
+
+    <div class="rounded-lg border border-gray-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                    <th class="px-4 py-3">Hospital</th>
+                    <th class="px-4 py-3">City</th>
+                    <th class="px-4 py-3">Ownership</th>
+                    <th class="px-4 py-3">CMS Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in hospitals %}
+                <tr class="border-b border-gray-100">
+                    <td class="px-4 py-3">
+                        <a href="/hospital/{{ row.state_slug }}/{{ row.slug }}" class="text-accent-700 hover:text-accent-800 font-medium">
+                            {{ row.name }}
+                        </a>
+                    </td>
+                    <td class="px-4 py-3">{{ row.city or "N/A" }}</td>
+                    <td class="px-4 py-3">{{ row.ownership or "N/A" }}</td>
+                    <td class="px-4 py-3">{{ row.overall_rating if row.overall_rating is not none else "N/A" }}</td>
+                </tr>
+                {% endfor %}
+                {% if not hospitals %}
+                <tr>
+                    <td colspan="4" class="px-4 py-4 text-gray-500">No hospitals loaded for this state yet.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

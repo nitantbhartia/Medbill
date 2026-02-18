@@ -88,6 +88,82 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_audit_bill ON audit_logs(bill_id)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_consent_bill ON consent_logs(bill_id)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_directory (
+            facility_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            state_slug TEXT,
+            zip TEXT,
+            county TEXT,
+            phone TEXT,
+            hospital_type TEXT,
+            ownership TEXT,
+            emergency_services TEXT,
+            overall_rating INTEGER,
+            bed_count INTEGER,
+            teaching_status TEXT,
+            system_affiliation TEXT,
+            slug TEXT,
+            last_updated DATE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_hospital_directory_slug ON hospital_directory(state_slug, slug)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_directory_state ON hospital_directory(state_slug)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_quality (
+            facility_id TEXT PRIMARY KEY REFERENCES hospital_directory(facility_id),
+            hcahps_summary TEXT,
+            patient_experience_score REAL,
+            readmission_score REAL,
+            mortality_score REAL,
+            updated_at DATE
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_financials (
+            facility_id TEXT PRIMARY KEY REFERENCES hospital_directory(facility_id),
+            total_charges REAL,
+            total_revenue REAL,
+            cost_to_charge_ratio REAL,
+            charity_care_amount REAL,
+            charity_care_pct REAL,
+            nonprofit_status INTEGER,
+            has_financial_assistance_policy INTEGER,
+            financial_assistance_url TEXT,
+            irs_990_url TEXT,
+            updated_at DATE
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_procedure_prices (
+            facility_id TEXT REFERENCES hospital_directory(facility_id),
+            cpt_code TEXT,
+            description TEXT,
+            gross_charge REAL,
+            cash_price REAL,
+            medicare_rate REAL,
+            avg_negotiated_rate REAL,
+            min_negotiated_rate REAL,
+            max_negotiated_rate REAL,
+            state_avg_rate REAL,
+            last_updated DATE,
+            PRIMARY KEY (facility_id, cpt_code)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices_facility ON hospital_procedure_prices(facility_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices_cpt ON hospital_procedure_prices(cpt_code)")
 
 
 SCHEMA = """
@@ -354,4 +430,71 @@ CREATE TABLE IF NOT EXISTS articles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- SEO hospital directory
+CREATE TABLE IF NOT EXISTS hospital_directory (
+    facility_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    state_slug TEXT,
+    zip TEXT,
+    county TEXT,
+    phone TEXT,
+    hospital_type TEXT,
+    ownership TEXT,
+    emergency_services TEXT,
+    overall_rating INTEGER,
+    bed_count INTEGER,
+    teaching_status TEXT,
+    system_affiliation TEXT,
+    slug TEXT,
+    last_updated DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_hospital_directory_slug ON hospital_directory(state_slug, slug);
+CREATE INDEX IF NOT EXISTS idx_hospital_directory_state ON hospital_directory(state_slug);
+
+CREATE TABLE IF NOT EXISTS hospital_quality (
+    facility_id TEXT PRIMARY KEY REFERENCES hospital_directory(facility_id),
+    hcahps_summary TEXT,
+    patient_experience_score REAL,
+    readmission_score REAL,
+    mortality_score REAL,
+    updated_at DATE
+);
+
+CREATE TABLE IF NOT EXISTS hospital_financials (
+    facility_id TEXT PRIMARY KEY REFERENCES hospital_directory(facility_id),
+    total_charges REAL,
+    total_revenue REAL,
+    cost_to_charge_ratio REAL,
+    charity_care_amount REAL,
+    charity_care_pct REAL,
+    nonprofit_status INTEGER,
+    has_financial_assistance_policy INTEGER,
+    financial_assistance_url TEXT,
+    irs_990_url TEXT,
+    updated_at DATE
+);
+
+CREATE TABLE IF NOT EXISTS hospital_procedure_prices (
+    facility_id TEXT REFERENCES hospital_directory(facility_id),
+    cpt_code TEXT,
+    description TEXT,
+    gross_charge REAL,
+    cash_price REAL,
+    medicare_rate REAL,
+    avg_negotiated_rate REAL,
+    min_negotiated_rate REAL,
+    max_negotiated_rate REAL,
+    state_avg_rate REAL,
+    last_updated DATE,
+    PRIMARY KEY (facility_id, cpt_code)
+);
+
+CREATE INDEX IF NOT EXISTS idx_hospital_prices_facility ON hospital_procedure_prices(facility_id);
+CREATE INDEX IF NOT EXISTS idx_hospital_prices_cpt ON hospital_procedure_prices(cpt_code);
 """

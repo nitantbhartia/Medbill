@@ -12,6 +12,8 @@ class TestDatabaseInit:
             "negotiations", "negotiation_messages", "articles",
             "zip_locality_map",
             "consent_logs", "audit_logs",
+            "hospital_directory", "hospital_quality", "hospital_financials",
+            "hospital_procedure_prices",
         ]
         with get_db() as db:
             rows = db.execute(
@@ -29,6 +31,8 @@ class TestDatabaseInit:
             "idx_neg_bill", "idx_neg_status", "idx_neg_msg",
             "idx_zip_locality_state",
             "idx_consent_bill", "idx_audit_bill",
+            "idx_hospital_directory_slug", "idx_hospital_directory_state",
+            "idx_hospital_prices_facility", "idx_hospital_prices_cpt",
         ]
         with get_db() as db:
             rows = db.execute(
