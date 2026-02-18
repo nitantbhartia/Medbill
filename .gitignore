@@ -6,6 +6,7 @@ data/*.db-shm
 data/*.db-wal
 data/cms/raw/
 data/cms/processed/
+data/hospitals/
 .env
 *.egg-info/
 dist/

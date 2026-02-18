@@ -62,6 +62,16 @@ def upsert_hospital_row(row: dict) -> None:
         is_nonprofit = 1 if "nonprofit" in str(ownership).lower() else 0
 
     with get_db() as db:
+        existing = db.execute(
+            """
+            SELECT facility_id FROM hospitals
+            WHERE state_slug = ? AND city_slug = ? AND slug = ?
+            """,
+            (state_slug, city_slug, slug),
+        ).fetchone()
+        if existing and existing["facility_id"] != facility_id:
+            slug = f"{slug}-{facility_id.lower()}"
+
         db.execute(
             """
             INSERT INTO hospitals (
