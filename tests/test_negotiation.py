@@ -196,12 +196,12 @@ class TestGeneratePhoneScript:
         assert "resubmitted to my insurance" in script
         assert "patient responsibility" in script
 
-    def test_prorated_script_uses_patient_responsibility(self):
-        """SAMPLE_BILL_WITH_DUPLICATES has total_patient_owes; proration fills per-line shares."""
+    def test_prorated_script_uses_selfpay_language(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has no insurance data; uses self-pay path."""
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_phone_script(bill_id)
-        assert "patient responsibility" in script
+        assert "self-pay" in script or "specific questions" in script
 
     def test_script_shows_up_to_five_findings(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -442,8 +442,9 @@ class TestInsuranceAwareness:
         assert _is_insurance_processed(items) is False
 
     def test_is_insurance_processed_patient_resp_only(self):
+        """patient_responsibility alone (e.g. from proration) is NOT insurance evidence."""
         items = [{"patient_responsibility": 200}]
-        assert _is_insurance_processed(items) is True
+        assert _is_insurance_processed(items) is False
 
     def test_phone_insured_mentions_patient_responsibility(self):
         """Full integration: SAMPLE_BILL has insurance, script should reference patient resp."""
@@ -453,12 +454,12 @@ class TestInsuranceAwareness:
         assert "$4,215.00" in script
         assert "insurance has processed" in script
 
-    def test_phone_prorated_uses_patient_responsibility_language(self):
-        """SAMPLE_BILL_WITH_DUPLICATES has total_patient_owes; proration enables patient-centric script."""
+    def test_phone_prorated_uses_selfpay_language(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has no real insurance data; uses self-pay path."""
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_phone_script(bill_id)
-        assert "patient responsibility" in script or "prompt-pay discount" in script.lower()
+        assert "self-pay" in script or "standard rate" in script.lower()
 
     def test_message_insured_asks_resubmit(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -467,17 +468,19 @@ class TestInsuranceAwareness:
         assert "resubmitted to my insurance" in script
         assert "$4,215.00" in script
 
-    def test_message_prorated_uses_patient_centric_language(self):
+    def test_message_prorated_uses_selfpay_language(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has no real insurance; uses self-pay message."""
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_message_script(bill_id)
-        assert "patient responsibility" in script or "resubmitted" in script
+        assert "correction" in script.lower() or "review" in script.lower()
 
     def test_phone_markup_insured_uses_patient_resp(self):
-        """When line item has patient_responsibility, phone line references it."""
+        """When line item has insurance evidence, phone line references patient responsibility."""
         finding = {"finding_type": "price_markup", "message": "markup"}
         details = {"charged": 4500.00, "medicare_rate": 227.00, "markup_multiple": 19.8}
-        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00}
+        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00,
+              "insurance_paid": 1800.00}
         lines = _phone_lines_for_finding(finding, details, li)
         text = " ".join(lines)
         assert "$1,200.00" in text
@@ -515,7 +518,8 @@ class TestInsuranceAwareness:
     def test_message_markup_insured_uses_patient_resp(self):
         finding = {"finding_type": "price_markup", "message": "markup"}
         details = {"charged": 4500.00, "medicare_rate": 227.00, "markup_multiple": 19.8}
-        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00}
+        li = {"description": "ED visit", "cpt_code": "99285", "patient_responsibility": 1200.00,
+              "insurance_paid": 1800.00}
         line = _message_line_for_finding(1, finding, details, li)
         assert "$1,200.00" in line
         assert "patient responsibility" in line

@@ -110,7 +110,7 @@ def generate_dispute_email(negotiation_id: int) -> dict:
     ]
     last_response = hospital_responses[-1]["body"] if hospital_responses else None
 
-    insured = _is_insurance_processed(items)
+    insured = _is_insurance_processed(items, neg)
 
     insurance_context = ""
     if insured:
@@ -343,12 +343,67 @@ def get_copilot_summary(negotiation_id: int) -> dict | None:
     }
 
 
-def _is_insurance_processed(items: list[dict]) -> bool:
-    """Return True if any line item shows insurance has processed the claim."""
-    return any(
-        li.get("insurance_paid") or li.get("patient_responsibility")
-        for li in items
-    )
+def _is_insurance_processed(items: list[dict], bill: dict | None = None) -> bool:
+    """Return True only when there's real evidence insurance has processed the claim.
+
+    Checks for insurance_paid / insurance_adjustment on line items, or a bill
+    where total_patient_owes is significantly less than total_charged (meaning
+    insurance reduced the amount).  Does NOT trigger on prorated patient_responsibility.
+    """
+    if any(li.get("insurance_paid") or li.get("insurance_adjustment") for li in items):
+        return True
+    if bill:
+        charged = float(bill.get("total_charged") or 0)
+        owes = float(bill.get("total_patient_owes") or 0)
+        if charged > 0 and owes > 0 and owes < charged * 0.95:
+            return True
+    return False
+
+
+def _filter_findings_for_script(findings: list[dict]) -> list[dict]:
+    """Dedup findings by CPT and remove counterproductive benchmarks.
+
+    For each CPT code, keep only the finding with the highest potential_savings
+    to avoid repetitive talking points (e.g., price_markup and benchmark_outlier
+    for the same service).  Also drops benchmark findings where the patient owes
+    less than the median charge — arguing "median is $X" when the patient pays
+    less than $X hurts the case.
+    """
+    filtered = []
+    for f in findings:
+        details = json.loads(f["details"]) if f.get("details") else {}
+        li = details.get("line_item", {})
+
+        # Skip benchmark findings where patient owes less than median
+        if f["finding_type"] == "benchmark_outlier":
+            patient_resp = li.get("patient_responsibility")
+            median = details.get("median_charged", 0)
+            if patient_resp is not None and float(patient_resp) <= float(median):
+                continue
+
+        filtered.append(f)
+
+    # Dedup by CPT: for each CPT, keep the highest-savings finding
+    best_by_cpt: dict[str, dict] = {}
+    no_cpt = []
+    for f in filtered:
+        details = json.loads(f["details"]) if f.get("details") else {}
+        li = details.get("line_item", {})
+        cpt = li.get("cpt_code")
+        if not cpt:
+            no_cpt.append(f)
+            continue
+        savings = float(details.get("potential_savings") or 0)
+        existing = best_by_cpt.get(cpt)
+        if existing is None:
+            best_by_cpt[cpt] = f
+        else:
+            existing_details = json.loads(existing["details"]) if existing.get("details") else {}
+            existing_savings = float(existing_details.get("potential_savings") or 0)
+            if savings > existing_savings:
+                best_by_cpt[cpt] = f
+
+    return list(best_by_cpt.values()) + no_cpt
 
 
 def generate_phone_script(bill_id: int) -> str:
@@ -376,20 +431,26 @@ def generate_phone_script(bill_id: int) -> str:
     bill = dict(bill)
     findings = [dict(f) for f in findings]
     items = [dict(li) for li in line_items]
+    script_findings = _filter_findings_for_script(findings)
 
     total_savings = sum(
         json.loads(f["details"]).get("potential_savings", 0)
-        for f in findings if f.get("details")
+        for f in script_findings if f.get("details")
     )
 
     provider = bill.get("provider_name", "the provider")
-    insured = _is_insurance_processed(items)
+    insured = _is_insurance_processed(items, bill)
     total_patient_owes = bill.get("total_patient_owes") or 0
+
+    have_ready = "Have ready: your itemized bill"
+    if insured:
+        have_ready += ", your insurance Explanation of Benefits (EOB)"
+    have_ready += ", and a pen."
 
     lines = [
         "BEFORE YOU CALL",
         "---------------",
-        "Have ready: your itemized bill, your insurance Explanation of Benefits (EOB), and a pen.",
+        have_ready,
         "Ask for: the billing department, then a supervisor if the first person can't help.",
         "Record: the name of everyone you speak with and any reference numbers.",
         "",
@@ -411,7 +472,7 @@ def generate_phone_script(bill_id: int) -> str:
         )
     lines.append("")
 
-    for i, finding in enumerate(findings[:5], 1):
+    for i, finding in enumerate(script_findings[:5], 1):
         details = json.loads(finding["details"]) if finding.get("details") else {}
         li = details.get("line_item", {})
         lines.append(f"POINT {i}:")
@@ -476,12 +537,15 @@ def generate_phone_script(bill_id: int) -> str:
 def _phone_lines_for_finding(finding: dict, details: dict, li: dict) -> list[str]:
     """Return talking-point lines for a single finding.
 
-    Automatically adapts language when the line item has patient_responsibility
-    or insurance_paid (i.e. insurance already processed).
+    Automatically adapts language when the line item has real insurance evidence
+    (insurance_paid or insurance_adjustment) — not just prorated patient_responsibility.
     """
     ftype = finding["finding_type"]
     patient_resp = li.get("patient_responsibility")
-    has_insurance = patient_resp is not None or li.get("insurance_paid") is not None
+    has_insurance = (
+        li.get("insurance_paid") is not None
+        or li.get("insurance_adjustment") is not None
+    )
 
     if ftype == "duplicate_charge":
         line = (
@@ -631,14 +695,15 @@ def generate_message_script(bill_id: int) -> str:
     bill = dict(bill)
     findings = [dict(f) for f in findings]
     items = [dict(li) for li in line_items]
+    script_findings = _filter_findings_for_script(findings)
 
     total_savings = sum(
         json.loads(f["details"]).get("potential_savings", 0)
-        for f in findings if f.get("details")
+        for f in script_findings if f.get("details")
     )
     has_nsa = any(f["finding_type"] == "no_surprises_act" for f in findings)
 
-    insured = _is_insurance_processed(items)
+    insured = _is_insurance_processed(items, bill)
     total_patient_owes = bill.get("total_patient_owes") or 0
 
     lines = [
@@ -665,7 +730,7 @@ def generate_message_script(bill_id: int) -> str:
         )
     lines.append("")
 
-    for i, finding in enumerate(findings[:5], 1):
+    for i, finding in enumerate(script_findings[:5], 1):
         details = json.loads(finding["details"]) if finding.get("details") else {}
         li = details.get("line_item", {})
         lines.append(_message_line_for_finding(i, finding, details, li))
@@ -715,12 +780,15 @@ def generate_message_script(bill_id: int) -> str:
 def _message_line_for_finding(num: int, finding: dict, details: dict, li: dict) -> str:
     """Return a single numbered line for a written message.
 
-    Adapts language when insurance has processed (patient_responsibility
-    present) versus self-pay.
+    Adapts language when there's real insurance evidence (insurance_paid or
+    insurance_adjustment) — not just prorated patient_responsibility.
     """
     ftype = finding["finding_type"]
     patient_resp = li.get("patient_responsibility")
-    has_insurance = patient_resp is not None or li.get("insurance_paid") is not None
+    has_insurance = (
+        li.get("insurance_paid") is not None
+        or li.get("insurance_adjustment") is not None
+    )
 
     if ftype == "duplicate_charge":
         line = (
