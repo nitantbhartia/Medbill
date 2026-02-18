@@ -10,11 +10,14 @@ import db
 from api import router as api_router
 from analyzer import get_bill_results, get_stats
 from hospital_seo import (
+    find_hospitals,
     get_cities_for_state,
     get_hospital_profile,
     get_hospital_sitemap_paths,
     get_state_hospitals,
     get_state_index_stats,
+    resolve_hospital_slug,
+    state_display_name,
 )
 
 logging.basicConfig(
@@ -46,7 +49,18 @@ def startup():
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     stats = get_stats()
-    return templates.TemplateResponse("landing.html", {"request": request, "stats": stats})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/"
+    return templates.TemplateResponse(
+        "landing.html",
+        {
+            "request": request,
+            "stats": stats,
+            "canonical_url": canonical_url,
+            "og_title": "BillKarma - Check Medical Bills Against Federal Rates",
+            "og_description": "Upload your medical bill. BillKarma flags errors, markups, and overcharges in 30 seconds.",
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/scan", response_class=HTMLResponse)
@@ -84,12 +98,22 @@ async def hospital_index_redirect():
 
 
 @app.get("/hospitals/", response_class=HTMLResponse)
-async def hospital_index_page(request: Request):
+async def hospital_index_page(request: Request, q: str = ""):
     states = get_state_index_stats()
+    results = find_hospitals(q) if q else []
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/"
     return templates.TemplateResponse(
         "hospitals_index.html",
-        {"request": request, "states": states, "canonical_url": canonical_url},
+        {
+            "request": request,
+            "states": states,
+            "search_query": q,
+            "search_results": results,
+            "canonical_url": canonical_url,
+            "og_title": "Hospital Billing Report Card Directory | BillKarma",
+            "og_description": "Search US hospital billing report cards by state, city, and hospital name.",
+            "meta_robots": "index, follow",
+        },
     )
 
 
@@ -107,7 +131,7 @@ async def hospital_state_page(
     page: int = 1,
 ):
     hospitals, total = get_state_hospitals(state_slug, sort=sort, ownership=ownership, page=page)
-    state_name = hospitals[0]["state"] if hospitals else state_slug.upper()
+    state_name = hospitals[0]["state"] if hospitals else state_display_name(state_slug)
     cities = get_cities_for_state(state_slug)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/"
     return templates.TemplateResponse(
@@ -124,6 +148,9 @@ async def hospital_state_page(
             "per_page": 50,
             "total": total,
             "canonical_url": canonical_url,
+            "og_title": f"{state_name} Hospital Billing Report Cards | BillKarma",
+            "og_description": f"Compare billing grades and markup ratios for hospitals in {state_name}.",
+            "meta_robots": "index, follow",
         },
     )
 
@@ -140,7 +167,7 @@ async def hospital_city_page(
 
     hospitals, total = get_city_hospitals(state_slug, city_slug, sort=sort, page=page)
     city_name = hospitals[0]["city"] if hospitals else city_slug.replace("-", " ").title()
-    state_name = hospitals[0]["state"] if hospitals else state_slug.upper()
+    state_name = hospitals[0]["state"] if hospitals else state_display_name(state_slug)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/"
     return templates.TemplateResponse(
         "hospitals_city.html",
@@ -156,6 +183,9 @@ async def hospital_city_page(
             "per_page": 50,
             "total": total,
             "canonical_url": canonical_url,
+            "og_title": f"{city_name}, {state_name} Hospital Billing Comparison | BillKarma",
+            "og_description": f"Compare billing grades and markup ratios across hospitals in {city_name}, {state_name}.",
+            "meta_robots": "index, follow",
         },
     )
 
@@ -176,22 +206,46 @@ async def hospital_profile_redirect_legacy(state_slug: str, hospital_slug: str):
 
 @app.get("/hospitals/{state_slug}/{city_slug}/{hospital_slug}/", response_class=HTMLResponse)
 async def hospital_profile_page(request: Request, state_slug: str, city_slug: str, hospital_slug: str):
-    profile = get_hospital_profile(state_slug, city_slug, hospital_slug)
+    canonical_slug = resolve_hospital_slug(state_slug, city_slug, hospital_slug)
+    if canonical_slug and canonical_slug != hospital_slug:
+        return RedirectResponse(url=f"/hospitals/{state_slug}/{city_slug}/{canonical_slug}/", status_code=301)
+
+    profile = get_hospital_profile(state_slug, city_slug, canonical_slug or hospital_slug)
     if not profile:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"})
-    canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{hospital_slug}/"
+    canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{canonical_slug or hospital_slug}/"
+
+    hospital_name = profile["hospital"]["name"]
+    city_name = profile["hospital"]["city"]
+    state_name = profile["hospital"]["state"]
+    markup = profile["hospital"].get("avg_markup_vs_medicare")
+    markup_text = f"{markup:.1f}x Medicare rates" if isinstance(markup, (int, float)) else "billing and pricing benchmarks"
+    seo_description = (
+        f"{hospital_name} billing review in {city_name}, {state_name}. "
+        f"See {markup_text}, financial assistance, and dispute tips."
+    )
+
     return templates.TemplateResponse(
         "hospitals_detail.html",
         {
             "request": request,
             "data": profile,
             "canonical_url": canonical_url,
+            "og_title": f"{hospital_name} Billing Review & Prices | BillKarma",
+            "og_description": seo_description,
+            "meta_description": seo_description,
+            "meta_robots": "index, follow",
             "enable_affiliate_slots": config.ENABLE_AFFILIATE_SLOTS,
             "affiliate_url": config.AFFILIATE_URL,
             "enable_hospital_claim": config.ENABLE_HOSPITAL_CLAIM,
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
         },
     )
+
+
+@app.get("/sitemap.xml")
+async def sitemap_main():
+    return RedirectResponse(url="/sitemap-hospitals.xml", status_code=301)
 
 
 @app.get("/hospitals/sitemap.xml")
@@ -202,9 +256,10 @@ async def hospital_sitemap():
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
+    paths = ["/", *get_hospital_sitemap_paths()]
     urlset = "".join(
         f"<url><loc>{base}{path}</loc></url>"
-        for path in get_hospital_sitemap_paths()
+        for path in paths
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -212,6 +267,16 @@ async def hospital_sitemap_v2():
         f"{urlset}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/robots.txt")
+async def robots_txt():
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
+    )
+    return Response(content=body, media_type="text/plain")
 
 
 if __name__ == "__main__":

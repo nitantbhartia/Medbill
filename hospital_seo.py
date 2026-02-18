@@ -15,6 +15,20 @@ GRADE_THRESHOLDS = (
     (8.0, "D"),
 )
 
+US_STATE_NAMES = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+    "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+    "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+    "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+    "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+    "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+    "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+    "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
+    "DC": "District of Columbia",
+}
+
 # Consumer-friendly aliases for commonly searched CPT/HCPCS codes.
 FRIENDLY_CPT_DESCRIPTIONS = {
     "20610": "Joint Injection (drainage)",
@@ -79,6 +93,24 @@ def _display_name(name: str | None) -> str:
     txt = txt.title() if txt.isupper() else txt
     txt = re.sub(r"(?i)\s*(?:,\s*)?(llc|inc|inc\.|corp|corporation|co|company)\s*$", "", txt).strip()
     return txt
+
+
+def _display_city(city: str | None) -> str:
+    txt = (city or "").strip()
+    if not txt:
+        return ""
+    txt = re.sub(r"\s+", " ", txt)
+    return txt.title() if txt.isupper() else txt
+
+
+def state_display_name(state: str | None) -> str:
+    txt = (state or "").strip()
+    if not txt:
+        return ""
+    code = txt.upper()
+    if code in US_STATE_NAMES:
+        return US_STATE_NAMES[code]
+    return txt.title() if txt.isupper() else txt
 
 
 def upsert_hospital_row(row: dict) -> None:
@@ -231,7 +263,12 @@ def get_state_index_stats() -> list[dict]:
             ORDER BY hospitals DESC, state
             """
         ).fetchall()
-    return [dict(r) for r in rows]
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["state"] = state_display_name(item.get("state") or item.get("state_slug"))
+        output.append(item)
+    return output
 
 
 def get_cities_for_state(state_slug: str) -> list[dict]:
@@ -246,7 +283,12 @@ def get_cities_for_state(state_slug: str) -> list[dict]:
             """,
             (state_slug,),
         ).fetchall()
-    return [dict(r) for r in rows]
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["city"] = _display_city(item.get("city"))
+        output.append(item)
+    return output
 
 
 def get_state_hospitals(
@@ -294,7 +336,14 @@ def get_state_hospitals(
             [*params, per_page, offset],
         ).fetchall()
 
-    return [dict(r) for r in rows], int(total)
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["name"] = _display_name(item.get("name"))
+        item["city"] = _display_city(item.get("city"))
+        item["state"] = state_display_name(item.get("state"))
+        output.append(item)
+    return output, int(total)
 
 
 def get_city_hospitals(
@@ -335,7 +384,14 @@ def get_city_hospitals(
             (state_slug, city_slug, per_page, offset),
         ).fetchall()
 
-    return [dict(r) for r in rows], int(total)
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["name"] = _display_name(item.get("name"))
+        item["city"] = _display_city(item.get("city"))
+        item["state"] = state_display_name(item.get("state"))
+        output.append(item)
+    return output, int(total)
 
 
 def _lookup_content_for_hospital(facility_id: str) -> dict:
@@ -468,6 +524,8 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     transparency_d = dict(transparency) if transparency else {}
     comparison_d = dict(comparison) if comparison else {}
     hospital_d["name"] = _display_name(hospital_d.get("name"))
+    hospital_d["city"] = _display_city(hospital_d.get("city"))
+    hospital_d["state"] = state_display_name(hospital_d.get("state"))
     nonprofit_flag = hospital_d.get("is_nonprofit")
     ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
     if nonprofit_flag in (None, 0) and ownership_nonprofit is True:
@@ -583,6 +641,66 @@ def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limi
         item["name"] = _display_name(item.get("name"))
         output.append(item)
     return output
+
+
+def find_hospitals(query: str, limit: int = 20) -> list[dict]:
+    q = (query or "").strip()
+    if len(q) < 2:
+        return []
+    token = f"%{q}%"
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT h.name, h.city, h.state, h.slug, h.state_slug, h.city_slug
+            FROM hospitals h
+            WHERE h.name LIKE ? OR h.city LIKE ? OR h.state LIKE ?
+            ORDER BY
+              CASE WHEN lower(h.name) LIKE lower(?) THEN 0 ELSE 1 END,
+              h.name
+            LIMIT ?
+            """,
+            (token, token, token, f"{q.lower()}%", limit),
+        ).fetchall()
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["name"] = _display_name(item.get("name"))
+        item["city"] = _display_city(item.get("city"))
+        item["state"] = state_display_name(item.get("state"))
+        output.append(item)
+    return output
+
+
+def resolve_hospital_slug(state_slug: str, city_slug: str, hospital_slug: str) -> str | None:
+    target = slugify(hospital_slug)
+    with get_db() as db:
+        exact = db.execute(
+            """
+            SELECT slug FROM hospitals
+            WHERE state_slug = ? AND city_slug = ? AND slug = ?
+            LIMIT 1
+            """,
+            (state_slug, city_slug, target),
+        ).fetchone()
+        if exact:
+            return exact["slug"]
+
+        fallback = db.execute(
+            """
+            SELECT slug
+            FROM hospitals
+            WHERE state_slug = ? AND city_slug = ?
+              AND (
+                slug LIKE ? || '-%'
+                OR replace(slug, '-inc', '') = ?
+                OR replace(slug, '-llc', '') = ?
+              )
+            ORDER BY LENGTH(slug) ASC
+            LIMIT 1
+            """,
+            (state_slug, city_slug, target, target, target),
+        ).fetchone()
+    return fallback["slug"] if fallback else None
 
 
 def _grade_from_avg_markup(avg_markup: float | None) -> str:

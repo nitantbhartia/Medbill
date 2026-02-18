@@ -114,7 +114,7 @@ class TestHospitalSeoPages:
         _seed_hospital()
         resp = client.get("/hospitals/fl/")
         assert resp.status_code == 200
-        assert "FL Hospital Billing Report Cards" in resp.text
+        assert "Florida Hospital Billing Report Cards" in resp.text
         assert "Memorial Regional Hospital" in resp.text
         assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in resp.text
 
@@ -122,7 +122,7 @@ class TestHospitalSeoPages:
         _seed_hospital()
         resp = client.get("/hospitals/fl/hollywood/")
         assert resp.status_code == 200
-        assert "Hollywood, FL Hospital Billing Comparison" in resp.text
+        assert "Hollywood, Florida Hospital Billing Comparison" in resp.text
         assert "Memorial Regional Hospital" in resp.text
 
     def test_hospital_profile_page(self):
@@ -184,6 +184,20 @@ class TestHospitalSeoPages:
         assert resp.status_code == 301
         assert resp.headers["location"] == "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"
 
+    def test_city_slug_fallback_redirects_to_canonical_slug(self):
+        upsert_hospital_row(
+            {
+                "facility_id": "10021",
+                "name": "Aspirus Iron River Hospital Inc",
+                "city": "Iron River",
+                "state": "MI",
+                "slug": "aspirus-iron-river-hospital-inc",
+            }
+        )
+        resp = client.get("/hospitals/mi/iron-river/aspirus-iron-river-hospital", follow_redirects=True)
+        assert resp.status_code == 200
+        assert "/hospitals/mi/iron-river/aspirus-iron-river-hospital-inc/" in resp.text
+
     def test_top_stat_falls_back_when_hcahps_missing(self):
         _seed_hospital()
         with get_db() as db:
@@ -199,8 +213,21 @@ class TestHospitalSeoPages:
         resp = client.get("/sitemap-hospitals.xml")
         assert resp.status_code == 200
         assert resp.headers["content-type"].startswith("application/xml")
+        assert "<loc>https://billkarma.app/</loc>" in resp.text
         assert "/hospitals/fl/" in resp.text
         assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in resp.text
+
+    def test_sitemap_and_robots_entrypoints(self):
+        _seed_hospital()
+        sitemap = client.get("/sitemap.xml", follow_redirects=True)
+        assert sitemap.status_code == 200
+        assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in sitemap.text
+
+        robots = client.get("/robots.txt")
+        assert robots.status_code == 200
+        assert "User-agent: *" in robots.text
+        assert "Allow: /" in robots.text
+        assert "Sitemap: https://billkarma.app/sitemap.xml" in robots.text
 
     def test_profile_uses_description_fallback_and_cash_column_logic(self):
         _seed_hospital()
@@ -275,3 +302,28 @@ class TestHospitalSeoPages:
         names = [row["name"] for row in profile["nearby"]]
         assert "Ascension Allegan Hospital" in names
         assert "No Data Medical Center" not in names
+
+    def test_listings_normalize_uppercase_city_and_name(self):
+        upsert_hospital_row(
+            {
+                "facility_id": "20001",
+                "name": "ADVENTIST HEALTH SYSTEM SUNBELT INC.",
+                "city": "WAUCHULA",
+                "state": "FL",
+                "slug": "adventist-health-system-sunbelt-inc-waurchula",
+            }
+        )
+        state_resp = client.get("/hospitals/fl/")
+        assert state_resp.status_code == 200
+        assert "Adventist Health System Sunbelt" in state_resp.text
+        assert "Wauchula" in state_resp.text
+
+    def test_hospital_page_has_og_and_faq_schema(self):
+        _seed_hospital()
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert 'property="og:title"' in resp.text
+        assert 'property="og:description"' in resp.text
+        assert 'property="og:image"' in resp.text
+        assert '<meta name="robots" content="index, follow">' in resp.text
+        assert '"@type": "FAQPage"' in resp.text

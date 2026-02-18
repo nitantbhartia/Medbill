@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="BillKarma">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef1f4"/>
+      <stop offset="100%" stop-color="#d9dde2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="72" y="64" width="220" height="64" rx="32" fill="#ffffff"/>
+  <text x="104" y="106" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#111827">BillKarma</text>
+  <text x="72" y="258" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800" fill="#111827">hospitals set the prices.</text>
+  <text x="72" y="348" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800" fill="#111827">we check the math.</text>
+  <text x="72" y="438" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#4b5563">Medical bill checks against federal pricing benchmarks.</text>
+</svg>

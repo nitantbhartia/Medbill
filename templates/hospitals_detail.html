@@ -3,9 +3,41 @@
 {% block title %}{{ data.hospital.name }} Billing Review & Prices | BillKarma{% endblock %}
 
 {% block head %}
-<meta name="description" content="{{ data.content.meta_description if data.content and data.content.meta_description else data.hospital.name ~ ' billing review, prices vs Medicare, financial assistance, and dispute tips.' }}">
+<meta name="description" content="{{ meta_description if meta_description else (data.hospital.name ~ ' billing review, prices vs Medicare, financial assistance, and dispute tips.') }}">
 <script type="application/ld+json">
 {{ data.content.structured_data_json | safe if data.content and data.content.structured_data_json else '{"@context":"https://schema.org","@type":"MedicalOrganization","name":"' ~ data.hospital.name ~ '"}' }}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is {{ data.hospital.name }} nonprofit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ 'Yes' if data.hospital.nonprofit_status_label == 'Yes' else ('No' if data.hospital.nonprofit_status_label == 'No' else 'Nonprofit status is not available in current data.') }}"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does {{ data.hospital.name }} charge for common procedures?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This page compares hospital charges against Medicare benchmarks. Current average markup is {{ ('%.1fx'|format(data.hospital.avg_markup_vs_medicare)) if data.hospital.avg_markup_vs_medicare is not none else 'not available' }}."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does {{ data.hospital.name }} offer financial assistance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{% if data.financials and (data.financials.fa_application_url or data.financials.financial_assistance_url) %}Yes. A financial assistance link is listed on this page.{% else %}A financial assistance link is not listed in current data; contact hospital billing for details.{% endif %}"
+      }
+    }
+  ]
+}
 </script>
 {% endblock %}
 
