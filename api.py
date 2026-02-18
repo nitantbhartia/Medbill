@@ -305,7 +305,7 @@ async def get_dispute_letter(bill_id: int, payload: dict):
         est = float(detail.get("estimated_patient_savings") or row["potential_savings"] or 0.0)
         total += est
         bullets.append(
-            f"- [{row['severity'].upper()}] {row['message']} (CPT: {cpt}, evidence: {source}, est. savings: ${est:,.2f})"
+            f"- {row['message']} (CPT: {cpt}, est. savings: ${est:,.2f})"
         )
 
     letter = (
