@@ -45,6 +45,28 @@ def _to_bool_int(value: str | int | None) -> int:
     return 1 if txt in ("1", "true", "yes", "y") else 0
 
 
+def _looks_nonprofit_from_ownership(ownership: str | None) -> bool | None:
+    if not ownership:
+        return None
+    txt = str(ownership).strip().lower()
+    nonprofit_markers = ("non-profit", "nonprofit", "voluntary", "church")
+    non_nonprofit_markers = ("proprietary", "for-profit", "for profit", "physician", "government")
+    if any(marker in txt for marker in nonprofit_markers):
+        return True
+    if any(marker in txt for marker in non_nonprofit_markers):
+        return False
+    return None
+
+
+def _display_name(name: str | None) -> str:
+    txt = (name or "").strip()
+    if not txt:
+        return ""
+    if txt.isupper():
+        return txt.title()
+    return txt
+
+
 def upsert_hospital_row(row: dict) -> None:
     facility_id = normalize_facility_id(row.get("facility_id"))
     if not facility_id:
@@ -58,8 +80,9 @@ def upsert_hospital_row(row: dict) -> None:
 
     ownership = row.get("ownership")
     is_nonprofit = row.get("is_nonprofit")
-    if is_nonprofit is None and ownership:
-        is_nonprofit = 1 if "nonprofit" in str(ownership).lower() else 0
+    if is_nonprofit is None:
+        inferred = _looks_nonprofit_from_ownership(ownership)
+        is_nonprofit = 1 if inferred is True else 0 if inferred is False else 0
 
     with get_db() as db:
         existing = db.execute(
@@ -347,13 +370,29 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         ).fetchone()
         prices = db.execute(
             """
-            SELECT hp.cpt_code, hp.description, hp.gross_charge, hp.cash_price,
+            SELECT hp.cpt_code,
+                   COALESCE(
+                     NULLIF(TRIM(hp.description), ''),
+                     (
+                        SELECT mr.description
+                        FROM medicare_rates mr
+                        WHERE mr.cpt_code = hp.cpt_code
+                          AND mr.description IS NOT NULL
+                          AND TRIM(mr.description) != ''
+                        ORDER BY mr.effective_year DESC
+                        LIMIT 1
+                     )
+                   ) AS description,
+                   hp.gross_charge, hp.cash_price,
                    hp.medicare_rate, hp.markup_vs_medicare,
                    ba.avg_markup_vs_medicare AS state_avg_markup
             FROM hospital_prices hp
             LEFT JOIN benchmark_averages ba
               ON ba.scope = ? AND ba.cpt_code = hp.cpt_code
             WHERE hp.facility_id = ?
+              AND hp.medicare_rate IS NOT NULL
+              AND hp.medicare_rate > 0
+              AND hp.markup_vs_medicare IS NOT NULL
             ORDER BY hp.markup_vs_medicare DESC, hp.gross_charge DESC
             LIMIT 40
             """,
@@ -361,13 +400,35 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         ).fetchall()
 
     hospital_d = dict(hospital)
+    hospital_d["name"] = _display_name(hospital_d.get("name"))
+    nonprofit_flag = hospital_d.get("is_nonprofit")
+    ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
+    if nonprofit_flag in (None, 0) and ownership_nonprofit is True:
+        nonprofit_flag = 1
+    if nonprofit_flag in (None, 0) and ownership_nonprofit is False:
+        nonprofit_flag = 0
+    hospital_d["is_nonprofit"] = 1 if nonprofit_flag else 0
+    if ownership_nonprofit is None and hospital_d.get("ownership") in (None, "") and nonprofit_flag in (None, 0):
+        hospital_d["nonprofit_status_label"] = "Unknown"
+    else:
+        hospital_d["nonprofit_status_label"] = "Yes" if hospital_d["is_nonprofit"] else "No"
     quality_d = dict(quality) if quality else {}
     financials_d = dict(financials) if financials else {}
     transparency_d = dict(transparency) if transparency else {}
     prices_d = [dict(p) for p in prices]
 
+    show_cash_column = False
     for row in prices_d:
         row["markup_band"] = _build_markup_band(row.get("markup_vs_medicare"))
+        row["description"] = row.get("description") or f"CPT {row['cpt_code']}"
+        gross = row.get("gross_charge")
+        cash = row.get("cash_price")
+        has_cash_discount = bool(
+            gross is not None and cash is not None and gross > 0 and cash < (gross * 0.999)
+        )
+        row["has_cash_discount"] = has_cash_discount
+        if has_cash_discount:
+            show_cash_column = True
 
     content = _lookup_content_for_hospital(hospital_d["facility_id"])
     tips = content.get("dispute_tips") or generate_deterministic_tips(hospital_d, financials_d)
@@ -384,6 +445,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "financials": financials_d,
         "transparency": transparency_d,
         "prices": prices_d,
+        "show_cash_column": show_cash_column,
         "tips": tips,
         "content": content,
         "nearby": nearby,
@@ -400,13 +462,21 @@ def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limi
             LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.state_slug = ?
               AND h.facility_id != ?
+              AND (m.avg_markup_vs_medicare IS NOT NULL OR (m.billing_grade IS NOT NULL AND m.billing_grade != 'N/A'))
               AND (h.city_slug = ? OR h.city_slug != ?)
-            ORDER BY CASE WHEN h.city_slug = ? THEN 0 ELSE 1 END, h.name
+            ORDER BY CASE WHEN h.city_slug = ? THEN 0 ELSE 1 END,
+                     CASE WHEN m.avg_markup_vs_medicare IS NOT NULL THEN 0 ELSE 1 END,
+                     h.name
             LIMIT ?
             """,
             (state_slug, facility_id, city_slug, city_slug, city_slug, limit),
         ).fetchall()
-    return [dict(r) for r in rows]
+    output = []
+    for row in rows:
+        item = dict(row)
+        item["name"] = _display_name(item.get("name"))
+        output.append(item)
+    return output
 
 
 def _grade_from_avg_markup(avg_markup: float | None) -> str:
@@ -582,7 +652,7 @@ def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
     charity_pct = financials.get("charity_care_pct_revenue") or financials.get("charity_care_pct")
     charity_txt = f"{float(charity_pct):.1f}%" if charity_pct is not None else "not reported"
     cash_discount = hospital.get("cash_discount_avg_pct")
-    cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else "not available"
+    cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else None
 
     para1 = (
         f"{hospital.get('name', 'This hospital')} currently shows a billing grade of {grade} "
@@ -597,10 +667,16 @@ def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
             f"Reported charity-care level is {charity_txt}."
         )
     else:
-        para2 = (
-            f"If you are self-pay or high-deductible, ask for the cash/self-pay schedule first. "
-            f"Current average cash discount in loaded data is {cash_txt}. Request the same discount level across all line items."
-        )
+        if cash_txt and float(cash_discount) > 0:
+            para2 = (
+                f"If you are self-pay or high-deductible, ask for the cash/self-pay schedule first. "
+                f"Recent cash discounts are around {cash_txt}, which can be a practical anchor in your negotiation."
+            )
+        else:
+            para2 = (
+                "If you are self-pay or high-deductible, still request the cash/self-pay schedule in writing. "
+                "If no discount is offered, ask for a supervisor review, payment-plan options, and item-level justification."
+            )
 
     para3 = "Before paying, scan your bill with BillKarma to identify line-item issues and generate a dispute packet."
     return "\n\n".join((para1, para2, para3))

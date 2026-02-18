@@ -34,7 +34,18 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6 mb-8">
         <div class="rounded-lg border border-gray-200 p-4">
             <div class="text-xs text-gray-500 uppercase">Billing Grade</div>
-            <div class="text-2xl font-semibold mt-1">{{ data.hospital.billing_grade or "N/A" }}</div>
+            {% set grade = data.hospital.billing_grade or "N/A" %}
+            <div class="mt-2">
+                {% if grade in ["A", "B"] %}
+                <span class="inline-flex items-center rounded-full bg-green-100 text-green-800 px-3 py-1 text-lg font-semibold">{{ grade }}</span>
+                {% elif grade == "C" %}
+                <span class="inline-flex items-center rounded-full bg-amber-100 text-amber-800 px-3 py-1 text-lg font-semibold">{{ grade }}</span>
+                {% elif grade in ["D", "F"] %}
+                <span class="inline-flex items-center rounded-full bg-red-100 text-red-800 px-3 py-1 text-lg font-semibold">{{ grade }}</span>
+                {% else %}
+                <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-lg font-semibold">{{ grade }}</span>
+                {% endif %}
+            </div>
         </div>
         <div class="rounded-lg border border-gray-200 p-4">
             <div class="text-xs text-gray-500 uppercase">Avg Markup</div>
@@ -53,7 +64,7 @@
     <div class="mb-8 rounded-lg border border-gray-200 p-5 bg-gray-50">
         <h2 class="text-lg font-semibold text-gray-900 mb-2">Got a bill from this hospital?</h2>
         <p class="text-sm text-gray-600">Scan it in 30 seconds to check line items against CMS benchmarks.</p>
-        <a href="/scan" class="inline-block mt-3 bg-accent-700 text-white text-sm font-semibold px-4 py-2 rounded">Scan My Bill</a>
+        <a href="/scan" class="inline-block mt-3 bg-accent-700 text-white text-base font-semibold px-6 py-3 rounded-lg">Scan My Bill</a>
     </div>
 
     {% if enable_affiliate_slots and affiliate_url %}
@@ -85,7 +96,9 @@
                     <th class="py-2 pr-3">CPT</th>
                     <th class="py-2 pr-3">Description</th>
                     <th class="py-2 pr-3">Hospital</th>
+                    {% if data.show_cash_column %}
                     <th class="py-2 pr-3">Cash</th>
+                    {% endif %}
                     <th class="py-2 pr-3">Medicare</th>
                     <th class="py-2 pr-3">Markup</th>
                 </tr>
@@ -94,9 +107,11 @@
                 {% for row in data.prices[:30] %}
                 <tr class="border-b border-gray-100">
                     <td class="py-2 pr-3 font-mono">{{ row.cpt_code }}</td>
-                    <td class="py-2 pr-3">{{ row.description or "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ row.description }}</td>
                     <td class="py-2 pr-3">{{ "$%.2f"|format(row.gross_charge) if row.gross_charge is not none else "N/A" }}</td>
+                    {% if data.show_cash_column %}
                     <td class="py-2 pr-3">{{ "$%.2f"|format(row.cash_price) if row.cash_price is not none else "N/A" }}</td>
+                    {% endif %}
                     <td class="py-2 pr-3">{{ "$%.2f"|format(row.medicare_rate) if row.medicare_rate is not none else "N/A" }}</td>
                     <td class="py-2 pr-3">
                         {% if row.markup_vs_medicare is not none %}
@@ -110,6 +125,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        <p class="text-xs text-gray-500 mt-3">Color key: <span class="text-green-700 font-semibold">green &lt;2x</span> · <span class="text-amber-700 font-semibold">yellow 2–5x</span> · <span class="text-red-700 font-semibold">red &gt;5x</span> Medicare</p>
         {% else %}
         <p class="text-sm text-gray-600">This hospital's pricing file could not be fully processed yet.</p>
         {% if data.transparency and data.transparency.file_url %}
@@ -120,7 +136,7 @@
 
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Financial Assistance</h2>
-        <p class="text-sm text-gray-700">Nonprofit status: <strong>{{ "Yes" if data.hospital.is_nonprofit else "Unknown/No" }}</strong></p>
+        <p class="text-sm text-gray-700">Nonprofit status: <strong>{{ data.hospital.nonprofit_status_label }}</strong></p>
         <p class="text-sm text-gray-700 mt-1">
             Financial assistance policy:
             {% if data.financials and (data.financials.fa_application_url or data.financials.financial_assistance_url) %}
@@ -152,17 +168,21 @@
 
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Nearby Hospitals</h2>
+        {% if data.nearby %}
         <div class="space-y-2">
             {% for row in data.nearby %}
             <div class="text-sm">
                 <a class="text-accent-700 underline" href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/">{{ row.name }}</a>
-                <span class="text-gray-500">&middot; Grade {{ row.billing_grade or "N/A" }} &middot; {{ "%.1fx"|format(row.avg_markup_vs_medicare) if row.avg_markup_vs_medicare is not none else "N/A" }}</span>
+                <span class="text-gray-500">
+                    {% if row.billing_grade and row.billing_grade != "N/A" %}&middot; Grade {{ row.billing_grade }}{% endif %}
+                    {% if row.avg_markup_vs_medicare is not none %} &middot; {{ "%.1fx"|format(row.avg_markup_vs_medicare) }}{% endif %}
+                </span>
             </div>
             {% endfor %}
-            {% if not data.nearby %}
-            <div class="text-sm text-gray-500">No nearby hospitals found.</div>
-            {% endif %}
         </div>
+        {% else %}
+        <div class="text-sm text-gray-500">Nearby hospitals with comparable billing data are unavailable.</div>
+        {% endif %}
     </div>
 
     <div class="text-xs text-gray-500 border-t border-gray-100 pt-5">

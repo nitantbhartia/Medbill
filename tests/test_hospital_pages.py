@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 import config  # noqa: E402
 from db import get_db  # noqa: E402
-from hospital_seo import upsert_hospital_row  # noqa: E402
+from hospital_seo import get_hospital_profile, upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
 
 
@@ -72,6 +72,14 @@ def _seed_hospital():
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             ("010001", "99285", "ER visit level 5", 2800.0, 1600.0, 227.0, 12.33, 2026),
+        )
+        db.execute(
+            """
+            INSERT INTO medicare_rates (cpt_code, description, locality, facility_rate, non_facility_rate, effective_year)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(cpt_code, locality, effective_year) DO UPDATE SET description=excluded.description
+            """,
+            ("99285", "Emergency visit, high severity", "0000000", 227.0, 227.0, 2026),
         )
         db.execute(
             """
@@ -140,3 +148,77 @@ class TestHospitalSeoPages:
         assert resp.headers["content-type"].startswith("application/xml")
         assert "/hospitals/fl/" in resp.text
         assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in resp.text
+
+    def test_profile_uses_description_fallback_and_cash_column_logic(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO hospital_prices (
+                    facility_id, cpt_code, description, gross_charge, cash_price,
+                    medicare_rate, markup_vs_medicare, data_year
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(facility_id, cpt_code, data_year) DO UPDATE SET
+                    description=excluded.description,
+                    gross_charge=excluded.gross_charge,
+                    cash_price=excluded.cash_price,
+                    medicare_rate=excluded.medicare_rate,
+                    markup_vs_medicare=excluded.markup_vs_medicare
+                """,
+                ("010001", "99284", None, 1400.0, 1400.0, 157.0, 8.92, 2026),
+            )
+            db.execute(
+                """
+                INSERT INTO medicare_rates (cpt_code, description, locality, facility_rate, non_facility_rate, effective_year)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(cpt_code, locality, effective_year) DO UPDATE SET description=excluded.description
+                """,
+                ("99284", "Emergency visit, moderate-high severity", "0000000", 157.0, 157.0, 2026),
+            )
+
+        profile = get_hospital_profile("fl", "hollywood", "memorial-regional-hospital-hollywood")
+        assert profile is not None
+        by_code = {row["cpt_code"]: row for row in profile["prices"]}
+        assert by_code["99284"]["description"] == "Emergency visit, moderate-high severity"
+        assert profile["show_cash_column"] is True
+
+    def test_nearby_hospitals_excludes_empty_metrics_and_normalizes_name(self):
+        _seed_hospital()
+        upsert_hospital_row(
+            {
+                "facility_id": "10002",
+                "name": "ASCENSION ALLEGAN HOSPITAL",
+                "city": "Hollywood",
+                "state": "FL",
+                "slug": "ascension-allegan-hospital-hollywood",
+            }
+        )
+        upsert_hospital_row(
+            {
+                "facility_id": "10003",
+                "name": "No Data Medical Center",
+                "city": "Hollywood",
+                "state": "FL",
+                "slug": "no-data-medical-center-hollywood",
+            }
+        )
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO billing_metrics (
+                    facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                    max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct, billing_grade
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("010002", 3.4, 3.2, 4.0, 10, 20.0, "C"),
+            )
+            db.execute(
+                "INSERT INTO billing_metrics (facility_id, procedures_compared, billing_grade) VALUES (?, ?, ?)",
+                ("010003", 0, "N/A"),
+            )
+
+        profile = get_hospital_profile("fl", "hollywood", "memorial-regional-hospital-hollywood")
+        assert profile is not None
+        names = [row["name"] for row in profile["nearby"]]
+        assert "Ascension Allegan Hospital" in names
+        assert "No Data Medical Center" not in names
