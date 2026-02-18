@@ -295,6 +295,21 @@ async def ops_data_quality():
             "SELECT COUNT(*) AS n FROM transparency_files WHERE parse_status IN ('parsed', 'partial')"
         ).fetchone()["n"]
         prices_rows = conn.execute("SELECT COUNT(*) AS n FROM hospital_prices").fetchone()["n"]
+        grade_rows = conn.execute(
+            """
+            SELECT billing_grade, COUNT(*) AS n
+            FROM billing_metrics
+            GROUP BY billing_grade
+            """
+        ).fetchall()
+        markup_rows = conn.execute(
+            """
+            SELECT avg_markup_vs_medicare
+            FROM billing_metrics
+            WHERE avg_markup_vs_medicare IS NOT NULL
+            ORDER BY avg_markup_vs_medicare
+            """
+        ).fetchall()
         refreshes = conn.execute(
             """
             SELECT source, MAX(refresh_date) AS last_refresh
@@ -303,6 +318,13 @@ async def ops_data_quality():
             ORDER BY source
             """
         ).fetchall()
+
+    markups = [r["avg_markup_vs_medicare"] for r in markup_rows]
+    def _quantile(p: float) -> float | None:
+        if not markups:
+            return None
+        idx = int((len(markups) - 1) * p)
+        return float(markups[idx])
 
     payload = {
         "hospitals_total": hospitals_total,
@@ -314,6 +336,13 @@ async def ops_data_quality():
         "transparency_parsed": transparency_parsed,
         "transparency_parsed_pct": round((transparency_parsed / hospitals_total * 100), 2) if hospitals_total else 0.0,
         "hospital_prices_rows": prices_rows,
+        "grade_distribution": {r["billing_grade"]: r["n"] for r in grade_rows},
+        "markup_quantiles": {
+            "p50": _quantile(0.50),
+            "p75": _quantile(0.75),
+            "p90": _quantile(0.90),
+            "p95": _quantile(0.95),
+        },
         "last_refresh_by_source": {r["source"]: r["last_refresh"] for r in refreshes},
     }
     return JSONResponse(payload)

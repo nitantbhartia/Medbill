@@ -397,6 +397,8 @@ class TestHospitalSeoPages:
         assert "hospitals_total" in data
         assert "metrics_with_avg" in data
         assert "hcahps_recommend_yes" in data
+        assert "grade_distribution" in data
+        assert "markup_quantiles" in data
         assert "last_refresh_by_source" in data
 
     def test_old_content_version_regenerates_tips_on_profile(self):

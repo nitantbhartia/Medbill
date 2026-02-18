@@ -19,7 +19,7 @@ def main() -> None:
 
     db.init_db()
     created = generate_and_save_hospital_content(limit=args.limit)
-    log_refresh("hospital_content", created, "success", "deterministic-template-v1")
+    log_refresh("hospital_content", created, "success", "deterministic-template-v2")
     print({"generated": created})
 
 
