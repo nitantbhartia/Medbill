@@ -1,11 +1,19 @@
-"""Hospital SEO profile queries and URL helpers."""
+"""Hospital directory SEO helpers, ranking logic, and deterministic content."""
 
 from __future__ import annotations
 
+import json
 import re
 from collections import defaultdict
 
 from db import get_db
+
+GRADE_THRESHOLDS = (
+    (2.0, "A"),
+    (3.0, "B"),
+    (5.0, "C"),
+    (8.0, "D"),
+)
 
 
 def slugify(value: str) -> str:
@@ -18,20 +26,110 @@ def state_slug_from_code(state_code: str) -> str:
     return slugify(state_code or "")
 
 
-def upsert_hospital_directory_row(row: dict) -> None:
+def city_slug_from_name(city: str) -> str:
+    return slugify(city or "")
+
+
+def normalize_facility_id(value: str | None) -> str | None:
+    if not value:
+        return None
+    return str(value).strip().zfill(6)
+
+
+def _to_bool_int(value: str | int | None) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, int):
+        return 1 if value else 0
+    txt = str(value).strip().lower()
+    return 1 if txt in ("1", "true", "yes", "y") else 0
+
+
+def upsert_hospital_row(row: dict) -> None:
+    facility_id = normalize_facility_id(row.get("facility_id"))
+    if not facility_id:
+        return
+
+    state = (row.get("state") or "").strip()
+    city = (row.get("city") or "").strip()
+    state_slug = row.get("state_slug") or state_slug_from_code(state)
+    city_slug = row.get("city_slug") or city_slug_from_name(city)
+    slug = row.get("slug") or slugify(f"{row.get('name', '')}-{city}")
+
+    ownership = row.get("ownership")
+    is_nonprofit = row.get("is_nonprofit")
+    if is_nonprofit is None and ownership:
+        is_nonprofit = 1 if "nonprofit" in str(ownership).lower() else 0
+
     with get_db() as db:
         db.execute(
             """
-            INSERT INTO hospital_directory (
+            INSERT INTO hospitals (
                 facility_id, name, address, city, state, zip, county, phone,
+                hospital_type, ownership, is_nonprofit, emergency_services,
+                bed_count, teaching_status, system_affiliation, cms_star_rating,
+                slug, state_slug, city_slug, cms_data_updated
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_DATE))
+            ON CONFLICT(facility_id) DO UPDATE SET
+                name=excluded.name,
+                address=excluded.address,
+                city=excluded.city,
+                state=excluded.state,
+                zip=excluded.zip,
+                county=excluded.county,
+                phone=excluded.phone,
+                hospital_type=excluded.hospital_type,
+                ownership=excluded.ownership,
+                is_nonprofit=excluded.is_nonprofit,
+                emergency_services=excluded.emergency_services,
+                bed_count=excluded.bed_count,
+                teaching_status=excluded.teaching_status,
+                system_affiliation=excluded.system_affiliation,
+                cms_star_rating=excluded.cms_star_rating,
+                slug=excluded.slug,
+                state_slug=excluded.state_slug,
+                city_slug=excluded.city_slug,
+                cms_data_updated=excluded.cms_data_updated,
+                updated_at=CURRENT_TIMESTAMP
+            """,
+            (
+                facility_id,
+                row.get("name"),
+                row.get("address"),
+                city,
+                state,
+                row.get("zip"),
+                row.get("county"),
+                row.get("phone"),
+                row.get("hospital_type"),
+                ownership,
+                _to_bool_int(is_nonprofit),
+                _to_bool_int(row.get("emergency_services")),
+                row.get("bed_count"),
+                row.get("teaching_status"),
+                row.get("system_affiliation"),
+                row.get("cms_star_rating") if row.get("cms_star_rating") is not None else row.get("overall_rating"),
+                slug,
+                state_slug,
+                city_slug,
+                row.get("cms_data_updated") or row.get("last_updated"),
+            ),
+        )
+
+        # Backward-compatible mirror for existing routes/code paths.
+        db.execute(
+            """
+            INSERT INTO hospital_directory (
+                facility_id, name, address, city, state, state_slug, zip, county, phone,
                 hospital_type, ownership, emergency_services, overall_rating,
-                bed_count, teaching_status, system_affiliation, slug, state_slug, last_updated
+                bed_count, teaching_status, system_affiliation, slug, last_updated
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_DATE))
             ON CONFLICT(facility_id) DO UPDATE SET
                 name=excluded.name,
                 address=excluded.address,
                 city=excluded.city,
                 state=excluded.state,
+                state_slug=excluded.state_slug,
                 zip=excluded.zip,
                 county=excluded.county,
                 phone=excluded.phone,
@@ -43,112 +141,37 @@ def upsert_hospital_directory_row(row: dict) -> None:
                 teaching_status=excluded.teaching_status,
                 system_affiliation=excluded.system_affiliation,
                 slug=excluded.slug,
-                state_slug=excluded.state_slug,
                 last_updated=excluded.last_updated
             """,
             (
-                row.get("facility_id"),
+                facility_id,
                 row.get("name"),
                 row.get("address"),
-                row.get("city"),
-                row.get("state"),
+                city,
+                state,
+                state_slug,
                 row.get("zip"),
                 row.get("county"),
                 row.get("phone"),
                 row.get("hospital_type"),
-                row.get("ownership"),
+                ownership,
                 row.get("emergency_services"),
-                row.get("overall_rating"),
+                row.get("cms_star_rating") if row.get("cms_star_rating") is not None else row.get("overall_rating"),
                 row.get("bed_count"),
                 row.get("teaching_status"),
                 row.get("system_affiliation"),
-                row.get("slug"),
-                row.get("state_slug"),
-                row.get("last_updated"),
+                slug,
+                row.get("cms_data_updated") or row.get("last_updated"),
             ),
         )
 
 
-def get_state_hospitals(state_slug: str, limit: int = 200) -> list[dict]:
+def log_refresh(source: str, records_updated: int, status: str, notes: str = "") -> None:
     with get_db() as db:
-        rows = db.execute(
-            """
-            SELECT facility_id, name, city, state, ownership, overall_rating, slug, state_slug
-            FROM hospital_directory
-            WHERE state_slug = ?
-            ORDER BY name
-            LIMIT ?
-            """,
-            (state_slug, limit),
-        ).fetchall()
-    return [dict(r) for r in rows]
-
-
-def get_hospital_profile(state_slug: str, hospital_slug: str) -> dict | None:
-    with get_db() as db:
-        hospital = db.execute(
-            """
-            SELECT *
-            FROM hospital_directory
-            WHERE state_slug = ? AND slug = ?
-            """,
-            (state_slug, hospital_slug),
-        ).fetchone()
-        if not hospital:
-            return None
-
-        quality = db.execute(
-            "SELECT * FROM hospital_quality WHERE facility_id = ?",
-            (hospital["facility_id"],),
-        ).fetchone()
-        financials = db.execute(
-            "SELECT * FROM hospital_financials WHERE facility_id = ?",
-            (hospital["facility_id"],),
-        ).fetchone()
-        prices = db.execute(
-            """
-            SELECT cpt_code, description, gross_charge, cash_price, medicare_rate,
-                   avg_negotiated_rate, min_negotiated_rate, max_negotiated_rate,
-                   state_avg_rate, last_updated
-            FROM hospital_procedure_prices
-            WHERE facility_id = ?
-            ORDER BY gross_charge DESC
-            LIMIT 30
-            """,
-            (hospital["facility_id"],),
-        ).fetchall()
-
-    hospital_d = dict(hospital)
-    quality_d = dict(quality) if quality else {}
-    financials_d = dict(financials) if financials else {}
-    prices_d = [dict(r) for r in prices]
-
-    multipliers = []
-    for row in prices_d:
-        gross = row.get("gross_charge")
-        medicare = row.get("medicare_rate")
-        if gross and medicare and medicare > 0:
-            multipliers.append(float(gross) / float(medicare))
-    markup_multiple = round(sum(multipliers) / len(multipliers), 2) if multipliers else None
-
-    issues = []
-    if markup_multiple and markup_multiple >= 5:
-        issues.append("High average markup vs Medicare")
-    if hospital_d.get("overall_rating") in (1, 2):
-        issues.append("Low CMS overall star rating")
-    if financials_d.get("charity_care_pct") is not None and float(financials_d["charity_care_pct"]) < 1.0:
-        issues.append("Low charity-care share")
-    if not issues:
-        issues.append("No major outlier detected from currently loaded public data")
-
-    return {
-        "hospital": hospital_d,
-        "quality": quality_d,
-        "financials": financials_d,
-        "prices": prices_d,
-        "markup_multiple": markup_multiple,
-        "issues": issues,
-    }
+        db.execute(
+            "INSERT INTO data_refresh_log (source, records_updated, status, notes) VALUES (?, ?, ?, ?)",
+            (source, records_updated, status, notes),
+        )
 
 
 def get_state_index_stats() -> list[dict]:
@@ -156,7 +179,7 @@ def get_state_index_stats() -> list[dict]:
         rows = db.execute(
             """
             SELECT state_slug, state, COUNT(*) AS hospitals
-            FROM hospital_directory
+            FROM hospitals
             GROUP BY state_slug, state
             ORDER BY hospitals DESC, state
             """
@@ -164,21 +187,494 @@ def get_state_index_stats() -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def get_hospital_sitemap_paths() -> list[str]:
+def get_cities_for_state(state_slug: str) -> list[dict]:
     with get_db() as db:
         rows = db.execute(
             """
-            SELECT state_slug, slug
-            FROM hospital_directory
-            WHERE state_slug IS NOT NULL AND slug IS NOT NULL
-            ORDER BY state_slug, slug
+            SELECT city_slug, city, COUNT(*) AS hospitals
+            FROM hospitals
+            WHERE state_slug = ?
+            GROUP BY city_slug, city
+            ORDER BY hospitals DESC, city
+            """,
+            (state_slug,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_state_hospitals(
+    state_slug: str,
+    *,
+    sort: str = "grade",
+    ownership: str = "",
+    page: int = 1,
+    per_page: int = 50,
+) -> tuple[list[dict], int]:
+    page = max(1, int(page))
+    per_page = max(1, min(100, int(per_page)))
+    offset = (page - 1) * per_page
+
+    where = ["h.state_slug = ?"]
+    params: list = [state_slug]
+    if ownership:
+        where.append("lower(COALESCE(h.ownership, '')) LIKE ?")
+        params.append(f"%{ownership.lower()}%")
+
+    order_by = {
+        "name": "h.name ASC",
+        "stars": "h.cms_star_rating DESC, h.name ASC",
+        "markup": "m.avg_markup_vs_medicare DESC, h.name ASC",
+        "grade": "CASE m.billing_grade WHEN 'A' THEN 1 WHEN 'B' THEN 2 WHEN 'C' THEN 3 WHEN 'D' THEN 4 WHEN 'F' THEN 5 ELSE 6 END, h.name ASC",
+    }.get(sort, "h.name ASC")
+
+    where_sql = " AND ".join(where)
+    with get_db() as db:
+        total = db.execute(
+            f"SELECT COUNT(*) AS c FROM hospitals h WHERE {where_sql}",
+            params,
+        ).fetchone()["c"]
+        rows = db.execute(
+            f"""
+            SELECT h.facility_id, h.name, h.city, h.state, h.ownership, h.cms_star_rating,
+                   h.slug, h.state_slug, h.city_slug,
+                   m.billing_grade, m.avg_markup_vs_medicare
+            FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            WHERE {where_sql}
+            ORDER BY {order_by}
+            LIMIT ? OFFSET ?
+            """,
+            [*params, per_page, offset],
+        ).fetchall()
+
+    return [dict(r) for r in rows], int(total)
+
+
+def get_city_hospitals(
+    state_slug: str,
+    city_slug: str,
+    *,
+    sort: str = "grade",
+    page: int = 1,
+    per_page: int = 50,
+) -> tuple[list[dict], int]:
+    page = max(1, int(page))
+    per_page = max(1, min(100, int(per_page)))
+    offset = (page - 1) * per_page
+
+    order_by = {
+        "name": "h.name ASC",
+        "stars": "h.cms_star_rating DESC, h.name ASC",
+        "markup": "m.avg_markup_vs_medicare DESC, h.name ASC",
+        "grade": "CASE m.billing_grade WHEN 'A' THEN 1 WHEN 'B' THEN 2 WHEN 'C' THEN 3 WHEN 'D' THEN 4 WHEN 'F' THEN 5 ELSE 6 END, h.name ASC",
+    }.get(sort, "h.name ASC")
+
+    with get_db() as db:
+        total = db.execute(
+            "SELECT COUNT(*) AS c FROM hospitals h WHERE h.state_slug = ? AND h.city_slug = ?",
+            (state_slug, city_slug),
+        ).fetchone()["c"]
+        rows = db.execute(
+            f"""
+            SELECT h.facility_id, h.name, h.city, h.state, h.ownership, h.cms_star_rating,
+                   h.slug, h.state_slug, h.city_slug,
+                   m.billing_grade, m.avg_markup_vs_medicare
+            FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            WHERE h.state_slug = ? AND h.city_slug = ?
+            ORDER BY {order_by}
+            LIMIT ? OFFSET ?
+            """,
+            (state_slug, city_slug, per_page, offset),
+        ).fetchall()
+
+    return [dict(r) for r in rows], int(total)
+
+
+def _lookup_content_for_hospital(facility_id: str) -> dict:
+    with get_db() as db:
+        row = db.execute("SELECT * FROM hospital_content WHERE facility_id = ?", (facility_id,)).fetchone()
+    return dict(row) if row else {}
+
+
+def _build_markup_band(markup: float | None) -> str:
+    if markup is None:
+        return "unknown"
+    if markup < 2:
+        return "fair"
+    if markup < 5:
+        return "high"
+    return "excessive"
+
+
+def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) -> dict | None:
+    with get_db() as db:
+        hospital = db.execute(
+            """
+            SELECT h.*, m.avg_markup_vs_medicare, m.median_markup_vs_medicare, m.max_markup_vs_medicare,
+                   m.procedures_compared, m.cash_discount_avg_pct, m.billing_grade, m.state_rank,
+                   m.national_percentile, m.computed_at
+            FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            WHERE h.state_slug = ? AND h.city_slug = ? AND h.slug = ?
+            """,
+            (state_slug, city_slug, hospital_slug),
+        ).fetchone()
+        if not hospital:
+            return None
+
+        quality = db.execute(
+            "SELECT * FROM hcahps_scores WHERE facility_id = ?",
+            (hospital["facility_id"],),
+        ).fetchone()
+        financials = db.execute(
+            "SELECT * FROM hospital_financials WHERE facility_id = ?",
+            (hospital["facility_id"],),
+        ).fetchone()
+        transparency = db.execute(
+            "SELECT * FROM transparency_files WHERE facility_id = ?",
+            (hospital["facility_id"],),
+        ).fetchone()
+        prices = db.execute(
+            """
+            SELECT hp.cpt_code, hp.description, hp.gross_charge, hp.cash_price,
+                   hp.medicare_rate, hp.markup_vs_medicare,
+                   ba.avg_markup_vs_medicare AS state_avg_markup
+            FROM hospital_prices hp
+            LEFT JOIN benchmark_averages ba
+              ON ba.scope = ? AND ba.cpt_code = hp.cpt_code
+            WHERE hp.facility_id = ?
+            ORDER BY hp.markup_vs_medicare DESC, hp.gross_charge DESC
+            LIMIT 40
+            """,
+            (hospital["state"], hospital["facility_id"]),
+        ).fetchall()
+
+    hospital_d = dict(hospital)
+    quality_d = dict(quality) if quality else {}
+    financials_d = dict(financials) if financials else {}
+    transparency_d = dict(transparency) if transparency else {}
+    prices_d = [dict(p) for p in prices]
+
+    for row in prices_d:
+        row["markup_band"] = _build_markup_band(row.get("markup_vs_medicare"))
+
+    content = _lookup_content_for_hospital(hospital_d["facility_id"])
+    tips = content.get("dispute_tips") or generate_deterministic_tips(hospital_d, financials_d)
+
+    nearby = get_nearby_hospitals(
+        state_slug=hospital_d["state_slug"],
+        city_slug=hospital_d["city_slug"],
+        facility_id=hospital_d["facility_id"],
+    )
+
+    return {
+        "hospital": hospital_d,
+        "quality": quality_d,
+        "financials": financials_d,
+        "transparency": transparency_d,
+        "prices": prices_d,
+        "tips": tips,
+        "content": content,
+        "nearby": nearby,
+    }
+
+
+def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limit: int = 6) -> list[dict]:
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT h.name, h.slug, h.state_slug, h.city_slug, h.cms_star_rating,
+                   m.billing_grade, m.avg_markup_vs_medicare
+            FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            WHERE h.state_slug = ?
+              AND h.facility_id != ?
+              AND (h.city_slug = ? OR h.city_slug != ?)
+            ORDER BY CASE WHEN h.city_slug = ? THEN 0 ELSE 1 END, h.name
+            LIMIT ?
+            """,
+            (state_slug, facility_id, city_slug, city_slug, city_slug, limit),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _grade_from_avg_markup(avg_markup: float | None) -> str:
+    if avg_markup is None:
+        return "N/A"
+    for bound, grade in GRADE_THRESHOLDS:
+        if avg_markup < bound:
+            return grade
+    return "F"
+
+
+def recompute_benchmarks() -> int:
+    with get_db() as db:
+        db.execute("DELETE FROM benchmark_averages")
+        rows = db.execute(
+            """
+            SELECT 'national' AS scope, cpt_code,
+                   AVG(gross_charge) AS avg_gross,
+                   AVG(cash_price) AS avg_cash,
+                   AVG(markup_vs_medicare) AS avg_markup,
+                   COUNT(DISTINCT facility_id) AS hospital_count
+            FROM hospital_prices
+            WHERE gross_charge IS NOT NULL
+            GROUP BY cpt_code
             """
         ).fetchall()
-    by_state = defaultdict(list)
-    for row in rows:
-        by_state[row["state_slug"]].append(f"/hospital/{row['state_slug']}/{row['slug']}")
-    paths = ["/"]
-    for state in sorted(by_state):
-        paths.append(f"/hospital/{state}")
-        paths.extend(by_state[state])
+        state_rows = db.execute(
+            """
+            SELECT h.state AS scope, hp.cpt_code,
+                   AVG(hp.gross_charge) AS avg_gross,
+                   AVG(hp.cash_price) AS avg_cash,
+                   AVG(hp.markup_vs_medicare) AS avg_markup,
+                   COUNT(DISTINCT hp.facility_id) AS hospital_count
+            FROM hospital_prices hp
+            JOIN hospitals h ON h.facility_id = hp.facility_id
+            WHERE hp.gross_charge IS NOT NULL
+            GROUP BY h.state, hp.cpt_code
+            """
+        ).fetchall()
+
+        inserted = 0
+        for row in [*rows, *state_rows]:
+            db.execute(
+                """
+                INSERT INTO benchmark_averages (
+                    scope, cpt_code, avg_gross_charge, avg_cash_price,
+                    avg_markup_vs_medicare, hospital_count
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    row["scope"],
+                    row["cpt_code"],
+                    row["avg_gross"],
+                    row["avg_cash"],
+                    row["avg_markup"],
+                    row["hospital_count"],
+                ),
+            )
+            inserted += 1
+
+    return inserted
+
+
+def recompute_billing_metrics() -> int:
+    with get_db() as db:
+        facilities = db.execute("SELECT facility_id, state FROM hospitals").fetchall()
+        upserted = 0
+
+        for f in facilities:
+            rows = db.execute(
+                """
+                SELECT gross_charge, cash_price, markup_vs_medicare
+                FROM hospital_prices
+                WHERE facility_id = ?
+                  AND gross_charge IS NOT NULL
+                  AND markup_vs_medicare IS NOT NULL
+                """,
+                (f["facility_id"],),
+            ).fetchall()
+
+            if len(rows) < 5:
+                db.execute(
+                    """
+                    INSERT INTO billing_metrics (
+                        facility_id, procedures_compared, billing_grade, computed_at
+                    ) VALUES (?, ?, 'N/A', CURRENT_TIMESTAMP)
+                    ON CONFLICT(facility_id) DO UPDATE SET
+                        procedures_compared=excluded.procedures_compared,
+                        billing_grade='N/A',
+                        computed_at=CURRENT_TIMESTAMP
+                    """,
+                    (f["facility_id"], len(rows)),
+                )
+                upserted += 1
+                continue
+
+            markups = [float(r["markup_vs_medicare"]) for r in rows if r["markup_vs_medicare"] is not None]
+            avg_markup = sum(markups) / len(markups)
+            med_markup = sorted(markups)[len(markups) // 2]
+            max_markup = max(markups)
+
+            cash_discounts = []
+            for r in rows:
+                gross = r["gross_charge"]
+                cash = r["cash_price"]
+                if gross and cash and gross > 0:
+                    cash_discounts.append((1 - (cash / gross)) * 100)
+
+            grade = _grade_from_avg_markup(avg_markup)
+            cash_discount_avg = (sum(cash_discounts) / len(cash_discounts)) if cash_discounts else None
+
+            db.execute(
+                """
+                INSERT INTO billing_metrics (
+                    facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                    max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
+                    billing_grade, computed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    avg_markup_vs_medicare=excluded.avg_markup_vs_medicare,
+                    median_markup_vs_medicare=excluded.median_markup_vs_medicare,
+                    max_markup_vs_medicare=excluded.max_markup_vs_medicare,
+                    procedures_compared=excluded.procedures_compared,
+                    cash_discount_avg_pct=excluded.cash_discount_avg_pct,
+                    billing_grade=excluded.billing_grade,
+                    computed_at=CURRENT_TIMESTAMP
+                """,
+                (
+                    f["facility_id"],
+                    round(avg_markup, 2),
+                    round(med_markup, 2),
+                    round(max_markup, 2),
+                    len(markups),
+                    round(cash_discount_avg, 2) if cash_discount_avg is not None else None,
+                    grade,
+                ),
+            )
+            upserted += 1
+
+        # state rank and national percentile backfill
+        all_rows = db.execute(
+            """
+            SELECT h.facility_id, h.state, bm.avg_markup_vs_medicare
+            FROM hospitals h
+            JOIN billing_metrics bm ON bm.facility_id = h.facility_id
+            WHERE bm.avg_markup_vs_medicare IS NOT NULL
+            ORDER BY bm.avg_markup_vs_medicare DESC
+            """
+        ).fetchall()
+
+        total = len(all_rows)
+        by_state: dict[str, list] = defaultdict(list)
+        for row in all_rows:
+            by_state[row["state"]].append(row)
+
+        for idx, row in enumerate(all_rows, start=1):
+            percentile = int(round((idx / total) * 100)) if total else None
+            state_list = by_state[row["state"]]
+            state_rank = next(i for i, s in enumerate(state_list, start=1) if s["facility_id"] == row["facility_id"])
+            db.execute(
+                "UPDATE billing_metrics SET state_rank = ?, national_percentile = ? WHERE facility_id = ?",
+                (state_rank, percentile, row["facility_id"]),
+            )
+
+    return upserted
+
+
+def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
+    grade = hospital.get("billing_grade") or "N/A"
+    markup = hospital.get("avg_markup_vs_medicare")
+    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
+    nonprofit = bool(hospital.get("is_nonprofit") or financials.get("nonprofit_status"))
+    charity_pct = financials.get("charity_care_pct_revenue") or financials.get("charity_care_pct")
+    charity_txt = f"{float(charity_pct):.1f}%" if charity_pct is not None else "not reported"
+    cash_discount = hospital.get("cash_discount_avg_pct")
+    cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else "not available"
+
+    para1 = (
+        f"{hospital.get('name', 'This hospital')} currently shows a billing grade of {grade} "
+        f"with an average markup around {markup_txt} versus Medicare reference rates. "
+        f"Use that benchmark when asking billing to review line items and justify large gaps."
+    )
+
+    if nonprofit:
+        para2 = (
+            f"This hospital appears to be nonprofit. Ask for the formal financial assistance application, "
+            f"income thresholds, and deadline rules before making payment commitments. "
+            f"Reported charity-care level is {charity_txt}."
+        )
+    else:
+        para2 = (
+            f"If you are self-pay or high-deductible, ask for the cash/self-pay schedule first. "
+            f"Current average cash discount in loaded data is {cash_txt}. Request the same discount level across all line items."
+        )
+
+    para3 = "Before paying, scan your bill with BillScan to identify line-item issues and generate a dispute packet."
+    return "\n\n".join((para1, para2, para3))
+
+
+def generate_and_save_hospital_content(limit: int | None = None) -> int:
+    with get_db() as db:
+        query = (
+            """
+            SELECT h.facility_id, h.name, h.state, h.city, h.ownership, h.is_nonprofit,
+                   bm.billing_grade, bm.avg_markup_vs_medicare, bm.cash_discount_avg_pct,
+                   hf.charity_care_pct_revenue, hf.charity_care_pct
+            FROM hospitals h
+            LEFT JOIN billing_metrics bm ON bm.facility_id = h.facility_id
+            LEFT JOIN hospital_financials hf ON hf.facility_id = h.facility_id
+            ORDER BY h.name
+            """
+        )
+        if limit:
+            query += " LIMIT ?"
+            rows = db.execute(query, (limit,)).fetchall()
+        else:
+            rows = db.execute(query).fetchall()
+
+        saved = 0
+        for row in rows:
+            data = dict(row)
+            tips = generate_deterministic_tips(data, data)
+            meta = (
+                f"{data['name']} billing review in {data['city']}, {data['state']}. "
+                f"Compare markup vs Medicare, financial assistance, and dispute options before paying."
+            )
+            schema = {
+                "@context": "https://schema.org",
+                "@type": "MedicalOrganization",
+                "name": data["name"],
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": data["city"],
+                    "addressRegion": data["state"],
+                },
+            }
+            db.execute(
+                """
+                INSERT INTO hospital_content (facility_id, dispute_tips, meta_description, structured_data_json, model_used)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    dispute_tips=excluded.dispute_tips,
+                    meta_description=excluded.meta_description,
+                    structured_data_json=excluded.structured_data_json,
+                    generated_at=CURRENT_TIMESTAMP,
+                    model_used=excluded.model_used
+                """,
+                (data["facility_id"], tips, meta, json.dumps(schema), "deterministic-template-v1"),
+            )
+            saved += 1
+    return saved
+
+
+def get_hospital_sitemap_paths() -> list[str]:
+    with get_db() as db:
+        states = db.execute(
+            "SELECT DISTINCT state_slug FROM hospitals WHERE state_slug IS NOT NULL ORDER BY state_slug"
+        ).fetchall()
+        cities = db.execute(
+            "SELECT DISTINCT state_slug, city_slug FROM hospitals WHERE state_slug IS NOT NULL AND city_slug IS NOT NULL ORDER BY state_slug, city_slug"
+        ).fetchall()
+        hospitals = db.execute(
+            "SELECT state_slug, city_slug, slug FROM hospitals WHERE state_slug IS NOT NULL AND city_slug IS NOT NULL AND slug IS NOT NULL ORDER BY state_slug, city_slug, slug"
+        ).fetchall()
+
+    paths = ["/hospitals/"]
+    paths.extend([f"/hospitals/{r['state_slug']}/" for r in states])
+    paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/" for r in cities])
+    paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/{r['slug']}/" for r in hospitals])
     return paths
+
+
+# Backward-compat wrappers
+
+def upsert_hospital_directory_row(row: dict) -> None:
+    upsert_hospital_row(row)
+
+
+def get_state_hospitals_legacy(state_slug: str, limit: int = 200) -> list[dict]:
+    rows, _ = get_state_hospitals(state_slug=state_slug, per_page=limit)
+    return rows

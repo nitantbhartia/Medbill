@@ -14,6 +14,9 @@ class TestDatabaseInit:
             "consent_logs", "audit_logs",
             "hospital_directory", "hospital_quality", "hospital_financials",
             "hospital_procedure_prices",
+            "hospitals", "hcahps_scores", "transparency_files",
+            "hospital_prices", "billing_metrics", "benchmark_averages",
+            "hospital_content", "data_refresh_log",
         ]
         with get_db() as db:
             rows = db.execute(
@@ -33,6 +36,9 @@ class TestDatabaseInit:
             "idx_consent_bill", "idx_audit_bill",
             "idx_hospital_directory_slug", "idx_hospital_directory_state",
             "idx_hospital_prices_facility", "idx_hospital_prices_cpt",
+            "idx_hospitals_slug_scope", "idx_hospitals_state", "idx_hospitals_city_state",
+            "idx_transparency_status", "idx_hospital_prices2_facility",
+            "idx_hospital_prices2_cpt", "idx_benchmark_scope",
         ]
         with get_db() as db:
             rows = db.execute(

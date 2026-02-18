@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Billing Report Cards | BillScan{% endblock %}
+
+{% block head %}
+<meta name="description" content="Search US hospital billing report cards by state and city. Compare billing grades, markup ratios, and patient experience before paying your bill.">
+{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-5 py-10">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">Hospital Billing Report Card Directory</h1>
+    <p class="text-sm text-gray-600 mb-8">One page per hospital with pricing benchmarks, financial assistance context, and dispute guidance.</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {% for row in states %}
+        <a href="/hospitals/{{ row.state_slug }}/" class="rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+            <div class="text-sm font-semibold text-gray-900">{{ row.state or row.state_slug|upper }}</div>
+            <div class="text-xs text-gray-500 mt-1">{{ row.hospitals }} hospitals</div>
+        </a>
+        {% endfor %}
+        {% if not states %}
+        <div class="text-sm text-gray-500">No hospital data loaded yet.</div>
+        {% endif %}
+    </div>
+
+    <div class="mt-10 p-4 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-600">
+        Data sourced from CMS and hospital-published transparency files. Actual charges vary by plan and clinical complexity.
+    </div>
+</section>
+{% endblock %}

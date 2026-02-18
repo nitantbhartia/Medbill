@@ -35,6 +35,12 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_REPORT = os.getenv("STRIPE_PRICE_REPORT", "")  # $19 report
 
+# Directory monetization toggles
+ENABLE_AFFILIATE_SLOTS = os.getenv("ENABLE_AFFILIATE_SLOTS", "false").lower() == "true"
+ENABLE_HOSPITAL_CLAIM = os.getenv("ENABLE_HOSPITAL_CLAIM", "false").lower() == "true"
+AFFILIATE_URL = os.getenv("AFFILIATE_URL", "")
+CLAIM_HOSPITAL_URL = os.getenv("CLAIM_HOSPITAL_URL", "")
+
 # Stats cache TTL
 STATS_CACHE_TTL_SECONDS = 60
 

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.hospital.name }} Billing Review & Prices | BillScan{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ data.content.meta_description if data.content and data.content.meta_description else data.hospital.name ~ ' billing review, prices vs Medicare, financial assistance, and dispute tips.' }}">
+<script type="application/ld+json">
+{{ data.content.structured_data_json | safe if data.content and data.content.structured_data_json else '{"@context":"https://schema.org","@type":"MedicalOrganization","name":"' ~ data.hospital.name ~ '"}' }}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 py-10">
+    <div class="text-xs text-gray-500 mb-2">
+        <a class="underline hover:text-gray-700" href="/hospitals/">Hospitals</a>
+        &rsaquo;
+        <a class="underline hover:text-gray-700" href="/hospitals/{{ data.hospital.state_slug }}/">{{ data.hospital.state }}</a>
+        &rsaquo;
+        <a class="underline hover:text-gray-700" href="/hospitals/{{ data.hospital.state_slug }}/{{ data.hospital.city_slug }}/">{{ data.hospital.city }}</a>
+        &rsaquo; {{ data.hospital.name }}
+    </div>
+
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ data.hospital.name }}</h1>
+    <p class="text-sm text-gray-600 mt-1">
+        {{ data.hospital.city }}, {{ data.hospital.state }}{% if data.hospital.zip %} {{ data.hospital.zip }}{% endif %}
+        {% if data.hospital.phone %}&middot; {{ data.hospital.phone }}{% endif %}
+    </p>
+    <p class="text-xs text-gray-500 mt-1">
+        {% if data.hospital.hospital_type %}{{ data.hospital.hospital_type }}{% endif %}
+        {% if data.hospital.ownership %} &middot; {{ data.hospital.ownership }}{% endif %}
+        {% if data.hospital.bed_count %} &middot; {{ data.hospital.bed_count }} beds{% endif %}
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6 mb-8">
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs text-gray-500 uppercase">Billing Grade</div>
+            <div class="text-2xl font-semibold mt-1">{{ data.hospital.billing_grade or "N/A" }}</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs text-gray-500 uppercase">Avg Markup</div>
+            <div class="text-2xl font-semibold mt-1">{{ "%.1fx"|format(data.hospital.avg_markup_vs_medicare) if data.hospital.avg_markup_vs_medicare is not none else "N/A" }}</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs text-gray-500 uppercase">CMS Stars</div>
+            <div class="text-2xl font-semibold mt-1">{{ data.hospital.cms_star_rating if data.hospital.cms_star_rating is not none else "N/A" }}</div>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-4">
+            <div class="text-xs text-gray-500 uppercase">Would Recommend</div>
+            <div class="text-2xl font-semibold mt-1">{{ "%.0f%%"|format(data.quality.recommend_yes) if data.quality and data.quality.recommend_yes is not none else "N/A" }}</div>
+        </div>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5 bg-gray-50">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Got a bill from this hospital?</h2>
+        <p class="text-sm text-gray-600">Scan it in 30 seconds to check line items against CMS benchmarks.</p>
+        <a href="/scan" class="inline-block mt-3 bg-accent-700 text-white text-sm font-semibold px-4 py-2 rounded">Scan My Bill</a>
+    </div>
+
+    {% if enable_affiliate_slots and affiliate_url %}
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Need professional billing help?</h2>
+        <p class="text-sm text-gray-600">Connect with an independent patient-advocacy service.</p>
+        <a href="{{ affiliate_url }}?utm_source=billscan&utm_medium=hospital_page&utm_campaign={{ data.hospital.facility_id }}"
+           target="_blank" rel="noopener"
+           class="inline-block mt-3 text-sm font-semibold text-accent-700 hover:text-accent-800 underline">Get dispute support</a>
+    </div>
+    {% endif %}
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Billing Profile</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+            <div>Average markup vs Medicare: <strong>{{ "%.1fx"|format(data.hospital.avg_markup_vs_medicare) if data.hospital.avg_markup_vs_medicare is not none else "N/A" }}</strong></div>
+            <div>Cash/self-pay discount avg: <strong>{{ "%.1f%%"|format(data.hospital.cash_discount_avg_pct) if data.hospital.cash_discount_avg_pct is not none else "N/A" }}</strong></div>
+            <div>Charity care (% revenue): <strong>{{ "%.1f%%"|format(data.financials.charity_care_pct_revenue or data.financials.charity_care_pct) if data.financials and (data.financials.charity_care_pct_revenue is not none or data.financials.charity_care_pct is not none) else "N/A" }}</strong></div>
+            <div>State rank by markup: <strong>{{ data.hospital.state_rank if data.hospital.state_rank is not none else "N/A" }}</strong></div>
+        </div>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5 overflow-x-auto">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Common Procedure Prices</h2>
+        {% if data.prices %}
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 border-b border-gray-200">
+                    <th class="py-2 pr-3">CPT</th>
+                    <th class="py-2 pr-3">Description</th>
+                    <th class="py-2 pr-3">Hospital</th>
+                    <th class="py-2 pr-3">Cash</th>
+                    <th class="py-2 pr-3">Medicare</th>
+                    <th class="py-2 pr-3">Markup</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data.prices[:30] %}
+                <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-3 font-mono">{{ row.cpt_code }}</td>
+                    <td class="py-2 pr-3">{{ row.description or "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.gross_charge) if row.gross_charge is not none else "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.cash_price) if row.cash_price is not none else "N/A" }}</td>
+                    <td class="py-2 pr-3">{{ "$%.2f"|format(row.medicare_rate) if row.medicare_rate is not none else "N/A" }}</td>
+                    <td class="py-2 pr-3">
+                        {% if row.markup_vs_medicare is not none %}
+                            {% set m = row.markup_vs_medicare %}
+                            <span class="font-semibold {% if m < 2 %}text-green-700{% elif m < 5 %}text-amber-700{% else %}text-red-700{% endif %}">{{ "%.1fx"|format(m) }}</span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-sm text-gray-600">This hospital's pricing file could not be fully processed yet.</p>
+        {% if data.transparency and data.transparency.file_url %}
+        <p class="text-sm mt-2">Raw file: <a class="underline text-accent-700" href="{{ data.transparency.file_url }}" target="_blank" rel="noopener">{{ data.transparency.file_url }}</a></p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Financial Assistance</h2>
+        <p class="text-sm text-gray-700">Nonprofit status: <strong>{{ "Yes" if data.hospital.is_nonprofit else "Unknown/No" }}</strong></p>
+        <p class="text-sm text-gray-700 mt-1">
+            Financial assistance policy:
+            {% if data.financials and (data.financials.fa_application_url or data.financials.financial_assistance_url) %}
+            <a class="underline text-accent-700" href="{{ data.financials.fa_application_url or data.financials.financial_assistance_url }}" target="_blank" rel="noopener">View application</a>
+            {% else %}
+            Not listed in current data
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">How to Dispute a Bill from {{ data.hospital.name }}</h2>
+        <div class="text-sm text-gray-700 whitespace-pre-line">{{ data.tips }}</div>
+        <div class="mt-4 text-sm">
+            Related guides:
+            <a class="underline text-accent-700 ml-1" href="/scan">How to Dispute a Medical Bill</a>
+            <a class="underline text-accent-700 ml-3" href="/scan">Medical Bill Negotiation Guide</a>
+        </div>
+    </div>
+
+    {% if enable_hospital_claim and claim_hospital_url %}
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Hospital representative?</h2>
+        <p class="text-sm text-gray-600">Claim this profile to add official billing-assistance links and correction notes.</p>
+        <a href="{{ claim_hospital_url }}?facility_id={{ data.hospital.facility_id }}"
+           class="inline-block mt-3 text-sm font-semibold text-accent-700 hover:text-accent-800 underline">Claim this hospital profile</a>
+    </div>
+    {% endif %}
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Nearby Hospitals</h2>
+        <div class="space-y-2">
+            {% for row in data.nearby %}
+            <div class="text-sm">
+                <a class="text-accent-700 underline" href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/">{{ row.name }}</a>
+                <span class="text-gray-500">&middot; Grade {{ row.billing_grade or "N/A" }} &middot; {{ "%.1fx"|format(row.avg_markup_vs_medicare) if row.avg_markup_vs_medicare is not none else "N/A" }}</span>
+            </div>
+            {% endfor %}
+            {% if not data.nearby %}
+            <div class="text-sm text-gray-500">No nearby hospitals found.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-xs text-gray-500 border-t border-gray-100 pt-5">
+        Data sourced from CMS and hospital-published pricing files. Actual charges vary. Not medical, legal, or financial advice.
+    </div>
+</section>
+{% endblock %}

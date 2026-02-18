@@ -39,6 +39,12 @@ def init_db():
 
 def _run_migrations(db):
     """Add columns that may be missing from older databases."""
+    def ensure_columns(table_name: str, required: dict[str, str]) -> None:
+        existing_cols = {row[1] for row in db.execute(f"PRAGMA table_info({table_name})").fetchall()}
+        for col, col_type in required.items():
+            if col not in existing_cols:
+                db.execute(f"ALTER TABLE {table_name} ADD COLUMN {col} {col_type}")
+
     existing = {row[1] for row in db.execute("PRAGMA table_info(bills)").fetchall()}
     if "zip_code" not in existing:
         db.execute("ALTER TABLE bills ADD COLUMN zip_code TEXT")
@@ -144,6 +150,22 @@ def _run_migrations(db):
         )
         """
     )
+    ensure_columns(
+        "hospital_financials",
+        {
+            "net_patient_revenue": "REAL",
+            "charity_care_charges": "REAL",
+            "charity_care_costs": "REAL",
+            "charity_care_pct_revenue": "REAL",
+            "bad_debt": "REAL",
+            "operating_margin": "REAL",
+            "has_financial_assistance": "INTEGER",
+            "fa_income_threshold": "TEXT",
+            "fa_application_url": "TEXT",
+            "ein": "TEXT",
+            "cost_report_year": "INTEGER",
+        },
+    )
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS hospital_procedure_prices (
@@ -164,6 +186,210 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices_facility ON hospital_procedure_prices(facility_id)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices_cpt ON hospital_procedure_prices(cpt_code)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospitals (
+            facility_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            address TEXT,
+            city TEXT NOT NULL,
+            state TEXT NOT NULL,
+            zip TEXT,
+            county TEXT,
+            phone TEXT,
+            hospital_type TEXT,
+            ownership TEXT,
+            is_nonprofit INTEGER,
+            emergency_services INTEGER,
+            bed_count INTEGER,
+            teaching_status TEXT,
+            system_affiliation TEXT,
+            cms_star_rating INTEGER,
+            slug TEXT NOT NULL,
+            state_slug TEXT NOT NULL,
+            city_slug TEXT NOT NULL,
+            cms_data_updated DATE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_hospitals_slug_scope ON hospitals(state_slug, city_slug, slug)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospitals_state ON hospitals(state)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospitals_city_state ON hospitals(city, state)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hcahps_scores (
+            facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+            overall_rating_pct_9_10 REAL,
+            overall_rating_pct_7_8 REAL,
+            overall_rating_pct_1_6 REAL,
+            recommend_yes REAL,
+            doctor_communication_top REAL,
+            nurse_communication_top REAL,
+            staff_responsiveness_top REAL,
+            medicine_communication_top REAL,
+            discharge_info_top REAL,
+            care_transition_top REAL,
+            hospital_cleanliness_top REAL,
+            hospital_quietness_top REAL,
+            survey_response_count INTEGER,
+            survey_period TEXT,
+            data_updated DATE
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS transparency_files (
+            facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+            file_url TEXT,
+            file_format TEXT,
+            file_size_mb REAL,
+            has_standard_codes INTEGER,
+            parse_status TEXT,
+            row_count INTEGER,
+            procedures_extracted INTEGER,
+            last_downloaded DATE,
+            last_parsed DATE,
+            parse_notes TEXT
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_transparency_status ON transparency_files(parse_status)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT REFERENCES hospitals(facility_id),
+            cpt_code TEXT NOT NULL,
+            description TEXT,
+            gross_charge REAL,
+            cash_price REAL,
+            min_negotiated_rate REAL,
+            max_negotiated_rate REAL,
+            avg_negotiated_rate REAL,
+            medicare_rate REAL,
+            markup_vs_medicare REAL,
+            data_year INTEGER,
+            UNIQUE(facility_id, cpt_code, data_year)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices2_facility ON hospital_prices(facility_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices2_cpt ON hospital_prices(cpt_code)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS billing_metrics (
+            facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+            avg_markup_vs_medicare REAL,
+            median_markup_vs_medicare REAL,
+            max_markup_vs_medicare REAL,
+            procedures_compared INTEGER,
+            cash_discount_avg_pct REAL,
+            billing_grade TEXT,
+            state_rank INTEGER,
+            national_percentile INTEGER,
+            computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS benchmark_averages (
+            scope TEXT NOT NULL,
+            cpt_code TEXT NOT NULL,
+            avg_gross_charge REAL,
+            avg_cash_price REAL,
+            avg_markup_vs_medicare REAL,
+            hospital_count INTEGER,
+            computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (scope, cpt_code)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_benchmark_scope ON benchmark_averages(scope)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hospital_content (
+            facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+            dispute_tips TEXT,
+            meta_description TEXT,
+            structured_data_json TEXT,
+            generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            model_used TEXT
+        )
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS data_refresh_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source TEXT NOT NULL,
+            refresh_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            records_updated INTEGER,
+            status TEXT,
+            notes TEXT
+        )
+        """
+    )
+
+    # Backward-compatible sync to canonical tables.
+    db.execute(
+        """
+        INSERT OR IGNORE INTO hospitals (
+            facility_id, name, address, city, state, zip, county, phone, hospital_type,
+            ownership, is_nonprofit, emergency_services, bed_count, teaching_status,
+            system_affiliation, cms_star_rating, slug, state_slug, city_slug, cms_data_updated
+        )
+        SELECT
+            facility_id, name, address, COALESCE(city, ''), COALESCE(state, ''), zip, county, phone, hospital_type,
+            ownership,
+            CASE
+                WHEN lower(COALESCE(ownership, '')) LIKE '%nonprofit%' THEN 1
+                ELSE 0
+            END AS is_nonprofit,
+            CASE
+                WHEN lower(COALESCE(emergency_services, '')) IN ('yes', 'true', '1') THEN 1
+                ELSE 0
+            END AS emergency_services,
+            bed_count, teaching_status, system_affiliation, overall_rating, slug, state_slug,
+            lower(replace(COALESCE(city, ''), ' ', '-')) AS city_slug,
+            last_updated
+        FROM hospital_directory
+        WHERE facility_id IS NOT NULL
+        """
+    )
+    db.execute(
+        """
+        INSERT OR IGNORE INTO hcahps_scores (
+            facility_id, recommend_yes, doctor_communication_top, nurse_communication_top,
+            staff_responsiveness_top, medicine_communication_top, discharge_info_top,
+            care_transition_top, survey_period, data_updated
+        )
+        SELECT
+            facility_id, patient_experience_score, patient_experience_score, patient_experience_score,
+            patient_experience_score, patient_experience_score, patient_experience_score,
+            patient_experience_score, NULL, updated_at
+        FROM hospital_quality
+        WHERE facility_id IS NOT NULL
+        """
+    )
+    db.execute(
+        """
+        INSERT OR IGNORE INTO hospital_prices (
+            facility_id, cpt_code, description, gross_charge, cash_price, min_negotiated_rate,
+            max_negotiated_rate, avg_negotiated_rate, medicare_rate, markup_vs_medicare, data_year
+        )
+        SELECT
+            facility_id, cpt_code, description, gross_charge, cash_price, min_negotiated_rate,
+            max_negotiated_rate, avg_negotiated_rate, medicare_rate,
+            CASE WHEN medicare_rate > 0 AND gross_charge IS NOT NULL THEN gross_charge / medicare_rate ELSE NULL END,
+            CAST(substr(COALESCE(last_updated, ''), 1, 4) AS INTEGER)
+        FROM hospital_procedure_prices
+        WHERE facility_id IS NOT NULL AND cpt_code IS NOT NULL
+        """
+    )
 
 
 SCHEMA = """
@@ -497,4 +723,132 @@ CREATE TABLE IF NOT EXISTS hospital_procedure_prices (
 
 CREATE INDEX IF NOT EXISTS idx_hospital_prices_facility ON hospital_procedure_prices(facility_id);
 CREATE INDEX IF NOT EXISTS idx_hospital_prices_cpt ON hospital_procedure_prices(cpt_code);
+
+-- Canonical hospitals table
+CREATE TABLE IF NOT EXISTS hospitals (
+    facility_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    address TEXT,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    zip TEXT,
+    county TEXT,
+    phone TEXT,
+    hospital_type TEXT,
+    ownership TEXT,
+    is_nonprofit INTEGER,
+    emergency_services INTEGER,
+    bed_count INTEGER,
+    teaching_status TEXT,
+    system_affiliation TEXT,
+    cms_star_rating INTEGER,
+    slug TEXT NOT NULL,
+    state_slug TEXT NOT NULL,
+    city_slug TEXT NOT NULL,
+    cms_data_updated DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_hospitals_slug_scope ON hospitals(state_slug, city_slug, slug);
+CREATE INDEX IF NOT EXISTS idx_hospitals_state ON hospitals(state);
+CREATE INDEX IF NOT EXISTS idx_hospitals_city_state ON hospitals(city, state);
+
+CREATE TABLE IF NOT EXISTS hcahps_scores (
+    facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+    overall_rating_pct_9_10 REAL,
+    overall_rating_pct_7_8 REAL,
+    overall_rating_pct_1_6 REAL,
+    recommend_yes REAL,
+    doctor_communication_top REAL,
+    nurse_communication_top REAL,
+    staff_responsiveness_top REAL,
+    medicine_communication_top REAL,
+    discharge_info_top REAL,
+    care_transition_top REAL,
+    hospital_cleanliness_top REAL,
+    hospital_quietness_top REAL,
+    survey_response_count INTEGER,
+    survey_period TEXT,
+    data_updated DATE
+);
+
+CREATE TABLE IF NOT EXISTS transparency_files (
+    facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+    file_url TEXT,
+    file_format TEXT,
+    file_size_mb REAL,
+    has_standard_codes INTEGER,
+    parse_status TEXT,
+    row_count INTEGER,
+    procedures_extracted INTEGER,
+    last_downloaded DATE,
+    last_parsed DATE,
+    parse_notes TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_transparency_status ON transparency_files(parse_status);
+
+CREATE TABLE IF NOT EXISTS hospital_prices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    facility_id TEXT REFERENCES hospitals(facility_id),
+    cpt_code TEXT NOT NULL,
+    description TEXT,
+    gross_charge REAL,
+    cash_price REAL,
+    min_negotiated_rate REAL,
+    max_negotiated_rate REAL,
+    avg_negotiated_rate REAL,
+    medicare_rate REAL,
+    markup_vs_medicare REAL,
+    data_year INTEGER,
+    UNIQUE(facility_id, cpt_code, data_year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_hospital_prices2_facility ON hospital_prices(facility_id);
+CREATE INDEX IF NOT EXISTS idx_hospital_prices2_cpt ON hospital_prices(cpt_code);
+
+CREATE TABLE IF NOT EXISTS billing_metrics (
+    facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+    avg_markup_vs_medicare REAL,
+    median_markup_vs_medicare REAL,
+    max_markup_vs_medicare REAL,
+    procedures_compared INTEGER,
+    cash_discount_avg_pct REAL,
+    billing_grade TEXT,
+    state_rank INTEGER,
+    national_percentile INTEGER,
+    computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS benchmark_averages (
+    scope TEXT NOT NULL,
+    cpt_code TEXT NOT NULL,
+    avg_gross_charge REAL,
+    avg_cash_price REAL,
+    avg_markup_vs_medicare REAL,
+    hospital_count INTEGER,
+    computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (scope, cpt_code)
+);
+
+CREATE INDEX IF NOT EXISTS idx_benchmark_scope ON benchmark_averages(scope);
+
+CREATE TABLE IF NOT EXISTS hospital_content (
+    facility_id TEXT PRIMARY KEY REFERENCES hospitals(facility_id),
+    dispute_tips TEXT,
+    meta_description TEXT,
+    structured_data_json TEXT,
+    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    model_used TEXT
+);
+
+CREATE TABLE IF NOT EXISTS data_refresh_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source TEXT NOT NULL,
+    refresh_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    records_updated INTEGER,
+    status TEXT,
+    notes TEXT
+);
 """

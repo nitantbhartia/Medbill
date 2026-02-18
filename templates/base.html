@@ -32,23 +32,26 @@
         }
     </script>
     <link rel="stylesheet" href="/static/css/app.css"/>
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
     {% block head %}{% endblock %}
 </head>
 <body class="bg-white text-gray-900 min-h-screen flex flex-col antialiased">
 
     <header class="border-b border-gray-100">
-        <div class="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
+        <div class="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
             <a href="/" class="text-lg font-semibold tracking-tight text-gray-900 no-underline">
                 BillScan
             </a>
-            <a href="/scan"
-               class="text-sm font-medium text-accent-700 hover:text-accent-800 transition-colors">
-                Scan a bill
-            </a>
-            <a href="/hospital"
-               class="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
-                Hospital directory
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="/hospitals/"
+                   class="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
+                    Hospitals
+                </a>
+                <a href="/scan"
+                   class="text-sm font-medium text-accent-700 hover:text-accent-800 transition-colors">
+                    Scan a bill
+                </a>
+            </div>
         </div>
     </header>
 
