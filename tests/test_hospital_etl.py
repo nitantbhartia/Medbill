@@ -14,7 +14,7 @@ os.environ["DB_PATH"] = ":memory:"
 import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
-from hospital_etl import auto_map_columns, normalize_price_rows, upsert_hospital_price  # noqa: E402
+from hospital_etl import auto_map_columns, first, normalize_price_rows, upsert_hospital_price  # noqa: E402
 from hospital_seo import recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
@@ -25,6 +25,12 @@ def test_auto_map_columns_detects_core_fields():
     assert mapped["description"] == "Service Description"
     assert mapped["gross_charge"] == "Gross Charge"
     assert mapped["cash_price"] == "Discounted Cash"
+
+
+def test_first_matches_case_insensitive_headers():
+    row = {"HCPCS": "99285", "NON_FACILITY_RATE": "684.22"}
+    assert first(row, ("cpt_code", "hcpcs")) == "99285"
+    assert first(row, ("non_facility_rate", "Non Facility Rate")) == "684.22"
 
 
 def test_normalize_price_rows_keeps_valid_cpt():

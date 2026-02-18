@@ -66,6 +66,11 @@ def first(row: dict, keys: Iterable[str]) -> str | None:
     for key in keys:
         if key in row and row[key] not in (None, ""):
             return row[key]
+    normalized = {str(k).strip().lower().replace(" ", "_"): v for k, v in row.items()}
+    for key in keys:
+        nk = str(key).strip().lower().replace(" ", "_")
+        if nk in normalized and normalized[nk] not in (None, ""):
+            return normalized[nk]
     return None
 
 
