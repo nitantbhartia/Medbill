@@ -15,6 +15,19 @@ GRADE_THRESHOLDS = (
     (8.0, "D"),
 )
 
+# Consumer-friendly aliases for commonly searched CPT/HCPCS codes.
+FRIENDLY_CPT_DESCRIPTIONS = {
+    "20610": "Joint Injection (drainage)",
+    "11042": "Wound Debridement",
+    "27447": "Total Knee Replacement",
+    "22551": "Cervical Spine Fusion",
+    "29881": "Knee Arthroscopy",
+    "27130": "Total Hip Replacement",
+    "10060": "Abscess Drainage",
+    "27236": "Hip Fracture Repair",
+    "23472": "Shoulder Replacement",
+}
+
 
 def slugify(value: str) -> str:
     text = (value or "").strip().lower()
@@ -62,8 +75,9 @@ def _display_name(name: str | None) -> str:
     txt = (name or "").strip()
     if not txt:
         return ""
-    if txt.isupper():
-        return txt.title()
+    txt = re.sub(r"\s+", " ", txt).strip().strip(",")
+    txt = txt.title() if txt.isupper() else txt
+    txt = re.sub(r"(?i)\s*(?:,\s*)?(llc|inc|inc\.|corp|corporation|co|company)\s*$", "", txt).strip()
     return txt
 
 
@@ -400,6 +414,9 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         ).fetchall()
 
     hospital_d = dict(hospital)
+    quality_d = dict(quality) if quality else {}
+    financials_d = dict(financials) if financials else {}
+    transparency_d = dict(transparency) if transparency else {}
     hospital_d["name"] = _display_name(hospital_d.get("name"))
     nonprofit_flag = hospital_d.get("is_nonprofit")
     ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
@@ -407,20 +424,24 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         nonprofit_flag = 1
     if nonprofit_flag in (None, 0) and ownership_nonprofit is False:
         nonprofit_flag = 0
+    fin_nonprofit = financials_d.get("nonprofit_status")
+    if nonprofit_flag in (None, 0) and fin_nonprofit in (1, "1", True):
+        nonprofit_flag = 1
+    if nonprofit_flag is None and fin_nonprofit in (0, "0", False):
+        nonprofit_flag = 0
     hospital_d["is_nonprofit"] = 1 if nonprofit_flag else 0
-    if ownership_nonprofit is None and hospital_d.get("ownership") in (None, "") and nonprofit_flag in (None, 0):
+
+    if ownership_nonprofit is None and hospital_d.get("ownership") in (None, "") and nonprofit_flag is None:
         hospital_d["nonprofit_status_label"] = "Unknown"
     else:
         hospital_d["nonprofit_status_label"] = "Yes" if hospital_d["is_nonprofit"] else "No"
-    quality_d = dict(quality) if quality else {}
-    financials_d = dict(financials) if financials else {}
-    transparency_d = dict(transparency) if transparency else {}
     prices_d = [dict(p) for p in prices]
 
     show_cash_column = False
     for row in prices_d:
         row["markup_band"] = _build_markup_band(row.get("markup_vs_medicare"))
-        row["description"] = row.get("description") or f"CPT {row['cpt_code']}"
+        code = row.get("cpt_code")
+        row["description"] = FRIENDLY_CPT_DESCRIPTIONS.get(code) or row.get("description") or f"CPT {code}"
         gross = row.get("gross_charge")
         cash = row.get("cash_price")
         has_cash_discount = bool(
@@ -431,7 +452,9 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
             show_cash_column = True
 
     content = _lookup_content_for_hospital(hospital_d["facility_id"])
-    tips = content.get("dispute_tips") or generate_deterministic_tips(hospital_d, financials_d)
+    tips = content.get("dispute_tips")
+    if not tips or "loaded data" in str(tips).lower():
+        tips = generate_deterministic_tips(hospital_d, financials_d)
 
     nearby = get_nearby_hospitals(
         state_slug=hospital_d["state_slug"],
