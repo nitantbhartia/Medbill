@@ -482,6 +482,63 @@
             transform: scale(1.05);
         }
 
+        .how-it-works {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 80px;
+            padding: 0 60px;
+        }
+
+        .how-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 22px;
+        }
+
+        .how-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .how-row {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 16px;
+            background: var(--card-white);
+            border-radius: var(--radius-md);
+            padding: 18px 22px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .how-step {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-black);
+        }
+
+        .how-copy {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .bottom-cta {
+            margin-top: 28px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .bottom-cta-copy {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-black);
+        }
+
         @media (max-width: 1024px) {
             .layout-grid {
                 grid-template-columns: 1fr;
@@ -502,6 +559,13 @@
             }
             .metric-block {
                 margin-top: 36px;
+            }
+            .how-it-works {
+                padding: 0 24px;
+                margin-bottom: 56px;
+            }
+            .how-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -527,24 +591,24 @@
             <div>
                 <span class="label-micro">Medical Bill Audit</span>
             </div>
-            <h1>your health is personal. your debt shouldn't be.</h1>
-            <p>We automatically compare every line item against federal Medicare rates (CMS.gov) to expose overcharging.</p>
+            <h1>hospitals set the prices. we check the math.</h1>
+            <p>Upload your medical bill. We compare every line item against federal pricing data and flag errors, markups, and overcharges in 30 seconds.</p>
             <div class="cta-row">
-                <button type="button" class="primary-cta" id="startAudit">Start Free Audit</button>
-                <span class="secondary-note">No credit card required</span>
+                <button type="button" class="primary-cta" id="startAudit">Check My Bill Free</button>
+                <span class="secondary-note">No account needed</span>
             </div>
 
             <div class="metric-block">
                 <div class="metric">
                     <span class="metric-val">30s</span>
-                    <span class="metric-lbl">avg. analysis time</span>
+                    <span class="metric-lbl">average scan time</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-val">40%</span>
-                    <span class="metric-lbl">avg. detected markup</span>
+                    <span class="metric-val">4/5</span>
+                    <span class="metric-lbl">bills have errors</span>
                 </div>
             </div>
-            <p class="proof-note">Metrics based on recent internal analyses. Results vary by provider, region, and bill complexity.</p>
+            <p class="proof-note">Stats shown are directional and should be updated as live scan coverage expands.</p>
         </section>
 
         <section class="col-interaction">
@@ -574,7 +638,7 @@
                         </div>
                         <div class="item-status alert">
                             <span class="dot"></span>
-                            4x Markup
+                            8x Medicare Rate
                         </div>
                     </div>
 
@@ -585,7 +649,7 @@
                         </div>
                         <div class="item-status alert">
                             <span class="dot"></span>
-                            Flagged
+                            Duplicate Charge
                         </div>
                     </div>
 
@@ -595,18 +659,40 @@
                             <span class="item-name">Room &amp; Board / ICU</span>
                         </div>
                         <div class="item-status">
-                            Fair Price
+                            &#10003; Fair Price
                         </div>
                     </div>
                 </div>
                 <div class="trust-strip">
-                    <span class="trust-pill">PHI Redaction Enabled</span>
-                    <span class="trust-pill">CMS Rates Referenced</span>
-                    <span class="trust-pill">Encrypted In Transit</span>
+                    <span class="trust-pill">Your data stays private</span>
+                    <span class="trust-pill">Compared to federal rates</span>
+                    <span class="trust-pill">Bank-level encryption</span>
                 </div>
             </div>
         </section>
     </main>
+
+    <section class="how-it-works">
+        <h2 class="how-title">How it works</h2>
+        <div class="how-grid">
+            <div class="how-row">
+                <div class="how-step">1. Upload your bill</div>
+                <div class="how-copy">Photo, PDF, or screenshot. Takes 10 seconds.</div>
+            </div>
+            <div class="how-row">
+                <div class="how-step">2. We scan every line</div>
+                <div class="how-copy">Checked against Medicare rates, coding rules, and the No Surprises Act.</div>
+            </div>
+            <div class="how-row">
+                <div class="how-step">3. Get your report</div>
+                <div class="how-copy">Errors flagged, fair prices shown, dispute letter ready to send.</div>
+            </div>
+        </div>
+        <div class="bottom-cta">
+            <span class="bottom-cta-copy">Your bill might be wrong. Find out in 30 seconds.</span>
+            <button type="button" class="primary-cta" id="bottomAudit">Check My Bill &rarr;</button>
+        </div>
+    </section>
 
     <script>
         (function () {
@@ -614,6 +700,7 @@
             var fileInput = document.getElementById("fileInput");
             var browseFiles = document.getElementById("browseFiles");
             var startAudit = document.getElementById("startAudit");
+            var bottomAudit = document.getElementById("bottomAudit");
             var uploadStatus = document.getElementById("uploadStatus");
 
             function setStatus(message) {
@@ -699,6 +786,9 @@
             });
 
             startAudit.addEventListener("click", function () {
+                fileInput.click();
+            });
+            bottomAudit.addEventListener("click", function () {
                 fileInput.click();
             });
 

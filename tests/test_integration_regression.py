@@ -34,10 +34,12 @@ class TestLandingPageRegression:
         html = resp.text
 
         # Core value prop + key interaction controls should stay stable.
-        assert "your health is personal. your debt shouldn't be." in html
+        assert "hospitals set the prices. we check the math." in html
         assert 'id="dropZone"' in html
         assert 'id="startAudit"' in html
-        assert "PHI Redaction Enabled" in html
+        assert "Check My Bill Free" in html
+        assert "Your data stays private" in html
+        assert "How it works" in html
         assert "/api/scan" in html
 
 
