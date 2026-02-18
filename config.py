@@ -1,8 +1,8 @@
 import os
 
 # App
-APP_NAME = "BillScan"
-APP_URL = os.getenv("APP_URL", "http://localhost:8000")
+APP_NAME = "BillKarma"
+APP_URL = os.getenv("APP_URL", "https://billkarma.app")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
@@ -27,8 +27,8 @@ DAYS_BETWEEN_FOLLOWUPS = 7
 MAX_NEGOTIATION_DAYS = 45
 
 # Email (for negotiation)
-EMAIL_FROM_NAME = "BillScan Patient Advocacy"
-EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM", "disputes@billscan.app")
+EMAIL_FROM_NAME = "BillKarma Patient Advocacy"
+EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM", "disputes@billkarma.app")
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
 
 # Stripe

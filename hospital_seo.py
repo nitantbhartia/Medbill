@@ -602,7 +602,7 @@ def generate_deterministic_tips(hospital: dict, financials: dict) -> str:
             f"Current average cash discount in loaded data is {cash_txt}. Request the same discount level across all line items."
         )
 
-    para3 = "Before paying, scan your bill with BillScan to identify line-item issues and generate a dispute packet."
+    para3 = "Before paying, scan your bill with BillKarma to identify line-item issues and generate a dispute packet."
     return "\n\n".join((para1, para2, para3))
 
 

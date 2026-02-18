@@ -1,5 +1,5 @@
 /* ============================================================
-   BillScan - Scanner / File Upload Handler
+   BillKarma - Scanner / File Upload Handler
    Vanilla JS - no frameworks
    ============================================================ */
 

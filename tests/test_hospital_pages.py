@@ -13,6 +13,7 @@ os.environ["DB_PATH"] = ":memory:"
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+import config  # noqa: E402
 from db import get_db  # noqa: E402
 from hospital_seo import upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
@@ -123,7 +124,8 @@ class TestHospitalSeoPages:
         assert "Billing Profile" in resp.text
         assert "Common Procedure Prices" in resp.text
         assert "Scan My Bill" in resp.text
-        assert '<link rel="canonical" href="http://localhost:8000/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"' in resp.text
+        expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
+        assert expected in resp.text
 
     def test_legacy_route_redirects_to_canonical(self):
         _seed_hospital()

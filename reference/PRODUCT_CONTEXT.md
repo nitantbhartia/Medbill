@@ -1,4 +1,4 @@
-# BillScan -- Product Context
+# BillKarma -- Product Context
 
 This document is the single source of truth for tone, scope, and language
 when generating any user-facing content (articles, reports, in-app copy,
@@ -6,7 +6,7 @@ emails, social posts, etc.).
 
 ---
 
-## What BillScan Does
+## What BillKarma Does
 
 - Lets patients photograph or upload a medical bill and instantly extracts
   every line item (CPT code, description, quantity, charge).
@@ -26,17 +26,17 @@ emails, social posts, etc.).
 - Publishes educational content to help patients understand medical
   billing, their rights, and how to advocate for themselves.
 
-## What BillScan Does NOT Do
+## What BillKarma Does NOT Do
 
-- BillScan is **not** a law firm and does not provide legal advice.
-- BillScan does **not** guarantee any specific reduction or outcome.
-- BillScan does **not** file insurance claims on the patient's behalf.
-- BillScan does **not** replace a licensed medical billing advocate or
+- BillKarma is **not** a law firm and does not provide legal advice.
+- BillKarma does **not** guarantee any specific reduction or outcome.
+- BillKarma does **not** file insurance claims on the patient's behalf.
+- BillKarma does **not** replace a licensed medical billing advocate or
   attorney for complex disputes, litigation, or collections defense.
-- BillScan does **not** access or store a patient's medical records,
+- BillKarma does **not** access or store a patient's medical records,
   diagnoses, or protected health information beyond what appears on the
   bill itself.
-- BillScan does **not** verify whether a service was medically necessary;
+- BillKarma does **not** verify whether a service was medically necessary;
   it only checks the billing accuracy and pricing.
 
 ---
@@ -103,6 +103,6 @@ Never use the following in any user-facing content:
    information. Use bullet points, headers, and short paragraphs. Long
    walls of text lose readers who are already stressed about a bill.
 
-8. **Consistent voice.** BillScan speaks as a knowledgeable, calm friend
+8. **Consistent voice.** BillKarma speaks as a knowledgeable, calm friend
    who has worked in healthcare billing -- not as a corporate brand, not
    as a medical professional, and not as a lawyer.

@@ -1,8 +1,8 @@
-/* BillScan - Global utilities */
+/* BillKarma - Global utilities */
 (function () {
   "use strict";
 
-  window.BillScan = window.BillScan || {};
+  window.BillKarma = window.BillKarma || {};
 
   // Currency formatting
   function formatCurrency(value) {
@@ -15,7 +15,7 @@
     return (neg ? "-" : "") + "$" + parts[0] + "." + parts[1];
   }
 
-  window.BillScan.formatCurrency = formatCurrency;
+  window.BillKarma.formatCurrency = formatCurrency;
 
   // Toast
   function showToast(message, type) {
@@ -35,7 +35,7 @@
     toast._t = setTimeout(function () { toast.classList.remove("show"); }, 3000);
   }
 
-  window.BillScan.showToast = showToast;
+  window.BillKarma.showToast = showToast;
 
   // Copy to clipboard
   function copyToClipboard(triggerEl) {
@@ -51,5 +51,5 @@
     }
   }
 
-  window.BillScan.copyToClipboard = copyToClipboard;
+  window.BillKarma.copyToClipboard = copyToClipboard;
 })();

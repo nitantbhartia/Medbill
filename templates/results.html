@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Results - BillScan{% endblock %}
+{% block title %}Results - BillKarma{% endblock %}
 
 {% block content %}
 {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
