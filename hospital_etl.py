@@ -5,6 +5,10 @@ from __future__ import annotations
 import csv
 import json
 import os
+import tempfile
+from urllib.error import URLError
+from urllib.parse import urlparse
+from urllib.request import urlopen
 from datetime import date
 from typing import Iterable
 
@@ -622,13 +626,48 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
             ).fetchone()
             file_url = row["file_url"] if row else None
             local_path = None
+            temp_download = None
 
             if file_url and (file_url.startswith("/") or file_url.startswith(".")):
                 local_path = file_url
             elif file_url and files_dir:
                 local_path = os.path.join(files_dir, os.path.basename(file_url))
+            elif file_url and str(file_url).startswith(("http://", "https://")):
+                parsed_url = urlparse(str(file_url))
+                ext = os.path.splitext(parsed_url.path)[1].lower()
+                if ext not in (".csv", ".xlsx", ".json"):
+                    ext = ".csv"
+                try:
+                    with urlopen(str(file_url), timeout=20) as resp:
+                        body = resp.read()
+                    if body:
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+                            tmp.write(body)
+                            temp_download = tmp.name
+                            local_path = temp_download
+                except (TimeoutError, URLError, OSError):
+                    db.execute(
+                        """
+                        INSERT INTO transparency_files (
+                            facility_id, file_url, parse_status, parse_notes, last_parsed
+                        ) VALUES (?, ?, 'failed', 'download_failed', CURRENT_DATE)
+                        ON CONFLICT(facility_id) DO UPDATE SET
+                            file_url=excluded.file_url,
+                            parse_status='failed',
+                            parse_notes='download_failed',
+                            last_parsed=CURRENT_DATE
+                        """,
+                        (fid, file_url),
+                    )
+                    failed += 1
+                    continue
 
             if not local_path or not os.path.exists(local_path):
+                if temp_download and os.path.exists(temp_download):
+                    try:
+                        os.remove(temp_download)
+                    except OSError:
+                        pass
                 db.execute(
                     """
                     INSERT INTO transparency_files (facility_id, file_url, parse_status, parse_notes, last_parsed)
@@ -646,6 +685,11 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
 
             rows, fmt, status = parse_transparency_file(local_path)
             if status != "parsed":
+                if temp_download and os.path.exists(temp_download):
+                    try:
+                        os.remove(temp_download)
+                    except OSError:
+                        pass
                 db.execute(
                     """
                     INSERT INTO transparency_files (
@@ -691,6 +735,11 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
                 (fid, file_url, fmt, size_mb, len(rows), len(rows)),
             )
             parsed += 1
+            if temp_download and os.path.exists(temp_download):
+                try:
+                    os.remove(temp_download)
+                except OSError:
+                    pass
 
     total = len(selected)
     log_refresh(
