@@ -452,6 +452,17 @@ def _gauge_xy(pct: float | None, radius: float, cx: float = 120.0, cy: float = 1
     }
 
 
+def _circle_xy(pct: float | None, radius: float, cx: float = 110.0, cy: float = 110.0) -> dict | None:
+    if pct is None:
+        return None
+    p = max(0.0, min(1.0, float(pct)))
+    angle = -math.pi / 2 + (2 * math.pi * p)
+    return {
+        "x": cx + radius * math.cos(angle),
+        "y": cy + radius * math.sin(angle),
+    }
+
+
 def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) -> dict | None:
     with get_db() as db:
         hospital = db.execute(
@@ -601,6 +612,17 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "state": _gauge_xy(gauge_markers["state"], radius=100),
         "national": _gauge_xy(gauge_markers["national"], radius=90),
     }
+    donut_radius = 74.0
+    donut_circumference = 2 * math.pi * donut_radius
+    donut_progress = donut_circumference * hospital_gauge_pct if hospital_gauge_pct is not None else None
+    grade_donut = {
+        "radius": donut_radius,
+        "circumference": donut_circumference,
+        "progress": donut_progress,
+        "hospital": _circle_xy(gauge_markers["hospital"], radius=86),
+        "state": _circle_xy(gauge_markers["state"], radius=86),
+        "national": _circle_xy(gauge_markers["national"], radius=86),
+    }
 
     comparison_max = max(
         [
@@ -625,6 +647,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "grade_gauge_pct": hospital_gauge_pct,
         "grade_gauge_markers": gauge_markers,
         "grade_gauge_points": gauge_points,
+        "grade_donut": grade_donut,
         "comparison_max": comparison_max,
         "prices": prices_d,
         "show_cash_column": show_cash_column,

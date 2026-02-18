@@ -137,39 +137,42 @@
         <div class="rounded-lg border border-gray-200 p-5">
             <h3 class="text-base font-semibold text-gray-900 mb-3">Billing Grade Position</h3>
             {% if data.grade_gauge_pct is not none %}
-            {% set p = data.grade_gauge_points %}
-            <svg viewBox="0 0 240 140" class="w-full max-w-md" aria-label="Billing grade gauge">
+            {% set donut = data.grade_donut %}
+            <svg viewBox="0 0 220 220" class="w-full max-w-sm" aria-label="Billing grade gauge">
                 <defs>
-                    <linearGradient id="gradeArc" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="gradeDonut" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#dc2626" />
-                        <stop offset="50%" stop-color="#f59e0b" />
+                        <stop offset="55%" stop-color="#f59e0b" />
                         <stop offset="100%" stop-color="#16a34a" />
                     </linearGradient>
                 </defs>
-                <path d="M20,120 A100,100 0 0 1 220,120" fill="none" stroke="#e5e7eb" stroke-width="16" stroke-linecap="round"></path>
-                <path d="M20,120 A100,100 0 0 1 220,120" fill="none" stroke="url(#gradeArc)" stroke-width="16" stroke-linecap="round"></path>
-                {% if p and p.state %}
-                <circle cx="{{ p.state.x|round(2) }}" cy="{{ p.state.y|round(2) }}" r="4.5" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"></circle>
+                <circle cx="110" cy="110" r="{{ donut.radius }}" fill="none" stroke="#e5e7eb" stroke-width="16"></circle>
+                <circle
+                    cx="110" cy="110" r="{{ donut.radius }}"
+                    fill="none" stroke="url(#gradeDonut)" stroke-width="16" stroke-linecap="round"
+                    transform="rotate(-90 110 110)"
+                    stroke-dasharray="{{ donut.progress|round(2) if donut.progress is not none else 0 }} {{ donut.circumference|round(2) }}"
+                ></circle>
+                {% if donut and donut.state %}
+                <circle cx="{{ donut.state.x|round(2) }}" cy="{{ donut.state.y|round(2) }}" r="3.5" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"></circle>
                 {% endif %}
-                {% if p and p.national %}
-                <circle cx="{{ p.national.x|round(2) }}" cy="{{ p.national.y|round(2) }}" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"></circle>
+                {% if donut and donut.national %}
+                <circle cx="{{ donut.national.x|round(2) }}" cy="{{ donut.national.y|round(2) }}" r="3.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"></circle>
                 {% endif %}
-                {% if p and p.hospital_tip %}
-                <line x1="120" y1="112" x2="{{ p.hospital_tip.x|round(2) }}" y2="{{ p.hospital_tip.y|round(2) }}" stroke="#111827" stroke-width="3.5" stroke-linecap="round"></line>
+                {% if donut and donut.hospital %}
+                <circle cx="{{ donut.hospital.x|round(2) }}" cy="{{ donut.hospital.y|round(2) }}" r="5.5" fill="#111827" stroke="#ffffff" stroke-width="2"></circle>
                 {% endif %}
-                <circle cx="120" cy="112" r="6.8" fill="#111827"></circle>
-                <text x="20" y="133" font-size="12" fill="#6b7280">F</text>
-                <text x="67" y="133" font-size="12" fill="#6b7280">D</text>
-                <text x="114" y="133" font-size="12" fill="#6b7280">C</text>
-                <text x="161" y="133" font-size="12" fill="#6b7280">B</text>
-                <text x="210" y="133" font-size="12" fill="#6b7280">A</text>
+                <text x="110" y="104" text-anchor="middle" font-size="13" fill="#6b7280">Grade</text>
+                <text x="110" y="132" text-anchor="middle" font-size="26" font-weight="700" fill="#111827">{{ data.hospital.billing_grade }}</text>
+                <text x="110" y="150" text-anchor="middle" font-size="11" fill="#6b7280">{{ "%.1fx"|format(data.hospital.avg_markup_vs_medicare) if data.hospital.avg_markup_vs_medicare is not none else "N/A" }}</text>
             </svg>
+            <div class="mt-1 text-xs text-gray-500">F <span class="mx-1">|</span> D <span class="mx-1">|</span> C <span class="mx-1">|</span> B <span class="mx-1">|</span> A</div>
             <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-600">
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-900 mr-1"></span>This hospital marker</span>
-                {% if p and p.state %}
+                {% if donut and donut.state %}
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-600 mr-1"></span>State avg marker</span>
                 {% endif %}
-                {% if p and p.national %}
+                {% if donut and donut.national %}
                 <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1"></span>National avg marker</span>
                 {% endif %}
             </div>
