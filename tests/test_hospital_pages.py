@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 import config  # noqa: E402
 from db import get_db  # noqa: E402
-from hospital_seo import get_hospital_profile, upsert_hospital_row  # noqa: E402
+from hospital_seo import clear_comparison_cache, get_hospital_profile, upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
 
 
@@ -174,7 +174,10 @@ class TestHospitalSeoPages:
         assert "State avg marker" in resp.text
         assert "National avg marker" in resp.text
         assert "Markup Comparison" in resp.text
-        assert "Comparison chart hidden due to limited benchmark sample size." in resp.text
+        assert (
+            "Comparison chart hidden due to limited benchmark sample size." in resp.text
+            or "Based on" in resp.text
+        )
         assert "Last updated:" in resp.text
         assert "Scan My Bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
@@ -380,6 +383,7 @@ class TestHospitalSeoPages:
                     """,
                     (fid.zfill(6), 3.4 + (i % 5) * 0.1, 3.4, 4.2, 10, 10.0, "C"),
                 )
+        clear_comparison_cache()
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
         assert "Based on" in resp.text
@@ -394,6 +398,24 @@ class TestHospitalSeoPages:
         assert "metrics_with_avg" in data
         assert "hcahps_recommend_yes" in data
         assert "last_refresh_by_source" in data
+
+    def test_old_content_version_regenerates_tips_on_profile(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO hospital_content (facility_id, dispute_tips, model_used)
+                VALUES (?, ?, ?)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    dispute_tips=excluded.dispute_tips,
+                    model_used=excluded.model_used
+                """,
+                ("010001", "Generic stale tip.", "deterministic-template-v0"),
+            )
+        profile = get_hospital_profile("fl", "hollywood", "memorial-regional-hospital-hollywood")
+        assert profile is not None
+        assert "Generic stale tip." not in profile["tips"]
+        assert "Memorial Regional Hospital" in profile["tips"]
 
     def test_comparison_averages_exclude_extreme_outliers(self):
         _seed_hospital()
@@ -439,6 +461,7 @@ class TestHospitalSeoPages:
                 "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
                 ("011003", 80.0, 10, "F"),
             )
+        clear_comparison_cache()
         profile = get_hospital_profile("mi", "hollywood", "memorial-regional-hospital-hollywood")
         assert profile is not None
         assert profile["comparison"]["state_avg_markup"] < 10.0

@@ -55,6 +55,28 @@ def parse_float(value: str | int | float | None) -> float | None:
         return None
 
 
+def numeric_by_patterns(row: dict, patterns: tuple[str, ...]) -> float | None:
+    # Try exact/known columns first via `first`.
+    val = parse_float(first(row, patterns))
+    if val is not None:
+        return val
+    # Fallback: fuzzy column search for coded CMS fields.
+    for key, raw in row.items():
+        k = str(key).strip().lower().replace(" ", "_")
+        if all(token in k for token in patterns):
+            v = parse_float(raw)
+            if v is not None:
+                return v
+    # Broader fallback: any key containing one token pattern.
+    for key, raw in row.items():
+        k = str(key).strip().lower().replace(" ", "_")
+        if any(token in k for token in patterns):
+            v = parse_float(raw)
+            if v is not None:
+                return v
+    return None
+
+
 def parse_int(value: str | int | float | None) -> int | None:
     num = parse_float(value)
     if num is None:
@@ -362,18 +384,31 @@ def load_hcahps(path: str) -> int:
                 """,
                 (
                     fid,
-                    parse_float(first(row, ("overall_rating_pct_9_10", "Overall Rating 9 or 10"))),
-                    parse_float(first(row, ("overall_rating_pct_7_8", "Overall Rating 7 or 8"))),
-                    parse_float(first(row, ("overall_rating_pct_1_6", "Overall Rating 1 to 6"))),
-                    parse_float(first(row, ("recommend_yes", "Would Recommend Hospital"))),
-                    parse_float(first(row, ("doctor_communication_top", "Doctor Communication"))),
-                    parse_float(first(row, ("nurse_communication_top", "Nurse Communication"))),
-                    parse_float(first(row, ("staff_responsiveness_top", "Staff Responsiveness"))),
-                    parse_float(first(row, ("medicine_communication_top", "Communication about Medicines"))),
-                    parse_float(first(row, ("discharge_info_top", "Discharge Information"))),
-                    parse_float(first(row, ("care_transition_top", "Care Transition"))),
-                    parse_float(first(row, ("hospital_cleanliness_top", "Hospital Cleanliness"))),
-                    parse_float(first(row, ("hospital_quietness_top", "Hospital Quietness"))),
+                    numeric_by_patterns(row, ("overall", "9", "10"))
+                    or numeric_by_patterns(row, ("h_hsp_rating_9_10",)),
+                    numeric_by_patterns(row, ("overall", "7", "8"))
+                    or numeric_by_patterns(row, ("h_hsp_rating_7_8",)),
+                    numeric_by_patterns(row, ("overall", "1", "6"))
+                    or numeric_by_patterns(row, ("h_hsp_rating_0_6",)),
+                    numeric_by_patterns(row, ("recommend",))
+                    or numeric_by_patterns(row, ("recmnd",))
+                    or numeric_by_patterns(row, ("h_recmnd_dy_p",)),
+                    numeric_by_patterns(row, ("doctor", "communication"))
+                    or numeric_by_patterns(row, ("h_comp_1",)),
+                    numeric_by_patterns(row, ("nurse", "communication"))
+                    or numeric_by_patterns(row, ("h_comp_2",)),
+                    numeric_by_patterns(row, ("staff", "responsiveness"))
+                    or numeric_by_patterns(row, ("h_comp_3",)),
+                    numeric_by_patterns(row, ("medicine", "communication"))
+                    or numeric_by_patterns(row, ("h_comp_5",)),
+                    numeric_by_patterns(row, ("discharge", "information"))
+                    or numeric_by_patterns(row, ("h_comp_6",)),
+                    numeric_by_patterns(row, ("care", "transition"))
+                    or numeric_by_patterns(row, ("h_comp_7",)),
+                    numeric_by_patterns(row, ("cleanliness",))
+                    or numeric_by_patterns(row, ("h_comp_8",)),
+                    numeric_by_patterns(row, ("quietness",))
+                    or numeric_by_patterns(row, ("h_comp_9",)),
                     parse_int(first(row, ("survey_response_count", "Survey Response Count"))),
                     first(row, ("survey_period", "Survey Period")),
                     first(row, ("Last Updated", "data_updated", "last_updated")),
@@ -396,7 +431,9 @@ def load_hcahps(path: str) -> int:
                 (
                     fid,
                     first(row, ("HCAHPS Summary Star Rating", "hcahps_summary")),
-                    parse_float(first(row, ("recommend_yes", "Would Recommend Hospital"))),
+                    numeric_by_patterns(row, ("recommend",))
+                    or numeric_by_patterns(row, ("recmnd",))
+                    or numeric_by_patterns(row, ("h_recmnd_dy_p",)),
                     parse_float(first(row, ("readmission_score", "Readmission Score"))),
                     parse_float(first(row, ("mortality_score", "Mortality Score"))),
                     first(row, ("Last Updated", "data_updated", "last_updated")),

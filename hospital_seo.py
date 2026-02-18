@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import time
 from collections import defaultdict
 
 from db import get_db
@@ -16,6 +17,8 @@ GRADE_THRESHOLDS = (
     (8.0, "D"),
 )
 MIN_COMPARISON_SAMPLE_SIZE = 25
+COMPARISON_CACHE_TTL_SECONDS = 900
+CONTENT_TEMPLATE_VERSION = "deterministic-template-v2"
 
 US_STATE_NAMES = {
     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
@@ -43,6 +46,14 @@ FRIENDLY_CPT_DESCRIPTIONS = {
     "27236": "Hip Fracture Repair",
     "23472": "Shoulder Replacement",
 }
+
+HOSPITAL_NAME_OVERRIDES_BY_ID: dict[str, str] = {}
+HOSPITAL_NAME_OVERRIDES_BY_NAME = {
+    "beaumont ashn": "Beaumont Hospital",
+    "beaumont ashn llc": "Beaumont Hospital",
+}
+
+_comparison_cache: dict[str, tuple[float, dict[str, float | int | bool | None]]] = {}
 
 
 def slugify(value: str) -> str:
@@ -87,15 +98,22 @@ def _looks_nonprofit_from_ownership(ownership: str | None) -> bool | None:
     return None
 
 
-def _display_name(name: str | None) -> str:
+def _normalized_name_key(value: str) -> str:
+    txt = re.sub(r"[^a-z0-9]+", " ", (value or "").strip().lower())
+    return re.sub(r"\s+", " ", txt).strip()
+
+
+def _display_name(name: str | None, facility_id: str | None = None) -> str:
+    fid = normalize_facility_id(facility_id)
+    if fid and fid in HOSPITAL_NAME_OVERRIDES_BY_ID:
+        return HOSPITAL_NAME_OVERRIDES_BY_ID[fid]
     txt = (name or "").strip()
     if not txt:
         return ""
     txt = re.sub(r"\s+", " ", txt).strip().strip(",")
     txt = txt.title() if txt.isupper() else txt
     txt = re.sub(r"(?i)\s*(?:,\s*)?(llc|inc|inc\.|corp|corporation|co|company)\s*$", "", txt).strip()
-    # Normalize recurring artifact abbreviations from source/provider strings.
-    txt = re.sub(r"(?i)\bashn\b", "Hospital", txt)
+    txt = HOSPITAL_NAME_OVERRIDES_BY_NAME.get(_normalized_name_key(txt), txt)
     return txt
 
 
@@ -257,6 +275,10 @@ def log_refresh(source: str, records_updated: int, status: str, notes: str = "")
         )
 
 
+def clear_comparison_cache() -> None:
+    _comparison_cache.clear()
+
+
 def get_state_index_stats() -> list[dict]:
     with get_db() as db:
         rows = db.execute(
@@ -343,7 +365,7 @@ def get_state_hospitals(
     output = []
     for row in rows:
         item = dict(row)
-        item["name"] = _display_name(item.get("name"))
+        item["name"] = _display_name(item.get("name"), item.get("facility_id"))
         item["city"] = _display_city(item.get("city"))
         item["state"] = state_display_name(item.get("state"))
         output.append(item)
@@ -391,7 +413,7 @@ def get_city_hospitals(
     output = []
     for row in rows:
         item = dict(row)
-        item["name"] = _display_name(item.get("name"))
+        item["name"] = _display_name(item.get("name"), item.get("facility_id"))
         item["city"] = _display_city(item.get("city"))
         item["state"] = state_display_name(item.get("state"))
         output.append(item)
@@ -474,6 +496,12 @@ def _robust_average_markups(markups: list[float], low_q: float = 0.05, high_q: f
 
 
 def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | None]:
+    key = (state_code or "").upper()
+    cached = _comparison_cache.get(key)
+    now = time.time()
+    if cached and (now - cached[0]) <= COMPARISON_CACHE_TTL_SECONDS:
+        return dict(cached[1])
+
     with get_db() as db:
         national_rows = db.execute(
             """
@@ -497,7 +525,7 @@ def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | 
     state = _robust_average_markups([r["avg_markup_vs_medicare"] for r in state_rows]) if state_rows else None
     state_n = len(state_rows)
     national_n = len(national_rows)
-    return {
+    payload: dict[str, float | int | bool | None] = {
         "state_avg_markup": state,
         "national_avg_markup": national,
         "state_sample_size": state_n,
@@ -507,6 +535,8 @@ def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | 
             national_n >= MIN_COMPARISON_SAMPLE_SIZE and state_n >= MIN_COMPARISON_SAMPLE_SIZE
         ),
     }
+    _comparison_cache[key] = (now, payload)
+    return dict(payload)
 
 
 def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) -> dict | None:
@@ -577,7 +607,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     financials_d = dict(financials) if financials else {}
     transparency_d = dict(transparency) if transparency else {}
     comparison_d = _comparison_averages_for_state(state_code)
-    hospital_d["name"] = _display_name(hospital_d.get("name"))
+    hospital_d["name"] = _display_name(hospital_d.get("name"), hospital_d.get("facility_id"))
     hospital_d["city"] = _display_city(hospital_d.get("city"))
     hospital_d["state"] = state_display_name(state_code)
     nonprofit_flag = hospital_d.get("is_nonprofit")
@@ -615,7 +645,8 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
 
     content = _lookup_content_for_hospital(hospital_d["facility_id"])
     tips = content.get("dispute_tips")
-    if not tips or "loaded data" in str(tips).lower():
+    content_version = (content.get("model_used") or "").strip()
+    if not tips or "loaded data" in str(tips).lower() or content_version != CONTENT_TEMPLATE_VERSION:
         tips = generate_deterministic_tips(hospital_d, financials_d, comparison_d)
 
     nearby = get_nearby_hospitals(
@@ -722,7 +753,7 @@ def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limi
     output = []
     for row in rows:
         item = dict(row)
-        item["name"] = _display_name(item.get("name"))
+        item["name"] = _display_name(item.get("name"), item.get("facility_id"))
         output.append(item)
     return output
 
@@ -748,7 +779,7 @@ def find_hospitals(query: str, limit: int = 20) -> list[dict]:
     output = []
     for row in rows:
         item = dict(row)
-        item["name"] = _display_name(item.get("name"))
+        item["name"] = _display_name(item.get("name"), item.get("facility_id"))
         item["city"] = _display_city(item.get("city"))
         item["state"] = state_display_name(item.get("state"))
         output.append(item)
@@ -804,7 +835,6 @@ def recompute_benchmarks() -> int:
             SELECT 'national' AS scope, cpt_code,
                    AVG(gross_charge) AS avg_gross,
                    AVG(cash_price) AS avg_cash,
-                   AVG(markup_vs_medicare) AS avg_markup,
                    COUNT(DISTINCT facility_id) AS hospital_count
             FROM hospital_prices
             WHERE gross_charge IS NOT NULL
@@ -816,7 +846,6 @@ def recompute_benchmarks() -> int:
             SELECT h.state AS scope, hp.cpt_code,
                    AVG(hp.gross_charge) AS avg_gross,
                    AVG(hp.cash_price) AS avg_cash,
-                   AVG(hp.markup_vs_medicare) AS avg_markup,
                    COUNT(DISTINCT hp.facility_id) AS hospital_count
             FROM hospital_prices hp
             JOIN hospitals h ON h.facility_id = hp.facility_id
@@ -824,9 +853,29 @@ def recompute_benchmarks() -> int:
             GROUP BY h.state, hp.cpt_code
             """
         ).fetchall()
+        markup_rows = db.execute(
+            """
+            SELECT 'national' AS scope, cpt_code, markup_vs_medicare
+            FROM hospital_prices
+            WHERE markup_vs_medicare IS NOT NULL
+            UNION ALL
+            SELECT h.state AS scope, hp.cpt_code, hp.markup_vs_medicare
+            FROM hospital_prices hp
+            JOIN hospitals h ON h.facility_id = hp.facility_id
+            WHERE hp.markup_vs_medicare IS NOT NULL
+            """
+        ).fetchall()
+        markup_by_scope_code: dict[tuple[str, str], list[float]] = defaultdict(list)
+        for r in markup_rows:
+            scope = r["scope"]
+            code = r["cpt_code"]
+            value = r["markup_vs_medicare"]
+            if scope and code and value is not None:
+                markup_by_scope_code[(scope, code)].append(float(value))
 
         inserted = 0
         for row in [*rows, *state_rows]:
+            robust_markup = _robust_average_markups(markup_by_scope_code.get((row["scope"], row["cpt_code"]), []))
             db.execute(
                 """
                 INSERT INTO benchmark_averages (
@@ -839,12 +888,13 @@ def recompute_benchmarks() -> int:
                     row["cpt_code"],
                     row["avg_gross"],
                     row["avg_cash"],
-                    row["avg_markup"],
+                    robust_markup,
                     row["hospital_count"],
                 ),
             )
             inserted += 1
 
+    clear_comparison_cache()
     return inserted
 
 
@@ -968,6 +1018,7 @@ def recompute_billing_metrics() -> int:
                 (state_rank, percentile, row["facility_id"]),
             )
 
+    clear_comparison_cache()
     return upserted
 
 
@@ -1049,7 +1100,7 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
         saved = 0
         for row in rows:
             data = dict(row)
-            tips = generate_deterministic_tips(data, data, None)
+            tips = generate_deterministic_tips(data, data, _comparison_averages_for_state(data.get("state")))
             meta = (
                 f"{data['name']} billing review in {data['city']}, {data['state']}. "
                 f"Compare markup vs Medicare, financial assistance, and dispute options before paying."
@@ -1075,7 +1126,7 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
                     generated_at=CURRENT_TIMESTAMP,
                     model_used=excluded.model_used
                 """,
-                (data["facility_id"], tips, meta, json.dumps(schema), "deterministic-template-v1"),
+                (data["facility_id"], tips, meta, json.dumps(schema), CONTENT_TEMPLATE_VERSION),
             )
             saved += 1
     return saved

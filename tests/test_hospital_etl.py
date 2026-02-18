@@ -3,6 +3,7 @@
 import io
 import os
 import sys
+import tempfile
 from unittest.mock import MagicMock
 
 sys.modules.setdefault("google", MagicMock())
@@ -14,7 +15,7 @@ os.environ["DB_PATH"] = ":memory:"
 import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
-from hospital_etl import auto_map_columns, first, normalize_price_rows, upsert_hospital_price  # noqa: E402
+from hospital_etl import auto_map_columns, first, load_hcahps, normalize_price_rows, upsert_hospital_price  # noqa: E402
 from hospital_seo import get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
@@ -210,3 +211,33 @@ def test_profile_comparison_averages_stay_realistic_with_normal_seed():
     assert profile is not None
     assert 2.0 < profile["comparison"]["state_avg_markup"] < 10.0
     assert 2.0 < profile["comparison"]["national_avg_markup"] < 10.0
+
+
+def test_load_hcahps_handles_cms_coded_columns():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "92001", "name": "HCAHPS Test", "city": "Austin", "state": "TX", "slug": "hcahps-test-austin"}
+    )
+
+    csv_text = (
+        "Facility ID,H_RECMND_DY_P,H_COMP_1_A_P,H_COMP_2_A_P,Survey Period\n"
+        "92001,67,78,74,2025-Q4\n"
+    )
+    with tempfile.NamedTemporaryFile("w+", suffix=".csv", delete=False) as f:
+        f.write(csv_text)
+        path = f.name
+    try:
+        count = load_hcahps(path)
+        assert count == 1
+        with get_db() as conn:
+            row = conn.execute(
+                "SELECT recommend_yes, doctor_communication_top, nurse_communication_top FROM hcahps_scores WHERE facility_id = ?",
+                ("092001",),
+            ).fetchone()
+        assert row is not None
+        assert row["recommend_yes"] == 67
+        assert row["doctor_communication_top"] == 78
+        assert row["nurse_communication_top"] == 74
+    finally:
+        os.unlink(path)
