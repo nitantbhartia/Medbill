@@ -1,0 +1,16 @@
+{
+  "provider_name": "Memorial Regional Hospital",
+  "total_charged": 5700.0,
+  "line_items": [
+    {
+      "cpt_code": "99285",
+      "description": "ER Visit Level 5",
+      "charged_amount": 4500.0
+    },
+    {
+      "cpt_code": "71046",
+      "description": "Chest X-Ray 2 views",
+      "charged_amount": 1200.0
+    }
+  ]
+}

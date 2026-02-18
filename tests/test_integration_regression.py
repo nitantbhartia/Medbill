@@ -144,6 +144,42 @@ class TestScanEndpointIntegration:
         assert resp.json()["data"]["bill_id"] == 88
         assert calls["multi"] == 1
 
+    def test_scan_with_optional_eob_upload_enriches_payload(self, monkeypatch):
+        bill_payload = {"provider_name": "Bill Provider", "line_items": [{"cpt_code": "99283", "charged_amount": 1000.0}]}
+        eob_payload = {
+            "provider_name": "Bill Provider",
+            "line_items": [{"cpt_code": "99283", "insurance_paid": 400.0, "insurance_adjustment": 500.0, "patient_responsibility": 100.0}],
+        }
+        seen = {"insurance_paid": None}
+
+        def fake_extract(image_bytes, _mime):
+            if image_bytes == b"fake-eob":
+                return eob_payload
+            return bill_payload
+
+        monkeypatch.setattr(api_module.scanner, "process_bill_with_verification", fake_extract)
+        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
+
+        def fake_analyze(extracted, _zip_code):
+            seen["insurance_paid"] = extracted["line_items"][0].get("insurance_paid")
+            return {"total_findings": 0, "total_potential_savings": 0.0, "findings": []}
+
+        monkeypatch.setattr(api_module.analyzer, "analyze_bill", fake_analyze)
+        monkeypatch.setattr(api_module.analyzer, "save_bill_and_findings", lambda *args, **kwargs: 99)
+
+        resp = client.post(
+            "/api/scan",
+            files=[
+                ("images", ("bill.png", b"fake-image", "image/png")),
+                ("eob_images", ("eob.png", b"fake-eob", "image/png")),
+            ],
+            data={"zip_code": "33021"},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["data"]["bill_id"] == 99
+        assert seen["insurance_paid"] == 400.0
+
     def test_scan_returns_500_when_extraction_fails(self, monkeypatch):
         def boom(*_args, **_kwargs):
             raise RuntimeError("extractor crashed")

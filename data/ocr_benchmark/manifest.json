@@ -1,0 +1,22 @@
+{
+  "samples": [
+    {
+      "id": "sample_clean_1",
+      "image": "sample_clean_1.png",
+      "truth_json": "sample_clean_1.truth.json",
+      "prediction_json": "sample_clean_1.pred.json"
+    },
+    {
+      "id": "sample_blurry_1",
+      "image": "sample_blurry_1.png",
+      "truth_json": "sample_blurry_1.truth.json",
+      "prediction_json": "sample_blurry_1.pred.json"
+    },
+    {
+      "id": "sample_screenshot_1",
+      "image": "sample_screenshot_1.png",
+      "truth_json": "sample_screenshot_1.truth.json",
+      "prediction_json": "sample_screenshot_1.pred.json"
+    }
+  ]
+}

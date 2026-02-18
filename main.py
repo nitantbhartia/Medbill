@@ -9,6 +9,7 @@ import config
 import db
 from api import router as api_router
 from analyzer import get_bill_results, get_stats
+from compliance import log_audit
 from hospital_seo import (
     find_hospitals,
     get_cities_for_state,
@@ -73,6 +74,7 @@ async def confirm_page(request: Request, bill_id: int):
     results = get_bill_results(bill_id)
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+    log_audit(action="view_confirm", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
     return templates.TemplateResponse("confirm.html", {"request": request, "data": results})
 
 
@@ -81,6 +83,7 @@ async def results_page(request: Request, bill_id: int):
     results = get_bill_results(bill_id)
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+    log_audit(action="view_results_page", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
 
     from negotiation import generate_phone_script, generate_message_script
     phone_script = generate_phone_script(bill_id)

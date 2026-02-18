@@ -1,0 +1,16 @@
+{
+  "provider_name": "Aspirus Iron River Hospital",
+  "total_charged": 1340.0,
+  "line_items": [
+    {
+      "cpt_code": "80053",
+      "description": "Comprehensive Metabolic Panel",
+      "charged_amount": 340.0
+    },
+    {
+      "cpt_code": "93000",
+      "description": "EKG 12 lead",
+      "charged_amount": 1000.0
+    }
+  ]
+}

@@ -172,6 +172,7 @@ def _ensure_evidence_panel(finding: dict, freshness: dict) -> None:
         "sample_size": sample_size,
         "confidence": finding.get("confidence"),
         "limitations": limitations,
+        "source_anchor": (finding.get("line_item") or {}).get("source_anchor"),
     }
 
 

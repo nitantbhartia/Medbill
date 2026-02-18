@@ -37,6 +37,22 @@
             </button>
         </div>
 
+        <!-- Optional EOB upload -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Upload EOB (optional)
+            </label>
+            <p class="text-xs text-gray-400 mb-2">Adding your Explanation of Benefits improves insurance mismatch detection.</p>
+            <input type="file"
+                   id="eob-input"
+                   name="eob_images"
+                   accept="image/*,.pdf"
+                   multiple
+                   class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
+        </div>
+
+        <div id="capture-quality" class="hidden text-xs rounded-md border px-3 py-2"></div>
+
         <!-- Zip code -->
         <div>
             <label for="zip-code" class="block text-sm font-medium text-gray-700 mb-1">
@@ -115,6 +131,8 @@
     var errorText = document.getElementById('error-text');
     var scanForm = document.getElementById('scan-form');
     var zipCode = document.getElementById('zip-code');
+    var eobInput = document.getElementById('eob-input');
+    var qualityBox = document.getElementById('capture-quality');
     var selectedFiles = [];
 
     function updateSubmitState() {
@@ -159,6 +177,48 @@
             div.appendChild(rm);
             previewArea.appendChild(div);
         });
+        runCaptureQualityChecks();
+    }
+
+    function runCaptureQualityChecks() {
+        if (!selectedFiles.length) {
+            qualityBox.classList.add('hidden');
+            return;
+        }
+        var file = selectedFiles[0];
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var w = Math.min(600, img.width);
+            var h = Math.max(1, Math.round((img.height / img.width) * w));
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            var d = ctx.getImageData(0, 0, w, h).data;
+            var lums = [];
+            for (var i = 0; i < d.length; i += 4) {
+                lums.push(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+            }
+            var sum = lums.reduce(function(a, b) { return a + b; }, 0);
+            var mean = sum / lums.length;
+            var variance = lums.reduce(function(a, b) { var x = b - mean; return a + x * x; }, 0) / lums.length;
+            var warnings = [];
+            if (variance < 350) warnings.push('Image may be blurry/low contrast.');
+            if (mean < 60) warnings.push('Image looks too dark.');
+            if (mean > 210) warnings.push('Image may be overexposed/glare-heavy.');
+            if (img.width < 900 || img.height < 900) warnings.push('Low resolution can reduce OCR accuracy.');
+
+            qualityBox.classList.remove('hidden', 'border-green-200', 'bg-green-50', 'text-green-700', 'border-amber-200', 'bg-amber-50', 'text-amber-700');
+            if (warnings.length) {
+                qualityBox.classList.add('border-amber-200', 'bg-amber-50', 'text-amber-700');
+                qualityBox.textContent = 'Capture quality warning: ' + warnings.join(' ');
+            } else {
+                qualityBox.classList.add('border-green-200', 'bg-green-50', 'text-green-700');
+                qualityBox.textContent = 'Capture quality looks good.';
+            }
+        };
+        img.src = URL.createObjectURL(file);
     }
 
     fileInput.addEventListener('change', function(e) {
@@ -187,6 +247,7 @@
 
         var formData = new FormData();
         selectedFiles.forEach(function(file) { formData.append('images', file); });
+        Array.from(eobInput.files || []).forEach(function(file) { formData.append('eob_images', file); });
         formData.append('zip_code', zipCode.value.trim());
 
         var emailVal = document.getElementById('email').value.trim();

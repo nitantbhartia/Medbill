@@ -16,6 +16,7 @@ os.environ["DB_PATH"] = ":memory:"
 from fastapi.testclient import TestClient  # noqa: E402
 
 import db as _db  # noqa: E402
+from api import _merge_eob_into_extracted  # noqa: E402
 from main import app  # noqa: E402
 from analyzer import analyze_bill, save_bill_and_findings, get_bill_results  # noqa: E402
 from tests.conftest import SAMPLE_BILL  # noqa: E402
@@ -43,6 +44,25 @@ class TestStatsEndpoint:
         data = resp.json()
         assert data["status"] == "ok"
         assert data["data"]["bills_scanned"] == 0
+
+
+class TestEobMerge:
+    def test_merge_eob_into_extracted_by_cpt(self):
+        extracted = {
+            "line_items": [
+                {"cpt_code": "99283", "description": "ER visit", "charged_amount": 1000.0},
+                {"cpt_code": "71046", "description": "Xray", "charged_amount": 200.0},
+            ]
+        }
+        eob = {
+            "line_items": [
+                {"cpt_code": "71046", "insurance_paid": 100.0, "insurance_adjustment": 80.0, "patient_responsibility": 20.0},
+                {"cpt_code": "99283", "insurance_paid": 400.0, "insurance_adjustment": 500.0, "patient_responsibility": 100.0},
+            ]
+        }
+        merged = _merge_eob_into_extracted(extracted, eob)
+        assert merged["line_items"][0]["insurance_paid"] == 400.0
+        assert merged["line_items"][1]["insurance_paid"] == 100.0
 
     def test_stats_after_bill(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -294,6 +314,15 @@ class TestComplianceEndpoints:
 
         after = client.get(f"/api/results/{bill_id}")
         assert after.status_code == 404
+
+
+class TestOpsEndpoints:
+    def test_ocr_benchmark_endpoint(self):
+        resp = client.get("/api/ops/ocr-benchmark")
+        assert resp.status_code == 200
+        payload = resp.json()["data"]
+        assert "aggregate" in payload
+        assert "overall_score" in payload["aggregate"]
 
 
 class TestDisputeLetterEndpoint:

@@ -5,6 +5,8 @@
 {% block content %}
 {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
 {% set issue_count = data.findings | length if data.findings else 0 %}
+{% set high_conf_findings = data.findings | selectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
+{% set review_conf_findings = data.findings | rejectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
 {% set insured = (data.line_items | selectattr('insurance_paid') | list | length > 0) or
                  (data.line_items | selectattr('patient_responsibility') | list | length > 0) %}
 {% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
@@ -48,6 +50,17 @@
     </div>
 
     {% if data.findings and data.findings | length > 0 %}
+    <div class="mb-8 grid gap-3 sm:grid-cols-2">
+        <div class="border border-green-200 bg-green-50 rounded-md p-4">
+            <h2 class="text-xs uppercase tracking-wide text-green-700 font-semibold mb-1">High-confidence issues</h2>
+            <p class="text-sm text-green-800">{{ high_conf_findings | length }} findings are ready to dispute with strong evidence.</p>
+        </div>
+        <div class="border border-amber-200 bg-amber-50 rounded-md p-4">
+            <h2 class="text-xs uppercase tracking-wide text-amber-700 font-semibold mb-1">Review-first issues</h2>
+            <p class="text-sm text-amber-800">{{ review_conf_findings | length }} findings should be confirmed before escalation.</p>
+        </div>
+    </div>
+
     <!-- Findings -->
     <div class="mb-10">
         <h2 class="text-xs uppercase tracking-wide text-gray-400 font-medium mb-4">Findings</h2>
@@ -83,6 +96,11 @@
                             {% endif %}
                             {% if finding.evidence_source %}
                             <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">source: {{ finding.evidence_source }}</span>
+                            {% endif %}
+                            {% if finding.parsed_details and finding.parsed_details.evidence and finding.parsed_details.evidence.source_anchor %}
+                            <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">
+                                line {{ finding.parsed_details.evidence.source_anchor.line_index }}: {{ finding.parsed_details.evidence.source_anchor.snippet }}
+                            </span>
                             {% endif %}
                         </div>
                         {% if finding.cpt_code %}

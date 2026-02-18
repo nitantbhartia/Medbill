@@ -106,7 +106,7 @@ def _coerce_numeric(value):
 
 def _add_confidence_flags(extracted: dict) -> dict:
     """Normalize numeric fields and flag items that need user confirmation."""
-    for item in extracted.get("line_items", []):
+    for idx, item in enumerate(extracted.get("line_items", [])):
         # Normalize numeric fields that Gemini may return as strings
         for field in ("charged_amount", "insurance_paid", "insurance_adjustment",
                       "patient_responsibility"):
@@ -127,6 +127,19 @@ def _add_confidence_flags(extracted: dict) -> dict:
         if item["quantity"] > config.HIGH_QUANTITY_FLAG:
             item["confidence"] = "medium"
             item["flag"] = f"Billed for {item['quantity']} units. Is that correct?"
+
+        # Best-effort source anchor for explainability UX.
+        snippet_parts = []
+        if item.get("cpt_code"):
+            snippet_parts.append(str(item.get("cpt_code")))
+        if item.get("description"):
+            snippet_parts.append(str(item.get("description")))
+        if item.get("charged_amount") is not None:
+            snippet_parts.append(f"${item.get('charged_amount')}")
+        item["source_anchor"] = {
+            "line_index": idx + 1,
+            "snippet": " | ".join(snippet_parts)[:180],
+        }
 
     # Normalize bill-level totals
     extracted["total_charged"] = _coerce_numeric(extracted.get("total_charged"))

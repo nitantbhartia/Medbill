@@ -1,0 +1,16 @@
+{
+  "provider_name": "Broward Health Medical Center",
+  "total_charged": 2625.0,
+  "line_items": [
+    {
+      "cpt_code": "74177",
+      "description": "CT Abdomen/Pelvis",
+      "charged_amount": 2200.0
+    },
+    {
+      "cpt_code": "85025",
+      "description": "CBC",
+      "charged_amount": 425.0
+    }
+  ]
+}

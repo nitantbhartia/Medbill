@@ -20,15 +20,66 @@ from compliance import (
     delete_bill_data,
     purge_old_data,
 )
+from ocr_benchmark import run_manifest
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 CLAIM_STATUSES = {"drafted", "sent", "acknowledged", "resolved", "denied"}
 
 
+def _merge_eob_into_extracted(extracted: dict, eob_data: dict) -> dict:
+    """
+    Enrich bill extraction with insurance fields from an uploaded EOB.
+    Matches by CPT first, then by line index fallback.
+    """
+    merged = dict(extracted or {})
+    bill_items = list(merged.get("line_items") or [])
+    eob_items = list((eob_data or {}).get("line_items") or [])
+    if not bill_items or not eob_items:
+        return merged
+
+    eob_by_cpt: dict[str, list[dict]] = {}
+    for row in eob_items:
+        code = (row.get("cpt_code") or "").strip()
+        if not code:
+            continue
+        eob_by_cpt.setdefault(code, []).append(row)
+
+    used_ids = set()
+    for idx, item in enumerate(bill_items):
+        candidate = None
+        code = (item.get("cpt_code") or "").strip()
+        if code and eob_by_cpt.get(code):
+            pool = eob_by_cpt[code]
+            for eob in pool:
+                marker = id(eob)
+                if marker not in used_ids:
+                    candidate = eob
+                    used_ids.add(marker)
+                    break
+        if candidate is None and idx < len(eob_items):
+            candidate = eob_items[idx]
+
+        if candidate is None:
+            continue
+        for fld in ("insurance_paid", "insurance_adjustment", "patient_responsibility"):
+            if item.get(fld) is None and candidate.get(fld) is not None:
+                item[fld] = candidate.get(fld)
+        if item.get("date_of_service") is None and candidate.get("date_of_service"):
+            item["date_of_service"] = candidate.get("date_of_service")
+
+    merged["line_items"] = bill_items
+    merged["_eob_merge"] = {
+        "bill_lines": len(bill_items),
+        "eob_lines": len(eob_items),
+    }
+    return merged
+
+
 @router.post("/scan")
 async def scan_bill(
     images: list[UploadFile] = File(...),
+    eob_images: list[UploadFile] | None = File(None),
     zip_code: str = Form("00000"),
     email: str = Form(""),
 ):
@@ -69,6 +120,20 @@ async def scan_bill(
     # Analyze and persist
     try:
         extracted = scrub_extracted_data(extracted)
+        if eob_images:
+            eob_uploads = [f for f in eob_images if f and f.filename]
+            if eob_uploads:
+                if len(eob_uploads) == 1:
+                    eob_bytes = await eob_uploads[0].read()
+                    eob_data = scanner.process_bill_with_verification(
+                        eob_bytes, eob_uploads[0].content_type or "image/jpeg"
+                    )
+                else:
+                    eob_image_list = []
+                    for f in eob_uploads:
+                        eob_image_list.append((await f.read(), f.content_type or "image/jpeg"))
+                    eob_data = scanner.process_multi_page_bill(eob_image_list)
+                extracted = _merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
         analysis = analyzer.analyze_bill(extracted, zip_code)
         bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
         log_audit(
@@ -299,6 +364,13 @@ async def get_dispute_letter(bill_id: int, payload: dict):
         f"Sincerely,\n"
         f"{requestor_name}\n"
     )
+    log_audit(
+        action="generate_dispute_letter",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=bill_id,
+        metadata={"finding_count": len(rows), "estimated_patient_impact": round(total, 2)},
+    )
 
     return {
         "status": "ok",
@@ -448,6 +520,7 @@ async def create_claim(
             "INSERT INTO dispute_claim_events (claim_id, from_status, to_status, event_note) VALUES (?, ?, ?, ?)",
             (claim_id, None, "drafted", "Claim created"),
         )
+    log_audit(action="create_claim", resource_type="claim", resource_id=str(claim_id), bill_id=bill_id)
 
     return {"status": "ok", "data": {"claim_id": claim_id, "current_status": "drafted"}}
 
@@ -496,8 +569,24 @@ async def update_claim_status(claim_id: int, status: str = Form(...), note: str 
             "INSERT INTO dispute_claim_events (claim_id, from_status, to_status, event_note) VALUES (?, ?, ?, ?)",
             (claim_id, prev, target, note or "status update"),
         )
+    log_audit(
+        action="update_claim_status",
+        resource_type="claim",
+        resource_id=str(claim_id),
+        metadata={"from": prev, "to": target},
+    )
 
     return {"status": "ok", "data": {"claim_id": claim_id, "from_status": prev, "to_status": target}}
+
+
+@router.get("/ops/ocr-benchmark")
+async def ocr_benchmark(manifest: str = "data/ocr_benchmark/manifest.json"):
+    """Run OCR benchmark over local fixture manifest."""
+    try:
+        result = run_manifest(manifest)
+    except FileNotFoundError:
+        raise HTTPException(404, "Benchmark manifest not found. Run scripts/generate_ocr_benchmark_samples.py first.")
+    return {"status": "ok", "data": result}
 
 
 @router.get("/provider-intelligence/{provider_name}")
