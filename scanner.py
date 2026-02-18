@@ -2,6 +2,7 @@ import json
 import re
 import base64
 import logging
+from io import BytesIO
 
 from google import genai
 from google.genai import types
@@ -9,6 +10,13 @@ from google.genai import types
 import config
 
 log = logging.getLogger(__name__)
+
+try:
+    from PIL import Image, ImageFilter, ImageOps
+except Exception:  # pragma: no cover - optional dependency fallback
+    Image = None
+    ImageFilter = None
+    ImageOps = None
 
 
 def _parse_json_response(text: str) -> dict:
@@ -127,25 +135,193 @@ def _add_confidence_flags(extracted: dict) -> dict:
     return extracted
 
 
+def _run_vision_extraction(image_bytes: bytes, mime_type: str, prompt: str) -> dict:
+    """Run Gemini vision extraction with a supplied prompt."""
+    client = _get_client()
+    image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
+    response = client.models.generate_content(
+        model=config.GEMINI_MODEL,
+        contents=[image_part, prompt],
+        config=types.GenerateContentConfig(response_mime_type="application/json"),
+    )
+    extracted = _parse_json_response(response.text)
+    return _add_confidence_flags(extracted)
+
+
+def _serialize_image(image_obj) -> bytes:
+    buf = BytesIO()
+    image_obj.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def _preprocess_variants(image_bytes: bytes, mime_type: str) -> list[tuple[str, bytes, str]]:
+    """
+    Build OCR-friendly variants.
+    Returns (label, bytes, mime_type) tuples and always includes original.
+    """
+    variants = [("original", image_bytes, mime_type)]
+    if not config.OCR_PREPROCESS_ENABLED or Image is None:
+        return variants[: max(1, config.OCR_MAX_VARIANTS)]
+
+    try:
+        img = Image.open(BytesIO(image_bytes))
+        img = ImageOps.exif_transpose(img)
+        if img.mode not in ("RGB", "L"):
+            img = img.convert("RGB")
+
+        gray = ImageOps.grayscale(img)
+        high_contrast = ImageOps.autocontrast(gray, cutoff=2)
+        variants.append(("gray_autocontrast", _serialize_image(high_contrast), "image/png"))
+
+        if ImageFilter is not None:
+            sharp = high_contrast.filter(ImageFilter.UnsharpMask(radius=1.8, percent=180, threshold=2))
+            variants.append(("sharpened", _serialize_image(sharp), "image/png"))
+
+        thresholded = high_contrast.point(lambda px: 255 if px > 170 else 0).convert("L")
+        variants.append(("thresholded", _serialize_image(thresholded), "image/png"))
+    except Exception as exc:
+        log.warning("OCR preprocessing skipped due to image error: %s", exc)
+
+    return variants[: max(1, config.OCR_MAX_VARIANTS)]
+
+
+def _is_valid_cpt(code) -> bool:
+    return bool(code and re.fullmatch(r"\d{5}", str(code).strip()))
+
+
+def _to_float(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _quality_score(extracted: dict) -> tuple[float, dict]:
+    """
+    Score extraction quality based on completeness + reconciliation.
+    Higher score is better.
+    """
+    items = extracted.get("line_items", [])
+    if not isinstance(items, list):
+        items = []
+
+    cpt_count = 0
+    amount_count = 0
+    described_count = 0
+    charged_sum = 0.0
+    charged_lines = 0
+    for item in items:
+        if _is_valid_cpt(item.get("cpt_code")):
+            cpt_count += 1
+        amount = _to_float(item.get("charged_amount"))
+        if amount is not None and amount > 0:
+            amount_count += 1
+            charged_lines += 1
+            charged_sum += amount
+        if item.get("description") and len(str(item.get("description")).strip()) >= 4:
+            described_count += 1
+
+    score = 0.0
+    score += min(len(items), 25) * 2.0
+    score += cpt_count * 2.5
+    score += amount_count * 2.0
+    score += described_count * 1.0
+
+    if extracted.get("provider_name"):
+        score += 4.0
+    if _to_float(extracted.get("total_charged")) is not None:
+        score += 5.0
+    if _to_float(extracted.get("total_patient_owes")) is not None:
+        score += 3.0
+
+    recon_delta = None
+    recon_pct = None
+    total = _to_float(extracted.get("total_charged"))
+    if total and charged_lines:
+        recon_delta = charged_sum - total
+        recon_pct = abs(recon_delta) / total * 100.0 if total else None
+        if recon_pct is not None and recon_pct > config.OCR_RECONCILIATION_TOLERANCE_PCT:
+            score -= min(25.0, recon_pct * 1.5)
+
+    meta = {
+        "line_items": len(items),
+        "cpt_count": cpt_count,
+        "amount_count": amount_count,
+        "described_count": described_count,
+        "charged_sum": round(charged_sum, 2),
+        "reconciliation_delta": round(recon_delta, 2) if recon_delta is not None else None,
+        "reconciliation_pct": round(recon_pct, 2) if recon_pct is not None else None,
+    }
+    return score, meta
+
+
+def _merge_candidate(best: dict, fallback: dict) -> dict:
+    """Fill missing fields in best extraction from fallback extraction."""
+    merged = dict(best)
+    for key in ("provider_name", "provider_address", "bill_date", "account_number", "total_charged", "total_patient_owes"):
+        if merged.get(key) in (None, "", 0) and fallback.get(key) not in (None, "", 0):
+            merged[key] = fallback.get(key)
+
+    best_items = list(merged.get("line_items", []))
+    alt_items = list(fallback.get("line_items", []))
+    for idx, item in enumerate(best_items):
+        if idx >= len(alt_items):
+            break
+        alt = alt_items[idx]
+        if item.get("cpt_code") in (None, "") and alt.get("cpt_code"):
+            item["cpt_code"] = alt.get("cpt_code")
+        if item.get("description") in (None, "") and alt.get("description"):
+            item["description"] = alt.get("description")
+        if item.get("charged_amount") in (None, 0) and _to_float(alt.get("charged_amount")) is not None:
+            item["charged_amount"] = alt.get("charged_amount")
+        if item.get("quantity") in (None, 0) and _to_float(alt.get("quantity")) is not None:
+            item["quantity"] = int(float(alt.get("quantity")))
+    merged["line_items"] = best_items
+    return merged
+
+
+def _extract_with_ensemble(image_bytes: bytes, mime_type: str) -> dict:
+    """
+    Run extraction across preprocessed variants and pick/merge best result.
+    """
+    variants = _preprocess_variants(image_bytes, mime_type)
+    candidates = []
+    for label, variant_bytes, variant_mime in variants:
+        try:
+            extracted = _run_vision_extraction(variant_bytes, variant_mime, EXTRACTION_PROMPT)
+            score, meta = _quality_score(extracted)
+            meta["variant"] = label
+            meta["quality_score"] = round(score, 2)
+            candidates.append((score, extracted, meta))
+        except Exception as exc:
+            log.warning("Variant extraction failed for %s: %s", label, exc)
+
+    if not candidates:
+        raise RuntimeError("No OCR extraction candidates succeeded")
+
+    candidates.sort(key=lambda tup: tup[0], reverse=True)
+    best_score, best_extract, best_meta = candidates[0]
+    merged = best_extract
+    if len(candidates) > 1:
+        merged = _merge_candidate(best_extract, candidates[1][1])
+
+    merged["_extraction_meta"] = {
+        "selected_variant": best_meta.get("variant"),
+        "quality_score": round(best_score, 2),
+        "candidates": [c[2] for c in candidates],
+        "ensemble_enabled": True,
+    }
+    return merged
+
+
 def process_bill_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     """
     Send a single bill image to Gemini Flash Vision.
     Returns extracted data with confidence flags.
     """
-    client = _get_client()
-
-    image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=[image_part, EXTRACTION_PROMPT],
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-        ),
-    )
-
-    extracted = _parse_json_response(response.text)
-    return _add_confidence_flags(extracted)
+    if config.OCR_ENSEMBLE_ENABLED:
+        return _extract_with_ensemble(image_bytes, mime_type)
+    return _run_vision_extraction(image_bytes, mime_type, EXTRACTION_PROMPT)
 
 
 def process_bill_with_verification(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
@@ -160,19 +336,12 @@ def process_bill_with_verification(image_bytes: bytes, mime_type: str = "image/j
         return extracted_1
 
     # Second extraction with a differently-phrased prompt
-    client = _get_client()
     verification_prompt = (
         "Extract all billing line items from this medical bill. "
         "For each: cpt_code, description, charged_amount, quantity, date_of_service. "
         "Also extract: total_charged, provider_name. Return JSON only."
     )
-    image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=[image_part, verification_prompt],
-        config=types.GenerateContentConfig(response_mime_type="application/json"),
-    )
-    extracted_2 = _parse_json_response(response.text)
+    extracted_2 = _run_vision_extraction(image_bytes, mime_type, verification_prompt)
 
     # Compare line item counts
     count_1 = len(extracted_1.get("line_items", []))
@@ -236,4 +405,12 @@ def process_multi_page_bill(images: list[tuple[bytes, str]]) -> dict:
     )
 
     extracted = _parse_json_response(response.text)
-    return _add_confidence_flags(extracted)
+    extracted = _add_confidence_flags(extracted)
+    score, meta = _quality_score(extracted)
+    extracted["_extraction_meta"] = {
+        "selected_variant": "multi_page_combined",
+        "quality_score": round(score, 2),
+        "candidates": [{**meta, "variant": "multi_page_combined", "quality_score": round(score, 2)}],
+        "ensemble_enabled": False,
+    }
+    return extracted

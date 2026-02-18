@@ -10,7 +10,7 @@ sys.modules.setdefault("google", MagicMock())
 sys.modules.setdefault("google.genai", _mock_genai)
 sys.modules.setdefault("google.genai.types", MagicMock())
 
-from scanner import _add_confidence_flags  # noqa: E402
+from scanner import _add_confidence_flags, _quality_score, _merge_candidate  # noqa: E402
 
 
 class TestAddConfidenceFlags:
@@ -74,3 +74,44 @@ class TestAddConfidenceFlags:
         assert result["line_items"][0]["confidence"] == "high"
         assert result["line_items"][1]["confidence"] == "low"
         assert result["line_items"][2]["confidence"] == "medium"
+
+
+class TestOcrQualityScoring:
+    def test_quality_score_penalizes_reconciliation_mismatch(self):
+        strong_reconciled = {
+            "provider_name": "Test",
+            "total_charged": 1500.0,
+            "line_items": [
+                {"cpt_code": "99283", "description": "ER visit", "charged_amount": 1000.0},
+                {"cpt_code": "71046", "description": "X-ray", "charged_amount": 500.0},
+            ],
+        }
+        poor_reconciled = {
+            "provider_name": "Test",
+            "total_charged": 1500.0,
+            "line_items": [
+                {"cpt_code": "99283", "description": "ER visit", "charged_amount": 4000.0},
+                {"cpt_code": None, "description": "", "charged_amount": None},
+            ],
+        }
+        good_score, good_meta = _quality_score(strong_reconciled)
+        bad_score, bad_meta = _quality_score(poor_reconciled)
+        assert good_score > bad_score
+        assert good_meta["reconciliation_pct"] is not None
+        assert bad_meta["reconciliation_pct"] is not None
+
+    def test_merge_candidate_fills_missing_fields(self):
+        best = {
+            "provider_name": "",
+            "line_items": [{"cpt_code": None, "description": "", "charged_amount": None, "quantity": 0}],
+        }
+        fallback = {
+            "provider_name": "Provider Name",
+            "line_items": [{"cpt_code": "99283", "description": "ER visit", "charged_amount": 800.0, "quantity": 1}],
+        }
+        merged = _merge_candidate(best, fallback)
+        assert merged["provider_name"] == "Provider Name"
+        assert merged["line_items"][0]["cpt_code"] == "99283"
+        assert merged["line_items"][0]["description"] == "ER visit"
+        assert merged["line_items"][0]["charged_amount"] == 800.0
+        assert merged["line_items"][0]["quantity"] == 1

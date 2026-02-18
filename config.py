@@ -49,3 +49,9 @@ STATS_CACHE_TTL_SECONDS = 60
 # Extraction validation
 DOUBLE_EXTRACTION_THRESHOLD = 5000  # double-extract bills over $5k
 MAX_REASONABLE_CHARGE = 500000
+
+# OCR pipeline rollout
+OCR_PREPROCESS_ENABLED = os.getenv("OCR_PREPROCESS_ENABLED", "true").lower() == "true"
+OCR_ENSEMBLE_ENABLED = os.getenv("OCR_ENSEMBLE_ENABLED", "false").lower() == "true"
+OCR_MAX_VARIANTS = int(os.getenv("OCR_MAX_VARIANTS", "3"))
+OCR_RECONCILIATION_TOLERANCE_PCT = float(os.getenv("OCR_RECONCILIATION_TOLERANCE_PCT", "2.0"))
