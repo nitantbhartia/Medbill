@@ -126,11 +126,53 @@ class TestHospitalSeoPages:
 
     def test_hospital_profile_page(self):
         _seed_hospital()
+        upsert_hospital_row(
+            {
+                "facility_id": "10011",
+                "name": "State Comparison Hospital",
+                "city": "Orlando",
+                "state": "FL",
+                "slug": "state-comparison-hospital-orlando",
+            }
+        )
+        upsert_hospital_row(
+            {
+                "facility_id": "10012",
+                "name": "National Comparison Hospital",
+                "city": "Boston",
+                "state": "MA",
+                "slug": "national-comparison-hospital-boston",
+            }
+        )
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO billing_metrics (
+                    facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                    max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct, billing_grade
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("010011", 6.2, 6.2, 6.2, 8, 20.0, "D"),
+            )
+            db.execute(
+                """
+                INSERT INTO billing_metrics (
+                    facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                    max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct, billing_grade
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("010012", 2.8, 2.8, 2.8, 8, 10.0, "B"),
+            )
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
         assert "Memorial Regional Hospital" in resp.text
         assert "Billing Profile" in resp.text
         assert "Common Procedure Prices" in resp.text
+        assert "Billing Grade Position" in resp.text
+        assert "This hospital marker" in resp.text
+        assert "State avg marker" in resp.text
+        assert "National avg marker" in resp.text
+        assert "Markup Comparison" in resp.text
         assert "Scan My Bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
         assert expected in resp.text

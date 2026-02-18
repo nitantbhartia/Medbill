@@ -354,6 +354,36 @@ def _build_markup_band(markup: float | None) -> str:
     return "excessive"
 
 
+def _grade_index(grade: str | None) -> int | None:
+    order = {"A": 0, "B": 1, "C": 2, "D": 3, "F": 4}
+    return order.get((grade or "").strip().upper())
+
+
+def _grade_position_from_markup(markup: float | int | None) -> float | None:
+    """Map markup-vs-Medicare onto a 0..1 gauge where 0=F and 1=A."""
+    if markup is None:
+        return None
+    try:
+        m = float(markup)
+    except (TypeError, ValueError):
+        return None
+
+    if m <= 0:
+        return 1.0
+    if m < 2.0:
+        return 0.8 + (2.0 - m) / 2.0 * 0.2
+    if m < 3.0:
+        return 0.6 + (3.0 - m) / 1.0 * 0.2
+    if m < 5.0:
+        return 0.4 + (5.0 - m) / 2.0 * 0.2
+    if m < 8.0:
+        return 0.2 + (8.0 - m) / 3.0 * 0.2
+
+    # Compress very high markups into the bottom red band.
+    cap = min(m, 14.0)
+    return max(0.0, 0.2 - (cap - 8.0) / 6.0 * 0.2)
+
+
 def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) -> dict | None:
     with get_db() as db:
         hospital = db.execute(
@@ -412,11 +442,31 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
             """,
             (hospital["state"], hospital["facility_id"]),
         ).fetchall()
+        comparison = db.execute(
+            """
+            SELECT
+                (
+                    SELECT AVG(avg_markup_vs_medicare)
+                    FROM billing_metrics
+                    WHERE facility_id IN (
+                        SELECT facility_id FROM hospitals WHERE state = ?
+                    )
+                    AND avg_markup_vs_medicare IS NOT NULL
+                ) AS state_avg_markup,
+                (
+                    SELECT AVG(avg_markup_vs_medicare)
+                    FROM billing_metrics
+                    WHERE avg_markup_vs_medicare IS NOT NULL
+                ) AS national_avg_markup
+            """,
+            (hospital["state"],),
+        ).fetchone()
 
     hospital_d = dict(hospital)
     quality_d = dict(quality) if quality else {}
     financials_d = dict(financials) if financials else {}
     transparency_d = dict(transparency) if transparency else {}
+    comparison_d = dict(comparison) if comparison else {}
     hospital_d["name"] = _display_name(hospital_d.get("name"))
     nonprofit_flag = hospital_d.get("is_nonprofit")
     ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
@@ -462,11 +512,44 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         facility_id=hospital_d["facility_id"],
     )
 
+    hospital_markup = hospital_d.get("avg_markup_vs_medicare")
+    state_markup = comparison_d.get("state_avg_markup")
+    national_markup = comparison_d.get("national_avg_markup")
+
+    hospital_gauge_pct = _grade_position_from_markup(hospital_markup)
+    if hospital_gauge_pct is None:
+        hospital_grade_idx = _grade_index(hospital_d.get("billing_grade"))
+        hospital_gauge_pct = None if hospital_grade_idx is None else max(0.0, min(1.0, (4 - hospital_grade_idx) / 4))
+
+    gauge_markers = {
+        "hospital": hospital_gauge_pct,
+        "state": _grade_position_from_markup(state_markup),
+        "national": _grade_position_from_markup(national_markup),
+    }
+
+    comparison_max = max(
+        [
+            v
+            for v in (
+                hospital_markup,
+                state_markup,
+                national_markup,
+            )
+            if isinstance(v, (int, float))
+        ]
+        or [1.0]
+    )
+    comparison_max = max(comparison_max, 1.0)
+
     return {
         "hospital": hospital_d,
         "quality": quality_d,
         "financials": financials_d,
         "transparency": transparency_d,
+        "comparison": comparison_d,
+        "grade_gauge_pct": hospital_gauge_pct,
+        "grade_gauge_markers": gauge_markers,
+        "comparison_max": comparison_max,
         "prices": prices_d,
         "show_cash_column": show_cash_column,
         "tips": tips,
