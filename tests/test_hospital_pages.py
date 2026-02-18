@@ -44,10 +44,10 @@ def _seed_hospital():
             """
             INSERT INTO hcahps_scores (
                 facility_id, recommend_yes, doctor_communication_top,
-                nurse_communication_top, survey_period
-            ) VALUES (?, ?, ?, ?, ?)
+                nurse_communication_top, survey_period, data_updated
+            ) VALUES (?, ?, ?, ?, ?, ?)
             """,
-            ("010001", 72.0, 78.0, 74.0, "2025-Q4"),
+            ("010001", 72.0, 78.0, 74.0, "2025-Q4", "2026-01-15"),
         )
         db.execute(
             """
@@ -60,10 +60,10 @@ def _seed_hospital():
         )
         db.execute(
             """
-            INSERT INTO transparency_files (facility_id, file_url, parse_status, file_format)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO transparency_files (facility_id, file_url, parse_status, file_format, last_parsed)
+            VALUES (?, ?, ?, ?, ?)
             """,
-            ("010001", "https://example.org/transparency.csv", "parsed", "csv"),
+            ("010001", "https://example.org/transparency.csv", "parsed", "csv", "2026-01-22"),
         )
         db.execute(
             """
@@ -174,6 +174,8 @@ class TestHospitalSeoPages:
         assert "State avg marker" in resp.text
         assert "National avg marker" in resp.text
         assert "Markup Comparison" in resp.text
+        assert "Comparison chart hidden due to limited benchmark sample size." in resp.text
+        assert "Last updated:" in resp.text
         assert "Scan My Bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
         assert expected in resp.text
@@ -353,6 +355,45 @@ class TestHospitalSeoPages:
         assert 'property="og:image"' in resp.text
         assert '<meta name="robots" content="index, follow">' in resp.text
         assert '"@type": "FAQPage"' in resp.text
+
+    def test_comparison_chart_shows_with_sufficient_sample(self):
+        _seed_hospital()
+        # Build enough state + national metrics to cross sample threshold.
+        for i in range(40):
+            fid = f"3{i:04d}"
+            upsert_hospital_row(
+                {
+                    "facility_id": fid,
+                    "name": f"Sample Hospital {i}",
+                    "city": "Hollywood" if i < 30 else "Albany",
+                    "state": "FL" if i < 30 else "GA",
+                    "slug": f"sample-hospital-{i}",
+                }
+            )
+            with get_db() as db:
+                db.execute(
+                    """
+                    INSERT INTO billing_metrics (
+                        facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                        max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct, billing_grade
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (fid.zfill(6), 3.4 + (i % 5) * 0.1, 3.4, 4.2, 10, 10.0, "C"),
+                )
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert "Based on" in resp.text
+        assert "Comparison chart hidden due to limited benchmark sample size." not in resp.text
+
+    def test_data_quality_endpoint(self):
+        _seed_hospital()
+        resp = client.get("/ops/data-quality")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "hospitals_total" in data
+        assert "metrics_with_avg" in data
+        assert "hcahps_recommend_yes" in data
+        assert "last_refresh_by_source" in data
 
     def test_comparison_averages_exclude_extreme_outliers(self):
         _seed_hospital()

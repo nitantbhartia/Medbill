@@ -15,6 +15,7 @@ GRADE_THRESHOLDS = (
     (5.0, "C"),
     (8.0, "D"),
 )
+MIN_COMPARISON_SAMPLE_SIZE = 25
 
 US_STATE_NAMES = {
     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
@@ -494,9 +495,17 @@ def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | 
 
     national = _robust_average_markups([r["avg_markup_vs_medicare"] for r in national_rows])
     state = _robust_average_markups([r["avg_markup_vs_medicare"] for r in state_rows]) if state_rows else None
+    state_n = len(state_rows)
+    national_n = len(national_rows)
     return {
         "state_avg_markup": state,
         "national_avg_markup": national,
+        "state_sample_size": state_n,
+        "national_sample_size": national_n,
+        "min_sample_size": MIN_COMPARISON_SAMPLE_SIZE,
+        "show_comparison_chart": bool(
+            national_n >= MIN_COMPARISON_SAMPLE_SIZE and state_n >= MIN_COMPARISON_SAMPLE_SIZE
+        ),
     }
 
 
@@ -561,15 +570,16 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
             (hospital["state"], hospital["facility_id"]),
         ).fetchall()
     hospital_d = dict(hospital)
+    state_code = hospital_d.get("state")
     if not hospital_d.get("ownership") and hospital_d.get("ownership_fallback"):
         hospital_d["ownership"] = hospital_d.get("ownership_fallback")
     quality_d = dict(quality) if quality else {}
     financials_d = dict(financials) if financials else {}
     transparency_d = dict(transparency) if transparency else {}
-    comparison_d = _comparison_averages_for_state(hospital_d.get("state"))
+    comparison_d = _comparison_averages_for_state(state_code)
     hospital_d["name"] = _display_name(hospital_d.get("name"))
     hospital_d["city"] = _display_city(hospital_d.get("city"))
-    hospital_d["state"] = state_display_name(hospital_d.get("state"))
+    hospital_d["state"] = state_display_name(state_code)
     nonprofit_flag = hospital_d.get("is_nonprofit")
     ownership_nonprofit = _looks_nonprofit_from_ownership(hospital_d.get("ownership"))
     if nonprofit_flag in (None, 0) and ownership_nonprofit is True:
@@ -659,6 +669,17 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     )
     comparison_max = max(comparison_max, 1.0)
 
+    section_updated = {
+        "directory": hospital_d.get("cms_data_updated"),
+        "quality": quality_d.get("data_updated"),
+        "financials": financials_d.get("data_updated") or financials_d.get("updated_at") or financials_d.get("cost_report_year"),
+        "pricing": transparency_d.get("last_parsed") or transparency_d.get("last_downloaded"),
+        "metrics": hospital_d.get("computed_at"),
+        "tips": content.get("generated_at"),
+    }
+    for key, value in list(section_updated.items()):
+        section_updated[key] = str(value) if value not in (None, "") else None
+
     return {
         "hospital": hospital_d,
         "quality": quality_d,
@@ -675,6 +696,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "tips": tips,
         "content": content,
         "nearby": nearby,
+        "section_updated": section_updated,
     }
 
 

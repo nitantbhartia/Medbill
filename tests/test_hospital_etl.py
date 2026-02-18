@@ -15,7 +15,7 @@ import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
 from hospital_etl import auto_map_columns, first, normalize_price_rows, upsert_hospital_price  # noqa: E402
-from hospital_seo import recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
+from hospital_seo import get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
 def test_auto_map_columns_detects_core_fields():
@@ -178,3 +178,35 @@ def test_refresh_top300_transparency_marks_download_failure(monkeypatch):
         ).fetchone()
     assert tf["parse_status"] == "failed"
     assert tf["parse_notes"] == "download_failed"
+
+
+def test_profile_comparison_averages_stay_realistic_with_normal_seed():
+    _db._connection = None
+    _db.init_db()
+
+    # Seed one target hospital + enough peers in-state and national.
+    upsert_hospital_row(
+        {"facility_id": "90001", "name": "Target", "city": "Miami", "state": "FL", "slug": "target-miami"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+            ("090001", 6.5, 10, "D"),
+        )
+
+    for i in range(35):
+        fid = f"91{i:03d}"
+        state = "FL" if i < 26 else "GA"
+        upsert_hospital_row(
+            {"facility_id": fid, "name": f"Peer {i}", "city": "City", "state": state, "slug": f"peer-{i}"}
+        )
+        with get_db() as conn:
+            conn.execute(
+                "INSERT INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                (fid.zfill(6), 3.5 + (i % 6) * 0.3, 10, "C"),
+            )
+
+    profile = get_hospital_profile("fl", "miami", "target-miami")
+    assert profile is not None
+    assert 2.0 < profile["comparison"]["state_avg_markup"] < 10.0
+    assert 2.0 < profile["comparison"]["national_avg_markup"] < 10.0

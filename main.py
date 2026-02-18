@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResponse
 
 import config
 import db
@@ -277,6 +277,45 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
     )
     return Response(content=body, media_type="text/plain")
+
+
+@app.get("/ops/data-quality")
+async def ops_data_quality():
+    with db.get_db() as conn:
+        hospitals_total = conn.execute("SELECT COUNT(*) AS n FROM hospitals").fetchone()["n"]
+        metrics_with_avg = conn.execute(
+            "SELECT COUNT(*) AS n FROM billing_metrics WHERE avg_markup_vs_medicare IS NOT NULL"
+        ).fetchone()["n"]
+        hcahps_rows = conn.execute("SELECT COUNT(*) AS n FROM hcahps_scores").fetchone()["n"]
+        hcahps_recommend_yes = conn.execute(
+            "SELECT COUNT(*) AS n FROM hcahps_scores WHERE recommend_yes IS NOT NULL"
+        ).fetchone()["n"]
+        transparency_parsed = conn.execute(
+            "SELECT COUNT(*) AS n FROM transparency_files WHERE parse_status IN ('parsed', 'partial')"
+        ).fetchone()["n"]
+        prices_rows = conn.execute("SELECT COUNT(*) AS n FROM hospital_prices").fetchone()["n"]
+        refreshes = conn.execute(
+            """
+            SELECT source, MAX(refresh_date) AS last_refresh
+            FROM data_refresh_log
+            GROUP BY source
+            ORDER BY source
+            """
+        ).fetchall()
+
+    payload = {
+        "hospitals_total": hospitals_total,
+        "metrics_with_avg": metrics_with_avg,
+        "metrics_coverage_pct": round((metrics_with_avg / hospitals_total * 100), 2) if hospitals_total else 0.0,
+        "hcahps_rows": hcahps_rows,
+        "hcahps_recommend_yes": hcahps_recommend_yes,
+        "hcahps_recommend_coverage_pct": round((hcahps_recommend_yes / hospitals_total * 100), 2) if hospitals_total else 0.0,
+        "transparency_parsed": transparency_parsed,
+        "transparency_parsed_pct": round((transparency_parsed / hospitals_total * 100), 2) if hospitals_total else 0.0,
+        "hospital_prices_rows": prices_rows,
+        "last_refresh_by_source": {r["source"]: r["last_refresh"] for r in refreshes},
+    }
+    return JSONResponse(payload)
 
 
 if __name__ == "__main__":
