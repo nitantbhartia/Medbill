@@ -208,6 +208,32 @@ class TestHospitalSeoPages:
         assert "Bed Count" in resp.text
         assert ">738<" in resp.text
 
+    def test_top_stat_never_shows_directory_status(self):
+        upsert_hospital_row(
+            {
+                "facility_id": "10031",
+                "name": "No Metrics Hospital",
+                "city": "Nowhere",
+                "state": "TX",
+                "slug": "no-metrics-hospital-nowhere",
+            }
+        )
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT INTO billing_metrics (
+                    facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                    max_markup_vs_medicare, procedures_compared, billing_grade
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                ("010031", 4.1, 4.1, 4.1, 7, "C"),
+            )
+        resp = client.get("/hospitals/tx/nowhere/no-metrics-hospital-nowhere/")
+        assert resp.status_code == 200
+        assert "Directory Status" not in resp.text
+        assert "Patient Experience" in resp.text
+        assert "Not Reported" in resp.text
+
     def test_sitemap_contains_hospital_paths(self):
         _seed_hospital()
         resp = client.get("/sitemap-hospitals.xml")
