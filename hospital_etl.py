@@ -234,11 +234,71 @@ def get_latest_medicare_rate(cpt_code: str) -> float | None:
     return float(row["rate"]) if row and row["rate"] is not None else None
 
 
+def _facility_zip(facility_id: str) -> str | None:
+    with get_db() as db:
+        row = db.execute("SELECT zip FROM hospitals WHERE facility_id = ? LIMIT 1", (facility_id,)).fetchone()
+    if not row or not row["zip"]:
+        return None
+    zip_digits = "".join(ch for ch in str(row["zip"]) if ch.isdigit())
+    return zip_digits[:5] if len(zip_digits) >= 5 else None
+
+
+def _locality_for_zip(zip_code: str | None) -> str | None:
+    if not zip_code:
+        return None
+    with get_db() as db:
+        row = db.execute(
+            """
+            SELECT locality
+            FROM zip_locality_map
+            WHERE ? LIKE zip_prefix || '%'
+            ORDER BY LENGTH(zip_prefix) DESC
+            LIMIT 1
+            """,
+            (zip_code,),
+        ).fetchone()
+    return str(row["locality"]).strip() if row and row["locality"] else None
+
+
+def get_medicare_rate_for_facility(facility_id: str, cpt_code: str) -> float | None:
+    fid = normalize_facility_id(facility_id)
+    if not fid:
+        return None
+    zip_code = _facility_zip(fid)
+    locality = _locality_for_zip(zip_code)
+    with get_db() as db:
+        if locality:
+            row = db.execute(
+                """
+                SELECT COALESCE(facility_rate, non_facility_rate) AS rate
+                FROM medicare_rates
+                WHERE cpt_code = ? AND locality = ?
+                ORDER BY effective_year DESC
+                LIMIT 1
+                """,
+                (cpt_code, locality),
+            ).fetchone()
+            if row and row["rate"] is not None:
+                return float(row["rate"])
+        # Fallback when locality mapping missing: best available CPT rate.
+        row = db.execute(
+            """
+            SELECT COALESCE(facility_rate, non_facility_rate) AS rate
+            FROM medicare_rates
+            WHERE cpt_code = ?
+            ORDER BY effective_year DESC
+            LIMIT 1
+            """,
+            (cpt_code,),
+        ).fetchone()
+    return float(row["rate"]) if row and row["rate"] is not None else None
+
+
 def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = None) -> None:
     facility_id = normalize_facility_id(facility_id)
     if not facility_id:
         return
-    medicare = get_latest_medicare_rate(row["cpt_code"])
+    medicare = get_medicare_rate_for_facility(facility_id, row["cpt_code"])
     gross = row.get("gross_charge")
     markup = (gross / medicare) if (gross is not None and medicare and medicare > 0) else None
     year = data_year or date.today().year

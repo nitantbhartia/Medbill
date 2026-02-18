@@ -172,10 +172,7 @@ class TestHospitalSeoPages:
         assert "Billing Grade Position" in resp.text
         assert "This hospital marker" in resp.text
         assert "Markup Comparison" in resp.text
-        assert (
-            "Comparison chart hidden due to limited benchmark sample size." in resp.text
-            or "Benchmark samples:" in resp.text
-        )
+        assert "Benchmark comparisons are temporarily disabled while Medicare locality validation is in progress." in resp.text
         assert "Last updated:" in resp.text
         assert "Scan My Bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
@@ -359,15 +356,17 @@ class TestHospitalSeoPages:
 
     def test_comparison_chart_shows_with_sufficient_sample(self):
         _seed_hospital()
+        original = config.ENABLE_MARKUP_COMPARISONS
+        config.ENABLE_MARKUP_COMPARISONS = True
         # Build enough state + national metrics to cross sample threshold.
-        for i in range(40):
+        for i in range(130):
             fid = f"3{i:04d}"
             upsert_hospital_row(
                 {
                     "facility_id": fid,
                     "name": f"Sample Hospital {i}",
-                    "city": "Hollywood" if i < 30 else "Albany",
-                    "state": "FL" if i < 30 else "GA",
+                    "city": "Hollywood" if i < 80 else "Albany",
+                    "state": "FL" if i < 80 else "GA",
                     "slug": f"sample-hospital-{i}",
                 }
             )
@@ -382,10 +381,13 @@ class TestHospitalSeoPages:
                     (fid.zfill(6), 3.4 + (i % 5) * 0.1, 3.4, 4.2, 10, 10.0, "C"),
                 )
         clear_comparison_cache()
-        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
-        assert resp.status_code == 200
-        assert "Benchmark samples:" in resp.text
-        assert "Comparison chart hidden due to limited benchmark sample size." not in resp.text
+        try:
+            resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+            assert resp.status_code == 200
+            assert "Benchmark samples:" in resp.text
+            assert "Comparison chart hidden due to limited benchmark sample size." not in resp.text
+        finally:
+            config.ENABLE_MARKUP_COMPARISONS = original
 
     def test_data_quality_endpoint(self):
         _seed_hospital()

@@ -15,7 +15,7 @@ os.environ["DB_PATH"] = ":memory:"
 import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
-from hospital_etl import auto_map_columns, first, load_hcahps, normalize_price_rows, upsert_hospital_price  # noqa: E402
+from hospital_etl import auto_map_columns, first, get_medicare_rate_for_facility, load_hcahps, normalize_price_rows, upsert_hospital_price  # noqa: E402
 from hospital_seo import clear_comparison_cache, get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
@@ -243,3 +243,26 @@ def test_load_hcahps_handles_cms_coded_columns():
         assert row["nurse_communication_top"] == 74
     finally:
         os.unlink(path)
+
+
+def test_locality_aware_medicare_rate_lookup():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "93001", "name": "Locality Test", "city": "Miami", "state": "FL", "zip": "33101", "slug": "locality-test-miami"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO zip_locality_map (zip_prefix, locality, state, region) VALUES (?, ?, ?, ?)",
+            ("331", "L001", "FL", "South"),
+        )
+        conn.execute(
+            "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+            ("99285", "L001", 410.0, 390.0, 2026),
+        )
+        conn.execute(
+            "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+            ("99285", "0000000", 220.0, 210.0, 2026),
+        )
+    rate = get_medicare_rate_for_facility("93001", "99285")
+    assert rate == 410.0

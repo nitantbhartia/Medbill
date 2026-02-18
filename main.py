@@ -239,6 +239,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
             "affiliate_url": config.AFFILIATE_URL,
             "enable_hospital_claim": config.ENABLE_HOSPITAL_CLAIM,
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
+            "enable_markup_comparisons": config.ENABLE_MARKUP_COMPARISONS,
         },
     )
 

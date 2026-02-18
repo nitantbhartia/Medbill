@@ -196,6 +196,11 @@
 
         <div class="rounded-lg border border-gray-200 p-5">
             <h3 class="text-base font-semibold text-gray-900 mb-3">Markup Comparison</h3>
+            {% if not enable_markup_comparisons %}
+            <p class="text-sm text-gray-600">
+                Benchmark comparisons are temporarily disabled while Medicare locality validation is in progress.
+            </p>
+            {% else %}
             {% set show_cmp = data.comparison.show_comparison_chart if data.comparison else false %}
             {% if show_cmp %}
             <p class="text-xs text-gray-500 mb-2">Benchmark samples: {{ data.comparison.state_sample_size }} state, {{ data.comparison.national_sample_size }} national.</p>
@@ -232,6 +237,7 @@
                 {{ data.comparison.national_sample_size if data.comparison else 0 }} national
                 (minimum {{ data.comparison.state_min_sample_size if data.comparison else 0 }} state / {{ data.comparison.national_min_sample_size if data.comparison else 0 }} national).
             </p>
+            {% endif %}
             {% endif %}
         </div>
     </div>
