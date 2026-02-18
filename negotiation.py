@@ -438,7 +438,7 @@ def generate_phone_script(bill_id: int) -> str:
         for f in script_findings if f.get("details")
     )
 
-    provider = bill.get("provider_name", "the provider")
+    provider = bill.get("provider_name") or "the provider"
     insured = _is_insurance_processed(items, bill)
     total_patient_owes = bill.get("total_patient_owes") or 0
 
@@ -716,7 +716,7 @@ def generate_message_script(bill_id: int) -> str:
     if insured and total_patient_owes > 0:
         lines.append(
             f"I am writing regarding my account with "
-            f"{bill.get('provider_name', 'your facility')}. I understand my "
+            f"{(bill.get('provider_name') or 'your facility')}. I understand my "
             f"insurance has processed this claim and my patient responsibility "
             f"is ${total_patient_owes:,.2f}. Before making payment, I would like "
             f"to raise the following questions about the underlying charges:"
@@ -724,7 +724,7 @@ def generate_message_script(bill_id: int) -> str:
     else:
         lines.append(
             f"I am writing regarding my account with "
-            f"{bill.get('provider_name', 'your facility')}. After carefully "
+            f"{(bill.get('provider_name') or 'your facility')}. After carefully "
             f"reviewing my itemized bill, I have identified the following "
             f"concerns that I believe require correction:"
         )

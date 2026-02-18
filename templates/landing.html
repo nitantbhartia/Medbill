@@ -568,6 +568,76 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 480px) {
+            .layout-grid {
+                padding: 80px 16px 32px 16px;
+                gap: 28px;
+            }
+            h1 {
+                font-size: 2.2rem;
+                margin-bottom: 20px;
+            }
+            h1::after {
+                width: 80px;
+                margin-top: 16px;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .nav-bar {
+                top: 16px;
+                left: 12px;
+                right: 12px;
+            }
+            .logo {
+                font-size: 1.1rem;
+                padding: 8px 14px;
+                gap: 8px;
+            }
+            .menu-trigger {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+            .upload-card {
+                padding: 20px 16px;
+                border-radius: var(--radius-lg);
+            }
+            .upload-zone {
+                height: 180px;
+                border-radius: var(--radius-md);
+            }
+            .upload-icon {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 16px;
+            }
+            .upload-text-main { font-size: 1.1rem; }
+            .upload-text-sub { font-size: 0.85rem; }
+            .metric-block {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 24px;
+            }
+            .metric {
+                min-width: 0;
+                padding: 16px;
+            }
+            .metric-val { font-size: 2rem; }
+            .how-it-works {
+                padding: 0 16px;
+                margin-bottom: 40px;
+            }
+            .how-title { font-size: 1.3rem; }
+            .list-item {
+                padding: 12px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .item-name { font-size: 0.9rem; }
+            .item-status { font-size: 0.7rem; padding: 4px 10px; }
+        }
     </style>
 </head>
 <body>
