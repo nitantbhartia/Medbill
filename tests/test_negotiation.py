@@ -196,12 +196,12 @@ class TestGeneratePhoneScript:
         assert "resubmitted to my insurance" in script
         assert "patient responsibility" in script
 
-    def test_uninsured_script_shows_total_savings(self):
-        """SAMPLE_BILL_WITH_DUPLICATES has no insurance data, keeps old framing."""
+    def test_prorated_script_uses_patient_responsibility(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has total_patient_owes; proration fills per-line shares."""
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_phone_script(bill_id)
-        assert "adjustments total approximately" in script or "corrected bill" in script
+        assert "patient responsibility" in script
 
     def test_script_shows_up_to_five_findings(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -453,12 +453,12 @@ class TestInsuranceAwareness:
         assert "$4,215.00" in script
         assert "insurance has processed" in script
 
-    def test_phone_uninsured_mentions_standard_rate(self):
-        """SAMPLE_BILL_WITH_DUPLICATES has no insurance, script uses self-pay language."""
+    def test_phone_prorated_uses_patient_responsibility_language(self):
+        """SAMPLE_BILL_WITH_DUPLICATES has total_patient_owes; proration enables patient-centric script."""
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_phone_script(bill_id)
-        assert "self-pay" in script.lower() or "standard rate" in script.lower()
+        assert "patient responsibility" in script or "prompt-pay discount" in script.lower()
 
     def test_message_insured_asks_resubmit(self):
         analysis = analyze_bill(SAMPLE_BILL, "33021")
@@ -467,11 +467,11 @@ class TestInsuranceAwareness:
         assert "resubmitted to my insurance" in script
         assert "$4,215.00" in script
 
-    def test_message_uninsured_shows_total_savings(self):
+    def test_message_prorated_uses_patient_centric_language(self):
         analysis = analyze_bill(SAMPLE_BILL_WITH_DUPLICATES, "33021")
         bill_id = save_bill_and_findings(None, SAMPLE_BILL_WITH_DUPLICATES, analysis)
         script = generate_message_script(bill_id)
-        assert "corrected bill" in script or "potential adjustment" in script
+        assert "patient responsibility" in script or "resubmitted" in script
 
     def test_phone_markup_insured_uses_patient_resp(self):
         """When line item has patient_responsibility, phone line references it."""

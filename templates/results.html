@@ -4,11 +4,12 @@
 
 {% block content %}
 {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
+{% set total_gross = data.total_gross_potential_savings if data.total_gross_potential_savings is defined else total_savings %}
 {% set issue_count = data.findings | length if data.findings else 0 %}
 {% set high_conf_findings = data.findings | selectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
 {% set review_conf_findings = data.findings | rejectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
-{% set insured = (data.line_items | selectattr('insurance_paid') | list | length > 0) or
-                 (data.line_items | selectattr('patient_responsibility') | list | length > 0) %}
+{% set has_patient_data = data.has_patient_data if data.has_patient_data is defined else false %}
+{% set has_insurance_data = data.has_insurance_data if data.has_insurance_data is defined else false %}
 {% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
 
 <section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
@@ -27,16 +28,34 @@
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">
             {{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} found
         </h1>
-        {% if insured and patient_balance > 0 %}
+        {% if patient_balance > 0 %}
         <p class="text-lg tabular-nums">
             <span class="text-gray-500">Your balance:</span>
             <span class="font-semibold text-gray-900">${{ "%.2f" | format(patient_balance) }}</span>
         </p>
-        <p class="text-xs text-gray-400 mt-1">Correcting billing errors or requesting discounts could reduce this amount.</p>
+        <p class="text-sm tabular-nums mt-1">
+            <span class="text-gray-500">Your estimated savings:</span>
+            <span class="font-semibold text-gray-900">${{ "%.2f" | format(total_savings) }}</span>
+        </p>
+        {% if total_gross > total_savings %}
+        <p class="text-xs text-gray-400 mt-1">
+            Total billing errors: ${{ "%.2f" | format(total_gross) }} &mdash;
+            savings capped to your share of the bill.
+        </p>
+        {% endif %}
+        {% elif has_patient_data %}
+        <p class="text-lg tabular-nums">
+            <span class="text-gray-500">Your estimated savings:</span>
+            <span class="font-semibold text-gray-900">${{ "%.2f" | format(total_savings) }}</span>
+        </p>
         {% else %}
         <p class="text-lg tabular-nums">
-            <span class="text-gray-500">Potential savings:</span>
+            <span class="text-gray-500">Billing errors found:</span>
             <span class="font-semibold text-gray-900">${{ "%.2f" | format(total_savings) }}</span>
+        </p>
+        <p class="text-xs text-gray-400 mt-1">
+            This is the total overcharge vs. Medicare rates. Your actual savings depend on your insurance &mdash;
+            add your "you owe" amounts on the confirm page for a precise estimate.
         </p>
         {% endif %}
         {% else %}
@@ -124,7 +143,7 @@
                             {% elif finding.severity == 'medium' %}text-amber-700
                             {% else %}text-blue-700{% endif %}
                         ">${{ "%.2f" | format(finding.potential_savings) }}</div>
-                        <div class="text-[10px] text-gray-400">savings</div>
+                        <div class="text-[10px] text-gray-400">{% if has_patient_data %}your savings{% else %}overcharge{% endif %}</div>
                     </div>
                     {% endif %}
                 </div>
