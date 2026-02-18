@@ -31,8 +31,6 @@
             background-color: var(--bg-canvas);
             color: var(--text-black);
             font-family: var(--font-main);
-            overflow-x: hidden;
-            width: 100vw;
             min-height: 100vh;
             position: relative;
         }
@@ -53,6 +51,7 @@
             border-radius: 50%;
             filter: blur(60px);
             opacity: 0.8;
+            will-change: transform;
         }
 
         .blob--1 {
@@ -218,7 +217,7 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             position: relative;
-            overflow: hidden;
+            overflow: clip;
             border: 4px solid var(--card-white);
         }
 
@@ -551,6 +550,7 @@
                 right: 24px;
             }
             .blob--1 { opacity: 0.5; }
+            .blob { filter: blur(30px); }
             .upload-card {
                 padding: 28px 20px;
             }
