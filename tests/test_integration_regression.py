@@ -179,3 +179,61 @@ class TestScanEndpointIntegration:
 
         assert resp.status_code == 500
         assert "Failed to analyze bill" in resp.json()["detail"]
+
+    def test_scan_to_results_and_dispute_artifacts_flow(self, monkeypatch):
+        extracted_payload = {
+            "provider_name": "Flow Provider",
+            "provider_address": "123 Main St",
+            "line_items": [{"cpt_code": "99283", "description": "ER visit", "charged_amount": 1200.0, "quantity": 1}],
+            "total_charged": 1200.0,
+            "total_patient_owes": 600.0,
+        }
+        analysis_payload = {
+            "total_findings": 1,
+            "total_potential_savings": 200.0,
+            "findings": [
+                {
+                    "type": "price_markup",
+                    "severity": "high",
+                    "message": "Marked up vs Medicare",
+                    "potential_savings": 200.0,
+                    "confidence": "high",
+                    "rule_id": "RULE_MARKUP_VS_MEDICARE",
+                    "evidence": {"source": "cms_medicare_pfs_opps"},
+                    "line_item": {"cpt_code": "99283"},
+                }
+            ],
+        }
+
+        monkeypatch.setattr(
+            api_module.scanner,
+            "process_bill_with_verification",
+            lambda *_args, **_kwargs: extracted_payload,
+        )
+        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(api_module.analyzer, "analyze_bill", lambda *_args, **_kwargs: analysis_payload)
+        monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
+
+        scan = client.post(
+            "/api/scan",
+            files=[("images", ("bill.png", b"fake-image", "image/png"))],
+            data={"zip_code": "33021"},
+        )
+        assert scan.status_code == 200
+        bill_id = scan.json()["data"]["bill_id"]
+
+        results = client.get(f"/api/results/{bill_id}")
+        assert results.status_code == 200
+        assert results.json()["data"]["bill"]["id"] == bill_id
+
+        packet = client.get(f"/api/dispute-packet/{bill_id}")
+        assert packet.status_code == 200
+        assert "cover_letter" in packet.json()["data"]
+
+        finding_id = results.json()["data"]["findings"][0]["id"]
+        letter = client.post(
+            f"/api/dispute-letter/{bill_id}",
+            json={"finding_ids": [finding_id], "requestor_name": "Flow Tester"},
+        )
+        assert letter.status_code == 200
+        assert "Flow Tester" in letter.json()["data"]["letter"]

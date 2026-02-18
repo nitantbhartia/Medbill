@@ -72,6 +72,19 @@
                         {% if finding.details %}
                         <p class="text-xs text-gray-500 mt-1">{{ finding.details }}</p>
                         {% endif %}
+                        <div class="mt-2 flex flex-wrap gap-2 text-[10px]">
+                            {% if finding.confidence %}
+                            <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 uppercase tracking-wide">
+                                confidence: {{ finding.confidence }}
+                            </span>
+                            {% endif %}
+                            {% if finding.rule_id %}
+                            <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-mono">{{ finding.rule_id }}</span>
+                            {% endif %}
+                            {% if finding.evidence_source %}
+                            <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">source: {{ finding.evidence_source }}</span>
+                            {% endif %}
+                        </div>
                         {% if finding.cpt_code %}
                         <div class="mt-2 flex flex-wrap gap-1.5 text-[10px] text-gray-500 font-mono">
                             <span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">{{ finding.cpt_code }}</span>
@@ -97,6 +110,10 @@
                     </div>
                     {% endif %}
                 </div>
+                <label class="mt-3 flex items-center gap-2 text-xs text-gray-600">
+                    <input class="finding-selector rounded border-gray-300" type="checkbox" value="{{ finding.id }}" checked />
+                    Include in dispute letter
+                </label>
             </div>
             {% endfor %}
         </div>
@@ -186,6 +203,38 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Dispute letter -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-gray-900">Dispute letter</h2>
+            <button type="button" id="generate-letter-btn"
+                    class="text-xs font-medium px-3 py-1.5 rounded bg-accent-700 text-white hover:bg-accent-800 transition-colors">
+                Generate
+            </button>
+        </div>
+        <div class="bg-gray-50 border border-gray-200 rounded-md p-4">
+            <pre class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed" id="dispute-letter-text">Select findings and click Generate.</pre>
+        </div>
+    </div>
+
+    <!-- Claim tracker -->
+    <div class="mb-8 border border-gray-200 rounded-md p-5">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-gray-900">Claim tracker</h2>
+            <button type="button" id="start-claim-btn"
+                    class="text-xs font-medium px-3 py-1.5 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                Start claim
+            </button>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-3">
+            <button type="button" data-claim-status="sent" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark sent</button>
+            <button type="button" data-claim-status="acknowledged" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark acknowledged</button>
+            <button type="button" data-claim-status="resolved" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark resolved</button>
+            <button type="button" data-claim-status="denied" class="claim-status-btn text-xs px-2.5 py-1 rounded bg-gray-100 hover:bg-gray-200">Mark denied</button>
+        </div>
+        <div id="claim-status-output" class="text-xs text-gray-500">No claim created yet.</div>
+    </div>
     {% endif %}
 
     <!-- Email report -->
@@ -215,6 +264,9 @@
 {% block scripts %}
 <script>
 (function() {
+    var billId = '{{ data.bill.id if data and data.bill else "" }}';
+    var activeClaimId = null;
+
     function copyText(sourceId, btnTextId) {
         var el = document.getElementById(sourceId);
         var btnText = document.getElementById(btnTextId);
@@ -230,6 +282,69 @@
 
     var copyMsgBtn = document.getElementById('copy-message-btn');
     if (copyMsgBtn) copyMsgBtn.addEventListener('click', function() { copyText('message-script-text', 'copy-message-btn-text'); });
+
+    function selectedFindingIds() {
+        return Array.from(document.querySelectorAll('.finding-selector:checked'))
+            .map(function(el) { return parseInt(el.value, 10); })
+            .filter(function(v) { return Number.isFinite(v); });
+    }
+
+    var letterBtn = document.getElementById('generate-letter-btn');
+    if (letterBtn) {
+        letterBtn.addEventListener('click', function() {
+            var payload = {
+                finding_ids: selectedFindingIds(),
+                requestor_name: 'BillKarma User'
+            };
+            letterBtn.disabled = true;
+            fetch('/api/dispute-letter/' + billId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(function(r) { if (!r.ok) throw new Error('Could not generate letter'); return r.json(); })
+            .then(function(data) {
+                document.getElementById('dispute-letter-text').textContent = data.data.letter;
+            })
+            .catch(function(err) {
+                document.getElementById('dispute-letter-text').textContent = err.message || 'Failed to generate letter.';
+            })
+            .finally(function() { letterBtn.disabled = false; });
+        });
+    }
+
+    var startClaimBtn = document.getElementById('start-claim-btn');
+    var claimOutput = document.getElementById('claim-status-output');
+    if (startClaimBtn) {
+        startClaimBtn.addEventListener('click', function() {
+            var form = new FormData();
+            form.append('bill_id', billId);
+            fetch('/api/claims', { method: 'POST', body: form })
+                .then(function(r) { if (!r.ok) throw new Error('Could not create claim'); return r.json(); })
+                .then(function(data) {
+                    activeClaimId = data.data.claim_id;
+                    claimOutput.textContent = 'Claim #' + activeClaimId + ' status: drafted';
+                })
+                .catch(function(err) { claimOutput.textContent = err.message || 'Failed to start claim.'; });
+        });
+    }
+
+    document.querySelectorAll('.claim-status-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (!activeClaimId) {
+                claimOutput.textContent = 'Start a claim first.';
+                return;
+            }
+            var form = new FormData();
+            form.append('status', btn.getAttribute('data-claim-status'));
+            fetch('/api/claims/' + activeClaimId + '/status', { method: 'POST', body: form })
+                .then(function(r) { if (!r.ok) throw new Error('Could not update claim'); return r.json(); })
+                .then(function(data) {
+                    claimOutput.textContent = 'Claim #' + activeClaimId + ' status: ' + data.data.to_status;
+                })
+                .catch(function(err) { claimOutput.textContent = err.message || 'Failed to update claim.'; });
+        });
+    });
 
     var emailForm = document.getElementById('email-report-form');
     if (emailForm) {

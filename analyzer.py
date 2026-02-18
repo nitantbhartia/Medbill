@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import TypedDict, Any
 
 from db import get_db
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
@@ -27,6 +28,32 @@ CONFIDENCE_RULES = {
     "benchmark_outlier": "medium",  # statistical comparison, informational
     "eob_mismatch": "high",  # arithmetic consistency check
 }
+
+RULE_ID_BY_TYPE = {
+    "duplicate_charge": "RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT",
+    "price_markup": "RULE_MARKUP_VS_MEDICARE",
+    "unbundling": "RULE_NCCI_UNBUNDLING",
+    "upcoding": "RULE_ER_LEVEL_UPCODING_HEURISTIC",
+    "quantity_flag": "RULE_HIGH_QUANTITY_CHECK",
+    "no_surprises_act": "RULE_NO_SURPRISES_ACT_HEURISTIC",
+    "benchmark_outlier": "RULE_REGIONAL_BENCHMARK_OUTLIER",
+    "eob_mismatch": "RULE_EOB_RECONCILIATION",
+}
+
+
+class FlagResult(TypedDict, total=False):
+    type: str
+    rule_id: str
+    severity: str
+    confidence: str
+    message: str
+    details: str
+    potential_savings: float
+    gross_potential_savings: float
+    estimated_patient_savings: float
+    line_item: dict[str, Any]
+    related_items: list[dict[str, Any]]
+    evidence: dict[str, Any]
 
 
 def _assign_confidence(finding: dict) -> str:
@@ -356,6 +383,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     # Assign confidence to each finding
     for finding in findings:
+        finding["rule_id"] = RULE_ID_BY_TYPE.get(finding.get("type"), "RULE_GENERIC_HEURISTIC")
         finding["confidence"] = _assign_confidence(finding)
         _ensure_evidence_panel(finding, freshness)
 
@@ -431,12 +459,17 @@ def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict,
 
         for finding in analysis.get("findings", []):
             db.execute(
-                "INSERT INTO findings (bill_id, finding_type, severity, "
-                "potential_savings, message, details) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
+                "evidence_source, evidence_json, potential_savings, message, details) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     finding["type"],
+                    finding.get("rule_id"),
                     finding["severity"],
+                    finding.get("confidence"),
+                    (finding.get("evidence") or {}).get("source"),
+                    json.dumps(finding.get("evidence") or {}),
                     finding.get("potential_savings", 0),
                     finding["message"],
                     json.dumps(finding),
@@ -463,10 +496,28 @@ def get_bill_results(bill_id: int) -> dict | None:
             (bill_id,),
         ).fetchall()
 
+    normalized_findings = []
+    for row in findings:
+        finding = dict(row)
+        try:
+            parsed = json.loads(finding.get("details") or "{}")
+        except json.JSONDecodeError:
+            parsed = {}
+        finding["parsed_details"] = parsed
+        finding["confidence"] = finding.get("confidence") or parsed.get("confidence")
+        finding["rule_id"] = finding.get("rule_id") or parsed.get("rule_id")
+        evidence = parsed.get("evidence") or {}
+        if not finding.get("evidence_source"):
+            finding["evidence_source"] = evidence.get("source")
+        finding["estimated_patient_savings"] = parsed.get(
+            "estimated_patient_savings", finding.get("potential_savings", 0)
+        )
+        normalized_findings.append(finding)
+
     return {
         "bill": dict(bill),
         "line_items": [dict(li) for li in line_items],
-        "findings": [dict(f) for f in findings],
+        "findings": normalized_findings,
     }
 
 

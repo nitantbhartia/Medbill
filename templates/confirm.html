@@ -18,6 +18,10 @@
     </div>
 
     {% if data.bill %}
+    {% set extracted_sum = data.line_items | sum(attribute='charged_amount') if data.line_items else 0 %}
+    {% set bill_total = data.bill.total_charged if data.bill and data.bill.total_charged else 0 %}
+    {% set recon_delta = (extracted_sum - bill_total) if bill_total else 0 %}
+    {% set recon_pct = ((recon_delta | abs) / bill_total * 100) if bill_total else 0 %}
     <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 mb-6 pb-6 border-b border-gray-100">
         {% if data.bill.provider_name %}
         <span><span class="text-gray-400">Provider:</span> {{ data.bill.provider_name }}</span>
@@ -31,6 +35,30 @@
         {% if data.bill.total_charged %}
         <span><span class="text-gray-400">Total:</span> ${{ "%.2f" | format(data.bill.total_charged) }}</span>
         {% endif %}
+    </div>
+
+    <div class="mb-6 rounded-md border px-4 py-3
+        {% if bill_total and recon_pct > 2 %}
+            border-amber-300 bg-amber-50
+        {% else %}
+            border-green-200 bg-green-50
+        {% endif %}
+    ">
+        <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Extraction Reconciliation</p>
+        <p class="text-sm text-gray-800">
+            Itemized sum: <strong>${{ "%.2f" | format(extracted_sum) }}</strong>
+            {% if bill_total %}
+                · Bill total: <strong>${{ "%.2f" | format(bill_total) }}</strong>
+                · Delta: <strong>${{ "%.2f" | format(recon_delta) }}</strong>
+            {% endif %}
+        </p>
+        <p class="text-xs mt-1 {% if bill_total and recon_pct > 2 %}text-amber-700{% else %}text-green-700{% endif %}">
+            {% if bill_total and recon_pct > 2 %}
+                Reconciliation mismatch is above 2%. Review missing/incorrect line items before continuing.
+            {% else %}
+                Reconciliation looks good. Continue to analysis when ready.
+            {% endif %}
+        </p>
     </div>
     {% endif %}
 

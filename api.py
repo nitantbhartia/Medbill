@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -22,6 +23,7 @@ from compliance import (
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
+CLAIM_STATUSES = {"drafted", "sent", "acknowledged", "resolved", "denied"}
 
 
 @router.post("/scan")
@@ -183,12 +185,17 @@ async def analyze_confirmed(bill_id: int, payload: dict):
     with get_db() as db:
         for finding in analysis.get("findings", []):
             db.execute(
-                "INSERT INTO findings (bill_id, finding_type, severity, "
-                "potential_savings, message, details) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
+                "evidence_source, evidence_json, potential_savings, message, details) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     finding["type"],
+                    finding.get("rule_id"),
                     finding["severity"],
+                    finding.get("confidence"),
+                    (finding.get("evidence") or {}).get("source"),
+                    json.dumps(finding.get("evidence") or {}),
                     finding.get("potential_savings", 0),
                     finding["message"],
                     json.dumps(finding),
@@ -235,6 +242,73 @@ async def get_dispute_packet(bill_id: int):
         raise HTTPException(404, "Bill not found")
     log_audit(action="generate_dispute_packet", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
     return {"status": "ok", "data": packet}
+
+
+@router.post("/dispute-letter/{bill_id}")
+async def get_dispute_letter(bill_id: int, payload: dict):
+    """
+    Generate a focused dispute letter from selected findings.
+    """
+    selected_ids = payload.get("finding_ids", [])
+    requestor_name = payload.get("requestor_name", "Patient")
+    if not isinstance(selected_ids, list):
+        raise HTTPException(400, "finding_ids must be an array")
+
+    with get_db() as db:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        if not bill:
+            raise HTTPException(404, "Bill not found")
+
+        if selected_ids:
+            placeholders = ",".join(["?"] * len(selected_ids))
+            rows = db.execute(
+                f"SELECT * FROM findings WHERE bill_id = ? AND id IN ({placeholders}) ORDER BY id",
+                [bill_id, *selected_ids],
+            ).fetchall()
+        else:
+            rows = db.execute("SELECT * FROM findings WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
+
+    if not rows:
+        raise HTTPException(400, "No findings available for dispute letter")
+
+    bill_dict = dict(bill)
+    bullets = []
+    total = 0.0
+    for row in rows:
+        detail = json.loads(row["details"] or "{}")
+        li = detail.get("line_item") or {}
+        cpt = li.get("cpt_code") or "N/A"
+        evidence = detail.get("evidence") or {}
+        source = evidence.get("source", "rule_engine")
+        est = float(detail.get("estimated_patient_savings") or row["potential_savings"] or 0.0)
+        total += est
+        bullets.append(
+            f"- [{row['severity'].upper()}] {row['message']} (CPT: {cpt}, evidence: {source}, est. savings: ${est:,.2f})"
+        )
+
+    letter = (
+        f"Date: {datetime.utcnow().strftime('%Y-%m-%d')}\n\n"
+        f"To: Billing Department, {bill_dict.get('provider_name') or 'Provider'}\n"
+        f"Re: Account review request for bill #{bill_id}\n\n"
+        f"Hello,\n\n"
+        f"I am requesting an item-level review and correction of charges on my bill dated "
+        f"{bill_dict.get('bill_date') or 'N/A'}. I found the following issues in my audit:\n\n"
+        f"{chr(10).join(bullets)}\n\n"
+        f"Please send a corrected itemized statement and any rebill submissions to my insurer where applicable. "
+        f"The estimated patient-impact amount under review is ${total:,.2f}.\n\n"
+        f"Sincerely,\n"
+        f"{requestor_name}\n"
+    )
+
+    return {
+        "status": "ok",
+        "data": {
+            "bill_id": bill_id,
+            "finding_count": len(rows),
+            "estimated_patient_impact": round(total, 2),
+            "letter": letter,
+        },
+    }
 
 
 @router.get("/appeal-playbook/{bill_id}")
@@ -350,6 +424,80 @@ async def record_dispute_outcome(
         )
 
     return {"status": "ok", "data": {"actual_savings": actual_savings}}
+
+
+@router.post("/claims")
+async def create_claim(
+    bill_id: int = Form(...),
+    user_id: int = Form(None),
+    channel: str = Form("provider_billing"),
+    note: str = Form(""),
+):
+    """Create a new claim workflow record for a bill."""
+    with get_db() as db:
+        bill = db.execute("SELECT id FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        if not bill:
+            raise HTTPException(404, "Bill not found")
+
+        cursor = db.execute(
+            "INSERT INTO dispute_claims (bill_id, user_id, current_status, channel, notes) VALUES (?, ?, 'drafted', ?, ?)",
+            (bill_id, user_id, channel, note),
+        )
+        claim_id = cursor.lastrowid
+        db.execute(
+            "INSERT INTO dispute_claim_events (claim_id, from_status, to_status, event_note) VALUES (?, ?, ?, ?)",
+            (claim_id, None, "drafted", "Claim created"),
+        )
+
+    return {"status": "ok", "data": {"claim_id": claim_id, "current_status": "drafted"}}
+
+
+@router.get("/claims/{bill_id}")
+async def list_claims(bill_id: int):
+    """List claim workflow records for a bill."""
+    with get_db() as db:
+        rows = db.execute(
+            "SELECT * FROM dispute_claims WHERE bill_id = ? ORDER BY id DESC",
+            (bill_id,),
+        ).fetchall()
+        claims = []
+        for row in rows:
+            events = db.execute(
+                "SELECT from_status, to_status, event_note, created_at FROM dispute_claim_events "
+                "WHERE claim_id = ? ORDER BY id",
+                (row["id"],),
+            ).fetchall()
+            claim = dict(row)
+            claim["events"] = [dict(e) for e in events]
+            claims.append(claim)
+    return {"status": "ok", "data": {"bill_id": bill_id, "claims": claims}}
+
+
+@router.post("/claims/{claim_id}/status")
+async def update_claim_status(claim_id: int, status: str = Form(...), note: str = Form("")):
+    """Transition a claim status and append an audit event."""
+    target = (status or "").strip().lower()
+    if target not in CLAIM_STATUSES:
+        raise HTTPException(400, f"Invalid status '{status}'")
+
+    with get_db() as db:
+        claim = db.execute("SELECT * FROM dispute_claims WHERE id = ?", (claim_id,)).fetchone()
+        if not claim:
+            raise HTTPException(404, "Claim not found")
+
+        prev = claim["current_status"]
+        db.execute(
+            "UPDATE dispute_claims SET current_status = ?, updated_at = CURRENT_TIMESTAMP, "
+            "notes = CASE WHEN ? != '' THEN COALESCE(notes, '') || '\n' || ? ELSE notes END "
+            "WHERE id = ?",
+            (target, note, note, claim_id),
+        )
+        db.execute(
+            "INSERT INTO dispute_claim_events (claim_id, from_status, to_status, event_note) VALUES (?, ?, ?, ?)",
+            (claim_id, prev, target, note or "status update"),
+        )
+
+    return {"status": "ok", "data": {"claim_id": claim_id, "from_status": prev, "to_status": target}}
 
 
 @router.get("/provider-intelligence/{provider_name}")

@@ -294,3 +294,46 @@ class TestComplianceEndpoints:
 
         after = client.get(f"/api/results/{bill_id}")
         assert after.status_code == 404
+
+
+class TestDisputeLetterEndpoint:
+    def test_dispute_letter_from_selected_findings(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+        results = get_bill_results(bill_id)
+        assert results is not None
+        finding_ids = [results["findings"][0]["id"]]
+
+        resp = client.post(
+            f"/api/dispute-letter/{bill_id}",
+            json={"finding_ids": finding_ids, "requestor_name": "Alex Patient"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["bill_id"] == bill_id
+        assert data["finding_count"] == 1
+        assert "Alex Patient" in data["letter"]
+
+
+class TestClaimWorkflowEndpoints:
+    def test_create_and_progress_claim_status(self):
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis)
+
+        created = client.post(
+            "/api/claims",
+            data={"bill_id": bill_id, "channel": "provider_billing", "note": "Start claim"},
+        )
+        assert created.status_code == 200
+        claim_id = created.json()["data"]["claim_id"]
+
+        listed = client.get(f"/api/claims/{bill_id}")
+        assert listed.status_code == 200
+        assert len(listed.json()["data"]["claims"]) >= 1
+
+        progressed = client.post(
+            f"/api/claims/{claim_id}/status",
+            data={"status": "sent", "note": "Submitted by portal"},
+        )
+        assert progressed.status_code == 200
+        assert progressed.json()["data"]["to_status"] == "sent"

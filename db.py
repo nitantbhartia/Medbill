@@ -48,6 +48,15 @@ def _run_migrations(db):
     existing = {row[1] for row in db.execute("PRAGMA table_info(bills)").fetchall()}
     if "zip_code" not in existing:
         db.execute("ALTER TABLE bills ADD COLUMN zip_code TEXT")
+    ensure_columns(
+        "findings",
+        {
+            "rule_id": "TEXT",
+            "confidence": "TEXT",
+            "evidence_source": "TEXT",
+            "evidence_json": "TEXT",
+        },
+    )
 
     # Geo mapping table (for ZIP -> Medicare locality/region)
     db.execute(
@@ -333,6 +342,35 @@ def _run_migrations(db):
         )
         """
     )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS dispute_claims (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bill_id INTEGER NOT NULL REFERENCES bills(id),
+            user_id INTEGER REFERENCES users(id),
+            current_status TEXT NOT NULL DEFAULT 'drafted',
+            channel TEXT DEFAULT 'provider_billing',
+            assignee TEXT,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_dispute_claims_bill ON dispute_claims(bill_id)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS dispute_claim_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            claim_id INTEGER NOT NULL REFERENCES dispute_claims(id),
+            from_status TEXT,
+            to_status TEXT NOT NULL,
+            event_note TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_dispute_claim_events_claim ON dispute_claim_events(claim_id)")
 
     # Backward-compatible sync to canonical tables.
     db.execute(
@@ -445,7 +483,11 @@ CREATE TABLE IF NOT EXISTS findings (
     bill_id INTEGER REFERENCES bills(id),
     line_item_id INTEGER REFERENCES line_items(id),
     finding_type TEXT,
+    rule_id TEXT,
     severity TEXT,
+    confidence TEXT,
+    evidence_source TEXT,
+    evidence_json TEXT,
     potential_savings REAL,
     message TEXT,
     details TEXT,
@@ -565,6 +607,32 @@ CREATE TABLE IF NOT EXISTS dispute_outcomes (
     shared_publicly BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Claim workflow tracking
+CREATE TABLE IF NOT EXISTS dispute_claims (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    user_id INTEGER REFERENCES users(id),
+    current_status TEXT NOT NULL DEFAULT 'drafted',
+    channel TEXT DEFAULT 'provider_billing',
+    assignee TEXT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_dispute_claims_bill ON dispute_claims(bill_id);
+
+CREATE TABLE IF NOT EXISTS dispute_claim_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    claim_id INTEGER NOT NULL REFERENCES dispute_claims(id),
+    from_status TEXT,
+    to_status TEXT NOT NULL,
+    event_note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_dispute_claim_events_claim ON dispute_claim_events(claim_id);
 
 -- Procedure benchmarks
 CREATE TABLE IF NOT EXISTS procedure_benchmarks (
