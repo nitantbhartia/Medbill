@@ -5,6 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+import config
 import scanner
 import analyzer
 import negotiation
@@ -537,6 +538,128 @@ async def update_claim_status(claim_id: int, status: str = Form(...), note: str 
     )
 
     return {"status": "ok", "data": {"claim_id": claim_id, "from_status": prev, "to_status": target}}
+
+
+@router.get("/calculator/cost")
+async def calculator_cost_lookup(cpt_code: str, zip_code: str = ""):
+    """Look up Medicare rate and benchmarks for a procedure by CPT code and ZIP."""
+    cpt_code = cpt_code.strip().upper()
+    zip_code = zip_code.strip()
+
+    if not cpt_code:
+        raise HTTPException(400, "cpt_code is required")
+
+    from validators.pricing import get_medicare_rate, get_opps_rate
+    from validators.geo import get_medicare_locality, get_region
+    from validators.benchmarks import get_benchmark
+
+    locality = get_medicare_locality(zip_code) if zip_code else "0000000"
+    medicare_rate = get_medicare_rate(cpt_code, locality)
+    opps_rate = get_opps_rate(cpt_code)
+    benchmark = get_benchmark(cpt_code, zip_code)
+
+    with get_db() as db:
+        desc_row = db.execute(
+            "SELECT description FROM medicare_rates WHERE cpt_code = ? AND description IS NOT NULL LIMIT 1",
+            (cpt_code,),
+        ).fetchone()
+
+    description = desc_row["description"] if desc_row else None
+    total_medicare = None
+    if medicare_rate and opps_rate:
+        total_medicare = round(medicare_rate + opps_rate, 2)
+
+    result = {
+        "cpt_code": cpt_code,
+        "zip_code": zip_code or None,
+        "description": description,
+        "medicare_rate": medicare_rate,
+        "opps_rate": opps_rate,
+        "total_medicare": total_medicare,
+        "locality": locality,
+        "region": get_region(zip_code) if zip_code else "national",
+    }
+
+    if benchmark:
+        result["benchmark"] = {
+            "median_charged": benchmark.get("median_charged"),
+            "p25_charged": benchmark.get("p25_charged"),
+            "p75_charged": benchmark.get("p75_charged"),
+            "sample_size": benchmark.get("sample_size"),
+            "region": benchmark.get("region"),
+        }
+
+    return {"status": "ok", "data": result}
+
+
+@router.get("/calculator/markup")
+async def calculator_markup_check(cpt_code: str, charged: float, zip_code: str = ""):
+    """Check how a charge compares to Medicare and regional benchmarks."""
+    cpt_code = cpt_code.strip().upper()
+    zip_code = zip_code.strip()
+
+    if not cpt_code:
+        raise HTTPException(400, "cpt_code is required")
+    if charged <= 0:
+        raise HTTPException(400, "charged must be positive")
+
+    from validators.pricing import get_medicare_rate, get_opps_rate
+    from validators.geo import get_medicare_locality, get_region
+    from validators.benchmarks import get_benchmark
+
+    locality = get_medicare_locality(zip_code) if zip_code else "0000000"
+    medicare_rate = get_medicare_rate(cpt_code, locality)
+    opps_rate = get_opps_rate(cpt_code)
+    benchmark = get_benchmark(cpt_code, zip_code)
+
+    with get_db() as db:
+        desc_row = db.execute(
+            "SELECT description FROM medicare_rates WHERE cpt_code = ? AND description IS NOT NULL LIMIT 1",
+            (cpt_code,),
+        ).fetchone()
+
+    description = desc_row["description"] if desc_row else None
+
+    result = {
+        "cpt_code": cpt_code,
+        "charged": charged,
+        "zip_code": zip_code or None,
+        "description": description,
+    }
+
+    if medicare_rate:
+        markup = round(charged / medicare_rate, 1)
+        fair_price = round(medicare_rate * config.MEDICARE_MARKUP_THRESHOLD, 2)
+        potential_savings = round(max(0, charged - fair_price), 2)
+
+        total_medicare = None
+        if opps_rate:
+            total_medicare = round(medicare_rate + opps_rate, 2)
+
+        result["medicare"] = {
+            "rate": medicare_rate,
+            "opps_rate": opps_rate,
+            "total_medicare": total_medicare,
+            "markup": markup,
+            "fair_estimate": fair_price,
+            "potential_savings": potential_savings,
+            "assessment": (
+                "high" if markup > config.HIGH_MARKUP_THRESHOLD
+                else "elevated" if markup > config.MEDICARE_MARKUP_THRESHOLD
+                else "fair"
+            ),
+        }
+
+    if benchmark and benchmark.get("median_charged"):
+        result["benchmark"] = {
+            "median_charged": benchmark["median_charged"],
+            "p75_charged": benchmark.get("p75_charged"),
+            "sample_size": benchmark.get("sample_size"),
+            "region": benchmark.get("region"),
+            "vs_median": round(charged / benchmark["median_charged"], 1),
+        }
+
+    return {"status": "ok", "data": result}
 
 
 @router.get("/ops/ocr-benchmark")

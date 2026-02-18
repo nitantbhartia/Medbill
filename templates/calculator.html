@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Procedure Cost Calculator | BillKarma</title>
+    <meta name="description" content="Look up fair prices for medical procedures. Compare your bill against Medicare rates and regional hospital benchmarks by CPT code and ZIP code.">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:title" content="Medical Procedure Cost Calculator | BillKarma">
+    <meta property="og:description" content="Look up what Medicare pays for any procedure. Enter a CPT code and ZIP to see fair pricing.">
+    <meta name="robots" content="index, follow">
+    <style>
+        :root {
+            --bg-canvas: #E0E2E5;
+            --card-white: #FFFFFF;
+            --text-black: #1A1A1A;
+            --accent-lime: #D2F635;
+            --accent-grey: #F4F5F7;
+            --text-secondary: #6B7280;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-xl: 48px;
+            --radius-lg: 32px;
+            --radius-md: 24px;
+            --radius-sm: 100px;
+            --red-bg: #FEE2E2;
+            --red-text: #991B1B;
+            --amber-bg: #FEF3C7;
+            --amber-text: #92400E;
+            --green-bg: #D1FAE5;
+            --green-text: #065F46;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-black);
+            font-family: var(--font-main);
+            min-height: 100vh;
+        }
+
+        .nav-bar {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-black);
+        }
+
+        .logo svg { width: 24px; height: auto; color: var(--text-black); }
+
+        .nav-link {
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--text-black);
+            color: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+        }
+
+        .page-content {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 140px 60px 80px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 40px;
+            max-width: 55ch;
+        }
+
+        .calc-card {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            margin-bottom: 32px;
+        }
+
+        .calc-card h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .calc-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .field label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+        }
+
+        .field input {
+            padding: 12px 16px;
+            border: 2px solid #D1D5DB;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field input:focus { border-color: var(--text-black); }
+
+        .calc-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            transition: transform 0.2s;
+            white-space: nowrap;
+            height: 46px;
+        }
+
+        .calc-btn:hover { transform: scale(1.03); }
+        .calc-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .results-area {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .results-area.visible { display: block; }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .result-tile {
+            background: var(--accent-grey);
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        .result-tile .tile-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .result-tile .tile-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .result-tile .tile-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .assessment-badge {
+            display: inline-block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+        }
+
+        .assessment-badge.fair { background: var(--green-bg); color: var(--green-text); }
+        .assessment-badge.elevated { background: var(--amber-bg); color: var(--amber-text); }
+        .assessment-badge.high { background: var(--red-bg); color: var(--red-text); }
+
+        .result-description {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-black);
+            margin-bottom: 16px;
+        }
+
+        .result-note {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .cta-banner {
+            background: var(--accent-lime);
+            border-radius: 18px;
+            padding: 24px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cta-banner-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-black);
+        }
+
+        .cta-banner a {
+            display: inline-flex;
+            align-items: center;
+            background: var(--text-black);
+            color: var(--card-white);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .error-msg {
+            color: var(--red-text);
+            background: var(--red-bg);
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .error-msg.visible { display: block; }
+
+        .common-codes {
+            margin-top: 48px;
+        }
+
+        .common-codes h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .code-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .code-chip {
+            background: var(--card-white);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .code-chip:hover { transform: translateX(4px); }
+
+        .code-chip-name {
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .code-chip-code {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background: var(--accent-grey);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        @media (max-width: 768px) {
+            .page-content { padding: 100px 20px 48px; }
+            .nav-bar { left: 16px; right: 16px; top: 20px; }
+            .logo { font-size: 1.1rem; padding: 8px 14px; gap: 8px; }
+            .nav-link { font-size: 0.8rem; padding: 8px 14px; }
+            h1 { font-size: 1.8rem; }
+            .calc-card { padding: 24px 18px; border-radius: var(--radius-md); }
+            .form-row { flex-direction: column; }
+            .field { min-width: 0; }
+            .result-grid { grid-template-columns: 1fr 1fr; }
+            .result-tile .tile-value { font-size: 1.4rem; }
+            .cta-banner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <a href="/" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            BillKarma
+        </a>
+        <a href="/scan" class="nav-link">Scan My Bill</a>
+    </nav>
+
+    <div class="page-content">
+        <h1>What should this procedure cost?</h1>
+        <p class="page-subtitle">Look up Medicare rates and hospital benchmarks for any medical procedure. Enter a CPT code from your bill to see what's fair.</p>
+
+        <!-- Cost Lookup -->
+        <div class="calc-card" id="costCard">
+            <h2>Procedure Cost Lookup</h2>
+            <p class="calc-description">See what Medicare pays and what hospitals typically charge in your area.</p>
+            <form id="costForm" onsubmit="return false">
+                <div class="form-row">
+                    <div class="field">
+                        <label for="costCpt">CPT Code</label>
+                        <input type="text" id="costCpt" placeholder="e.g. 99285" maxlength="10" required>
+                    </div>
+                    <div class="field">
+                        <label for="costZip">ZIP Code (optional)</label>
+                        <input type="text" id="costZip" placeholder="e.g. 33021" maxlength="5" inputmode="numeric">
+                    </div>
+                    <button type="submit" class="calc-btn" id="costBtn">Look Up</button>
+                </div>
+            </form>
+            <div class="error-msg" id="costError"></div>
+            <div class="results-area" id="costResults">
+                <p class="result-description" id="costDesc"></p>
+                <div class="result-grid" id="costGrid"></div>
+                <p class="result-note">Medicare rates are from CMS Physician Fee Schedule and OPPS. Benchmarks are based on hospital claims data. Actual costs vary by insurance and facility.</p>
+            </div>
+        </div>
+
+        <!-- Markup Checker -->
+        <div class="calc-card" id="markupCard">
+            <h2>Bill Markup Checker</h2>
+            <p class="calc-description">Enter what you were charged to see how it compares to fair pricing.</p>
+            <form id="markupForm" onsubmit="return false">
+                <div class="form-row">
+                    <div class="field">
+                        <label for="markupCpt">CPT Code</label>
+                        <input type="text" id="markupCpt" placeholder="e.g. 71046" maxlength="10" required>
+                    </div>
+                    <div class="field">
+                        <label for="markupCharged">Amount Charged ($)</label>
+                        <input type="number" id="markupCharged" placeholder="e.g. 1200" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="field">
+                        <label for="markupZip">ZIP Code (optional)</label>
+                        <input type="text" id="markupZip" placeholder="e.g. 10001" maxlength="5" inputmode="numeric">
+                    </div>
+                    <button type="submit" class="calc-btn" id="markupBtn">Check Markup</button>
+                </div>
+            </form>
+            <div class="error-msg" id="markupError"></div>
+            <div class="results-area" id="markupResults">
+                <p class="result-description" id="markupDesc"></p>
+                <div class="result-grid" id="markupGrid"></div>
+                <div id="markupCta" style="margin-top: 16px; display: none;">
+                    <div class="cta-banner">
+                        <span class="cta-banner-text">Want a full audit of every line on your bill?</span>
+                        <a href="/scan">Upload Your Bill &rarr;</a>
+                    </div>
+                </div>
+                <p class="result-note">Markup is calculated vs. Medicare facility rate. A charge above 3x Medicare is flagged as elevated; above 5x is high.</p>
+            </div>
+        </div>
+
+        <!-- Common Procedures -->
+        <div class="common-codes">
+            <h2>Common procedures</h2>
+            <div class="code-grid">
+                <div class="code-chip" onclick="quickLookup('99285')">
+                    <span class="code-chip-name">ER Visit (Level 5)</span>
+                    <span class="code-chip-code">99285</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('71046')">
+                    <span class="code-chip-name">Chest X-Ray (2 views)</span>
+                    <span class="code-chip-code">71046</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('72148')">
+                    <span class="code-chip-name">MRI Lumbar Spine</span>
+                    <span class="code-chip-code">72148</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('74177')">
+                    <span class="code-chip-name">CT Abdomen/Pelvis</span>
+                    <span class="code-chip-code">74177</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('45380')">
+                    <span class="code-chip-name">Colonoscopy w/ Biopsy</span>
+                    <span class="code-chip-code">45380</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('27447')">
+                    <span class="code-chip-name">Total Knee Replacement</span>
+                    <span class="code-chip-code">27447</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('99214')">
+                    <span class="code-chip-name">Office Visit (Level 4)</span>
+                    <span class="code-chip-code">99214</span>
+                </div>
+                <div class="code-chip" onclick="quickLookup('85025')">
+                    <span class="code-chip-name">CBC with Differential</span>
+                    <span class="code-chip-code">85025</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function $(id) { return document.getElementById(id); }
+    function fmt(n) { return n == null ? '—' : '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+    function showError(id, msg) {
+        var el = $(id);
+        el.textContent = msg;
+        el.classList.add('visible');
+    }
+    function hideError(id) { $(id).classList.remove('visible'); }
+
+    function tile(label, value, detail) {
+        return '<div class="result-tile"><div class="tile-label">' + label + '</div><div class="tile-value">' + value + '</div>' + (detail ? '<div class="tile-detail">' + detail + '</div>' : '') + '</div>';
+    }
+
+    /* Cost Lookup */
+    $('costForm').addEventListener('submit', function() {
+        var cpt = $('costCpt').value.trim();
+        var zip = $('costZip').value.trim();
+        if (!cpt) return;
+
+        hideError('costError');
+        $('costResults').classList.remove('visible');
+        $('costBtn').disabled = true;
+        $('costBtn').textContent = 'Looking up...';
+
+        fetch('/api/calculator/cost?cpt_code=' + encodeURIComponent(cpt) + '&zip_code=' + encodeURIComponent(zip))
+            .then(function(r) { return r.json(); })
+            .then(function(json) {
+                $('costBtn').disabled = false;
+                $('costBtn').textContent = 'Look Up';
+
+                if (json.status !== 'ok') {
+                    showError('costError', json.detail || 'Something went wrong.');
+                    return;
+                }
+
+                var d = json.data;
+                if (!d.medicare_rate && !d.benchmark) {
+                    showError('costError', 'No pricing data found for CPT ' + d.cpt_code + '. Check the code and try again.');
+                    return;
+                }
+
+                $('costDesc').textContent = d.description ? d.cpt_code + ' — ' + d.description : 'CPT ' + d.cpt_code;
+
+                var html = '';
+                if (d.medicare_rate) html += tile('Medicare Physician Rate', fmt(d.medicare_rate), d.locality !== '0000000' ? 'Locality: ' + d.locality : 'National rate');
+                if (d.opps_rate) html += tile('Hospital Facility Fee (OPPS)', fmt(d.opps_rate), 'Outpatient');
+                if (d.total_medicare) html += tile('Total Medicare Allowable', fmt(d.total_medicare), 'Physician + facility');
+                if (d.benchmark) {
+                    html += tile('Median Hospital Charge', fmt(d.benchmark.median_charged), d.benchmark.sample_size ? d.benchmark.sample_size.toLocaleString() + ' claims (' + d.benchmark.region + ')' : d.benchmark.region);
+                    if (d.benchmark.p25_charged) html += tile('25th Percentile', fmt(d.benchmark.p25_charged), 'Lower end');
+                    if (d.benchmark.p75_charged) html += tile('75th Percentile', fmt(d.benchmark.p75_charged), 'Higher end');
+                }
+
+                $('costGrid').innerHTML = html;
+                $('costResults').classList.add('visible');
+            })
+            .catch(function() {
+                $('costBtn').disabled = false;
+                $('costBtn').textContent = 'Look Up';
+                showError('costError', 'Network error. Please try again.');
+            });
+    });
+
+    /* Markup Checker */
+    $('markupForm').addEventListener('submit', function() {
+        var cpt = $('markupCpt').value.trim();
+        var charged = parseFloat($('markupCharged').value);
+        var zip = $('markupZip').value.trim();
+        if (!cpt || !charged || charged <= 0) return;
+
+        hideError('markupError');
+        $('markupResults').classList.remove('visible');
+        $('markupBtn').disabled = true;
+        $('markupBtn').textContent = 'Checking...';
+
+        fetch('/api/calculator/markup?cpt_code=' + encodeURIComponent(cpt) + '&charged=' + charged + '&zip_code=' + encodeURIComponent(zip))
+            .then(function(r) { return r.json(); })
+            .then(function(json) {
+                $('markupBtn').disabled = false;
+                $('markupBtn').textContent = 'Check Markup';
+
+                if (json.status !== 'ok') {
+                    showError('markupError', json.detail || 'Something went wrong.');
+                    return;
+                }
+
+                var d = json.data;
+                if (!d.medicare && !d.benchmark) {
+                    showError('markupError', 'No pricing data found for CPT ' + d.cpt_code + '. Check the code and try again.');
+                    return;
+                }
+
+                $('markupDesc').textContent = d.description ? d.cpt_code + ' — ' + d.description : 'CPT ' + d.cpt_code;
+
+                var html = '';
+                html += tile('You Were Charged', fmt(d.charged), '');
+
+                if (d.medicare) {
+                    var badge = '<span class="assessment-badge ' + d.medicare.assessment + '">' + d.medicare.markup + 'x Medicare</span>';
+                    html += tile('Markup', badge, d.medicare.assessment === 'fair' ? 'Within normal range' : d.medicare.assessment === 'elevated' ? 'Above typical markup' : 'Significantly above fair pricing');
+                    html += tile('Medicare Rate', fmt(d.medicare.rate), d.medicare.total_medicare ? 'Total w/ facility: ' + fmt(d.medicare.total_medicare) : '');
+                    if (d.medicare.potential_savings > 0) {
+                        html += tile('Potential Savings', fmt(d.medicare.potential_savings), 'vs. 3x Medicare estimate');
+                    }
+                }
+
+                if (d.benchmark) {
+                    html += tile('Median Hospital Charge', fmt(d.benchmark.median_charged), d.benchmark.vs_median + 'x median (' + d.benchmark.region + ')');
+                }
+
+                $('markupGrid').innerHTML = html;
+                $('markupResults').classList.add('visible');
+
+                if (d.medicare && d.medicare.assessment !== 'fair') {
+                    $('markupCta').style.display = 'block';
+                } else {
+                    $('markupCta').style.display = 'none';
+                }
+            })
+            .catch(function() {
+                $('markupBtn').disabled = false;
+                $('markupBtn').textContent = 'Check Markup';
+                showError('markupError', 'Network error. Please try again.');
+            });
+    });
+
+    /* Quick lookup from common procedures */
+    function quickLookup(cpt) {
+        $('costCpt').value = cpt;
+        $('costForm').dispatchEvent(new Event('submit'));
+        $('costCard').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    </script>
+</body>
+</html>
