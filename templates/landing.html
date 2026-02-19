@@ -950,11 +950,11 @@
             .upload-icon { width: 52px; height: 52px; margin-bottom: 16px; }
             .upload-text-main { font-size: 1.1rem; }
             .upload-text-sub { font-size: 0.85rem; }
-            .metric-block { flex-direction: column; gap: 12px; margin-top: 24px; }
-            .metric { min-width: 0; padding: 16px; }
+            .metric-block { flex-direction: row; gap: 12px; margin-top: 24px; }
+            .metric { min-width: 0; padding: 16px; flex: 1; }
             .metric-val { font-size: 2rem; }
             .trust-bar { padding: 16px; }
-            .trust-bar-inner { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .trust-bar-inner { flex-direction: column; gap: 10px; align-items: flex-start; }
             .bill-line { grid-template-columns: 1fr auto; gap: 4px; padding: 10px 12px; }
             .bill-line-code { display: none; }
             .bill-line-amount { display: none; }
@@ -962,18 +962,23 @@
             .callout-inner { padding: 24px; border-radius: var(--radius-lg); }
             .callout-text { font-size: 1.05rem; }
             .how-it-works { padding: 0 16px; margin-bottom: 32px; }
+            .how-card { padding: 24px 20px; }
+            .how-card-headline { font-size: 1.25rem; }
             .section-title { font-size: 1.3rem; }
-            .price-gap-section { padding: 0 16px; }
-            .price-bar-row { padding: 16px; }
+
+            /* Hide on mobile: too dense / duplicate */
+            .price-gap-section { display: none; }
+            .footer-cta-section { display: none; }
+
+            /* Social proof: show only first card */
             .social-proof-section { padding: 0 16px; }
             .testimonial-card { padding: 24px; }
+            .testimonial-grid .testimonial-card:nth-child(n+2) { display: none; }
+
             .lead-magnet-section { padding: 0 16px; }
             .lead-magnet-card { padding: 28px; border-radius: var(--radius-lg); }
             .lead-magnet-title { font-size: 1.4rem; }
             .lead-magnet-form { flex-direction: column; }
-            .footer-cta-section { padding: 48px 16px 32px; }
-            .footer-cta-title { font-size: 1.6rem; }
-            .primary-cta--large { font-size: 0.95rem; padding: 14px 24px; }
             .site-footer { flex-direction: column; gap: 8px; text-align: center; padding: 24px 16px; }
         }
     </style>
