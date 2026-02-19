@@ -17,16 +17,16 @@
                 extend: {
                     colors: {
                         accent: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            200: '#99f6e4',
-                            300: '#5eead4',
-                            400: '#2dd4bf',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            700: '#0f766e',
-                            800: '#115e59',
-                            900: '#134e4a',
+                            50:  '#F7FEE0',
+                            100: '#F0FCC4',
+                            200: '#E4F88C',
+                            300: '#D8F568',
+                            400: '#D2F635',
+                            500: '#D2F635',
+                            600: '#2D2D2D',
+                            700: '#1A1A1A',
+                            800: '#333333',
+                            900: '#111111',
                         }
                     },
                     fontFamily: {
@@ -39,37 +39,161 @@
     </script>
     <link rel="stylesheet" href="/static/css/app.css"/>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
+    <style>
+        /* === BillKarma Internal Pages — Unified Design System === */
+        :root {
+            --bk-canvas:    #E0E2E5;
+            --bk-white:     #FFFFFF;
+            --bk-black:     #1A1A1A;
+            --bk-lime:      #D2F635;
+            --bk-secondary: #6B7280;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bk-canvas) !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Print: restore white background */
+        @media print { body { background: #fff !important; } }
+
+        /* === NAV === */
+        .bk-nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--bk-canvas);
+        }
+
+        .bk-logo {
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bk-white);
+            padding: 10px 20px;
+            border-radius: 100px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--bk-black);
+        }
+
+        .bk-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bk-nav-link {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--bk-black);
+            text-decoration: none;
+            padding: 9px 18px;
+            border-radius: 100px;
+            transition: background 0.15s;
+        }
+
+        .bk-nav-link:hover {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--bk-black);
+        }
+
+        .bk-nav-cta {
+            font-size: 0.875rem;
+            font-weight: 700;
+            background: var(--bk-black);
+            color: var(--bk-white);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 100px;
+            transition: transform 0.15s;
+        }
+
+        .bk-nav-cta:hover {
+            transform: scale(1.04);
+            color: var(--bk-white);
+        }
+
+        /* === CARDS — rounder to match landing === */
+        .rounded-lg { border-radius: 20px !important; }
+        .rounded-md { border-radius: 14px !important; }
+
+        /* === PRIMARY BUTTONS — pill shape === */
+        button.bg-accent-700,
+        a.bg-accent-700,
+        button.bg-accent-800,
+        a.bg-accent-800 {
+            border-radius: 100px !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.01em;
+        }
+
+        /* === HEADINGS — tighter tracking === */
+        h1 { letter-spacing: -0.025em; }
+        h2 { letter-spacing: -0.02em; }
+
+        /* === FOOTER === */
+        .bk-footer {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 24px 40px;
+            font-size: 0.78rem;
+            color: var(--bk-secondary);
+            font-weight: 500;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            margin-top: auto;
+        }
+
+        .bk-footer a {
+            color: var(--bk-secondary);
+            text-decoration: underline;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 640px) {
+            .bk-nav { padding: 12px 16px; }
+            .bk-logo { font-size: 1rem; padding: 8px 14px; gap: 8px; }
+            .bk-nav-link { display: none; }
+            .bk-footer { flex-direction: column; align-items: center; gap: 6px; padding: 20px 16px; }
+        }
+    </style>
     {% block head %}{% endblock %}
 </head>
-<body class="bg-white text-gray-900 min-h-screen flex flex-col antialiased">
+<body class="text-gray-900 min-h-screen flex flex-col antialiased">
 
-    <header class="border-b border-gray-100">
-        <div class="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
-            <a href="/" class="text-lg font-semibold tracking-tight text-gray-900 no-underline">
+    <header>
+        <nav class="bk-nav">
+            <a href="/" class="bk-logo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
                 BillKarma
             </a>
-            <div class="flex items-center gap-4">
-                <a href="/hospitals/"
-                   class="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
-                    Hospitals
-                </a>
-                <a href="/scan"
-                   class="text-sm font-medium text-accent-700 hover:text-accent-800 transition-colors">
-                    Scan a bill
-                </a>
+            <div class="bk-nav-links">
+                <a href="/hospitals/" class="bk-nav-link">Hospitals</a>
+                <a href="/scan" class="bk-nav-cta">Scan a Bill</a>
             </div>
-        </div>
+        </nav>
     </header>
 
     <main class="flex-1">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="border-t border-gray-100 mt-auto">
-        <div class="max-w-3xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
-            <span>&copy; 2026 BillKarma. Not medical or legal advice.</span>
-            <span>Data from <a href="https://www.cms.gov" target="_blank" rel="noopener" class="underline hover:text-gray-600">CMS.gov</a></span>
-        </div>
+    <footer class="bk-footer">
+        <span>&copy; 2026 BillKarma. Not medical or legal advice.</span>
+        <span>Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
     </footer>
 
     <script src="/static/js/app.js"></script>
