@@ -59,9 +59,9 @@ register("mental-health-billing-and-parity-rights", {
 <p>Parity applies to three types of coverage limits:</p>
 
 <ul>
-    <li><strong>Quantitative treatment limits (QTLs)</strong> — Numerical limits like visit caps, day limits for inpatient stays, or dollar maximums. If your plan allows unlimited physical therapy visits, it cannot cap mental health therapy visits.</li>
-    <li><strong>Non-quantitative treatment limits (NQTLs)</strong> — Non-numerical restrictions like prior authorization requirements, step therapy protocols (requiring cheaper treatments first), and fail-first policies. If prior auth isn't required for a cardiologist visit, it generally can't be required for a psychiatrist visit.</li>
-    <li><strong>Financial requirements</strong> — Copays, coinsurance, and deductibles. Mental health cost-sharing cannot be higher than for comparable medical services.</li>
+    <li><strong>Quantitative treatment limits (QTLs)</strong> — Numerical limits like visit caps, day limits for inpatient stays, or dollar maximums. <em>Plain English:</em> If your plan lets you see a physical therapist 50 times a year, it cannot cap your therapist visits at 30.</li>
+    <li><strong>Non-quantitative treatment limits (NQTLs)</strong> — Non-numerical restrictions like prior authorization requirements, step therapy protocols (requiring cheaper treatments first), and fail-first policies. <em>Plain English:</em> If you can walk into a cardiologist&rsquo;s office without getting permission from your insurer first, your insurer can&rsquo;t require you to get permission before seeing a psychiatrist.</li>
+    <li><strong>Financial requirements</strong> — Copays, coinsurance, and deductibles. <em>Plain English:</em> If your copay for a primary care visit is $30, your copay for a therapy session can&rsquo;t be $60.</li>
 </ul>
 
 <div class="key-takeaway">
@@ -86,6 +86,10 @@ register("mental-health-billing-and-parity-rights", {
         <tr><td>Medical necessity criteria</td><td>Insurer applies more stringent "medical necessity" standards to mental health than to medical care</td></tr>
     </tbody>
 </table>
+
+<div class="key-takeaway">
+    <strong>The simplest test for a parity violation:</strong> Take any restriction your insurer places on your mental health care — a visit limit, a prior auth requirement, a copay amount — and ask: &ldquo;Does this same restriction apply to an equivalent medical/surgical service?&rdquo; If the answer is no, you may have a parity violation. Write it down. You&rsquo;ll need the specific comparison when filing a complaint.
+</div>
 
 <div class="case-study">
     <h3>Example: Visit cap parity violation — $3,200 in denied claims reversed</h3>
@@ -142,8 +146,8 @@ register("mental-health-billing-and-parity-rights", {
     <li><strong>Get the denial in writing.</strong> Your insurer must provide a written denial with the specific reason and the clinical criteria used to make the decision. Request a copy of the "medical necessity criteria" they applied.</li>
     <li><strong>Obtain a letter of medical necessity.</strong> Your therapist, psychiatrist, or prescribing physician documents why the treatment is clinically necessary—the diagnosis, treatment goals, and why this specific type and frequency of care is appropriate.</li>
     <li><strong>File the internal appeal.</strong> Submit the letter of medical necessity plus any supporting clinical documentation (treatment notes, assessment results) to the insurer's appeals department. Most plans allow 60–180 days to file. Do not miss this deadline.</li>
-    <li><strong>Request the insurer's criteria.</strong> Ask them to provide the specific clinical criteria they use to determine medical necessity for mental health. Compare this against the criteria they use for medical/surgical decisions. Divergence is evidence of a parity violation.</li>
-    <li><strong>Request external review if the internal appeal is denied.</strong> Under the ACA, you have the right to an independent external review by a third party. The external reviewer's decision is binding on the insurer. Mental health denials are frequently overturned at this stage.</li>
+    <li><strong>Request the insurer's criteria.</strong> Ask them to provide the specific clinical criteria they use to determine medical necessity for mental health. Compare this against the criteria they use for medical/surgical decisions. Divergence is evidence of a parity violation. <em>Example: if your insurer requires &ldquo;documented treatment progress within 6 sessions&rdquo; for therapy but has no equivalent progress requirement for physical therapy, that&rsquo;s a red flag.</em></li>
+    <li><strong>Request external review if the internal appeal is denied.</strong> Under the ACA, you have the right to an independent external review by a third party. The external reviewer&rsquo;s decision is binding on the insurer — meaning if they rule in your favor, the insurer <em>must</em> pay. Mental health denials are frequently overturned at this stage.</li>
 </ol>
 
 <div class="case-study">

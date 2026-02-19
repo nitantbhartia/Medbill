@@ -15,7 +15,7 @@ register("how-to-fight-an-ambulance-bill", {
         },
         {
             "q": "Does the No Surprises Act cover ambulance bills?",
-            "a": "Partially. As of 2025, the No Surprises Act's balance billing protections apply to ground ambulance rides in most states. Air ambulance protections have been in place since 2022 under separate provisions. However, ground ambulance protection has a state opt-out provision, so coverage varies. Check your state insurance commissioner's website for specifics.",
+            "a": "Only partially. Air ambulance has been fully protected since January 2022 — providers cannot balance bill you beyond your in-network cost-sharing. However, the original NSA explicitly excluded ground ambulance from these protections. Some states have since passed their own ground ambulance balance billing laws, but many have not. If you received a ground ambulance bill, do not assume it is covered by the NSA. Check your state insurance commissioner's website for your state's specific rules.",
         },
         {
             "q": "Can I negotiate an ambulance bill?",
@@ -133,17 +133,26 @@ register("how-to-fight-an-ambulance-bill", {
 
 <h2 id="no-surprises-act">4. No Surprises Act protections</h2>
 
-<p>The No Surprises Act (NSA), effective January 2022, banned surprise billing for air ambulance services. As of 2025, ground ambulance protections have been phased in—though implementation varies by state.</p>
+<div class="key-takeaway">
+    <strong>Critical distinction: air ambulance is fully protected. Ground ambulance is not.</strong> The No Surprises Act banned balance billing for air ambulance in 2022 — but it explicitly left ground ambulance out of the original law. Ground ambulance protections are being phased in through a separate advisory committee process and depend on your state. Do not assume your ground ambulance bill is covered by the NSA.
+</div>
 
-<p>Under the current framework, if a ground ambulance service operates in a state that has adopted the federal protections:</p>
+<h3>Air ambulance (protected since January 2022)</h3>
+<p>If you received an air ambulance bill after January 1, 2022, and the flight was medically necessary, the provider cannot balance bill you beyond your in-network out-of-pocket cost. Any amount above your cost-sharing is the insurer's responsibility to negotiate. This applies regardless of whether the air ambulance provider is in-network.</p>
 
+<h3>Ground ambulance (partial, state-dependent)</h3>
+<p>The original NSA carved out ground ambulance from balance billing protections entirely. Congress directed CMS to establish a Ground Ambulance and Patient Billing Advisory Committee (GAPB) to recommend future protections. As of 2025, some states have adopted their own ground ambulance balance billing laws, while others have not.</p>
+
+<p>In states that <strong>have</strong> adopted ground ambulance protections:</p>
 <ul>
     <li>You cannot be billed more than your in-network cost-sharing amount</li>
-    <li>The ambulance company must bill your insurer directly and accept the insurer's payment</li>
+    <li>The ambulance company must bill your insurer directly and accept the insurer&rsquo;s payment</li>
     <li>Balance billing the patient for the remainder is prohibited</li>
 </ul>
 
-<p>If you received an air ambulance bill after January 1, 2022, and the flight was medically necessary, the provider cannot balance bill you beyond your in-network out-of-pocket cost. Any amount above your cost-sharing is the insurer's responsibility to negotiate. Learn more in our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a>.</p>
+<p>In states that <strong>have not</strong> adopted protections, you can still be balance billed the full difference between the ambulance company&rsquo;s charge and what your insurer pays. This is why negotiation (Section 6 below) is critical.</p>
+
+<p>Check your state&rsquo;s status at your state insurance commissioner&rsquo;s website, or see our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a> for details.</p>
 
 <h2 id="appeal-insurance-denial">5. How to appeal an insurance denial</h2>
 
@@ -215,7 +224,7 @@ register("how-to-fight-an-ambulance-bill", {
 
     <div class="faq-item">
         <h3>Does the No Surprises Act cover ambulance bills?</h3>
-        <p>Air ambulance has been protected since January 2022—providers cannot balance bill you beyond your in-network cost-sharing. Ground ambulance protections have been phased in since 2025 but vary by state. Check your state insurance commissioner's website for current rules.</p>
+        <p>Air ambulance has been fully protected since January 2022 — providers cannot balance bill beyond your in-network cost-sharing. However, the original NSA explicitly <em>excluded</em> ground ambulance. Some states have since passed their own ground ambulance balance billing laws, but many have not. Do not assume your ground ambulance bill is covered. Check your state insurance commissioner&rsquo;s website for current rules.</p>
     </div>
 
     <div class="faq-item">

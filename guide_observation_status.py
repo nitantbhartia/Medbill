@@ -179,6 +179,13 @@ register("observation-status-billing", {
     <p><strong>Lesson:</strong> Unexpected medication bills after an apparent hospital stay are often a sign of observation status. Request your records and check your MSN before paying.</p>
 </div>
 
+<div class="case-study">
+    <h3>Case Study 3: Appeal Denied — What Went Wrong ($4,200 Owed)</h3>
+    <p>A 71-year-old Medicare patient was on observation status for two nights after a transient ischemic attack (TIA). His family filed an appeal after discharge, arguing that TIA warranted inpatient admission. The MAC denied the redetermination, and the QIC upheld the denial.</p>
+    <p><strong>Why the appeal failed:</strong> The physician&rsquo;s notes described the patient as &ldquo;stable for monitoring&rdquo; and documented that symptoms resolved within hours of arrival. The notes did not state an expectation that the patient would require care crossing two midnights — the threshold Medicare uses to justify inpatient admission. The appeal relied on the diagnosis alone (TIA) rather than on clinical documentation of severity.</p>
+    <p><strong>Lesson:</strong> A serious diagnosis is not enough to win an appeal. Medicare looks for physician documentation that the patient&rsquo;s <em>specific condition and clinical trajectory</em> required inpatient-level care spanning two midnights. If you suspect observation misclassification, ask your physician to document severity and expected length of stay in the clinical notes <em>before</em> discharge — not after.</p>
+</div>
+
 <h2 id="private-insurance">7. Private insurance and observation status</h2>
 
 <p>For patients with private insurance, the impact of observation status depends on your specific plan design. Most private plans do not use the same inpatient/outpatient Medicare framework, so the effect is less uniform — but it can still be significant.</p>

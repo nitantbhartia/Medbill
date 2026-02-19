@@ -141,7 +141,7 @@ register("what-are-cpt-codes", {
 <p>A phantom procedure is a charge for a service that was never performed. This is the most serious billing error because it is straightforward fraud. It can happen due to data entry errors (wrong patient record, wrong date), but it also occurs intentionally. Verify every CPT code on your bill against your own memory of what happened and against your medical records.</p>
 
 <div class="key-takeaway">
-    <strong>Studies estimate 80% of medical bills contain errors.</strong> The majority are upcoding and unbundling — not phantom procedures. But all four error types are worth checking for, because each one means you or your insurer is paying more than you should.
+    <strong>Billing errors are common enough to always check.</strong> A 2016 NerdWallet study found that 49% of Medicare claims contained billing errors, and the Medical Billing Advocates of America estimates the rate is even higher for hospital bills. The majority are upcoding and unbundling — not phantom procedures. But all four error types are worth checking for, because each one means you or your insurer is paying more than you should.
 </div>
 
 <h2 id="audit-your-bill">5. How to audit your bill with CPT codes</h2>

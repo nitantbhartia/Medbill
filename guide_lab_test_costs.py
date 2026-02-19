@@ -54,14 +54,14 @@ register("why-lab-test-bills-are-so-high", {
 
 <h2 id="how-lab-billing-works">1. How hospital lab billing works</h2>
 
-<p>When your doctor orders blood work at a hospital, the sample typically goes to the hospital's Clinical Laboratory. The lab bills using CPT codes (5-digit procedure codes) at rates pulled from the hospital's Chargemaster—their internal master price list.</p>
+<p>Your doctor orders a &ldquo;basic metabolic panel&rdquo; during an annual checkup. A tech draws a vial of blood. A machine runs eight chemical measurements in about 90 seconds. The reagents and labor cost the lab roughly $3&ndash;$5. Then the billing department enters the charge: $330.</p>
 
-<p>Chargemaster prices are not negotiated, not evidence-based, and not regulated. Hospitals set them unilaterally and use them as starting points for negotiations with insurers. Insured patients pay the negotiated rate (usually 40–70% less). Uninsured patients are often billed the full Chargemaster price.</p>
+<p>This is not an exaggeration &mdash; it&rsquo;s the system working as designed. Hospital labs bill from the <strong>Chargemaster</strong>, an internal price list that is not negotiated, not evidence-based, and not regulated. Hospitals set these prices unilaterally. Insurers negotiate them down 40&ndash;70%. Uninsured patients get the full sticker price.</p>
 
 <p>The result: the same CBC test that costs Medicare $11 might be billed at $180 at a hospital, contracted down to $80 by an insurer, and still charged at $180 to an uninsured patient.</p>
 
 <div class="key-takeaway">
-    <strong>Lab tests are where hospital markup is most extreme.</strong> While imaging and ER visits also carry large markups, lab test markups are uniquely high because the actual cost of running a blood test is very low—often under $5 in reagents and labor. The markup is almost entirely margin.
+    <strong>Lab tests have the highest markup ratio in all of hospital billing.</strong> Imaging and ER visits carry large markups too, but the gap between cost and price is widest in the lab. The actual cost of running a blood test is under $5 in reagents and labor. A 23x markup on a $14 Medicare rate means you&rsquo;re paying for hospital overhead, not chemistry.
 </div>
 
 <h2 id="common-cpt-codes">2. Common lab CPT codes and Medicare rates</h2>
@@ -145,6 +145,15 @@ register("why-lab-test-bills-are-so-high", {
     <li><strong>Unbundling</strong> — Component tests billed separately instead of using the comprehensive panel code. Covered in detail in the next section.</li>
     <li><strong>Tests not ordered</strong> — Compare your bill against your doctor's lab order. Any test not on the order shouldn't be on your bill.</li>
     <li><strong>Wrong date of service</strong> — Data entry errors that can delay insurance payment and eventually cause you to be billed directly.</li>
+</ul>
+
+<h3>Accidental vs. intentional errors</h3>
+
+<p>Lab billing errors fall into two camps, and it matters which one you&rsquo;re facing:</p>
+
+<ul>
+    <li><strong>Accidental errors</strong> are by far the most common. High-volume hospital labs process thousands of orders daily. Duplicate charges happen when orders are re-entered after a system timeout. Wrong-patient charges happen during shift changes. These errors are usually corrected quickly once flagged &mdash; a single phone call to billing often resolves them.</li>
+    <li><strong>Systemic unbundling</strong> is different. When a hospital&rsquo;s billing system is configured to automatically bill panel components as individual codes &mdash; generating 5&ndash;10x more revenue per panel &mdash; that&rsquo;s not a typo. It&rsquo;s a billing configuration that affects every patient. If unbundling appears on your bill, it likely appears on thousands of others. These require a formal written dispute citing NCCI rules, and if the hospital doesn&rsquo;t correct, a complaint to CMS or your state AG.</li>
 </ul>
 
 <h2 id="unbundling">5. Unbundling: the most common lab billing violation</h2>
