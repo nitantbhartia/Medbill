@@ -1,6 +1,8 @@
+import collections
 import json
 import logging
 import re
+import time
 from datetime import datetime
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
@@ -27,6 +29,21 @@ from ocr_benchmark import run_manifest
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
+_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+
+
+def _check_rate_limit(ip: str) -> bool:
+    """Return True if the request is allowed. Prunes expired timestamps in-place."""
+    now = time.monotonic()
+    window = config.RATE_LIMIT_WINDOW_SECONDS
+    bucket = _rate_buckets[ip]
+    _rate_buckets[ip] = [t for t in bucket if now - t < window]
+    if len(_rate_buckets[ip]) >= config.RATE_LIMIT_REQUESTS:
+        return False
+    _rate_buckets[ip].append(now)
+    return True
+
+
 ALLOWED_MIME_TYPES = {
     "image/jpeg", "image/png", "image/gif", "image/webp",
     "image/heic", "image/heif", "image/tiff", "image/bmp",
@@ -52,6 +69,14 @@ async def scan_bill(
     """Scan one or more bill images, extract line items, and analyze."""
     if not images:
         raise HTTPException(400, "No files uploaded")
+
+    # Rate limit by client IP
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(
+            429,
+            f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour per IP.",
+        )
 
     # Validate ZIP code format
     zip_code = zip_code.strip()
@@ -450,10 +475,13 @@ async def negotiation_copilot(negotiation_id: int):
 # --- Dispute outcome tracking ---
 
 
+VALID_OUTCOMES = {"pending", "reduced", "forgiven", "no_change", "sent_to_collections"}
+
+
 @router.post("/dispute-outcome")
 async def record_dispute_outcome(
     bill_id: int = Form(...),
-    user_id: int = Form(...),
+    user_id: int = Form(None),
     called_billing: bool = Form(False),
     outcome: str = Form("pending"),
     final_patient_owes: float = Form(0),
@@ -461,6 +489,11 @@ async def record_dispute_outcome(
     share_publicly: bool = Form(False),
 ):
     """Record what happened after the user disputed their bill."""
+    if outcome not in VALID_OUTCOMES:
+        raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
+    if final_patient_owes < 0:
+        raise HTTPException(400, "final_patient_owes cannot be negative")
+
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
         if not bill:
@@ -487,6 +520,17 @@ async def record_dispute_outcome(
             ),
         )
 
+    # New outcome data invalidates adaptive thresholds and stats caches
+    analyzer._invalidate_adaptive_cache()
+
+    log_audit(
+        action="record_dispute_outcome",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        user_id=user_id,
+        bill_id=bill_id,
+        metadata={"outcome": outcome, "actual_savings": actual_savings},
+    )
     return {"status": "ok", "data": {"actual_savings": actual_savings}}
 
 
