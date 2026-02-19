@@ -51,3 +51,8 @@ import guide_surgery_costs
 import guide_charity_care
 import guide_appeal_denial
 import guide_medical_debt_collections
+import guide_ambulance_bills
+import guide_lab_test_costs
+import guide_mental_health_billing
+import guide_observation_status
+import guide_cpt_codes
