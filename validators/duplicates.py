@@ -26,6 +26,9 @@ def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
         if match_index < first_index:
             return None  # already reported from the earlier item
 
+    description = item.get("description") or item.get("cpt_code") or "this service"
+    date_str = item.get("date_of_service") or "the same date"
+
     return {
         "type": "duplicate_charge",
         "severity": "high",
@@ -33,8 +36,8 @@ def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
         "duplicate_of": matches,
         "potential_savings": item["charged_amount"],
         "message": (
-            f"'{item['description']}' appears to be billed {len(matches) + 1} times "
-            f"on {item['date_of_service']}. "
+            f"'{description}' appears to be billed {len(matches) + 1} times "
+            f"on {date_str}. "
             f"This could save you ${item['charged_amount']:,.2f}."
         ),
     }

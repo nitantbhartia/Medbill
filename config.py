@@ -49,6 +49,7 @@ STATS_CACHE_TTL_SECONDS = 60
 # Extraction validation
 DOUBLE_EXTRACTION_THRESHOLD = 5000  # double-extract bills over $5k
 MAX_REASONABLE_CHARGE = 500000
+MAX_UPLOAD_SIZE_MB = int(os.getenv("MAX_UPLOAD_SIZE_MB", "20"))  # max per-file upload size
 
 # OCR pipeline rollout
 OCR_PREPROCESS_ENABLED = os.getenv("OCR_PREPROCESS_ENABLED", "true").lower() == "true"
