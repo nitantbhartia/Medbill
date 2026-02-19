@@ -341,8 +341,11 @@ async def hospital_sitemap():
 
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
+    from guides import get_guide_slugs
+
     base = config.APP_URL.rstrip("/")
-    paths = ["/", *get_hospital_sitemap_paths()]
+    guide_paths = [f"/guides/{slug}" for slug in get_guide_slugs()]
+    paths = ["/", "/guides/", "/calculator", *guide_paths, *get_hospital_sitemap_paths()]
     urlset = "".join(
         f"<url><loc>{base}{path}</loc></url>"
         for path in paths
