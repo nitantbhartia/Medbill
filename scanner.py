@@ -27,12 +27,18 @@ def _parse_json_response(text: str) -> dict:
 
     try:
         data = json.loads(cleaned)
+        return _normalize_structure(data)
     except json.JSONDecodeError:
-        # Remove trailing commas before } or ]
+        pass
+
+    # Remove trailing commas before } or ] and retry
+    try:
         cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
         data = json.loads(cleaned)
-
-    return _normalize_structure(data)
+        return _normalize_structure(data)
+    except json.JSONDecodeError as e:
+        log.error("Failed to parse Gemini JSON response after cleanup: %s. Raw text: %.200s", e, text)
+        raise ValueError(f"Gemini returned unparseable JSON: {e}") from e
 
 
 def _normalize_structure(data) -> dict:

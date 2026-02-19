@@ -1,6 +1,8 @@
 import json
 import logging
+import time
 
+import config
 from db import get_db
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
 from validators.duplicates import find_duplicates
@@ -489,6 +491,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
 def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict, zip_code: str = "") -> int:
     """Persist a scanned bill, its line items, and findings to the database."""
+    global _stats_cache_ts
+    _stats_cache_ts = 0.0  # invalidate stats cache so next call reflects new data
+
     with get_db() as db:
         cursor = db.execute(
             "INSERT INTO bills (user_id, provider_name, provider_address, bill_date, zip_code, "
@@ -535,7 +540,6 @@ def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict,
                     item.get("confidence", "high"),
                 ),
             )
-            line_item_id = cursor.lastrowid
 
         for finding in analysis.get("findings", []):
             db.execute(
@@ -613,8 +617,17 @@ def get_bill_results(bill_id: int) -> dict | None:
     }
 
 
+_stats_cache: dict = {}
+_stats_cache_ts: float = 0.0
+
+
 def get_stats() -> dict:
-    """Get aggregate stats for the live counter."""
+    """Get aggregate stats for the live counter, cached for STATS_CACHE_TTL_SECONDS."""
+    global _stats_cache, _stats_cache_ts
+    now = time.monotonic()
+    if _stats_cache and (now - _stats_cache_ts) < config.STATS_CACHE_TTL_SECONDS:
+        return _stats_cache
+
     with get_db() as db:
         row = db.execute(
             "SELECT COUNT(*) as bills_scanned, "
@@ -624,7 +637,9 @@ def get_stats() -> dict:
             "(SELECT COUNT(*) FROM dispute_outcomes) as dispute_outcomes_count "
             "FROM bills WHERE total_findings > 0"
         ).fetchone()
-    return dict(row)
+    _stats_cache = dict(row)
+    _stats_cache_ts = now
+    return _stats_cache
 
 
 def get_effectiveness_metrics() -> dict:

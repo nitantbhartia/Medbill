@@ -152,16 +152,18 @@ def check_pricing(
 
     patient_resp = item.get("patient_responsibility")
 
+    description = item.get("description") or "this service"
+
     if patient_resp is not None:
         message = (
-            f"You owe ${patient_resp:,.2f} for {item['description']}, "
+            f"You owe ${patient_resp:,.2f} for {description}, "
             f"but the total charge of ${item['charged_amount']:,.2f} is "
             f"{markup:.1f}x what Medicare pays (${medicare_rate:,.2f}). "
             f"The overcharge may be inflating your share."
         )
     else:
         message = (
-            f"You were charged ${item['charged_amount']:,.2f} for {item['description']}. "
+            f"You were charged ${item['charged_amount']:,.2f} for {description}. "
             f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
             f"That's a {markup:.1f}x markup."
         )

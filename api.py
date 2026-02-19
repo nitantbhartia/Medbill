@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from datetime import datetime
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
@@ -25,6 +26,13 @@ from ocr_benchmark import run_manifest
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
+
+ALLOWED_MIME_TYPES = {
+    "image/jpeg", "image/png", "image/gif", "image/webp",
+    "image/heic", "image/heif", "image/tiff", "image/bmp",
+    "application/pdf",
+}
+
 CLAIM_TRANSITIONS = {
     "drafted": {"sent", "denied"},
     "sent": {"acknowledged", "denied"},
@@ -44,6 +52,27 @@ async def scan_bill(
     """Scan one or more bill images, extract line items, and analyze."""
     if not images:
         raise HTTPException(400, "No files uploaded")
+
+    # Validate ZIP code format
+    zip_code = zip_code.strip()
+    if not re.fullmatch(r"\d{5}", zip_code):
+        raise HTTPException(400, "zip_code must be a 5-digit US ZIP code")
+
+    # Validate each uploaded file
+    max_bytes = config.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+    all_uploads = list(images) + (list(eob_images) if eob_images else [])
+    for upload in all_uploads:
+        if not upload or not upload.filename:
+            continue
+        mime = upload.content_type or ""
+        if mime not in ALLOWED_MIME_TYPES:
+            raise HTTPException(400, f"Unsupported file type '{mime}'. Upload images or PDFs only.")
+        # Peek at size without consuming the stream
+        data = await upload.read()
+        if len(data) > max_bytes:
+            raise HTTPException(400, f"File '{upload.filename}' exceeds {config.MAX_UPLOAD_SIZE_MB} MB limit.")
+        # Rewind for later reading
+        await upload.seek(0)
 
     # Get or create user
     user_id = None
@@ -106,12 +135,17 @@ async def scan_bill(
         log.error("Analysis/save failed: %s", e, exc_info=True)
         raise HTTPException(500, f"Failed to analyze bill: {e}")
 
+    extraction_meta = extracted.get("_extraction_meta", {})
     return {
         "status": "ok",
         "data": {
             "bill_id": bill_id,
             "extracted": extracted,
             "analysis": analysis,
+            "extraction_quality": {
+                "score": extraction_meta.get("quality_score"),
+                "variant": extraction_meta.get("selected_variant"),
+            },
         },
     }
 
@@ -744,7 +778,10 @@ async def confirm_items(
     confirmed_items: str = Form(...),
 ):
     """User confirms/edits extracted line items before analysis."""
-    items = json.loads(confirmed_items)
+    try:
+        items = json.loads(confirmed_items)
+    except json.JSONDecodeError as e:
+        raise HTTPException(400, f"Invalid JSON in confirmed_items: {e}")
 
     with get_db() as db:
         # Delete old line items and re-insert confirmed ones
