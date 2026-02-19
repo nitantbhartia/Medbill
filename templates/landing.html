@@ -570,14 +570,14 @@
         }
 
         .how-card {
-            background: var(--text-black);
-            color: var(--card-white);
+            background: var(--card-white);
             border-radius: var(--radius-md);
             padding: 36px 32px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
             gap: 16px;
+            border-top: 3px solid var(--accent-lime);
         }
 
         .how-card-number {
@@ -598,14 +598,14 @@
             font-weight: 800;
             letter-spacing: -0.02em;
             line-height: 1.15;
-            color: var(--card-white);
+            color: var(--text-black);
         }
 
         .how-card-detail {
             font-size: 0.95rem;
             font-weight: 500;
             line-height: 1.55;
-            color: #9CA3AF;
+            color: var(--text-secondary);
         }
 
         /* === PRICE GAP === */
@@ -1003,7 +1003,7 @@
     <!-- HERO -->
     <main class="layout-grid">
         <section class="col-narrative">
-            <span class="label-micro">AI-Powered Bill Audit</span>
+            <span class="label-micro">Hospitals markup avg 8x Medicare</span>
             <h1>Your Hospital Bill Has Errors. We Find Them.</h1>
             <p class="hero-sub">Upload your bill. We check every charge against federal rates in 30 seconds.</p>
             <div class="cta-row">
@@ -1234,39 +1234,16 @@
         <p class="price-gap-source">Source: CMS Physician Fee Schedule 2026 &amp; hospital Chargemaster filings</p>
     </section>
 
-    <!-- SOCIAL PROOF -->
-    <section class="social-proof-section">
-        <h2 class="section-title">What BillKarma finds on real bills</h2>
-        <p class="section-subtitle">Common errors flagged in our audit engine</p>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <span class="testimonial-amount">$2,840</span>
-                <span class="testimonial-context">surgery bill overcharge</span>
-                <p class="testimonial-quote">Double-billed anesthesia consult on the same date of service. CPT 00840 appeared twice — a textbook duplicate charge billing managers often miss.</p>
-            </div>
-            <div class="testimonial-card">
-                <span class="testimonial-amount">$1,190</span>
-                <span class="testimonial-context">ER visit upcoding</span>
-                <p class="testimonial-quote">Visit coded as Level 5 (99285) with documentation supporting only Level 3 (99283). The difference: $1,190 in charges above the appropriate rate.</p>
-            </div>
-            <div class="testimonial-card">
-                <span class="testimonial-amount">$640</span>
-                <span class="testimonial-context">lab markup flagged</span>
-                <p class="testimonial-quote">Basic Metabolic Panel (80048) billed at $487. Medicare's reimbursement rate: $14. The 34x markup is legal — but disputable with the right documentation.</p>
-            </div>
-        </div>
-    </section>
-
     <!-- LEAD MAGNET -->
     <section class="lead-magnet-section">
         <p class="lead-magnet-bridge">Not ready to upload yet?</p>
         <div class="lead-magnet-card">
-            <span class="label-micro">Free Guide</span>
-            <h2 class="lead-magnet-title">Download the 2026 Hospital Financial Aid Guide</h2>
-            <p class="lead-magnet-copy">Every major hospital has a financial assistance program they don't advertise. Learn how to apply and what you qualify for.</p>
+            <span class="label-micro">Free Script</span>
+            <h2 class="lead-magnet-title">The Dispute Call Script Billing Managers Can't Ignore</h2>
+            <p class="lead-magnet-copy">A word-for-word phone script for challenging duplicate charges, upcoding, and inflated markups. Cite the exact federal codes. Get it before you call.</p>
             <form class="lead-magnet-form" id="leadForm">
                 <input type="email" placeholder="your@email.com" class="lead-magnet-input" required>
-                <button type="submit" class="primary-cta">Send Me the Guide</button>
+                <button type="submit" class="primary-cta">Send Me the Script</button>
             </form>
         </div>
     </section>
