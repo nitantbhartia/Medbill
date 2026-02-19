@@ -145,11 +145,25 @@ def _get_outcome_precision_by_type() -> dict:
     return precision
 
 
+_adaptive_cache: dict = {}
+_adaptive_cache_ts: float = 0.0
+
+
+def _invalidate_adaptive_cache() -> None:
+    global _adaptive_cache_ts
+    _adaptive_cache_ts = 0.0
+
+
 def _get_adaptive_thresholds() -> dict:
     """
-    Outcome loop v1:
-    Raise trigger thresholds slightly when precision is weak.
+    Outcome loop v1: raise trigger thresholds slightly when precision is weak.
+    Cached for ADAPTIVE_THRESHOLDS_CACHE_TTL_SECONDS to avoid a DB query per analysis.
     """
+    global _adaptive_cache, _adaptive_cache_ts
+    now = time.monotonic()
+    if _adaptive_cache and (now - _adaptive_cache_ts) < config.ADAPTIVE_THRESHOLDS_CACHE_TTL_SECONDS:
+        return _adaptive_cache
+
     precision = _get_outcome_precision_by_type()
     pricing_precision = precision.get("price_markup")
     benchmark_precision = precision.get("benchmark_outlier")
@@ -164,12 +178,14 @@ def _get_adaptive_thresholds() -> dict:
     if benchmark_precision is not None and benchmark_precision < 0.35:
         benchmark_multiplier = 1.1
 
-    return {
+    _adaptive_cache = {
         "pricing_markup_threshold": pricing_markup_threshold,
         "pricing_high_threshold": pricing_high_threshold,
         "benchmark_multiplier": benchmark_multiplier,
         "precision_by_type": precision,
     }
+    _adaptive_cache_ts = now
+    return _adaptive_cache
 
 
 def _ensure_evidence_panel(finding: dict, freshness: dict) -> None:

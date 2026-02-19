@@ -46,6 +46,13 @@ ENABLE_MARKUP_COMPARISONS = os.getenv("ENABLE_MARKUP_COMPARISONS", "false").lowe
 # Stats cache TTL
 STATS_CACHE_TTL_SECONDS = 60
 
+# Rate limiting for /api/scan (per IP, in-memory)
+RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "10"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "3600"))
+
+# Adaptive thresholds cache TTL (outcomes data changes slowly)
+ADAPTIVE_THRESHOLDS_CACHE_TTL_SECONDS = 300
+
 # Extraction validation
 DOUBLE_EXTRACTION_THRESHOLD = 5000  # double-extract bills over $5k
 MAX_REASONABLE_CHARGE = 500000
