@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Bill Audit</title>
+    <title>BillKarma — Your Hospital Bill Has Errors. We Find Them.</title>
+    <meta name="description" content="Upload your medical bill. Our AI audits every CPT code against fair-market rates and flags overcharges in 30 seconds.">
     <style>
         :root {
             --bg-canvas: #E0E2E5;
@@ -70,6 +71,56 @@
             right: -10%;
         }
 
+        /* === NAV === */
+        .nav-bar {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: var(--text-black);
+        }
+
+        .logo svg {
+            width: 24px;
+            height: auto;
+            color: var(--text-black);
+        }
+
+        .menu-trigger {
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--text-black);
+            color: var(--card-white);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            transition: transform 0.2s;
+            text-decoration: none;
+        }
+
+        .menu-trigger:hover {
+            transform: scale(1.05);
+        }
+
+        /* === HERO === */
         .layout-grid {
             position: relative;
             z-index: 10;
@@ -84,31 +135,19 @@
         }
 
         h1 {
-            font-size: 5rem;
-            line-height: 0.95;
+            font-size: 4.2rem;
+            line-height: 1.0;
             font-weight: 800;
             letter-spacing: -0.03em;
-            margin-bottom: 40px;
+            margin-bottom: 28px;
             color: var(--text-black);
-            position: relative;
         }
 
-        h1::after {
-            content: "";
-            display: block;
-            width: 120px;
-            height: 10px;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='10' viewBox='0 0 40 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 10 0 20 5 T 40 5' stroke='%231A1A1A' fill='none' stroke-width='2'/%3E%3C/svg%3E");
-            background-repeat: repeat-x;
-            margin-top: 24px;
-            opacity: 0.8;
-        }
-
-        p {
+        .hero-sub {
             font-size: 1.25rem;
             line-height: 1.5;
             font-weight: 500;
-            max-width: 40ch;
+            max-width: 44ch;
             color: var(--text-secondary);
         }
 
@@ -129,12 +168,6 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        .metric-block {
-            margin-top: 60px;
-            display: flex;
-            gap: 20px;
         }
 
         .cta-row {
@@ -166,10 +199,21 @@
             transform: scale(1.03);
         }
 
+        .primary-cta--large {
+            font-size: 1.1rem;
+            padding: 16px 32px;
+        }
+
         .secondary-note {
             font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 600;
+        }
+
+        .metric-block {
+            margin-top: 48px;
+            display: flex;
+            gap: 20px;
         }
 
         .metric {
@@ -197,6 +241,7 @@
             font-weight: 600;
         }
 
+        /* === UPLOAD CARD === */
         .col-interaction {
             display: flex;
             flex-direction: column;
@@ -314,24 +359,6 @@
             z-index: 2;
         }
 
-        .trust-strip {
-            margin-top: 18px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-
-        .trust-pill {
-            background: var(--accent-grey);
-            color: var(--text-black);
-            font-size: 0.78rem;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
-            padding: 7px 10px;
-        }
-
         .status-text {
             margin-top: 12px;
             font-size: 0.85rem;
@@ -341,144 +368,199 @@
             text-align: center;
         }
 
-        .analysis-preview {
+        /* === BILL MAP === */
+        .bill-map {
             margin-top: 32px;
             position: relative;
             z-index: 1;
         }
 
-        .list-item {
+        .bill-map-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
             margin-bottom: 12px;
-            background: var(--accent-grey);
-            border-radius: var(--radius-md);
-            transition: transform 0.2s;
         }
 
-        .list-item:hover {
-            transform: translateX(5px);
-            background: #EDEDED;
-        }
-
-        .list-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .item-left {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .item-index {
+        .bill-map-label {
             font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             font-weight: 700;
-            color: var(--text-black);
-            background: var(--card-white);
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
         }
 
-        .item-name {
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: var(--text-black);
-        }
-
-        .item-status {
+        .bill-map-hint {
             font-size: 0.75rem;
-            padding: 6px 14px;
-            background: var(--card-white);
-            color: var(--text-black);
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
-        .item-status.alert {
+        .bill-map-document {
+            background: var(--card-white);
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .bill-line {
+            display: grid;
+            grid-template-columns: 64px 1fr 90px 90px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #F3F4F6;
+            font-size: 0.88rem;
+            transition: background 0.15s;
+            position: relative;
+            cursor: default;
+        }
+
+        .bill-line:last-child {
+            border-bottom: none;
+        }
+
+        .bill-line--flagged {
+            border-left: 3px solid var(--accent-lime);
+        }
+
+        .bill-line--flagged:hover {
+            background: #FFFDE7;
+        }
+
+        .bill-line-code {
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .bill-line-desc {
+            font-weight: 600;
+            color: var(--text-black);
+        }
+
+        .bill-line-amount {
+            text-align: right;
+            font-weight: 700;
+            color: var(--text-black);
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.82rem;
+        }
+
+        .bill-line-flag {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
             background: var(--accent-lime);
+            color: var(--text-black);
+            white-space: nowrap;
         }
 
-        .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--text-black);
-            border-radius: 50%;
+        .bill-line-flag--ok {
+            background: var(--accent-grey);
+            color: var(--text-secondary);
         }
 
-        .nav-bar {
+        .bill-tooltip {
+            display: none;
             position: absolute;
-            top: 40px;
-            left: 60px;
-            right: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 20;
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--card-white);
-            padding: 12px 24px;
-            border-radius: var(--radius-sm);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            text-decoration: none;
-            color: var(--text-black);
-        }
-
-        .logo svg {
-            width: 24px;
-            height: auto;
-            color: var(--text-black);
-        }
-
-        .menu-trigger {
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
             background: var(--text-black);
             color: var(--card-white);
-            padding: 12px 24px;
-            border-radius: var(--radius-sm);
-            transition: transform 0.2s;
-            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1.4;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 300px;
+            z-index: 50;
+            pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
-        .menu-trigger:hover {
-            transform: scale(1.05);
+        .bill-tooltip.visible {
+            display: block;
         }
 
+        /* === TRUST BAR === */
+        .trust-bar {
+            position: relative;
+            z-index: 10;
+            background: var(--text-black);
+            color: var(--card-white);
+            padding: 18px 60px;
+        }
+
+        .trust-bar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .trust-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .trust-bar-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* === CALLOUT === */
+        .callout-section {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 60px;
+        }
+
+        .callout-inner {
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-xl);
+            padding: 48px 60px;
+        }
+
+        .callout-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.5;
+            max-width: 60ch;
+        }
+
+        /* === HOW IT WORKS === */
         .how-it-works {
             position: relative;
             z-index: 10;
             max-width: 1400px;
-            margin: 0 auto 80px;
+            margin: 0 auto 60px;
             padding: 0 60px;
         }
 
-        .how-title {
+        .section-title {
             font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            margin-bottom: 22px;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 24px;
         }
 
         .how-grid {
@@ -509,51 +591,321 @@
             line-height: 1.45;
         }
 
-        .bottom-cta {
-            margin-top: 28px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
+        /* === PRICE GAP === */
+        .price-gap-section {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 60px;
+            padding: 0 60px;
         }
 
-        .bottom-cta-copy {
-            font-size: 1.05rem;
+        .price-gap-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .price-bar-row {
+            background: var(--card-white);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .price-bar-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-black);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .price-bar-track {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .price-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .price-bar-type {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+            width: 64px;
+            flex-shrink: 0;
+        }
+
+        .price-bar {
+            height: 28px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            min-width: 60px;
+            transition: width 0.6s ease;
+        }
+
+        .price-bar--hospital {
+            background: var(--text-black);
+        }
+
+        .price-bar--fair {
+            background: var(--accent-lime);
+        }
+
+        .price-bar-val {
+            font-size: 0.78rem;
+            font-weight: 800;
+            font-family: "SF Mono", "Fira Code", monospace;
+            white-space: nowrap;
+        }
+
+        .price-bar--hospital .price-bar-val {
+            color: var(--card-white);
+        }
+
+        .price-bar--fair .price-bar-val {
+            color: var(--text-black);
+        }
+
+        .price-gap-source {
+            margin-top: 16px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* === SOCIAL PROOF === */
+        .social-proof-section {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 60px;
+            padding: 0 60px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .testimonial-card {
+            background: var(--card-white);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .testimonial-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: var(--text-black);
+            display: block;
+        }
+
+        .testimonial-context {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-quote {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-author {
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-black);
         }
 
+        /* === LEAD MAGNET === */
+        .lead-magnet-section {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto 60px;
+            padding: 0 60px;
+        }
+
+        .lead-magnet-card {
+            background: var(--text-black);
+            color: var(--card-white);
+            border-radius: var(--radius-xl);
+            padding: 60px;
+        }
+
+        .lead-magnet-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+        .lead-magnet-copy {
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #9CA3AF;
+            max-width: 55ch;
+        }
+
+        .lead-magnet-form {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            max-width: 480px;
+        }
+
+        .lead-magnet-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 0;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: var(--font-main);
+            outline: none;
+        }
+
+        .lead-magnet-form .primary-cta {
+            background: var(--accent-lime);
+            color: var(--text-black);
+            white-space: nowrap;
+        }
+
+        /* === FOOTER CTA === */
+        .footer-cta-section {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 80px 60px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            max-width: 20ch;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.1;
+        }
+
+        .footer-cta-note {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .site-footer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 24px 60px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .site-footer a {
+            color: var(--text-secondary);
+        }
+
+        /* === SCAN ANIMATION === */
+        .scan-animation {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 60%;
+            margin-bottom: 24px;
+        }
+
+        .scan-line {
+            height: 8px;
+            background: var(--accent-grey);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scan-line::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-lime), transparent);
+            animation: scan-sweep 1.5s ease-in-out infinite;
+        }
+
+        .scan-line:nth-child(2)::after { animation-delay: 0.2s; }
+        .scan-line:nth-child(3)::after { animation-delay: 0.4s; }
+        .scan-line:nth-child(4)::after { animation-delay: 0.6s; }
+        .scan-line:nth-child(5)::after { animation-delay: 0.8s; }
+
+        @keyframes scan-sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* === RESPONSIVE 1024px === */
         @media (max-width: 1024px) {
             .layout-grid {
                 grid-template-columns: 1fr;
                 padding: 110px 24px 40px 24px;
                 gap: 40px;
             }
-            h1 { font-size: 3.5rem; }
-            .nav-bar {
-                left: 24px;
-                right: 24px;
-            }
+            h1 { font-size: 3.2rem; }
+            .nav-bar { left: 24px; right: 24px; }
             .blob--1 { opacity: 0.5; }
             .blob { filter: blur(30px); }
-            .upload-card {
-                padding: 28px 20px;
-            }
-            .upload-zone {
-                height: 220px;
-            }
-            .metric-block {
-                margin-top: 36px;
-            }
-            .how-it-works {
-                padding: 0 24px;
-                margin-bottom: 56px;
-            }
-            .how-row {
-                grid-template-columns: 1fr;
-            }
+            .upload-card { padding: 28px 20px; }
+            .upload-zone { height: 220px; }
+            .metric-block { margin-top: 36px; }
+            .trust-bar { padding: 18px 24px; }
+            .trust-bar-inner { gap: 24px; }
+            .callout-section { padding: 0 24px; margin: 40px auto; }
+            .callout-inner { padding: 32px; }
+            .callout-text { font-size: 1.15rem; }
+            .how-it-works { padding: 0 24px; margin-bottom: 40px; }
+            .how-row { grid-template-columns: 1fr; }
+            .price-gap-section { padding: 0 24px; }
+            .social-proof-section { padding: 0 24px; }
+            .testimonial-grid { grid-template-columns: 1fr; }
+            .lead-magnet-section { padding: 0 24px; }
+            .lead-magnet-card { padding: 36px; }
+            .footer-cta-section { padding: 60px 24px 40px; }
+            .footer-cta-title { font-size: 2rem; }
+            .site-footer { padding: 24px; }
         }
 
+        /* === RESPONSIVE 480px === */
         @media (max-width: 480px) {
             .layout-grid {
                 padding: 80px 16px 32px 16px;
@@ -561,67 +913,42 @@
             }
             h1 {
                 font-size: 2.2rem;
-                margin-bottom: 20px;
-            }
-            h1::after {
-                width: 80px;
-                margin-top: 16px;
-            }
-            p {
-                font-size: 1rem;
-            }
-            .nav-bar {
-                top: 16px;
-                left: 12px;
-                right: 12px;
-            }
-            .logo {
-                font-size: 1.1rem;
-                padding: 8px 14px;
-                gap: 8px;
-            }
-            .menu-trigger {
-                font-size: 0.8rem;
-                padding: 8px 14px;
-            }
-            .upload-card {
-                padding: 20px 16px;
-                border-radius: var(--radius-lg);
-            }
-            .upload-zone {
-                height: 180px;
-                border-radius: var(--radius-md);
-            }
-            .upload-icon {
-                width: 52px;
-                height: 52px;
                 margin-bottom: 16px;
             }
+            .hero-sub { font-size: 1rem; }
+            .nav-bar { top: 16px; left: 12px; right: 12px; }
+            .logo { font-size: 1.1rem; padding: 8px 14px; gap: 8px; }
+            .menu-trigger { font-size: 0.8rem; padding: 8px 14px; }
+            .upload-card { padding: 20px 16px; border-radius: var(--radius-lg); }
+            .upload-zone { height: 180px; border-radius: var(--radius-md); }
+            .upload-icon { width: 52px; height: 52px; margin-bottom: 16px; }
             .upload-text-main { font-size: 1.1rem; }
             .upload-text-sub { font-size: 0.85rem; }
-            .metric-block {
-                flex-direction: column;
-                gap: 12px;
-                margin-top: 24px;
-            }
-            .metric {
-                min-width: 0;
-                padding: 16px;
-            }
+            .metric-block { flex-direction: column; gap: 12px; margin-top: 24px; }
+            .metric { min-width: 0; padding: 16px; }
             .metric-val { font-size: 2rem; }
-            .how-it-works {
-                padding: 0 16px;
-                margin-bottom: 40px;
-            }
-            .how-title { font-size: 1.3rem; }
-            .list-item {
-                padding: 12px;
-                margin-bottom: 8px;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            .item-name { font-size: 0.9rem; }
-            .item-status { font-size: 0.7rem; padding: 4px 10px; }
+            .trust-bar { padding: 16px; }
+            .trust-bar-inner { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .bill-line { grid-template-columns: 1fr auto; gap: 4px; padding: 10px 12px; }
+            .bill-line-code { display: none; }
+            .bill-line-amount { display: none; }
+            .callout-section { padding: 0 16px; margin: 32px auto; }
+            .callout-inner { padding: 24px; border-radius: var(--radius-lg); }
+            .callout-text { font-size: 1.05rem; }
+            .how-it-works { padding: 0 16px; margin-bottom: 32px; }
+            .section-title { font-size: 1.3rem; }
+            .price-gap-section { padding: 0 16px; }
+            .price-bar-row { padding: 16px; }
+            .social-proof-section { padding: 0 16px; }
+            .testimonial-card { padding: 24px; }
+            .lead-magnet-section { padding: 0 16px; }
+            .lead-magnet-card { padding: 28px; border-radius: var(--radius-lg); }
+            .lead-magnet-title { font-size: 1.4rem; }
+            .lead-magnet-form { flex-direction: column; }
+            .footer-cta-section { padding: 48px 16px 32px; }
+            .footer-cta-title { font-size: 1.6rem; }
+            .primary-cta--large { font-size: 0.95rem; padding: 14px 24px; }
+            .site-footer { flex-direction: column; gap: 8px; text-align: center; padding: 24px 16px; }
         }
     </style>
 </head>
@@ -631,6 +958,7 @@
         <div class="blob blob--2"></div>
     </div>
 
+    <!-- NAV -->
     <nav class="nav-bar">
         <a href="/" class="logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -641,13 +969,15 @@
         <a href="/scan" class="menu-trigger">Upload Bill</a>
     </nav>
 
+    <!-- HERO -->
     <main class="layout-grid">
         <section class="col-narrative">
-            <h1>hospitals set the prices. we check the math.</h1>
-            <p>Upload your medical bill. We compare every line item against federal pricing data and flag errors, markups, and overcharges in 30 seconds.</p>
+            <span class="label-micro">AI-Powered Bill Audit</span>
+            <h1>Your Hospital Bill Has Errors. We Find Them.</h1>
+            <p class="hero-sub">Upload your medical bill. Our AI audits every CPT code against fair-market rates and flags overcharges in 30 seconds.</p>
             <div class="cta-row">
-                <button type="button" class="primary-cta" id="startAudit">Check My Bill Free</button>
-                <span class="secondary-note">No account needed</span>
+                <button type="button" class="primary-cta" id="startAudit">Audit My Bill Free</button>
+                <span class="secondary-note">Free. No login. Results in 30 seconds.</span>
             </div>
 
             <div class="metric-block">
@@ -678,71 +1008,247 @@
                     <div class="status-text" id="uploadStatus" aria-live="polite"></div>
                 </div>
 
-                <div class="analysis-preview">
-                    <span class="label-micro" style="margin-bottom: 16px; background: transparent; padding: 0;">Live Detection Preview</span>
-
-                    <div class="list-item">
-                        <div class="item-left">
-                            <span class="item-index">1</span>
-                            <span class="item-name">CT Scan / Chest</span>
+                <!-- ANNOTATED BILL MAP -->
+                <div class="bill-map">
+                    <div class="bill-map-header">
+                        <span class="bill-map-label">Live Audit Preview</span>
+                        <span class="bill-map-hint">Hover flagged lines to see details</span>
+                    </div>
+                    <div class="bill-map-document" id="billMapDoc">
+                        <div class="bill-line bill-line--flagged" data-tooltip="Duplicate Charge: CPT 71046 was billed twice on the same date of service. Potential savings: $847.">
+                            <span class="bill-line-code">71046</span>
+                            <span class="bill-line-desc">Chest X-Ray, 2 Views</span>
+                            <span class="bill-line-amount">$847</span>
+                            <span class="bill-line-flag">Duplicate</span>
                         </div>
-                        <div class="item-status alert">
-                            <span class="dot"></span>
-                            8x Medicare Rate
+                        <div class="bill-line bill-line--flagged" data-tooltip="Upcoded: Visit coded as Level 5 (99285) but documentation supports Level 3 (99283). Difference: $1,400.">
+                            <span class="bill-line-code">99285</span>
+                            <span class="bill-line-desc">ER Visit Level 5</span>
+                            <span class="bill-line-amount">$2,890</span>
+                            <span class="bill-line-flag">Upcoded</span>
+                        </div>
+                        <div class="bill-line">
+                            <span class="bill-line-code">36415</span>
+                            <span class="bill-line-desc">Blood Draw</span>
+                            <span class="bill-line-amount">$45</span>
+                            <span class="bill-line-flag bill-line-flag--ok">&#10003; Fair</span>
+                        </div>
+                        <div class="bill-line bill-line--flagged" data-tooltip="8.2x Medicare rate. Fair price: $320. You were charged $2,624. Potential savings: $2,304.">
+                            <span class="bill-line-code">74177</span>
+                            <span class="bill-line-desc">CT Abdomen w/ Contrast</span>
+                            <span class="bill-line-amount">$2,624</span>
+                            <span class="bill-line-flag">8x Markup</span>
+                        </div>
+                        <div class="bill-line">
+                            <span class="bill-line-code">J7120</span>
+                            <span class="bill-line-desc">IV Saline 1000ml</span>
+                            <span class="bill-line-amount">$87</span>
+                            <span class="bill-line-flag bill-line-flag--ok">&#10003; Fair</span>
                         </div>
                     </div>
-
-                    <div class="list-item">
-                        <div class="item-left">
-                            <span class="item-index">2</span>
-                            <span class="item-name">Tylenol (Acetaminophen)</span>
-                        </div>
-                        <div class="item-status alert">
-                            <span class="dot"></span>
-                            Duplicate Charge
-                        </div>
-                    </div>
-
-                    <div class="list-item">
-                        <div class="item-left">
-                            <span class="item-index">3</span>
-                            <span class="item-name">Room &amp; Board / ICU</span>
-                        </div>
-                        <div class="item-status">
-                            &#10003; Fair Price
-                        </div>
-                    </div>
-                </div>
-                <div class="trust-strip">
-                    <span class="trust-pill">Your data stays private</span>
-                    <span class="trust-pill">Compared to federal rates</span>
-                    <span class="trust-pill">Bank-level encryption</span>
+                    <div class="bill-tooltip" id="billTooltip"></div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- TRUST BAR -->
+    <section class="trust-bar">
+        <div class="trust-bar-inner">
+            <div class="trust-bar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                HIPAA Compliant Pipeline
+            </div>
+            <div class="trust-bar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+                256-bit Bank-Level Encryption
+            </div>
+            <div class="trust-bar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+                    <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+                No Data Sold to Third Parties
+            </div>
+        </div>
+    </section>
+
+    <!-- CALLOUT -->
+    <section class="callout-section">
+        <div class="callout-inner">
+            <p class="callout-text">Hospitals rely on the fact that 90% of patients never request an itemized bill. We use the same Chargemaster data the hospitals use to find where they overcharged you.</p>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
     <section class="how-it-works">
-        <h2 class="how-title">How it works</h2>
+        <h2 class="section-title">How it works</h2>
         <div class="how-grid">
             <div class="how-row">
                 <div class="how-step">1. Upload your bill</div>
-                <div class="how-copy">Photo, PDF, or screenshot. Takes 10 seconds.</div>
+                <div class="how-copy">Photo, PDF, or screenshot. We accept itemized bills, EOBs, and surprise balance bills.</div>
             </div>
             <div class="how-row">
-                <div class="how-step">2. We scan every line</div>
-                <div class="how-copy">Checked against Medicare rates, coding rules, and the No Surprises Act.</div>
+                <div class="how-step">2. AI audits every line</div>
+                <div class="how-copy">Every CPT code checked against Medicare rates, NCCI bundling edits, and the No Surprises Act.</div>
             </div>
             <div class="how-row">
-                <div class="how-step">3. Get your report</div>
-                <div class="how-copy">Errors flagged, fair prices shown, dispute letter ready to send.</div>
+                <div class="how-step">3. Get your dispute-ready report</div>
+                <div class="how-copy">Errors flagged with dollar amounts. Download a pre-written dispute letter to send to your provider.</div>
             </div>
-        </div>
-        <div class="bottom-cta">
-            <span class="bottom-cta-copy">Your bill might be wrong. Find out in 30 seconds.</span>
-            <button type="button" class="primary-cta" id="bottomAudit">Check My Bill &rarr;</button>
         </div>
     </section>
+
+    <!-- PRICE GAP -->
+    <section class="price-gap-section">
+        <h2 class="section-title">What hospitals charge vs. what's fair</h2>
+        <p class="section-subtitle">Based on Medicare reimbursement rates and published Chargemaster data</p>
+        <div class="price-gap-grid">
+            <div class="price-bar-row">
+                <span class="price-bar-label">ER Visit Level 4 (99284)</span>
+                <div class="price-bar-track">
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Hospital</span>
+                        <div class="price-bar price-bar--hospital" style="width: 100%">
+                            <span class="price-bar-val">$2,328</span>
+                        </div>
+                    </div>
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Fair</span>
+                        <div class="price-bar price-bar--fair" style="width: 22%">
+                            <span class="price-bar-val">$512</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-bar-row">
+                <span class="price-bar-label">CT Abdomen w/ Contrast (74177)</span>
+                <div class="price-bar-track">
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Hospital</span>
+                        <div class="price-bar price-bar--hospital" style="width: 100%">
+                            <span class="price-bar-val">$2,624</span>
+                        </div>
+                    </div>
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Fair</span>
+                        <div class="price-bar price-bar--fair" style="width: 12%">
+                            <span class="price-bar-val">$320</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-bar-row">
+                <span class="price-bar-label">MRI Brain (70553)</span>
+                <div class="price-bar-track">
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Hospital</span>
+                        <div class="price-bar price-bar--hospital" style="width: 100%">
+                            <span class="price-bar-val">$3,100</span>
+                        </div>
+                    </div>
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Fair</span>
+                        <div class="price-bar price-bar--fair" style="width: 19%">
+                            <span class="price-bar-val">$590</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-bar-row">
+                <span class="price-bar-label">Basic Metabolic Panel (80048)</span>
+                <div class="price-bar-track">
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Hospital</span>
+                        <div class="price-bar price-bar--hospital" style="width: 100%">
+                            <span class="price-bar-val">$487</span>
+                        </div>
+                    </div>
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Fair</span>
+                        <div class="price-bar price-bar--fair" style="width: 3%">
+                            <span class="price-bar-val">$14</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-bar-row">
+                <span class="price-bar-label">Chest X-Ray 2 Views (71046)</span>
+                <div class="price-bar-track">
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Hospital</span>
+                        <div class="price-bar price-bar--hospital" style="width: 100%">
+                            <span class="price-bar-val">$847</span>
+                        </div>
+                    </div>
+                    <div class="price-bar-wrapper">
+                        <span class="price-bar-type">Fair</span>
+                        <div class="price-bar price-bar--fair" style="width: 6%">
+                            <span class="price-bar-val">$51</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="price-gap-source">Source: CMS Physician Fee Schedule 2026 &amp; hospital Chargemaster filings</p>
+    </section>
+
+    <!-- SOCIAL PROOF -->
+    <section class="social-proof-section">
+        <h2 class="section-title">Real savings from real bills</h2>
+        <p class="section-subtitle">What BillKarma users found on their medical bills</p>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <span class="testimonial-amount">$2,840</span>
+                <span class="testimonial-context">saved on surgery bill</span>
+                <p class="testimonial-quote">"I had no idea my surgeon double-billed for the anesthesia consult. BillKarma caught it in seconds."</p>
+                <span class="testimonial-author">Sarah M., Austin TX</span>
+            </div>
+            <div class="testimonial-card">
+                <span class="testimonial-amount">$1,190</span>
+                <span class="testimonial-context">saved on ER visit</span>
+                <p class="testimonial-quote">"They coded my visit as Level 5 when it was clearly a Level 3. The dispute letter worked on the first try."</p>
+                <span class="testimonial-author">James R., Denver CO</span>
+            </div>
+            <div class="testimonial-card">
+                <span class="testimonial-amount">$640</span>
+                <span class="testimonial-context">saved on lab work</span>
+                <p class="testimonial-quote">"$487 for a blood panel that Medicare pays $14 for. I showed the hospital the report and they adjusted it same day."</p>
+                <span class="testimonial-author">Maria L., Chicago IL</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEAD MAGNET -->
+    <section class="lead-magnet-section">
+        <div class="lead-magnet-card">
+            <span class="label-micro">Free Guide</span>
+            <h2 class="lead-magnet-title">Download the 2026 Hospital Financial Aid Guide</h2>
+            <p class="lead-magnet-copy">Every major hospital has a financial assistance program they don't advertise. Learn how to apply and what you qualify for.</p>
+            <form class="lead-magnet-form" id="leadForm">
+                <input type="email" placeholder="your@email.com" class="lead-magnet-input" required>
+                <button type="submit" class="primary-cta">Send Me the Guide</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <section class="footer-cta-section">
+        <h2 class="footer-cta-title">Your bill might have errors. Find out in 30 seconds.</h2>
+        <button type="button" class="primary-cta primary-cta--large" id="footerAudit">Start Your Free Audit &rarr;</button>
+        <p class="footer-cta-note">No account. No credit card. Upload and get results.</p>
+    </section>
+
+    <footer class="site-footer">
+        <span>&copy; 2026 BillKarma. Not medical or legal advice.</span>
+        <span>Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
+    </footer>
 
     <script>
         (function () {
@@ -750,8 +1256,10 @@
             var fileInput = document.getElementById("fileInput");
             var browseFiles = document.getElementById("browseFiles");
             var startAudit = document.getElementById("startAudit");
-            var bottomAudit = document.getElementById("bottomAudit");
+            var footerAudit = document.getElementById("footerAudit");
             var uploadStatus = document.getElementById("uploadStatus");
+            var billTooltip = document.getElementById("billTooltip");
+            var leadForm = document.getElementById("leadForm");
 
             function setStatus(message) {
                 uploadStatus.textContent = message || "";
@@ -759,16 +1267,17 @@
 
             function updateDropzoneAnalyzing() {
                 dropZone.style.borderColor = "var(--accent-lime)";
-                dropZone.style.background = "var(--accent-lime)";
-                dropZone.innerHTML = `
-                    <div class="upload-icon" style="background: var(--text-black); color: var(--accent-lime)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </div>
-                    <div class="upload-text-main">Analyzing...</div>
-                    <div class="upload-text-sub">OCR and validation in progress</div>
-                `;
+                dropZone.style.background = "var(--card-white)";
+                dropZone.innerHTML =
+                    '<div class="scan-animation">' +
+                        '<div class="scan-line"></div>' +
+                        '<div class="scan-line"></div>' +
+                        '<div class="scan-line"></div>' +
+                        '<div class="scan-line"></div>' +
+                        '<div class="scan-line"></div>' +
+                    '</div>' +
+                    '<div class="upload-text-main">Auditing your bill...</div>' +
+                    '<div class="upload-text-sub">Checking CPT codes against federal rates</div>';
             }
 
             function uploadFiles(files) {
@@ -808,6 +1317,7 @@
                     });
             }
 
+            // Drag and drop
             dropZone.addEventListener("dragover", function (e) {
                 e.preventDefault();
                 dropZone.classList.add("drag-active");
@@ -835,18 +1345,45 @@
                 fileInput.click();
             });
 
-            startAudit.addEventListener("click", function () {
-                fileInput.click();
-            });
-            bottomAudit.addEventListener("click", function () {
-                fileInput.click();
-            });
+            // CTA buttons trigger file picker
+            startAudit.addEventListener("click", function () { fileInput.click(); });
+            footerAudit.addEventListener("click", function () { fileInput.click(); });
 
             dropZone.addEventListener("keydown", function (e) {
                 if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     fileInput.click();
                 }
+            });
+
+            // Bill map tooltips
+            var flaggedLines = document.querySelectorAll(".bill-line--flagged");
+            flaggedLines.forEach(function (line) {
+                line.addEventListener("mouseenter", function (e) {
+                    var text = line.getAttribute("data-tooltip");
+                    if (!text) return;
+                    billTooltip.textContent = text;
+                    billTooltip.classList.add("visible");
+                    var rect = line.getBoundingClientRect();
+                    var mapRect = document.getElementById("billMapDoc").getBoundingClientRect();
+                    billTooltip.style.left = (rect.left - mapRect.left) + "px";
+                    billTooltip.style.top = (rect.bottom - mapRect.top + 8) + "px";
+                });
+                line.addEventListener("mouseleave", function () {
+                    billTooltip.classList.remove("visible");
+                });
+            });
+
+            // Lead magnet form
+            leadForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var btn = leadForm.querySelector("button");
+                btn.textContent = "Sent!";
+                btn.disabled = true;
+                setTimeout(function () {
+                    btn.textContent = "Send Me the Guide";
+                    btn.disabled = false;
+                }, 3000);
             });
         })();
     </script>
