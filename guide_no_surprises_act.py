@@ -54,7 +54,7 @@ register("no-surprises-act-explained", {
 
 <h3>a) Emergency services</h3>
 
-<p>If you go to an ER, you cannot be billed at out-of-network rates&mdash;regardless of whether the hospital or any provider who treats you is in your network. This includes the ER physician, radiologist, anesthesiologist, and any specialist called in during your emergency visit.</p>
+<p>If you go to an ER, you cannot be billed at out-of-network rates&mdash;regardless of whether the hospital or any provider who treats you is in your network. This includes the ER physician, radiologist, anesthesiologist, and any specialist called in during your emergency visit. (For more on how ER bills work, see our <a href="/guides/why-emergency-room-bills-are-so-high">ER bill guide</a>.)</p>
 
 <p><strong>What this means for your bill:</strong> Your cost-sharing (deductible, copay, coinsurance) must be calculated at in-network rates. The provider cannot bill you for the difference between what they charge and what your insurance pays (this practice was called &ldquo;balance billing&rdquo;).</p>
 
@@ -108,7 +108,7 @@ register("no-surprises-act-explained", {
 
 <h2 id="good-faith-estimates">4. Good faith estimates for uninsured patients</h2>
 
-<p>If you are uninsured or choose to self-pay, the No Surprises Act gives you a separate set of protections:</p>
+<p>If you are uninsured or choose to self-pay, the No Surprises Act gives you a separate set of protections. (For additional strategies to reduce your bill as an uninsured patient, see our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.)</p>
 
 <ul>
     <li><strong>Right to a good faith estimate:</strong> Before any scheduled service, the provider must give you a written estimate of expected charges. You can also request one at any time.</li>
@@ -122,6 +122,46 @@ register("no-surprises-act-explained", {
 </div>
 
 <h2 id="spot-violation">5. How to spot a No Surprises Act violation</h2>
+
+<p>Here&rsquo;s what a surprise bill looks like in practice. This patient went to an in-network ER, but the radiologist and anesthesiologist were out-of-network:</p>
+
+<div class="bill-example">
+    <div class="bill-header">Patient Bills Received &mdash; Memorial Hospital ER &mdash; Date of Service: 01/10/2026</div>
+    <div class="line-item">
+        <span><strong>Hospital bill (in-network)</strong></span>
+        <span></span>
+    </div>
+    <div class="line-item">
+        <span>99284 &mdash; ER Visit Level 4</span>
+        <span>$2,890.00</span>
+    </div>
+    <div class="line-item">
+        <span>74178 &mdash; CT Abdomen w/Contrast</span>
+        <span>$2,400.00</span>
+    </div>
+    <div class="line-item">
+        <span><strong>Separate bill from radiology group (out-of-network)</strong></span>
+        <span></span>
+    </div>
+    <div class="line-item error">
+        <span>74178-26 &mdash; CT Interpretation &nbsp; &#10060; <em>NSA violation: out-of-network provider at in-network ER</em></span>
+        <span>$1,100.00</span>
+    </div>
+    <div class="line-item">
+        <span><strong>Separate bill from anesthesia group (out-of-network)</strong></span>
+        <span></span>
+    </div>
+    <div class="line-item error">
+        <span>01916 &mdash; Anesthesia for CT &nbsp; &#10060; <em>NSA violation: patient did not choose this provider</em></span>
+        <span>$1,800.00</span>
+    </div>
+    <div class="line-total">
+        <span>TOTAL SURPRISE BILLS</span>
+        <span>$2,900.00</span>
+    </div>
+</div>
+
+<p>Under the No Surprises Act, the patient should owe only their in-network cost-sharing on the two surprise bills&mdash;not $2,900. If these were processed at in-network rates (approximately $180 + $240 in cost-sharing), the savings would be <strong>$2,480</strong>.</p>
 
 <p>Check your bill for these red flags:</p>
 
@@ -137,7 +177,11 @@ register("no-surprises-act-explained", {
     </tbody>
 </table>
 
-<p>You can <a href="/scan">upload your bill to BillKarma</a> and our scanner automatically checks for potential No Surprises Act violations alongside other billing errors.</p>
+<p>If you suspect a surprise bill, look up the CPT codes to see what the in-network rate should be. The gap between what you were billed and the Medicare benchmark gives you a sense of how much may be in dispute:</p>
+
+{_embed(mode="markup", title="Check your surprise bill", subtitle="Enter a CPT code and the amount you were billed to see the Medicare rate.", height="420")}
+
+<p>You can also <a href="/scan">upload your bill to BillKarma</a> and our scanner automatically checks for potential No Surprises Act violations alongside other billing errors.</p>
 
 <h2 id="what-to-do">6. What to do if you get a surprise bill</h2>
 
@@ -151,7 +195,7 @@ register("no-surprises-act-explained", {
 </ol>
 
 <div class="key-takeaway">
-    <strong>Keep all documents.</strong> Save your EOB, the surprise bill, any good faith estimates, and records of all phone calls. These are your evidence if you need to file a formal complaint.
+    <strong>Keep all documents.</strong> Save your <a href="/guides/understanding-explanation-of-benefits">EOB</a>, the surprise bill, any good faith estimates, and records of all phone calls. These are your evidence if you need to file a formal complaint. Need help writing a dispute letter? See our <a href="/guides/how-to-dispute-a-medical-bill">step-by-step dispute guide</a>.
 </div>
 
 <h2 id="real-examples">7. Real examples of No Surprises Act protections</h2>

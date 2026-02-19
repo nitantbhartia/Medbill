@@ -146,12 +146,20 @@ register("why-emergency-room-bills-are-so-high", {
 
 <p><strong>Common upcoding scenarios</strong> (where patients are often billed at a higher level than warranted):</p>
 
-<ul>
-    <li><strong>Sprained ankle billed as Level 4</strong> &mdash; An X-ray and an ACE bandage is Level 2 or 3. Cost difference: $700&ndash;$1,500.</li>
-    <li><strong>UTI billed as Level 4</strong> &mdash; A urinalysis and antibiotic prescription is Level 2 or 3. Cost difference: $700&ndash;$1,500.</li>
-    <li><strong>Stitches billed as Level 4</strong> &mdash; Simple laceration repair with no complications is Level 2 or 3. Cost difference: $700&ndash;$1,500.</li>
-    <li><strong>Ear infection billed as Level 3 or 4</strong> &mdash; An otoscope exam and antibiotic prescription is Level 1 or 2. Cost difference: $300&ndash;$1,000.</li>
-</ul>
+<div class="case-study">
+    <h3>Sprained ankle billed as Level 4</h3>
+    <p>An X-ray and an ACE bandage is Level 2 (CPT 99282, ~$137 Medicare) or Level 3 (CPT 99283, ~$221 Medicare). Being coded at Level 4 (CPT 99284, ~$371 Medicare) means the hospital charges $1,800&ndash;$3,200 instead of $600&ndash;$1,800. <strong>Potential overcharge: $700&ndash;$1,500.</strong></p>
+</div>
+
+<div class="case-study">
+    <h3>UTI billed as Level 4</h3>
+    <p>A urinalysis and antibiotic prescription is Level 2 or 3. One patient was billed <strong>$2,400</strong> for a UTI visit coded as Level 4. After requesting a level review and pointing out the visit involved a single urine test and a 5-minute doctor exam, the hospital downgraded to Level 2 at <strong>$780</strong>. <strong>Savings: $1,620.</strong></p>
+</div>
+
+<div class="case-study">
+    <h3>Stitches billed as Level 4</h3>
+    <p>Simple laceration repair (3 stitches, no complications) is a Level 2 or 3 visit. A patient billed at Level 4 (<strong>$2,890</strong>) for 4 stitches on a finger <a href="/guides/how-to-dispute-a-medical-bill">disputed the ER level</a> with the clinical notes showing a 15-minute visit with no imaging or labs. The hospital adjusted to Level 3 (<strong>$1,400</strong>). <strong>Savings: $1,490.</strong></p>
+</div>
 
 <p>Look up the ER visit code from your bill to see what Medicare pays:</p>
 

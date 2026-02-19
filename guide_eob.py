@@ -187,10 +187,20 @@ register("understanding-explanation-of-benefits", {
 <p><strong>Impact:</strong> Your cost-sharing is calculated at the much higher out-of-network rate. Instead of a $40 copay, you might owe $800+ in coinsurance.</p>
 <p><strong>Fix:</strong> Call your insurance company. Provide the provider&rsquo;s NPI (National Provider Identifier) and ask them to verify network status and reprocess the claim.</p>
 
+<div class="case-study">
+    <h3>Example: In-network lab processed as out-of-network</h3>
+    <p>A patient had routine blood work (CPT 80053, 85025) at an in-network lab after a physical. The EOB showed the claim processed as out-of-network, with patient responsibility of <strong>$487</strong> instead of the expected $12 copay. The lab was verified as in-network&mdash;the claim had been submitted with an old Tax ID number. After calling the insurer and requesting reprocessing, the patient&rsquo;s cost dropped to <strong>$12</strong>. <strong>Savings: $475.</strong></p>
+</div>
+
 <h3>b) Service denied as &ldquo;not medically necessary&rdquo;</h3>
 
 <p><strong>Impact:</strong> Insurance pays $0. You&rsquo;re responsible for the full billed amount.</p>
 <p><strong>Fix:</strong> Ask your doctor&rsquo;s office to submit clinical notes supporting the medical necessity. Then file an appeal with your insurance company. First-level appeals succeed about 40&ndash;50% of the time.</p>
+
+<div class="case-study">
+    <h3>Example: MRI denied, then approved on appeal</h3>
+    <p>A patient&rsquo;s MRI of the knee (CPT 73721) was denied as &ldquo;not medically necessary.&rdquo; The EOB showed patient responsibility of <strong>$2,100</strong> (the full billed amount). The patient&rsquo;s orthopedist submitted a letter of medical necessity with clinical notes documenting failed physical therapy and persistent symptoms. On first appeal, the insurer approved the claim. The allowed amount was $410, and the patient owed a <strong>$60</strong> copay. <strong>Savings: $2,040.</strong></p>
+</div>
 
 <h3>c) Duplicate claim denial</h3>
 
