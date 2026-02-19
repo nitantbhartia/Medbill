@@ -78,7 +78,7 @@
             min-height: 100vh;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 60px;
+            padding: 120px 60px 60px;
             gap: 80px;
             align-items: center;
         }
@@ -170,14 +170,6 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 600;
-        }
-
-        .proof-note {
-            margin-top: 14px;
-            font-size: 0.84rem;
-            color: var(--text-secondary);
-            line-height: 1.45;
-            max-width: 58ch;
         }
 
         .metric {
@@ -320,13 +312,6 @@
             cursor: pointer;
             position: relative;
             z-index: 2;
-        }
-
-        .upload-guidance {
-            margin-top: 12px;
-            font-size: 0.83rem;
-            color: var(--text-secondary);
-            font-weight: 600;
         }
 
         .trust-strip {
@@ -541,7 +526,7 @@
         @media (max-width: 1024px) {
             .layout-grid {
                 grid-template-columns: 1fr;
-                padding: 100px 24px 40px 24px;
+                padding: 110px 24px 40px 24px;
                 gap: 40px;
             }
             h1 { font-size: 3.5rem; }
@@ -653,14 +638,11 @@
             </svg>
             BillKarma
         </a>
-        <a href="/scan" class="menu-trigger">menu</a>
+        <a href="/scan" class="menu-trigger">Upload Bill</a>
     </nav>
 
     <main class="layout-grid">
         <section class="col-narrative">
-            <div>
-                <span class="label-micro">Medical Bill Audit</span>
-            </div>
             <h1>hospitals set the prices. we check the math.</h1>
             <p>Upload your medical bill. We compare every line item against federal pricing data and flag errors, markups, and overcharges in 30 seconds.</p>
             <div class="cta-row">
@@ -678,7 +660,6 @@
                     <span class="metric-lbl">bills have errors</span>
                 </div>
             </div>
-            <p class="proof-note">Stats shown are directional and should be updated as live scan coverage expands.</p>
         </section>
 
         <section class="col-interaction">
@@ -692,9 +673,8 @@
                         </svg>
                     </div>
                     <div class="upload-text-main">Drop your bill here</div>
-                    <div class="upload-text-sub">PDF or Image (max 20MB)</div>
+                    <div class="upload-text-sub">PDF or image — up to 20MB</div>
                     <button type="button" class="upload-actions" id="browseFiles">Browse Files</button>
-                    <div class="upload-guidance">We extract line items, compare to CMS rates, then generate a dispute-ready summary.</div>
                     <div class="status-text" id="uploadStatus" aria-live="polite"></div>
                 </div>
 
