@@ -563,32 +563,49 @@
             margin-bottom: 24px;
         }
 
-        .how-grid {
+        .how-cards {
             display: grid;
-            gap: 14px;
-        }
-
-        .how-row {
-            display: grid;
-            grid-template-columns: 220px 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-            background: var(--card-white);
+        }
+
+        .how-card {
+            background: var(--text-black);
+            color: var(--card-white);
             border-radius: var(--radius-md);
-            padding: 18px 22px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            padding: 36px 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .how-step {
-            font-size: 1rem;
+        .how-card-number {
+            display: inline-block;
+            font-size: 0.75rem;
             font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: var(--accent-lime);
             color: var(--text-black);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            align-self: flex-start;
         }
 
-        .how-copy {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            line-height: 1.45;
+        .how-card-headline {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            color: var(--card-white);
+        }
+
+        .how-card-detail {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.55;
+            color: #9CA3AF;
         }
 
         /* === PRICE GAP === */
@@ -737,6 +754,15 @@
         }
 
         /* === LEAD MAGNET === */
+        .lead-magnet-bridge {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
         .lead-magnet-section {
             position: relative;
             z-index: 10;
@@ -894,7 +920,7 @@
             .callout-inner { padding: 32px; }
             .callout-text { font-size: 1.15rem; }
             .how-it-works { padding: 0 24px; margin-bottom: 40px; }
-            .how-row { grid-template-columns: 1fr; }
+            .how-cards { grid-template-columns: 1fr; }
             .price-gap-section { padding: 0 24px; }
             .social-proof-section { padding: 0 24px; }
             .testimonial-grid { grid-template-columns: 1fr; }
@@ -974,10 +1000,10 @@
         <section class="col-narrative">
             <span class="label-micro">AI-Powered Bill Audit</span>
             <h1>Your Hospital Bill Has Errors. We Find Them.</h1>
-            <p class="hero-sub">Upload your medical bill. Our AI audits every CPT code against fair-market rates and flags overcharges in 30 seconds.</p>
+            <p class="hero-sub">Upload your bill. We check every charge against federal rates in 30 seconds.</p>
             <div class="cta-row">
                 <button type="button" class="primary-cta" id="startAudit">Audit My Bill Free</button>
-                <span class="secondary-note">Free. No login. Results in 30 seconds.</span>
+                <span class="secondary-note">Free scan &middot; Full report $19</span>
             </div>
 
             <div class="metric-block">
@@ -986,8 +1012,8 @@
                     <span class="metric-lbl">average scan time</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-val">4/5</span>
-                    <span class="metric-lbl">bills have errors</span>
+                    <span class="metric-val">8x</span>
+                    <span class="metric-lbl">avg markup over Medicare rates</span>
                 </div>
             </div>
         </section>
@@ -1089,18 +1115,22 @@
     <!-- HOW IT WORKS -->
     <section class="how-it-works">
         <h2 class="section-title">How it works</h2>
-        <div class="how-grid">
-            <div class="how-row">
-                <div class="how-step">1. Upload your bill</div>
-                <div class="how-copy">Photo, PDF, or screenshot. We accept itemized bills, EOBs, and surprise balance bills.</div>
+        <p class="section-subtitle">Three steps. Fully automated. Dispute-ready in under a minute.</p>
+        <div class="how-cards">
+            <div class="how-card">
+                <span class="how-card-number">01</span>
+                <div class="how-card-headline">Snap, Secure, Send.</div>
+                <p class="how-card-detail">Upload a photo or PDF. Our HIPAA-compliant pipeline strips your data and prepares it for a deep audit.</p>
             </div>
-            <div class="how-row">
-                <div class="how-step">2. AI audits every line</div>
-                <div class="how-copy">Every CPT code checked against Medicare rates, NCCI bundling edits, and the No Surprises Act.</div>
+            <div class="how-card">
+                <span class="how-card-number">02</span>
+                <div class="how-card-headline">Scrubbing 10,000+ Codes.</div>
+                <p class="how-card-detail">We don't just look for typos. We benchmark your charges against 2026 Medicare rates and local facility price files.</p>
             </div>
-            <div class="how-row">
-                <div class="how-step">3. Get your dispute-ready report</div>
-                <div class="how-copy">Errors flagged with dollar amounts. Download a pre-written dispute letter to send to your provider.</div>
+            <div class="how-card">
+                <span class="how-card-number">03</span>
+                <div class="how-card-headline">The Dispute Playbook.</div>
+                <p class="how-card-detail">Receive an instant report flagging every error, plus a custom Dispute Package with the legal language billing managers can't ignore.</p>
             </div>
         </div>
     </section>
@@ -1201,32 +1231,30 @@
 
     <!-- SOCIAL PROOF -->
     <section class="social-proof-section">
-        <h2 class="section-title">Real savings from real bills</h2>
-        <p class="section-subtitle">What BillKarma users found on their medical bills</p>
+        <h2 class="section-title">What BillKarma finds on real bills</h2>
+        <p class="section-subtitle">Common errors flagged in our audit engine</p>
         <div class="testimonial-grid">
             <div class="testimonial-card">
                 <span class="testimonial-amount">$2,840</span>
-                <span class="testimonial-context">saved on surgery bill</span>
-                <p class="testimonial-quote">"I had no idea my surgeon double-billed for the anesthesia consult. BillKarma caught it in seconds."</p>
-                <span class="testimonial-author">Sarah M., Austin TX</span>
+                <span class="testimonial-context">surgery bill overcharge</span>
+                <p class="testimonial-quote">Double-billed anesthesia consult on the same date of service. CPT 00840 appeared twice — a textbook duplicate charge billing managers often miss.</p>
             </div>
             <div class="testimonial-card">
                 <span class="testimonial-amount">$1,190</span>
-                <span class="testimonial-context">saved on ER visit</span>
-                <p class="testimonial-quote">"They coded my visit as Level 5 when it was clearly a Level 3. The dispute letter worked on the first try."</p>
-                <span class="testimonial-author">James R., Denver CO</span>
+                <span class="testimonial-context">ER visit upcoding</span>
+                <p class="testimonial-quote">Visit coded as Level 5 (99285) with documentation supporting only Level 3 (99283). The difference: $1,190 in charges above the appropriate rate.</p>
             </div>
             <div class="testimonial-card">
                 <span class="testimonial-amount">$640</span>
-                <span class="testimonial-context">saved on lab work</span>
-                <p class="testimonial-quote">"$487 for a blood panel that Medicare pays $14 for. I showed the hospital the report and they adjusted it same day."</p>
-                <span class="testimonial-author">Maria L., Chicago IL</span>
+                <span class="testimonial-context">lab markup flagged</span>
+                <p class="testimonial-quote">Basic Metabolic Panel (80048) billed at $487. Medicare's reimbursement rate: $14. The 34x markup is legal — but disputable with the right documentation.</p>
             </div>
         </div>
     </section>
 
     <!-- LEAD MAGNET -->
     <section class="lead-magnet-section">
+        <p class="lead-magnet-bridge">Not ready to upload yet?</p>
         <div class="lead-magnet-card">
             <span class="label-micro">Free Guide</span>
             <h2 class="lead-magnet-title">Download the 2026 Hospital Financial Aid Guide</h2>
@@ -1242,7 +1270,7 @@
     <section class="footer-cta-section">
         <h2 class="footer-cta-title">Your bill might have errors. Find out in 30 seconds.</h2>
         <button type="button" class="primary-cta primary-cta--large" id="footerAudit">Start Your Free Audit &rarr;</button>
-        <p class="footer-cta-note">No account. No credit card. Upload and get results.</p>
+        <p class="footer-cta-note">No account required. Free scan — full dispute report $19.</p>
     </section>
 
     <footer class="site-footer">
