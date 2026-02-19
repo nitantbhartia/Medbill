@@ -46,3 +46,8 @@ import guide_er_bills
 import guide_no_surprises_act
 import guide_negotiate_bills
 import guide_eob
+import guide_imaging_costs
+import guide_surgery_costs
+import guide_charity_care
+import guide_appeal_denial
+import guide_medical_debt_collections
