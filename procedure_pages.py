@@ -69,14 +69,22 @@ WITH all_prices AS (
         min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
         medicare_rate, markup_vs_medicare, data_year,
         facility_type, medicare_benchmark_type, medicare_benchmark_rate
-    FROM hospital_prices
+    FROM procedure_prices
     UNION ALL
     SELECT
-        facility_id, cpt_code, description, gross_charge, cash_price,
-        min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
-        medicare_rate, markup_vs_medicare, data_year,
-        facility_type, medicare_benchmark_type, medicare_benchmark_rate
-    FROM procedure_prices
+        hp.facility_id, hp.cpt_code, hp.description, hp.gross_charge, hp.cash_price,
+        hp.min_negotiated_rate, hp.max_negotiated_rate, hp.avg_negotiated_rate,
+        hp.medicare_rate, hp.markup_vs_medicare, hp.data_year,
+        hp.facility_type, hp.medicare_benchmark_type, hp.medicare_benchmark_rate
+    FROM hospital_prices hp
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM procedure_prices pp
+        WHERE pp.facility_id = hp.facility_id
+          AND pp.cpt_code = hp.cpt_code
+          AND COALESCE(pp.data_year, -1) = COALESCE(hp.data_year, -1)
+          AND COALESCE(pp.facility_type, 'hospital') = COALESCE(hp.facility_type, 'hospital')
+    )
 )
 """
 _BODY_SYSTEMS: list[tuple[int, int, str]] = [

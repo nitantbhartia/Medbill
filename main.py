@@ -99,9 +99,19 @@ def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> 
     with db.get_db() as conn:
         all_prices_cte = """
             WITH all_prices AS (
-                SELECT cpt_code, description, gross_charge, facility_type FROM procedure_prices
+                SELECT cpt_code, description, gross_charge, COALESCE(facility_type, 'hospital') AS facility_type
+                FROM procedure_prices
                 UNION ALL
-                SELECT cpt_code, description, gross_charge, COALESCE(facility_type, 'hospital') FROM hospital_prices
+                SELECT hp.cpt_code, hp.description, hp.gross_charge, COALESCE(hp.facility_type, 'hospital') AS facility_type
+                FROM hospital_prices hp
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM procedure_prices pp
+                    WHERE pp.facility_id = hp.facility_id
+                      AND pp.cpt_code = hp.cpt_code
+                      AND COALESCE(pp.data_year, -1) = COALESCE(hp.data_year, -1)
+                      AND COALESCE(pp.facility_type, 'hospital') = COALESCE(hp.facility_type, 'hospital')
+                )
             )
         """
         if exact_only:

@@ -129,9 +129,19 @@ def get_content_page_data(slug: str) -> dict | None:
                 COALESCE(f.state, h.state) AS state,
                 AVG(p.gross_charge) AS avg_charge
             FROM (
-                SELECT facility_id, cpt_code, gross_charge FROM hospital_prices
+                SELECT facility_id, cpt_code, gross_charge, data_year, COALESCE(facility_type, 'hospital') AS facility_type
+                FROM procedure_prices
                 UNION ALL
-                SELECT facility_id, cpt_code, gross_charge FROM procedure_prices
+                SELECT hp.facility_id, hp.cpt_code, hp.gross_charge, hp.data_year, COALESCE(hp.facility_type, 'hospital') AS facility_type
+                FROM hospital_prices hp
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM procedure_prices pp
+                    WHERE pp.facility_id = hp.facility_id
+                      AND pp.cpt_code = hp.cpt_code
+                      AND COALESCE(pp.data_year, -1) = COALESCE(hp.data_year, -1)
+                      AND COALESCE(pp.facility_type, 'hospital') = COALESCE(hp.facility_type, 'hospital')
+                )
             ) p
             LEFT JOIN facilities f ON f.facility_id = p.facility_id
             LEFT JOIN hospitals h ON h.facility_id = p.facility_id

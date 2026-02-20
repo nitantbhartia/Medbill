@@ -250,3 +250,40 @@ def test_all_week1_slugs_have_data():
         assert data is not None, f"No data for slug: {slug}"
         assert data.get("content_heading"), f"No heading for slug: {slug}"
         assert data.get("what_to_ask"), f"No what_to_ask for slug: {slug}"
+
+
+def test_content_page_state_average_dedupes_hospital_and_procedure_rows():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {
+            "facility_id": "22901",
+            "name": "Duplicate State Avg Hospital",
+            "city": "Dallas",
+            "state": "TX",
+            "slug": "duplicate-state-avg-hospital-dallas",
+            "lat": 32.77,
+            "lon": -96.79,
+        }
+    )
+    with get_db() as db:
+        db.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+            ("022901", 5.0, 10, "D"),
+        )
+        db.execute(
+            "INSERT OR REPLACE INTO hospital_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            ("022901", "70551", "MRI BRAIN W/O CONTRAST", 2000.0, 200.0, 10.0, 2026, "hospital"),
+        )
+        db.execute(
+            "INSERT OR REPLACE INTO procedure_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            ("022901", "70551", "MRI BRAIN W/O CONTRAST", 2000.0, 200.0, 10.0, 2026, "hospital"),
+        )
+
+    from procedure_content import get_content_page_data
+
+    data = get_content_page_data("mri-cost")
+    assert data is not None
+    tx = next((r for r in data.get("state_averages", []) if r.get("state") == "TX"), None)
+    assert tx is not None
+    assert round(float(tx["avg_charge"]), 2) == 2000.0

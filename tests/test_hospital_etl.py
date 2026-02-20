@@ -25,6 +25,7 @@ from hospital_seo import (  # noqa: E402
     upsert_hospital_row,
 )
 from main import _build_home_procedure_cards, _build_home_sample_facilities  # noqa: E402
+from procedure_pages import get_procedure_profile  # noqa: E402
 
 
 def test_auto_map_columns_detects_core_fields():
@@ -467,6 +468,36 @@ def test_home_procedure_cards_derive_markup_from_medicare_rate_when_missing():
     assert er.get("hospital_avg") == 1250.0
     assert er.get("hospital_markup") is not None
     assert float(er.get("hospital_markup")) >= 4.9
+
+
+def test_home_procedure_cards_match_procedure_profile_hospital_metrics():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "77001", "name": "Card Consistency Hospital A", "city": "Austin", "state": "TX", "slug": "card-consistency-austin-a"}
+    )
+    upsert_hospital_row(
+        {"facility_id": "77002", "name": "Card Consistency Hospital B", "city": "Austin", "state": "TX", "slug": "card-consistency-austin-b"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO hospital_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            ("077001", "70551", "MRI BRAIN W/O CONTRAST", 2000.0, 200.0, 10.0, 2026, "hospital"),
+        )
+        conn.execute(
+            "INSERT INTO hospital_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            ("077002", "70551", "MRI BRAIN W/O CONTRAST", 3000.0, 200.0, 15.0, 2026, "hospital"),
+        )
+
+    cards = _build_home_procedure_cards()
+    mri_card = next((c for c in cards if c.get("cpt_code") == "70551"), None)
+    assert mri_card is not None
+    profile = get_procedure_profile("70551")
+    assert profile is not None
+    hospital_row = next((r for r in profile.get("ranges_by_type", []) if r.get("facility_type") == "hospital"), None)
+    assert hospital_row is not None
+    assert round(float(mri_card["hospital_avg"]), 2) == round(float(hospital_row["avg_charge"]), 2)
+    assert round(float(mri_card["hospital_markup"]), 2) == round(float(hospital_row["avg_markup"]), 2)
 
 
 def test_load_hcahps_handles_cms_coded_columns():

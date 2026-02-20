@@ -346,6 +346,24 @@ def test_search_procedures_keyword_fallback_when_descriptions_missing():
     assert any((r.get("cpt_code") == "70553") for r in rows)
 
 
+def test_search_procedures_dedupes_hospital_and_procedure_rows():
+    _seed()
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT OR REPLACE INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (_FID_A, "70553", "MRI BRAIN W CONTRAST", 3100.0, 1720.0, 1.8, 2025, "hospital"),
+        )
+    rows = _search_procedures("70553", limit=5, exact_only=True)
+    assert rows
+    row = rows[0]
+    # Deduped result should match single-source value, not an inflated double-count aggregate.
+    assert round(float(row.get("hospital_avg") or 0.0), 2) == 5300.0
+
+
 def test_get_providers_falls_back_when_zip_coords_missing():
     _seed()
     with get_db() as db:
@@ -552,3 +570,41 @@ def test_get_procedure_profile_uses_medicare_rate_fallback_when_markup_missing()
     assert profile is not None
     assert profile["header"]["medicare_rate"] is not None
     assert profile["header"]["avg_markup"] is not None
+
+
+def test_get_procedure_profile_dedupes_hospital_and_procedure_price_duplicates():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {
+            "facility_id": "99201",
+            "name": "Duplicate Source Hospital",
+            "city": "Austin",
+            "state": "TX",
+            "slug": "duplicate-source-hospital-austin",
+            "lat": 30.26,
+            "lon": -97.74,
+        }
+    )
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099201", "70551", "MRI BRAIN STEM W/O DYE", 2000.0, 200.0, 10.0, 2026, "hospital"),
+        )
+        db.execute(
+            """
+            INSERT INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099201", "70551", "MRI BRAIN STEM W/O DYE", 2000.0, 200.0, 10.0, 2026, "hospital"),
+        )
+
+    profile = get_procedure_profile("70551")
+    assert profile is not None
+    assert profile["header"]["provider_count"] == 1
+    assert profile["header"]["national_avg_charge"] == 2000.0
