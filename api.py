@@ -9,6 +9,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 import config
+import email_service
 import scanner
 import analyzer
 import negotiation
@@ -402,6 +403,127 @@ async def record_concierge_interest(
     return {"status": "ok", "data": {"queued": True}}
 
 
+def _build_report_html(results: dict) -> str:
+    """Build an HTML email body from bill results."""
+    bill = results.get("bill", {})
+    findings = results.get("findings", [])
+    provider = bill.get("provider_name") or "your provider"
+    bill_date = bill.get("bill_date") or "N/A"
+    total_charged = bill.get("total_charged")
+    total_owes = bill.get("total_patient_owes")
+    savings = bill.get("total_potential_savings") or 0
+    bill_id = bill.get("id", "")
+    results_url = f"{config.APP_URL.rstrip('/')}/results/{bill_id}"
+
+    severity_colors = {"high": "#b91c1c", "medium": "#b45309", "low": "#1d4ed8"}
+
+    finding_rows = ""
+    for f in findings[:10]:  # cap at 10 in email
+        sev = f.get("severity", "low")
+        color = severity_colors.get(sev, "#374151")
+        est = f.get("potential_savings") or f.get("estimated_patient_savings") or 0
+        finding_rows += (
+            f'<tr>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:{color};font-weight:600;text-transform:uppercase;font-size:11px">{sev}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">{f.get("message", "")}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#059669;white-space:nowrap">'
+            f'{"$" + f"{est:,.2f}" if est else "—"}</td>'
+            f'</tr>'
+        )
+    if len(findings) > 10:
+        finding_rows += (
+            f'<tr><td colspan="3" style="padding:8px 12px;font-size:12px;color:#6b7280">'
+            f'…and {len(findings) - 10} more issues. View the full report online.</td></tr>'
+        )
+
+    charge_line = f"${total_charged:,.2f}" if total_charged else "N/A"
+    owes_line = f"${total_owes:,.2f}" if total_owes is not None else "N/A"
+
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;margin:0;padding:24px">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+    <div style="background:#0f766e;padding:24px 28px">
+      <p style="margin:0;color:#ccfbf1;font-size:13px;font-weight:600;letter-spacing:.05em">BILLKARMA REPORT</p>
+      <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:700">{len(findings)} issue{"s" if len(findings) != 1 else ""} found</h1>
+    </div>
+    <div style="padding:24px 28px">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Provider</td>
+          <td style="font-size:13px;color:#111827;font-weight:500;padding:4px 0">{provider}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Bill date</td>
+          <td style="font-size:13px;color:#111827;padding:4px 0">{bill_date}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Total charged</td>
+          <td style="font-size:13px;color:#111827;padding:4px 0">{charge_line}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">You owe</td>
+          <td style="font-size:13px;color:#111827;font-weight:600;padding:4px 0">{owes_line}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Potential savings</td>
+          <td style="font-size:14px;color:#059669;font-weight:700;padding:4px 0">${savings:,.2f}</td>
+        </tr>
+      </table>
+      {"<h2 style='font-size:14px;font-weight:600;color:#111827;margin:0 0 12px'>Issues found</h2><table style='width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden'><thead><tr><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Severity</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Finding</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Est. savings</th></tr></thead><tbody>" + finding_rows + "</tbody></table>" if findings else "<p style='color:#059669;font-weight:600'>No significant issues found — your bill looks clean.</p>"}
+      <div style="margin-top:24px;text-align:center">
+        <a href="{results_url}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:600">View full report &amp; dispute tools →</a>
+      </div>
+    </div>
+    <div style="padding:16px 28px;border-top:1px solid #e5e7eb;background:#f9fafb">
+      <p style="margin:0;font-size:11px;color:#9ca3af">BillKarma compares charges against CMS Medicare rate data. This is not medical or legal advice.</p>
+    </div>
+  </div>
+</body></html>"""
+
+
+@router.post("/email-report")
+async def email_report(request: Request):
+    """Email a bill report to the user. Requires SENDGRID_API_KEY to deliver."""
+    body = await request.json()
+    bill_id = body.get("bill_id")
+    to_email = (body.get("email") or "").strip()
+
+    if not to_email:
+        raise HTTPException(400, "email is required")
+    if not bill_id:
+        raise HTTPException(400, "bill_id is required")
+
+    results = analyzer.get_bill_results(int(bill_id))
+    if not results:
+        raise HTTPException(404, "Bill not found")
+
+    bill = results["bill"]
+    findings_count = bill.get("total_findings") or len(results.get("findings", []))
+    savings = bill.get("total_potential_savings") or 0
+
+    subject = f"Your BillKarma report: {findings_count} issue{'s' if findings_count != 1 else ''} found"
+    if savings:
+        subject += f" — up to ${savings:,.0f} in potential savings"
+
+    html = _build_report_html(results)
+
+    try:
+        sent = email_service.send_email(to_email, subject, html)
+    except RuntimeError as e:
+        log.error("email_report delivery failed: %s", e)
+        raise HTTPException(503, "Email delivery failed. Check back later or copy your report manually.")
+
+    log_audit(
+        action="email_report",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=int(bill_id),
+        metadata={"email": to_email, "sent": sent},
+    )
+    return {"status": "ok", "data": {"sent": sent}}
+
+
 @router.get("/appeal-playbook/{bill_id}")
 async def get_appeal_playbook(bill_id: int):
     """Generate issue-specific appeal steps."""
@@ -435,12 +557,15 @@ async def get_message_script(bill_id: int):
 @router.post("/negotiate/start")
 async def start_negotiation(
     bill_id: int = Form(...),
-    user_id: int = Form(...),
+    user_id: int = Form(None),
     account_number: str = Form(...),
     hospital_email: str = Form(""),
 ):
     """Create a new negotiation for a bill."""
-    neg_id = negotiation.create_negotiation(bill_id, user_id, account_number, hospital_email)
+    try:
+        neg_id = negotiation.create_negotiation(bill_id, user_id, account_number, hospital_email)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
     return {"status": "ok", "data": {"negotiation_id": neg_id}}
 
 

@@ -7,6 +7,7 @@ from google import genai
 from google.genai import types
 
 import config
+import email_service
 from db import get_db
 
 log = logging.getLogger(__name__)
@@ -183,9 +184,9 @@ Return JSON with these fields:
         log.warning("Generated email failed validation: %s", validation["violations"])
         raise ValueError(f"Generated email contains prohibited content: {validation['violations']}")
 
-    # Save as draft
+    # Save as draft and return message_id so callers can approve it
     with get_db() as db:
-        db.execute(
+        cursor = db.execute(
             "INSERT INTO negotiation_messages (negotiation_id, direction, stage, "
             "subject, body, patient_summary) VALUES (?, 'outbound', ?, ?, ?, ?)",
             (
@@ -196,26 +197,52 @@ Return JSON with these fields:
                 email_data.get("patient_summary", ""),
             ),
         )
+        email_data["message_id"] = cursor.lastrowid
 
     return email_data
 
 
 def approve_and_send(message_id: int) -> bool:
-    """Mark a message as approved. Actual email sending is handled by the email service."""
+    """Mark a message as approved and email it to the hospital if an address is on file."""
     with get_db() as db:
+        row = db.execute(
+            "SELECT nm.subject, nm.body, nm.negotiation_id, "
+            "n.hospital_email, n.hospital_name "
+            "FROM negotiation_messages nm "
+            "JOIN negotiations n ON n.id = nm.negotiation_id "
+            "WHERE nm.id = ?",
+            (message_id,),
+        ).fetchone()
+        if not row:
+            raise ValueError(f"Message {message_id} not found")
+        row = dict(row)
+
         db.execute(
             "UPDATE negotiation_messages SET user_approved = 1, approved_at = ? WHERE id = ?",
             (datetime.utcnow().isoformat(), message_id),
         )
-        msg = db.execute(
-            "SELECT negotiation_id FROM negotiation_messages WHERE id = ?", (message_id,)
-        ).fetchone()
-        if msg:
-            db.execute(
-                "UPDATE negotiations SET status = 'awaiting_response', "
-                "rounds_completed = rounds_completed + 1 WHERE id = ?",
-                (msg["negotiation_id"],),
+        db.execute(
+            "UPDATE negotiations SET status = 'awaiting_response', "
+            "rounds_completed = rounds_completed + 1 WHERE id = ?",
+            (row["negotiation_id"],),
+        )
+
+    hospital_email = (row.get("hospital_email") or "").strip()
+    if hospital_email:
+        try:
+            email_service.send_email(
+                to=hospital_email,
+                subject=row["subject"],
+                html_body=f"<pre style='font-family:sans-serif;white-space:pre-wrap'>{row['body']}</pre>",
+                text_body=row["body"],
             )
+            log.info("Dispute email sent to %s for negotiation %s", hospital_email, row["negotiation_id"])
+        except RuntimeError as e:
+            log.error("Failed to send dispute email to %s: %s", hospital_email, e)
+            # Don't re-raise — the message is approved even if delivery fails
+    else:
+        log.info("No hospital email on file for negotiation %s — message approved but not sent", row["negotiation_id"])
+
     return True
 
 
