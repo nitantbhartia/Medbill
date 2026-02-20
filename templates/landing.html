@@ -124,9 +124,9 @@
             margin-bottom: 20px;
         }
         .hero h1 { font-size: 3.5rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
-        .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.84); max-width: 680px; line-height: 1.6; }
+        .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 480px; line-height: 1.6; }
 
-        .search-container { position: relative; max-width: 760px; margin-top: 30px; }
+        .search-container { position: relative; max-width: 600px; margin-top: 36px; }
         .hero-search-form { position: relative; }
         .search-input {
             width: 100%; padding: 22px 132px 22px 30px;
@@ -178,40 +178,19 @@
         .ac-group-title {
             font-size: 0.72rem; font-weight: 700; color: #6B7280;
             letter-spacing: 0.05em; text-transform: uppercase;
-            padding: 10px 18px 6px;
-            background: #F8FAFC;
+            padding: 10px 18px 6px; background: #F8FAFC;
             border-top: 1px solid #EFF3F7;
         }
         .ac-group-title:first-child { border-top: none; }
         .ac-item {
-            display: block;
-            padding: 10px 18px;
-            text-decoration: none;
-            color: var(--c-black);
-            border-top: 1px solid #F3F4F6;
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 20px; text-decoration: none; color: var(--c-black);
+            transition: background 0.1s; border-top: 1px solid #F3F4F6;
         }
-        .ac-item:hover, .ac-item.active { background: #F8FAFC; }
-        .ac-line1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .ac-name { font-weight: 600; font-size: 0.92rem; }
-        .ac-meta { font-size: 0.8rem; color: #6B7280; }
-        .ac-pills { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .ac-price-pill {
-            font-size: 0.74rem;
-            font-weight: 600;
-            border-radius: 999px;
-            padding: 4px 8px;
-            background: #F3F4F6;
-            color: #374151;
-        }
-        .ac-facility-meta { margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.78rem; color: #6B7280; }
-        .ac-type-badge { padding: 3px 8px; border: 1px solid #D1D5DB; border-radius: 999px; font-size: 0.72rem; font-weight: 700; color: #374151; }
-        .ac-grade-badge {
-            padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
-        }
-        .ac-grade-a, .ac-grade-b { background: #E6F4EA; color: #00824F; }
-        .ac-grade-c { background: #FEF9E6; color: #B7791F; }
-        .ac-grade-d { background: #FFF0EB; color: #DD6B20; }
-        .ac-grade-f { background: #FDE8E8; color: #B91C1C; }
+        .ac-item:hover, .ac-item.active { background: #F3F4F6; }
+        .ac-info { display: flex; flex-direction: column; min-width: 0; }
+        .ac-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ac-loc { font-size: 0.8rem; color: var(--c-gray-text); }
         .ac-search-all { font-weight: 700; color: var(--c-green-dark); }
         .ac-empty { padding: 16px 18px; font-size: 0.86rem; color: #4B5563; }
         .ac-empty a { color: var(--c-green-dark); font-weight: 700; text-decoration: none; }
@@ -255,18 +234,6 @@
         .bar-label { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: var(--c-gray-text); font-weight: 600; }
 
         .comparison-section { background: #F4F4F4; padding: 80px 0; margin-bottom: 80px; border-radius: 40px; }
-        .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 24px; }
-        .filter-tab {
-            border: 1px solid var(--c-gray-border);
-            border-radius: 999px;
-            background: #fff;
-            color: #374151;
-            font-size: 0.82rem;
-            padding: 7px 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .filter-tab.active { background: var(--c-black); color: #fff; border-color: var(--c-black); }
 
         .hospital-card {
             background: var(--c-white); border-radius: var(--radius-card);
@@ -296,45 +263,16 @@
 
         .procedure-section { margin-bottom: 80px; }
         .procedure-sub { color: var(--c-gray-text); font-size: 1rem; margin-top: -8px; margin-bottom: 20px; }
-        .procedure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .procedure-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
         .procedure-card {
             background: #fff; border: 1px solid var(--c-gray-border); border-radius: 20px;
-            padding: 18px; display: flex; flex-direction: column; gap: 12px;
+            padding: 20px; display: flex; flex-direction: column; gap: 8px;
         }
         .procedure-category { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280; }
-        .procedure-name { font-size: 1.08rem; font-weight: 600; line-height: 1.3; }
-        .procedure-cpt { font-size: 0.78rem; color: #6B7280; margin-top: -4px; }
-        .pricing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .price-block { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 14px; padding: 10px; min-height: 70px; }
-        .price-label { font-size: 0.72rem; color: #6B7280; font-weight: 700; text-transform: uppercase; }
-        .price-value { font-size: 1.08rem; font-weight: 700; margin-top: 4px; }
-        .price-meta { font-size: 0.76rem; color: #6B7280; }
-        .vs-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.82rem; font-weight: 700; }
-        .vs-down { color: #0E9F6E; }
-        .vs-up { color: #DD6B20; }
-        .procedure-cta { margin-top: auto; }
-
-        .precare-flow { margin: 0 auto 0; padding: 62px 24px 32px; max-width: 1200px; }
-        .flow-wrap {
-            border: 1px solid #D6EEE1;
-            background: #F7FBF9;
-            border-radius: 28px;
-            padding: 32px;
-        }
-        .flow-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
-        .flow-step { background: #fff; border: 1px solid #E6EFEA; border-radius: 16px; padding: 18px; }
-        .flow-icon { font-size: 1.2rem; margin-bottom: 8px; }
-        .flow-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-        .flow-copy { font-size: 0.86rem; color: #4B5563; }
-
-        .flow-transition {
-            max-width: 1200px;
-            margin: 20px auto -20px;
-            padding: 0 24px;
-            font-size: 0.95rem;
-            color: #374151;
-            font-weight: 600;
-        }
+        .procedure-name { font-size: 1rem; font-weight: 600; line-height: 1.3; }
+        .procedure-price { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; margin-top: 4px; }
+        .procedure-markup { font-size: 0.82rem; color: var(--c-gray-text); }
+        .procedure-cta { margin-top: auto; padding-top: 8px; }
 
         .steps-section {
             background: var(--c-green); color: var(--c-white);
@@ -371,7 +309,7 @@
 
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .procedure-grid { grid-template-columns: 1fr; }
+            .procedure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 768px) {
             .hero { padding: 48px 0 72px; }
@@ -380,7 +318,8 @@
             .search-input { padding: 16px 120px 16px 18px; font-size: 0.95rem; }
             .section-split { grid-template-columns: 1fr; gap: 40px; margin-bottom: 70px; }
             .section-heading { font-size: 2rem; }
-            .steps-grid, .flow-grid { grid-template-columns: 1fr; text-align: left; }
+            .steps-grid { grid-template-columns: 1fr; text-align: left; }
+            .procedure-grid { grid-template-columns: 1fr; }
             .guide-grid { grid-template-columns: 1fr; }
             .footer-grid { flex-direction: column; gap: 32px; }
         }
@@ -512,20 +451,12 @@
             </div>
 
             <div class="quick-row">
-                <span class="quick-row-label">Common procedures:</span>
+                <span class="quick-row-label">Try:</span>
                 <a class="quick-chip js-procedure-chip" href="/procedures/70551/">MRI Scan</a>
                 <a class="quick-chip js-procedure-chip" href="/procedures/45378/">Colonoscopy</a>
                 <a class="quick-chip js-procedure-chip" href="/procedures/27447/">Knee Replacement</a>
                 <a class="quick-chip js-procedure-chip" href="/procedures/74177/">CT Scan</a>
                 <a class="quick-chip js-procedure-chip" href="/procedures/99284/">ER Visit</a>
-                <a class="quick-chip js-procedure-chip" href="/procedures/44970/">Appendectomy</a>
-                <a class="quick-chip js-procedure-chip" href="/procedures/27130/">Hip Replacement</a>
-                <a class="quick-chip js-procedure-chip" href="/procedures/77067/">Mammogram</a>
-            </div>
-            <div class="quick-row">
-                <span class="quick-row-label">Or search by hospital:</span>
-                <a class="quick-chip" href="/find/">Find hospitals near me</a>
-                <a class="quick-chip" href="/hospitals/">Check a specific hospital →</a>
             </div>
 
             <p class="grade-microcopy">Search your procedure to see what it should cost — or search your hospital to check their billing grade. <a href="/guides/hospital-billing-grades-explained">About our grades →</a></p>
@@ -595,16 +526,7 @@
             </div>
             <a href="/compare/" class="btn btn-outline" style="background: var(--c-white);">Compare facilities</a>
         </div>
-        <p style="color: var(--c-gray-text); font-size: 0.92rem;">Sample from our directory</p>
-
-        <div class="filter-tabs" data-filter-group="facilities">
-            <button class="filter-tab active" data-filter="all">All facilities</button>
-            <button class="filter-tab" data-filter="hospital">Hospitals</button>
-            <button class="filter-tab" data-filter="asc">Surgery Centers</button>
-            <button class="filter-tab" data-filter="imaging_center">Imaging Centers</button>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;" id="facilityCardsGrid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 8px;" id="facilityCardsGrid">
             {% set card_colors = {"A": "#00824F", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
             {% set card_grade_classes = {"A": "grade-a", "B": "grade-b", "C": "grade-c", "D": "grade-d", "F": "grade-f"} %}
             {% for h in sample_facilities %}
@@ -647,49 +569,14 @@
     <h2 class="section-heading" style="margin-bottom: 10px;">What should your procedure cost?</h2>
     <p class="procedure-sub">Compare prices across hospitals, surgery centers, and imaging centers — before you schedule.</p>
 
-    <div class="filter-tabs" data-filter-group="procedures">
-        <button class="filter-tab active" data-filter="all">All</button>
-        <button class="filter-tab" data-filter="Imaging">Imaging</button>
-        <button class="filter-tab" data-filter="Surgery">Surgery</button>
-        <button class="filter-tab" data-filter="Emergency">Emergency</button>
-        <button class="filter-tab" data-filter="Preventive">Preventive</button>
-        <button class="filter-tab" data-filter="Lab Tests">Lab Tests</button>
-    </div>
-
     <div class="procedure-grid" id="procedureCardsGrid">
         {% for p in procedure_cards %}
-        <article class="procedure-card" data-category="{{ p.category }}">
+        <article class="procedure-card">
             <div class="procedure-category">{{ p.category|upper }}</div>
             <div class="procedure-name">{{ p.name }}</div>
-            <div class="procedure-cpt">CPT {{ p.cpt_code }}</div>
-
-            <div class="pricing-grid">
-                <div class="price-block">
-                    <div class="price-label">🏥 Hospital avg</div>
-                    <div class="price-value">{% if p.hospital_avg %}${{ "{:,.0f}".format(p.hospital_avg) }}{% else %}—{% endif %}</div>
-                    <div class="price-meta">{% if p.hospital_markup %}{{ "%.1f"|format(p.hospital_markup) }}x Medicare{% else %}No benchmark{% endif %}</div>
-                </div>
-                {% if p.secondary_avg %}
-                <div class="price-block">
-                    <div class="price-label">{% if p.secondary_type == 'asc' %}⚕ Surgery Center avg{% else %}🩻 Imaging Center avg{% endif %}</div>
-                    <div class="price-value">${{ "{:,.0f}".format(p.secondary_avg) }}</div>
-                    <div class="price-meta">{% if p.secondary_markup %}{{ "%.1f"|format(p.secondary_markup) }}x {% if p.secondary_type == 'asc' %}ASC{% else %}Imaging{% endif %} rate{% else %}No benchmark{% endif %}</div>
-                </div>
-                {% else %}
-                <div class="price-block" style="visibility: hidden;"></div>
-                {% endif %}
-            </div>
-
-            <div class="vs-row">
-                {% if p.vs_hospital is not none %}
-                <span class="{{ 'vs-up' if p.vs_hospital > 0 else 'vs-down' }}">vs. National avg (Hospital): {% if p.vs_hospital > 0 %}↑{% else %}↓{% endif %}{{ "%d"|format(p.vs_hospital|abs|int) }}%</span>
-                {% endif %}
-                {% if p.vs_secondary is not none %}
-                <span class="{{ 'vs-up' if p.vs_secondary > 0 else 'vs-down' }}">{% if p.secondary_type == 'asc' %}Surgery Center{% else %}Imaging Center{% endif %}: {% if p.vs_secondary > 0 %}↑{% else %}↓{% endif %}{{ "%d"|format(p.vs_secondary|abs|int) }}%</span>
-                {% endif %}
-            </div>
-
-            <div class="procedure-cta"><a href="{{ p.url }}" class="btn btn-outline" style="background:#fff; width: 100%;">Find near me →</a></div>
+            <div class="procedure-price">{% if p.hospital_avg %}${{ "{:,.0f}".format(p.hospital_avg) }}{% else %}—{% endif %}</div>
+            <div class="procedure-markup">{% if p.hospital_markup %}{{ "%.1f"|format(p.hospital_markup) }}x Medicare · hospital avg{% else %}No benchmark{% endif %}</div>
+            <div class="procedure-cta"><a href="{{ p.url }}" class="btn btn-outline" style="background:#fff; width: 100%;">Compare prices →</a></div>
         </article>
         {% endfor %}
     </div>
@@ -699,32 +586,6 @@
         <a href="#heroSearchSection" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.95rem;">Don't see yours? Search above →</a>
     </div>
 </div>
-
-<section class="precare-flow">
-    <div class="flow-wrap">
-        <h2 class="section-heading" style="font-size: 2rem; margin-bottom: 10px;">Planning a procedure?</h2>
-        <div class="flow-grid">
-            <div class="flow-step">
-                <div class="flow-icon">🔍</div>
-                <div class="flow-title">Step 1: Search</div>
-                <p class="flow-copy">Enter your procedure or hospital to see prices, grades, and cost comparisons across all nearby facilities.</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon">📊</div>
-                <div class="flow-title">Step 2: Compare</div>
-                <p class="flow-copy">See what hospitals, surgery centers, and imaging centers charge for your procedure — and what Medicare says it should cost.</p>
-            </div>
-            <div class="flow-step">
-                <div class="flow-icon">✅</div>
-                <div class="flow-title">Step 3: Choose</div>
-                <p class="flow-copy">Pick the best-priced, highest-graded facility near you. Save hundreds or thousands before you schedule.</p>
-            </div>
-        </div>
-        <div style="margin-top: 24px;"><a href="#heroSearchSection" class="btn btn-outline" style="min-width: 220px;">Search Your Procedure →</a></div>
-    </div>
-</section>
-
-<div class="flow-transition">Already have a bill?</div>
 
 <section class="steps-section">
     <div class="container" style="max-width: 900px;">

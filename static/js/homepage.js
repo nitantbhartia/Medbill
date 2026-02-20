@@ -21,19 +21,6 @@ function highlightMatch(text, query) {
     return escapeHtml(pre) + "<strong>" + escapeHtml(match) + "</strong>" + escapeHtml(post);
 }
 
-function formatMoney(v) {
-    if (v === null || v === undefined || Number.isNaN(Number(v))) return "—";
-    return "$" + Math.round(Number(v)).toLocaleString();
-}
-
-function gradeClass(grade) {
-    var g = String(grade || "").toUpperCase();
-    if (g === "A" || g === "B") return "ac-grade-a";
-    if (g === "C") return "ac-grade-c";
-    if (g === "D") return "ac-grade-d";
-    if (g === "F") return "ac-grade-f";
-    return "";
-}
 
 function initUnifiedSearch(inputEl, resultsEl, formEl) {
     if (!inputEl || !resultsEl) return;
@@ -46,36 +33,21 @@ function initUnifiedSearch(inputEl, resultsEl, formEl) {
     }
 
     function buildProcedureItem(item, q) {
-        var pills = [];
-        if (item.hospital_avg) pills.push('<span class="ac-price-pill">🏥 Hospital avg: ' + formatMoney(item.hospital_avg) + "</span>");
-        if (item.asc_avg) pills.push('<span class="ac-price-pill">⚕ Surgery Center avg: ' + formatMoney(item.asc_avg) + "</span>");
-        if (item.imaging_avg) pills.push('<span class="ac-price-pill">🩻 Imaging Center avg: ' + formatMoney(item.imaging_avg) + "</span>");
         return '' +
             '<a class="ac-item" data-selectable="1" href="' + escapeHtml(item.url || ("/procedures/" + item.cpt_code + "/")) + '">' +
-                '<div class="ac-line1">' +
+                '<div class="ac-info">' +
                     '<span class="ac-name">' + highlightMatch(item.description || item.cpt_code, q) + '</span>' +
-                    '<span class="ac-meta">→</span>' +
+                    '<span class="ac-loc">CPT ' + escapeHtml(item.cpt_code || "") + '</span>' +
                 '</div>' +
-                '<div class="ac-meta">CPT ' + escapeHtml(item.cpt_code || "") + '</div>' +
-                '<div class="ac-pills">' + pills.join("") + '</div>' +
             '</a>';
     }
 
     function buildFacilityItem(item, q) {
-        var grade = item.billing_grade ? String(item.billing_grade).toUpperCase() : "N/A";
-        var gradeCls = gradeClass(grade);
-        var markupTxt = item.avg_markup ? (Number(item.avg_markup).toFixed(1) + "x Medicare") : "No markup data";
         return '' +
             '<a class="ac-item" data-selectable="1" href="' + escapeHtml(item.url || "#") + '">' +
-                '<div class="ac-line1">' +
+                '<div class="ac-info">' +
                     '<span class="ac-name">' + highlightMatch(item.name || "", q) + '</span>' +
-                    '<span class="ac-meta">→</span>' +
-                '</div>' +
-                '<div class="ac-meta">' + escapeHtml(item.city || "") + ', ' + escapeHtml(item.state || "") + '</div>' +
-                '<div class="ac-facility-meta">' +
-                    '<span class="ac-type-badge">' + escapeHtml(item.facility_type_label || "Facility") + '</span>' +
-                    '<span class="ac-grade-badge ' + gradeCls + '">' + escapeHtml(grade) + '</span>' +
-                    '<span>' + escapeHtml(markupTxt) + '</span>' +
+                    '<span class="ac-loc">' + escapeHtml(item.city || "") + ', ' + escapeHtml(item.state || "") + '</span>' +
                 '</div>' +
             '</a>';
     }
@@ -261,25 +233,6 @@ function initScrollTriggers() {
     });
 }
 
-function initFilterTabs() {
-    document.querySelectorAll(".filter-tabs").forEach(function (group) {
-        var buttons = group.querySelectorAll(".filter-tab");
-        buttons.forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                buttons.forEach(function (b) { b.classList.remove("active"); });
-                btn.classList.add("active");
-                var target = btn.getAttribute("data-filter");
-                var gridId = group.getAttribute("data-filter-group") === "procedures" ? "procedureCardsGrid" : "facilityCardsGrid";
-                var cards = document.getElementById(gridId);
-                if (!cards) return;
-                cards.querySelectorAll("[data-category], [data-facility-type]").forEach(function (card) {
-                    var value = card.getAttribute("data-category") || card.getAttribute("data-facility-type") || "";
-                    card.style.display = (target === "all" || value === target) ? "" : "none";
-                });
-            });
-        });
-    });
-}
 
 function initMobileNav() {
     var toggle = document.getElementById("navToggle");
@@ -321,6 +274,5 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     initScrollTriggers();
-    initFilterTabs();
     initMobileNav();
 });
