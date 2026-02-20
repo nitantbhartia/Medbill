@@ -424,39 +424,11 @@ def startup():
 
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
-    stats = get_stats()
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
-    grade_dist = get_grade_distribution()
-    sample_hospitals = get_sample_hospitals(6)
     sample_facilities = _build_home_sample_facilities(6)
     procedure_cards = _build_home_procedure_cards()
 
-    from guides import list_guides, get_guide
-    priority_slugs = [
-        "hospital-billing-grades-explained",
-        "common-hospital-billing-errors",
-        "private-equity-hospital-billing",
-    ]
-    featured_guides = []
-    for slug in priority_slugs:
-        g = get_guide(slug)
-        if g:
-            word_count = len(g.get("body", "").split())
-            g["reading_time"] = max(1, word_count // 200)
-            featured_guides.append(g)
-    if len(featured_guides) < 3:
-        for g in list_guides():
-            if g["slug"] not in priority_slugs:
-                word_count = len(g.get("body", "").split())
-                g["reading_time"] = max(1, word_count // 200)
-                featured_guides.append(g)
-                if len(featured_guides) >= 3:
-                    break
-
     with db.get_db() as conn:
-        hospital_count = conn.execute(
-            "SELECT COUNT(*) AS n FROM billing_metrics WHERE billing_grade IS NOT NULL"
-        ).fetchone()["n"]
         graded_facility_count = conn.execute(
             """
             SELECT COUNT(DISTINCT facility_id) AS n
@@ -470,15 +442,9 @@ async def landing(request: Request):
         "landing.html",
         {
             "request": request,
-            "stats": stats,
-            "outcome_stats": get_outcome_stats(),
             "canonical_url": canonical_url,
-            "grade_distribution": grade_dist,
-            "sample_hospitals": sample_hospitals,
             "sample_facilities": sample_facilities,
             "procedure_cards": procedure_cards,
-            "featured_guides": featured_guides,
-            "hospital_count": hospital_count,
             "graded_facility_count": graded_facility_count,
             "og_title": "BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades",
             "og_description": "Search any medical procedure to see what hospitals, surgery centers, and imaging centers charge vs. Medicare rates. Grade A-F for 6,798+ facilities. Scan your bill to catch overcharges.",
