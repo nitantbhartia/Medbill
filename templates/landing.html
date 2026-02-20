@@ -193,11 +193,19 @@
             border-color: var(--c-green);
         }
         .grade-microcopy {
-            margin-top: 12px; font-size: 0.86rem; color: rgba(255,255,255,0.84);
+            margin-top: 12px; font-size: 0.95rem; line-height: 1.5;
+            color: rgba(255,255,255,0.9);
         }
         .grade-microcopy a {
             color: #FFFFFF; font-weight: 700; text-decoration: underline;
             text-underline-offset: 2px;
+        }
+        .grade-info {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; margin-left: 6px;
+            border-radius: 50%; border: 1px solid rgba(255,255,255,0.65);
+            font-size: 0.72rem; font-weight: 700; color: #fff;
+            cursor: help;
         }
 
         /* --- Autocomplete (shared with homepage.js) --- */
@@ -370,6 +378,20 @@
         .donut-inner {
             width: 22px; height: 22px;
             background: var(--c-white); border-radius: 50%;
+        }
+        .precare-cta {
+            background: #F7FBF9;
+            border: 1px solid #D6EEE1;
+            border-radius: 20px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 768px) {
+            .precare-cta { flex-direction: column; align-items: flex-start; }
         }
 
         /* --- Procedure list --- */
@@ -593,7 +615,7 @@
                 <div id="heroResults" class="ac-results"></div>
             </div>
             <p class="grade-microcopy">
-                Grades compare hospital charges to 2026 Medicare rates (A: <=2x, F: >8x). <a href="/guides/hospital-billing-grades-explained">About the grade</a>
+                Grades compare hospital charges to 2026 Medicare rates (A: <=2x, F: >8x). <a href="/guides/hospital-billing-grades-explained">About the grade</a><span class="grade-info" title="Billing grades are calculated from hospital-published standard charges vs 2026 Medicare rates for matching CPT codes.">i</span>
             </p>
         </div>
     </div>
@@ -643,15 +665,23 @@
             <ul class="grade-list">
                 <li>
                     <div class="grade-dot" style="background: var(--c-green);"></div>
-                    <span><strong>Grade A:</strong> Fair market price (Close to Medicare)</span>
+                    <span><strong>Grade A:</strong> 2x Medicare or less (lowest markup)</span>
                 </li>
                 <li>
-                    <div class="grade-dot" style="background: var(--c-black);"></div>
-                    <span><strong>Grade C:</strong> Market Average (2-3x Markup)</span>
+                    <div class="grade-dot" style="background: #38A169;"></div>
+                    <span><strong>Grade B:</strong> 2.1x to 3x Medicare (fair range)</span>
+                </li>
+                <li>
+                    <div class="grade-dot" style="background: #D69E2E;"></div>
+                    <span><strong>Grade C:</strong> 3.1x to 5x Medicare (elevated)</span>
+                </li>
+                <li>
+                    <div class="grade-dot" style="background: #DD6B20;"></div>
+                    <span><strong>Grade D:</strong> 5.1x to 8x Medicare (aggressive)</span>
                 </li>
                 <li>
                     <div class="grade-dot" style="background: var(--c-orange);"></div>
-                    <span><strong>Grade F:</strong> Predatory (5x+ Markup)</span>
+                    <span><strong>Grade F:</strong> Above 8x Medicare (highest-risk pricing)</span>
                 </li>
             </ul>
             <div style="margin-top: 28px;">
@@ -732,6 +762,12 @@
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
         <h2 class="section-heading" style="margin-bottom: 0;">Common procedure costs</h2>
         <a href="/procedures/" class="btn btn-outline">View all procedures</a>
+    </div>
+    <div class="precare-cta">
+        <p style="font-size: 1rem; color: var(--c-black);">
+            Have a procedure scheduled? See what it should cost at your hospital.
+        </p>
+        <a href="/procedures/" class="btn btn-outline" style="background: #fff;">Check procedure pricing</a>
     </div>
     <div class="procedure-list">
         <div class="procedure-item fade-up">
@@ -834,7 +870,7 @@
             <div style="max-width: 300px;">
                 <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">BillKarma</div>
                 <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">
-                    Helping patients fight back against opaque medical billing since 2023.
+                    Helping patients understand what hospitals really charge.
                 </p>
             </div>
             <div style="display: flex; gap: 64px;">

@@ -352,6 +352,7 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
     Picks 1 A/B, 2 C, 2 D/F, 1 with highest single-procedure markup.
     All from different states, with at least 10 procedures compared.
     Uses state_slug (raw code) for dedup to match the SQL column.
+    Excludes behavioral/psychiatric facilities to keep homepage sample broadly relevant.
     """
     with get_db() as db:
         buckets = [
@@ -382,8 +383,14 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
                 WHERE m.billing_grade IN ({placeholders})
                   AND m.avg_markup_vs_medicare IS NOT NULL
                   AND m.procedures_compared >= 10
+                  AND lower(COALESCE(h.name, '')) NOT LIKE '%behavioral%'
+                  AND lower(COALESCE(h.name, '')) NOT LIKE '%psychi%'
+                  AND lower(COALESCE(h.hospital_type, '')) NOT LIKE '%behavioral%'
+                  AND lower(COALESCE(h.hospital_type, '')) NOT LIKE '%psychi%'
                   {state_clause}
-                ORDER BY m.procedures_compared DESC
+                ORDER BY
+                    CASE WHEN lower(COALESCE(h.hospital_type, '')) LIKE '%acute%' THEN 0 ELSE 1 END,
+                    m.procedures_compared DESC
                 LIMIT ?
                 """,
                 params,
@@ -423,6 +430,10 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
                 JOIN hospital_prices p ON p.facility_id = h.facility_id
                 WHERE m.procedures_compared >= 10
                   AND p.markup_vs_medicare IS NOT NULL
+                  AND lower(COALESCE(h.name, '')) NOT LIKE '%behavioral%'
+                  AND lower(COALESCE(h.name, '')) NOT LIKE '%psychi%'
+                  AND lower(COALESCE(h.hospital_type, '')) NOT LIKE '%behavioral%'
+                  AND lower(COALESCE(h.hospital_type, '')) NOT LIKE '%psychi%'
                   {id_clause}
                   {state_clause}
                 ORDER BY p.markup_vs_medicare DESC
@@ -438,7 +449,20 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
                 item["state"] = state_display_name(item.get("state"))
                 results.append(item)
 
-    return results[:count]
+    # Mix grades so homepage rows feel representative, not ranked.
+    lower_risk = [r for r in results if (r.get("billing_grade") or "").upper() in ("A", "B", "C")]
+    higher_risk = [r for r in results if (r.get("billing_grade") or "").upper() in ("D", "F")]
+    mixed: list[dict] = []
+    while lower_risk or higher_risk:
+        if lower_risk:
+            mixed.append(lower_risk.pop(0))
+        if higher_risk:
+            mixed.append(higher_risk.pop(0))
+
+    if len(mixed) < len(results):
+        mixed.extend(results[len(mixed):])
+
+    return mixed[:count]
 
 
 def get_state_index_stats() -> list[dict]:
