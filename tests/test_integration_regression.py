@@ -20,6 +20,9 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 import api as api_module  # noqa: E402
 from analyzer import analyze_bill, save_bill_and_findings  # noqa: E402
+import db as _db  # noqa: E402
+from db import get_db  # noqa: E402
+from hospital_seo import upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
 from tests.conftest import SAMPLE_BILL  # noqa: E402
 
@@ -271,3 +274,103 @@ class TestScanEndpointIntegration:
         )
         assert letter.status_code == 200
         assert "Flow Tester" in letter.json()["data"]["letter"]
+
+
+class TestPricingConsistencyRegression:
+    @staticmethod
+    def _seed_consistency_fixture():
+        _db._connection = None
+        _db.init_db()
+        upsert_hospital_row(
+            {
+                "facility_id": "99151",
+                "name": "Consistency Hospital A",
+                "city": "Springfield",
+                "state": "IL",
+                "slug": "consistency-hospital-a-springfield",
+                "lat": 39.7817,
+                "lon": -89.6501,
+            }
+        )
+        upsert_hospital_row(
+            {
+                "facility_id": "99152",
+                "name": "Consistency Hospital B",
+                "city": "Springfield",
+                "state": "IL",
+                "slug": "consistency-hospital-b-springfield",
+                "lat": 39.79,
+                "lon": -89.64,
+            }
+        )
+        with get_db() as db:
+            db.execute(
+                "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                ("099151", 10.0, 20, "F"),
+            )
+            db.execute(
+                "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+                ("099152", 15.0, 20, "F"),
+            )
+            db.execute(
+                "INSERT OR REPLACE INTO hospital_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                ("099151", "70551", "MRI BRAIN STEM W/O DYE", 2000.0, 200.0, 10.0, 2026, "hospital"),
+            )
+            db.execute(
+                "INSERT OR REPLACE INTO hospital_prices (facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                ("099152", "70551", "MRI BRAIN STEM W/O DYE", 3000.0, 200.0, 15.0, 2026, "hospital"),
+            )
+
+    @staticmethod
+    def _extract_money_int(pattern: str, text: str) -> int:
+        import re
+
+        m = re.search(pattern, text, flags=re.S)
+        assert m is not None
+        return int(m.group(1).replace(",", ""))
+
+    def test_homepage_and_mri_article_hospital_avg_match(self):
+        self._seed_consistency_fixture()
+
+        landing = client.get("/")
+        assert landing.status_code == 200
+        landing_price = self._extract_money_int(
+            r'<div class="procedure-name">[^<]*MRI[^<]*</div>\s*<div class="procedure-price">\$([0-9,]+)</div>',
+            landing.text,
+        )
+
+        mri = client.get("/procedures/mri-cost/")
+        assert mri.status_code == 200
+        mri_hosp_avg = self._extract_money_int(
+            r'<div class="hero-stat-label">Hospital avg</div>\s*<div class="hero-stat-value">\$([0-9,]+)</div>',
+            mri.text,
+        )
+
+        assert landing_price == 2500
+        assert mri_hosp_avg == 2500
+        assert landing_price == mri_hosp_avg
+
+    def test_mri_detail_and_article_medicare_rate_match(self):
+        self._seed_consistency_fixture()
+
+        detail = client.get("/procedures/70551/")
+        assert detail.status_code == 200
+        detail_rate = self._extract_money_int(r"Medicare rate:\s*<strong>\$([0-9,]+)</strong>", detail.text)
+
+        article = client.get("/procedures/mri-cost/")
+        assert article.status_code == 200
+        article_rate = self._extract_money_int(
+            r'<div class="hero-stat-label">Medicare rate</div>\s*<div class="hero-stat-value">\$([0-9,]+)</div>',
+            article.text,
+        )
+
+        assert detail_rate == 200
+        assert article_rate == 200
+        assert detail_rate == article_rate
+
+    def test_hospital_profile_table_matches_seeded_price(self):
+        self._seed_consistency_fixture()
+        page = client.get("/hospitals/il/springfield/consistency-hospital-a-springfield/")
+        assert page.status_code == 200
+        assert "70551" in page.text
+        assert "$2000.00" in page.text
