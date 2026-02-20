@@ -4,58 +4,166 @@
 
 {% block head %}
 <meta name="description" content="Search US hospital billing report cards by state and city. Compare billing grades, markup ratios, and patient experience before paying your bill.">
+<style>
+    .hospital-hero {
+        background: var(--bk-green, #00824F);
+        color: #fff;
+        padding: 56px 0 72px;
+        border-radius: 0 0 32px 32px;
+        margin-bottom: 48px;
+    }
+    .hospital-hero h1 {
+        font-size: 2.75rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 12px;
+    }
+    .hospital-hero p {
+        color: rgba(255,255,255,0.75);
+        font-size: 1rem;
+        max-width: 480px;
+    }
+    .hero-search-form {
+        margin-top: 28px;
+        max-width: 560px;
+        display: flex;
+        gap: 8px;
+    }
+    .hero-search-input {
+        flex: 1;
+        padding: 16px 24px;
+        border-radius: 999px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        outline: none;
+        font-family: inherit;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .hero-search-input::placeholder { color: #999; }
+    .hero-search-btn {
+        padding: 14px 28px;
+        border-radius: 999px;
+        background: var(--bk-black, #1A1A1A);
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .hero-search-btn:hover { background: #333; }
+
+    .state-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+    }
+    .state-card {
+        display: block;
+        background: #fff;
+        border: 1px solid var(--bk-gray-border, #E5E5E5);
+        border-radius: 16px;
+        padding: 20px 24px;
+        text-decoration: none;
+        color: var(--bk-black, #1A1A1A);
+        transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    }
+    .state-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        border-color: var(--bk-green, #00824F);
+    }
+    .state-card-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--bk-black, #1A1A1A);
+    }
+    .state-card-count {
+        font-size: 0.8rem;
+        color: var(--bk-gray-text, #666);
+        margin-top: 4px;
+    }
+
+    .search-result-card {
+        display: block;
+        border: 1px solid var(--bk-gray-border, #E5E5E5);
+        border-radius: 16px;
+        padding: 16px 20px;
+        text-decoration: none;
+        color: var(--bk-black, #1A1A1A);
+        background: #fff;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-result-card:hover {
+        border-color: var(--bk-green, #00824F);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    @media (max-width: 640px) {
+        .hospital-hero { padding: 40px 0 56px; }
+        .hospital-hero h1 { font-size: 2rem; }
+        .hero-search-form { flex-direction: column; }
+        .state-grid { grid-template-columns: 1fr 1fr; }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<section class="max-w-5xl mx-auto px-5 py-10">
-    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">Hospital Billing Report Card Directory</h1>
-    <p class="text-sm text-gray-600 mb-8">One page per hospital with pricing benchmarks, financial assistance context, and dispute guidance.</p>
+<section class="hospital-hero">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+        <h1>Hospital Billing Report Cards</h1>
+        <p>Search {{ "{:,}".format(states|sum(attribute='hospitals')) if states else "6,000+" }} hospitals by state or name. Every grade is based on publicly available Medicare pricing data.</p>
 
-    <form method="get" action="/hospitals/" class="mb-6">
-        <label for="hospital-search" class="block text-sm font-medium text-gray-700 mb-2">Find your hospital</label>
-        <div class="flex gap-2">
+        <form method="get" action="/hospitals/" class="hero-search-form">
             <input
                 id="hospital-search"
                 name="q"
                 value="{{ search_query or '' }}"
-                placeholder="Search by hospital, city, or state"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                placeholder="Search by hospital, city, or state..."
+                class="hero-search-input"
             />
-            <button class="bg-accent-700 text-white text-sm font-medium rounded px-4 py-2">Search</button>
-        </div>
-    </form>
+            <button type="submit" class="hero-search-btn">Search</button>
+        </form>
+    </div>
+</section>
 
+<section style="max-width: 1200px; margin: 0 auto; padding: 0 24px 64px;">
     {% if search_query %}
-    <div class="mb-8">
-        <h2 class="text-base font-semibold text-gray-900 mb-2">Search results{% if search_results %} ({{ search_results|length }}){% endif %}</h2>
+    <div style="margin-bottom: 40px;">
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">
+            Search results{% if search_results %} ({{ search_results|length }}){% endif %}
+        </h2>
         {% if search_results %}
-        <div class="space-y-2">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
             {% for row in search_results %}
-            <a class="block rounded-lg border border-gray-200 p-3 hover:border-gray-300" href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/">
-                <div class="text-sm font-semibold text-gray-900">{{ row.name }}</div>
-                <div class="text-xs text-gray-500">{{ row.city }}, {{ row.state }}</div>
+            <a class="search-result-card" href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/">
+                <div style="font-size: 0.95rem; font-weight: 600;">{{ row.name }}</div>
+                <div style="font-size: 0.8rem; color: var(--bk-gray-text, #666); margin-top: 2px;">{{ row.city }}, {{ row.state }}</div>
             </a>
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-sm text-gray-500">No hospitals found for "{{ search_query }}".</div>
+        <p style="font-size: 0.9rem; color: var(--bk-gray-text, #666);">No hospitals found for "{{ search_query }}".</p>
         {% endif %}
     </div>
     {% endif %}
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <h2 style="font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 20px;">Browse by state</h2>
+    <div class="state-grid">
         {% for row in states %}
-        <a href="/hospitals/{{ row.state_slug }}/" class="rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
-            <div class="text-sm font-semibold text-gray-900">{{ row.state or row.state_slug|upper }}</div>
-            <div class="text-xs text-gray-500 mt-1">{{ row.hospitals }} hospitals</div>
+        <a href="/hospitals/{{ row.state_slug }}/" class="state-card">
+            <div class="state-card-name">{{ row.state or row.state_slug|upper }}</div>
+            <div class="state-card-count">{{ row.hospitals }} hospitals</div>
         </a>
         {% endfor %}
         {% if not states %}
-        <div class="text-sm text-gray-500">No hospital data loaded yet.</div>
+        <p style="font-size: 0.9rem; color: var(--bk-gray-text, #666);">No hospital data loaded yet.</p>
         {% endif %}
     </div>
 
-    <div class="mt-10 p-4 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-600">
+    <div style="margin-top: 48px; padding: 20px 24px; border-radius: 16px; border: 1px solid var(--bk-gray-border, #E5E5E5); background: #FAFAFA; font-size: 0.8rem; color: var(--bk-gray-text, #666);">
         Data sourced from CMS and hospital-published transparency files. Actual charges vary by plan and clinical complexity.
     </div>
 </section>
