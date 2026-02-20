@@ -1,0 +1,223 @@
+{# Insurance Plan Personalization Bar — include near the top of hospital/procedure detail pages #}
+{# All state stored in localStorage key 'billkarma_insurance_plan' #}
+
+<div id="bk-ins-bar" class="hidden mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
+  <div id="bk-ins-set" class="hidden">
+    <!-- Plan is set: show plan info + deductible tracker -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-blue-700 uppercase tracking-widest mb-1">Your Insurance Plan</div>
+        <div class="flex flex-wrap gap-3 text-sm text-blue-900">
+          <span id="bk-ins-name" class="font-semibold"></span>
+          <span id="bk-ins-type" class="text-blue-700"></span>
+          <span class="text-blue-400">·</span>
+          <span class="text-blue-700">Deductible remaining: <strong id="bk-ins-ded"></strong></span>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-shrink-0">
+        <button onclick="bkInsEdit()" class="text-xs text-blue-700 underline hover:text-blue-900">Edit</button>
+        <button onclick="bkInsClear()" class="text-xs text-blue-500 hover:text-blue-700">✕ Clear</button>
+      </div>
+    </div>
+    <!-- Deductible tracker: two cost estimates -->
+    <div id="bk-ded-tracker" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="bg-white rounded-lg border border-blue-100 p-3">
+        <div class="text-xs text-gray-500 mb-1">Low estimate (negotiated rate)</div>
+        <div class="text-xl font-extrabold text-blue-700" id="bk-oop-low">—</div>
+        <div class="text-xs text-gray-400 mt-1">Based on typical insurer negotiated rate</div>
+      </div>
+      <div class="bg-white rounded-lg border border-blue-100 p-3">
+        <div class="text-xs text-gray-500 mb-1">High estimate (gross charge)</div>
+        <div class="text-xl font-extrabold text-orange-600" id="bk-oop-high">—</div>
+        <div class="text-xs text-gray-400 mt-1">If out-of-network or self-pay</div>
+      </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-3">
+      Estimates assume 20% coinsurance after deductible. Actual costs depend on your plan's negotiated rates,
+      coinsurance, and out-of-pocket maximum. <button onclick="bkInsEdit()" class="underline hover:text-gray-600">Update deductible</button>.
+    </p>
+  </div>
+
+  <div id="bk-ins-unset" class="flex flex-col sm:flex-row sm:items-center gap-3">
+    <!-- Plan not set -->
+    <div class="flex-1 text-sm text-blue-800">
+      <strong>Get personalized cost estimates.</strong>
+      Add your insurance plan to see your estimated out-of-pocket cost for each procedure.
+    </div>
+    <button onclick="bkInsEdit()" class="flex-shrink-0 bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-800">
+      Add My Insurance
+    </button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="bk-ins-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">Your Insurance Plan</h3>
+    <form id="bk-ins-form" onsubmit="bkInsSave(event)">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Insurer Name (optional)</label>
+          <input id="bk-f-insurer" type="text" placeholder="e.g. Blue Cross, Aetna, United"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Plan Type</label>
+          <select id="bk-f-type" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">— Select —</option>
+            <option value="PPO">PPO</option>
+            <option value="HMO">HMO</option>
+            <option value="HDHP">HDHP (High Deductible)</option>
+            <option value="HDHP+HSA">HDHP + HSA</option>
+            <option value="EPO">EPO</option>
+            <option value="Medicare">Medicare</option>
+            <option value="Medicaid">Medicaid</option>
+            <option value="Uninsured">Uninsured / Self-Pay</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Remaining Deductible ($)</label>
+          <input id="bk-f-ded" type="number" min="0" step="1" placeholder="0"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+          <p class="text-xs text-gray-400 mt-1">Enter $0 if your deductible is fully met for the year.</p>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button type="submit" class="flex-1 bg-blue-700 text-white font-semibold py-2 rounded-lg text-sm hover:bg-blue-800">
+          Save Plan
+        </button>
+        <button type="button" onclick="bkInsCloseModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function() {
+  const KEY = 'billkarma_insurance_plan';
+  const COINSURANCE = 0.20;
+
+  function getPlan() {
+    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; }
+  }
+
+  function savePlan(plan) {
+    localStorage.setItem(KEY, JSON.stringify({...plan, saved_at: new Date().toISOString()}));
+  }
+
+  function estimateOOP(charge, deductibleRemaining) {
+    if (!charge || charge <= 0) return null;
+    const ded = Math.min(deductibleRemaining || 0, charge);
+    const afterDed = charge - ded;
+    return Math.round(ded + afterDed * COINSURANCE);
+  }
+
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function refreshBar() {
+    const plan = getPlan();
+    const bar = document.getElementById('bk-ins-bar');
+    const setPart = document.getElementById('bk-ins-set');
+    const unsetPart = document.getElementById('bk-ins-unset');
+    if (!bar) return;
+    bar.classList.remove('hidden');
+    if (plan) {
+      setPart.classList.remove('hidden');
+      unsetPart.classList.add('hidden');
+      document.getElementById('bk-ins-name').textContent = plan.insurer || 'My Plan';
+      document.getElementById('bk-ins-type').textContent = plan.plan_type || '';
+      document.getElementById('bk-ins-ded').textContent = fmt(plan.deductible_remaining || 0);
+      applyPersonalization(plan);
+    } else {
+      setPart.classList.add('hidden');
+      unsetPart.classList.remove('hidden');
+      removePersonalization();
+    }
+  }
+
+  // Personalize OOP columns in price tables (data-charge on <tr>)
+  function applyPersonalization(plan) {
+    const ded = plan.deductible_remaining || 0;
+    // Show the OOP column headers
+    document.querySelectorAll('.bk-oop-th').forEach(el => el.classList.remove('hidden'));
+    // Fill in each OOP cell
+    document.querySelectorAll('tr[data-charge]').forEach(row => {
+      const charge = parseFloat(row.getAttribute('data-charge') || '0');
+      const td = row.querySelector('.bk-oop-td');
+      if (td) {
+        td.classList.remove('hidden');
+        const oop = estimateOOP(charge, ded);
+        td.textContent = oop !== null ? fmt(oop) : '—';
+        td.classList.add('font-semibold', 'text-blue-700');
+      }
+    });
+    // Show deductible tracker if a primary procedure charge is available
+    const primaryEl = document.querySelector('[data-primary-charge]');
+    const primaryCharge = parseFloat((primaryEl && primaryEl.getAttribute('data-primary-charge')) || '0');
+    if (primaryCharge > 0) {
+      const tracker = document.getElementById('bk-ded-tracker');
+      if (tracker) {
+        tracker.classList.remove('hidden');
+        // Low estimate: assume avg_negotiated_rate ≈ gross_charge / 3 (industry avg markup)
+        const negotiatedProxy = primaryCharge / 3;
+        document.getElementById('bk-oop-low').textContent = fmt(estimateOOP(negotiatedProxy, ded));
+        document.getElementById('bk-oop-high').textContent = fmt(estimateOOP(primaryCharge, ded));
+      }
+    }
+  }
+
+  function removePersonalization() {
+    document.querySelectorAll('.bk-oop-th').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('tr[data-charge]').forEach(row => {
+      const td = row.querySelector('.bk-oop-td');
+      if (td) td.classList.add('hidden');
+    });
+    const tracker = document.getElementById('bk-ded-tracker');
+    if (tracker) tracker.classList.add('hidden');
+  }
+
+  window.bkInsEdit = function() {
+    const plan = getPlan() || {};
+    document.getElementById('bk-f-insurer').value = plan.insurer || '';
+    document.getElementById('bk-f-type').value = plan.plan_type || '';
+    document.getElementById('bk-f-ded').value = plan.deductible_remaining || '';
+    document.getElementById('bk-ins-modal').classList.remove('hidden');
+  };
+
+  window.bkInsSave = function(e) {
+    e.preventDefault();
+    savePlan({
+      insurer: document.getElementById('bk-f-insurer').value.trim() || 'My Plan',
+      plan_type: document.getElementById('bk-f-type').value,
+      deductible_remaining: parseFloat(document.getElementById('bk-f-ded').value || '0') || 0,
+    });
+    bkInsCloseModal();
+    refreshBar();
+  };
+
+  window.bkInsClear = function() {
+    localStorage.removeItem(KEY);
+    refreshBar();
+  };
+
+  window.bkInsCloseModal = function() {
+    document.getElementById('bk-ins-modal').classList.add('hidden');
+  };
+
+  // Close modal on backdrop click
+  document.getElementById('bk-ins-modal').addEventListener('click', function(e) {
+    if (e.target === this) bkInsCloseModal();
+  });
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshBar);
+  } else {
+    refreshBar();
+  }
+})();
+</script>
