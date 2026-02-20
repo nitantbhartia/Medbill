@@ -145,9 +145,9 @@
         /* === FOOTER === */
         .bk-footer {
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            padding: 24px 40px;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0 16px;
             font-size: 0.78rem;
             color: var(--bk-secondary);
             font-weight: 500;
@@ -157,6 +157,10 @@
 
         .bk-footer a {
             color: var(--bk-secondary);
+            text-decoration: none;
+        }
+
+        .bk-footer a:hover {
             text-decoration: underline;
         }
 
@@ -165,7 +169,8 @@
             .bk-nav { padding: 12px 16px; }
             .bk-logo { font-size: 1rem; padding: 8px 14px; gap: 8px; }
             .bk-nav-link { display: none; }
-            .bk-footer { flex-direction: column; align-items: center; gap: 6px; padding: 20px 16px; }
+            .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
+            .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
         }
     </style>
     {% block head %}{% endblock %}
@@ -182,7 +187,10 @@
             </a>
             <div class="bk-nav-links">
                 <a href="/hospitals/" class="bk-nav-link">Hospitals</a>
-                <a href="/scan" class="bk-nav-cta">Scan a Bill</a>
+                <a href="/procedures/" class="bk-nav-link">Procedures</a>
+                <a href="/compare/" class="bk-nav-link">Compare</a>
+                <a href="/guides/" class="bk-nav-link">Guides</a>
+                <a href="/scan" class="bk-nav-cta">Scan My Bill</a>
             </div>
         </nav>
     </header>
@@ -192,8 +200,32 @@
     </main>
 
     <footer class="bk-footer">
-        <span>&copy; 2026 BillKarma. Not medical or legal advice.</span>
-        <span>Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:100%;max-width:1200px;margin:0 auto;padding:24px 40px 16px;text-align:left;">
+            <div>
+                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Product</div>
+                <a href="/hospitals/" style="display:block;padding:3px 0;">Hospital Directory</a>
+                <a href="/procedures/" style="display:block;padding:3px 0;">Procedure Costs</a>
+                <a href="/compare/" style="display:block;padding:3px 0;">Compare Hospitals</a>
+                <a href="/scan" style="display:block;padding:3px 0;">Scan My Bill</a>
+                <a href="/calculator" style="display:block;padding:3px 0;">Medicare Calculator</a>
+            </div>
+            <div>
+                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Learn</div>
+                <a href="/guides/hospital-billing-grades-explained" style="display:block;padding:3px 0;">How Billing Grades Work</a>
+                <a href="/guides/common-hospital-billing-errors" style="display:block;padding:3px 0;">Common Billing Errors</a>
+                <a href="/guides/private-equity-hospital-billing" style="display:block;padding:3px 0;">Private Equity Hospitals</a>
+                <a href="/guides/" style="display:block;padding:3px 0;">All Guides</a>
+            </div>
+            <div>
+                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">About</div>
+                <a href="/guides/hospital-billing-grades-explained" style="display:block;padding:3px 0;">Our Methodology</a>
+                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
+                <span style="display:block;padding:3px 0;font-size:0.72rem;color:#9CA3AF;">Not medical, legal, or financial advice.</span>
+            </div>
+        </div>
+        <div style="width:100%;max-width:1200px;margin:0 auto;padding:12px 40px 0;border-top:1px solid rgba(0,0,0,0.06);font-size:0.72rem;">
+            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
+        </div>
     </footer>
 
     <script src="/static/js/app.js"></script>
