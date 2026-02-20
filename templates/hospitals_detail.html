@@ -110,10 +110,21 @@
         </div>
     </div>
 
-    <div class="mb-8 rounded-lg border border-gray-200 p-5 bg-gray-50">
-        <h2 class="text-lg font-semibold text-gray-900 mb-2">Got a bill from this hospital?</h2>
-        <p class="text-sm text-gray-600">Scan it in 30 seconds to check line items against CMS benchmarks.</p>
-        <a href="/scan" class="inline-block mt-3 bg-accent-700 text-white text-base font-semibold px-6 py-3 rounded-lg">Scan My Bill</a>
+    {% if data.intro_paragraph %}
+    <p class="text-sm text-gray-700 mb-6 leading-relaxed">{{ data.intro_paragraph }}</p>
+    {% endif %}
+
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-lg border border-gray-200 p-5 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">Got a bill from this hospital?</h2>
+            <p class="text-sm text-gray-600">Scan it in 30 seconds to check line items against CMS benchmarks.</p>
+            <a href="/scan" class="inline-block mt-3 bg-accent-700 text-white text-base font-semibold px-6 py-3 rounded-lg">Scan My Bill</a>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-5">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">Planning a procedure here?</h2>
+            <p class="text-sm text-gray-600">See what common procedures cost at this hospital before your visit — and compare to nearby alternatives.</p>
+            <a href="#procedure-prices" class="inline-block mt-3 border border-accent-700 text-accent-700 text-base font-semibold px-6 py-3 rounded-lg hover:bg-accent-50">See Procedure Prices</a>
+        </div>
     </div>
 
     {% if enable_affiliate_slots and affiliate_url %}
@@ -133,7 +144,15 @@
         {% endif %}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
             <div>Average markup vs Medicare: <strong>{{ "%.1fx"|format(data.hospital.avg_markup_vs_medicare) if data.hospital.avg_markup_vs_medicare is not none else "N/A" }}</strong></div>
-            <div>Cash/self-pay discount avg: <strong>{{ "%.1f%%"|format(data.hospital.cash_discount_avg_pct) if data.hospital.cash_discount_avg_pct is not none else "N/A" }}</strong></div>
+            <div>Cash/self-pay discount avg: <strong>
+                {%- if data.hospital.cash_discount_avg_pct is none -%}
+                    Not reported
+                {%- elif data.hospital.cash_discount_avg_pct < 0.5 -%}
+                    None offered
+                {%- else -%}
+                    {{ "%.1f%%"|format(data.hospital.cash_discount_avg_pct) }}
+                {%- endif -%}
+            </strong></div>
             <div>Charity care (% revenue): <strong>{{ "%.1f%%"|format(data.financials.charity_care_pct_revenue or data.financials.charity_care_pct) if data.financials and (data.financials.charity_care_pct_revenue is not none or data.financials.charity_care_pct is not none) else "N/A" }}</strong></div>
             <div>State rank by markup: <strong>{{ data.hospital.state_rank if data.hospital.state_rank is not none else "N/A" }}</strong></div>
         </div>
@@ -198,7 +217,7 @@
             <h3 class="text-base font-semibold text-gray-900 mb-3">Markup Comparison</h3>
             {% if not enable_markup_comparisons %}
             <p class="text-sm text-gray-600">
-                Benchmark comparisons are temporarily disabled while Medicare locality validation is in progress.
+                Benchmark comparisons are not available for this hospital.
             </p>
             {% else %}
             {% set show_cmp = data.comparison.show_comparison_chart if data.comparison else false %}
@@ -242,7 +261,7 @@
         </div>
     </div>
 
-    <div class="mb-8 rounded-lg border border-gray-200 p-5 overflow-x-auto">
+    <div id="procedure-prices" class="mb-8 rounded-lg border border-gray-200 p-5 overflow-x-auto">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Common Procedure Prices</h2>
         {% if data.section_updated and data.section_updated.pricing %}
         <p class="text-xs text-gray-500 mb-3">Last updated: {{ data.section_updated.pricing[:10] }}</p>
@@ -338,7 +357,8 @@
             <div class="text-sm">
                 <a class="text-accent-700 underline" href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/">{{ row.name }}</a>
                 <span class="text-gray-500">
-                    {% if row.billing_grade and row.billing_grade != "N/A" %}&middot; Grade {{ row.billing_grade }}{% endif %}
+                    {% if row.city %} &middot; {{ row.city }}{% endif %}
+                    {% if row.billing_grade and row.billing_grade != "N/A" %} &middot; Grade {{ row.billing_grade }}{% endif %}
                     {% if row.avg_markup_vs_medicare is not none %} &middot; {{ "%.1fx"|format(row.avg_markup_vs_medicare) }}{% endif %}
                 </span>
             </div>

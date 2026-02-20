@@ -41,7 +41,7 @@ ENABLE_AFFILIATE_SLOTS = os.getenv("ENABLE_AFFILIATE_SLOTS", "false").lower() ==
 ENABLE_HOSPITAL_CLAIM = os.getenv("ENABLE_HOSPITAL_CLAIM", "false").lower() == "true"
 AFFILIATE_URL = os.getenv("AFFILIATE_URL", "")
 CLAIM_HOSPITAL_URL = os.getenv("CLAIM_HOSPITAL_URL", "")
-ENABLE_MARKUP_COMPARISONS = os.getenv("ENABLE_MARKUP_COMPARISONS", "false").lower() == "true"
+ENABLE_MARKUP_COMPARISONS = os.getenv("ENABLE_MARKUP_COMPARISONS", "true").lower() == "true"
 
 # Stats cache TTL
 STATS_CACHE_TTL_SECONDS = 60

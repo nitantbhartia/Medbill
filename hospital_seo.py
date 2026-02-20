@@ -90,7 +90,7 @@ def _looks_nonprofit_from_ownership(ownership: str | None) -> bool | None:
     if not ownership:
         return None
     txt = str(ownership).strip().lower()
-    nonprofit_markers = ("non-profit", "nonprofit", "voluntary", "church")
+    nonprofit_markers = ("non-profit", "nonprofit", "non profit", "not-for-profit", "not for profit", "voluntary", "church")
     non_nonprofit_markers = ("proprietary", "for-profit", "for profit", "physician", "government")
     if any(marker in txt for marker in nonprofit_markers):
         return True
@@ -637,7 +637,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     hospital_d["is_nonprofit"] = 1 if nonprofit_flag else 0
 
     if ownership_nonprofit is None and hospital_d.get("ownership") in (None, "") and nonprofit_flag is None:
-        hospital_d["nonprofit_status_label"] = "Unknown"
+        hospital_d["nonprofit_status_label"] = "Not reported"
     else:
         hospital_d["nonprofit_status_label"] = "Yes" if hospital_d["is_nonprofit"] else "No"
     prices_d = [dict(p) for p in prices]
@@ -661,11 +661,13 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     content_version = (content.get("model_used") or "").strip()
     if not tips or "loaded data" in str(tips).lower() or content_version != CONTENT_TEMPLATE_VERSION:
         tips = generate_deterministic_tips(hospital_d, financials_d, comparison_d)
+    intro_paragraph = generate_intro_paragraph(hospital_d, comparison_d)
 
     nearby = get_nearby_hospitals(
         state_slug=hospital_d["state_slug"],
         city_slug=hospital_d["city_slug"],
         facility_id=hospital_d["facility_id"],
+        state_code=state_code,
     )
 
     hospital_markup = hospital_d.get("avg_markup_vs_medicare")
@@ -738,21 +740,29 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "prices": prices_d,
         "show_cash_column": show_cash_column,
         "tips": tips,
+        "intro_paragraph": intro_paragraph,
         "content": content,
         "nearby": nearby,
         "section_updated": section_updated,
     }
 
 
-def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limit: int = 6) -> list[dict]:
+def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, state_code: str | None = None, limit: int = 6) -> list[dict]:
     with get_db() as db:
+        # Double-filter by both state_slug and state code (abbreviation) to guard against bad data
+        state_filter = "AND h.state = ?" if state_code else ""
+        params: list = [state_slug]
+        if state_code:
+            params.append(state_code)
+        params += [facility_id, city_slug, city_slug, city_slug, limit]
         rows = db.execute(
-            """
-            SELECT h.name, h.slug, h.state_slug, h.city_slug, h.cms_star_rating,
+            f"""
+            SELECT h.name, h.slug, h.city, h.state_slug, h.city_slug, h.cms_star_rating,
                    m.billing_grade, m.avg_markup_vs_medicare
             FROM hospitals h
             LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.state_slug = ?
+              {state_filter}
               AND h.facility_id != ?
               AND (m.avg_markup_vs_medicare IS NOT NULL OR (m.billing_grade IS NOT NULL AND m.billing_grade != 'N/A'))
               AND (h.city_slug = ? OR h.city_slug != ?)
@@ -761,12 +771,13 @@ def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, limi
                      h.name
             LIMIT ?
             """,
-            (state_slug, facility_id, city_slug, city_slug, city_slug, limit),
+            params,
         ).fetchall()
     output = []
     for row in rows:
         item = dict(row)
         item["name"] = _display_name(item.get("name"), item.get("facility_id"))
+        item["city"] = _display_city(item.get("city"))
         output.append(item)
     return output
 
@@ -1033,6 +1044,57 @@ def recompute_billing_metrics() -> int:
 
     clear_comparison_cache()
     return upserted
+
+
+def generate_intro_paragraph(hospital: dict, comparison: dict | None = None) -> str:
+    """Generate a 2-3 sentence summary paragraph unique to this hospital for SEO and readability."""
+    name = hospital.get("name", "This hospital")
+    grade = hospital.get("billing_grade") or "N/A"
+    markup = hospital.get("avg_markup_vs_medicare")
+    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else None
+    state = hospital.get("state") or ""
+    state_rank = hospital.get("state_rank")
+    procedures = hospital.get("procedures_compared")
+
+    cmp_data = comparison or {}
+    state_avg = cmp_data.get("state_avg_markup_raw")
+    national_avg = cmp_data.get("national_avg_markup_raw")
+
+    parts = []
+
+    if markup_txt and grade != "N/A":
+        sentence = f"{name} receives a BillKarma billing grade of {grade}, with an average markup of {markup_txt} versus Medicare reimbursement rates"
+        if procedures:
+            sentence += f" across {procedures:,} procedures"
+        sentence += "."
+        parts.append(sentence)
+    elif grade != "N/A":
+        parts.append(f"{name} receives a BillKarma billing grade of {grade}.")
+
+    if isinstance(markup, (int, float)) and isinstance(state_avg, (int, float)) and state:
+        if markup > state_avg * 1.1:
+            diff_pct = round((markup / state_avg - 1) * 100)
+            parts.append(f"Charges here run approximately {diff_pct}% higher than the {state} state average ({state_avg:.1f}x Medicare).")
+        elif markup < state_avg * 0.9:
+            diff_pct = round((1 - markup / state_avg) * 100)
+            parts.append(f"Charges here run approximately {diff_pct}% lower than the {state} state average ({state_avg:.1f}x Medicare).")
+        elif isinstance(national_avg, (int, float)):
+            if markup > national_avg * 1.1:
+                parts.append(f"This is above the national average of {national_avg:.1f}x Medicare.")
+            else:
+                parts.append(f"This is near the national average of {national_avg:.1f}x Medicare.")
+    elif isinstance(markup, (int, float)) and isinstance(national_avg, (int, float)):
+        if markup > national_avg * 1.1:
+            parts.append(f"Charges here are above the national average of {national_avg:.1f}x Medicare.")
+        else:
+            parts.append(f"Charges here are near or below the national average of {national_avg:.1f}x Medicare.")
+
+    if state_rank and state:
+        parts.append(f"It ranks #{state_rank} in {state} by markup ratio.")
+
+    if not parts:
+        return ""
+    return " ".join(parts)
 
 
 def generate_deterministic_tips(hospital: dict, financials: dict, comparison: dict | None = None) -> str:
