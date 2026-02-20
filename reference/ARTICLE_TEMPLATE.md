@@ -24,6 +24,15 @@ Before publishing, verify every item:
 - [ ] **3+ CTAs distributed throughout** — not just at the end. See CTA
       placement rules below. At least one in the first half of the article.
 - [ ] **5+ FAQs** with FAQPage schema (structured in `faqs` list)
+- [ ] **BillKarma proprietary data** — at least 1 stat framed as "According to
+      BillKarma's analysis of X,XXX hospitals..." or "BillKarma data shows..."
+      Pull real numbers from the hospital database (markup medians, grade
+      distributions, error rates, transparency scores). This is the content
+      that earns AI citations and backlinks — external sources alone won't.
+      If the article topic has no obvious BillKarma angle, find one: grade
+      distributions for the relevant hospital type, markup comparison by
+      ownership category, share of hospitals flagged for the specific error
+      being discussed.
 - [ ] **Sources section** — 5+ authoritative external links (CMS, KFF, CFPB,
       Health Affairs, etc.). Every stat in the lead paragraph must trace to
       a named, specific source (no journal homepages — use DOIs or direct links)
@@ -336,6 +345,9 @@ characters for mobile SERP display.
 - **Empowering, not alarming** — lead with what they can do
 - **Precise with numbers** — always cite CPT codes, dollar amounts, Medicare
   rates
+- **Lead with BillKarma data when possible** — "According to BillKarma's
+  analysis of 6,000+ hospitals" outranks "According to RAND." External sources
+  corroborate; BillKarma data is the reason to cite the article at all.
 - **Neutral toward providers** — billing mistakes, not accusations
 - **8th grade reading level** — define jargon inline on first use
 - **Action-oriented** — every section should end with something the reader
