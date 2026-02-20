@@ -300,25 +300,16 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
         return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"})
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{canonical_slug or hospital_slug}/"
 
-    hospital_name = profile["hospital"]["name"]
-    city_name = profile["hospital"]["city"]
-    state_name = profile["hospital"]["state"]
-    markup = profile["hospital"].get("avg_markup_vs_medicare")
-    markup_text = f"{markup:.1f}x Medicare rates" if isinstance(markup, (int, float)) else "billing and pricing benchmarks"
-    seo_description = (
-        f"{hospital_name} billing review in {city_name}, {state_name}. "
-        f"See {markup_text}, financial assistance, and dispute tips."
-    )
-
+    seo = profile["seo"]
     return templates.TemplateResponse(
         "hospitals_detail.html",
         {
             "request": request,
             "data": profile,
             "canonical_url": canonical_url,
-            "og_title": f"{hospital_name} Billing Review & Prices | BillKarma",
-            "og_description": seo_description,
-            "meta_description": seo_description,
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
             "meta_robots": "index, follow",
             "enable_affiliate_slots": config.ENABLE_AFFILIATE_SLOTS,
             "affiliate_url": config.AFFILIATE_URL,
