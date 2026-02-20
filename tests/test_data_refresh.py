@@ -8,6 +8,7 @@ from data_refresh import (
     data_health_check,
     refresh_medicare_rates,
     refresh_ncci_edits,
+    refresh_zip_latlon,
     refresh_zip_localities,
 )
 from db import get_db
@@ -94,6 +95,34 @@ class TestRefreshZipLocalities:
                     "SELECT region FROM zip_locality_map WHERE zip_prefix = '33021'"
                 ).fetchone()
                 assert row["region"] == "southeast"
+        finally:
+            os.unlink(path)
+
+
+class TestRefreshZipLatLon:
+    def test_load_csv(self):
+        csv_content = (
+            "ZIP,LAT,LON,STATE,CITY\n"
+            "92111,32.7972,-117.1708,CA,San Diego\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            f.flush()
+            path = f.name
+
+        try:
+            count = refresh_zip_latlon(path)
+            assert count == 1
+
+            with get_db() as db:
+                row = db.execute(
+                    "SELECT lat, lon, state, city FROM zip_latlon WHERE zip = '92111'"
+                ).fetchone()
+                assert row is not None
+                assert round(float(row["lat"]), 4) == 32.7972
+                assert round(float(row["lon"]), 4) == -117.1708
+                assert row["state"] == "CA"
+                assert row["city"] == "San Diego"
         finally:
             os.unlink(path)
 

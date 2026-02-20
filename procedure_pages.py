@@ -731,7 +731,105 @@ def get_providers_near_zip_for_cpt(
         results.sort(key=lambda r: (r["markup_vs_medicare"] is None, r["markup_vs_medicare"] or 0.0))
     else:
         results.sort(key=lambda r: (r["estimated_patient_cost"] is None, r["estimated_patient_cost"] or 0.0))
-    return results[:limit]
+    if results:
+        return results[:limit]
+
+    # If no providers are available in-radius, return nearest same-state matches
+    # (distance-ranked) so users still get useful options without crossing states.
+    fallback = _get_nearest_same_state_providers_for_cpt(
+        cpt_code=cpt_code,
+        zip_code=zip_code,
+        zip_lat=zip_lat,
+        zip_lon=zip_lon,
+        limit=limit,
+        facility_type=normalized_type,
+        grade_ab_only=grade_ab_only,
+        sort_by=sort_key,
+    )
+    return fallback[:limit]
+
+
+def _get_nearest_same_state_providers_for_cpt(
+    cpt_code: str,
+    zip_code: str,
+    zip_lat: float,
+    zip_lon: float,
+    limit: int,
+    facility_type: str,
+    grade_ab_only: bool,
+    sort_by: str,
+) -> list[dict]:
+    state = _resolve_state_from_zip(zip_code)
+    if not state:
+        return []
+    normalized_type = (facility_type or "all").strip().lower()
+    with get_db() as db:
+        where_type = ""
+        params: list = [cpt_code, state]
+        if normalized_type != "all":
+            where_type = " AND COALESCE(f.facility_type, hp.facility_type, 'hospital') = ?"
+            params.append(normalized_type)
+        rows = db.execute(
+            f"""
+            {_ALL_PRICES_CTE}
+            SELECT
+                COALESCE(f.name, h.name) AS name,
+                COALESCE(f.city, h.city) AS city,
+                COALESCE(f.state, h.state) AS state,
+                COALESCE(f.state_slug, h.state_slug) AS state_slug,
+                COALESCE(f.city_slug, h.city_slug) AS city_slug,
+                COALESCE(f.slug, h.slug) AS slug,
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
+                COALESCE(f.lat, h.lat) AS lat,
+                COALESCE(f.lon, h.lon) AS lon,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
+                COALESCE(f.is_hospital_owned, 0) AS is_hospital_owned,
+                hp.gross_charge,
+                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                COALESCE(hp.medicare_benchmark_type, CASE WHEN COALESCE(f.facility_type, hp.facility_type, 'hospital') = 'asc' THEN 'asc' ELSE 'opps' END) AS medicare_benchmark_type,
+                hp.markup_vs_medicare
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
+            LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
+            WHERE hp.cpt_code = ?
+              AND hp.gross_charge IS NOT NULL
+              AND hp.markup_vs_medicare IS NOT NULL
+              AND COALESCE(f.name, h.name) IS NOT NULL
+              AND UPPER(COALESCE(f.state, h.state)) = ?
+              AND COALESCE(f.lat, h.lat) IS NOT NULL
+              AND COALESCE(f.lon, h.lon) IS NOT NULL
+              {where_type}
+            ORDER BY hp.gross_charge ASC
+            LIMIT 1500
+            """,
+            tuple(params),
+        ).fetchall()
+
+    out = []
+    for row in rows:
+        if grade_ab_only and (row["billing_grade"] or "").upper() not in {"A", "B"}:
+            continue
+        dist = _haversine_miles(zip_lat, zip_lon, row["lat"], row["lon"])
+        charge = row["gross_charge"] or 0.0
+        out.append({
+            **dict(row),
+            "facility_type_label": _FACILITY_TYPE_LABELS.get(row["facility_type"] or "hospital", "Provider"),
+            "ownership_badge": "Hospital-owned" if row["is_hospital_owned"] else "Independent",
+            "benchmark_label": _BENCHMARK_TYPE_LABELS.get(row["medicare_benchmark_type"] or "opps", "Medicare"),
+            "profile_url": _provider_profile_url(dict(row)),
+            "estimated_patient_cost": round(charge * 0.20, 2) if charge else None,
+            "distance_miles": round(dist, 1),
+            "badge_class": _grade_badge_class(row["billing_grade"]),
+        })
+
+    # Prefer nearest options first; tie-break by configured sort.
+    if sort_by == "markup":
+        out.sort(key=lambda r: (r["distance_miles"], r["markup_vs_medicare"] is None, r["markup_vs_medicare"] or 0.0))
+    else:
+        out.sort(key=lambda r: (r["distance_miles"], r["estimated_patient_cost"] is None, r["estimated_patient_cost"] or 0.0))
+    return out[:limit]
 
 
 def _get_providers_without_zip_coords(

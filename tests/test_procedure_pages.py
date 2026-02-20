@@ -448,6 +448,25 @@ def test_get_providers_without_coords_returns_empty_when_zip_unresolvable():
     assert rows == []
 
 
+def test_get_providers_returns_nearest_same_state_when_radius_has_none():
+    _seed()
+    with get_db() as db:
+        db.execute(
+            "INSERT OR REPLACE INTO zip_latlon (zip, lat, lon, state, city) VALUES (?, ?, ?, ?, ?)",
+            ("60601", 41.8864, -87.6186, "IL", "Chicago"),
+        )
+    rows = get_providers_near_zip_for_cpt(
+        "27447",
+        "60601",
+        limit=10,
+        facility_type="all",
+        radius_miles=10,
+    )
+    assert rows
+    assert all((r.get("state") or "").upper() == "IL" for r in rows)
+    assert all((r.get("distance_miles") or 0) > 10 for r in rows)
+
+
 def test_get_top_cpt_codes_returns_list():
     _seed()
     codes = get_top_cpt_codes(10)

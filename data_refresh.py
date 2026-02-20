@@ -310,6 +310,47 @@ def refresh_zip_localities(csv_path: str) -> int:
     return count
 
 
+def refresh_zip_latlon(csv_path: str) -> int:
+    """
+    Load ZIP centroid coordinates from a CSV file.
+    Returns number of rows inserted.
+
+    Expected CSV columns: ZIP,LAT,LON[,STATE,CITY]
+    """
+    import csv
+
+    count = 0
+    rows = []
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                zip_code = (row.get("ZIP") or "").strip()
+                if len(zip_code) != 5 or not zip_code.isdigit():
+                    continue
+                lat = float((row.get("LAT") or "").strip())
+                lon = float((row.get("LON") or "").strip())
+                state = (row.get("STATE") or "").strip().upper() or None
+                city = (row.get("CITY") or "").strip() or None
+                rows.append((zip_code, lat, lon, state, city))
+                count += 1
+            except (ValueError, KeyError, TypeError) as e:
+                log.warning("Skipping bad ZIP lat/lon row: %s — %s", row, e)
+
+    if not rows:
+        log.warning("No ZIP lat/lon rows parsed from %s", csv_path)
+        return 0
+
+    with get_db() as db:
+        db.executemany(
+            "INSERT OR REPLACE INTO zip_latlon (zip, lat, lon, state, city) VALUES (?, ?, ?, ?, ?)",
+            rows,
+        )
+
+    log.info("Loaded %d ZIP lat/lon rows from %s", count, csv_path)
+    return count
+
+
 def refresh_all_from_directory(data_dir: str) -> dict:
     """
     Refresh all known data sources from a directory of CSV files.
@@ -322,6 +363,7 @@ def refresh_all_from_directory(data_dir: str) -> dict:
         "ncci_edits.csv": refresh_ncci_edits,
         "procedure_benchmarks.csv": refresh_benchmarks,
         "zip_locality_map.csv": refresh_zip_localities,
+        "zip_latlon.csv": refresh_zip_latlon,
     }
     loaded = {}
     for filename, loader in loaders.items():
@@ -522,7 +564,7 @@ if __name__ == "__main__":
         print("Usage: python data_refresh.py <command> [csv_path]")
         print(
             "Commands: health-check, refresh-pfs, refresh-opps, refresh-asc, refresh-ncci, "
-            "refresh-benchmarks, refresh-zip-localities, refresh-all, "
+            "refresh-benchmarks, refresh-zip-localities, refresh-zip-latlon, refresh-all, "
             "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )
         sys.exit(1)
@@ -577,6 +619,10 @@ if __name__ == "__main__":
         count = refresh_zip_localities(sys.argv[2])
         print(f"Loaded {count} ZIP locality rows.")
 
+    elif cmd == "refresh-zip-latlon" and len(sys.argv) == 3:
+        count = refresh_zip_latlon(sys.argv[2])
+        print(f"Loaded {count} ZIP lat/lon rows.")
+
     elif cmd == "refresh-all" and len(sys.argv) == 3:
         result = refresh_all_from_directory(sys.argv[2])
         print("Loaded data files:")
@@ -586,7 +632,7 @@ if __name__ == "__main__":
     else:
         print(
             "Unknown command. Use: health-check, refresh-pfs, refresh-opps, refresh-asc, "
-            "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-all, "
+            "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-zip-latlon, refresh-all, "
             "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )
         sys.exit(1)
