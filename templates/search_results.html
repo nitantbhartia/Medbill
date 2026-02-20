@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title or "Search Results | BillKarma" }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ og_description if og_description else 'Search procedures and facilities on BillKarma.' }}">
+<style>
+  .search-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 48px; }
+  .search-head { margin-bottom: 22px; }
+  .search-head h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; }
+  .search-head p { color: #6b7280; margin-top: 8px; }
+  .search-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .result-col { border: 1px solid #e5e7eb; border-radius: 16px; background: #fff; }
+  .result-col h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+  .result-item { display: block; text-decoration: none; color: #111827; padding: 12px 16px; border-top: 1px solid #f8fafc; }
+  .result-item:hover { background: #f9fafb; }
+  .result-name { font-weight: 700; }
+  .result-sub { font-size: 0.83rem; color: #6b7280; margin-top: 4px; }
+  .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; margin-right: 6px; background: #f3f4f6; color: #374151; }
+  .empty { padding: 16px; color: #6b7280; font-size: 0.9rem; }
+  @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-wrap">
+  <div class="search-head">
+    <h1>Search results</h1>
+    {% if query %}
+    <p>Results for "{{ query }}"</p>
+    {% else %}
+    <p>Enter a procedure, hospital, surgery center, or imaging center.</p>
+    {% endif %}
+  </div>
+
+  <div class="search-grid">
+    <section class="result-col">
+      <h2>Procedures</h2>
+      {% if procedures %}
+        {% for p in procedures %}
+        <a class="result-item" href="{{ p.url }}">
+          <div class="result-name">{{ p.description or p.cpt_code }}</div>
+          <div class="result-sub">CPT {{ p.cpt_code }}</div>
+          <div class="result-sub">
+            {% if p.hospital_avg %}<span class="pill">🏥 {{ "${:,.0f}".format(p.hospital_avg) }}</span>{% endif %}
+            {% if p.asc_avg %}<span class="pill">⚕ {{ "${:,.0f}".format(p.asc_avg) }}</span>{% endif %}
+            {% if p.imaging_avg %}<span class="pill">🩻 {{ "${:,.0f}".format(p.imaging_avg) }}</span>{% endif %}
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty">No procedure results.</div>
+      {% endif %}
+    </section>
+
+    <section class="result-col">
+      <h2>Hospitals & Facilities</h2>
+      {% if facilities %}
+        {% for f in facilities %}
+        <a class="result-item" href="{{ f.url }}">
+          <div class="result-name">{{ f.name }}</div>
+          <div class="result-sub">{{ f.city }}, {{ f.state }}</div>
+          <div class="result-sub">
+            <span class="pill">{{ f.facility_type_label }}</span>
+            {% if f.billing_grade %}<span class="pill">Grade {{ f.billing_grade }}</span>{% endif %}
+            {% if f.avg_markup %}<span class="pill">{{ "%.1f"|format(f.avg_markup) }}x Medicare</span>{% endif %}
+          </div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty">No facility results.</div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

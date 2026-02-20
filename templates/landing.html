@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BillKarma | Hospital Billing Transparency</title>
-    <meta name="description" content="Check any U.S. hospital's billing grade before you schedule. Scan your bill for errors. Fight overcharges with real Medicare data. 6,000+ hospitals graded free.">
+    <title>BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades</title>
+    <meta name="description" content="Search any medical procedure to see what hospitals, surgery centers, and imaging centers charge vs. Medicare rates. Grade A-F for 6,798+ facilities. Scan your bill to catch overcharges.">
     <meta name="robots" content="{{ meta_robots|default('index, follow') }}">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="BillKarma — Know What Your Hospital Charges">
-    <meta property="og:description" content="Hospital billing grades, bill scanner, and dispute tools. The average U.S. hospital charges 3.4x Medicare rates. Find out where yours stands.">
+    <meta property="og:title" content="BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades">
+    <meta property="og:description" content="Search procedures, compare facility prices, and check billing grades before care. Scan your bill after care to catch overcharges.">
     <meta property="og:url" content="{{ canonical_url }}">
     <meta property="og:image" content="{{ request.base_url|string ~ 'static/img/billkarma-og.svg' }}">
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
@@ -32,6 +32,7 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: var(--font-main);
@@ -44,7 +45,6 @@
 
         .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
 
-        /* --- Nav --- */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(255,255,255,0.95);
@@ -62,10 +62,7 @@
             text-decoration: none; color: var(--c-black);
             font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em;
         }
-        .nav-logo-dot {
-            width: 24px; height: 24px; background: var(--c-green);
-            border-radius: 50%; flex-shrink: 0;
-        }
+        .nav-logo-dot { width: 24px; height: 24px; background: var(--c-green); border-radius: 50%; flex-shrink: 0; }
         .nav-center { display: flex; gap: 4px; }
         .nav-link {
             text-decoration: none; color: var(--c-black);
@@ -78,97 +75,59 @@
         .btn {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 10px 22px; border-radius: var(--radius-pill);
-            font-size: 0.875rem; font-weight: 500; text-decoration: none;
+            font-size: 0.875rem; font-weight: 600; text-decoration: none;
             transition: all 0.2s ease; cursor: pointer; border: none;
         }
-        .btn-outline {
-            border: 1px solid var(--c-gray-border); color: var(--c-black);
-            background: transparent;
-        }
+        .btn-outline { border: 1px solid var(--c-gray-border); color: var(--c-black); background: transparent; }
         .btn-outline:hover { border-color: var(--c-black); }
-        .btn-primary {
-            background-color: var(--c-black); color: var(--c-white);
-            border: 1px solid var(--c-black);
-        }
+        .btn-primary { background-color: var(--c-black); color: var(--c-white); border: 1px solid var(--c-black); }
         .btn-primary:hover { background-color: #333; }
-        .btn-white {
-            background-color: var(--c-white); color: var(--c-green);
-            border: 1px solid var(--c-white); font-weight: 600;
-        }
-        .btn-green {
-            background-color: var(--c-green); color: var(--c-white);
-            border: 1px solid var(--c-green);
-        }
-        .btn-green:hover { background-color: var(--c-green-dark); }
+        .btn-white { background-color: var(--c-white); color: var(--c-green); border: 1px solid var(--c-white); font-weight: 700; }
 
-        /* Mobile nav */
-        .nav-hamburger {
-            display: none; background: none; border: none; cursor: pointer; padding: 8px;
-        }
-        .mobile-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-            z-index: 998;
-        }
+        .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+        .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 998; }
         .mobile-overlay.open { display: block; }
         .mobile-menu {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--c-white); z-index: 999; padding: 24px;
+            position: fixed; top: 0; right: -330px; width: 320px; height: 100%;
+            background: var(--c-white); z-index: 999; padding: 20px;
             transition: right 0.25s ease; display: flex; flex-direction: column;
+            gap: 8px;
         }
         .mobile-menu.open { right: 0; }
-        .mobile-menu a {
-            color: var(--c-black); text-decoration: none; font-size: 1rem;
-            font-weight: 500; padding: 14px 0;
-            border-bottom: 1px solid var(--c-gray-border); display: block;
-        }
+        .mobile-menu a { color: var(--c-black); text-decoration: none; font-size: 1rem; font-weight: 500; padding: 12px 0; border-bottom: 1px solid var(--c-gray-border); display: block; }
         .mobile-menu .mobile-cta {
             margin-top: auto; background: var(--c-black); color: var(--c-white);
             font-weight: 700; text-align: center; padding: 14px;
             border-radius: var(--radius-pill); border: none;
         }
-        @media (max-width: 768px) {
+        .mobile-menu-search { position: relative; margin-bottom: 8px; }
+        .mobile-menu-input {
+            width: 100%; border: 1px solid var(--c-gray-border); border-radius: 999px;
+            padding: 12px 16px; font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
             .nav-center, .nav-right { display: none; }
             .nav-hamburger { display: block; }
         }
 
-        /* --- Hero --- */
         .hero {
             background-color: var(--c-green); color: var(--c-white);
             padding: 72px 0 100px; position: relative; overflow: hidden;
             border-radius: 0 0 40px 40px;
         }
-        .hero-pattern {
-            position: absolute; right: -10%; top: 50%;
-            transform: translateY(-50%); width: 600px; height: 600px;
-            opacity: 0.15; pointer-events: none;
-        }
-        .hero-circle {
-            position: absolute; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
+        .hero-pattern { position: absolute; right: -10%; top: 50%; transform: translateY(-50%); width: 600px; height: 600px; opacity: 0.15; pointer-events: none; }
+        .hero-circle { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
         .hero-label {
             font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
             text-transform: uppercase; color: rgba(255,255,255,0.7);
             margin-bottom: 20px;
         }
-        .hero h1 {
-            font-size: 3.5rem; font-weight: 500; letter-spacing: -0.02em;
-            line-height: 1.1; margin-bottom: 20px;
-        }
-        .hero-sub {
-            font-size: 1.1rem; color: rgba(255,255,255,0.8);
-            max-width: 480px; line-height: 1.6;
-        }
-        @media (max-width: 768px) {
-            .hero { padding: 48px 0 72px; }
-            .hero h1 { font-size: 2.25rem; }
-            .hero-sub { font-size: 1rem; }
-        }
+        .hero h1 { font-size: 3.5rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
+        .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.84); max-width: 680px; line-height: 1.6; }
 
-        /* --- Search --- */
-        .search-container {
-            position: relative; max-width: 600px; margin-top: 36px;
-        }
+        .search-container { position: relative; max-width: 760px; margin-top: 30px; }
+        .hero-search-form { position: relative; }
         .search-input {
             width: 100%; padding: 22px 132px 22px 30px;
             border-radius: var(--radius-pill); border: 2px solid rgba(255,255,255,0.8);
@@ -177,329 +136,263 @@
             font-family: var(--font-main); color: var(--c-black);
         }
         .search-input::placeholder { color: #71717A; }
-        .search-btn-wrap {
-            position: absolute; right: 8px; top: 50%;
-            transform: translateY(-50%);
-        }
+        .search-btn-wrap { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
         .search-btn-wrap .btn-primary {
-            background-color: var(--c-green-dark);
-            border-color: var(--c-green-dark);
-            box-shadow: 0 8px 18px rgba(0,0,0,0.18);
-            font-weight: 700;
-            padding: 12px 24px;
+            background-color: var(--c-green-dark); border-color: var(--c-green-dark);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.18); font-weight: 700; padding: 12px 24px;
         }
-        .search-btn-wrap .btn-primary:hover {
-            background-color: var(--c-green);
-            border-color: var(--c-green);
-        }
-        .grade-microcopy {
-            margin-top: 12px; font-size: 0.95rem; line-height: 1.5;
-            color: rgba(255,255,255,0.9);
-        }
-        .grade-microcopy a {
-            color: #FFFFFF; font-weight: 700; text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-        .grade-info {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 18px; height: 18px; margin-left: 6px;
-            border-radius: 50%; border: 1px solid rgba(255,255,255,0.65);
-            font-size: 0.72rem; font-weight: 700; color: #fff;
-            cursor: help;
-        }
+        .search-btn-wrap .btn-primary:hover { background-color: var(--c-green); border-color: var(--c-green); }
 
-        /* --- Autocomplete (shared with homepage.js) --- */
+        .quick-row {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .quick-row-label { font-size: 0.86rem; color: rgba(255,255,255,0.84); font-weight: 600; }
+        .quick-chip {
+            border: 1px solid rgba(255,255,255,0.45);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .quick-chip:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.65); }
+
+        .grade-microcopy { margin-top: 12px; font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.92); }
+        .grade-microcopy a { color: #FFFFFF; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
         .ac-results {
             position: absolute; top: calc(100% + 6px); left: 0; right: 0;
             background: #fff; border-radius: 16px; overflow: hidden;
             box-shadow: 0 12px 40px rgba(0,0,0,0.2);
             display: none; z-index: 50;
+            border: 1px solid #E5E7EB;
         }
         .ac-results.open { display: block; }
+        .ac-group-title {
+            font-size: 0.72rem; font-weight: 700; color: #6B7280;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 10px 18px 6px;
+            background: #F8FAFC;
+            border-top: 1px solid #EFF3F7;
+        }
+        .ac-group-title:first-child { border-top: none; }
         .ac-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 20px; text-decoration: none; color: var(--c-black);
-            transition: background 0.1s;
+            display: block;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: var(--c-black);
+            border-top: 1px solid #F3F4F6;
         }
-        .ac-item:hover, .ac-item.active { background: #F3F4F6; }
-        .ac-badge {
-            width: 32px; height: 32px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.8rem; color: #fff; flex-shrink: 0;
+        .ac-item:hover, .ac-item.active { background: #F8FAFC; }
+        .ac-line1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .ac-name { font-weight: 600; font-size: 0.92rem; }
+        .ac-meta { font-size: 0.8rem; color: #6B7280; }
+        .ac-pills { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .ac-price-pill {
+            font-size: 0.74rem;
+            font-weight: 600;
+            border-radius: 999px;
+            padding: 4px 8px;
+            background: #F3F4F6;
+            color: #374151;
         }
-        .ac-grade-a { background: var(--c-green); }
-        .ac-grade-b { background: #38A169; }
-        .ac-grade-c { background: #D69E2E; }
-        .ac-grade-d { background: #DD6B20; }
-        .ac-grade-f { background: #E53E3E; }
-        .ac-grade-na { background: #9CA3AF; }
-        .ac-info { display: flex; flex-direction: column; min-width: 0; }
-        .ac-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ac-loc { font-size: 0.8rem; color: var(--c-gray-text); }
+        .ac-facility-meta { margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 0.78rem; color: #6B7280; }
+        .ac-type-badge { padding: 3px 8px; border: 1px solid #D1D5DB; border-radius: 999px; font-size: 0.72rem; font-weight: 700; color: #374151; }
+        .ac-grade-badge {
+            padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+        }
+        .ac-grade-a, .ac-grade-b { background: #E6F4EA; color: #00824F; }
+        .ac-grade-c { background: #FEF9E6; color: #B7791F; }
+        .ac-grade-d { background: #FFF0EB; color: #DD6B20; }
+        .ac-grade-f { background: #FDE8E8; color: #B91C1C; }
+        .ac-search-all { font-weight: 700; color: var(--c-green-dark); }
+        .ac-empty { padding: 16px 18px; font-size: 0.86rem; color: #4B5563; }
+        .ac-empty a { color: var(--c-green-dark); font-weight: 700; text-decoration: none; }
 
-        /* --- Stats Bar --- */
         .stats-bar { margin-top: -48px; margin-bottom: 80px; position: relative; z-index: 10; }
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .stat-card {
             background: var(--c-white); padding: 28px;
             border-radius: var(--radius-card);
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             border: 1px solid var(--c-gray-border);
-            display: flex; flex-direction: column;
-            justify-content: space-between; min-height: 170px;
+            display: flex; flex-direction: column; justify-content: space-between; min-height: 176px;
         }
-        .stat-label {
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
-            text-transform: uppercase; color: var(--c-gray-text);
-        }
-        .stat-number {
-            font-size: 3rem; font-weight: 400; letter-spacing: -0.03em;
-            line-height: 1;
-        }
-        .stat-bar {
-            width: 100%; height: 4px; background: #eee; border-radius: 2px;
-        }
+        .stat-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--c-gray-text); }
+        .stat-number { font-size: 2.6rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+        .stat-sub { font-size: 0.78rem; color: #6B7280; margin-top: 6px; }
+        .stat-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; }
         .stat-bar-fill { height: 100%; border-radius: 2px; }
         .text-green { color: var(--c-green); }
-        .text-orange { color: #C66B3D; }
         .text-gray { color: var(--c-gray-text); }
-        .stat-card-dark {
-            background: var(--c-black); color: var(--c-white);
-            border: none;
-        }
-        @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 640px) {
-            .stats-grid { grid-template-columns: 1fr; }
-        }
+        .stat-card-dark { background: var(--c-black); color: var(--c-white); border: none; }
 
-        /* --- Section split (methodology) --- */
-        .section-split {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 64px; align-items: center; margin-bottom: 100px;
-        }
-        @media (max-width: 768px) {
-            .section-split { grid-template-columns: 1fr; gap: 40px; }
-        }
-        .section-label {
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
-            text-transform: uppercase; color: var(--c-gray-text);
-            margin-bottom: 12px; display: block;
-        }
-        .section-heading {
-            font-size: 2.75rem; font-weight: 500; letter-spacing: -0.02em;
-            line-height: 1.1; margin-bottom: 20px;
-        }
-        @media (max-width: 768px) {
-            .section-heading { font-size: 2rem; }
-        }
+        .section-split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 100px; }
+        .section-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--c-gray-text); margin-bottom: 12px; display: block; }
+        .section-heading { font-size: 2.6rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; }
+
         .grade-list { list-style: none; padding: 0; }
-        .grade-list li {
-            display: flex; align-items: center; gap: 14px;
-            padding: 8px 0; font-size: 0.95rem;
-        }
-        .grade-dot {
-            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-        }
+        .grade-list li { display: flex; align-items: center; gap: 14px; padding: 8px 0; font-size: 0.95rem; }
+        .grade-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-        /* --- Bar chart viz --- */
         .bar-chart-viz {
             display: flex; align-items: flex-end; gap: 6px;
             height: 260px; width: 100%; padding: 24px;
             background: #FAFAFA; border-radius: var(--radius-card);
             border: 1px solid var(--c-gray-border);
         }
-        .bar {
-            flex: 1; border-radius: 6px 6px 0 0; position: relative;
-            transition: height 1s ease-out;
-        }
+        .bar { flex: 1; border-radius: 6px 6px 0 0; position: relative; }
         .bar-green { background-color: var(--c-green); }
         .bar-black { background-color: #D69E2E; }
         .bar-orange { background-color: var(--c-orange); }
-        .bar-label {
-            position: absolute; bottom: -28px; left: 50%;
-            transform: translateX(-50%); font-size: 0.75rem;
-            color: var(--c-gray-text); font-weight: 600;
-        }
+        .bar-label { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: var(--c-gray-text); font-weight: 600; }
 
-        /* --- Comparison section --- */
-        .comparison-section {
-            background: #F4F4F4; padding: 80px 0;
-            margin-bottom: 80px; border-radius: 40px;
+        .comparison-section { background: #F4F4F4; padding: 80px 0; margin-bottom: 80px; border-radius: 40px; }
+        .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 24px; }
+        .filter-tab {
+            border: 1px solid var(--c-gray-border);
+            border-radius: 999px;
+            background: #fff;
+            color: #374151;
+            font-size: 0.82rem;
+            padding: 7px 12px;
+            font-weight: 700;
+            cursor: pointer;
         }
+        .filter-tab.active { background: var(--c-black); color: #fff; border-color: var(--c-black); }
+
         .hospital-card {
             background: var(--c-white); border-radius: var(--radius-card);
-            padding: 28px; text-decoration: none; color: var(--c-black);
+            padding: 24px; text-decoration: none; color: var(--c-black);
             transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; border: 1px solid var(--c-gray-border);
         }
-        .hospital-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-        }
-        .hospital-card-link {
-            color: inherit; text-decoration: none; display: block;
-        }
-        .hospital-card-actions {
-            margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px;
-            align-items: center;
-        }
-        .risk-chip {
-            font-size: 0.74rem; font-weight: 700; letter-spacing: 0.04em;
-            text-transform: uppercase; color: #8A2C0D; background: #FFF0EB;
-            border-radius: 999px; padding: 5px 10px;
-        }
-        .action-link {
-            font-size: 0.82rem; font-weight: 700; text-decoration: none;
-            border-radius: 999px; padding: 6px 10px; border: 1px solid;
-        }
-        .action-link.compare { color: var(--c-green-dark); border-color: #9BD2B8; background: #F2FAF6; }
-        .action-link.negotiate { color: #8A2C0D; border-color: #F4B89E; background: #FFF7F3; }
-        .action-link.compare:hover, .action-link.negotiate:hover { filter: brightness(0.98); }
-        .grade-badge {
-            width: 48px; height: 48px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.15rem; flex-shrink: 0;
-        }
+        .hospital-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+        .grade-badge { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.08rem; flex-shrink: 0; }
         .grade-a { background: #E6F4EA; color: var(--c-green); }
         .grade-b { background: #E6F4EA; color: #38A169; }
         .grade-c { background: #FEF9E6; color: #D69E2E; }
         .grade-d { background: #FFF0EB; color: #DD6B20; }
-        .grade-f { background: #FFF0EB; color: var(--c-orange); }
+        .grade-f { background: #FDE8E8; color: #B91C1C; }
         .grade-na { background: #F3F4F6; color: #9CA3AF; }
-        .donut-chart {
-            width: 56px; height: 56px; border-radius: 50%;
-            position: relative; display: flex;
-            align-items: center; justify-content: center;
+        .donut-chart { width: 56px; height: 56px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .donut-inner { width: 22px; height: 22px; background: var(--c-white); border-radius: 50%; }
+        .facility-badge-row { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .facility-type-badge {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 4px 8px; border-radius: 999px; border: 1px solid #D1D5DB; color: #374151;
         }
-        .donut-inner {
-            width: 22px; height: 22px;
-            background: var(--c-white); border-radius: 50%;
+        .facility-owned-badge {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 4px 8px; border-radius: 999px; background: #FFF7ED; color: #B45309; border: 1px solid #FCD34D;
         }
-        .precare-cta {
-            background: #F7FBF9;
+
+        .procedure-section { margin-bottom: 80px; }
+        .procedure-sub { color: var(--c-gray-text); font-size: 1rem; margin-top: -8px; margin-bottom: 20px; }
+        .procedure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .procedure-card {
+            background: #fff; border: 1px solid var(--c-gray-border); border-radius: 20px;
+            padding: 18px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .procedure-category { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280; }
+        .procedure-name { font-size: 1.08rem; font-weight: 600; line-height: 1.3; }
+        .procedure-cpt { font-size: 0.78rem; color: #6B7280; margin-top: -4px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .price-block { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 14px; padding: 10px; min-height: 70px; }
+        .price-label { font-size: 0.72rem; color: #6B7280; font-weight: 700; text-transform: uppercase; }
+        .price-value { font-size: 1.08rem; font-weight: 700; margin-top: 4px; }
+        .price-meta { font-size: 0.76rem; color: #6B7280; }
+        .vs-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.82rem; font-weight: 700; }
+        .vs-down { color: #0E9F6E; }
+        .vs-up { color: #DD6B20; }
+        .procedure-cta { margin-top: auto; }
+
+        .precare-flow { margin: 0 auto 0; padding: 62px 24px 32px; max-width: 1200px; }
+        .flow-wrap {
             border: 1px solid #D6EEE1;
-            border-radius: 20px;
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 22px;
+            background: #F7FBF9;
+            border-radius: 28px;
+            padding: 32px;
         }
-        @media (max-width: 768px) {
-            .precare-cta { flex-direction: column; align-items: flex-start; }
+        .flow-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
+        .flow-step { background: #fff; border: 1px solid #E6EFEA; border-radius: 16px; padding: 18px; }
+        .flow-icon { font-size: 1.2rem; margin-bottom: 8px; }
+        .flow-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+        .flow-copy { font-size: 0.86rem; color: #4B5563; }
+
+        .flow-transition {
+            max-width: 1200px;
+            margin: 20px auto -20px;
+            padding: 0 24px;
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 600;
         }
 
-        /* --- Procedure list --- */
-        .procedure-list { display: flex; flex-direction: column; }
-        .procedure-item {
-            display: grid; grid-template-columns: 1fr auto auto;
-            align-items: center; padding: 24px 0;
-            border-bottom: 1px solid var(--c-gray-border); gap: 32px;
-        }
-        @media (max-width: 768px) {
-            .procedure-item { grid-template-columns: 1fr; gap: 12px; }
-        }
-        .trend-indicator {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 1.3rem; font-weight: 400;
-        }
-
-        /* --- How it works --- */
         .steps-section {
             background: var(--c-green); color: var(--c-white);
             padding: 80px 0; border-radius: 40px;
             margin: 0 24px 80px;
         }
-        .steps-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 40px; text-align: center;
-        }
-        @media (max-width: 768px) {
-            .steps-grid { grid-template-columns: 1fr; gap: 32px; text-align: left; }
-        }
+        .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; text-align: center; }
         .step-num {
             width: 48px; height: 48px; border-radius: 50%;
             background: rgba(255,255,255,0.2); color: var(--c-white);
             font-weight: 700; font-size: 1.1rem;
-            display: inline-flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
+            display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;
         }
         .step-h { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
-        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
+        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.78); line-height: 1.6; }
 
-        /* --- Guides --- */
-        .guide-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-        }
-        @media (max-width: 768px) { .guide-grid { grid-template-columns: 1fr; } }
+        .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .guide-card {
             background: var(--c-white); border: 1px solid var(--c-gray-border);
             border-radius: 16px; padding: 28px; text-decoration: none;
             color: var(--c-black); display: flex; flex-direction: column;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .guide-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.06);
-        }
-        .guide-card-title {
-            font-weight: 600; font-size: 1rem; margin-bottom: 8px; line-height: 1.35;
-        }
-        .guide-card-desc {
-            font-size: 0.9rem; color: var(--c-gray-text); line-height: 1.5; flex: 1;
-        }
-        .guide-card-meta {
-            font-size: 0.8rem; color: #9CA3AF; margin-top: 14px; font-weight: 500;
-        }
+        .guide-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
+        .guide-card-title { font-weight: 600; font-size: 1rem; margin-bottom: 8px; line-height: 1.35; }
+        .guide-card-desc { font-size: 0.9rem; color: var(--c-gray-text); line-height: 1.5; flex: 1; }
+        .guide-card-meta { font-size: 0.8rem; color: #9CA3AF; margin-top: 14px; font-weight: 500; }
 
-        /* --- Footer --- */
         footer { padding: 80px 0; border-top: 1px solid var(--c-gray-border); }
-        .footer-grid {
-            display: flex; justify-content: space-between; gap: 48px;
-        }
-        @media (max-width: 768px) {
-            .footer-grid { flex-direction: column; gap: 32px; }
-        }
-        .footer-col-title {
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
-            text-transform: uppercase; color: var(--c-black); margin-bottom: 12px;
-        }
-        .footer-col a {
-            display: block; color: var(--c-gray-text); text-decoration: none;
-            font-size: 0.875rem; padding: 3px 0; transition: color 0.15s;
-        }
+        .footer-grid { display: flex; justify-content: space-between; gap: 48px; }
+        .footer-col-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--c-black); margin-bottom: 12px; }
+        .footer-col a { display: block; color: var(--c-gray-text); text-decoration: none; font-size: 0.875rem; padding: 3px 0; transition: color 0.15s; }
         .footer-col a:hover { color: var(--c-black); }
 
-        /* --- Animations --- */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .procedure-grid { grid-template-columns: 1fr; }
         }
-        .animate-up {
-            animation: slideUp 0.6s ease-out forwards;
+        @media (max-width: 768px) {
+            .hero { padding: 48px 0 72px; }
+            .hero h1 { font-size: 2.25rem; }
+            .hero-sub { font-size: 1rem; }
+            .search-input { padding: 16px 120px 16px 18px; font-size: 0.95rem; }
+            .section-split { grid-template-columns: 1fr; gap: 40px; margin-bottom: 70px; }
+            .section-heading { font-size: 2rem; }
+            .steps-grid, .flow-grid { grid-template-columns: 1fr; text-align: left; }
+            .guide-grid { grid-template-columns: 1fr; }
+            .footer-grid { flex-direction: column; gap: 32px; }
         }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .fade-up {
-            opacity: 0; transform: translateY(20px);
-            transition: opacity 0.6s, transform 0.6s;
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr; }
         }
-        .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-        /* Print */
         @media print {
             nav, footer, .hero-pattern { display: none !important; }
             body { background: #fff !important; color: #000 !important; }
         }
     </style>
 
-    <!-- JSON-LD: WebSite -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -508,22 +401,20 @@
         "url": "{{ canonical_url }}",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "{{ canonical_url }}hospitals/?q={search_term_string}",
+            "target": "{{ canonical_url }}search?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
     </script>
-    <!-- JSON-LD: Organization -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "BillKarma",
         "url": "{{ canonical_url }}",
-        "description": "Hospital billing transparency and medical bill analysis. BillKarma grades 6,000+ U.S. hospitals on billing fairness and scans bills for errors."
+        "description": "Procedure-first medical cost transparency and bill analysis across hospitals, surgery centers, and imaging centers."
     }
     </script>
-    <!-- JSON-LD: FAQPage -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -531,52 +422,54 @@
         "mainEntity": [
             {
                 "@type": "Question",
+                "name": "How do I find out what a procedure should cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Search your procedure on BillKarma to see average costs at hospitals, surgery centers, and imaging centers near you, compared to Medicare reference rates. Facilities are graded A-F based on how their charges compare to Medicare rates."
+                }
+            },
+            {
+                "@type": "Question",
                 "name": "What is a hospital billing grade?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "A hospital billing grade (A through F) reflects how much a hospital charges compared to what Medicare pays for the same procedures. BillKarma calculates grades by comparing each hospital's gross charges to 2026 Medicare OPPS rates. An A-grade hospital charges 2x Medicare or less. An F-grade hospital charges more than 8x Medicare."
+                    "text": "BillKarma grades hospitals A through F based on how their prices compare to Medicare reference rates. Grade A hospitals charge close to Medicare rates (fair pricing). Grade F hospitals charge 5x or more above Medicare rates (predatory pricing)."
                 }
             },
             {
                 "@type": "Question",
-                "name": "How do I check my hospital's billing grade?",
+                "name": "How do I check if my medical bill is correct?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Search your hospital name in BillKarma's free hospital directory. Every hospital's billing grade, average markup vs Medicare, and procedure-level pricing is available without creating an account."
+                    "text": "Upload your bill to BillKarma's bill scanner. We compare every CPT code against Medicare rates and flag duplicates, unbundling errors, and inflated charges. Most users find at least one issue worth disputing."
                 }
             },
             {
                 "@type": "Question",
-                "name": "How common are hospital billing errors?",
+                "name": "Is it cheaper to use a surgery center than a hospital?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "BillKarma's automated analysis flags potential billing issues in approximately 1 in 4 hospital bills reviewed. The most common error types are upcoding (billing a higher service level than performed), duplicate charges, and unbundling (billing procedure components separately instead of using the correct bundled code)."
+                    "text": "In most cases, yes. Ambulatory surgery centers (ASCs) typically charge 40-70% less than hospital outpatient departments for the same procedures. Search your procedure on BillKarma to compare prices across both facility types near you."
                 }
             }
         ]
     }
     </script>
 </head>
-
 <body>
-
-<!-- ========== NAV ========== -->
 <nav>
     <div class="nav-inner">
-        <a href="/" class="nav-logo">
-            <div class="nav-logo-dot"></div>
-            BillKarma
-        </a>
+        <a href="/" class="nav-logo"><div class="nav-logo-dot"></div>BillKarma</a>
         <div class="nav-center">
-            <a href="/guides/hospital-billing-grades-explained" class="nav-link">Methodology</a>
-            <a href="/hospitals/" class="nav-link">Hospitals</a>
-            <a href="/procedures/" class="nav-link">Procedures</a>
+            <a href="/procedures/" class="nav-link">Find a Procedure</a>
+            <a href="/hospitals/" class="nav-link">Find a Hospital</a>
             <a href="/compare/" class="nav-link">Compare</a>
             <a href="/guides/" class="nav-link">Guides</a>
+            <a href="/guides/hospital-billing-grades-explained" class="nav-link">Methodology</a>
         </div>
         <div class="nav-right">
-            <a href="/hospitals/" class="btn btn-outline">Check Hospital</a>
-            <a href="/scan" class="btn btn-primary">Scan My Bill</a>
+            <a href="/procedures/" class="btn btn-outline">Find a Procedure</a>
+            <a href="/scan" class="btn btn-primary">Scan My Bill ●</a>
         </div>
         <button class="nav-hamburger" id="navToggle" aria-label="Menu">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -586,107 +479,100 @@
 
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
-    <a href="/hospitals/">Hospitals</a>
-    <a href="/procedures/">Procedures</a>
+    <div class="mobile-menu-search">
+        <input id="mobileMenuSearch" type="text" class="mobile-menu-input" placeholder="Search procedure or hospital" autocomplete="off">
+        <div id="mobileMenuResults" class="ac-results"></div>
+    </div>
+    <a href="/procedures/">Find a Procedure</a>
+    <a href="/hospitals/">Find a Hospital</a>
     <a href="/compare/">Compare</a>
     <a href="/guides/">Guides</a>
+    <a href="/guides/hospital-billing-grades-explained">Methodology</a>
     <a href="/scan" class="mobile-cta">Scan My Bill</a>
 </div>
 
-<!-- ========== HERO ========== -->
-<section class="hero">
+<section class="hero" id="heroSearchSection">
     <div class="hero-pattern">
         <div class="hero-circle" style="width: 400px; height: 400px; top: 0; left: 0;"></div>
         <div class="hero-circle" style="width: 250px; height: 250px; top: 80px; left: 80px;"></div>
         <div class="hero-circle" style="width: 120px; height: 120px; top: 140px; left: 260px;"></div>
     </div>
-    <div class="container animate-up">
-        <div style="max-width: 700px;">
+    <div class="container">
+        <div style="max-width: 760px;">
             <p class="hero-label">Simple and intuitive transparency</p>
             <h1>Don't pay blindly.<br>Know the grade.</h1>
-            <p class="hero-sub">
-                We analyze millions of Medicare records to grade hospitals on fair pricing. Check before you go, or scan your bill to fight overcharges.
-            </p>
+            <p class="hero-sub">Before any procedure, know what it should cost and where to go. After any bill, know if you were overcharged and how to fight back.</p>
+
             <div class="search-container">
-                <input id="heroSearch" type="text" class="search-input" placeholder="Search {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }}+ hospitals (e.g. Mayo Clinic)" autocomplete="off">
-                <div class="search-btn-wrap">
-                    <button class="btn btn-primary" onclick="document.getElementById('heroSearch').focus()">Search</button>
-                </div>
+                <form id="heroSearchForm" class="hero-search-form" action="/search" method="get">
+                    <input id="heroSearch" name="q" type="text" class="search-input" placeholder="Search any procedure or hospital (e.g. MRI, colonoscopy, Mayo Clinic)" autocomplete="off">
+                    <div class="search-btn-wrap"><button type="submit" class="btn btn-primary">Search</button></div>
+                </form>
                 <div id="heroResults" class="ac-results"></div>
             </div>
-            <p class="grade-microcopy">
-                Grades compare hospital charges to 2026 Medicare rates (A: <=2x, F: >8x). <a href="/guides/hospital-billing-grades-explained">About the grade</a><span class="grade-info" title="Billing grades are calculated from hospital-published standard charges vs 2026 Medicare rates for matching CPT codes.">i</span>
-            </p>
+
+            <div class="quick-row">
+                <span class="quick-row-label">Common procedures:</span>
+                <a class="quick-chip js-procedure-chip" href="/procedures/70551/">MRI Scan</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/45378/">Colonoscopy</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/27447/">Knee Replacement</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/74177/">CT Scan</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/99284/">ER Visit</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/44970/">Appendectomy</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/27130/">Hip Replacement</a>
+                <a class="quick-chip js-procedure-chip" href="/procedures/77067/">Mammogram</a>
+            </div>
+            <div class="quick-row">
+                <span class="quick-row-label">Or search by hospital:</span>
+                <a class="quick-chip" href="/find/">Find hospitals near me</a>
+                <a class="quick-chip" href="/hospitals/">Check a specific hospital →</a>
+            </div>
+
+            <p class="grade-microcopy">Search your procedure to see what it should cost — or search your hospital to check their billing grade. <a href="/guides/hospital-billing-grades-explained">About our grades →</a></p>
         </div>
     </div>
 </section>
 
-<!-- ========== STATS BAR ========== -->
 <div class="container stats-bar">
     <div class="stats-grid">
-        <div class="stat-card animate-up delay-1">
-            <span class="stat-label">Graded Hospitals</span>
-            <span class="stat-number text-green" data-count-target="{{ hospital_count or 6000 }}" data-suffix="">0</span>
-            <div class="stat-bar">
-                <div class="stat-bar-fill" style="width: 85%; background: var(--c-green);"></div>
-            </div>
+        <div class="stat-card">
+            <span class="stat-label">Graded Facilities</span>
+            <span class="stat-number text-green" data-count-target="{{ graded_facility_count or 14000 }}" data-suffix="+">0</span>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width: 86%; background: var(--c-green);"></div></div>
         </div>
-        <div class="stat-card animate-up delay-2">
-            <span class="stat-label">Avg Markup vs Medicare</span>
+        <div class="stat-card">
+            <span class="stat-label">Avg Hospital Markup</span>
             <span class="stat-number" data-count-target="3.4" data-suffix="x">0</span>
-            <div class="stat-bar">
-                <div class="stat-bar-fill" style="width: 65%; background: var(--c-black);"></div>
-            </div>
+            <div class="stat-sub">Independent surgery centers avg: 2.1x</div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width: 65%; background: var(--c-black);"></div></div>
         </div>
-        <div class="stat-card animate-up delay-3">
+        <div class="stat-card">
             <span class="stat-label">Bills Flagged</span>
             <span class="stat-number text-gray">1 in 4</span>
-            <div class="stat-bar">
-                <div class="stat-bar-fill" style="width: 38%; background: #C79A6A;"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width: 38%; background: #C79A6A;"></div></div>
         </div>
-        <div class="stat-card stat-card-dark animate-up delay-3">
+        <div class="stat-card stat-card-dark">
             <span class="stat-label" style="color: rgba(255,255,255,0.5);">Start Now</span>
             <h3 style="font-size: 1.25rem; font-weight: 500;">Have a bill in hand?</h3>
-            <a href="/scan" class="btn btn-white" style="width: 100%; text-align: center;">Scan My Bill &rarr;</a>
+            <a href="/scan" class="btn btn-white" style="width: 100%; text-align: center;">Scan My Bill →</a>
         </div>
     </div>
 </div>
 
-<!-- ========== METHODOLOGY ========== -->
 <main class="container">
     <div class="section-split">
         <div>
             <span class="section-label">Methodology</span>
             <h2 class="section-heading">How we grade pricing fairness</h2>
-            <p style="color: var(--c-gray-text); font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;">
-                Hospitals are required to publish prices, but they hide them in complex files. We compare their cash prices against Medicare rates.
-            </p>
+            <p style="color: var(--c-gray-text); font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;">Hospitals are required to publish prices, but they hide them in complex files. We compare their cash prices against Medicare rates.</p>
             <ul class="grade-list">
-                <li>
-                    <div class="grade-dot" style="background: var(--c-green);"></div>
-                    <span><strong>Grade A:</strong> 2x Medicare or less (lowest markup)</span>
-                </li>
-                <li>
-                    <div class="grade-dot" style="background: #38A169;"></div>
-                    <span><strong>Grade B:</strong> 2.1x to 3x Medicare (fair range)</span>
-                </li>
-                <li>
-                    <div class="grade-dot" style="background: #D69E2E;"></div>
-                    <span><strong>Grade C:</strong> 3.1x to 5x Medicare (elevated)</span>
-                </li>
-                <li>
-                    <div class="grade-dot" style="background: #DD6B20;"></div>
-                    <span><strong>Grade D:</strong> 5.1x to 8x Medicare (aggressive)</span>
-                </li>
-                <li>
-                    <div class="grade-dot" style="background: var(--c-orange);"></div>
-                    <span><strong>Grade F:</strong> Above 8x Medicare (highest-risk pricing)</span>
-                </li>
+                <li><div class="grade-dot" style="background: var(--c-green);"></div><span><strong>Grade A:</strong> 2x Medicare or less (lowest markup)</span></li>
+                <li><div class="grade-dot" style="background: #38A169;"></div><span><strong>Grade B:</strong> 2.1x to 3x Medicare (fair range)</span></li>
+                <li><div class="grade-dot" style="background: #D69E2E;"></div><span><strong>Grade C:</strong> 3.1x to 5x Medicare (elevated)</span></li>
+                <li><div class="grade-dot" style="background: #DD6B20;"></div><span><strong>Grade D:</strong> 5.1x to 8x Medicare (aggressive)</span></li>
+                <li><div class="grade-dot" style="background: var(--c-orange);"></div><span><strong>Grade F:</strong> Above 8x Medicare (highest-risk pricing)</span></li>
             </ul>
-            <div style="margin-top: 28px;">
-                <a href="/guides/hospital-billing-grades-explained" class="btn btn-outline">Read full methodology</a>
-            </div>
+            <div style="margin-top: 28px;"><a href="/guides/hospital-billing-grades-explained" class="btn btn-outline">Read full methodology</a></div>
         </div>
 
         <div class="bar-chart-viz">
@@ -694,193 +580,198 @@
             {% set grade_heights = {"A": "40%", "B": "65%", "C": "85%", "D": "55%", "F": "30%"} %}
             {% set grade_opacities = {"A": "1", "B": "0.8", "C": "1", "D": "0.8", "F": "1"} %}
             {% for grade in ["A", "B", "C", "D", "F"] %}
-            <div class="bar {{ grade_colors_map[grade] }}" style="height: {{ grade_heights[grade] }}; opacity: {{ grade_opacities[grade] }};">
-                <span class="bar-label">{{ grade }}</span>
-            </div>
+            <div class="bar {{ grade_colors_map[grade] }}" style="height: {{ grade_heights[grade] }}; opacity: {{ grade_opacities[grade] }};"><span class="bar-label">{{ grade }}</span></div>
             {% endfor %}
         </div>
     </div>
 </main>
 
-<!-- ========== COMPARE SAMPLE ========== -->
-<section class="comparison-section">
+<section class="comparison-section" id="facilityComparisonSection">
     <div class="container">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px;">
-            <h2 class="section-heading" style="margin-bottom: 0;">See how hospitals compare</h2>
-            <a href="/compare/" class="btn btn-outline" style="background: var(--c-white);">Compare hospitals</a>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+            <div>
+                <h2 class="section-heading" style="margin-bottom: 8px;">See what facilities near you charge</h2>
+                <p style="color: var(--c-gray-text); font-size: 0.95rem;">Hospitals, surgery centers, and imaging centers — all graded on the same scale.</p>
+            </div>
+            <a href="/compare/" class="btn btn-outline" style="background: var(--c-white);">Compare facilities</a>
         </div>
-        <p style="color: var(--c-gray-text); font-size: 0.95rem; margin-bottom: 20px;">Sample from our directory</p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <p style="color: var(--c-gray-text); font-size: 0.92rem;">Sample from our directory</p>
+
+        <div class="filter-tabs" data-filter-group="facilities">
+            <button class="filter-tab active" data-filter="all">All facilities</button>
+            <button class="filter-tab" data-filter="hospital">Hospitals</button>
+            <button class="filter-tab" data-filter="asc">Surgery Centers</button>
+            <button class="filter-tab" data-filter="imaging_center">Imaging Centers</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;" id="facilityCardsGrid">
             {% set card_colors = {"A": "#00824F", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
             {% set card_grade_classes = {"A": "grade-a", "B": "grade-b", "C": "grade-c", "D": "grade-d", "F": "grade-f"} %}
-            {% for h in sample_hospitals[:6] %}
-            {% set high_risk = (h.billing_grade in ["D", "F"]) or ((h.avg_markup_vs_medicare or 0) >= 5) %}
-            <article class="hospital-card fade-up">
-                <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/" class="hospital-card-link">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+            {% for h in sample_facilities %}
+            {% set ratio = h.avg_markup or 0 %}
+            {% set markup_pct = [[(ratio / 10 * 100)|int, 100]|min, 5]|max %}
+            <article class="hospital-card" data-facility-type="{{ h.facility_type }}">
+                <a href="{{ h.url }}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                         <div>
                             <span class="stat-label">{{ h.city }}, {{ h.state }}</span>
-                            <h3 style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">{{ h.name }}</h3>
+                            <h3 style="font-size: 1.05rem; font-weight: 600; margin-top: 4px; line-height: 1.3;">{{ h.name }}</h3>
+                            <div class="facility-badge-row">
+                                <span class="facility-type-badge">{{ h.facility_type_label }}</span>
+                                {% if h.is_hospital_owned and h.facility_type != 'hospital' %}
+                                <span class="facility-owned-badge">Hospital-owned</span>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="grade-badge {{ card_grade_classes.get(h.billing_grade, 'grade-na') }}">
-                            {{ h.billing_grade or "—" }}
-                        </div>
+                        <div class="grade-badge {{ card_grade_classes.get(h.billing_grade, 'grade-na') }}">{{ h.billing_grade or '—' }}</div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 16px;">
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 12px;">
                         <div>
-                            <span class="stat-label" style="display: block; margin-bottom: 4px;">Avg Markup</span>
-                            <span class="stat-number" style="font-size: 2.5rem; color: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">
-                                {{ "%.1f"|format(h.avg_markup_vs_medicare) }}x
-                            </span>
+                            <span class="stat-label" style="display:block; margin-bottom:4px;">Avg Markup</span>
+                            <span class="stat-number" style="font-size: 2.2rem; color: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">{{ "%.1f"|format(ratio) }}x</span>
                         </div>
-                        {% set markup_pct = [[(h.avg_markup_vs_medicare / 10 * 100)|int, 100]|min, 5]|max %}
-                        <div class="donut-chart" style="background: conic-gradient({{ card_colors.get(h.billing_grade, '#9CA3AF') }} 0% {{ markup_pct }}%, #E5E5E5 {{ markup_pct }}% 100%);">
-                            <div class="donut-inner"></div>
-                        </div>
+                        <div class="donut-chart" style="background: conic-gradient({{ card_colors.get(h.billing_grade, '#9CA3AF') }} 0% {{ markup_pct }}%, #E5E5E5 {{ markup_pct }}% 100%);"><div class="donut-inner"></div></div>
                     </div>
                 </a>
-                {% if high_risk %}
-                <div class="hospital-card-actions">
-                    <span class="risk-chip">Higher-risk pricing</span>
-                    <a class="action-link compare" href="/compare/">Compare alternatives</a>
-                    <a class="action-link negotiate" href="/scan">Negotiate this bill</a>
-                </div>
-                {% endif %}
             </article>
             {% endfor %}
         </div>
-        <div style="text-align: center; margin-top: 32px;">
-            <a href="/hospitals/" style="color: var(--c-green); font-weight: 600; text-decoration: none; font-size: 0.95rem;">
-                Browse all {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} hospitals &rarr;
-            </a>
+        <div style="text-align: center; margin-top: 28px;">
+            <a href="/find/" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.95rem;">Browse all facilities →</a>
         </div>
     </div>
 </section>
 
-<!-- ========== COMMON PROCEDURE COSTS ========== -->
-<div class="container" style="margin-bottom: 80px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
-        <h2 class="section-heading" style="margin-bottom: 0;">Common procedure costs</h2>
-        <a href="/procedures/" class="btn btn-outline">View all procedures</a>
+<div class="container procedure-section">
+    <h2 class="section-heading" style="margin-bottom: 10px;">What should your procedure cost?</h2>
+    <p class="procedure-sub">Compare prices across hospitals, surgery centers, and imaging centers — before you schedule.</p>
+
+    <div class="filter-tabs" data-filter-group="procedures">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="Imaging">Imaging</button>
+        <button class="filter-tab" data-filter="Surgery">Surgery</button>
+        <button class="filter-tab" data-filter="Emergency">Emergency</button>
+        <button class="filter-tab" data-filter="Preventive">Preventive</button>
+        <button class="filter-tab" data-filter="Lab Tests">Lab Tests</button>
     </div>
-    <div class="precare-cta">
-        <p style="font-size: 1rem; color: var(--c-black);">
-            Have a procedure scheduled? See what it should cost at your hospital.
-        </p>
-        <a href="/procedures/" class="btn btn-outline" style="background: #fff;">Check procedure pricing</a>
+
+    <div class="procedure-grid" id="procedureCardsGrid">
+        {% for p in procedure_cards %}
+        <article class="procedure-card" data-category="{{ p.category }}">
+            <div class="procedure-category">{{ p.category|upper }}</div>
+            <div class="procedure-name">{{ p.name }}</div>
+            <div class="procedure-cpt">CPT {{ p.cpt_code }}</div>
+
+            <div class="pricing-grid">
+                <div class="price-block">
+                    <div class="price-label">🏥 Hospital avg</div>
+                    <div class="price-value">{% if p.hospital_avg %}${{ "{:,.0f}".format(p.hospital_avg) }}{% else %}—{% endif %}</div>
+                    <div class="price-meta">{% if p.hospital_markup %}{{ "%.1f"|format(p.hospital_markup) }}x Medicare{% else %}No benchmark{% endif %}</div>
+                </div>
+                {% if p.secondary_avg %}
+                <div class="price-block">
+                    <div class="price-label">{% if p.secondary_type == 'asc' %}⚕ Surgery Center avg{% else %}🩻 Imaging Center avg{% endif %}</div>
+                    <div class="price-value">${{ "{:,.0f}".format(p.secondary_avg) }}</div>
+                    <div class="price-meta">{% if p.secondary_markup %}{{ "%.1f"|format(p.secondary_markup) }}x {% if p.secondary_type == 'asc' %}ASC{% else %}Imaging{% endif %} rate{% else %}No benchmark{% endif %}</div>
+                </div>
+                {% else %}
+                <div class="price-block" style="visibility: hidden;"></div>
+                {% endif %}
+            </div>
+
+            <div class="vs-row">
+                {% if p.vs_hospital is not none %}
+                <span class="{{ 'vs-up' if p.vs_hospital > 0 else 'vs-down' }}">vs. National avg (Hospital): {% if p.vs_hospital > 0 %}↑{% else %}↓{% endif %}{{ "%d"|format(p.vs_hospital|abs|int) }}%</span>
+                {% endif %}
+                {% if p.vs_secondary is not none %}
+                <span class="{{ 'vs-up' if p.vs_secondary > 0 else 'vs-down' }}">{% if p.secondary_type == 'asc' %}Surgery Center{% else %}Imaging Center{% endif %}: {% if p.vs_secondary > 0 %}↑{% else %}↓{% endif %}{{ "%d"|format(p.vs_secondary|abs|int) }}%</span>
+                {% endif %}
+            </div>
+
+            <div class="procedure-cta"><a href="{{ p.url }}" class="btn btn-outline" style="background:#fff; width: 100%;">Find near me →</a></div>
+        </article>
+        {% endfor %}
     </div>
-    <div class="procedure-list">
-        <div class="procedure-item fade-up">
-            <div>
-                <span class="stat-label" style="display: block; margin-bottom: 4px;">Imaging</span>
-                <h4 style="font-size: 1.2rem; font-weight: 500;">MRI of Brain (w/o contrast)</h4>
-            </div>
-            <div class="trend-indicator text-green">
-                <span>&darr; 46%</span>
-                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
-            </div>
-            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-green) 0% 46%, #E5E5E5 46% 100%);">
-                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
-            </div>
-        </div>
-        <div class="procedure-item fade-up">
-            <div>
-                <span class="stat-label" style="display: block; margin-bottom: 4px;">Emergency</span>
-                <h4 style="font-size: 1.2rem; font-weight: 500;">Level 4 ER Visit</h4>
-            </div>
-            <div class="trend-indicator text-orange">
-                <span>&uarr; 125%</span>
-                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
-            </div>
-            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-orange) 0% 80%, #E5E5E5 80% 100%);">
-                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
-            </div>
-        </div>
-        <div class="procedure-item fade-up">
-            <div>
-                <span class="stat-label" style="display: block; margin-bottom: 4px;">Surgery</span>
-                <h4 style="font-size: 1.2rem; font-weight: 500;">Appendectomy (Laparoscopic)</h4>
-            </div>
-            <div class="trend-indicator text-green">
-                <span>&darr; 15%</span>
-                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
-            </div>
-            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-green) 0% 15%, #E5E5E5 15% 100%);">
-                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
-            </div>
-        </div>
+
+    <div style="display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 24px;">
+        <a href="/procedures/" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.95rem;">View all procedures →</a>
+        <a href="#heroSearchSection" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.95rem;">Don't see yours? Search above →</a>
     </div>
 </div>
 
-<!-- ========== HOW IT WORKS ========== -->
-<section class="steps-section">
-    <div class="container" style="max-width: 900px;">
-        <h2 class="section-heading" style="color: var(--c-white); text-align: center; margin-bottom: 48px;">
-            Got a bill? Check it in 30 seconds.
-        </h2>
-        <div class="steps-grid">
-            <div>
-                <div class="step-num">1</div>
-                <div class="step-h">Upload</div>
-                <p class="step-p">Upload your itemized hospital bill — PDF or image. We accept any format.</p>
+<section class="precare-flow">
+    <div class="flow-wrap">
+        <h2 class="section-heading" style="font-size: 2rem; margin-bottom: 10px;">Planning a procedure?</h2>
+        <div class="flow-grid">
+            <div class="flow-step">
+                <div class="flow-icon">🔍</div>
+                <div class="flow-title">Step 1: Search</div>
+                <p class="flow-copy">Enter your procedure or hospital to see prices, grades, and cost comparisons across all nearby facilities.</p>
             </div>
-            <div>
-                <div class="step-num">2</div>
-                <div class="step-h">Analyze</div>
-                <p class="step-p">We compare every CPT code against Medicare rates and flag upcoding, duplicates, and unbundled charges.</p>
+            <div class="flow-step">
+                <div class="flow-icon">📊</div>
+                <div class="flow-title">Step 2: Compare</div>
+                <p class="flow-copy">See what hospitals, surgery centers, and imaging centers charge for your procedure — and what Medicare says it should cost.</p>
             </div>
-            <div>
-                <div class="step-num">3</div>
-                <div class="step-h">Act</div>
-                <p class="step-p">Download your dispute letter and phone script, pre-filled with your specific charges.</p>
+            <div class="flow-step">
+                <div class="flow-icon">✅</div>
+                <div class="flow-title">Step 3: Choose</div>
+                <p class="flow-copy">Pick the best-priced, highest-graded facility near you. Save hundreds or thousands before you schedule.</p>
             </div>
         </div>
+        <div style="margin-top: 24px;"><a href="#heroSearchSection" class="btn btn-outline" style="min-width: 220px;">Search Your Procedure →</a></div>
+    </div>
+</section>
+
+<div class="flow-transition">Already have a bill?</div>
+
+<section class="steps-section">
+    <div class="container" style="max-width: 900px;">
+        <h2 class="section-heading" style="color: var(--c-white); text-align: center; margin-bottom: 48px; font-size: 2.2rem;">Got a bill? Check it in 30 seconds.</h2>
+        <div class="steps-grid">
+            <div><div class="step-num">1</div><div class="step-h">Upload</div><p class="step-p">Upload your itemized hospital bill — PDF or image. We accept any format.</p></div>
+            <div><div class="step-num">2</div><div class="step-h">Analyze</div><p class="step-p">We compare every CPT code against Medicare rates and flag upcoding, duplicates, and unbundled charges.</p></div>
+            <div><div class="step-num">3</div><div class="step-h">Act</div><p class="step-p">Download your dispute letter and phone script, pre-filled with your specific charges.</p></div>
+        </div>
         <div style="text-align: center; margin-top: 48px;">
-            <a href="/scan" class="btn btn-white" style="padding: 14px 32px; font-size: 1rem;">Scan My Bill Free &rarr;</a>
-            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 12px;">
-                No account required. Your bill is not stored after analysis.
-            </p>
+            <a href="/scan" class="btn btn-white" style="padding: 14px 32px; font-size: 1rem;">Scan My Bill Free →</a>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 12px;">No account required. Your bill is not stored after analysis.</p>
         </div>
     </div>
 </section>
 
-<!-- ========== GUIDES ========== -->
 {% if featured_guides %}
 <div class="container" style="margin-bottom: 80px;">
     <h2 class="section-heading" style="margin-bottom: 32px;">Understand your rights</h2>
     <div class="guide-grid">
         {% for g in featured_guides %}
-        <a href="/guides/{{ g.slug }}" class="guide-card fade-up">
+        <a href="/guides/{{ g.slug }}" class="guide-card">
             <div class="guide-card-title">{{ g.title }}</div>
             <p class="guide-card-desc">{{ g.meta_description }}</p>
-            <div class="guide-card-meta">{{ g.reading_time|default(5) }} min read &middot; Read &rarr;</div>
+            <div class="guide-card-meta">{{ g.reading_time|default(5) }} min read · Read →</div>
         </a>
         {% endfor %}
     </div>
-    <p style="text-align: center; margin-top: 24px;">
-        <a href="/guides/" style="color: var(--c-green); font-weight: 600; text-decoration: none; font-size: 0.95rem;">View all guides &rarr;</a>
-    </p>
+    <p style="text-align: center; margin-top: 24px;"><a href="/guides/" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.95rem;">View all guides →</a></p>
 </div>
 {% endif %}
 
-<!-- ========== FOOTER ========== -->
 <footer>
     <div class="container">
         <div class="footer-grid">
             <div style="max-width: 300px;">
                 <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">BillKarma</div>
-                <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">
-                    Helping patients understand what hospitals really charge.
-                </p>
+                <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">Helping patients understand what providers really charge.</p>
             </div>
-            <div style="display: flex; gap: 64px;">
+            <div style="display: flex; gap: 64px; flex-wrap: wrap;">
                 <div class="footer-col">
                     <div class="footer-col-title">Platform</div>
-                    <a href="/hospitals/">Search Hospitals</a>
+                    <a href="/procedures/">Find a Procedure</a>
+                    <a href="/hospitals/">Find a Hospital</a>
+                    <a href="/find/">Find Facilities</a>
                     <a href="/scan">Scan Bill</a>
-                    <a href="/procedures/">Procedure Costs</a>
                     <a href="/compare/">Compare</a>
-                    <a href="/calculator">Medicare Calculator</a>
                     <a href="/guides/hospital-billing-grades-explained">Methodology</a>
                 </div>
                 <div class="footer-col">
@@ -892,9 +783,7 @@
                 </div>
             </div>
         </div>
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--c-gray-border); font-size: 0.78rem; color: var(--c-gray-text);">
-            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" style="color: var(--c-gray-text); text-decoration: underline;" target="_blank" rel="noopener">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
-        </div>
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--c-gray-border); font-size: 0.78rem; color: var(--c-gray-text);">© 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" style="color: var(--c-gray-text); text-decoration: underline;" target="_blank" rel="noopener">CMS.gov</a>. Billing grades are based on publicly available price transparency data.</div>
     </div>
 </footer>
 

@@ -1,6 +1,7 @@
 import logging
+import re
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResponse
@@ -20,17 +21,19 @@ from hospital_seo import (
     get_state_hospitals,
     get_state_index_stats,
     resolve_hospital_slug,
+    slugify,
     state_display_name,
 )
 from compare_pages import get_comparison_data, search_hospitals_for_compare
 from dispute_workflow import build_phone_script, get_outcome_stats
-from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_state_index
+from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_state_index, get_landing_stats
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
     get_providers_near_zip_for_cpt,
     get_procedure_profile,
     get_top_cpt_codes,
 )
+from procedure_content import get_content_page_data
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -43,6 +46,291 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
+
+HOME_PROCEDURE_CARD_SPECS = [
+    {"cpt_code": "70551", "name": "MRI of Brain (w/o contrast)", "category": "Imaging", "secondary_type": "imaging_center"},
+    {"cpt_code": "45378", "name": "Colonoscopy (Diagnostic)", "category": "Surgery", "secondary_type": "asc"},
+    {"cpt_code": "99284", "name": "Level 4 ER Visit", "category": "Emergency", "secondary_type": ""},
+    {"cpt_code": "44970", "name": "Appendectomy (Laparoscopic)", "category": "Surgery", "secondary_type": "asc"},
+    {"cpt_code": "74177", "name": "CT Abdomen/Pelvis w/ contrast", "category": "Imaging", "secondary_type": "imaging_center"},
+    {"cpt_code": "27447", "name": "Knee Replacement (Total)", "category": "Surgery", "secondary_type": "asc"},
+    {"cpt_code": "77067", "name": "Mammography (Screening)", "category": "Preventive", "secondary_type": "imaging_center"},
+    {"cpt_code": "80048", "name": "Basic Metabolic Panel", "category": "Lab Tests", "secondary_type": ""},
+]
+
+FACILITY_TYPE_LABELS = {
+    "hospital": "Hospital",
+    "asc": "Surgery Center",
+    "imaging_center": "Imaging Center",
+}
+
+
+def _facility_profile_url(item: dict) -> str:
+    ftype = (item.get("facility_type") or "hospital").strip().lower()
+    state_slug = item.get("state_slug") or slugify(item.get("state") or "")
+    city_slug = item.get("city_slug") or slugify(item.get("city") or "")
+    slug = item.get("slug") or slugify(item.get("name") or item.get("facility_id") or "")
+    if ftype == "asc":
+        return f"/surgery-centers/{state_slug}/{city_slug}/{slug}/"
+    if ftype == "imaging_center":
+        return f"/imaging/{state_slug}/{city_slug}/{slug}/"
+    return f"/hospitals/{state_slug}/{city_slug}/{slug}/"
+
+
+def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> list[dict]:
+    token = (query or "").strip()
+    if not token:
+        return []
+    like = f"%{token}%"
+    with db.get_db() as conn:
+        if exact_only:
+            rows = conn.execute(
+                """
+                SELECT
+                    pp.cpt_code,
+                    MIN(pp.description) AS description,
+                    AVG(CASE WHEN pp.facility_type = 'hospital' THEN pp.gross_charge END) AS hospital_avg,
+                    AVG(CASE WHEN pp.facility_type = 'asc' THEN pp.gross_charge END) AS asc_avg,
+                    AVG(CASE WHEN pp.facility_type = 'imaging_center' THEN pp.gross_charge END) AS imaging_avg
+                FROM procedure_prices pp
+                WHERE lower(trim(pp.cpt_code)) = lower(trim(?))
+                   OR lower(trim(pp.description)) = lower(trim(?))
+                GROUP BY pp.cpt_code
+                LIMIT ?
+                """,
+                (token, token, max(1, min(limit, 20))),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT
+                    pp.cpt_code,
+                    MIN(pp.description) AS description,
+                    AVG(CASE WHEN pp.facility_type = 'hospital' THEN pp.gross_charge END) AS hospital_avg,
+                    AVG(CASE WHEN pp.facility_type = 'asc' THEN pp.gross_charge END) AS asc_avg,
+                    AVG(CASE WHEN pp.facility_type = 'imaging_center' THEN pp.gross_charge END) AS imaging_avg
+                FROM procedure_prices pp
+                WHERE pp.cpt_code LIKE ? OR pp.description LIKE ?
+                GROUP BY pp.cpt_code
+                ORDER BY
+                    CASE
+                        WHEN lower(pp.cpt_code) = lower(?) THEN 0
+                        WHEN lower(pp.cpt_code) LIKE lower(?) THEN 1
+                        WHEN lower(MIN(pp.description)) = lower(?) THEN 2
+                        WHEN lower(MIN(pp.description)) LIKE lower(?) THEN 3
+                        ELSE 4
+                    END,
+                    MIN(pp.description) ASC
+                LIMIT ?
+                """,
+                (like, like, token, f"{token}%", token, f"{token}%", max(1, min(limit, 20))),
+            ).fetchall()
+    out = []
+    for row in rows:
+        d = dict(row)
+        d["url"] = f"/procedures/{d['cpt_code']}/"
+        out.append(d)
+    return out
+
+
+def _search_facilities(query: str, limit: int = 4, exact_only: bool = False) -> list[dict]:
+    token = (query or "").strip()
+    if not token:
+        return []
+    like = f"%{token}%"
+    with db.get_db() as conn:
+        if exact_only:
+            rows = conn.execute(
+                """
+                SELECT
+                    f.facility_id,
+                    f.name,
+                    f.city,
+                    f.state,
+                    f.state_slug,
+                    f.city_slug,
+                    f.slug,
+                    f.facility_type,
+                    f.is_hospital_owned,
+                    COALESCE(fbm.billing_grade, bm.billing_grade) AS billing_grade,
+                    COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup
+                FROM facilities f
+                LEFT JOIN facility_billing_metrics fbm ON fbm.facility_id = f.facility_id
+                LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
+                WHERE lower(trim(f.name)) = lower(trim(?))
+                ORDER BY f.name
+                LIMIT ?
+                """,
+                (token, max(1, min(limit, 20))),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT
+                    f.facility_id,
+                    f.name,
+                    f.city,
+                    f.state,
+                    f.state_slug,
+                    f.city_slug,
+                    f.slug,
+                    f.facility_type,
+                    f.is_hospital_owned,
+                    COALESCE(fbm.billing_grade, bm.billing_grade) AS billing_grade,
+                    COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup
+                FROM facilities f
+                LEFT JOIN facility_billing_metrics fbm ON fbm.facility_id = f.facility_id
+                LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
+                WHERE f.name LIKE ? OR f.city LIKE ? OR f.state LIKE ? OR f.zip LIKE ?
+                ORDER BY
+                    CASE
+                        WHEN f.zip = ? THEN 0
+                        WHEN f.zip LIKE ? THEN 1
+                        WHEN lower(f.name) = lower(?) THEN 0
+                        WHEN lower(f.name) LIKE lower(?) THEN 2
+                        ELSE 3
+                    END,
+                    f.name ASC
+                LIMIT ?
+                """,
+                (
+                    like,
+                    like,
+                    like,
+                    like,
+                    token,
+                    f"{token}%",
+                    token,
+                    f"{token}%",
+                    max(1, min(limit, 20)),
+                ),
+            ).fetchall()
+    out = []
+    for row in rows:
+        d = dict(row)
+        d["url"] = _facility_profile_url(d)
+        d["facility_type_label"] = FACILITY_TYPE_LABELS.get(d.get("facility_type") or "hospital", "Facility")
+        out.append(d)
+    return out
+
+
+def _build_home_procedure_cards() -> list[dict]:
+    cpts = [item["cpt_code"] for item in HOME_PROCEDURE_CARD_SPECS]
+    if not cpts:
+        return []
+    placeholders = ",".join("?" for _ in cpts)
+    with db.get_db() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT
+                cpt_code,
+                MIN(description) AS description,
+                AVG(gross_charge) AS national_avg,
+                AVG(CASE WHEN facility_type = 'hospital' THEN gross_charge END) AS hospital_avg,
+                AVG(CASE WHEN facility_type = 'hospital' THEN markup_vs_medicare END) AS hospital_markup,
+                AVG(CASE WHEN facility_type = 'asc' THEN gross_charge END) AS asc_avg,
+                AVG(CASE WHEN facility_type = 'asc' THEN markup_vs_medicare END) AS asc_markup,
+                AVG(CASE WHEN facility_type = 'imaging_center' THEN gross_charge END) AS imaging_avg,
+                AVG(CASE WHEN facility_type = 'imaging_center' THEN markup_vs_medicare END) AS imaging_markup
+            FROM procedure_prices
+            WHERE cpt_code IN ({placeholders})
+            GROUP BY cpt_code
+            """,
+            cpts,
+        ).fetchall()
+    by_cpt = {row["cpt_code"]: dict(row) for row in rows}
+    cards = []
+    for spec in HOME_PROCEDURE_CARD_SPECS:
+        row = by_cpt.get(spec["cpt_code"], {})
+        secondary_type = spec.get("secondary_type") or ""
+        secondary_avg = row.get("asc_avg") if secondary_type == "asc" else row.get("imaging_avg")
+        secondary_markup = row.get("asc_markup") if secondary_type == "asc" else row.get("imaging_markup")
+        national = row.get("national_avg")
+        hospital_avg = row.get("hospital_avg")
+        vs_hosp = ((hospital_avg - national) / national * 100) if national and hospital_avg else None
+        vs_secondary = ((secondary_avg - national) / national * 100) if national and secondary_avg else None
+        cards.append(
+            {
+                "category": spec["category"],
+                "name": row.get("description") or spec["name"],
+                "cpt_code": spec["cpt_code"],
+                "hospital_avg": hospital_avg,
+                "hospital_markup": row.get("hospital_markup"),
+                "secondary_type": secondary_type,
+                "secondary_label": FACILITY_TYPE_LABELS.get(secondary_type, ""),
+                "secondary_avg": secondary_avg,
+                "secondary_markup": secondary_markup,
+                "vs_hospital": vs_hosp,
+                "vs_secondary": vs_secondary,
+                "url": f"/procedures/{spec['cpt_code']}/",
+            }
+        )
+    return cards
+
+
+def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
+    with db.get_db() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug,
+                f.facility_type, f.is_hospital_owned,
+                COALESCE(fbm.billing_grade, bm.billing_grade) AS billing_grade,
+                COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup
+            FROM facilities f
+            LEFT JOIN facility_billing_metrics fbm ON fbm.facility_id = f.facility_id
+            LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
+            WHERE f.facility_type IN ('hospital', 'asc', 'imaging_center')
+              AND COALESCE(fbm.billing_grade, bm.billing_grade) IS NOT NULL
+              AND COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) IS NOT NULL
+            ORDER BY COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) DESC
+            LIMIT 300
+            """
+        ).fetchall()
+    items = [dict(r) for r in rows]
+    for item in items:
+        item["url"] = _facility_profile_url(item)
+        item["facility_type_label"] = FACILITY_TYPE_LABELS.get(item.get("facility_type") or "hospital", "Facility")
+
+    def pick(pool: list[dict], predicate) -> dict | None:
+        for i, row in enumerate(pool):
+            if predicate(row):
+                return pool.pop(i)
+        return None
+
+    hospitals = [x for x in items if x.get("facility_type") == "hospital"]
+    ascs = [x for x in items if x.get("facility_type") == "asc"]
+    imaging = [x for x in items if x.get("facility_type") == "imaging_center"]
+    selected: list[dict] = []
+
+    h_good = pick(hospitals, lambda x: (x.get("billing_grade") or "") in {"A", "B", "C"})
+    h_bad = pick(hospitals, lambda x: (x.get("billing_grade") or "") == "F")
+    if h_good:
+        selected.append(h_good)
+    if h_bad:
+        selected.append(h_bad)
+
+    asc_ind = pick(ascs, lambda x: not bool(x.get("is_hospital_owned")))
+    asc_owned = pick(ascs, lambda x: bool(x.get("is_hospital_owned")))
+    if asc_ind:
+        selected.append(asc_ind)
+    if asc_owned:
+        selected.append(asc_owned)
+
+    img_ind = pick(imaging, lambda x: not bool(x.get("is_hospital_owned")))
+    img_owned = pick(imaging, lambda x: bool(x.get("is_hospital_owned")))
+    if img_ind:
+        selected.append(img_ind)
+    if img_owned:
+        selected.append(img_owned)
+
+    remaining = [*hospitals, *ascs, *imaging]
+    for row in remaining:
+        if len(selected) >= limit:
+            break
+        if row not in selected:
+            selected.append(row)
+    return selected[:limit]
 
 
 @app.on_event("startup")
@@ -65,6 +353,8 @@ async def landing(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
     grade_dist = get_grade_distribution()
     sample_hospitals = get_sample_hospitals(6)
+    sample_facilities = _build_home_sample_facilities(6)
+    procedure_cards = _build_home_procedure_cards()
 
     from guides import list_guides, get_guide
     priority_slugs = [
@@ -92,6 +382,14 @@ async def landing(request: Request):
         hospital_count = conn.execute(
             "SELECT COUNT(*) AS n FROM billing_metrics WHERE billing_grade IS NOT NULL"
         ).fetchone()["n"]
+        graded_facility_count = conn.execute(
+            """
+            SELECT COUNT(DISTINCT facility_id) AS n
+            FROM facility_billing_metrics
+            WHERE facility_type IN ('hospital', 'asc', 'imaging_center')
+              AND billing_grade IS NOT NULL
+            """
+        ).fetchone()["n"]
 
     return templates.TemplateResponse(
         "landing.html",
@@ -102,10 +400,13 @@ async def landing(request: Request):
             "canonical_url": canonical_url,
             "grade_distribution": grade_dist,
             "sample_hospitals": sample_hospitals,
+            "sample_facilities": sample_facilities,
+            "procedure_cards": procedure_cards,
             "featured_guides": featured_guides,
             "hospital_count": hospital_count,
-            "og_title": "BillKarma — Hospital Billing Grades, Bill Scanner & Price Transparency",
-            "og_description": "Check any U.S. hospital's billing grade before you schedule. Scan your bill for errors. Fight overcharges with real Medicare data. 6,000+ hospitals graded free.",
+            "graded_facility_count": graded_facility_count,
+            "og_title": "BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades",
+            "og_description": "Search any medical procedure to see what hospitals, surgery centers, and imaging centers charge vs. Medicare rates. Grade A-F for 6,798+ facilities. Scan your bill to catch overcharges.",
             "meta_robots": "index, follow",
         },
     )
@@ -374,6 +675,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
 @app.get("/surgery-centers/", response_class=HTMLResponse)
 async def surgery_centers_index(request: Request):
     states = get_facility_state_index("asc")
+    stats = get_landing_stats("asc")
     return templates.TemplateResponse(
         "facilities_index.html",
         {
@@ -382,6 +684,7 @@ async def surgery_centers_index(request: Request):
             "title": "Find Ambulatory Surgery Centers Near You",
             "label": "Surgery Centers",
             "base_path": "/surgery-centers/",
+            "stats": stats,
         },
     )
 
@@ -424,13 +727,24 @@ async def surgery_centers_detail(request: Request, state_slug: str, city_slug: s
         return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
     return templates.TemplateResponse(
         "facilities_detail.html",
-        {"request": request, "data": data, "label": "Ambulatory Surgery Center", "base_path": "/surgery-centers/"},
+        {
+            "request": request,
+            "data": data,
+            "label": "Ambulatory Surgery Center",
+            "base_path": "/surgery-centers/",
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/surgery-centers/{state_slug}/{city_slug}/{slug}/",
+            "meta_description": data["seo"]["meta_description"],
+            "og_title": data["seo"]["page_title"],
+            "og_description": data["seo"]["meta_description"],
+            "meta_robots": "index, follow",
+        },
     )
 
 
 @app.get("/imaging/", response_class=HTMLResponse)
 async def imaging_index(request: Request):
     states = get_facility_state_index("imaging_center")
+    stats = get_landing_stats("imaging_center")
     return templates.TemplateResponse(
         "facilities_index.html",
         {
@@ -439,6 +753,7 @@ async def imaging_index(request: Request):
             "title": "Find Imaging Centers Near You",
             "label": "Imaging Centers",
             "base_path": "/imaging/",
+            "stats": stats,
         },
     )
 
@@ -481,7 +796,17 @@ async def imaging_detail(request: Request, state_slug: str, city_slug: str, slug
         return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
     return templates.TemplateResponse(
         "facilities_detail.html",
-        {"request": request, "data": data, "label": "Imaging Center", "base_path": "/imaging/"},
+        {
+            "request": request,
+            "data": data,
+            "label": "Imaging Center",
+            "base_path": "/imaging/",
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/imaging/{state_slug}/{city_slug}/{slug}/",
+            "meta_description": data["seo"]["meta_description"],
+            "og_title": data["seo"]["page_title"],
+            "og_description": data["seo"]["meta_description"],
+            "meta_robots": "index, follow",
+        },
     )
 
 
@@ -502,6 +827,25 @@ async def procedure_index_page(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Procedure Cost Directory: Medicare Rates & Hospital Grades | BillKarma",
             "og_description": "See Medicare rates, national average charges, and billing grades for 100 common procedures. Find the best-priced hospital near you.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/procedures/{slug}-cost/", response_class=HTMLResponse)
+async def procedure_content_page(request: Request, slug: str):
+    data = get_content_page_data(f"{slug}-cost")
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"})
+    return templates.TemplateResponse(
+        "procedure_cost_guide.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/procedures/{slug}-cost/",
+            "meta_description": data["seo"]["meta_description"],
+            "og_title": data["content_heading"] + " | BillKarma",
+            "og_description": data["seo"]["meta_description"],
             "meta_robots": "index, follow",
         },
     )
@@ -546,6 +890,7 @@ async def procedure_providers_by_zip(
     facility_type: str = "all",
     sort: str = "patient_cost",
     grade_ab_only: int = 0,
+    radius_miles: int = 75,
     limit: int = 10,
 ):
     """Return providers near zip for this CPT code across facility types."""
@@ -558,6 +903,7 @@ async def procedure_providers_by_zip(
         facility_type=facility_type,
         grade_ab_only=bool(int(grade_ab_only)),
         sort_by=sort,
+        radius_miles=radius_miles,
     )
     if not results:
         return JSONResponse({"providers": [], "found": False})
@@ -571,8 +917,128 @@ async def hospital_search_api(q: str = ""):
     return JSONResponse({"results": results})
 
 
+@app.get("/api/providers/search")
+async def provider_search_api(q: str = ""):
+    """JSON autocomplete across hospitals + ASC + imaging for compare/deep links."""
+    token = (q or "").strip()
+    if len(token) < 2:
+        return JSONResponse({"results": []})
+    like = f"%{token}%"
+    with db.get_db() as conn:
+        rows = conn.execute(
+            """
+            SELECT facility_id, name, city, state, state_slug, city_slug, slug, facility_type
+            FROM facilities
+            WHERE name LIKE ? OR city LIKE ? OR state LIKE ?
+            ORDER BY
+                CASE WHEN lower(name) LIKE lower(?) THEN 0 ELSE 1 END,
+                name
+            LIMIT 20
+            """,
+            (like, like, like, f"{token.lower()}%"),
+        ).fetchall()
+    return JSONResponse({"results": [dict(r) for r in rows]})
+
+
+@app.get("/api/procedures/search")
+async def procedure_search_api(q: str = "", limit: int = 5):
+    """JSON autocomplete for procedures."""
+    token = (q or "").strip()
+    if len(token) < 2:
+        return JSONResponse({"results": []})
+    results = _search_procedures(token, limit=max(1, min(limit, 10)))
+    return JSONResponse({"results": results})
+
+
+@app.get("/api/search/unified")
+async def unified_search_api(q: str = "", procedure_limit: int = 5, facility_limit: int = 4):
+    """Unified autocomplete payload: procedures + facilities + exact-match routing hints."""
+    token = (q or "").strip()
+    if len(token) < 2:
+        return JSONResponse(
+            {
+                "query": token,
+                "procedures": [],
+                "facilities": [],
+                "exact_procedure": None,
+                "exact_facility": None,
+                "is_zip": bool(re.fullmatch(r"\d{5}", token or "")),
+            }
+        )
+    procedures = _search_procedures(token, limit=max(1, min(procedure_limit, 10)))
+    facilities = _search_facilities(token, limit=max(1, min(facility_limit, 10)))
+    exact_procedure = _search_procedures(token, limit=1, exact_only=True)
+    exact_facility = _search_facilities(token, limit=1, exact_only=True)
+    return JSONResponse(
+        {
+            "query": token,
+            "procedures": procedures,
+            "facilities": facilities,
+            "exact_procedure": exact_procedure[0] if exact_procedure else None,
+            "exact_facility": exact_facility[0] if exact_facility else None,
+            "is_zip": bool(re.fullmatch(r"\d{5}", token)),
+        }
+    )
+
+
+@app.get("/search", response_class=HTMLResponse)
+async def unified_search_page(request: Request, q: str = ""):
+    token = (q or "").strip()
+    procedures = _search_procedures(token, limit=25) if len(token) >= 2 else []
+    facilities = _search_facilities(token, limit=25) if len(token) >= 2 else []
+    canonical_url = f"{config.APP_URL.rstrip('/')}/search?q={token}" if token else f"{config.APP_URL.rstrip('/')}/search"
+    return templates.TemplateResponse(
+        "search_results.html",
+        {
+            "request": request,
+            "query": token,
+            "procedures": procedures,
+            "facilities": facilities,
+            "canonical_url": canonical_url,
+            "title": "Search Results | BillKarma",
+            "og_title": "Search Medical Procedure and Facility Prices | BillKarma",
+            "og_description": "Search procedures, hospitals, surgery centers, and imaging centers with pricing context from Medicare benchmarks.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/find/", response_class=HTMLResponse)
+async def unified_find_page(request: Request, q: str = "", zip: str = "", type: str = "all"):
+    token = (q or "").strip() or (zip or "").strip()
+    facilities = _search_facilities(token, limit=50) if len(token) >= 2 else []
+    normalized = (type or "all").strip().lower()
+    if normalized in {"hospital", "asc", "imaging_center"}:
+        facilities = [f for f in facilities if f.get("facility_type") == normalized]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/find/"
+    return templates.TemplateResponse(
+        "search_results.html",
+        {
+            "request": request,
+            "query": token,
+            "procedures": [],
+            "facilities": facilities,
+            "canonical_url": canonical_url,
+            "title": "Find Facilities | BillKarma",
+            "og_title": "Find Hospitals, Surgery Centers, and Imaging Centers | BillKarma",
+            "og_description": "Find and compare graded facilities near you across hospitals, surgery centers, and imaging centers.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
 @app.get("/compare/", response_class=HTMLResponse)
-async def compare_index(request: Request):
+async def compare_index(
+    request: Request,
+    facility_a: str = Query("", alias="facility-a"),
+    facility_b: str = Query("", alias="facility-b"),
+    hospital: str = "",
+):
+    # Deep-link support from ASC/imaging pages.
+    if facility_a and facility_b:
+        return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=302)
+    if hospital:
+        return RedirectResponse(url=f"/compare/?facility-a={hospital}", status_code=302)
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
     return templates.TemplateResponse(
         "compare_index.html",
