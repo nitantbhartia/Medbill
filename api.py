@@ -317,6 +317,14 @@ async def get_effectiveness_stats():
     return {"status": "ok", "data": metrics}
 
 
+@router.get("/hospitals/search")
+async def search_hospitals(q: str = "", limit: int = 8):
+    """Autocomplete endpoint for hospital search."""
+    from hospital_seo import find_hospitals
+    results = find_hospitals(q, limit=min(limit, 20))
+    return {"status": "ok", "data": results}
+
+
 @router.get("/dispute-packet/{bill_id}")
 async def get_dispute_packet(bill_id: int):
     """Generate a full dispute packet."""

@@ -13,8 +13,10 @@ from compliance import log_audit
 from hospital_seo import (
     find_hospitals,
     get_cities_for_state,
+    get_grade_distribution,
     get_hospital_profile,
     get_hospital_sitemap_paths,
+    get_sample_hospitals,
     get_state_hospitals,
     get_state_index_stats,
     resolve_hospital_slug,
@@ -58,6 +60,36 @@ def startup():
 async def landing(request: Request):
     stats = get_stats()
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
+    grade_dist = get_grade_distribution()
+    sample_hospitals = get_sample_hospitals(6)
+
+    from guides import list_guides, get_guide
+    priority_slugs = [
+        "hospital-billing-grades-explained",
+        "common-hospital-billing-errors",
+        "private-equity-hospital-billing",
+    ]
+    featured_guides = []
+    for slug in priority_slugs:
+        g = get_guide(slug)
+        if g:
+            word_count = len(g.get("body", "").split())
+            g["reading_time"] = max(1, word_count // 200)
+            featured_guides.append(g)
+    if len(featured_guides) < 3:
+        for g in list_guides():
+            if g["slug"] not in priority_slugs:
+                word_count = len(g.get("body", "").split())
+                g["reading_time"] = max(1, word_count // 200)
+                featured_guides.append(g)
+                if len(featured_guides) >= 3:
+                    break
+
+    with db.get_db() as conn:
+        hospital_count = conn.execute(
+            "SELECT COUNT(*) AS n FROM billing_metrics WHERE billing_grade IS NOT NULL"
+        ).fetchone()["n"]
+
     return templates.TemplateResponse(
         "landing.html",
         {
@@ -65,8 +97,12 @@ async def landing(request: Request):
             "stats": stats,
             "outcome_stats": get_outcome_stats(),
             "canonical_url": canonical_url,
-            "og_title": "BillKarma - Check Medical Bills Against Federal Rates",
-            "og_description": "Upload your medical bill. BillKarma flags errors, markups, and overcharges in 30 seconds.",
+            "grade_distribution": grade_dist,
+            "sample_hospitals": sample_hospitals,
+            "featured_guides": featured_guides,
+            "hospital_count": hospital_count,
+            "og_title": "BillKarma — Hospital Billing Grades, Bill Scanner & Price Transparency",
+            "og_description": "Check any U.S. hospital's billing grade before you schedule. Scan your bill for errors. Fight overcharges with real Medicare data. 6,000+ hospitals graded free.",
             "meta_robots": "index, follow",
         },
     )
