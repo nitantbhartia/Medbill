@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% block title %}Fight This Bill — BillKarma{% endblock %}
+{% block content %}
+<section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
+
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-400 mb-6 flex items-center gap-1.5">
+        <a href="/results/{{ bill_id }}" class="hover:text-gray-600">Results</a>
+        <span>&rsaquo;</span>
+        <span class="text-gray-700 font-medium">Fight This Bill</span>
+    </div>
+
+    <!-- Savings headline -->
+    <div class="mb-8 bg-green-50 border border-green-200 rounded-xl p-6">
+        <p class="text-sm font-semibold text-green-700 uppercase tracking-wide mb-1">We found a problem</p>
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight mb-2">
+            You may be owed
+            <span class="text-green-600">${{ "%.0f"|format(potential_savings) }}</span>
+        </h1>
+        <p class="text-sm text-gray-600">
+            {{ finding_count }} billing issue{{ 's' if finding_count != 1 else '' }} found at
+            <strong>{{ provider_name or 'this provider' }}</strong>.
+            BillKarma will send a formal dispute letter and follow up automatically until it's resolved.
+        </p>
+    </div>
+
+    <!-- How it works (3 steps) -->
+    <div class="mb-8">
+        <h2 class="text-sm font-semibold text-gray-900 mb-4">What happens after you pay</h2>
+        <ol class="space-y-3">
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <div class="text-sm text-gray-700">
+                    <span class="font-medium text-gray-900">We send the dispute.</span>
+                    AI generates a formal letter citing Medicare benchmarks and your hospital's own published prices.
+                    Sent to the billing department within minutes.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <div class="text-sm text-gray-700">
+                    <span class="font-medium text-gray-900">We follow up automatically.</span>
+                    Reminders at day 7, 14, 30, and 45 if no response. You don't need to do anything.
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <div class="text-sm text-gray-700">
+                    <span class="font-medium text-gray-900">You get updates by email.</span>
+                    We notify you when the hospital responds or if we can't resolve it. If unresolved after 45 days,
+                    you get a full refund.
+                </div>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Pricing -->
+    <div class="mb-8 border border-gray-200 rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <p class="text-sm font-semibold text-gray-900">Flat fee — no surprises</p>
+            <p class="text-xs text-gray-500 mt-0.5">No savings? Full refund. No contingency fees.</p>
+        </div>
+        <div class="text-right">
+            <p class="text-2xl font-bold text-gray-900">${{ "%.0f"|format(fee_dollars) }}</p>
+            <p class="text-xs text-gray-500">one-time</p>
+        </div>
+    </div>
+
+    <!-- E-sign + Payment Form -->
+    <div id="activate-form">
+
+        <!-- Step 1: Your details -->
+        <div id="step-details" class="mb-6">
+            <h2 class="text-sm font-semibold text-gray-900 mb-4">Your information</h2>
+            <div class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Full name <span class="text-red-400">*</span></label>
+                        <input id="patient-name" type="text" placeholder="Jane Smith" required
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Email <span class="text-red-400">*</span></label>
+                        <input id="patient-email" type="email" placeholder="you@example.com" required
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Mailing address</label>
+                    <input id="patient-address" type="text" placeholder="123 Main St, City, ST 12345"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Account / invoice number</label>
+                        <input id="account-number" type="text" placeholder="e.g. 123456789"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Hospital billing email</label>
+                        <input id="hospital-email" type="email" placeholder="billing@hospital.org"
+                               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: E-sign documents -->
+        <div id="step-esign" class="mb-6">
+            <h2 class="text-sm font-semibold text-gray-900 mb-1">Sign three short documents</h2>
+            <p class="text-xs text-gray-500 mb-4">
+                Required before we can act on your behalf. Valid under the E-SIGN Act.
+            </p>
+
+            {% set docs = [
+                ('hipaa_authorization', 'HIPAA Authorization', 'Authorizes BillKarma to access your billing records and communicate with the provider.'),
+                ('representative_designation', 'Authorized Rep Designation', 'Designates BillKarma as your authorized representative for billing disputes.'),
+                ('terms_of_service', 'Terms of Service', 'Our flat-fee pricing, refund policy, and scope of service.')
+            ] %}
+
+            <div class="space-y-3" id="doc-list">
+                {% for doc_id, doc_name, doc_desc in docs %}
+                <div class="border border-gray-200 rounded-lg p-4" id="doc-{{ doc_id }}">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">{{ doc_name }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ doc_desc }}</p>
+                        </div>
+                        <span class="esign-badge-{{ doc_id }} flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Pending</span>
+                    </div>
+                    <div class="mt-3 flex gap-2">
+                        <button type="button"
+                                class="doc-view-btn text-xs px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                data-doc="{{ doc_id }}">
+                            View document
+                        </button>
+                        <button type="button"
+                                class="doc-sign-btn text-xs px-3 py-1.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                                data-doc="{{ doc_id }}">
+                            I agree &amp; sign
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Document modal -->
+        <div id="doc-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl max-w-lg w-full max-h-[80vh] flex flex-col">
+                <div class="flex items-center justify-between p-5 border-b border-gray-200">
+                    <h3 id="modal-title" class="text-sm font-semibold text-gray-900"></h3>
+                    <button type="button" id="modal-close" class="text-gray-400 hover:text-gray-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-5">
+                    <pre id="modal-content" class="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
+                </div>
+                <div class="p-5 border-t border-gray-200">
+                    <button type="button" id="modal-sign-btn"
+                            class="w-full py-2.5 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                        I have read and agree to this document
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Pay -->
+        <div id="step-pay" class="mb-6">
+            <button type="button" id="proceed-to-pay"
+                    class="w-full py-3.5 bg-green-600 text-white font-semibold text-base rounded-xl hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled>
+                Pay ${{ "%.0f"|format(fee_dollars) }} and Fight This Bill →
+            </button>
+            <p class="text-xs text-gray-400 text-center mt-2">
+                No savings in 45 days? Full refund. Secure payment via Stripe.
+            </p>
+            <div id="pay-error" class="hidden mt-3 text-sm text-red-600"></div>
+        </div>
+
+    </div>
+
+    <!-- What we check -->
+    <div class="mt-8 border-t border-gray-100 pt-6">
+        <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">What we dispute for you</h2>
+        <ul class="space-y-1.5 text-xs text-gray-600">
+            <li class="flex gap-2"><span class="text-green-600 font-bold">✓</span> Charges above Medicare benchmarks</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">✓</span> Duplicate or unbundled billing codes</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">✓</span> Upcoding — billed at higher complexity than performed</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">✓</span> No Surprises Act violations</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">✓</span> 501(r) financial assistance application (nonprofit hospitals)</li>
+        </ul>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const BILL_ID = {{ bill_id }};
+const FEE_DOLLARS = {{ fee_dollars }};
+const PROVIDER_NAME = {{ (provider_name or '')|tojson }};
+
+const DOC_CONTENT = {
+    hipaa_authorization: {{ hipaa_text|tojson }},
+    representative_designation: {{ rep_text|tojson }},
+    terms_of_service: {{ tos_text|tojson }},
+};
+
+const DOC_NAMES = {
+    hipaa_authorization: 'HIPAA Authorization',
+    representative_designation: 'Authorized Representative Designation',
+    terms_of_service: 'Terms of Service',
+};
+
+const signed = { hipaa_authorization: false, representative_designation: false, terms_of_service: false };
+let activeDoc = null;
+
+function updatePayButton() {
+    const allSigned = Object.values(signed).every(Boolean);
+    document.getElementById('proceed-to-pay').disabled = !allSigned;
+}
+
+function markSigned(docType) {
+    signed[docType] = true;
+    const badge = document.querySelector('.esign-badge-' + docType);
+    if (badge) {
+        badge.textContent = '✓ Signed';
+        badge.className = badge.className.replace('bg-gray-100 text-gray-500', 'bg-green-100 text-green-700');
+    }
+    const signBtn = document.querySelector(`.doc-sign-btn[data-doc="${docType}"]`);
+    if (signBtn) {
+        signBtn.textContent = '✓ Signed';
+        signBtn.disabled = true;
+        signBtn.className = signBtn.className.replace('bg-black text-white hover:bg-gray-800', 'bg-green-100 text-green-700 cursor-default');
+    }
+    updatePayButton();
+}
+
+async function recordSignature(docType) {
+    const name = document.getElementById('patient-name').value.trim();
+    const email = document.getElementById('patient-email').value.trim();
+    if (!name || !email) {
+        alert('Please fill in your name and email first.');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('patient_name', name);
+    fd.append('patient_email', email);
+    fd.append('doc_type', docType);
+
+    const resp = await fetch(`/api/dispute/esign/${BILL_ID}`, { method: 'POST', body: fd });
+    if (resp.ok) {
+        markSigned(docType);
+    } else {
+        const err = await resp.json().catch(() => ({}));
+        alert('Error signing: ' + (err.detail || 'Please try again.'));
+    }
+}
+
+// View button
+document.querySelectorAll('.doc-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const doc = btn.dataset.doc;
+        activeDoc = doc;
+        document.getElementById('modal-title').textContent = DOC_NAMES[doc];
+        document.getElementById('modal-content').textContent = DOC_CONTENT[doc];
+        document.getElementById('doc-modal').classList.remove('hidden');
+    });
+});
+
+// Sign button (inline)
+document.querySelectorAll('.doc-sign-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        activeDoc = btn.dataset.doc;
+        await recordSignature(activeDoc);
+    });
+});
+
+// Modal sign button
+document.getElementById('modal-sign-btn').addEventListener('click', async () => {
+    if (activeDoc) {
+        await recordSignature(activeDoc);
+        document.getElementById('doc-modal').classList.add('hidden');
+    }
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('doc-modal').classList.add('hidden');
+});
+
+// Proceed to pay
+document.getElementById('proceed-to-pay').addEventListener('click', async () => {
+    const name = document.getElementById('patient-name').value.trim();
+    const email = document.getElementById('patient-email').value.trim();
+
+    if (!name || !email) {
+        document.getElementById('pay-error').textContent = 'Please fill in your name and email.';
+        document.getElementById('pay-error').classList.remove('hidden');
+        return;
+    }
+
+    const btn = document.getElementById('proceed-to-pay');
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to checkout…';
+
+    // Store details in sessionStorage for post-payment activation
+    sessionStorage.setItem('bk_dispute', JSON.stringify({
+        bill_id: BILL_ID,
+        patient_name: name,
+        patient_email: email,
+        patient_address: document.getElementById('patient-address').value.trim(),
+        account_number: document.getElementById('account-number').value.trim(),
+        hospital_billing_email: document.getElementById('hospital-email').value.trim(),
+    }));
+
+    const fd = new FormData();
+    fd.append('bill_id', BILL_ID);
+    fd.append('email', email);
+
+    const resp = await fetch('/api/dispute/checkout', { method: 'POST', body: fd });
+    const data = await resp.json();
+
+    if (resp.ok && data.data && data.data.checkout_url) {
+        window.location.href = data.data.checkout_url;
+    } else {
+        document.getElementById('pay-error').textContent = data.detail || 'Payment setup failed. Please try again.';
+        document.getElementById('pay-error').classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = `Pay $${FEE_DOLLARS} and Fight This Bill →`;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Dispute Filed — BillKarma{% endblock %}
+{% block content %}
+<section class="max-w-xl mx-auto px-5 py-14 text-center">
+
+    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00824F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+        </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900 tracking-tight mb-3">
+        Your dispute is being filed.
+    </h1>
+    <p class="text-gray-600 mb-8 max-w-md mx-auto">
+        We're generating your dispute letter now and will send it to the hospital billing department.
+        You'll receive an email confirmation shortly.
+    </p>
+
+    <!-- Status cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+        <div class="border border-gray-200 rounded-xl p-4">
+            <div class="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Now</div>
+            <p class="text-sm text-gray-700">Dispute letter being sent to billing dept</p>
+        </div>
+        <div class="border border-gray-200 rounded-xl p-4">
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Days 7–45</div>
+            <p class="text-sm text-gray-700">Automatic follow-ups if no response</p>
+        </div>
+        <div class="border border-gray-200 rounded-xl p-4">
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">If unresolved</div>
+            <p class="text-sm text-gray-700">Full refund — no questions asked</p>
+        </div>
+    </div>
+
+    <!-- Activation (hidden — JS triggers this after confirming payment) -->
+    <div id="activating" class="mb-6">
+        <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <svg class="animate-spin w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            Activating your dispute…
+        </div>
+    </div>
+
+    <div id="activated-view" class="hidden">
+        <a id="dashboard-link" href="/dispute/dashboard" class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors">
+            View Dispute Dashboard →
+        </a>
+    </div>
+
+    <div id="activation-error" class="hidden mt-4 text-sm text-red-600">
+        Dispute activation failed. Please contact support@billkarma.app with your payment confirmation.
+    </div>
+
+    <p class="mt-8 text-xs text-gray-400">
+        A confirmation email has been sent to your inbox. Questions? Reply to that email.
+    </p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(async function activateDispute() {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+
+    if (!sessionId) {
+        document.getElementById('activating').classList.add('hidden');
+        document.getElementById('activated-view').classList.remove('hidden');
+        return;
+    }
+
+    // Retrieve stored dispute details from sessionStorage
+    let details = {};
+    try {
+        details = JSON.parse(sessionStorage.getItem('bk_dispute') || '{}');
+    } catch (e) {}
+
+    if (!details.bill_id) {
+        // Nothing to activate without bill details
+        document.getElementById('activating').classList.add('hidden');
+        document.getElementById('activated-view').classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const fd = new FormData();
+        fd.append('bill_id', details.bill_id);
+        fd.append('stripe_session_id', sessionId);
+        fd.append('patient_name', details.patient_name || '');
+        fd.append('patient_email', details.patient_email || '');
+        fd.append('patient_address', details.patient_address || '');
+        fd.append('account_number', details.account_number || '');
+        fd.append('hospital_billing_email', details.hospital_billing_email || '');
+        fd.append('hospital_billing_fax', details.hospital_billing_fax || '');
+
+        const resp = await fetch('/api/dispute/activate', { method: 'POST', body: fd });
+        const data = await resp.json();
+
+        document.getElementById('activating').classList.add('hidden');
+
+        if (resp.ok && data.data && data.data.case_id) {
+            sessionStorage.removeItem('bk_dispute');
+            const link = document.getElementById('dashboard-link');
+            link.href = `/dispute/dashboard?case=${data.data.case_id}`;
+            document.getElementById('activated-view').classList.remove('hidden');
+        } else {
+            document.getElementById('activation-error').classList.remove('hidden');
+            document.getElementById('activated-view').classList.remove('hidden');
+        }
+    } catch (err) {
+        document.getElementById('activating').classList.add('hidden');
+        document.getElementById('activation-error').classList.remove('hidden');
+        document.getElementById('activated-view').classList.remove('hidden');
+    }
+})();
+</script>
+{% endblock %}

@@ -13,6 +13,9 @@ import email_service
 import scanner
 import analyzer
 import negotiation
+import payment as payment_module
+import dispute_service
+import esign as esign_module
 from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
 from db import get_db
 from dispute_packet import generate_dispute_packet
@@ -978,3 +981,232 @@ async def confirm_items(
             )
 
     return {"status": "ok", "data": {"bill_id": bill_id, "items_confirmed": len(items)}}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# DISPUTE SERVICE — Paid dispute activation, e-sign, payment, follow-ups
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+@router.post("/dispute/checkout")
+async def create_dispute_checkout(
+    bill_id: int = Form(...),
+    email: str = Form(...),
+):
+    """Create a Stripe Checkout session for the dispute service fee."""
+    if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+        raise HTTPException(400, "Invalid email address")
+
+    with get_db() as db:
+        bill = db.execute("SELECT total_patient_owes, total_charged FROM bills WHERE id = ?", (bill_id,)).fetchone()
+    if not bill:
+        raise HTTPException(404, "Bill not found")
+
+    bill_total = float(bill["total_patient_owes"] or bill["total_charged"] or 0)
+    fee_cents = payment_module.calculate_fee(bill_total)
+
+    try:
+        session = payment_module.create_checkout_session(
+            bill_id=bill_id,
+            email=email,
+            amount_cents=fee_cents,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(500, str(exc))
+
+    return {"status": "ok", "data": {"checkout_url": session["url"], "session_id": session["id"], "fee_cents": fee_cents}}
+
+
+@router.post("/stripe/webhook")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events (payment.completed, charge.refunded)."""
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature", "")
+
+    if config.STRIPE_WEBHOOK_SECRET:
+        if not payment_module.verify_webhook_signature(payload, sig_header, config.STRIPE_WEBHOOK_SECRET):
+            raise HTTPException(400, "Invalid webhook signature")
+
+    try:
+        event = json.loads(payload)
+    except json.JSONDecodeError:
+        raise HTTPException(400, "Invalid JSON")
+
+    event_type = event.get("type", "")
+    data = event.get("data", {}).get("object", {})
+
+    if event_type == "checkout.session.completed":
+        session_id = data.get("id")
+        bill_id = payment_module.record_payment_success(session_id)
+        if bill_id:
+            log_audit(action="payment_completed", resource_type="dispute_payment",
+                      resource_id=session_id, metadata={"bill_id": bill_id})
+
+    return {"status": "ok"}
+
+
+@router.get("/dispute/esign/{bill_id}")
+async def get_esign_status(bill_id: int):
+    """Get e-signature status for all three documents."""
+    status = esign_module.get_status(bill_id)
+    return {"status": "ok", "data": status}
+
+
+@router.post("/dispute/esign/{bill_id}")
+async def record_esign(
+    request: Request,
+    bill_id: int,
+    patient_name: str = Form(...),
+    patient_email: str = Form(...),
+    doc_type: str = Form(...),
+):
+    """Record an e-signature for a specific document type."""
+    if doc_type not in esign_module.ALL_DOCS:
+        raise HTTPException(400, f"doc_type must be one of: {', '.join(esign_module.ALL_DOCS)}")
+
+    if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", patient_email):
+        raise HTTPException(400, "Invalid email address")
+
+    ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "")
+
+    esign_module.get_or_create_session(bill_id, patient_name, patient_email)
+    esign_module.record_signature(bill_id, doc_type, ip, user_agent)
+
+    record_consent(
+        user_id=None, bill_id=bill_id,
+        consent_type=doc_type, consent_version=esign_module.ESIGN_VERSION,
+        ip_address=ip, user_agent=user_agent,
+    )
+
+    status = esign_module.get_status(bill_id)
+    return {"status": "ok", "data": status}
+
+
+@router.post("/dispute/activate")
+async def activate_dispute(
+    bill_id: int = Form(...),
+    stripe_session_id: str = Form(...),
+    patient_name: str = Form(...),
+    patient_email: str = Form(...),
+    patient_address: str = Form(""),
+    account_number: str = Form(""),
+    hospital_billing_email: str = Form(""),
+    hospital_billing_fax: str = Form(""),
+):
+    """Activate a paid dispute case after payment and e-sign completion."""
+    # Verify all docs are signed
+    esign_status = esign_module.get_status(bill_id)
+    if not esign_status.get("all_signed"):
+        raise HTTPException(400, "All three documents must be signed before activating dispute")
+
+    # Verify payment is confirmed
+    payment_row = payment_module.get_payment_for_bill(bill_id)
+    if not payment_row or payment_row["status"] != "paid":
+        # Try to confirm from Stripe
+        try:
+            session = payment_module.get_session(stripe_session_id)
+            if session.get("payment_status") == "paid":
+                payment_module.record_payment_success(stripe_session_id)
+                payment_row = payment_module.get_payment_for_bill(bill_id)
+        except Exception:
+            pass
+
+    if not payment_row or payment_row["status"] != "paid":
+        raise HTTPException(402, "Payment not confirmed")
+
+    try:
+        case_id = dispute_service.activate_dispute(
+            bill_id=bill_id,
+            payment_id=payment_row["id"],
+            patient_name=patient_name,
+            patient_email=patient_email,
+            patient_address=patient_address,
+            account_number=account_number,
+            hospital_billing_email=hospital_billing_email,
+            hospital_billing_fax=hospital_billing_fax,
+        )
+    except Exception as exc:
+        log.error("Failed to activate dispute for bill %d: %s", bill_id, exc)
+        raise HTTPException(500, "Failed to activate dispute")
+
+    log_audit(action="dispute_activated", resource_type="dispute_case",
+              resource_id=str(case_id), bill_id=bill_id)
+
+    return {"status": "ok", "data": {"case_id": case_id}}
+
+
+@router.get("/dispute/dashboard/{bill_id}")
+async def dispute_dashboard(bill_id: int):
+    """Get the full dispute dashboard data for a bill."""
+    summary = dispute_service.get_dispute_summary(bill_id)
+    return {"status": "ok", "data": summary}
+
+
+@router.post("/dispute/resolve/{case_id}")
+async def resolve_dispute(
+    case_id: int,
+    outcome: str = Form(...),
+    actual_savings: float = Form(0.0),
+):
+    """Mark a dispute case as resolved."""
+    valid_outcomes = {"reduced", "forgiven", "denied", "payment_plan", "other"}
+    if outcome not in valid_outcomes:
+        raise HTTPException(400, f"outcome must be one of: {', '.join(valid_outcomes)}")
+
+    case = dispute_service.get_case(case_id)
+    if not case:
+        raise HTTPException(404, "Case not found")
+
+    dispute_service.mark_resolved(case_id, outcome, actual_savings if actual_savings > 0 else None)
+    log_audit(action="dispute_resolved", resource_type="dispute_case",
+              resource_id=str(case_id), metadata={"outcome": outcome, "savings": actual_savings})
+
+    return {"status": "ok", "data": {"case_id": case_id, "outcome": outcome}}
+
+
+@router.post("/dispute/refund/{case_id}")
+async def request_refund(case_id: int):
+    """Issue a refund for a dispute case that couldn't be resolved."""
+    case = dispute_service.get_case(case_id)
+    if not case:
+        raise HTTPException(404, "Case not found")
+    if case["status"] == "refunded":
+        return {"status": "ok", "data": {"message": "Already refunded"}}
+    if case["status"] == "resolved":
+        raise HTTPException(400, "Cannot refund a resolved case")
+
+    try:
+        refunded = dispute_service.issue_refund_for_case(case_id)
+    except Exception as exc:
+        raise HTTPException(500, f"Refund failed: {exc}")
+
+    log_audit(action="dispute_refunded", resource_type="dispute_case", resource_id=str(case_id))
+
+    return {"status": "ok", "data": {"refunded": refunded}}
+
+
+@router.post("/dispute/run-followups")
+async def run_followups(request: Request):
+    """Admin endpoint: process all overdue follow-ups."""
+    # Basic security: only allow from localhost in production
+    client_ip = request.client.host if request.client else "unknown"
+    if not config.DEBUG and client_ip not in ("127.0.0.1", "::1"):
+        raise HTTPException(403, "Admin only")
+
+    sent = dispute_service.process_due_followups()
+    return {"status": "ok", "data": {"followups_sent": sent}}
+
+
+@router.get("/dispute/fee")
+async def get_dispute_fee(bill_id: int):
+    """Return the dispute fee for a bill based on its total."""
+    with get_db() as db:
+        bill = db.execute("SELECT total_patient_owes, total_charged FROM bills WHERE id = ?", (bill_id,)).fetchone()
+    if not bill:
+        raise HTTPException(404, "Bill not found")
+
+    bill_total = float(bill["total_patient_owes"] or bill["total_charged"] or 0)
+    fee_cents = payment_module.calculate_fee(bill_total)
+
+    return {"status": "ok", "data": {"fee_cents": fee_cents, "fee_dollars": fee_cents / 100}}
