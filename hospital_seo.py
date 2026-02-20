@@ -710,7 +710,8 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     with get_db() as db:
         hospital = db.execute(
             """
-            SELECT h.*, COALESCE(h.ownership, hd.ownership) AS ownership_fallback,
+            SELECT h.*,
+                   COALESCE(h.ownership, hd.ownership) AS ownership_fallback,
                    m.avg_markup_vs_medicare, m.median_markup_vs_medicare, m.max_markup_vs_medicare,
                    m.procedures_compared, m.cash_discount_avg_pct, m.billing_grade, m.state_rank,
                    m.national_percentile, m.computed_at
@@ -797,7 +798,12 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         nonprofit_flag = 0
     hospital_d["is_nonprofit"] = 1 if nonprofit_flag else 0
 
-    hospital_d["nonprofit_status_label"] = _ownership_display_label(hospital_d.get("ownership"))
+    # Prefer enriched ownership_type (from CMS POS codes) over raw text
+    enriched_ownership = hospital_d.get("ownership_type")
+    if enriched_ownership and enriched_ownership not in ("Unknown", ""):
+        hospital_d["nonprofit_status_label"] = enriched_ownership
+    else:
+        hospital_d["nonprofit_status_label"] = _ownership_display_label(hospital_d.get("ownership"))
     prices_d = [dict(p) for p in prices]
 
     show_cash_column = False
@@ -1279,6 +1285,62 @@ def recompute_billing_metrics() -> int:
     return upserted
 
 
+def _generate_ungraded_intro(hospital: dict) -> str:
+    """Generate fallback prose summary for hospitals with no billing grade."""
+    name = hospital.get("name", "This hospital")
+    city = hospital.get("city") or ""
+    state = hospital.get("state") or ""
+    location = f"in {city}, {state}" if city and state else (f"in {state}" if state else "")
+
+    ownership_type = hospital.get("ownership_type") or hospital.get("ownership") or ""
+    beds = hospital.get("bed_count")
+    stars = hospital.get("cms_star_rating")
+    procedures = hospital.get("procedures_compared") or 0
+    is_pe = bool(hospital.get("is_pe_owned"))
+    pe_firm = hospital.get("pe_firm") or ""
+    pe_year = hospital.get("pe_acquisition_year")
+    is_nonprofit = bool(hospital.get("is_nonprofit"))
+    compliance = hospital.get("compliance_status") or "Unverified"
+
+    ownership_txt = ownership_type if ownership_type and ownership_type not in ("Unknown", "") else "general"
+    pe_txt = ""
+    if is_pe and pe_firm:
+        pe_txt = f", owned by {pe_firm}" + (f" since {pe_year}" if pe_year else "")
+    beds_txt = f" with {beds:,} certified beds" if beds else ""
+
+    intro = f"{name} {location} is a {ownership_txt} hospital{pe_txt}{beds_txt}."
+
+    if stars:
+        intro += f" CMS rates it {stars} out of 5 stars for overall quality."
+
+    if procedures > 0:
+        intro += (
+            f" BillKarma was unable to compute a billing grade for this hospital because"
+            f" their published price transparency file contains only {procedures}"
+            f" procedure{'s' if procedures != 1 else ''}"
+            " — insufficient for a representative markup analysis."
+        )
+    else:
+        intro += (
+            " BillKarma was unable to compute a billing grade for this hospital because"
+            " no usable pricing data was found in their published price transparency file."
+        )
+
+    if compliance == "Non-compliant":
+        intro += (
+            " This hospital has not posted a complete machine-readable price file"
+            " as required by federal law."
+        )
+
+    if is_nonprofit:
+        intro += (
+            " As a nonprofit hospital, they are required under IRS 501(r) to maintain"
+            " a written financial assistance policy. Contact their billing department to request it."
+        )
+
+    return intro
+
+
 def generate_intro_paragraph(
     hospital: dict,
     comparison: dict | None = None,
@@ -1294,7 +1356,7 @@ def generate_intro_paragraph(
     state_rank = hospital.get("state_rank")
 
     if not grade or grade == "N/A" or markup is None:
-        return ""
+        return _generate_ungraded_intro(hospital)
 
     location = f"in {city}, {state}" if city and state else (f"in {state}" if state else "")
     markup_txt = f"{markup:.1f}x"
@@ -1351,12 +1413,52 @@ def generate_intro_paragraph(
 def generate_deterministic_tips(hospital: dict, financials: dict, comparison: dict | None = None) -> str:
     grade = hospital.get("billing_grade") or "N/A"
     markup = hospital.get("avg_markup_vs_medicare")
-    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
+    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else None
     nonprofit = bool(hospital.get("is_nonprofit") or financials.get("nonprofit_status"))
     charity_pct = financials.get("charity_care_pct_revenue") or financials.get("charity_care_pct")
     charity_txt = f"{float(charity_pct):.1f}%" if charity_pct is not None else "not reported"
     cash_discount = hospital.get("cash_discount_avg_pct")
     cash_txt = f"{float(cash_discount):.1f}%" if cash_discount is not None else None
+
+    # N/A hospitals — no grade or markup data
+    if grade == "N/A" or markup_txt is None:
+        name = hospital.get("name", "This hospital")
+        procedures = hospital.get("procedures_compared") or 0
+        phone = hospital.get("phone")
+        contact_txt = f" Call billing at {phone} and request an itemized statement with CPT codes." if phone else ""
+
+        markup_hint = ""
+        if procedures > 0 and markup is not None:
+            markup_hint = (
+                f" The procedure data we do have shows a markup of approximately {markup:.1f}x Medicare"
+                " — use this as a reference point when reviewing your full bill."
+            )
+
+        para1 = (
+            f"{name} does not have enough pricing data in their published file for BillKarma"
+            " to compute a billing grade. However, you can still dispute individual charges"
+            f" using Medicare rates as your benchmark.{markup_hint}"
+        )
+
+        if nonprofit:
+            para2 = (
+                "As a nonprofit hospital, they are required under IRS Section 501(r) to have"
+                " a written financial assistance policy. Ask their billing department for the"
+                " Financial Assistance Policy (FAP) application and income eligibility thresholds"
+                " before making any payment."
+            )
+        else:
+            para2 = (
+                "Request the self-pay or cash discount rate from billing — most hospitals offer"
+                " significant reductions off their list prices for uninsured or high-deductible patients."
+            )
+
+        para3 = (
+            "Request an itemized bill with CPT codes from their billing department,"
+            " then use the BillKarma calculator to look up the Medicare rate for each code."
+            + contact_txt
+        )
+        return "\n\n".join((para1, para2, para3))
 
     cmp_data = comparison or {}
     state_avg = cmp_data.get("state_avg_markup")

@@ -387,6 +387,138 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_dispute_claim_events_claim ON dispute_claim_events(claim_id)")
 
+    # Enrichment fields — Tier 1 (Phase 1)
+    ensure_columns(
+        "hospitals",
+        {
+            "ownership_type": "TEXT",
+            "ownership_subtype": "TEXT",
+            "ownership_code": "TEXT",
+            "hospital_size": "TEXT",
+            "patient_experience": "TEXT",
+            "quality_measures": "TEXT",
+            "cms_stars_last_updated": "DATE",
+            "enrichment_last_run": "DATE",
+            "enrichment_source": "TEXT",
+            "enrichment_match_confidence": "TEXT",
+            # Tier 2 (Phase 2)
+            "charity_care_pct": "REAL",
+            "charity_care_reported": "INTEGER",
+            "charity_care_report_year": "INTEGER",
+            "compliance_status": "TEXT",
+            "compliance_last_checked": "DATE",
+            "procedures_in_file": "INTEGER",
+            "parent_system": "TEXT",
+            "is_pe_owned": "INTEGER DEFAULT 0",
+            "pe_firm": "TEXT",
+            "pe_acquisition_year": "INTEGER",
+            "pe_exit_year": "INTEGER",
+        },
+    )
+
+    # CMS POS enrichment staging table
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS cms_pos_enrichment (
+            ccn TEXT PRIMARY KEY,
+            fac_name TEXT,
+            st_adr TEXT,
+            city_name TEXT,
+            state_cd TEXT,
+            zip_cd TEXT,
+            latitude REAL,
+            longitude REAL,
+            crtfd_bed_cnt INTEGER,
+            gnrl_cntl_type_cd TEXT,
+            gnrl_fac_type_cd TEXT,
+            orgnl_prtcptn_dt TEXT,
+            phne_num TEXT,
+            loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_cms_pos_state ON cms_pos_enrichment(state_cd)")
+
+    # Hospitals that couldn't be matched to CMS POS data
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS enrichment_unmatched (
+            facility_id TEXT PRIMARY KEY,
+            name TEXT,
+            city TEXT,
+            state TEXT,
+            reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+
+    # Coordinates validation log
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS coordinates_validation (
+            facility_id TEXT PRIMARY KEY,
+            name TEXT,
+            city TEXT,
+            state TEXT,
+            latitude REAL,
+            longitude REAL,
+            issue TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+
+    # PE ownership reference data
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS pe_ownership (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            hospital_name TEXT,
+            ccn TEXT,
+            pe_firm TEXT,
+            acquisition_year INTEGER,
+            exit_year INTEGER,
+            current_parent_system TEXT,
+            source_url TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_pe_ownership_ccn ON pe_ownership(ccn)")
+
+    # Enrichment run log
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS enrichment_run_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            hospitals_processed INTEGER,
+            ownership_updated INTEGER,
+            coordinates_updated INTEGER,
+            stars_updated INTEGER,
+            ownership_unknown_remaining INTEGER,
+            stars_not_rated_remaining INTEGER,
+            errors TEXT
+        )
+        """
+    )
+
+    # Enrichment changelog for tracking field changes over time
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS enrichment_changelog (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT NOT NULL,
+            field_name TEXT NOT NULL,
+            old_value TEXT,
+            new_value TEXT,
+            changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_enrichment_changelog_fid ON enrichment_changelog(facility_id)")
+
     # Backward-compatible sync to canonical tables.
     db.execute(
         """
