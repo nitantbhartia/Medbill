@@ -116,6 +116,10 @@
             padding: 72px 0 100px; position: relative; overflow: hidden;
             border-radius: 0 0 40px 40px;
         }
+        .hero-blob {
+            position: absolute; border-radius: 50%;
+            background: var(--c-green-dark); pointer-events: none;
+        }
         .hero-pattern { position: absolute; right: -10%; top: 50%; transform: translateY(-50%); width: 600px; height: 600px; opacity: 0.15; pointer-events: none; }
         .hero-circle { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
         .hero-label {
@@ -303,6 +307,10 @@
             .steps-grid { grid-template-columns: 1fr; text-align: left; }
             .procedure-grid { grid-template-columns: 1fr; }
             .footer-grid { flex-direction: column; gap: 32px; }
+            .stats-bar { display: none; }
+            .grade-strip { display: none; }
+            .procedure-grid .procedure-card:nth-child(n+4) { display: none; }
+            .hero-blob { display: none; }
         }
         @media (max-width: 640px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -408,6 +416,8 @@
 </div>
 
 <section class="hero" id="heroSearchSection">
+    <div class="hero-blob" style="width: 500px; height: 500px; bottom: -160px; right: -60px; opacity: 0.55;"></div>
+    <div class="hero-blob" style="width: 260px; height: 260px; top: -80px; right: 260px; opacity: 0.4;"></div>
     <div class="hero-pattern">
         <div class="hero-circle" style="width: 400px; height: 400px; top: 0; left: 0;"></div>
         <div class="hero-circle" style="width: 250px; height: 250px; top: 80px; left: 80px;"></div>
