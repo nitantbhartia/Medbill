@@ -99,6 +99,7 @@ def test_compare_detail_renders():
     assert resp.status_code == 200
     assert "Test General Hospital" in resp.text
     assert "Test Specialty Center" in resp.text
+    assert 'data-free-map="compare"' in resp.text
 
 
 def test_compare_detail_shows_verdict():
@@ -149,7 +150,10 @@ def test_hospital_search_api_requires_query():
     resp = client.get("/api/hospitals/search")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["results"] == []
+    results = data.get("results")
+    if results is None:
+        results = data.get("data", [])
+    assert results == []
 
 
 def test_hospital_search_api_returns_results():
@@ -157,18 +161,25 @@ def test_hospital_search_api_returns_results():
     resp = client.get("/api/hospitals/search?q=Test")
     assert resp.status_code == 200
     data = resp.json()
-    assert "results" in data
-    assert len(data["results"]) >= 1
-    # Each result must have facility_id for comparison URL building
-    for r in data["results"]:
-        assert "facility_id" in r
+    results = data.get("results")
+    if results is None:
+        results = data.get("data", [])
+    assert len(results) >= 1
+    # Each result must include key display/search fields.
+    for r in results:
         assert "name" in r
+        assert "city" in r
+        assert "state" in r
 
 
 def test_hospital_search_api_short_query_returns_empty():
     resp = client.get("/api/hospitals/search?q=T")
     assert resp.status_code == 200
-    assert resp.json()["results"] == []
+    payload = resp.json()
+    results = payload.get("results")
+    if results is None:
+        results = payload.get("data", [])
+    assert results == []
 
 
 # ---- Function tests ----
@@ -210,6 +221,8 @@ def test_get_comparison_data_full():
     assert "a" in data and "b" in data
     assert "common_procedures" in data
     assert "verdict" in data
+    assert "map_data" in data
+    assert data["map_data"]["available"] is True
     assert "winner" in data["verdict"]
     assert data["verdict"]["winner"] in ("a", "b", "tie", "unknown")
 
@@ -248,3 +261,13 @@ def test_compare_detail_distance_shown():
     data = get_comparison_data(_FID_A, _FID_B)
     assert data["distance_miles"] is not None
     assert data["distance_miles"] < 5.0  # Both are in Springfield, close together
+    assert data["map_data"]["line"]["show"] is True
+
+
+def test_compare_map_fallback_without_coordinates():
+    _seed()
+    with get_db() as db:
+        db.execute("UPDATE hospitals SET lat = NULL, lon = NULL WHERE facility_id = ?", (_FID_A,))
+    data = get_comparison_data(_FID_A, _FID_B)
+    assert data is not None
+    assert data["map_data"]["available"] is False

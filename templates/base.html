@@ -164,6 +164,9 @@
             text-decoration: underline;
         }
 
+        .bk-map-hospital { height: 300px; }
+        .bk-map-compare { height: 320px; }
+
         /* === RESPONSIVE === */
         @media (max-width: 640px) {
             .bk-nav { padding: 12px 16px; }
@@ -171,6 +174,8 @@
             .bk-nav-link { display: none; }
             .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
             .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
+            .bk-map-hospital { height: 220px; }
+            .bk-map-compare { height: 240px; }
         }
     </style>
     {% block head %}{% endblock %}
@@ -229,6 +234,20 @@
     </footer>
 
     <script src="/static/js/app.js"></script>
+    <script>
+        window.BILLKARMA_MAP_TILE_URL = {{ config.MAP_TILE_URL | tojson if config is defined else '"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"' }};
+        window.BILLKARMA_MAP_ATTRIBUTION = {{ config.MAP_TILE_ATTRIBUTION | tojson if config is defined else '"&copy; <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors"' }};
+        window.BILLKARMA_MAP_MAX_ZOOM = {{ config.MAP_MAX_ZOOM if config is defined else 18 }};
+    </script>
+    <script>
+        (function() {
+            if (!document.querySelector(".bk-free-map")) return;
+            var script = document.createElement("script");
+            script.src = "/static/js/hospital-maps.js";
+            script.defer = true;
+            document.body.appendChild(script);
+        })();
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 
+from config import ENABLE_FREE_MAPS
 from db import get_db
 from hospital_seo import (
     FRIENDLY_CPT_DESCRIPTIONS,
@@ -145,12 +146,14 @@ def get_comparison_data(fid_a: str, fid_b: str) -> dict | None:
     common = get_common_procedures(fid_a, fid_b)
     verdict = _build_verdict(h_a, h_b, common)
     distance_miles = _distance_between(h_a, h_b)
+    map_data = _build_compare_map_data(h_a, h_b, distance_miles)
     return {
         "a": h_a,
         "b": h_b,
         "common_procedures": common,
         "verdict": verdict,
         "distance_miles": distance_miles,
+        "map_data": map_data,
     }
 
 
@@ -232,4 +235,68 @@ def _build_verdict(h_a: dict, h_b: dict, common: list[dict]) -> dict:
         "common_count": len(common),
         "savings_if_choose_a": round(savings_a_over_b, 2),
         "savings_if_choose_b": round(savings_b_over_a, 2),
+    }
+
+
+def _safe_float(value) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _build_compare_map_data(h_a: dict, h_b: dict, distance_miles: float | None) -> dict:
+    if not ENABLE_FREE_MAPS:
+        return {
+            "available": False,
+            "aria_label": f"Map comparing locations of {h_a.get('name')} and {h_b.get('name')}",
+            "fallback_text": f"Map disabled for comparison between {h_a.get('name')} and {h_b.get('name')}.",
+            "legend": "A <=2x · B 2-3x · C 3-5x · D 5-8x · F 8x+",
+            "hospitals": [],
+            "line": {"show": False, "distance_miles": distance_miles},
+            "tile_max_zoom": 18,
+        }
+
+    lat_a, lon_a = _safe_float(h_a.get("lat")), _safe_float(h_a.get("lon"))
+    lat_b, lon_b = _safe_float(h_b.get("lat")), _safe_float(h_b.get("lon"))
+    available = None not in (lat_a, lon_a, lat_b, lon_b)
+
+    marker_a = {
+        "facility_id": h_a.get("facility_id"),
+        "name": h_a.get("name"),
+        "lat": lat_a,
+        "lon": lon_a,
+        "grade": h_a.get("billing_grade") or "N/A",
+        "grade_color": h_a.get("grade_color") or "#9ca3af",
+        "profile_url": f"/hospitals/{h_a.get('state_slug')}/{h_a.get('city_slug')}/{h_a.get('slug')}/",
+    }
+    marker_b = {
+        "facility_id": h_b.get("facility_id"),
+        "name": h_b.get("name"),
+        "lat": lat_b,
+        "lon": lon_b,
+        "grade": h_b.get("billing_grade") or "N/A",
+        "grade_color": h_b.get("grade_color") or "#9ca3af",
+        "profile_url": f"/hospitals/{h_b.get('state_slug')}/{h_b.get('city_slug')}/{h_b.get('slug')}/",
+    }
+    line = {
+        "show": bool(distance_miles is not None and distance_miles <= 100 and available),
+        "distance_miles": distance_miles,
+    }
+    fallback_text = (
+        f"Map compares {h_a.get('name')} and {h_b.get('name')}. "
+        f"Distance between hospitals: {distance_miles} miles."
+        if distance_miles is not None
+        else f"Map compares {h_a.get('name')} and {h_b.get('name')}."
+    )
+    return {
+        "available": available,
+        "aria_label": f"Map comparing locations of {h_a.get('name')} and {h_b.get('name')}",
+        "fallback_text": fallback_text,
+        "legend": "A <=2x · B 2-3x · C 3-5x · D 5-8x · F 8x+",
+        "hospitals": [marker_a, marker_b],
+        "line": line,
+        "tile_max_zoom": 18,
     }

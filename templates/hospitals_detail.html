@@ -321,6 +321,31 @@
     </div>
 
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Location</h2>
+        {% if data.map_data and data.map_data.available %}
+        <div
+            id="hospital-map"
+            class="bk-free-map bk-map-hospital rounded-lg border border-gray-200"
+            data-free-map="hospital"
+            data-map-source="hospital-map-data"
+            aria-label="{{ data.map_data.aria_label }}"
+        ></div>
+        <script id="hospital-map-data" type="application/json">{{ data.map_data | tojson }}</script>
+        <div class="mt-3 text-xs text-gray-600">
+            <span class="font-medium">Grade legend:</span> {{ data.map_data.legend }}
+        </div>
+        <p class="sr-only">{{ data.map_data.fallback_text }}</p>
+        {% else %}
+        <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm text-gray-600" role="img" aria-label="No location map available for {{ data.hospital.name }}">
+            Location map unavailable for this hospital.
+        </div>
+        {% if data.map_data and data.map_data.fallback_text %}
+        <p class="sr-only">{{ data.map_data.fallback_text }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Financial Assistance</h2>
         {% if data.section_updated and data.section_updated.financials %}
         <p class="text-xs text-gray-500 mb-3">Last updated: {{ data.section_updated.financials[:10] }}</p>

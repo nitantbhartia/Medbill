@@ -8,7 +8,7 @@ import re
 import time
 from collections import defaultdict
 
-from config import APP_URL
+from config import APP_URL, ENABLE_FREE_MAPS
 from db import get_db
 
 GRADE_THRESHOLDS = (
@@ -29,6 +29,14 @@ _LON_DEGREE_MILES_EQUATOR = 69.17
 NATIONAL_COMPARISON_MIN_SAMPLE_SIZE = 100
 COMPARISON_CACHE_TTL_SECONDS = 900
 CONTENT_TEMPLATE_VERSION = "deterministic-template-v2"
+MAP_GRADE_COLORS = {
+    "A": "#00B37E",
+    "B": "#52C41A",
+    "C": "#FAAD14",
+    "D": "#FA8C16",
+    "F": "#E53E3E",
+    "N/A": "#9CA3AF",
+}
 
 US_STATE_NAMES = {
     "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
@@ -835,6 +843,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         lat=hospital_d.get("lat"),
         lon=hospital_d.get("lon"),
     )
+    map_data = _build_hospital_map_data(hospital_d, nearby)
 
     hospital_markup = hospital_d.get("avg_markup_vs_medicare")
     state_markup = comparison_d.get("state_avg_markup")
@@ -919,6 +928,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "content": content,
         "nearby": nearby,
         "nearby_all_shown": nearby_all_shown,
+        "map_data": map_data,
         "section_updated": section_updated,
         "seo": seo,
     }
@@ -995,7 +1005,7 @@ def _get_nearby_by_state(
         rows = db.execute(
             f"""
             SELECT h.facility_id, h.name, h.slug, h.city, h.state_slug, h.city_slug,
-                   h.cms_star_rating, m.billing_grade, m.avg_markup_vs_medicare
+                   h.cms_star_rating, h.lat, h.lon, m.billing_grade, m.avg_markup_vs_medicare
             FROM hospitals h
             LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.state_slug = ?
@@ -1017,6 +1027,94 @@ def _get_nearby_by_state(
         item["city"] = _display_city(item.get("city"))
         output.append(item)
     return output
+
+
+def _safe_float(value) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _map_marker_for_hospital(row: dict, profile_url: str | None = None, is_current: bool = False) -> dict | None:
+    lat = _safe_float(row.get("lat"))
+    lon = _safe_float(row.get("lon"))
+    if lat is None or lon is None:
+        return None
+    grade = row.get("billing_grade") or "N/A"
+    avg_markup = row.get("avg_markup_vs_medicare")
+    distance = row.get("distance_miles")
+    return {
+        "facility_id": row.get("facility_id"),
+        "name": row.get("name"),
+        "lat": lat,
+        "lon": lon,
+        "grade": grade,
+        "grade_color": MAP_GRADE_COLORS.get(grade, MAP_GRADE_COLORS["N/A"]),
+        "avg_markup_vs_medicare": avg_markup,
+        "distance_miles": distance,
+        "profile_url": profile_url,
+        "is_current": is_current,
+    }
+
+
+def _build_hospital_map_data(hospital: dict, nearby: list[dict]) -> dict:
+    if not ENABLE_FREE_MAPS:
+        return {
+            "available": False,
+            "aria_label": f"Map showing location of {hospital.get('name')} and nearby hospitals",
+            "fallback_text": f"Map disabled for {hospital.get('name')}.",
+            "legend": "A <=2x · B 2-3x · C 3-5x · D 5-8x · F 8x+",
+            "tile_max_zoom": 18,
+            "current": None,
+            "nearby": [],
+        }
+    current_marker = _map_marker_for_hospital(
+        hospital,
+        profile_url=f"/hospitals/{hospital.get('state_slug')}/{hospital.get('city_slug')}/{hospital.get('slug')}/",
+        is_current=True,
+    )
+    nearby_markers = []
+    for row in nearby:
+        marker = _map_marker_for_hospital(
+            row,
+            profile_url=f"/hospitals/{row.get('state_slug')}/{row.get('city_slug')}/{row.get('slug')}/",
+        )
+        if marker:
+            nearby_markers.append(marker)
+
+    available = current_marker is not None
+    fallback_neighbors = []
+    for row in nearby[:3]:
+        name = row.get("name")
+        dist = row.get("distance_miles")
+        if name:
+            if dist is not None:
+                fallback_neighbors.append(f"{name} ({dist} miles)")
+            else:
+                fallback_neighbors.append(str(name))
+    if fallback_neighbors:
+        nearby_text = ", ".join(fallback_neighbors)
+    else:
+        nearby_text = "No nearby hospitals with comparable billing data."
+
+    address_parts = [hospital.get("address"), hospital.get("city"), hospital.get("state"), hospital.get("zip")]
+    address_text = ", ".join([str(x) for x in address_parts if x])
+    fallback_text = (
+        f"Map shows {hospital.get('name')} at {address_text}. "
+        f"Nearby hospitals within 50 miles include {nearby_text}."
+    )
+    return {
+        "available": available,
+        "aria_label": f"Map showing location of {hospital.get('name')} and nearby hospitals",
+        "fallback_text": fallback_text,
+        "legend": "A <=2x · B 2-3x · C 3-5x · D 5-8x · F 8x+",
+        "tile_max_zoom": 18,
+        "current": current_marker,
+        "nearby": nearby_markers,
+    }
 
 
 def find_hospitals(query: str, limit: int = 20) -> list[dict]:

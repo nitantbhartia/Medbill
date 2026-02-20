@@ -74,3 +74,16 @@ OCR_SCORE_TOTAL_CHARGED = 5.0
 OCR_SCORE_TOTAL_PATIENT_OWES = 3.0
 OCR_SCORE_RECON_PENALTY_MULTIPLIER = 1.5
 OCR_SCORE_MAX_RECON_PENALTY = 25.0
+
+# Free maps (Leaflet + OSM)
+ENABLE_FREE_MAPS = os.getenv("ENABLE_FREE_MAPS", "true").lower() == "true"
+MAP_TILE_URL = os.getenv("MAP_TILE_URL", "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
+MAP_TILE_ATTRIBUTION = os.getenv(
+    "MAP_TILE_ATTRIBUTION",
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+)
+MAP_MAX_ZOOM = int(os.getenv("MAP_MAX_ZOOM", "18"))
+
+# Free geocoder backfill
+GEOCODER_FALLBACK_ENABLED = os.getenv("GEOCODER_FALLBACK_ENABLED", "true").lower() == "true"
+GEOCODER_REQUEST_DELAY_MS = int(os.getenv("GEOCODER_REQUEST_DELAY_MS", "1000"))

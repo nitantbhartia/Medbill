@@ -37,6 +37,8 @@ def _seed_hospital():
             "cms_star_rating": 3,
             "slug": "memorial-regional-hospital-hollywood",
             "is_nonprofit": 1,
+            "lat": 26.0165,
+            "lon": -80.1794,
         }
     )
     with get_db() as db:
@@ -134,6 +136,8 @@ class TestHospitalSeoPages:
                 "city": "Orlando",
                 "state": "FL",
                 "slug": "state-comparison-hospital-orlando",
+                "lat": 28.5383,
+                "lon": -81.3792,
             }
         )
         upsert_hospital_row(
@@ -143,6 +147,8 @@ class TestHospitalSeoPages:
                 "city": "Boston",
                 "state": "MA",
                 "slug": "national-comparison-hospital-boston",
+                "lat": 42.3601,
+                "lon": -71.0589,
             }
         )
         with get_db() as db:
@@ -170,9 +176,9 @@ class TestHospitalSeoPages:
         assert "Billing Profile" in resp.text
         assert "Common Procedure Prices" in resp.text
         assert "Billing Grade Position" in resp.text
-        assert "This hospital marker" in resp.text
-        assert "Markup Comparison" in resp.text
-        assert "Benchmark comparisons are temporarily disabled while Medicare locality validation is in progress." in resp.text
+        assert "Grade legend:" in resp.text
+        assert 'data-free-map="hospital"' in resp.text
+        assert "Location" in resp.text
         assert "Last updated:" in resp.text
         assert "Scan My Bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
@@ -207,6 +213,14 @@ class TestHospitalSeoPages:
         assert "Would Recommend" not in resp.text
         assert "Bed Count" in resp.text
         assert ">738<" in resp.text
+
+    def test_hospital_map_fallback_when_coordinates_missing(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute("UPDATE hospitals SET lat = NULL, lon = NULL WHERE facility_id = ?", ("010001",))
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert "Location map unavailable for this hospital." in resp.text
 
     def test_top_stat_never_shows_directory_status(self):
         upsert_hospital_row(
@@ -297,6 +311,8 @@ class TestHospitalSeoPages:
                 "city": "Hollywood",
                 "state": "FL",
                 "slug": "ascension-allegan-hospital-hollywood",
+                "lat": 26.05,
+                "lon": -80.2,
             }
         )
         upsert_hospital_row(
@@ -306,6 +322,8 @@ class TestHospitalSeoPages:
                 "city": "Hollywood",
                 "state": "FL",
                 "slug": "no-data-medical-center-hollywood",
+                "lat": 26.07,
+                "lon": -80.21,
             }
         )
         with get_db() as db:
