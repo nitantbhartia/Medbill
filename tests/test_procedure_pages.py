@@ -326,6 +326,15 @@ def test_get_providers_asc_uses_asc_benchmark_type():
     assert all(r["medicare_benchmark_type"] == "asc" for r in rows)
 
 
+def test_get_providers_falls_back_when_zip_coords_missing():
+    _seed()
+    with get_db() as db:
+        db.execute("DELETE FROM zip_latlon")
+    rows = get_providers_near_zip_for_cpt("27447", "62701", limit=10, facility_type="all")
+    assert rows
+    assert all("name" in r and r["name"] for r in rows)
+
+
 def test_get_top_cpt_codes_returns_list():
     _seed()
     codes = get_top_cpt_codes(10)

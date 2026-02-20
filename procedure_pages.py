@@ -496,7 +496,13 @@ def get_providers_near_zip_for_cpt(
     """Return up to `limit` providers near zip for a CPT code across facility types."""
     coords = get_zip_latlon(zip_code)
     if not coords:
-        return []
+        return _get_providers_without_zip_coords(
+            cpt_code=cpt_code,
+            limit=limit,
+            facility_type=facility_type,
+            grade_ab_only=grade_ab_only,
+            sort_by=sort_by,
+        )
     zip_lat, zip_lon = coords
     radius = max(5.0, min(float(radius_miles or _PROCEDURE_RADIUS_MILES), 200.0))
     lat_delta = radius / 69.0
@@ -577,6 +583,81 @@ def get_providers_near_zip_for_cpt(
                 "distance_miles": round(dist, 1),
                 "badge_class": _grade_badge_class(row["billing_grade"]),
             })
+
+    if sort_key == "markup":
+        results.sort(key=lambda r: (r["markup_vs_medicare"] is None, r["markup_vs_medicare"] or 0.0))
+    else:
+        results.sort(key=lambda r: (r["estimated_patient_cost"] is None, r["estimated_patient_cost"] or 0.0))
+    return results[:limit]
+
+
+def _get_providers_without_zip_coords(
+    cpt_code: str,
+    limit: int,
+    facility_type: str,
+    grade_ab_only: bool,
+    sort_by: str,
+) -> list[dict]:
+    sort_key = _parse_sort(sort_by)
+    normalized_type = (facility_type or "all").strip().lower()
+    allowed = {"all", "hospital", "asc", "imaging_center"}
+    if normalized_type not in allowed:
+        normalized_type = "all"
+
+    with get_db() as db:
+        where_type = ""
+        params: list = [cpt_code]
+        if normalized_type != "all":
+            where_type = " AND COALESCE(f.facility_type, hp.facility_type, 'hospital') = ?"
+            params.append(normalized_type)
+        candidates = db.execute(
+            f"""
+            {_ALL_PRICES_CTE}
+            SELECT
+                COALESCE(f.name, h.name) AS name,
+                COALESCE(f.city, h.city) AS city,
+                COALESCE(f.state, h.state) AS state,
+                COALESCE(f.state_slug, h.state_slug) AS state_slug,
+                COALESCE(f.city_slug, h.city_slug) AS city_slug,
+                COALESCE(f.slug, h.slug) AS slug,
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
+                COALESCE(f.is_hospital_owned, 0) AS is_hospital_owned,
+                hp.gross_charge,
+                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                COALESCE(hp.medicare_benchmark_type, CASE WHEN COALESCE(f.facility_type, hp.facility_type, 'hospital') = 'asc' THEN 'asc' ELSE 'opps' END) AS medicare_benchmark_type,
+                hp.markup_vs_medicare
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
+            LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
+            WHERE hp.cpt_code = ?
+              AND hp.gross_charge IS NOT NULL
+              AND hp.markup_vs_medicare IS NOT NULL
+              AND COALESCE(f.name, h.name) IS NOT NULL
+              {where_type}
+            ORDER BY hp.gross_charge ASC
+            LIMIT 500
+            """,
+            tuple(params),
+        ).fetchall()
+
+    results = []
+    for row in candidates:
+        if grade_ab_only and (row["billing_grade"] or "").upper() not in {"A", "B"}:
+            continue
+        charge = row["gross_charge"] or 0.0
+        results.append({
+            **dict(row),
+            "facility_type_label": _FACILITY_TYPE_LABELS.get(row["facility_type"] or "hospital", "Provider"),
+            "ownership_badge": "Hospital-owned" if row["is_hospital_owned"] else "Independent",
+            "benchmark_label": _BENCHMARK_TYPE_LABELS.get(row["medicare_benchmark_type"] or "opps", "Medicare"),
+            "profile_url": _provider_profile_url(dict(row)),
+            "estimated_patient_cost": round(charge * 0.20, 2) if charge else None,
+            "distance_miles": None,
+            "badge_class": _grade_badge_class(row["billing_grade"]),
+        })
 
     if sort_key == "markup":
         results.sort(key=lambda r: (r["markup_vs_medicare"] is None, r["markup_vs_medicare"] or 0.0))
