@@ -17,6 +17,11 @@ GRADE_THRESHOLDS = (
     (8.0, "D"),
 )
 STATE_COMPARISON_MIN_SAMPLE_SIZE = 25
+NEARBY_RADIUS_MILES = 50.0
+_EARTH_RADIUS_MILES = 3958.8
+# ~1 degree lat ≈ 69 miles; padding for lon variation at different latitudes
+_LAT_DEGREE_MILES = 69.0
+_LON_DEGREE_MILES_EQUATOR = 69.17
 NATIONAL_COMPARISON_MIN_SAMPLE_SIZE = 100
 COMPARISON_CACHE_TTL_SECONDS = 900
 CONTENT_TEMPLATE_VERSION = "deterministic-template-v2"
@@ -99,6 +104,37 @@ def _looks_nonprofit_from_ownership(ownership: str | None) -> bool | None:
     return None
 
 
+def _ownership_display_label(ownership: str | None) -> str:
+    """Map CMS ownership text to a human-readable label."""
+    if not ownership:
+        return "Unknown"
+    txt = ownership.strip()
+    txt_lower = txt.lower()
+    if "voluntary non-profit" in txt_lower or "voluntary non profit" in txt_lower:
+        if "church" in txt_lower:
+            return "Nonprofit (Church-affiliated)"
+        if "private" in txt_lower:
+            return "Nonprofit (Private)"
+        return "Nonprofit"
+    if "non-profit" in txt_lower or "non profit" in txt_lower or "nonprofit" in txt_lower:
+        return "Nonprofit"
+    if "proprietary" in txt_lower or "for-profit" in txt_lower or "for profit" in txt_lower:
+        return "For-profit"
+    if "government" in txt_lower:
+        if "federal" in txt_lower:
+            return "Government (Federal)"
+        if "district" in txt_lower or "authority" in txt_lower:
+            return "Government (Public District)"
+        if "state" in txt_lower:
+            return "Government (State)"
+        if "local" in txt_lower or "city" in txt_lower or "county" in txt_lower:
+            return "Government (Local)"
+        return "Government"
+    if "physician" in txt_lower:
+        return "For-profit (Physician-owned)"
+    return txt  # Return raw value if unrecognized rather than hiding it
+
+
 def _normalized_name_key(value: str) -> str:
     txt = re.sub(r"[^a-z0-9]+", " ", (value or "").strip().lower())
     return re.sub(r"\s+", " ", txt).strip()
@@ -170,8 +206,8 @@ def upsert_hospital_row(row: dict) -> None:
                 facility_id, name, address, city, state, zip, county, phone,
                 hospital_type, ownership, is_nonprofit, emergency_services,
                 bed_count, teaching_status, system_affiliation, cms_star_rating,
-                slug, state_slug, city_slug, cms_data_updated
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_DATE))
+                slug, state_slug, city_slug, cms_data_updated, lat, lon
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_DATE), ?, ?)
             ON CONFLICT(facility_id) DO UPDATE SET
                 name=excluded.name,
                 address=excluded.address,
@@ -192,6 +228,8 @@ def upsert_hospital_row(row: dict) -> None:
                 state_slug=excluded.state_slug,
                 city_slug=excluded.city_slug,
                 cms_data_updated=excluded.cms_data_updated,
+                lat=COALESCE(excluded.lat, lat),
+                lon=COALESCE(excluded.lon, lon),
                 updated_at=CURRENT_TIMESTAMP
             """,
             (
@@ -215,6 +253,8 @@ def upsert_hospital_row(row: dict) -> None:
                 state_slug,
                 city_slug,
                 row.get("cms_data_updated") or row.get("last_updated"),
+                row.get("lat"),
+                row.get("lon"),
             ),
         )
 
@@ -478,6 +518,14 @@ def _gauge_xy(pct: float | None, radius: float, cx: float = 120.0, cy: float = 1
     }
 
 
+def _haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Return distance in miles between two lat/lon points."""
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    return 2 * _EARTH_RADIUS_MILES * math.asin(math.sqrt(a))
+
+
 def _robust_average_markups(markups: list[float], low_q: float = 0.05, high_q: float = 0.95) -> float | None:
     clean = sorted(
         float(v)
@@ -636,10 +684,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         nonprofit_flag = 0
     hospital_d["is_nonprofit"] = 1 if nonprofit_flag else 0
 
-    if ownership_nonprofit is None and hospital_d.get("ownership") in (None, "") and nonprofit_flag is None:
-        hospital_d["nonprofit_status_label"] = "Not reported"
-    else:
-        hospital_d["nonprofit_status_label"] = "Yes" if hospital_d["is_nonprofit"] else "No"
+    hospital_d["nonprofit_status_label"] = _ownership_display_label(hospital_d.get("ownership"))
     prices_d = [dict(p) for p in prices]
 
     show_cash_column = False
@@ -661,13 +706,15 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     content_version = (content.get("model_used") or "").strip()
     if not tips or "loaded data" in str(tips).lower() or content_version != CONTENT_TEMPLATE_VERSION:
         tips = generate_deterministic_tips(hospital_d, financials_d, comparison_d)
-    intro_paragraph = generate_intro_paragraph(hospital_d, comparison_d)
+    intro_paragraph = generate_intro_paragraph(hospital_d, comparison_d, top_prices=prices_d[:5])
 
-    nearby = get_nearby_hospitals(
+    nearby, nearby_all_shown = get_nearby_hospitals(
         state_slug=hospital_d["state_slug"],
         city_slug=hospital_d["city_slug"],
         facility_id=hospital_d["facility_id"],
         state_code=state_code,
+        lat=hospital_d.get("lat"),
+        lon=hospital_d.get("lon"),
     )
 
     hospital_markup = hospital_d.get("avg_markup_vs_medicare")
@@ -743,22 +790,83 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "intro_paragraph": intro_paragraph,
         "content": content,
         "nearby": nearby,
+        "nearby_all_shown": nearby_all_shown,
         "section_updated": section_updated,
     }
 
 
-def get_nearby_hospitals(state_slug: str, city_slug: str, facility_id: str, state_code: str | None = None, limit: int = 6) -> list[dict]:
+def get_nearby_hospitals(
+    state_slug: str,
+    city_slug: str,
+    facility_id: str,
+    state_code: str | None = None,
+    lat: float | None = None,
+    lon: float | None = None,
+    limit: int = 5,
+) -> tuple[list[dict], bool]:
+    """Return (nearby_list, all_shown) where all_shown=True means fewer than limit
+    exist within radius. When lat/lon unavailable falls back to state filter."""
+    if lat is not None and lon is not None:
+        return _get_nearby_by_coords(facility_id, lat, lon, limit)
+    results = _get_nearby_by_state(state_slug, city_slug, facility_id, state_code, limit)
+    return results, False  # can't tell if all shown without coords
+
+
+def _get_nearby_by_coords(facility_id: str, lat: float, lon: float, limit: int) -> tuple[list[dict], bool]:
+    """Use bounding box pre-filter then exact Haversine sort."""
+    lat_delta = NEARBY_RADIUS_MILES / _LAT_DEGREE_MILES
+    lon_delta = NEARBY_RADIUS_MILES / (_LON_DEGREE_MILES_EQUATOR * math.cos(math.radians(lat)))
     with get_db() as db:
-        # Double-filter by both state_slug and state code (abbreviation) to guard against bad data
-        state_filter = "AND h.state = ?" if state_code else ""
-        params: list = [state_slug]
-        if state_code:
-            params.append(state_code)
-        params += [facility_id, city_slug, city_slug, city_slug, limit]
+        rows = db.execute(
+            """
+            SELECT h.facility_id, h.name, h.slug, h.city, h.state_slug, h.city_slug,
+                   h.lat, h.lon, m.billing_grade, m.avg_markup_vs_medicare
+            FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            WHERE h.facility_id != ?
+              AND h.lat BETWEEN ? AND ?
+              AND h.lon BETWEEN ? AND ?
+              AND (m.avg_markup_vs_medicare IS NOT NULL OR (m.billing_grade IS NOT NULL AND m.billing_grade != 'N/A'))
+            """,
+            (facility_id, lat - lat_delta, lat + lat_delta, lon - lon_delta, lon + lon_delta),
+        ).fetchall()
+
+    candidates = []
+    for row in rows:
+        h_lat = row["lat"]
+        h_lon = row["lon"]
+        if h_lat is None or h_lon is None:
+            continue
+        dist = _haversine_miles(lat, lon, float(h_lat), float(h_lon))
+        if dist <= NEARBY_RADIUS_MILES:
+            item = dict(row)
+            item["distance_miles"] = round(dist, 1)
+            candidates.append(item)
+
+    candidates.sort(key=lambda x: x["distance_miles"])
+    all_shown = len(candidates) <= limit
+    output = []
+    for item in candidates[:limit]:
+        item["name"] = _display_name(item.get("name"), item.get("facility_id"))
+        item["city"] = _display_city(item.get("city"))
+        output.append(item)
+    return output, all_shown
+
+
+def _get_nearby_by_state(
+    state_slug: str, city_slug: str, facility_id: str, state_code: str | None, limit: int
+) -> list[dict]:
+    """Fallback: same-state hospitals when coordinates are unavailable."""
+    state_filter = "AND h.state = ?" if state_code else ""
+    params: list = [state_slug]
+    if state_code:
+        params.append(state_code)
+    params += [facility_id, city_slug, city_slug, city_slug, limit]
+    with get_db() as db:
         rows = db.execute(
             f"""
-            SELECT h.name, h.slug, h.city, h.state_slug, h.city_slug, h.cms_star_rating,
-                   m.billing_grade, m.avg_markup_vs_medicare
+            SELECT h.facility_id, h.name, h.slug, h.city, h.state_slug, h.city_slug,
+                   h.cms_star_rating, m.billing_grade, m.avg_markup_vs_medicare
             FROM hospitals h
             LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.state_slug = ?
@@ -1046,54 +1154,72 @@ def recompute_billing_metrics() -> int:
     return upserted
 
 
-def generate_intro_paragraph(hospital: dict, comparison: dict | None = None) -> str:
-    """Generate a 2-3 sentence summary paragraph unique to this hospital for SEO and readability."""
+def generate_intro_paragraph(
+    hospital: dict,
+    comparison: dict | None = None,
+    top_prices: list[dict] | None = None,
+) -> str:
+    """Generate a 3-4 sentence hospital summary for SEO and page readability."""
     name = hospital.get("name", "This hospital")
+    city = hospital.get("city") or ""
+    state = hospital.get("state") or ""
     grade = hospital.get("billing_grade") or "N/A"
     markup = hospital.get("avg_markup_vs_medicare")
-    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else None
-    state = hospital.get("state") or ""
-    state_rank = hospital.get("state_rank")
     procedures = hospital.get("procedures_compared")
+    state_rank = hospital.get("state_rank")
 
-    cmp_data = comparison or {}
-    state_avg = cmp_data.get("state_avg_markup_raw")
-    national_avg = cmp_data.get("national_avg_markup_raw")
-
-    parts = []
-
-    if markup_txt and grade != "N/A":
-        sentence = f"{name} receives a BillKarma billing grade of {grade}, with an average markup of {markup_txt} versus Medicare reimbursement rates"
-        if procedures:
-            sentence += f" across {procedures:,} procedures"
-        sentence += "."
-        parts.append(sentence)
-    elif grade != "N/A":
-        parts.append(f"{name} receives a BillKarma billing grade of {grade}.")
-
-    if isinstance(markup, (int, float)) and isinstance(state_avg, (int, float)) and state:
-        if markup > state_avg * 1.1:
-            diff_pct = round((markup / state_avg - 1) * 100)
-            parts.append(f"Charges here run approximately {diff_pct}% higher than the {state} state average ({state_avg:.1f}x Medicare).")
-        elif markup < state_avg * 0.9:
-            diff_pct = round((1 - markup / state_avg) * 100)
-            parts.append(f"Charges here run approximately {diff_pct}% lower than the {state} state average ({state_avg:.1f}x Medicare).")
-        elif isinstance(national_avg, (int, float)):
-            if markup > national_avg * 1.1:
-                parts.append(f"This is above the national average of {national_avg:.1f}x Medicare.")
-            else:
-                parts.append(f"This is near the national average of {national_avg:.1f}x Medicare.")
-    elif isinstance(markup, (int, float)) and isinstance(national_avg, (int, float)):
-        if markup > national_avg * 1.1:
-            parts.append(f"Charges here are above the national average of {national_avg:.1f}x Medicare.")
-        else:
-            parts.append(f"Charges here are near or below the national average of {national_avg:.1f}x Medicare.")
-
-    if state_rank and state:
-        parts.append(f"It ranks #{state_rank} in {state} by markup ratio.")
-
-    if not parts:
+    if not grade or grade == "N/A" or markup is None:
         return ""
+
+    location = f"in {city}, {state}" if city and state else (f"in {state}" if state else "")
+    markup_txt = f"{markup:.1f}x"
+    proc_txt = f" across {procedures:,} procedures in their published price transparency file" if procedures else ""
+
+    parts = [
+        f"{name} {location} receives a BillKarma billing grade of {grade} "
+        f"based on an average markup of {markup_txt} Medicare rates{proc_txt}."
+    ]
+
+    # State rank sentence
+    if state_rank and state:
+        if state_rank <= 10:
+            parts.append(f"This places it among the 10 most expensive hospitals in {state} by markup ratio.")
+        elif state_rank <= 25:
+            parts.append(f"This places it in the top 25 most expensive hospitals in {state} by markup ratio.")
+        else:
+            parts.append(f"This places it at rank {state_rank} in {state} by markup ratio.")
+
+    # Top 2 highest-markup procedures
+    if top_prices:
+        top2 = [p for p in top_prices if p.get("markup_vs_medicare") and p.get("description")][:2]
+        if len(top2) == 2:
+            p1, p2 = top2
+            parts.append(
+                f"The highest individual markups are for {p1['description']} ({p1['markup_vs_medicare']:.1f}x Medicare) "
+                f"and {p2['description']} ({p2['markup_vs_medicare']:.1f}x Medicare)."
+            )
+        elif len(top2) == 1:
+            p1 = top2[0]
+            parts.append(f"The highest individual markup is for {p1['description']} ({p1['markup_vs_medicare']:.1f}x Medicare).")
+
+    # Grade-based advisory
+    if grade in ("D", "F"):
+        parts.append(
+            "Patients with scheduled procedures at this hospital should review costs and compare nearby alternatives "
+            "before confirming — charges at D and F grade hospitals are significantly above the national average."
+        )
+    elif grade == "C":
+        parts.append(
+            "This hospital prices above the national average. "
+            "Review procedure-level costs before scheduling non-emergency care."
+        )
+    elif grade in ("A", "B"):
+        if state:
+            parts.append(
+                f"This hospital prices its services closer to Medicare benchmarks than most facilities in {state}, "
+                "making it one of the more cost-transparent options in the area."
+            )
+
     return " ".join(parts)
 
 
