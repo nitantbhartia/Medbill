@@ -306,6 +306,131 @@ def data_health_check() -> dict:
     return {"all_passed": all_passed, "checks": checks, "stale_sources": stale}
 
 
+def refresh_enrichment_weekly() -> dict:
+    """
+    Weekly scheduled job: re-fetch CMS Care Compare star ratings.
+    Logs any hospitals whose star rating changed.
+
+    Schedule: every week (e.g., Sunday 2am UTC)
+    Run: python data_refresh.py enrich-weekly
+    """
+    from enrichment import fetch_care_compare_ratings, coverage_report
+
+    updated = fetch_care_compare_ratings()
+    cov = coverage_report()
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO data_refresh_log (source, records_updated, status, notes) VALUES (?, ?, ?, ?)",
+            ("care_compare_weekly", updated, "ok", f"stars_known={cov.get('stars_known')}"),
+        )
+    log.info("Weekly enrichment: %d star ratings updated", updated)
+    return {"updated": updated, "coverage": cov}
+
+
+def refresh_enrichment_quarterly(pos_csv_path: str) -> dict:
+    """
+    Quarterly scheduled job (Jan/Apr/Jul/Oct): re-download CMS POS file,
+    update ownership, coordinates, bed counts, and standardize addresses.
+
+    Schedule: 1st of January, April, July, October
+    Run: python data_refresh.py enrich-quarterly <pos_csv_path>
+    """
+    from enrichment import (
+        load_pos_file, match_pos_to_hospitals, update_ownership_from_pos,
+        update_coordinates_from_pos, update_beds_from_pos,
+        standardize_addresses_from_pos, coverage_report,
+    )
+
+    pos_count = load_pos_file(pos_csv_path)
+    matched = match_pos_to_hospitals()
+    ownership_updated = update_ownership_from_pos(matched)
+    coords_updated, _ = update_coordinates_from_pos(matched)
+    beds_updated = update_beds_from_pos(matched)
+    addr_updated = standardize_addresses_from_pos(matched)
+    cov = coverage_report()
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO data_refresh_log (source, records_updated, status, notes) VALUES (?, ?, ?, ?)",
+            (
+                "cms_pos_quarterly",
+                ownership_updated + coords_updated + beds_updated,
+                "ok",
+                f"pos_loaded={pos_count} matched={len(matched)} ownership={ownership_updated} coords={coords_updated}",
+            ),
+        )
+    log.info("Quarterly enrichment complete: %d matched, %d ownership, %d coords", len(matched), ownership_updated, coords_updated)
+    return {
+        "pos_records_loaded": pos_count,
+        "hospitals_matched": len(matched),
+        "ownership_updated": ownership_updated,
+        "coordinates_updated": coords_updated,
+        "beds_updated": beds_updated,
+        "addresses_updated": addr_updated,
+        "coverage": cov,
+    }
+
+
+def refresh_enrichment_annual(hcris_csv_path: str) -> dict:
+    """
+    Annual scheduled job (January/February): reload HCRIS cost reports
+    and recalculate charity care percentages.
+
+    Schedule: February 1st each year (HCRIS data typically released Jan/Feb for prior year)
+    Run: python data_refresh.py enrich-annual <hcris_csv_path>
+    """
+    from enrichment import load_hcris_charity_care, coverage_report
+
+    updated = load_hcris_charity_care(hcris_csv_path)
+    cov = coverage_report()
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO data_refresh_log (source, records_updated, status, notes) VALUES (?, ?, ?, ?)",
+            ("hcris_annual", updated, "ok", f"charity_known={cov.get('charity_known')}"),
+        )
+    log.info("Annual HCRIS enrichment: %d hospitals updated", updated)
+    return {"updated": updated, "coverage": cov}
+
+
+def refresh_compliance_after_parse(facility_id: str) -> None:
+    """
+    On-demand: recalculate compliance_status for a single hospital
+    after their price transparency file is re-parsed.
+    """
+    from enrichment import update_compliance_status
+    from db import get_db
+
+    with get_db() as db:
+        tf = db.execute(
+            "SELECT parse_status, procedures_extracted, has_standard_codes FROM transparency_files WHERE facility_id = ?",
+            (facility_id,),
+        ).fetchone()
+
+        if tf is None:
+            status, procs = "Unverified", None
+        elif tf["parse_status"] == "error" or not tf.get("procedures_extracted"):
+            status, procs = "Non-compliant", 0
+        else:
+            procs = tf["procedures_extracted"] or 0
+            if procs >= 50 and tf.get("has_standard_codes"):
+                status = "Compliant"
+            elif procs > 0:
+                status = "Partial"
+            else:
+                status = "Non-compliant"
+
+        db.execute(
+            """
+            UPDATE hospitals
+            SET compliance_status = ?, procedures_in_file = ?, compliance_last_checked = CURRENT_DATE
+            WHERE facility_id = ?
+            """,
+            (status, procs, facility_id),
+        )
+
+
 def _parse_float(val: str | None) -> float | None:
     if not val or val.strip() == "":
         return None
@@ -323,7 +448,8 @@ if __name__ == "__main__":
         print("Usage: python data_refresh.py <command> [csv_path]")
         print(
             "Commands: health-check, refresh-pfs, refresh-opps, refresh-ncci, "
-            "refresh-benchmarks, refresh-zip-localities, refresh-all"
+            "refresh-benchmarks, refresh-zip-localities, refresh-all, "
+            "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )
         sys.exit(1)
 
@@ -337,6 +463,21 @@ if __name__ == "__main__":
             status = "PASS" if check["passed"] else "FAIL"
             print(f"  [{status}] {name}: {check['detail']}")
         sys.exit(0 if result["all_passed"] else 1)
+
+    elif cmd == "enrich-weekly":
+        result = refresh_enrichment_weekly()
+        print(f"Weekly enrichment complete: {result['updated']} star ratings updated")
+
+    elif cmd == "enrich-quarterly" and len(sys.argv) == 3:
+        result = refresh_enrichment_quarterly(sys.argv[2])
+        print("Quarterly enrichment complete:")
+        for key, val in result.items():
+            if key != "coverage":
+                print(f"  - {key}: {val}")
+
+    elif cmd == "enrich-annual" and len(sys.argv) == 3:
+        result = refresh_enrichment_annual(sys.argv[2])
+        print(f"Annual HCRIS enrichment complete: {result['updated']} hospitals updated")
 
     elif cmd == "refresh-pfs" and len(sys.argv) == 3:
         count = refresh_medicare_rates(sys.argv[2])
@@ -367,6 +508,7 @@ if __name__ == "__main__":
     else:
         print(
             "Unknown command. Use: health-check, refresh-pfs, refresh-opps, "
-            "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-all"
+            "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-all, "
+            "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )
         sys.exit(1)
