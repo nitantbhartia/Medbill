@@ -63,3 +63,7 @@ import guide_balance_billing
 import guide_medicare_advantage
 import guide_hospital_billing_grades
 import guide_forprofit_vs_nonprofit_hospitals
+import guide_hospital_billing_errors
+import guide_private_equity_hospitals
+import guide_hospital_cash_pay
+import guide_hospital_price_transparency

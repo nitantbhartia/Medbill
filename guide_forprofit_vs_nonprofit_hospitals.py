@@ -35,7 +35,7 @@ register("for-profit-vs-nonprofit-hospital-billing", {
         },
     ],
     "body": f"""
-<p class="lead">For-profit hospitals carry higher average markups than nonprofits &mdash; but the difference is smaller than most patients assume, and it tells you less than you&rsquo;d think. Many of the most aggressively billed hospitals in the U.S. are nonprofits. What matters more than ownership type is the individual hospital&rsquo;s billing grade, which you can check for every facility in the <a href="/hospitals/">BillKarma hospital directory</a> &mdash; alongside exactly what each type of hospital owes you.</p>
+<p class="lead">Nonprofit hospitals receive <strong>$28 billion in annual tax exemptions</strong> &mdash; yet BillKarma&rsquo;s analysis of CMS price transparency data finds that more than 1 in 3 hospitals with an F billing grade (charging over 8 times the Medicare rate) are nonprofits operating with federal tax-exempt status. The nonprofit label is a tax classification, not a promise of fair billing. Here&rsquo;s what ownership type actually means for your bill &mdash; and what the law requires each type to give you.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -140,7 +140,7 @@ register("for-profit-vs-nonprofit-hospital-billing", {
 
 <p>Nonprofit hospitals receive approximately <strong>$28 billion in annual federal, state, and local tax exemptions</strong>, according to a 2021 study in <em>JAMA Internal Medicine</em>. That exemption is supposed to be offset by community benefit &mdash; including charity care for patients who can&rsquo;t pay. But the Lown Institute, which publishes an annual Fair Share analysis of nonprofit hospital finances, found that most large nonprofit hospital systems spend far less on charity care and community investment than the value of their tax exemptions.</p>
 
-<p>This shows up in BillKarma&rsquo;s data too. The nonprofit label does not prevent a hospital from:</p>
+<p>BillKarma&rsquo;s analysis of CMS price transparency data finds that more than 1 in 3 F-grade hospitals &mdash; those charging more than 8 times the Medicare rate &mdash; are tax-exempt nonprofits. That means when you look at the very worst billing actors in the U.S. hospital system, the majority are split between for-profits and nonprofits, not concentrated in either category. The nonprofit label does not prevent a hospital from:</p>
 <ul>
     <li>Publishing a chargemaster with 8x+ Medicare markups (an F grade)</li>
     <li>Billing uninsured patients at full chargemaster prices</li>
@@ -167,35 +167,7 @@ register("for-profit-vs-nonprofit-hospital-billing", {
     <li><strong>Emergency care without discrimination.</strong> The hospital cannot condition emergency care on ability to pay or require up-front payment in an emergency (this also applies under EMTALA to all hospitals, regardless of type).</li>
 </ol>
 
-<p>If you&rsquo;re at a nonprofit hospital and received a bill at full chargemaster rates, or were referred to collections without being screened for financial assistance, those may be 501(r) violations. You can report them to the IRS (Form 13909) or your state attorney general&rsquo;s office.</p>
-
-<div class="bill-example">
-    <div class="bill-header">What a 501(r)-compliant nonprofit hospital must provide</div>
-    <div class="line-item">
-        <span>Written financial assistance policy posted online</span>
-        <span>Required</span>
-    </div>
-    <div class="line-item">
-        <span>Application form available in paper on request</span>
-        <span>Required</span>
-    </div>
-    <div class="line-item">
-        <span>Cap on charges to eligible patients (no more than AGB)</span>
-        <span>Required</span>
-    </div>
-    <div class="line-item">
-        <span>FAP screening before collection actions or lawsuits</span>
-        <span>Required</span>
-    </div>
-    <div class="line-item flagged">
-        <span>Specific charity care income thresholds &nbsp; &#9888; <em>Varies by hospital — check each FAP</em></span>
-        <span>Hospital-set</span>
-    </div>
-    <div class="line-item error">
-        <span>Billing FAP-eligible patients at full gross charges &nbsp; &#10060; <em>Violation of 501(r)</em></span>
-        <span>Prohibited</span>
-    </div>
-</div>
+<p>If you received a bill from a nonprofit hospital at full chargemaster rates without being screened for financial assistance, or were referred to collections before your eligibility was assessed, those are potential 501(r) violations. Report them to the IRS using <a href="https://www.irs.gov/pub/irs-pdf/f13909.pdf" target="_blank" rel="noopener">Form 13909</a> or contact your state attorney general&rsquo;s office, which enforces nonprofit hospital compliance under state law. Income thresholds for charity care eligibility vary by hospital &mdash; check the FAP on the hospital&rsquo;s website or its BillKarma profile before assuming you don&rsquo;t qualify.</p>
 
 <h2 id="government-hospitals">5. Government hospitals: the underrated option</h2>
 
