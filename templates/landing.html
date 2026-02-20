@@ -100,9 +100,9 @@
         }
 
         /* --- Section spacing --- */
-        .section-pad { padding: 96px 40px; }
+        .section-pad { padding: 80px 40px; }
         .section-inner { max-width: 1200px; margin: 0 auto; }
-        @media (max-width: 768px) { .section-pad { padding: 64px 20px; } }
+        @media (max-width: 768px) { .section-pad { padding: 56px 20px; } }
 
         /* --- Headings --- */
         .h-section {
@@ -173,23 +173,24 @@
         }
 
         /* --- Grade Viz --- */
-        .grade-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .grade-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
         .grade-letter {
-            width: 36px; height: 36px; border-radius: 10px;
+            width: 44px; height: 44px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.9rem; color: #fff; flex-shrink: 0;
+            font-weight: 800; font-size: 1.1rem; color: #fff; flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .grade-track {
-            flex: 1; height: 28px; background: rgba(255,255,255,0.06);
-            border-radius: 8px; overflow: hidden; position: relative;
+            flex: 1; height: 36px; background: rgba(255,255,255,0.08);
+            border-radius: 10px; overflow: hidden; position: relative;
         }
         .grade-bar {
-            height: 100%; width: 0; border-radius: 8px;
+            height: 100%; width: 0; border-radius: 10px;
             transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .grade-count {
-            font-size: 0.85rem; color: rgba(255,255,255,0.5);
-            font-weight: 600; width: 48px; text-align: right;
+            font-size: 0.95rem; color: rgba(255,255,255,0.8);
+            font-weight: 700; min-width: 52px; text-align: right;
             font-variant-numeric: tabular-nums;
         }
 
@@ -281,13 +282,15 @@
         @media (max-width: 1024px) { .hospital-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 640px) { .hospital-grid { grid-template-columns: 1fr; } }
         .hospital-card {
-            background: #fff; border: 1px solid #E5E7EB; border-radius: 16px;
+            background: #fff; border: 2px solid #E5E7EB; border-radius: 16px;
             padding: 24px; text-decoration: none; color: #111827;
-            transition: transform 0.2s, box-shadow 0.2s; display: block;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: flex; flex-direction: column; cursor: pointer;
         }
         .hospital-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+            border-color: #00B37E;
         }
         .hospital-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
         .hospital-grade-lg {
@@ -303,31 +306,42 @@
             font-size: 0.8rem; color: #E53E3E; font-weight: 600; margin-top: 6px;
         }
         .hospital-card-link {
-            display: inline-block; margin-top: 12px; font-size: 0.875rem;
-            color: #00B37E; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: auto; padding-top: 14px; font-size: 0.9rem;
+            color: #00B37E; font-weight: 700;
+            transition: gap 0.2s;
         }
+        .hospital-card:hover .hospital-card-link { gap: 10px; }
 
         /* --- How It Works --- */
         .steps-grid { display: flex; align-items: flex-start; gap: 0; position: relative; }
-        .step-item { flex: 1; text-align: center; position: relative; padding: 0 20px; }
+        .step-item { flex: 1; text-align: center; position: relative; padding: 0 24px; }
         .step-num {
-            width: 48px; height: 48px; border-radius: 50%;
-            background: #00B37E; color: #fff; font-weight: 800; font-size: 1.1rem;
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #00B37E; color: #fff; font-weight: 800; font-size: 1.2rem;
             display: inline-flex; align-items: center; justify-content: center;
             margin-bottom: 20px; position: relative; z-index: 2;
+            box-shadow: 0 0 0 4px rgba(0, 179, 126, 0.2);
         }
         .step-connector {
-            position: absolute; top: 24px; left: calc(50% + 32px); right: calc(-50% + 32px);
-            height: 2px; border-top: 2px dashed rgba(255,255,255,0.2);
+            position: absolute; top: 26px; left: calc(50% + 36px); right: calc(-50% + 36px);
+            height: 0; border-top: 2px dashed rgba(255,255,255,0.35);
+            z-index: 1;
         }
         .step-item:last-child .step-connector { display: none; }
         .step-h { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
+        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.5; max-width: 28ch; margin: 0 auto; }
         @media (max-width: 768px) {
-            .steps-grid { flex-direction: column; align-items: stretch; gap: 32px; }
-            .step-item { text-align: left; display: flex; gap: 16px; padding: 0; }
-            .step-num { flex-shrink: 0; margin-bottom: 0; }
+            .steps-grid { flex-direction: column; align-items: stretch; gap: 0; }
+            .step-item {
+                text-align: left; display: flex; gap: 20px; padding: 0 0 32px 0;
+                border-left: 2px dashed rgba(255,255,255,0.25);
+                margin-left: 25px; padding-left: 28px;
+            }
+            .step-item:last-child { border-left: 2px dashed transparent; padding-bottom: 0; }
+            .step-num { flex-shrink: 0; margin-bottom: 0; margin-left: -53px; }
             .step-connector { display: none; }
+            .step-p { max-width: none; }
         }
 
         /* --- Data section --- */
@@ -533,9 +547,12 @@
             </div>
 
             <!-- Right: grade distribution viz -->
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 32px;">
-                <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 20px;">
-                    Grade Distribution
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 24px; padding: 36px 40px;">
+                <p style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
+                    Hospital Grade Distribution
+                </p>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 28px;">
+                    How {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} U.S. hospitals score on billing fairness
                 </p>
                 {% set total = grade_distribution.values()|sum if grade_distribution else 1 %}
                 {% set grade_colors = {"A": "#00B37E", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
@@ -550,9 +567,6 @@
                     <span class="grade-count">{{ "{:,}".format(count) }}</span>
                 </div>
                 {% endfor %}
-                <p style="font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 16px; text-align: center;">
-                    Based on {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} U.S. hospitals with pricing data
-                </p>
             </div>
         </div>
     </div>
@@ -587,7 +601,7 @@
 <!-- ========== SECTION 3: THREE USE CASES ========== -->
 <section class="section-pad" style="background: #F7F8FA;">
     <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; text-align: center; margin-bottom: 56px;">
+        <h2 class="h-section" style="color: #111827; text-align: center; margin-bottom: 48px;">
             BillKarma works before, during, and after your hospital visit
         </h2>
         <div class="usecase-grid">
@@ -728,7 +742,7 @@
                     {{ h.standout_procedure }}: {{ "%.0f"|format(h.standout_markup) }}x Medicare
                 </div>
                 {% endif %}
-                <span class="hospital-card-link">View Profile →</span>
+                <span class="hospital-card-link">View Profile <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </a>
             {% endfor %}
         </div>
@@ -747,7 +761,7 @@
 <!-- ========== SECTION 6: HOW IT WORKS ========== -->
 <section class="section-pad" style="background: #0A1628;">
     <div class="section-inner" style="max-width: 900px;">
-        <h2 class="h-section" style="text-align: center; margin-bottom: 56px;">
+        <h2 class="h-section" style="text-align: center; margin-bottom: 48px;">
             Got a bill? Check it in 30 seconds.
         </h2>
         <div class="steps-grid">
@@ -896,8 +910,9 @@
             <div class="footer-col">
                 <div class="footer-col-title">About</div>
                 <a href="/guides/hospital-billing-grades-explained">Our Methodology</a>
-                <span style="display: block; color: rgba(255,255,255,0.6); font-size: 0.9rem; padding: 4px 0;">Data from CMS.gov</span>
-                <span style="display: block; color: rgba(255,255,255,0.4); font-size: 0.8rem; padding: 4px 0; line-height: 1.5;">Not medical, legal, or financial advice.</span>
+                <a href="https://www.cms.gov" target="_blank" rel="noopener">Data Sources (CMS.gov)</a>
+                <a href="/guides/hospital-price-transparency">Price Transparency Rules</a>
+                <span style="display: block; color: rgba(255,255,255,0.4); font-size: 0.8rem; padding: 4px 0; line-height: 1.5; margin-top: 8px;">Not medical, legal, or financial advice.</span>
             </div>
         </div>
         <div class="footer-bottom">
