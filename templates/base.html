@@ -10,6 +10,9 @@
     <meta property="og:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta property="og:url" content="{{ canonical_url if canonical_url else request.url }}">
     <meta property="og:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,20 +20,21 @@
                 extend: {
                     colors: {
                         accent: {
-                            50:  '#F7FEE0',
-                            100: '#F0FCC4',
-                            200: '#E4F88C',
-                            300: '#D8F568',
-                            400: '#D2F635',
-                            500: '#D2F635',
-                            600: '#2D2D2D',
+                            50:  '#E6F4EA',
+                            100: '#C8E6D0',
+                            200: '#8BCFA0',
+                            300: '#4EB873',
+                            400: '#00A05E',
+                            500: '#00824F',
+                            600: '#00663D',
                             700: '#1A1A1A',
                             800: '#333333',
                             900: '#111111',
-                        }
+                        },
+                        grade: { a: '#00824F', b: '#38A169', c: '#D69E2E', d: '#DD6B20', f: '#E53E3E' },
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Segoe UI', 'sans-serif'],
                         mono: ['SF Mono', 'Menlo', 'Consolas', 'monospace'],
                     }
                 }
@@ -40,13 +44,16 @@
     <link rel="stylesheet" href="/static/css/app.css"/>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
     <style>
-        /* === BillKarma Internal Pages — Unified Design System === */
         :root {
-            --bk-canvas:    #E0E2E5;
+            --bk-canvas:    #FFFFFF;
             --bk-white:     #FFFFFF;
             --bk-black:     #1A1A1A;
-            --bk-lime:      #D2F635;
-            --bk-secondary: #6B7280;
+            --bk-green:     #00824F;
+            --bk-green-dark:#00663D;
+            --bk-orange:    #EB4C0A;
+            --bk-gray-text: #666666;
+            --bk-gray-border:#E5E5E5;
+            --bk-secondary: #666666;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -57,112 +64,73 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Print: restore white background */
         @media print { body { background: #fff !important; } }
 
         /* === NAV === */
         .bk-nav {
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: var(--bk-canvas);
+            padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--bk-gray-border);
         }
 
         .bk-logo {
-            font-weight: 800;
-            font-size: 1.15rem;
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--bk-white);
-            padding: 10px 20px;
-            border-radius: 100px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            text-decoration: none;
-            color: var(--bk-black);
+            font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--bk-black);
+        }
+        .bk-logo-dot {
+            width: 22px; height: 22px; background: var(--bk-green);
+            border-radius: 50%; flex-shrink: 0;
         }
 
-        .bk-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .bk-nav-links { display: flex; align-items: center; gap: 4px; }
 
         .bk-nav-link {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--bk-black);
-            text-decoration: none;
-            padding: 9px 18px;
-            border-radius: 100px;
+            font-size: 0.875rem; font-weight: 500;
+            color: var(--bk-black); text-decoration: none;
+            padding: 8px 16px; border-radius: 8px;
             transition: background 0.15s;
         }
-
-        .bk-nav-link:hover {
-            background: rgba(0, 0, 0, 0.06);
-            color: var(--bk-black);
-        }
+        .bk-nav-link:hover { background: rgba(0,0,0,0.04); }
 
         .bk-nav-cta {
-            font-size: 0.875rem;
-            font-weight: 700;
-            background: var(--bk-black);
-            color: var(--bk-white);
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 100px;
-            transition: transform 0.15s;
+            font-size: 0.875rem; font-weight: 600;
+            background: var(--bk-black); color: var(--bk-white);
+            text-decoration: none; padding: 10px 20px;
+            border-radius: 999px; transition: background 0.15s;
         }
+        .bk-nav-cta:hover { background: #333; color: var(--bk-white); }
 
-        .bk-nav-cta:hover {
-            transform: scale(1.04);
-            color: var(--bk-white);
-        }
-
-        /* === CARDS — rounder to match landing === */
+        /* === CARDS === */
         .rounded-lg { border-radius: 20px !important; }
         .rounded-md { border-radius: 14px !important; }
 
         /* === PRIMARY BUTTONS — pill shape === */
-        button.bg-accent-700,
-        a.bg-accent-700,
-        button.bg-accent-800,
-        a.bg-accent-800 {
-            border-radius: 100px !important;
+        button.bg-accent-700, a.bg-accent-700,
+        button.bg-accent-800, a.bg-accent-800 {
+            border-radius: 999px !important;
             font-weight: 700 !important;
             letter-spacing: -0.01em;
         }
 
-        /* === HEADINGS — tighter tracking === */
+        /* === HEADINGS === */
         h1 { letter-spacing: -0.025em; }
         h2 { letter-spacing: -0.02em; }
 
         /* === FOOTER === */
         .bk-footer {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 24px 0 16px;
-            font-size: 0.78rem;
-            color: var(--bk-secondary);
-            font-weight: 500;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 24px 0 16px; font-size: 0.78rem;
+            color: var(--bk-secondary); font-weight: 500;
+            border-top: 1px solid var(--bk-gray-border);
             margin-top: auto;
         }
-
-        .bk-footer a {
-            color: var(--bk-secondary);
-            text-decoration: none;
-        }
-
-        .bk-footer a:hover {
-            text-decoration: underline;
-        }
+        .bk-footer a { color: var(--bk-secondary); text-decoration: none; }
+        .bk-footer a:hover { text-decoration: underline; }
 
         .bk-map-hospital { height: 300px; }
         .bk-map-compare { height: 320px; }
@@ -170,7 +138,6 @@
         /* === RESPONSIVE === */
         @media (max-width: 640px) {
             .bk-nav { padding: 12px 16px; }
-            .bk-logo { font-size: 1rem; padding: 8px 14px; gap: 8px; }
             .bk-nav-link { display: none; }
             .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
             .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
@@ -185,9 +152,7 @@
     <header>
         <nav class="bk-nav">
             <a href="/" class="bk-logo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
+                <div class="bk-logo-dot"></div>
                 BillKarma
             </a>
             <div class="bk-nav-links">
@@ -207,7 +172,7 @@
     <footer class="bk-footer">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:100%;max-width:1200px;margin:0 auto;padding:24px 40px 16px;text-align:left;">
             <div>
-                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Product</div>
+                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Platform</div>
                 <a href="/hospitals/" style="display:block;padding:3px 0;">Hospital Directory</a>
                 <a href="/procedures/" style="display:block;padding:3px 0;">Procedure Costs</a>
                 <a href="/compare/" style="display:block;padding:3px 0;">Compare Hospitals</a>

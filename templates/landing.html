@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BillKarma — Hospital Billing Grades, Bill Scanner &amp; Price Transparency</title>
+    <title>BillKarma | Hospital Billing Transparency</title>
     <meta name="description" content="Check any U.S. hospital's billing grade before you schedule. Scan your bill for errors. Fight overcharges with real Medicare data. 6,000+ hospitals graded free.">
     <meta name="robots" content="{{ meta_robots|default('index, follow') }}">
     <meta property="og:type" content="website">
@@ -14,129 +14,185 @@
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy:   { DEFAULT: '#0A1628', light: '#0F2035', mid: '#162A45' },
-                        accent: { DEFAULT: '#00B37E', hover: '#00D492' },
-                        grade:  { a: '#00B37E', b: '#38A169', c: '#D69E2E', d: '#DD6B20', f: '#E53E3E' },
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
-        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        :root {
+            --c-green: #00824F;
+            --c-green-dark: #00663D;
+            --c-orange: #EB4C0A;
+            --c-black: #1A1A1A;
+            --c-gray-text: #666666;
+            --c-gray-border: #E5E5E5;
+            --c-white: #FFFFFF;
+            --c-bg: #FFFFFF;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-pill: 999px;
+            --radius-card: 24px;
+            --container-width: 1200px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--c-black);
+            background-color: var(--c-bg);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
 
         /* --- Nav --- */
-        .bk-nav {
+        nav {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(10, 22, 40, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 0 40px; height: 64px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--c-gray-border);
+            padding: 16px 0;
+        }
+        .nav-inner {
+            max-width: var(--container-width); margin: 0 auto; padding: 0 24px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .bk-nav-logo {
-            font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em;
-            color: #fff; text-decoration: none;
+        .nav-logo {
             display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--c-black);
+            font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em;
         }
-        .bk-nav-center { display: flex; gap: 4px; }
-        .bk-nav-center a {
-            color: rgba(255,255,255,0.7); text-decoration: none;
+        .nav-logo-dot {
+            width: 24px; height: 24px; background: var(--c-green);
+            border-radius: 50%; flex-shrink: 0;
+        }
+        .nav-center { display: flex; gap: 4px; }
+        .nav-link {
+            text-decoration: none; color: var(--c-black);
             font-size: 0.875rem; font-weight: 500;
             padding: 8px 16px; border-radius: 8px;
-            transition: color 0.15s, background 0.15s;
+            transition: background 0.15s;
         }
-        .bk-nav-center a:hover { color: #fff; background: rgba(255,255,255,0.08); }
-        .bk-nav-right { display: flex; align-items: center; gap: 12px; }
-        .bk-nav-cta {
-            background: #00B37E; color: #fff; font-weight: 700; font-size: 0.875rem;
-            padding: 9px 20px; border-radius: 100px; text-decoration: none;
-            transition: background 0.15s, transform 0.15s;
+        .nav-link:hover { background: rgba(0,0,0,0.04); }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 10px 22px; border-radius: var(--radius-pill);
+            font-size: 0.875rem; font-weight: 500; text-decoration: none;
+            transition: all 0.2s ease; cursor: pointer; border: none;
         }
-        .bk-nav-cta:hover { background: #00D492; transform: scale(1.03); }
+        .btn-outline {
+            border: 1px solid var(--c-gray-border); color: var(--c-black);
+            background: transparent;
+        }
+        .btn-outline:hover { border-color: var(--c-black); }
+        .btn-primary {
+            background-color: var(--c-black); color: var(--c-white);
+            border: 1px solid var(--c-black);
+        }
+        .btn-primary:hover { background-color: #333; }
+        .btn-white {
+            background-color: var(--c-white); color: var(--c-green);
+            border: 1px solid var(--c-white); font-weight: 600;
+        }
+        .btn-green {
+            background-color: var(--c-green); color: var(--c-white);
+            border: 1px solid var(--c-green);
+        }
+        .btn-green:hover { background-color: var(--c-green-dark); }
 
         /* Mobile nav */
         .nav-hamburger {
             display: none; background: none; border: none; cursor: pointer; padding: 8px;
         }
-        .nav-hamburger svg { color: #fff; }
         .mobile-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
             z-index: 998;
         }
         .mobile-overlay.open { display: block; }
         .mobile-menu {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: #0A1628; z-index: 999; padding: 24px;
+            background: var(--c-white); z-index: 999; padding: 24px;
             transition: right 0.25s ease; display: flex; flex-direction: column;
         }
         .mobile-menu.open { right: 0; }
         .mobile-menu a {
-            color: rgba(255,255,255,0.8); text-decoration: none; font-size: 1rem;
-            font-weight: 500; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
-            display: block;
+            color: var(--c-black); text-decoration: none; font-size: 1rem;
+            font-weight: 500; padding: 14px 0;
+            border-bottom: 1px solid var(--c-gray-border); display: block;
         }
-        .mobile-menu a:hover { color: #fff; }
         .mobile-menu .mobile-cta {
-            margin-top: auto; background: #00B37E; color: #fff; font-weight: 700;
-            text-align: center; padding: 14px; border-radius: 12px; border: none;
+            margin-top: auto; background: var(--c-black); color: var(--c-white);
+            font-weight: 700; text-align: center; padding: 14px;
+            border-radius: var(--radius-pill); border: none;
         }
-
         @media (max-width: 768px) {
-            .bk-nav { padding: 0 16px; }
-            .bk-nav-center, .bk-nav-right { display: none; }
+            .nav-center, .nav-right { display: none; }
             .nav-hamburger { display: block; }
         }
 
-        /* --- Section spacing --- */
-        .section-pad { padding: 80px 40px; }
-        .section-inner { max-width: 1200px; margin: 0 auto; }
-        @media (max-width: 768px) { .section-pad { padding: 56px 20px; } }
+        /* --- Hero --- */
+        .hero {
+            background-color: var(--c-green); color: var(--c-white);
+            padding: 72px 0 100px; position: relative; overflow: hidden;
+            border-radius: 0 0 40px 40px;
+        }
+        .hero-pattern {
+            position: absolute; right: -10%; top: 50%;
+            transform: translateY(-50%); width: 600px; height: 600px;
+            opacity: 0.15; pointer-events: none;
+        }
+        .hero-circle {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .hero-label {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: 3.5rem; font-weight: 500; letter-spacing: -0.02em;
+            line-height: 1.1; margin-bottom: 20px;
+        }
+        .hero-sub {
+            font-size: 1.1rem; color: rgba(255,255,255,0.8);
+            max-width: 480px; line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+            .hero { padding: 48px 0 72px; }
+            .hero h1 { font-size: 2.25rem; }
+            .hero-sub { font-size: 1rem; }
+        }
 
-        /* --- Headings --- */
-        .h-section {
-            font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em;
-            line-height: 1.15;
+        /* --- Search --- */
+        .search-container {
+            position: relative; max-width: 600px; margin-top: 36px;
         }
-        @media (max-width: 768px) { .h-section { font-size: 1.75rem; } }
+        .search-input {
+            width: 100%; padding: 20px 120px 20px 28px;
+            border-radius: var(--radius-pill); border: none;
+            font-size: 1rem; font-weight: 500; outline: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            font-family: var(--font-main); color: var(--c-black);
+        }
+        .search-input::placeholder { color: #999; }
+        .search-btn-wrap {
+            position: absolute; right: 8px; top: 50%;
+            transform: translateY(-50%);
+        }
 
-        /* --- Autocomplete --- */
-        .ac-wrap { position: relative; width: 100%; }
-        .ac-input {
-            width: 100%; padding: 16px 20px 16px 48px;
-            font-size: 1rem; font-weight: 500;
-            border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 14px; background: rgba(255,255,255,0.06);
-            color: #fff; outline: none;
-            transition: border-color 0.2s, background 0.2s;
-        }
-        .ac-input::placeholder { color: rgba(255,255,255,0.4); }
-        .ac-input:focus { border-color: #00B37E; background: rgba(255,255,255,0.1); }
-        .ac-icon {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            color: rgba(255,255,255,0.4); pointer-events: none;
-        }
+        /* --- Autocomplete (shared with homepage.js) --- */
         .ac-results {
             position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-            background: #fff; border-radius: 14px; overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            background: #fff; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
             display: none; z-index: 50;
         }
         .ac-results.open { display: block; }
         .ac-item {
             display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; text-decoration: none; color: #1A1A1A;
+            padding: 12px 20px; text-decoration: none; color: var(--c-black);
             transition: background 0.1s;
         }
         .ac-item:hover, .ac-item.active { background: #F3F4F6; }
@@ -145,7 +201,7 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 0.8rem; color: #fff; flex-shrink: 0;
         }
-        .ac-grade-a { background: #00B37E; }
+        .ac-grade-a { background: var(--c-green); }
         .ac-grade-b { background: #38A169; }
         .ac-grade-c { background: #D69E2E; }
         .ac-grade-d { background: #DD6B20; }
@@ -153,277 +209,235 @@
         .ac-grade-na { background: #9CA3AF; }
         .ac-info { display: flex; flex-direction: column; min-width: 0; }
         .ac-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ac-loc { font-size: 0.8rem; color: #6B7280; }
+        .ac-loc { font-size: 0.8rem; color: var(--c-gray-text); }
 
-        /* Light-bg autocomplete variant */
-        .ac-light .ac-input {
-            background: #fff; color: #1A1A1A; border-color: #D1D5DB;
+        /* --- Stats Bar --- */
+        .stats-bar { margin-top: -48px; margin-bottom: 80px; position: relative; z-index: 10; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
         }
-        .ac-light .ac-input::placeholder { color: #9CA3AF; }
-        .ac-light .ac-input:focus { border-color: #00B37E; }
-        .ac-light .ac-icon { color: #9CA3AF; }
-
-        /* --- Hero --- */
-        .hero-grid {
-            display: grid; grid-template-columns: 1.1fr 0.9fr;
-            gap: 64px; align-items: center; min-height: calc(100vh - 64px);
-        }
-        @media (max-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr; gap: 48px; min-height: auto; }
-        }
-
-        /* --- Grade Viz --- */
-        .grade-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-        .grade-letter {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.1rem; color: #fff; flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .grade-track {
-            flex: 1; height: 36px; background: rgba(255,255,255,0.08);
-            border-radius: 10px; overflow: hidden; position: relative;
-        }
-        .grade-bar {
-            height: 100%; width: 0; border-radius: 10px;
-            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .grade-count {
-            font-size: 0.95rem; color: rgba(255,255,255,0.8);
-            font-weight: 700; min-width: 52px; text-align: right;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* --- Data Bar --- */
-        .stat-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 0; text-align: center;
-        }
-        .stat-tile {
-            padding: 32px 24px;
-            border-right: 1px solid rgba(255,255,255,0.08);
-        }
-        .stat-tile:last-child { border-right: none; }
-        .stat-number {
-            display: block; font-size: 2.75rem; font-weight: 800;
-            letter-spacing: -0.02em; color: #fff; line-height: 1;
+        .stat-card {
+            background: var(--c-white); padding: 28px;
+            border-radius: var(--radius-card);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid var(--c-gray-border);
+            display: flex; flex-direction: column;
+            justify-content: space-between; min-height: 170px;
         }
         .stat-label {
-            display: block; font-size: 0.85rem; color: rgba(255,255,255,0.5);
-            font-weight: 500; margin-top: 8px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: var(--c-gray-text);
+        }
+        .stat-number {
+            font-size: 3rem; font-weight: 400; letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        .stat-bar {
+            width: 100%; height: 4px; background: #eee; border-radius: 2px;
+        }
+        .stat-bar-fill { height: 100%; border-radius: 2px; }
+        .text-green { color: var(--c-green); }
+        .text-orange { color: var(--c-orange); }
+        .text-gray { color: var(--c-gray-text); }
+        .stat-card-dark {
+            background: var(--c-black); color: var(--c-white);
+            border: none;
+        }
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 640px) {
-            .stat-grid { grid-template-columns: 1fr 1fr; }
-            .stat-tile { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 24px 16px; }
-            .stat-number { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
 
-        /* --- Use-case Cards --- */
-        .usecase-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+        /* --- Section split (methodology) --- */
+        .section-split {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 64px; align-items: center; margin-bottom: 100px;
         }
-        @media (max-width: 768px) { .usecase-grid { grid-template-columns: 1fr; } }
-        .usecase-card {
-            background: #fff; border: 1px solid #E5E7EB; border-radius: 16px;
-            padding: 32px; transition: transform 0.2s, box-shadow 0.2s;
+        @media (max-width: 768px) {
+            .section-split { grid-template-columns: 1fr; gap: 40px; }
         }
-        .usecase-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        .section-label {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: var(--c-gray-text);
+            margin-bottom: 12px; display: block;
         }
-        .usecase-stage {
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
-            text-transform: uppercase; color: #6B7280; margin-bottom: 12px;
+        .section-heading {
+            font-size: 2.75rem; font-weight: 500; letter-spacing: -0.02em;
+            line-height: 1.1; margin-bottom: 20px;
         }
-        .usecase-icon {
-            width: 40px; height: 40px; margin-bottom: 16px; color: #374151;
+        @media (max-width: 768px) {
+            .section-heading { font-size: 2rem; }
         }
-        .usecase-h { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 10px; color: #111827; }
-        .usecase-p { font-size: 0.95rem; color: #4B5563; line-height: 1.6; margin-bottom: 16px; }
-        .usecase-cta { color: #00B37E; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
-        .usecase-cta:hover { color: #00D492; }
+        .grade-list { list-style: none; padding: 0; }
+        .grade-list li {
+            display: flex; align-items: center; gap: 14px;
+            padding: 8px 0; font-size: 0.95rem;
+        }
+        .grade-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
 
-        /* --- Grade Explainer --- */
-        .explainer-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+        /* --- Bar chart viz --- */
+        .bar-chart-viz {
+            display: flex; align-items: flex-end; gap: 6px;
+            height: 260px; width: 100%; padding: 24px;
+            background: #FAFAFA; border-radius: var(--radius-card);
+            border: 1px solid var(--c-gray-border);
         }
-        @media (max-width: 768px) { .explainer-grid { grid-template-columns: 1fr; gap: 40px; } }
-        .grade-scale-item {
-            display: flex; align-items: center; gap: 16px;
-            padding: 12px 0; border-bottom: 1px solid #E5E7EB;
+        .bar {
+            flex: 1; border-radius: 6px 6px 0 0; position: relative;
+            transition: height 1s ease-out;
         }
-        .grade-scale-item:last-child { border-bottom: none; }
-        .grade-pill {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.1rem; color: #fff; flex-shrink: 0;
+        .bar-green { background-color: var(--c-green); }
+        .bar-black { background-color: var(--c-black); }
+        .bar-orange { background-color: var(--c-orange); }
+        .bar-label {
+            position: absolute; bottom: -28px; left: 50%;
+            transform: translateX(-50%); font-size: 0.75rem;
+            color: var(--c-gray-text); font-weight: 600;
         }
-        .grade-scale-text { font-size: 0.95rem; color: #374151; }
-        .grade-scale-range { font-weight: 700; color: #111827; }
-        .natl-avg-marker {
-            background: #EBF5FF; border: 2px solid #3B82F6;
-            border-radius: 10px; padding: 10px 16px; margin-top: 16px;
-            font-size: 0.85rem; color: #1E40AF; font-weight: 600;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .cost-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-        .cost-table th {
-            text-align: left; font-weight: 700; font-size: 0.75rem;
-            text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280;
-            padding: 8px 12px; border-bottom: 2px solid #E5E7EB;
-        }
-        .cost-table td { padding: 12px; border-bottom: 1px solid #F3F4F6; color: #374151; }
-        .cost-table .charge { font-weight: 700; color: #111827; font-variant-numeric: tabular-nums; }
 
-        /* --- Hospital Sample Cards --- */
-        .hospital-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+        /* --- Comparison section --- */
+        .comparison-section {
+            background: #F4F4F4; padding: 80px 0;
+            margin-bottom: 80px; border-radius: 40px;
         }
-        @media (max-width: 1024px) { .hospital-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 640px) { .hospital-grid { grid-template-columns: 1fr; } }
         .hospital-card {
-            background: #fff; border: 2px solid #E5E7EB; border-radius: 16px;
-            padding: 24px; text-decoration: none; color: #111827;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-            display: flex; flex-direction: column; cursor: pointer;
+            background: var(--c-white); border-radius: var(--radius-card);
+            padding: 28px; text-decoration: none; color: var(--c-black);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column;
         }
         .hospital-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-            border-color: #00B37E;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
         }
-        .hospital-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
-        .hospital-grade-lg {
-            width: 48px; height: 48px; border-radius: 14px;
+        .grade-badge {
+            width: 48px; height: 48px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.2rem; color: #fff; flex-shrink: 0;
+            font-weight: 700; font-size: 1.15rem; flex-shrink: 0;
         }
-        .hospital-card-name { font-weight: 700; font-size: 1rem; line-height: 1.3; }
-        .hospital-card-loc { font-size: 0.85rem; color: #6B7280; margin-top: 2px; }
-        .hospital-card-markup { font-size: 0.9rem; color: #374151; margin-top: 8px; }
-        .hospital-card-markup strong { color: #111827; font-weight: 700; }
-        .hospital-card-standout {
-            font-size: 0.8rem; color: #E53E3E; font-weight: 600; margin-top: 6px;
+        .grade-a { background: #E6F4EA; color: var(--c-green); }
+        .grade-b { background: #E6F4EA; color: #38A169; }
+        .grade-c { background: #FEF9E6; color: #D69E2E; }
+        .grade-d { background: #FFF0EB; color: #DD6B20; }
+        .grade-f { background: #FFF0EB; color: var(--c-orange); }
+        .grade-na { background: #F3F4F6; color: #9CA3AF; }
+        .donut-chart {
+            width: 56px; height: 56px; border-radius: 50%;
+            position: relative; display: flex;
+            align-items: center; justify-content: center;
         }
-        .hospital-card-link {
-            display: inline-flex; align-items: center; gap: 6px;
-            margin-top: auto; padding-top: 14px; font-size: 0.9rem;
-            color: #00B37E; font-weight: 700;
-            transition: gap 0.2s;
+        .donut-inner {
+            width: 22px; height: 22px;
+            background: var(--c-white); border-radius: 50%;
         }
-        .hospital-card:hover .hospital-card-link { gap: 10px; }
 
-        /* --- How It Works --- */
-        .steps-grid { display: flex; align-items: flex-start; gap: 0; position: relative; }
-        .step-item { flex: 1; text-align: center; position: relative; padding: 0 24px; }
-        .step-num {
-            width: 52px; height: 52px; border-radius: 50%;
-            background: #00B37E; color: #fff; font-weight: 800; font-size: 1.2rem;
-            display: inline-flex; align-items: center; justify-content: center;
-            margin-bottom: 20px; position: relative; z-index: 2;
-            box-shadow: 0 0 0 4px rgba(0, 179, 126, 0.2);
+        /* --- Procedure list --- */
+        .procedure-list { display: flex; flex-direction: column; }
+        .procedure-item {
+            display: grid; grid-template-columns: 1fr auto auto;
+            align-items: center; padding: 24px 0;
+            border-bottom: 1px solid var(--c-gray-border); gap: 32px;
         }
-        .step-connector {
-            position: absolute; top: 26px; left: calc(50% + 36px); right: calc(-50% + 36px);
-            height: 0; border-top: 2px dashed rgba(255,255,255,0.35);
-            z-index: 1;
-        }
-        .step-item:last-child .step-connector { display: none; }
-        .step-h { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.5; max-width: 28ch; margin: 0 auto; }
         @media (max-width: 768px) {
-            .steps-grid { flex-direction: column; align-items: stretch; gap: 0; }
-            .step-item {
-                text-align: left; display: flex; gap: 20px; padding: 0 0 32px 0;
-                border-left: 2px dashed rgba(255,255,255,0.25);
-                margin-left: 25px; padding-left: 28px;
-            }
-            .step-item:last-child { border-left: 2px dashed transparent; padding-bottom: 0; }
-            .step-num { flex-shrink: 0; margin-bottom: 0; margin-left: -53px; }
-            .step-connector { display: none; }
-            .step-p { max-width: none; }
+            .procedure-item { grid-template-columns: 1fr; gap: 12px; }
+        }
+        .trend-indicator {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 1.3rem; font-weight: 400;
         }
 
-        /* --- Data section --- */
-        .data-grid {
-            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px;
+        /* --- How it works --- */
+        .steps-section {
+            background: var(--c-green); color: var(--c-white);
+            padding: 80px 0; border-radius: 40px;
+            margin: 0 24px 80px;
         }
-        @media (max-width: 768px) { .data-grid { grid-template-columns: 1fr; gap: 40px; } }
-        .data-pill {
-            display: inline-block; background: #F3F4F6; color: #374151;
-            font-size: 0.8rem; font-weight: 600; padding: 6px 14px;
-            border-radius: 100px; margin: 4px 4px 4px 0;
+        .steps-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 40px; text-align: center;
         }
-        .data-callout {
-            padding: 24px 0; border-bottom: 1px solid #E5E7EB;
+        @media (max-width: 768px) {
+            .steps-grid { grid-template-columns: 1fr; gap: 32px; text-align: left; }
         }
-        .data-callout:last-child { border-bottom: none; }
-        .data-callout-num { font-size: 2.25rem; font-weight: 800; color: #111827; letter-spacing: -0.02em; }
-        .data-callout-label { font-size: 0.9rem; color: #6B7280; margin-top: 4px; }
+        .step-num {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); color: var(--c-white);
+            font-weight: 700; font-size: 1.1rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+        }
+        .step-h { font-size: 1.15rem; font-weight: 600; margin-bottom: 8px; }
+        .step-p { font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
 
-        /* --- Guide Cards --- */
-        .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        /* --- Guides --- */
+        .guide-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+        }
         @media (max-width: 768px) { .guide-grid { grid-template-columns: 1fr; } }
         .guide-card {
-            background: #fff; border: 1px solid #E5E7EB; border-radius: 16px;
-            padding: 28px; text-decoration: none; color: #111827;
-            transition: transform 0.2s, box-shadow 0.2s; display: flex;
-            flex-direction: column;
+            background: var(--c-white); border: 1px solid var(--c-gray-border);
+            border-radius: 16px; padding: 28px; text-decoration: none;
+            color: var(--c-black); display: flex; flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .guide-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.06);
         }
-        .guide-card-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; line-height: 1.35; }
-        .guide-card-desc { font-size: 0.9rem; color: #6B7280; line-height: 1.5; flex: 1; }
-        .guide-card-meta { font-size: 0.8rem; color: #9CA3AF; margin-top: 14px; font-weight: 500; }
-
-        /* --- Final CTA --- */
-        .cta-pair {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+        .guide-card-title {
+            font-weight: 600; font-size: 1rem; margin-bottom: 8px; line-height: 1.35;
         }
-        @media (max-width: 768px) { .cta-pair { grid-template-columns: 1fr; } }
-        .cta-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 40px;
+        .guide-card-desc {
+            font-size: 0.9rem; color: var(--c-gray-text); line-height: 1.5; flex: 1;
         }
-        .cta-card-h { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
-        .cta-card-p { font-size: 0.95rem; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 20px; }
-        .btn-green {
-            display: inline-block; background: #00B37E; color: #fff;
-            font-weight: 700; font-size: 0.95rem;
-            padding: 13px 28px; border-radius: 100px; text-decoration: none;
-            transition: background 0.15s, transform 0.15s;
+        .guide-card-meta {
+            font-size: 0.8rem; color: #9CA3AF; margin-top: 14px; font-weight: 500;
         }
-        .btn-green:hover { background: #00D492; transform: scale(1.03); }
-        .btn-outline {
-            display: inline-block; border: 2px solid #00B37E; color: #00B37E;
-            font-weight: 700; font-size: 0.95rem;
-            padding: 11px 28px; border-radius: 100px; text-decoration: none;
-            transition: background 0.15s, color 0.15s, transform 0.15s;
-        }
-        .btn-outline:hover { background: #00B37E; color: #fff; transform: scale(1.03); }
 
         /* --- Footer --- */
-        .bk-footer-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px;
+        footer { padding: 80px 0; border-top: 1px solid var(--c-gray-border); }
+        .footer-grid {
+            display: flex; justify-content: space-between; gap: 48px;
         }
-        @media (max-width: 768px) { .bk-footer-grid { grid-template-columns: 1fr; gap: 32px; } }
-        .footer-col-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
-        .footer-col a { display: block; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem; padding: 4px 0; transition: color 0.15s; }
-        .footer-col a:hover { color: #fff; }
-        .footer-bottom {
-            margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);
-            font-size: 0.8rem; color: rgba(255,255,255,0.35);
+        @media (max-width: 768px) {
+            .footer-grid { flex-direction: column; gap: 32px; }
         }
+        .footer-col-title {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: var(--c-black); margin-bottom: 12px;
+        }
+        .footer-col a {
+            display: block; color: var(--c-gray-text); text-decoration: none;
+            font-size: 0.875rem; padding: 3px 0; transition: color 0.15s;
+        }
+        .footer-col a:hover { color: var(--c-black); }
 
-        /* --- Fade-up animation --- */
-        .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+        /* --- Animations --- */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up {
+            animation: slideUp 0.6s ease-out forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .fade-up {
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
         .fade-up.visible { opacity: 1; transform: translateY(0); }
 
-        /* --- Pill link --- */
-        .link-arrow { color: #00B37E; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
-        .link-arrow:hover { color: #00D492; }
+        /* Print */
+        @media print {
+            nav, footer, .hero-pattern { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+        }
     </style>
 
     <!-- JSON-LD: WebSite -->
@@ -485,28 +499,29 @@
     </script>
 </head>
 
-<body class="bg-navy text-white font-sans">
+<body>
 
 <!-- ========== NAV ========== -->
-<nav class="bk-nav">
-    <a href="/" class="bk-nav-logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-        BillKarma
-    </a>
-    <div class="bk-nav-center">
-        <a href="/hospitals/">Hospitals</a>
-        <a href="/procedures/">Procedures</a>
-        <a href="/compare/">Compare</a>
-        <a href="/guides/">Guides</a>
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="nav-logo">
+            <div class="nav-logo-dot"></div>
+            BillKarma
+        </a>
+        <div class="nav-center">
+            <a href="/guides/hospital-billing-grades-explained" class="nav-link">Methodology</a>
+            <a href="/hospitals/" class="nav-link">Hospitals</a>
+            <a href="/procedures/" class="nav-link">Procedures</a>
+            <a href="/guides/" class="nav-link">Guides</a>
+        </div>
+        <div class="nav-right">
+            <a href="/hospitals/" class="btn btn-outline">Check Hospital</a>
+            <a href="/scan" class="btn btn-primary">Scan My Bill</a>
+        </div>
+        <button class="nav-hamburger" id="navToggle" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
     </div>
-    <div class="bk-nav-right">
-        <a href="/scan" class="bk-nav-cta">Scan My Bill</a>
-    </div>
-    <button class="nav-hamburger" id="navToggle" aria-label="Menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
 </nav>
 
 <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -518,410 +533,279 @@
     <a href="/scan" class="mobile-cta">Scan My Bill</a>
 </div>
 
-<!-- ========== SECTION 1: HERO ========== -->
-<section class="section-pad" style="padding-top: 48px; padding-bottom: 64px;">
-    <div class="section-inner">
-        <div class="hero-grid">
-            <!-- Left: headline + search -->
-            <div>
-                <h1 style="font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 20px;">
-                    Hospital bills are designed<br>to confuse you.
-                    <span style="color: #00B37E; display: block; margin-top: 4px;">BillKarma isn't.</span>
-                </h1>
-                <p style="font-size: 1.125rem; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 52ch; margin-bottom: 28px;">
-                    Check your hospital's billing grade before you go. Scan your bill for errors after. Fight back with real data.
-                </p>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;">
-                    <a href="/hospitals/" class="btn-green">Check My Hospital</a>
-                    <a href="/scan" class="btn-outline">Scan My Bill</a>
+<!-- ========== HERO ========== -->
+<section class="hero">
+    <div class="hero-pattern">
+        <div class="hero-circle" style="width: 400px; height: 400px; top: 0; left: 0;"></div>
+        <div class="hero-circle" style="width: 250px; height: 250px; top: 80px; left: 80px;"></div>
+        <div class="hero-circle" style="width: 120px; height: 120px; top: 140px; left: 260px;"></div>
+    </div>
+    <div class="container animate-up">
+        <div style="max-width: 700px;">
+            <p class="hero-label">Simple and intuitive transparency</p>
+            <h1>Don't pay blindly.<br>Know the grade.</h1>
+            <p class="hero-sub">
+                We analyze millions of Medicare records to grade hospitals on fair pricing. Check before you go, or scan your bill to fight overcharges.
+            </p>
+            <div class="search-container">
+                <input id="heroSearch" type="text" class="search-input" placeholder="Search {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }}+ hospitals (e.g. Mayo Clinic)" autocomplete="off">
+                <div class="search-btn-wrap">
+                    <button class="btn btn-primary" onclick="document.getElementById('heroSearch').focus()">Search</button>
                 </div>
-                <!-- Hospital search -->
-                <div class="ac-wrap" style="max-width: 480px;">
-                    <svg class="ac-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input id="heroSearch" class="ac-input" type="text" placeholder="Search any U.S. hospital..." autocomplete="off">
-                    <div id="heroResults" class="ac-results"></div>
-                </div>
-                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.35); margin-top: 10px;">
-                    {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} hospitals graded · Updated February 2026
-                </p>
-            </div>
-
-            <!-- Right: grade distribution viz -->
-            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 24px; padding: 36px 40px;">
-                <p style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px;">
-                    Hospital Grade Distribution
-                </p>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 28px;">
-                    How {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} U.S. hospitals score on billing fairness
-                </p>
-                {% set total = grade_distribution.values()|sum if grade_distribution else 1 %}
-                {% set grade_colors = {"A": "#00B37E", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
-                {% for grade in ["A", "B", "C", "D", "F"] %}
-                {% set count = grade_distribution.get(grade, 0) if grade_distribution else 0 %}
-                {% set pct = ((count / total) * 100) if total else 0 %}
-                <div class="grade-row">
-                    <div class="grade-letter" style="background: {{ grade_colors[grade] }};">{{ grade }}</div>
-                    <div class="grade-track">
-                        <div class="grade-bar" style="background: {{ grade_colors[grade] }};" data-width="{{ pct|round(1) }}"></div>
-                    </div>
-                    <span class="grade-count">{{ "{:,}".format(count) }}</span>
-                </div>
-                {% endfor %}
+                <div id="heroResults" class="ac-results"></div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ========== SECTION 2: DATA BAR ========== -->
-<section style="background: #0F2035;">
-    <div class="section-inner">
-        <div class="stat-grid">
-            <div class="stat-tile">
-                <span class="stat-number" data-count-target="{{ hospital_count or 6000 }}" data-suffix="+">0</span>
-                <span class="stat-label">U.S. hospitals graded</span>
-            </div>
-            <div class="stat-tile">
-                <span class="stat-number" data-count-target="3.4" data-suffix="x">0</span>
-                <span class="stat-label">Average hospital markup vs. Medicare</span>
-            </div>
-            <div class="stat-tile">
-                <span class="stat-number" style="font-size: 2.75rem;">1 in 4</span>
-                <span class="stat-label">Bills flagged for potential errors</span>
-            </div>
-            {% if outcome_stats and outcome_stats.show_stat %}
-            <div class="stat-tile">
-                <span class="stat-number" data-prefix="$">{{ "%.0f"|format(outcome_stats.median_recovered) }}</span>
-                <span class="stat-label">Median recovered per dispute &mdash; {{ outcome_stats.total_disputes }} verified outcomes</span>
-            </div>
-            {% elif stats and stats.realized_savings and stats.realized_savings > 0 %}
-            <div class="stat-tile">
-                <span class="stat-number" data-count-target="{{ stats.realized_savings|int }}" data-prefix="$">0</span>
-                <span class="stat-label">Average recovered per dispute</span>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</section>
-
-<!-- ========== SECTION 3: THREE USE CASES ========== -->
-<section class="section-pad" style="background: #F7F8FA;">
-    <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; text-align: center; margin-bottom: 48px;">
-            BillKarma works before, during, and after your hospital visit
-        </h2>
-        <div class="usecase-grid">
-            <!-- Before Care -->
-            <div class="usecase-card fade-up">
-                <svg class="usecase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/>
-                </svg>
-                <div class="usecase-stage">Before Care</div>
-                <div class="usecase-h">Know what you're walking into</div>
-                <p class="usecase-p">
-                    Every U.S. hospital has a billing grade based on how much they charge compared to what Medicare pays for the same procedures. An F-grade hospital charges 8x Medicare or more. An A-grade charges 2x or less. Check yours before you schedule anything non-emergency.
-                </p>
-                <a href="/hospitals/" class="usecase-cta">Find My Hospital →</a>
-            </div>
-            <!-- Review Your Bill -->
-            <div class="usecase-card fade-up">
-                <svg class="usecase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
-                </svg>
-                <div class="usecase-stage">Review Your Bill</div>
-                <div class="usecase-h">1 in 4 hospital bills has a flaggable issue</div>
-                <p class="usecase-p">
-                    Upcoding, duplicate charges, unbundled procedures — billing errors aren't rare. They're a predictable feature of a system with no patient oversight. Upload your bill and we'll compare every line against Medicare rates and flag anything worth disputing.
-                </p>
-                <a href="/scan" class="usecase-cta">Scan My Bill Free →</a>
-            </div>
-            <!-- Fight Back -->
-            <div class="usecase-card fade-up">
-                <svg class="usecase-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                <div class="usecase-stage">Fight Back</div>
-                <div class="usecase-h">A dispute packet ready in minutes</div>
-                <p class="usecase-p">
-                    If we flag errors, we don't just tell you — we generate a pre-written dispute letter with your CPT codes and Medicare rates already filled in, plus a phone script for your billing department call. Track your outcome and escalate if needed.
-                </p>
-                <a href="/scan" class="usecase-cta">Start a Dispute →</a>
+<!-- ========== STATS BAR ========== -->
+<div class="container stats-bar">
+    <div class="stats-grid">
+        <div class="stat-card animate-up delay-1">
+            <span class="stat-label">Graded Hospitals</span>
+            <span class="stat-number text-green" data-count-target="{{ hospital_count or 6000 }}" data-suffix="">0</span>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 85%; background: var(--c-green);"></div>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- ========== SECTION 4: GRADE EXPLAINER ========== -->
-<section class="section-pad" style="background: #fff;">
-    <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; margin-bottom: 48px;">
-            Most hospitals charge far more than Medicare rates.<br>Some charge more than 10x.
-        </h2>
-        <div class="explainer-grid">
-            <!-- Left: Grade scale -->
-            <div>
-                {% set scale_items = [
-                    ("A", "#00B37E", "2x or less", "Fair — charges are within 2x Medicare rates"),
-                    ("B", "#38A169", "2.1x – 3x", "Moderate — slightly above Medicare benchmarks"),
-                    ("C", "#D69E2E", "3.1x – 5x", "Elevated — well above Medicare standards"),
-                    ("D", "#DD6B20", "5.1x – 8x", "High — charges 5 to 8 times Medicare rates"),
-                    ("F", "#E53E3E", "8x+", "Excessive — more than 8x what Medicare pays"),
-                ] %}
-                {% for letter, color, range_text, desc in scale_items %}
-                <div class="grade-scale-item">
-                    <div class="grade-pill" style="background: {{ color }};">{{ letter }}</div>
-                    <div>
-                        <div class="grade-scale-range">{{ range_text }}</div>
-                        <div class="grade-scale-text">{{ desc }}</div>
-                    </div>
-                </div>
-                {% endfor %}
-                <div class="natl-avg-marker">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    National average: 3.4x Medicare — between grade B and C
-                </div>
-            </div>
-            <!-- Right: Knee replacement cost table -->
-            <div>
-                <h3 style="font-size: 1.15rem; font-weight: 700; color: #111827; margin-bottom: 20px;">
-                    The same knee replacement at different hospitals:
-                </h3>
-                <table class="cost-table">
-                    <thead>
-                        <tr>
-                            <th>Grade</th>
-                            <th>Typical Charge</th>
-                            <th>Your Est. Cost (20% coinsurance)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% set knee_data = [
-                            ("A", "#00B37E", "~$2,300", "~$460"),
-                            ("B", "#38A169", "~$3,500", "~$700"),
-                            ("C", "#D69E2E", "~$5,800", "~$1,160"),
-                            ("D", "#DD6B20", "~$9,200", "~$1,840"),
-                            ("F", "#E53E3E", "~$15,000+", "~$3,000+"),
-                        ] %}
-                        {% for letter, color, charge, cost in knee_data %}
-                        <tr>
-                            <td>
-                                <span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:{{ color }};color:#fff;font-weight:800;font-size:0.8rem;">{{ letter }}</span>
-                            </td>
-                            <td class="charge">{{ charge }}</td>
-                            <td class="charge">{{ cost }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <p style="font-size: 0.85rem; color: #6B7280; margin-top: 16px; font-style: italic;">
-                    Medicare rate for this procedure (CPT 27447): $1,159. Your hospital's grade determines your starting point.
-                </p>
-                <a href="/hospitals/" class="link-arrow" style="display: inline-block; margin-top: 16px;">Find Your Hospital's Grade →</a>
+        <div class="stat-card animate-up delay-2">
+            <span class="stat-label">Avg Markup vs Medicare</span>
+            <span class="stat-number" data-count-target="3.4" data-suffix="x">0</span>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 65%; background: var(--c-black);"></div>
             </div>
         </div>
+        <div class="stat-card animate-up delay-3">
+            <span class="stat-label">Bills Flagged</span>
+            <span class="stat-number text-orange">1 in 4</span>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width: 45%; background: var(--c-orange);"></div>
+            </div>
+        </div>
+        <div class="stat-card stat-card-dark animate-up delay-3">
+            <span class="stat-label" style="color: rgba(255,255,255,0.5);">Start Now</span>
+            <h3 style="font-size: 1.25rem; font-weight: 500;">Have a bill in hand?</h3>
+            <a href="/scan" class="btn btn-white" style="width: 100%; text-align: center;">Scan My Bill &rarr;</a>
+        </div>
     </div>
-</section>
+</div>
 
-<!-- ========== SECTION 5: LIVE HOSPITAL SAMPLE ========== -->
-<section class="section-pad" style="background: #F7F8FA;">
-    <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; margin-bottom: 8px;">See how your hospital compares</h2>
-        <p style="color: #6B7280; font-size: 1rem; margin-bottom: 40px;">A live sample from our directory — search yours above</p>
-        <div class="hospital-grid">
-            {% set card_colors = {"A": "#00B37E", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
-            {% for h in sample_hospitals %}
+<!-- ========== METHODOLOGY ========== -->
+<main class="container">
+    <div class="section-split">
+        <div>
+            <span class="section-label">Methodology</span>
+            <h2 class="section-heading">How we grade pricing fairness</h2>
+            <p style="color: var(--c-gray-text); font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;">
+                Hospitals are required to publish prices, but they hide them in complex files. We compare their cash prices against Medicare rates.
+            </p>
+            <ul class="grade-list">
+                <li>
+                    <div class="grade-dot" style="background: var(--c-green);"></div>
+                    <span><strong>Grade A:</strong> Fair market price (Close to Medicare)</span>
+                </li>
+                <li>
+                    <div class="grade-dot" style="background: var(--c-black);"></div>
+                    <span><strong>Grade C:</strong> Market Average (2-3x Markup)</span>
+                </li>
+                <li>
+                    <div class="grade-dot" style="background: var(--c-orange);"></div>
+                    <span><strong>Grade F:</strong> Predatory (5x+ Markup)</span>
+                </li>
+            </ul>
+            <div style="margin-top: 28px;">
+                <a href="/guides/hospital-billing-grades-explained" class="btn btn-outline">Read full methodology</a>
+            </div>
+        </div>
+
+        <div class="bar-chart-viz">
+            {% set grade_colors_map = {"A": "bar-green", "B": "bar-green", "C": "bar-black", "D": "bar-orange", "F": "bar-orange"} %}
+            {% set grade_heights = {"A": "40%", "B": "65%", "C": "85%", "D": "55%", "F": "30%"} %}
+            {% set grade_opacities = {"A": "1", "B": "0.8", "C": "1", "D": "0.8", "F": "1"} %}
+            {% for grade in ["A", "B", "C", "D", "F"] %}
+            <div class="bar {{ grade_colors_map[grade] }}" style="height: {{ grade_heights[grade] }}; opacity: {{ grade_opacities[grade] }};">
+                <span class="bar-label">{{ grade }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+<!-- ========== COMPARE LOCAL CARE ========== -->
+<section class="comparison-section">
+    <div class="container">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px;">
+            <h2 class="section-heading" style="margin-bottom: 0;">Compare local care</h2>
+            <a href="/compare/" class="btn btn-outline" style="background: var(--c-white);">Compare hospitals</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            {% set card_colors = {"A": "#00824F", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
+            {% set card_grade_classes = {"A": "grade-a", "B": "grade-b", "C": "grade-c", "D": "grade-d", "F": "grade-f"} %}
+            {% for h in sample_hospitals[:6] %}
             <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/" class="hospital-card fade-up">
-                <div class="hospital-card-header">
-                    <div class="hospital-grade-lg" style="background: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                    <div>
+                        <span class="stat-label">{{ h.city }}, {{ h.state }}</span>
+                        <h3 style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">{{ h.name }}</h3>
+                    </div>
+                    <div class="grade-badge {{ card_grade_classes.get(h.billing_grade, 'grade-na') }}">
                         {{ h.billing_grade or "—" }}
                     </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 16px;">
                     <div>
-                        <div class="hospital-card-name">{{ h.name }}</div>
-                        <div class="hospital-card-loc">{{ h.city }}, {{ h.state }}</div>
+                        <span class="stat-label" style="display: block; margin-bottom: 4px;">Avg Markup</span>
+                        <span class="stat-number" style="font-size: 2.5rem; color: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">
+                            {{ "%.1f"|format(h.avg_markup_vs_medicare) }}x
+                        </span>
+                    </div>
+                    {% set markup_pct = [[(h.avg_markup_vs_medicare / 10 * 100)|int, 100]|min, 5]|max %}
+                    <div class="donut-chart" style="background: conic-gradient({{ card_colors.get(h.billing_grade, '#9CA3AF') }} 0% {{ markup_pct }}%, #E5E5E5 {{ markup_pct }}% 100%);">
+                        <div class="donut-inner"></div>
                     </div>
                 </div>
-                <div class="hospital-card-markup">
-                    Average markup: <strong>{{ "%.1f"|format(h.avg_markup_vs_medicare) }}x Medicare</strong>
-                </div>
-                {% if h.standout_procedure and h.standout_markup %}
-                <div class="hospital-card-standout">
-                    {{ h.standout_procedure }}: {{ "%.0f"|format(h.standout_markup) }}x Medicare
-                </div>
-                {% endif %}
-                <span class="hospital-card-link">View Profile <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </a>
             {% endfor %}
         </div>
-        <!-- Inline search -->
-        <div class="ac-wrap ac-light" style="max-width: 480px; margin: 40px auto 0;">
-            <svg class="ac-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input id="sampleSearch" class="ac-input" type="text" placeholder="Search your hospital..." autocomplete="off">
-            <div id="sampleResults" class="ac-results"></div>
+        <div style="text-align: center; margin-top: 32px;">
+            <a href="/hospitals/" style="color: var(--c-green); font-weight: 600; text-decoration: none; font-size: 0.95rem;">
+                Browse all {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} hospitals &rarr;
+            </a>
         </div>
-        <p style="text-align: center; margin-top: 16px;">
-            <a href="/hospitals/" class="link-arrow">Browse all {{ "{:,}".format(hospital_count) if hospital_count else "6,000+" }} hospitals →</a>
-        </p>
     </div>
 </section>
 
-<!-- ========== SECTION 6: HOW IT WORKS ========== -->
-<section class="section-pad" style="background: #0A1628;">
-    <div class="section-inner" style="max-width: 900px;">
-        <h2 class="h-section" style="text-align: center; margin-bottom: 48px;">
+<!-- ========== COMMON PROCEDURE COSTS ========== -->
+<div class="container" style="margin-bottom: 80px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
+        <h2 class="section-heading" style="margin-bottom: 0;">Common procedure costs</h2>
+        <a href="/procedures/" class="btn btn-outline">View all procedures</a>
+    </div>
+    <div class="procedure-list">
+        <div class="procedure-item fade-up">
+            <div>
+                <span class="stat-label" style="display: block; margin-bottom: 4px;">Imaging</span>
+                <h4 style="font-size: 1.2rem; font-weight: 500;">MRI of Brain (w/o contrast)</h4>
+            </div>
+            <div class="trend-indicator text-green">
+                <span>&darr; 46%</span>
+                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
+            </div>
+            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-green) 0% 46%, #E5E5E5 46% 100%);">
+                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
+            </div>
+        </div>
+        <div class="procedure-item fade-up">
+            <div>
+                <span class="stat-label" style="display: block; margin-bottom: 4px;">Emergency</span>
+                <h4 style="font-size: 1.2rem; font-weight: 500;">Level 4 ER Visit</h4>
+            </div>
+            <div class="trend-indicator text-orange">
+                <span>&uarr; 125%</span>
+                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
+            </div>
+            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-orange) 0% 80%, #E5E5E5 80% 100%);">
+                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
+            </div>
+        </div>
+        <div class="procedure-item fade-up">
+            <div>
+                <span class="stat-label" style="display: block; margin-bottom: 4px;">Surgery</span>
+                <h4 style="font-size: 1.2rem; font-weight: 500;">Appendectomy (Laparoscopic)</h4>
+            </div>
+            <div class="trend-indicator text-green">
+                <span>&darr; 15%</span>
+                <span style="font-size: 0.85rem; color: var(--c-gray-text);">vs Nat. Avg</span>
+            </div>
+            <div class="donut-chart" style="width: 48px; height: 48px; background: conic-gradient(var(--c-green) 0% 15%, #E5E5E5 15% 100%);">
+                <div class="donut-inner" style="width: 16px; height: 16px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section class="steps-section">
+    <div class="container" style="max-width: 900px;">
+        <h2 class="section-heading" style="color: var(--c-white); text-align: center; margin-bottom: 48px;">
             Got a bill? Check it in 30 seconds.
         </h2>
         <div class="steps-grid">
-            <div class="step-item">
+            <div>
                 <div class="step-num">1</div>
-                <div class="step-connector"></div>
-                <div>
-                    <div class="step-h">Upload</div>
-                    <p class="step-p">Upload your itemized hospital bill — PDF or image. We accept any format.</p>
-                </div>
+                <div class="step-h">Upload</div>
+                <p class="step-p">Upload your itemized hospital bill — PDF or image. We accept any format.</p>
             </div>
-            <div class="step-item">
+            <div>
                 <div class="step-num">2</div>
-                <div class="step-connector"></div>
-                <div>
-                    <div class="step-h">Analyze</div>
-                    <p class="step-p">We compare every CPT code against Medicare rates and flag upcoding, duplicates, and unbundled charges automatically.</p>
-                </div>
+                <div class="step-h">Analyze</div>
+                <p class="step-p">We compare every CPT code against Medicare rates and flag upcoding, duplicates, and unbundled charges.</p>
             </div>
-            <div class="step-item">
+            <div>
                 <div class="step-num">3</div>
-                <div>
-                    <div class="step-h">Act</div>
-                    <p class="step-p">Download your dispute letter and phone script. Pre-filled with your specific charges and Medicare benchmarks.</p>
-                </div>
+                <div class="step-h">Act</div>
+                <p class="step-p">Download your dispute letter and phone script, pre-filled with your specific charges.</p>
             </div>
         </div>
         <div style="text-align: center; margin-top: 48px;">
-            <a href="/scan" class="btn-green" style="padding: 16px 36px; font-size: 1.05rem;">Scan My Bill Free →</a>
-            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.35); margin-top: 12px;">
+            <a href="/scan" class="btn btn-white" style="padding: 14px 32px; font-size: 1rem;">Scan My Bill Free &rarr;</a>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 12px;">
                 No account required. Your bill is not stored after analysis.
             </p>
         </div>
     </div>
 </section>
 
-<!-- ========== SECTION 7: DATA BEHIND BILLKARMA ========== -->
-<section class="section-pad" style="background: #fff;">
-    <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; margin-bottom: 48px;">
-            BillKarma analyzes pricing data from every U.S. hospital
-        </h2>
-        <div class="data-grid">
-            <div>
-                <p style="color: #374151; line-height: 1.7; margin-bottom: 20px;">
-                    We download and parse the CMS-mandated price transparency files that every U.S. hospital is required to post. We compare each hospital's gross charges to the 2026 Medicare Outpatient Prospective Payment System (OPPS) rates for the same CPT codes. The result is a markup ratio and a billing grade for every hospital in America.
-                </p>
-                <p style="color: #374151; line-height: 1.7; margin-bottom: 24px;">
-                    Grades are updated when hospitals post new price files. Approximately 28% of hospitals post files too incomplete to grade — we flag these as ungraded rather than assigning a score we can't defend.
-                </p>
-                <div>
-                    <span class="data-pill">CMS Price Transparency Files</span>
-                    <span class="data-pill">2026 Medicare OPPS Final Rule</span>
-                    <span class="data-pill">CMS Hospital Compare</span>
-                    <span class="data-pill">RAND Corporation</span>
-                    <span class="data-pill">Health Affairs</span>
-                </div>
-                <div style="margin-top: 24px;">
-                    <a href="/guides/hospital-billing-grades-explained" class="link-arrow">Read our methodology →</a>
-                </div>
-            </div>
-            <div>
-                <div class="data-callout fade-up">
-                    <div class="data-callout-num">9.7x</div>
-                    <div class="data-callout-label">Highest average markup in our database</div>
-                </div>
-                <div class="data-callout fade-up">
-                    <div class="data-callout-num">28%</div>
-                    <div class="data-callout-label">Of hospitals post incomplete price files</div>
-                </div>
-                <div class="data-callout fade-up">
-                    <div class="data-callout-num">$1,159</div>
-                    <div class="data-callout-label">Medicare rate for a knee replacement. Average hospital charges $8,400.</div>
-                </div>
-            </div>
-        </div>
+<!-- ========== GUIDES ========== -->
+{% if featured_guides %}
+<div class="container" style="margin-bottom: 80px;">
+    <h2 class="section-heading" style="margin-bottom: 32px;">Understand your rights</h2>
+    <div class="guide-grid">
+        {% for g in featured_guides %}
+        <a href="/guides/{{ g.slug }}" class="guide-card fade-up">
+            <div class="guide-card-title">{{ g.title }}</div>
+            <p class="guide-card-desc">{{ g.meta_description }}</p>
+            <div class="guide-card-meta">{{ g.reading_time|default(5) }} min read &middot; Read &rarr;</div>
+        </a>
+        {% endfor %}
     </div>
-</section>
-
-<!-- ========== SECTION 8: GUIDES ========== -->
-<section class="section-pad" style="background: #F7F8FA;">
-    <div class="section-inner">
-        <h2 class="h-section" style="color: #111827; margin-bottom: 40px;">
-            Understand your rights before you pay
-        </h2>
-        <div class="guide-grid">
-            {% for g in featured_guides %}
-            <a href="/guides/{{ g.slug }}" class="guide-card fade-up">
-                <div class="guide-card-title">{{ g.title }}</div>
-                <p class="guide-card-desc">{{ g.meta_description }}</p>
-                <div class="guide-card-meta">{{ g.reading_time|default(5) }} min read · Read →</div>
-            </a>
-            {% endfor %}
-        </div>
-        <p style="text-align: center; margin-top: 32px;">
-            <a href="/guides/" class="link-arrow">View all guides →</a>
-        </p>
-    </div>
-</section>
-
-<!-- ========== SECTION 9: FINAL CTA ========== -->
-<section class="section-pad" style="background: #0A1628;">
-    <div class="section-inner" style="max-width: 900px;">
-        <h2 class="h-section" style="text-align: center; margin-bottom: 40px;">
-            Ready to find out what your hospital really charges?
-        </h2>
-        <div class="cta-pair">
-            <div class="cta-card">
-                <div class="cta-card-h">Check your hospital</div>
-                <p class="cta-card-p">
-                    See their billing grade, common procedure prices, and how they compare to nearby alternatives.
-                </p>
-                <a href="/hospitals/" class="btn-outline">Search Hospitals →</a>
-            </div>
-            <div class="cta-card">
-                <div class="cta-card-h">Review your bill</div>
-                <p class="cta-card-p">
-                    Upload your itemized bill for a free line-item comparison against Medicare rates.
-                </p>
-                <a href="/scan" class="btn-green">Scan My Bill →</a>
-            </div>
-        </div>
-    </div>
-</section>
+    <p style="text-align: center; margin-top: 24px;">
+        <a href="/guides/" style="color: var(--c-green); font-weight: 600; text-decoration: none; font-size: 0.95rem;">View all guides &rarr;</a>
+    </p>
+</div>
+{% endif %}
 
 <!-- ========== FOOTER ========== -->
-<footer class="section-pad" style="background: #070E1A; padding-top: 64px; padding-bottom: 40px;">
-    <div class="section-inner">
-        <div class="bk-footer-grid">
-            <div class="footer-col">
-                <div class="footer-col-title">Product</div>
-                <a href="/hospitals/">Hospital Directory</a>
-                <a href="/procedures/">Procedure Costs</a>
-                <a href="/compare/">Compare Hospitals</a>
-                <a href="/scan">Scan My Bill</a>
-                <a href="/calculator">Medicare Calculator</a>
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div style="max-width: 300px;">
+                <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">BillKarma</div>
+                <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">
+                    Helping patients fight back against opaque medical billing since 2023.
+                </p>
             </div>
-            <div class="footer-col">
-                <div class="footer-col-title">Learn</div>
-                <a href="/guides/hospital-billing-grades-explained">How Billing Grades Work</a>
-                <a href="/guides/common-hospital-billing-errors">Common Billing Errors</a>
-                <a href="/guides/for-profit-vs-nonprofit-hospital-billing">For-Profit vs Nonprofit</a>
-                <a href="/guides/private-equity-hospital-billing">Private Equity Hospitals</a>
-                <a href="/guides/">All Guides</a>
-            </div>
-            <div class="footer-col">
-                <div class="footer-col-title">About</div>
-                <a href="/guides/hospital-billing-grades-explained">Our Methodology</a>
-                <a href="https://www.cms.gov" target="_blank" rel="noopener">Data Sources (CMS.gov)</a>
-                <a href="/guides/hospital-price-transparency">Price Transparency Rules</a>
-                <span style="display: block; color: rgba(255,255,255,0.4); font-size: 0.8rem; padding: 4px 0; line-height: 1.5; margin-top: 8px;">Not medical, legal, or financial advice.</span>
+            <div style="display: flex; gap: 64px;">
+                <div class="footer-col">
+                    <div class="footer-col-title">Platform</div>
+                    <a href="/hospitals/">Search Hospitals</a>
+                    <a href="/scan">Scan Bill</a>
+                    <a href="/procedures/">Procedure Costs</a>
+                    <a href="/compare/">Compare</a>
+                    <a href="/calculator">Medicare Calculator</a>
+                    <a href="/guides/hospital-billing-grades-explained">Methodology</a>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Company</div>
+                    <a href="/guides/hospital-billing-grades-explained">About</a>
+                    <a href="https://www.cms.gov" target="_blank" rel="noopener">Data Sources</a>
+                    <a href="/guides/">All Guides</a>
+                    <span style="display: block; color: #9CA3AF; font-size: 0.78rem; padding: 3px 0; margin-top: 8px;">Not medical, legal, or financial advice.</span>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" style="color: rgba(255,255,255,0.5); text-decoration: underline;" target="_blank" rel="noopener">CMS.gov</a>. Not medical, legal, or financial advice. Hospital billing grades are based on publicly available price transparency data.
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--c-gray-border); font-size: 0.78rem; color: var(--c-gray-text);">
+            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" style="color: var(--c-gray-text); text-decoration: underline;" target="_blank" rel="noopener">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
         </div>
     </div>
 </footer>
