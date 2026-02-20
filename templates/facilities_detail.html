@@ -1,13 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.name }} {{ label }} Prices & Grade | BillKarma{% endblock %}
+{% block title %}{{ data.seo.page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
+{% endblock %}
 
 {% block content %}
 <section class="max-w-6xl mx-auto px-5 py-10">
     <div class="mb-5">
         <div class="text-sm text-gray-500 mb-1">{{ label }}</div>
         <h1 class="text-3xl font-bold text-gray-900">{{ data.name }}</h1>
-        <div class="text-sm text-gray-600 mt-1">{{ data.city }}, {{ data.state }} {{ data.zip or "" }}</div>
+        <div class="text-sm text-gray-600 mt-1">{{ data.city }}, {{ data.state }} {{ data.zip or "" }}{% if data.phone %} · {{ data.phone }}{% endif %}</div>
         <div class="flex flex-wrap gap-2 mt-3">
             <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">
                 Grade {{ data.billing_grade or "N/A" }}
@@ -17,11 +23,17 @@
             </span>
             {% if data.avg_markup %}
             <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
-                Avg {{ "%.1fx"|format(data.avg_markup) }} benchmark
+                Avg {{ "%.1fx"|format(data.avg_markup) }} {{ "ASC benchmark" if data.facility_type == "asc" else "Medicare benchmark" }}
             </span>
             {% endif %}
         </div>
     </div>
+
+    {% if data.facility_type == "asc" and data.is_hospital_owned and data.parent_system %}
+    <div class="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        Owned by {{ data.parent_system }}. Hospital-owned surgery centers often price higher than independent ASCs.
+    </div>
+    {% endif %}
 
     {% if data.asc_specialties %}
     <div class="mb-5">
@@ -45,29 +57,150 @@
     </div>
     {% endif %}
 
-    <div class="rounded-lg border border-gray-200 overflow-hidden bg-white">
+    {% if data.nearest_hospital_comparison %}
+    <div class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-5">
+        <h2 class="text-lg font-bold text-blue-900 mb-2">vs. Hospital Comparison</h2>
+        <p class="text-sm text-blue-800">
+            This {{ "surgery center" if data.facility_type == "asc" else "imaging center" }} charges an average of
+            <strong>{{ "%.1fx"|format(data.avg_markup or 0) }}</strong>
+            {{ "the ASC Medicare rate" if data.facility_type == "asc" else "Medicare rates" }}.
+            Compared to the nearest hospital with overlapping procedures,
+            this center is typically
+            <strong>{{ "%.1f"|format(data.nearest_hospital_comparison.pct_less_than_hospital|abs) }}% {{ "cheaper" if data.nearest_hospital_comparison.pct_less_than_hospital >= 0 else "more expensive" }}</strong>.
+        </p>
+        <p class="text-sm text-blue-800 mt-2">
+            Nearest hospital:
+            <a class="underline font-semibold" href="/hospitals/{{ data.nearest_hospital_comparison.hospital.state_slug }}/{{ data.nearest_hospital_comparison.hospital.city_slug }}/{{ data.nearest_hospital_comparison.hospital.slug }}/">
+                {{ data.nearest_hospital_comparison.hospital.name }}
+            </a>
+            · Grade {{ data.nearest_hospital_comparison.hospital.billing_grade or "N/A" }}
+            · {{ "%.1f"|format(data.nearest_hospital_comparison.hospital.distance_miles) }} mi
+            · {{ "%.1fx"|format(data.nearest_hospital_comparison.hospital.avg_markup_vs_medicare or 0) }} Medicare
+        </p>
+        <a class="inline-block mt-3 text-sm font-semibold text-accent-700 underline"
+           href="/compare/?facility-a={{ data.facility_id }}&facility-b={{ data.nearest_hospital_comparison.hospital.facility_id }}">
+            See full comparison →
+        </a>
+    </div>
+    {% endif %}
+
+    {% if data.facility_type == "imaging_center" and data.cash_callouts %}
+    <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-5">
+        <h2 class="text-lg font-bold text-green-900 mb-2">Walk-in vs. Referred Pricing</h2>
+        {% for row in data.cash_callouts %}
+        <p class="text-sm text-green-800">
+            Cash price for {{ row.description }}: <strong>${{ "{:,.0f}".format(row.cash_price) }}</strong>
+            ({{ row.discount_pct }}% less than standard charge). Ask about self-pay rates when scheduling.
+        </p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if data.facility_type == "imaging_center" and data.imaging_groups %}
+    <div class="space-y-6">
+        {% for group in data.imaging_groups %}
+        <div class="rounded-lg border border-gray-200 overflow-hidden bg-white">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                <h2 class="font-bold text-gray-800">{{ group.modality }}</h2>
+            </div>
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 border-b border-gray-100">
+                        <th class="px-4 py-2 font-semibold">CPT</th>
+                        <th class="px-4 py-2 font-semibold">Scan Type</th>
+                        <th class="px-4 py-2 font-semibold">This Center</th>
+                        <th class="px-4 py-2 font-semibold">Medicare</th>
+                        <th class="px-4 py-2 font-semibold">Markup</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in group.rows %}
+                    <tr class="border-b border-gray-100">
+                        <td class="px-4 py-2 font-mono">{{ row.cpt_code }}</td>
+                        <td class="px-4 py-2">{{ row.description or "N/A" }}</td>
+                        <td class="px-4 py-2">{% if row.this_charge %}${{ "{:,.0f}".format(row.this_charge) }}{% else %}N/A{% endif %}</td>
+                        <td class="px-4 py-2">{% if row.benchmark_rate %}${{ "{:,.0f}".format(row.benchmark_rate) }}{% else %}N/A{% endif %}</td>
+                        <td class="px-4 py-2">{% if row.markup_ratio %}{{ "%.1fx"|format(row.markup_ratio) }}{% else %}N/A{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="rounded-lg border border-gray-200 overflow-hidden bg-white mb-6">
         <table class="min-w-full text-sm">
             <thead>
                 <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
                     <th class="px-4 py-3 font-semibold">CPT</th>
                     <th class="px-4 py-3 font-semibold">Procedure</th>
-                    <th class="px-4 py-3 font-semibold">Charge</th>
-                    <th class="px-4 py-3 font-semibold">Benchmark</th>
+                    <th class="px-4 py-3 font-semibold">This {{ "ASC" if data.facility_type == "asc" else "Center" }}</th>
+                    {% if data.facility_type == "asc" and data.nearest_hospital_comparison %}
+                    <th class="px-4 py-3 font-semibold">Nearest Hospital</th>
+                    {% endif %}
+                    <th class="px-4 py-3 font-semibold">{{ "ASC Medicare" if data.facility_type == "asc" else "Medicare" }}</th>
                     <th class="px-4 py-3 font-semibold">Markup</th>
                 </tr>
             </thead>
             <tbody>
-                {% for p in data.prices %}
+                {% set cmp_map = {} %}
+                {% if data.nearest_hospital_comparison %}
+                    {% for r in data.nearest_hospital_comparison.comparison_rows %}
+                        {% set _ = cmp_map.update({r.cpt_code: r}) %}
+                    {% endfor %}
+                {% endif %}
+                {% for p in data.prices[:30] %}
                 <tr class="border-b border-gray-100">
                     <td class="px-4 py-3 font-mono">{{ p.cpt_code }}</td>
                     <td class="px-4 py-3">{{ p.description or "N/A" }}</td>
-                    <td class="px-4 py-3">{% if p.gross_charge %}${{ "{:,.0f}".format(p.gross_charge) }}{% else %}N/A{% endif %}</td>
+                    {% set cmp = cmp_map.get(p.cpt_code) %}
+                    <td class="px-4 py-3 {% if cmp and cmp.is_cheaper %}text-green-700{% elif cmp %}text-red-700{% endif %}">
+                        {% if p.this_charge %}${{ "{:,.0f}".format(p.this_charge) }}{% else %}N/A{% endif %}
+                    </td>
+                    {% if data.facility_type == "asc" and data.nearest_hospital_comparison %}
+                    <td class="px-4 py-3 text-gray-600">
+                        {% if cmp and cmp.hospital_charge %}${{ "{:,.0f}".format(cmp.hospital_charge) }}{% else %}N/A{% endif %}
+                    </td>
+                    {% endif %}
                     <td class="px-4 py-3">{% if p.benchmark_rate %}${{ "{:,.0f}".format(p.benchmark_rate) }}{% else %}N/A{% endif %}</td>
-                    <td class="px-4 py-3">{% if p.markup_vs_medicare %}{{ "%.1fx"|format(p.markup_vs_medicare) }}{% else %}N/A{% endif %}</td>
+                    <td class="px-4 py-3">{% if p.markup_ratio %}{{ "%.1fx"|format(p.markup_ratio) }}{% else %}N/A{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-lg border border-gray-200 bg-white p-4">
+            <h3 class="font-bold text-gray-900 mb-2">
+                {% if data.facility_type == "asc" %}Nearby Surgery Centers{% else %}Other Imaging Centers within 25 miles{% endif %}
+            </h3>
+            <div class="space-y-2 text-sm">
+                {% for row in data.nearby_same_type %}
+                <div>
+                    <a class="underline text-accent-700" href="{{ row.profile_url }}">{{ row.name }}</a>
+                    <span class="text-gray-500"> · {{ row.distance_miles }} mi · Grade {{ row.billing_grade or "N/A" }}</span>
+                </div>
+                {% else %}
+                <div class="text-gray-500">No nearby facilities found.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="rounded-lg border border-gray-200 bg-white p-4">
+            <h3 class="font-bold text-gray-900 mb-2">Nearby Hospitals</h3>
+            <div class="space-y-2 text-sm">
+                {% for row in data.nearby_hospitals %}
+                <div>
+                    <a class="underline text-accent-700" href="{{ row.profile_url }}">{{ row.name }}</a>
+                    <span class="text-gray-500"> · {{ row.distance_miles }} mi · Grade {{ row.billing_grade or "N/A" }}</span>
+                </div>
+                {% else %}
+                <div class="text-gray-500">No nearby hospitals found.</div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

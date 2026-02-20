@@ -222,6 +222,39 @@ class TestHospitalSeoPages:
         assert resp.status_code == 200
         assert "Location map unavailable for this hospital." in resp.text
 
+    def test_df_hospital_shows_surgery_center_alternative_callout(self):
+        _seed_hospital()
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT OR REPLACE INTO facilities (
+                    facility_id, name, city, state, state_slug, city_slug, slug, facility_type, lat, lon, is_hospital_owned
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("asc-near-1", "Nearby ASC One", "Hollywood", "FL", "fl", "hollywood", "nearby-asc-one", "asc", 26.02, -80.18, 0),
+            )
+            db.execute(
+                """
+                INSERT OR REPLACE INTO facility_billing_metrics (
+                    facility_id, facility_type, avg_markup, procedures_compared, billing_grade, benchmark_type
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                ("asc-near-1", "asc", 2.2, 12, "B", "asc"),
+            )
+            db.execute(
+                """
+                INSERT OR REPLACE INTO procedure_prices (
+                    facility_id, cpt_code, description, gross_charge, medicare_benchmark_rate,
+                    markup_vs_medicare, data_year, facility_type, medicare_benchmark_type
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("asc-near-1", "99285", "ER visit level 5", 900.0, 250.0, 3.6, 2026, "asc", "asc"),
+            )
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert "Lower-cost alternatives for elective procedures" in resp.text
+        assert "Nearby ASC One" in resp.text
+
     def test_top_stat_never_shows_directory_status(self):
         upsert_hospital_row(
             {

@@ -15,7 +15,7 @@ os.environ["DB_PATH"] = ":memory:"
 import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
-from hospital_etl import auto_map_columns, first, get_medicare_rate_for_facility, load_hcahps, normalize_price_rows, upsert_hospital_price  # noqa: E402
+from hospital_etl import auto_map_columns, first, get_medicare_rate_for_facility, load_hcahps, normalize_price_rows, refresh_facility_transparency, upsert_facility_procedure_price, upsert_hospital_price  # noqa: E402
 from hospital_seo import clear_comparison_cache, get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
 
 
@@ -42,6 +42,14 @@ def test_normalize_price_rows_keeps_valid_cpt():
     norm = normalize_price_rows(rows)
     assert len(norm) == 1
     assert norm[0]["cpt_code"] == "99285"
+
+
+def test_normalize_price_rows_extracts_modifier_from_code_suffix():
+    rows = [{"cpt_code": "70553-26", "description": "MRI pro fee", "gross_charge": "900"}]
+    norm = normalize_price_rows(rows)
+    assert len(norm) == 1
+    assert norm[0]["cpt_code"] == "70553"
+    assert norm[0]["cpt_modifier"] == "26"
 
 
 def test_metrics_compute_grade_and_benchmarks():
@@ -266,3 +274,141 @@ def test_locality_aware_medicare_rate_lookup():
         )
     rate = get_medicare_rate_for_facility("93001", "99285")
     assert rate == 410.0
+
+
+def test_upsert_facility_procedure_price_asc_uses_asc_rate():
+    _db._connection = None
+    _db.init_db()
+
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT INTO facilities (facility_id, name, city, state, state_slug, city_slug, slug, facility_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'asc')
+            """,
+            ("asc100", "ASC One", "Miami", "FL", "fl", "miami", "asc-one-miami-surgery-center"),
+        )
+        conn.execute(
+            """
+            INSERT INTO asc_medicare_rates (cpt_code, description, medicare_asc_rate, effective_year, is_covered_asc_procedure)
+            VALUES ('45378', 'COLONOSCOPY', 164.0, 2026, 1)
+            """
+        )
+
+    upsert_facility_procedure_price(
+        "asc100",
+        {"cpt_code": "45378", "description": "COLONOSCOPY", "gross_charge": 820.0},
+        "asc",
+        data_year=2026,
+    )
+
+    with get_db() as conn:
+        row = conn.execute(
+            """
+            SELECT facility_type, medicare_benchmark_type, medicare_benchmark_rate, markup_vs_medicare
+            FROM procedure_prices
+            WHERE facility_id = 'asc100' AND cpt_code = '45378' AND data_year = 2026
+            """
+        ).fetchone()
+    assert row is not None
+    assert row["facility_type"] == "asc"
+    assert row["medicare_benchmark_type"] == "asc"
+    assert round(row["medicare_benchmark_rate"], 2) == 164.00
+    assert round(row["markup_vs_medicare"], 1) == 5.0
+
+
+def test_upsert_facility_procedure_price_imaging_modifier_uses_pfs():
+    _db._connection = None
+    _db.init_db()
+
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT INTO facilities (facility_id, name, city, state, state_slug, city_slug, zip, slug, facility_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'imaging_center')
+            """,
+            ("img100", "Imaging One", "Miami", "FL", "fl", "miami", "33101", "imaging-one-miami-imaging-center"),
+        )
+        conn.execute(
+            "INSERT INTO zip_locality_map (zip_prefix, locality, state, region) VALUES ('331', 'L001', 'FL', 'South')"
+        )
+        conn.execute(
+            """
+            INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year)
+            VALUES ('70553', 'L001', 210.0, 220.0, 2026)
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO hospital_opps_rates (cpt_code, apc, description, national_payment_rate, effective_year)
+            VALUES ('70553', '5571', 'MRI', 317.0, 2026)
+            """
+        )
+
+    upsert_facility_procedure_price(
+        "img100",
+        {"cpt_code": "70553", "cpt_modifier": "26", "description": "MRI brain", "gross_charge": 840.0},
+        "imaging_center",
+        data_year=2026,
+    )
+
+    with get_db() as conn:
+        row = conn.execute(
+            """
+            SELECT medicare_benchmark_type, medicare_benchmark_rate
+            FROM procedure_prices
+            WHERE facility_id = 'img100' AND cpt_code = '70553' AND data_year = 2026
+            """
+        ).fetchone()
+    assert row is not None
+    assert row["medicare_benchmark_type"] == "pfs"
+    assert round(row["medicare_benchmark_rate"], 2) == 210.00
+
+
+def test_refresh_facility_transparency_tracks_non_hospital_parse_results():
+    _db._connection = None
+    _db.init_db()
+    tmp_dir = tempfile.mkdtemp(prefix="asc-transparency-")
+    csv_path = os.path.join(tmp_dir, "asc-two-miami-surgery-center.csv")
+    with open(csv_path, "w", encoding="utf-8") as f:
+        f.write("cpt_code,description,gross_charge,cash_price\n45378,COLONOSCOPY,900,600\n")
+
+    try:
+        with get_db() as conn:
+            conn.execute(
+                """
+                INSERT INTO facilities (facility_id, name, city, state, state_slug, city_slug, slug, facility_type)
+                VALUES ('asc200', 'ASC Two', 'Miami', 'FL', 'fl', 'miami', 'asc-two-miami-surgery-center', 'asc')
+                """
+            )
+            conn.execute(
+                """
+                INSERT INTO asc_medicare_rates (cpt_code, description, medicare_asc_rate, effective_year, is_covered_asc_procedure)
+                VALUES ('45378', 'COLONOSCOPY', 180.0, 2026, 1)
+                """
+            )
+
+        summary = refresh_facility_transparency(
+            selected=[{"facility_id": "asc200", "facility_type": "asc", "slug": "asc-two-miami-surgery-center"}],
+            files_dir=os.path.dirname(csv_path),
+            data_year=2026,
+        )
+        assert summary["parsed"] == 1
+
+        with get_db() as conn:
+                parse_row = conn.execute(
+                    "SELECT facility_type, parse_status FROM transparency_parse_results WHERE facility_id = 'asc200'"
+                ).fetchone()
+                price_row = conn.execute(
+                    "SELECT facility_type, medicare_benchmark_type FROM procedure_prices WHERE facility_id = 'asc200' AND cpt_code = '45378'"
+                ).fetchone()
+        assert parse_row is not None
+        assert parse_row["facility_type"] == "asc"
+        assert parse_row["parse_status"] == "parsed"
+        assert price_row is not None
+        assert price_row["facility_type"] == "asc"
+        assert price_row["medicare_benchmark_type"] == "asc"
+    finally:
+        if os.path.exists(csv_path):
+            os.unlink(csv_path)
+        os.rmdir(tmp_dir)

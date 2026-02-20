@@ -25,6 +25,21 @@ _GRADE_BADGE = {
     "D": "bg-orange-100 text-orange-700",
     "F": "bg-red-100 text-red-700",
 }
+_ALL_PRICES_CTE = """
+WITH all_prices AS (
+    SELECT
+        facility_id, cpt_code, description, gross_charge,
+        medicare_rate, markup_vs_medicare,
+        facility_type, medicare_benchmark_type, medicare_benchmark_rate
+    FROM hospital_prices
+    UNION ALL
+    SELECT
+        facility_id, cpt_code, description, gross_charge,
+        medicare_rate, markup_vs_medicare,
+        facility_type, medicare_benchmark_type, medicare_benchmark_rate
+    FROM procedure_prices
+)
+"""
 
 
 def search_hospitals_for_compare(query: str, limit: int = 10) -> list[dict]:
@@ -59,7 +74,7 @@ def search_hospitals_for_compare(query: str, limit: int = 10) -> list[dict]:
 
 
 def get_hospital_for_compare(facility_id: str) -> dict | None:
-    """Return core stats for one hospital, or None if not found."""
+    """Return core stats for one provider, or None if not found."""
     with get_db() as db:
         row = db.execute(
             """
@@ -79,6 +94,25 @@ def get_hospital_for_compare(facility_id: str) -> dict | None:
             """,
             (facility_id,),
         ).fetchone()
+        if not row:
+            row = db.execute(
+                """
+                SELECT
+                    f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug,
+                    f.ownership_type AS ownership, NULL AS is_nonprofit, NULL AS cms_star_rating, NULL AS bed_count,
+                    f.lat, f.lon,
+                    fm.billing_grade, fm.avg_markup AS avg_markup_vs_medicare, fm.procedures_compared,
+                    NULL AS state_rank, NULL AS national_percentile,
+                    NULL AS parse_status, NULL AS procedures_extracted, NULL AS has_standard_codes,
+                    NULL AS charity_care_pct, NULL AS charity_care_pct_revenue,
+                    NULL AS has_financial_assistance_policy, NULL AS nonprofit_status,
+                    f.facility_type
+                FROM facilities f
+                LEFT JOIN facility_billing_metrics fm ON fm.facility_id = f.facility_id
+                WHERE f.facility_id = ?
+                """,
+                (facility_id,),
+            ).fetchone()
     if not row:
         return None
     d = dict(row)
@@ -88,6 +122,7 @@ def get_hospital_for_compare(facility_id: str) -> dict | None:
     d["ownership_label"] = _ownership_display_label(d.get("ownership"))
     d["grade_color"] = _GRADE_COLORS.get(d.get("billing_grade") or "", "#9ca3af")
     d["grade_badge"] = _GRADE_BADGE.get(d.get("billing_grade") or "", "bg-gray-100 text-gray-600")
+    d["facility_type"] = d.get("facility_type") or "hospital"
     d["has_transparency"] = bool(d.get("parse_status") in ("parsed", "partial"))
     charity = d.get("charity_care_pct_revenue") or d.get("charity_care_pct")
     d["charity_pct"] = round(float(charity), 1) if charity is not None else None
@@ -98,25 +133,26 @@ def get_hospital_for_compare(facility_id: str) -> dict | None:
 
 
 def get_common_procedures(fid_a: str, fid_b: str, limit: int = 20) -> list[dict]:
-    """Return procedures priced by both hospitals, sorted by biggest absolute price gap."""
+    """Return procedures priced by both facilities, sorted by biggest absolute price gap."""
     with get_db() as db:
         rows = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
                 a.cpt_code,
                 COALESCE(NULLIF(TRIM(a.description), ''), NULLIF(TRIM(b.description), '')) AS description,
                 a.gross_charge AS charge_a,
                 b.gross_charge AS charge_b,
-                a.medicare_rate,
+                COALESCE(a.medicare_benchmark_rate, a.medicare_rate) AS medicare_rate,
                 a.markup_vs_medicare AS markup_a,
                 b.markup_vs_medicare AS markup_b
-            FROM hospital_prices a
-            JOIN hospital_prices b ON b.cpt_code = a.cpt_code AND b.facility_id = ?
+            FROM all_prices a
+            JOIN all_prices b ON b.cpt_code = a.cpt_code AND b.facility_id = ?
             WHERE a.facility_id = ?
               AND a.gross_charge IS NOT NULL
               AND b.gross_charge IS NOT NULL
-              AND a.medicare_rate IS NOT NULL
-              AND a.medicare_rate > 0
+              AND COALESCE(a.medicare_benchmark_rate, a.medicare_rate) IS NOT NULL
+              AND COALESCE(a.medicare_benchmark_rate, a.medicare_rate) > 0
             ORDER BY ABS(a.gross_charge - b.gross_charge) DESC
             LIMIT ?
             """,

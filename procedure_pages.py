@@ -491,14 +491,16 @@ def get_providers_near_zip_for_cpt(
     facility_type: str = "all",
     grade_ab_only: bool = False,
     sort_by: str = "patient_cost",
+    radius_miles: float = _PROCEDURE_RADIUS_MILES,
 ) -> list[dict]:
     """Return up to `limit` providers near zip for a CPT code across facility types."""
     coords = get_zip_latlon(zip_code)
     if not coords:
         return []
     zip_lat, zip_lon = coords
-    lat_delta = _PROCEDURE_RADIUS_MILES / 69.0
-    lon_delta = _PROCEDURE_RADIUS_MILES / max(69.17 * math.cos(math.radians(zip_lat)), 0.1)
+    radius = max(5.0, min(float(radius_miles or _PROCEDURE_RADIUS_MILES), 200.0))
+    lat_delta = radius / 69.0
+    lon_delta = radius / max(69.17 * math.cos(math.radians(zip_lat)), 0.1)
     sort_key = _parse_sort(sort_by)
     normalized_type = (facility_type or "all").strip().lower()
     allowed = {"all", "hospital", "asc", "imaging_center"}
@@ -561,7 +563,7 @@ def get_providers_near_zip_for_cpt(
         if row["lat"] is None or row["lon"] is None:
             continue
         dist = _haversine_miles(zip_lat, zip_lon, row["lat"], row["lon"])
-        if dist <= _PROCEDURE_RADIUS_MILES:
+        if dist <= radius:
             if grade_ab_only and (row["billing_grade"] or "").upper() not in {"A", "B"}:
                 continue
             charge = row["gross_charge"] or 0.0
@@ -592,6 +594,7 @@ def get_hospitals_near_zip_for_cpt(cpt_code: str, zip_code: str, limit: int = 10
         facility_type="hospital",
         grade_ab_only=False,
         sort_by="patient_cost",
+        radius_miles=_PROCEDURE_RADIUS_MILES,
     )
 
 

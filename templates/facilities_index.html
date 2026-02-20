@@ -5,7 +5,34 @@
 {% block content %}
 <section class="max-w-5xl mx-auto px-5 py-10">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
-    <p class="text-gray-600 mb-6">Browse {{ label.lower() }} by state.</p>
+    {% if base_path == "/surgery-centers/" %}
+    <p class="text-gray-600 mb-3">Surgery centers perform many of the same procedures as hospital outpatient departments, often at substantially lower cost.</p>
+    {% if stats and stats.pct_less %}
+    <div class="mb-5 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-900">
+        Featured stat: Average ASC charge vs hospital outpatient is <strong>{{ "%.1f"|format(stats.pct_less) }}% less</strong> for overlapping procedures.
+    </div>
+    {% endif %}
+    <div class="mb-5 flex flex-wrap gap-2 text-sm">
+        <a class="underline text-accent-700" href="/procedures/45378/">Colonoscopy</a>
+        <a class="underline text-accent-700" href="/procedures/27447/">Knee Replacement</a>
+        <a class="underline text-accent-700" href="/procedures/27130/">Hip Replacement</a>
+    </div>
+    {% else %}
+    <p class="text-gray-600 mb-3">Compare MRI, CT, X-ray, and ultrasound pricing across independent imaging centers and hospital departments.</p>
+    {% if stats and stats.hospital_mri_avg and stats.imaging_mri_avg %}
+    <div class="mb-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        Featured stat: Average hospital MRI charge vs independent imaging center:
+        <strong>${{ "{:,.0f}".format(stats.hospital_mri_avg) }}</strong> vs
+        <strong>${{ "{:,.0f}".format(stats.imaging_mri_avg) }}</strong>.
+    </div>
+    {% endif %}
+    <div class="mb-5 flex flex-wrap gap-2 text-sm">
+        <a class="underline text-accent-700" href="/procedures/mri-cost/">MRI</a>
+        <a class="underline text-accent-700" href="/procedures/ct-scan-cost/">CT Scan</a>
+        <a class="underline text-accent-700" href="/procedures/x-ray-cost/">X-Ray</a>
+        <a class="underline text-accent-700" href="/procedures/ultrasound-cost/">Ultrasound</a>
+    </div>
+    {% endif %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {% for row in states %}
         <a href="{{ base_path }}{{ row.state_slug }}/" class="rounded border border-gray-200 bg-white p-3 hover:bg-gray-50">

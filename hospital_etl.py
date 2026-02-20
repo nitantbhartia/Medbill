@@ -7,6 +7,7 @@ import json
 import os
 import re
 import tempfile
+from glob import glob
 from urllib.error import URLError
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -200,15 +201,32 @@ def normalize_price_rows(rows: list[dict]) -> list[dict]:
     normalized = []
     for row in rows:
         code = row.get(code_col)
-        if not is_valid_cpt(str(code) if code is not None else None):
+        if code is None:
+            continue
+        cpt_code, inferred_modifier = split_cpt_modifier(str(code))
+        if not is_valid_cpt(cpt_code):
             continue
         desc = row.get(mapping.get("description", "")) if mapping.get("description") else None
         gross = parse_float(row.get(mapping.get("gross_charge", ""))) if mapping.get("gross_charge") else None
         cash = parse_float(row.get(mapping.get("cash_price", ""))) if mapping.get("cash_price") else None
         negotiated = parse_float(row.get(mapping.get("negotiated_rate", ""))) if mapping.get("negotiated_rate") else None
+        modifier = (
+            first(
+                row,
+                (
+                    "modifier",
+                    "mod",
+                    "cpt_modifier",
+                    "hcpcs_modifier",
+                    "code_modifier",
+                ),
+            )
+            or inferred_modifier
+        )
         normalized.append(
             {
-                "cpt_code": str(code).strip().upper(),
+                "cpt_code": cpt_code,
+                "cpt_modifier": normalize_modifier(modifier),
                 "description": str(desc).strip() if desc is not None else None,
                 "gross_charge": gross,
                 "cash_price": cash,
@@ -218,6 +236,29 @@ def normalize_price_rows(rows: list[dict]) -> list[dict]:
             }
         )
     return normalized
+
+
+def normalize_modifier(value: str | None) -> str | None:
+    if not value:
+        return None
+    txt = str(value).strip().upper()
+    if not txt:
+        return None
+    if txt in {"26", "TC"}:
+        return txt
+    return None
+
+
+def split_cpt_modifier(raw_code: str) -> tuple[str | None, str | None]:
+    txt = str(raw_code or "").strip().upper()
+    if not txt:
+        return None, None
+    m = re.match(r"^([A-Z0-9]{5})[-:\s]?((26|TC))$", txt)
+    if m:
+        return m.group(1), m.group(2)
+    if len(txt) == 7 and txt[:5].isalnum() and txt[5:] in {"26", "TC"}:
+        return txt[:5], txt[5:]
+    return txt, None
 
 
 def get_latest_medicare_rate(cpt_code: str) -> float | None:
@@ -237,7 +278,9 @@ def get_latest_medicare_rate(cpt_code: str) -> float | None:
 
 def _facility_zip(facility_id: str) -> str | None:
     with get_db() as db:
-        row = db.execute("SELECT zip FROM hospitals WHERE facility_id = ? LIMIT 1", (facility_id,)).fetchone()
+        row = db.execute("SELECT zip FROM facilities WHERE facility_id = ? LIMIT 1", (facility_id,)).fetchone()
+        if not row or not row["zip"]:
+            row = db.execute("SELECT zip FROM hospitals WHERE facility_id = ? LIMIT 1", (facility_id,)).fetchone()
     if not row or not row["zip"]:
         return None
     zip_digits = "".join(ch for ch in str(row["zip"]) if ch.isdigit())
@@ -262,9 +305,22 @@ def _locality_for_zip(zip_code: str | None) -> str | None:
 
 
 def get_medicare_rate_for_facility(facility_id: str, cpt_code: str) -> float | None:
-    fid = normalize_facility_id(facility_id)
-    if not fid:
+    raw = str(facility_id or "").strip()
+    if not raw:
         return None
+    normalized = normalize_facility_id(raw)
+    fid = raw
+    if normalized:
+        with get_db() as db:
+            has_normalized = db.execute(
+                "SELECT 1 FROM facilities WHERE facility_id = ? LIMIT 1",
+                (normalized,),
+            ).fetchone() or db.execute(
+                "SELECT 1 FROM hospitals WHERE facility_id = ? LIMIT 1",
+                (normalized,),
+            ).fetchone()
+        if has_normalized:
+            fid = normalized
     zip_code = _facility_zip(fid)
     locality = _locality_for_zip(zip_code)
     with get_db() as db:
@@ -293,6 +349,67 @@ def get_medicare_rate_for_facility(facility_id: str, cpt_code: str) -> float | N
             (cpt_code,),
         ).fetchone()
     return float(row["rate"]) if row and row["rate"] is not None else None
+
+
+def get_latest_opps_rate(cpt_code: str) -> float | None:
+    with get_db() as db:
+        row = db.execute(
+            """
+            SELECT national_payment_rate AS rate
+            FROM hospital_opps_rates
+            WHERE cpt_code = ?
+            ORDER BY effective_year DESC
+            LIMIT 1
+            """,
+            (cpt_code,),
+        ).fetchone()
+    return float(row["rate"]) if row and row["rate"] is not None else None
+
+
+def get_latest_asc_rate(cpt_code: str) -> tuple[float | None, bool]:
+    with get_db() as db:
+        row = db.execute(
+            """
+            SELECT medicare_asc_rate AS rate, is_covered_asc_procedure AS covered
+            FROM asc_medicare_rates
+            WHERE cpt_code = ?
+            ORDER BY effective_year DESC
+            LIMIT 1
+            """,
+            (cpt_code,),
+        ).fetchone()
+    if not row:
+        return None, False
+    return (
+        float(row["rate"]) if row["rate"] is not None else None,
+        bool(row["covered"]) if row["covered"] is not None else False,
+    )
+
+
+def resolve_benchmark_for_row(facility_id: str, facility_type: str, row: dict) -> tuple[str, float | None]:
+    cpt = row["cpt_code"]
+    modifier = normalize_modifier(row.get("cpt_modifier"))
+    ftype = (facility_type or "hospital").strip().lower()
+
+    if ftype == "asc":
+        asc_rate, covered = get_latest_asc_rate(cpt)
+        if not covered:
+            return "asc", None
+        return "asc", asc_rate
+
+    if ftype == "imaging_center":
+        # Professional component lines (26/TC) should use PFS.
+        if modifier in {"26", "TC"}:
+            return "pfs", get_medicare_rate_for_facility(facility_id, cpt)
+        opps = get_latest_opps_rate(cpt)
+        if opps is not None:
+            return "opps", opps
+        return "pfs", get_medicare_rate_for_facility(facility_id, cpt)
+
+    opps = get_latest_opps_rate(cpt)
+    if opps is not None:
+        return "opps", opps
+    return "pfs", get_medicare_rate_for_facility(facility_id, cpt)
 
 
 def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = None) -> None:
@@ -374,6 +491,70 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 None,
             ),
         )
+
+
+def upsert_facility_procedure_price(
+    facility_id: str,
+    row: dict,
+    facility_type: str,
+    data_year: int | None = None,
+) -> None:
+    ftype = (facility_type or "hospital").strip().lower()
+    if ftype not in {"hospital", "asc", "imaging_center"}:
+        ftype = "hospital"
+    raw_fid = str(facility_id or "").strip()
+    if not raw_fid:
+        return
+    facility_id = normalize_facility_id(raw_fid) if ftype == "hospital" else raw_fid
+    if not facility_id:
+        return
+    benchmark_type, benchmark_rate = resolve_benchmark_for_row(facility_id, ftype, row)
+    gross = row.get("gross_charge")
+    markup = (gross / benchmark_rate) if (gross is not None and benchmark_rate and benchmark_rate > 0) else None
+    year = data_year or date.today().year
+
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge, cash_price,
+                min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
+                medicare_rate, markup_vs_medicare, data_year,
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(facility_id, cpt_code, data_year) DO UPDATE SET
+                description=excluded.description,
+                gross_charge=excluded.gross_charge,
+                cash_price=excluded.cash_price,
+                min_negotiated_rate=excluded.min_negotiated_rate,
+                max_negotiated_rate=excluded.max_negotiated_rate,
+                avg_negotiated_rate=excluded.avg_negotiated_rate,
+                medicare_rate=excluded.medicare_rate,
+                markup_vs_medicare=excluded.markup_vs_medicare,
+                facility_type=excluded.facility_type,
+                medicare_benchmark_type=excluded.medicare_benchmark_type,
+                medicare_benchmark_rate=excluded.medicare_benchmark_rate
+            """,
+            (
+                facility_id,
+                row["cpt_code"],
+                row.get("description"),
+                row.get("gross_charge"),
+                row.get("cash_price"),
+                row.get("min_negotiated_rate"),
+                row.get("max_negotiated_rate"),
+                row.get("avg_negotiated_rate"),
+                benchmark_rate,
+                markup,
+                year,
+                ftype,
+                benchmark_type,
+                benchmark_rate,
+            ),
+        )
+
+    if ftype == "hospital":
+        upsert_hospital_price(facility_id, row, data_year=year)
 
 
 def _parse_cms_lat_lon(row: dict) -> tuple[float | None, float | None]:
@@ -709,6 +890,25 @@ def load_transparency_index(path: str) -> int:
                 """,
                 (fid, url),
             )
+            ftype_row = db.execute(
+                "SELECT facility_type FROM facilities WHERE facility_id = ? LIMIT 1",
+                (fid,),
+            ).fetchone()
+            facility_type = (ftype_row["facility_type"] if ftype_row and ftype_row["facility_type"] else "hospital")
+            db.execute(
+                """
+                INSERT INTO transparency_parse_results (
+                    facility_id, facility_type, file_url, parse_status, last_downloaded
+                ) VALUES (?, ?, ?, 'pending', CURRENT_DATE)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    facility_type=excluded.facility_type,
+                    file_url=excluded.file_url,
+                    parse_status='pending',
+                    last_downloaded=CURRENT_DATE,
+                    updated_at=CURRENT_TIMESTAMP
+                """,
+                (fid, facility_type, url),
+            )
             count += 1
 
     log_refresh("transparency_index", count, "success")
@@ -727,6 +927,156 @@ def select_top_hospitals_by_beds(limit: int = 300) -> list[dict]:
             (limit,),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def select_facilities_for_transparency(
+    facility_types: tuple[str, ...] = ("hospital", "asc", "imaging_center"),
+    limit: int | None = None,
+) -> list[dict]:
+    placeholders = ",".join("?" for _ in facility_types)
+    limit_sql = "LIMIT ?" if limit else ""
+    params: list[object] = [*facility_types]
+    if limit:
+        params.append(limit)
+    with get_db() as db:
+        rows = db.execute(
+            f"""
+            SELECT facility_id, facility_type, name, slug
+            FROM facilities
+            WHERE facility_type IN ({placeholders})
+            ORDER BY CASE WHEN facility_type = 'hospital' THEN 0 WHEN facility_type = 'asc' THEN 1 ELSE 2 END,
+                     name
+            {limit_sql}
+            """,
+            tuple(params),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _update_parse_result(
+    db,
+    facility_id: str,
+    facility_type: str,
+    file_url: str | None,
+    *,
+    file_format: str | None = None,
+    file_size_mb: float | None = None,
+    has_standard_codes: int | None = None,
+    parse_status: str,
+    parse_notes: str | None = None,
+    row_count: int | None = None,
+    procedures_extracted: int | None = None,
+) -> None:
+    db.execute(
+        """
+        INSERT INTO transparency_parse_results (
+            facility_id, facility_type, file_url, file_format, file_size_mb,
+            has_standard_codes, parse_status, parse_notes, row_count, procedures_extracted,
+            last_parsed, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, CURRENT_TIMESTAMP)
+        ON CONFLICT(facility_id) DO UPDATE SET
+            facility_type=excluded.facility_type,
+            file_url=excluded.file_url,
+            file_format=excluded.file_format,
+            file_size_mb=excluded.file_size_mb,
+            has_standard_codes=excluded.has_standard_codes,
+            parse_status=excluded.parse_status,
+            parse_notes=excluded.parse_notes,
+            row_count=excluded.row_count,
+            procedures_extracted=excluded.procedures_extracted,
+            last_parsed=CURRENT_DATE,
+            updated_at=CURRENT_TIMESTAMP
+        """,
+        (
+            facility_id,
+            facility_type,
+            file_url,
+            file_format,
+            file_size_mb,
+            has_standard_codes,
+            parse_status,
+            parse_notes,
+            row_count,
+            procedures_extracted,
+        ),
+    )
+
+
+def _update_hospital_transparency_file(
+    db,
+    facility_id: str,
+    file_url: str | None,
+    *,
+    file_format: str | None = None,
+    file_size_mb: float | None = None,
+    has_standard_codes: int | None = None,
+    parse_status: str,
+    parse_notes: str | None = None,
+    row_count: int | None = None,
+    procedures_extracted: int | None = None,
+) -> None:
+    db.execute(
+        """
+        INSERT INTO transparency_files (
+            facility_id, file_url, file_format, file_size_mb, has_standard_codes,
+            parse_status, parse_notes, row_count, procedures_extracted, last_parsed
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE)
+        ON CONFLICT(facility_id) DO UPDATE SET
+            file_url=excluded.file_url,
+            file_format=excluded.file_format,
+            file_size_mb=excluded.file_size_mb,
+            has_standard_codes=excluded.has_standard_codes,
+            parse_status=excluded.parse_status,
+            parse_notes=excluded.parse_notes,
+            row_count=excluded.row_count,
+            procedures_extracted=excluded.procedures_extracted,
+            last_parsed=CURRENT_DATE
+        """,
+        (
+            facility_id,
+            file_url,
+            file_format,
+            file_size_mb,
+            has_standard_codes,
+            parse_status,
+            parse_notes,
+            row_count,
+            procedures_extracted,
+        ),
+    )
+
+
+def _resolve_file_url(db, facility_id: str, facility_type: str) -> str | None:
+    pr = db.execute(
+        "SELECT file_url FROM transparency_parse_results WHERE facility_id = ?",
+        (facility_id,),
+    ).fetchone()
+    if pr and pr["file_url"]:
+        return str(pr["file_url"])
+    if facility_type == "hospital":
+        tf = db.execute(
+            "SELECT file_url FROM transparency_files WHERE facility_id = ?",
+            (facility_id,),
+        ).fetchone()
+        if tf and tf["file_url"]:
+            return str(tf["file_url"])
+    return None
+
+
+def _guess_local_file(files_dir: str, facility_id: str, slug: str | None) -> str | None:
+    if not files_dir:
+        return None
+    patterns = [facility_id, normalize_facility_id(facility_id)]
+    if slug:
+        patterns.append(slug)
+    for p in patterns:
+        if not p:
+            continue
+        for ext in ("csv", "json", "xlsx"):
+            matches = glob(os.path.join(files_dir, f"*{p}*.{ext}"))
+            if matches:
+                return matches[0]
+    return None
 
 
 def parse_transparency_file(path: str) -> tuple[list[dict], str, str]:
@@ -749,19 +1099,30 @@ def parse_transparency_file(path: str) -> tuple[list[dict], str, str]:
 
 
 def refresh_top300_transparency(files_dir: str = "", data_year: int | None = None) -> dict:
-    selected = select_top_hospitals_by_beds(limit=300)
+    selected = [{"facility_id": r["facility_id"], "facility_type": "hospital", "slug": None} for r in select_top_hospitals_by_beds(limit=300)]
+    return refresh_facility_transparency(selected=selected, files_dir=files_dir, data_year=data_year)
+
+
+def refresh_facility_transparency(
+    selected: list[dict] | None = None,
+    files_dir: str = "",
+    data_year: int | None = None,
+    facility_types: tuple[str, ...] = ("hospital", "asc", "imaging_center"),
+    limit: int | None = None,
+) -> dict:
+    selected = selected or select_facilities_for_transparency(facility_types=facility_types, limit=limit)
     parsed = 0
     failed = 0
     missing = 0
 
     with get_db() as db:
-        for h in selected:
-            fid = h["facility_id"]
-            row = db.execute(
-                "SELECT file_url FROM transparency_files WHERE facility_id = ?",
-                (fid,),
-            ).fetchone()
-            file_url = row["file_url"] if row else None
+        for item in selected:
+            facility_type = (item.get("facility_type") or "hospital").strip().lower()
+            raw_fid = str(item.get("facility_id") or "").strip()
+            fid = normalize_facility_id(raw_fid) if facility_type == "hospital" else raw_fid
+            if not fid:
+                continue
+            file_url = _resolve_file_url(db, fid, facility_type)
             local_path = None
             temp_download = None
 
@@ -783,21 +1144,27 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
                             temp_download = tmp.name
                             local_path = temp_download
                 except (TimeoutError, URLError, OSError):
-                    db.execute(
-                        """
-                        INSERT INTO transparency_files (
-                            facility_id, file_url, parse_status, parse_notes, last_parsed
-                        ) VALUES (?, ?, 'failed', 'download_failed', CURRENT_DATE)
-                        ON CONFLICT(facility_id) DO UPDATE SET
-                            file_url=excluded.file_url,
-                            parse_status='failed',
-                            parse_notes='download_failed',
-                            last_parsed=CURRENT_DATE
-                        """,
-                        (fid, file_url),
+                    _update_parse_result(
+                        db,
+                        fid,
+                        facility_type,
+                        file_url,
+                        parse_status="failed",
+                        parse_notes="download_failed",
                     )
+                    if facility_type == "hospital":
+                        _update_hospital_transparency_file(
+                            db,
+                            fid,
+                            file_url,
+                            parse_status="failed",
+                            parse_notes="download_failed",
+                        )
                     failed += 1
                     continue
+
+            if not local_path:
+                local_path = _guess_local_file(files_dir, fid, item.get("slug"))
 
             if not local_path or not os.path.exists(local_path):
                 if temp_download and os.path.exists(temp_download):
@@ -805,18 +1172,22 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
                         os.remove(temp_download)
                     except OSError:
                         pass
-                db.execute(
-                    """
-                    INSERT INTO transparency_files (facility_id, file_url, parse_status, parse_notes, last_parsed)
-                    VALUES (?, ?, 'not_found', 'File missing in local run', CURRENT_DATE)
-                    ON CONFLICT(facility_id) DO UPDATE SET
-                        file_url=excluded.file_url,
-                        parse_status='not_found',
-                        parse_notes='File missing in local run',
-                        last_parsed=CURRENT_DATE
-                    """,
-                    (fid, file_url),
+                _update_parse_result(
+                    db,
+                    fid,
+                    facility_type,
+                    file_url,
+                    parse_status="not_found",
+                    parse_notes="File missing in local run",
                 )
+                if facility_type == "hospital":
+                    _update_hospital_transparency_file(
+                        db,
+                        fid,
+                        file_url,
+                        parse_status="not_found",
+                        parse_notes="File missing in local run",
+                    )
                 missing += 1
                 continue
 
@@ -827,50 +1198,61 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
                         os.remove(temp_download)
                     except OSError:
                         pass
-                db.execute(
-                    """
-                    INSERT INTO transparency_files (
-                        facility_id, file_url, file_format, parse_status, parse_notes,
-                        row_count, procedures_extracted, last_parsed
-                    ) VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_DATE)
-                    ON CONFLICT(facility_id) DO UPDATE SET
-                        file_url=excluded.file_url,
-                        file_format=excluded.file_format,
-                        parse_status=excluded.parse_status,
-                        parse_notes=excluded.parse_notes,
-                        row_count=excluded.row_count,
-                        procedures_extracted=0,
-                        last_parsed=CURRENT_DATE
-                    """,
-                    (fid, file_url, fmt, status, status, 0),
+                _update_parse_result(
+                    db,
+                    fid,
+                    facility_type,
+                    file_url,
+                    file_format=fmt,
+                    parse_status=status,
+                    parse_notes=status,
+                    row_count=0,
+                    procedures_extracted=0,
                 )
+                if facility_type == "hospital":
+                    _update_hospital_transparency_file(
+                        db,
+                        fid,
+                        file_url,
+                        file_format=fmt,
+                        parse_status=status,
+                        parse_notes=status,
+                        row_count=0,
+                        procedures_extracted=0,
+                    )
                 failed += 1
                 continue
 
             for item in rows:
-                upsert_hospital_price(fid, item, data_year=data_year)
+                upsert_facility_procedure_price(fid, item, facility_type, data_year=data_year)
 
             size_mb = (os.path.getsize(local_path) / (1024 * 1024)) if os.path.exists(local_path) else None
-            db.execute(
-                """
-                INSERT INTO transparency_files (
-                    facility_id, file_url, file_format, file_size_mb,
-                    has_standard_codes, parse_status, row_count, procedures_extracted,
-                    last_parsed
-                ) VALUES (?, ?, ?, ?, 1, 'parsed', ?, ?, CURRENT_DATE)
-                ON CONFLICT(facility_id) DO UPDATE SET
-                    file_url=excluded.file_url,
-                    file_format=excluded.file_format,
-                    file_size_mb=excluded.file_size_mb,
-                    has_standard_codes=1,
-                    parse_status='parsed',
-                    row_count=excluded.row_count,
-                    procedures_extracted=excluded.procedures_extracted,
-                    last_parsed=CURRENT_DATE,
-                    parse_notes=NULL
-                """,
-                (fid, file_url, fmt, size_mb, len(rows), len(rows)),
+            _update_parse_result(
+                db,
+                fid,
+                facility_type,
+                file_url,
+                file_format=fmt,
+                file_size_mb=size_mb,
+                has_standard_codes=1,
+                parse_status="parsed",
+                parse_notes=None,
+                row_count=len(rows),
+                procedures_extracted=len(rows),
             )
+            if facility_type == "hospital":
+                _update_hospital_transparency_file(
+                    db,
+                    fid,
+                    file_url,
+                    file_format=fmt,
+                    file_size_mb=size_mb,
+                    has_standard_codes=1,
+                    parse_status="parsed",
+                    parse_notes=None,
+                    row_count=len(rows),
+                    procedures_extracted=len(rows),
+                )
             parsed += 1
             if temp_download and os.path.exists(temp_download):
                 try:
@@ -880,7 +1262,7 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
 
     total = len(selected)
     log_refresh(
-        "transparency_top300",
+        "transparency_refresh",
         parsed,
         "partial" if (failed or missing) else "success",
         f"selected={total} parsed={parsed} failed={failed} missing={missing}",

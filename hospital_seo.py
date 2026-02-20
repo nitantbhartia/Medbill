@@ -512,6 +512,58 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
     return mixed[:count]
 
 
+def get_sample_facilities(count: int = 6) -> list[dict]:
+    """Mixed sample cards for homepage: include hospital + ASC + imaging when available."""
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT
+                f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug, f.facility_type,
+                COALESCE(fm.billing_grade, bm.billing_grade) AS billing_grade,
+                COALESCE(fm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup_vs_medicare
+            FROM facilities f
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = f.facility_id
+            LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
+            WHERE f.slug IS NOT NULL
+              AND f.state_slug IS NOT NULL
+            ORDER BY
+              CASE COALESCE(fm.billing_grade, bm.billing_grade)
+                WHEN 'A' THEN 1 WHEN 'B' THEN 2 WHEN 'C' THEN 3 WHEN 'D' THEN 4 WHEN 'F' THEN 5 ELSE 6 END,
+              f.name
+            LIMIT 300
+            """
+        ).fetchall()
+
+    out = [dict(r) for r in rows]
+    for r in out:
+        r["name"] = _display_name(r.get("name"), r.get("facility_id"))
+        r["city"] = _display_city(r.get("city"))
+        r["state"] = state_display_name(r.get("state"))
+        r["facility_type_label"] = {
+            "hospital": "Hospital",
+            "asc": "Surgery Center",
+            "imaging_center": "Imaging Center",
+        }.get(r.get("facility_type") or "hospital", "Provider")
+
+    hospitals = [r for r in out if r.get("facility_type") == "hospital"]
+    ascs = [r for r in out if r.get("facility_type") == "asc"]
+    imaging = [r for r in out if r.get("facility_type") == "imaging_center"]
+    selected: list[dict] = []
+    if hospitals:
+        selected.append(hospitals[0])
+    if ascs:
+        selected.append(ascs[0])
+    if imaging:
+        selected.append(imaging[0])
+    for row in out:
+        if row in selected:
+            continue
+        selected.append(row)
+        if len(selected) >= count:
+            break
+    return selected[:count]
+
+
 def get_state_index_stats() -> list[dict]:
     with get_db() as db:
         rows = db.execute(
@@ -915,6 +967,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         lon=hospital_d.get("lon"),
     )
     map_data = _build_hospital_map_data(hospital_d, nearby)
+    surgery_center_alternatives = _get_nearby_asc_alternatives(hospital_d, prices_d) if (hospital_d.get("billing_grade") or "").upper() in {"D", "F"} else []
 
     hospital_markup = hospital_d.get("avg_markup_vs_medicare")
     state_markup = comparison_d.get("state_avg_markup")
@@ -999,6 +1052,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "content": content,
         "nearby": nearby,
         "nearby_all_shown": nearby_all_shown,
+        "surgery_center_alternatives": surgery_center_alternatives,
         "map_data": map_data,
         "section_updated": section_updated,
         "seo": seo,
@@ -1186,6 +1240,104 @@ def _build_hospital_map_data(hospital: dict, nearby: list[dict]) -> dict:
         "current": current_marker,
         "nearby": nearby_markers,
     }
+
+
+def _get_nearby_asc_alternatives(hospital_d: dict, hospital_prices: list[dict], limit: int = 3) -> list[dict]:
+    """Find nearby ASCs with overlapping procedures for high-markup hospitals."""
+    lat = hospital_d.get("lat")
+    lon = hospital_d.get("lon")
+    if lat is None or lon is None:
+        return []
+    try:
+        lat_f = float(lat)
+        lon_f = float(lon)
+    except (TypeError, ValueError):
+        return []
+
+    cpt_to_hospital_price = {
+        p.get("cpt_code"): p for p in hospital_prices if p.get("cpt_code") and p.get("gross_charge") is not None
+    }
+    if not cpt_to_hospital_price:
+        return []
+    cpts = list(cpt_to_hospital_price.keys())
+    placeholders = ",".join(["?"] * len(cpts))
+
+    with get_db() as db:
+        asc_rows = db.execute(
+            """
+            SELECT
+                f.facility_id, f.name, f.state_slug, f.city_slug, f.slug, f.lat, f.lon, f.city,
+                fm.billing_grade, fm.avg_markup
+            FROM facilities f
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = f.facility_id
+            WHERE f.facility_type = 'asc'
+              AND f.lat IS NOT NULL
+              AND f.lon IS NOT NULL
+            """
+        ).fetchall()
+        price_rows = db.execute(
+            f"""
+            SELECT facility_id, cpt_code, gross_charge
+            FROM procedure_prices
+            WHERE facility_type = 'asc'
+              AND cpt_code IN ({placeholders})
+              AND gross_charge IS NOT NULL
+            """,
+            tuple(cpts),
+        ).fetchall()
+
+    asc_prices: dict[str, dict[str, float]] = {}
+    for row in price_rows:
+        d = dict(row)
+        asc_prices.setdefault(d["facility_id"], {})[d["cpt_code"]] = d["gross_charge"]
+
+    candidates = []
+    for row in asc_rows:
+        d = dict(row)
+        fid = d["facility_id"]
+        if fid not in asc_prices:
+            continue
+        dist = _haversine_miles(lat_f, lon_f, float(d["lat"]), float(d["lon"]))
+        if dist > 25.0:
+            continue
+        overlap = []
+        for cpt, asc_charge in asc_prices[fid].items():
+            h = cpt_to_hospital_price.get(cpt)
+            if not h:
+                continue
+            h_charge = h.get("gross_charge")
+            if h_charge is None:
+                continue
+            overlap.append(
+                {
+                    "cpt_code": cpt,
+                    "description": h.get("description") or f"CPT {cpt}",
+                    "hospital_charge": h_charge,
+                    "asc_charge": asc_charge,
+                    "savings": h_charge - asc_charge,
+                }
+            )
+        if not overlap:
+            continue
+        overlap.sort(key=lambda x: x["savings"], reverse=True)
+        sample = overlap[0]
+        candidates.append(
+            {
+                "facility_id": fid,
+                "name": d["name"],
+                "city": d.get("city"),
+                "state_slug": d["state_slug"],
+                "city_slug": d["city_slug"],
+                "slug": d["slug"],
+                "distance_miles": round(dist, 1),
+                "billing_grade": d.get("billing_grade"),
+                "avg_markup": d.get("avg_markup"),
+                "sample": sample,
+                "overlap_count": len(overlap),
+            }
+        )
+    candidates.sort(key=lambda x: (_grade_index(x.get("billing_grade")), -(x["sample"]["savings"] or 0.0), x["distance_miles"]))
+    return candidates[:limit]
 
 
 def find_hospitals(query: str, limit: int = 20) -> list[dict]:

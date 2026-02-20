@@ -126,14 +126,8 @@
             <div class="text-xs text-gray-500 uppercase">Bed Count</div>
             <div class="text-2xl font-semibold mt-1">{{ data.hospital.bed_count }}</div>
             {% else %}
-            {% set own_label = data.hospital.ownership_type or data.hospital.ownership %}
-            {% if own_label and own_label not in ("Unknown", "") %}
-            <div class="text-xs text-gray-500 uppercase">Ownership</div>
-            <div class="text-sm font-semibold mt-2">{{ own_label }}</div>
-            {% else %}
-            <div class="text-xs text-gray-500 uppercase">Ownership</div>
-            <div class="text-sm text-gray-400 mt-2">Not confirmed</div>
-            {% endif %}
+            <div class="text-xs text-gray-500 uppercase">Patient Experience</div>
+            <div class="text-sm text-gray-400 mt-2">Not Reported</div>
             {% endif %}
         </div>
     </div>
@@ -221,6 +215,36 @@
         </div>
         <p class="text-xs text-gray-400 mt-3">Cash discount data sourced from hospital price transparency files. "Not reported" means the hospital did not include this in their posted file.</p>
     </div>
+
+    {% if (data.hospital.billing_grade in ["D", "F"]) and data.surgery_center_alternatives %}
+    <div class="mb-8 rounded-lg border border-green-200 bg-green-50 p-5">
+        <h2 class="text-lg font-bold text-green-900 mb-2">Lower-cost alternatives for elective procedures</h2>
+        <p class="text-sm text-green-800 mb-3">
+            {{ data.surgery_center_alternatives|length }} surgery centers within 25 miles perform many of the same procedures at significantly lower cost.
+        </p>
+        <div class="space-y-2 text-sm">
+            {% for alt in data.surgery_center_alternatives %}
+            <div>
+                <a class="underline font-semibold text-accent-700" href="/surgery-centers/{{ alt.state_slug }}/{{ alt.city_slug }}/{{ alt.slug }}/">
+                    {{ alt.name }}
+                </a>
+                <span class="text-gray-600">
+                    · {{ alt.distance_miles }} mi
+                    · Grade {{ alt.billing_grade or "N/A" }}
+                    {% if alt.avg_markup %}· {{ "%.1fx"|format(alt.avg_markup) }} ASC{% endif %}
+                    · {{ alt.sample.description }}:
+                    ASC ${{ "{:,.0f}".format(alt.sample.asc_charge) }}
+                    vs Hospital ${{ "{:,.0f}".format(alt.sample.hospital_charge) }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        <a class="inline-block mt-3 text-sm font-semibold text-accent-700 underline"
+           href="/surgery-centers/{{ data.hospital.state_slug }}/{{ data.hospital.city_slug }}/">
+            See all nearby surgery centers →
+        </a>
+    </div>
+    {% endif %}
 
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h3 class="text-base font-semibold text-gray-900 mb-3">Billing Grade Position</h3>

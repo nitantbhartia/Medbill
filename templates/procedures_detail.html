@@ -196,6 +196,15 @@
                 <option value="imaging_center">Imaging centers</option>
                 {% endif %}
             </select>
+            <select id="radius-filter" class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="50">Within 50 miles</option>
+                <option value="75" selected>Within 75 miles</option>
+                <option value="100">Within 100 miles</option>
+            </select>
+            <select id="network-filter" class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="all">In-network: all</option>
+                <option value="in" disabled>In-network only (coming soon)</option>
+            </select>
             <select id="sort-filter" class="border border-gray-300 rounded px-3 py-2 text-sm">
                 <option value="patient_cost">Sort: est. patient cost</option>
                 <option value="markup">Sort: markup ratio</option>
@@ -385,13 +394,14 @@ async function searchByZip(e) {
     const defaultDiv = document.getElementById('default-results');
     const facilityType = document.getElementById('facility-type-filter').value;
     const sort = document.getElementById('sort-filter').value;
+    const radius = document.getElementById('radius-filter').value;
     const gradeOnly = document.getElementById('grade-filter').checked ? 1 : 0;
     resultsDiv.textContent = 'Searching…';
     resultsDiv.classList.remove('hidden');
     defaultDiv.classList.add('hidden');
 
     try {
-        const resp = await fetch(`/api/procedures/{{ data.cpt_code }}/providers?zip=${zip}&facility_type=${encodeURIComponent(facilityType)}&sort=${encodeURIComponent(sort)}&grade_ab_only=${gradeOnly}`);
+        const resp = await fetch(`/api/procedures/{{ data.cpt_code }}/providers?zip=${zip}&facility_type=${encodeURIComponent(facilityType)}&sort=${encodeURIComponent(sort)}&grade_ab_only=${gradeOnly}&radius_miles=${encodeURIComponent(radius)}`);
         const json = await resp.json();
         if (!json.found || !json.providers.length) {
             resultsDiv.innerHTML = '<p class="text-gray-500">No providers with pricing data for this procedure found within 75 miles. ' +

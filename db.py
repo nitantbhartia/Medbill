@@ -292,6 +292,28 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_transparency_status ON transparency_files(parse_status)")
     db.execute(
         """
+        CREATE TABLE IF NOT EXISTS transparency_parse_results (
+            facility_id TEXT PRIMARY KEY,
+            facility_type TEXT NOT NULL DEFAULT 'hospital',
+            file_url TEXT,
+            file_format TEXT,
+            file_size_mb REAL,
+            has_standard_codes INTEGER,
+            parse_status TEXT,
+            row_count INTEGER,
+            procedures_extracted INTEGER,
+            last_downloaded DATE,
+            last_parsed DATE,
+            parse_notes TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_parse_results_type_status ON transparency_parse_results(facility_type, parse_status)"
+    )
+    db.execute(
+        """
         CREATE TABLE IF NOT EXISTS hospital_prices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             facility_id TEXT REFERENCES hospitals(facility_id),

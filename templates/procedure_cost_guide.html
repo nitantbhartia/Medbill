@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.content_heading }} | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ data.seo.meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 py-10">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ data.content_heading }}</h1>
+    <p class="text-sm text-gray-600 mb-5">
+        CPT {{ data.cpt_code }} · National benchmark rate:
+        {% if data.header.medicare_rate %}${{ "{:,.0f}".format(data.header.medicare_rate) }}{% else %}N/A{% endif %}
+    </p>
+
+    {% if data.is_colonoscopy_content %}
+    <div class="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        Preventive vs diagnostic colonoscopy billing can change out-of-pocket costs significantly. Confirm which billing pathway your procedure will use before scheduling.
+    </div>
+    {% endif %}
+
+    <div class="mb-6 rounded-lg border border-gray-200 bg-white overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                    <th class="px-4 py-3 font-semibold">Facility Type</th>
+                    <th class="px-4 py-3 font-semibold">Range</th>
+                    <th class="px-4 py-3 font-semibold">Average</th>
+                    <th class="px-4 py-3 font-semibold">Avg Markup</th>
+                    <th class="px-4 py-3 font-semibold">Providers</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data.by_facility_type %}
+                <tr class="border-b border-gray-100">
+                    <td class="px-4 py-3 font-medium">{{ row.label }}</td>
+                    <td class="px-4 py-3">
+                        {% if row.min_charge %}${{ "{:,.0f}".format(row.min_charge) }}{% else %}N/A{% endif %}
+                        —
+                        {% if row.max_charge %}${{ "{:,.0f}".format(row.max_charge) }}{% else %}N/A{% endif %}
+                    </td>
+                    <td class="px-4 py-3">{% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}N/A{% endif %}</td>
+                    <td class="px-4 py-3">{% if row.avg_markup %}{{ "%.1fx"|format(row.avg_markup) }}{% else %}N/A{% endif %}</td>
+                    <td class="px-4 py-3">{{ row.providers }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if data.state_averages %}
+    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+        <h2 class="text-lg font-bold text-gray-800 mb-3">Average Cost by State</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+            {% for s in data.state_averages %}
+            <div class="rounded border border-gray-100 p-2">
+                <div class="text-gray-500">{{ s.state }}</div>
+                <div class="font-semibold">{% if s.avg_charge %}${{ "{:,.0f}".format(s.avg_charge) }}{% else %}N/A{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="rounded-lg border border-blue-200 bg-blue-50 p-5">
+        <h2 class="text-lg font-bold text-blue-900 mb-2">Find Providers Near You</h2>
+        <p class="text-sm text-blue-800 mb-2">
+            Use the procedure finder to compare charges and billing grades across hospitals, surgery centers, and imaging centers near you.
+        </p>
+        <a href="/procedures/{{ data.cpt_code }}/" class="text-sm font-semibold text-accent-700 underline">
+            Open provider comparison for CPT {{ data.cpt_code }} →
+        </a>
+    </div>
+</section>
+{% endblock %}

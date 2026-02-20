@@ -93,6 +93,13 @@ def test_compare_index_renders():
     assert "Hospital Comparison Tool" in resp.text
 
 
+def test_compare_query_deeplink_redirects():
+    _seed()
+    resp = client.get(f"/compare/?facility-a={_FID_A}&facility-b={_FID_B}", follow_redirects=False)
+    assert resp.status_code in (302, 307)
+    assert resp.headers["location"] == f"/compare/{_FID_A}/vs/{_FID_B}/"
+
+
 def test_compare_detail_renders():
     _seed()
     resp = client.get(f"/compare/{_FID_A}/vs/{_FID_B}/")
