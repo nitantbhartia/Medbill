@@ -64,6 +64,20 @@ FACILITY_TYPE_LABELS = {
     "imaging_center": "Imaging Center",
 }
 
+PROCEDURE_KEYWORD_CPTS = {
+    "mri": ["70551", "70553", "72141", "72148", "73221", "73721", "74183"],
+    "ct": ["74176", "74177"],
+    "ct scan": ["74176", "74177"],
+    "xray": ["71045", "71046"],
+    "x-ray": ["71045", "71046"],
+    "ultrasound": ["76805", "76856"],
+    "mammogram": ["77067"],
+    "mammography": ["77067"],
+    "colonoscopy": ["45378", "45385"],
+    "knee replacement": ["27447"],
+    "hip replacement": ["27130"],
+}
+
 
 def _facility_profile_url(item: dict) -> str:
     ftype = (item.get("facility_type") or "hospital").strip().lower()
@@ -83,48 +97,84 @@ def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> 
         return []
     like = f"%{token}%"
     with db.get_db() as conn:
+        all_prices_cte = """
+            WITH all_prices AS (
+                SELECT cpt_code, description, gross_charge, facility_type FROM procedure_prices
+                UNION ALL
+                SELECT cpt_code, description, gross_charge, COALESCE(facility_type, 'hospital') FROM hospital_prices
+            )
+        """
         if exact_only:
             rows = conn.execute(
-                """
+                f"""
+                {all_prices_cte}
                 SELECT
-                    pp.cpt_code,
-                    MIN(pp.description) AS description,
-                    AVG(CASE WHEN pp.facility_type = 'hospital' THEN pp.gross_charge END) AS hospital_avg,
-                    AVG(CASE WHEN pp.facility_type = 'asc' THEN pp.gross_charge END) AS asc_avg,
-                    AVG(CASE WHEN pp.facility_type = 'imaging_center' THEN pp.gross_charge END) AS imaging_avg
-                FROM procedure_prices pp
-                WHERE lower(trim(pp.cpt_code)) = lower(trim(?))
-                   OR lower(trim(pp.description)) = lower(trim(?))
-                GROUP BY pp.cpt_code
+                    ap.cpt_code,
+                    MIN(ap.description) AS description,
+                    AVG(CASE WHEN ap.facility_type = 'hospital' THEN ap.gross_charge END) AS hospital_avg,
+                    AVG(CASE WHEN ap.facility_type = 'asc' THEN ap.gross_charge END) AS asc_avg,
+                    AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
+                FROM all_prices ap
+                WHERE lower(trim(ap.cpt_code)) = lower(trim(?))
+                   OR lower(trim(ap.description)) = lower(trim(?))
+                GROUP BY ap.cpt_code
                 LIMIT ?
                 """,
                 (token, token, max(1, min(limit, 20))),
             ).fetchall()
         else:
             rows = conn.execute(
-                """
+                f"""
+                {all_prices_cte}
                 SELECT
-                    pp.cpt_code,
-                    MIN(pp.description) AS description,
-                    AVG(CASE WHEN pp.facility_type = 'hospital' THEN pp.gross_charge END) AS hospital_avg,
-                    AVG(CASE WHEN pp.facility_type = 'asc' THEN pp.gross_charge END) AS asc_avg,
-                    AVG(CASE WHEN pp.facility_type = 'imaging_center' THEN pp.gross_charge END) AS imaging_avg
-                FROM procedure_prices pp
-                WHERE pp.cpt_code LIKE ? OR pp.description LIKE ?
-                GROUP BY pp.cpt_code
+                    ap.cpt_code,
+                    MIN(ap.description) AS description,
+                    AVG(CASE WHEN ap.facility_type = 'hospital' THEN ap.gross_charge END) AS hospital_avg,
+                    AVG(CASE WHEN ap.facility_type = 'asc' THEN ap.gross_charge END) AS asc_avg,
+                    AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
+                FROM all_prices ap
+                WHERE ap.cpt_code LIKE ? OR ap.description LIKE ?
+                GROUP BY ap.cpt_code
                 ORDER BY
                     CASE
-                        WHEN lower(pp.cpt_code) = lower(?) THEN 0
-                        WHEN lower(pp.cpt_code) LIKE lower(?) THEN 1
-                        WHEN lower(MIN(pp.description)) = lower(?) THEN 2
-                        WHEN lower(MIN(pp.description)) LIKE lower(?) THEN 3
+                        WHEN lower(ap.cpt_code) = lower(?) THEN 0
+                        WHEN lower(ap.cpt_code) LIKE lower(?) THEN 1
+                        WHEN lower(MIN(ap.description)) = lower(?) THEN 2
+                        WHEN lower(MIN(ap.description)) LIKE lower(?) THEN 3
                         ELSE 4
                     END,
-                    MIN(pp.description) ASC
+                    MIN(ap.description) ASC
                 LIMIT ?
                 """,
                 (like, like, token, f"{token}%", token, f"{token}%", max(1, min(limit, 20))),
             ).fetchall()
+        if not rows and not exact_only:
+            keyword = token.lower()
+            cpts = PROCEDURE_KEYWORD_CPTS.get(keyword)
+            if not cpts:
+                for k, vals in PROCEDURE_KEYWORD_CPTS.items():
+                    if keyword in k:
+                        cpts = vals
+                        break
+            if cpts:
+                placeholders = ",".join("?" for _ in cpts)
+                rows = conn.execute(
+                    f"""
+                    {all_prices_cte}
+                    SELECT
+                        ap.cpt_code,
+                        MIN(ap.description) AS description,
+                        AVG(CASE WHEN ap.facility_type = 'hospital' THEN ap.gross_charge END) AS hospital_avg,
+                        AVG(CASE WHEN ap.facility_type = 'asc' THEN ap.gross_charge END) AS asc_avg,
+                        AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
+                    FROM all_prices ap
+                    WHERE ap.cpt_code IN ({placeholders})
+                    GROUP BY ap.cpt_code
+                    ORDER BY ap.cpt_code
+                    LIMIT ?
+                    """,
+                    tuple(cpts + [max(1, min(limit, 20))]),
+                ).fetchall()
     out = []
     for row in rows:
         d = dict(row)

@@ -16,6 +16,7 @@ import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 from hospital_seo import upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
+from main import _search_procedures  # noqa: E402
 from procedure_pages import (  # noqa: E402
     get_providers_near_zip_for_cpt,
     get_procedure_profile,
@@ -324,6 +325,25 @@ def test_get_providers_asc_uses_asc_benchmark_type():
     assert rows
     assert all(r["facility_type"] == "asc" for r in rows)
     assert all(r["medicare_benchmark_type"] == "asc" for r in rows)
+
+
+def test_search_procedures_includes_hospital_prices_when_procedure_prices_missing():
+    _seed()
+    with get_db() as db:
+        db.execute("DELETE FROM procedure_prices WHERE cpt_code = '70553'")
+    rows = _search_procedures("mri", limit=10)
+    assert rows
+    assert any((r.get("cpt_code") == "70553") for r in rows)
+
+
+def test_search_procedures_keyword_fallback_when_descriptions_missing():
+    _seed()
+    with get_db() as db:
+        db.execute("DELETE FROM procedure_prices WHERE cpt_code = '70553'")
+        db.execute("UPDATE hospital_prices SET description = NULL WHERE cpt_code = '70553'")
+    rows = _search_procedures("mri", limit=10)
+    assert rows
+    assert any((r.get("cpt_code") == "70553") for r in rows)
 
 
 def test_get_providers_falls_back_when_zip_coords_missing():
