@@ -299,6 +299,29 @@ def get_top_cpt_codes(limit: int = 100) -> list[dict]:
 
 def get_procedure_profile(cpt_code: str) -> dict | None:
     """Return full data dict for a procedure detail page."""
+    resolved_rate_expr = """
+    COALESCE(
+        hp.medicare_benchmark_rate,
+        hp.medicare_rate,
+        (
+            SELECT mr.facility_rate
+            FROM medicare_rates mr
+            WHERE mr.cpt_code = hp.cpt_code
+              AND mr.facility_rate IS NOT NULL
+            ORDER BY mr.effective_year DESC
+            LIMIT 1
+        )
+    )
+    """
+    resolved_markup_expr = f"""
+    COALESCE(
+        hp.markup_vs_medicare,
+        CASE
+            WHEN ({resolved_rate_expr}) > 0 THEN hp.gross_charge / ({resolved_rate_expr})
+            ELSE NULL
+        END
+    )
+    """
     with get_db() as db:
         detail_rows = db.execute(
             f"""
@@ -306,8 +329,8 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             SELECT
                 hp.facility_id,
                 hp.gross_charge,
-                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
-                hp.markup_vs_medicare,
+                {resolved_rate_expr} AS medicare_rate,
+                {resolved_markup_expr} AS markup_vs_medicare,
                 COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
                 COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
                 COALESCE(
@@ -323,8 +346,8 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
-              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) IS NOT NULL
-              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) > 0
+              AND ({resolved_rate_expr}) IS NOT NULL
+              AND ({resolved_rate_expr}) > 0
             """,
             (cpt_code,),
         ).fetchall()
@@ -346,9 +369,9 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
                 COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
                 COALESCE(f.is_hospital_owned, 0) AS is_hospital_owned,
                 hp.gross_charge,
-                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                {resolved_rate_expr} AS medicare_rate,
                 COALESCE(hp.medicare_benchmark_type, CASE WHEN COALESCE(f.facility_type, hp.facility_type, 'hospital') = 'asc' THEN 'asc' ELSE 'opps' END) AS medicare_benchmark_type,
-                hp.markup_vs_medicare
+                {resolved_markup_expr} AS markup_vs_medicare
             FROM all_prices hp
             LEFT JOIN facilities f ON f.facility_id = hp.facility_id
             LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
@@ -356,9 +379,9 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
-              AND hp.markup_vs_medicare IS NOT NULL
+              AND ({resolved_markup_expr}) IS NOT NULL
               AND COALESCE(f.name, h.name) IS NOT NULL
-            ORDER BY hp.markup_vs_medicare ASC
+            ORDER BY ({resolved_markup_expr}) ASC
             LIMIT 30
             """,
             (cpt_code,),

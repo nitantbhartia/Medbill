@@ -504,3 +504,51 @@ def test_procedure_profile_keeps_mri_acronym_in_name():
     assert profile is not None
     assert "MRI" in profile["name"]
     assert "Mri" not in profile["name"]
+
+
+def test_get_procedure_profile_uses_medicare_rate_fallback_when_markup_missing():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {
+            "facility_id": "99101",
+            "name": "Fallback Benchmark Hospital",
+            "address": "10 Test Way",
+            "city": "Austin",
+            "state": "TX",
+            "zip": "73301",
+            "slug": "fallback-benchmark-hospital-austin",
+            "lat": 30.2672,
+            "lon": -97.7431,
+        }
+    )
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            ("99284", "0000000", 250.0, 250.0, 2026),
+        )
+        db.execute(
+            """
+            INSERT INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge,
+                medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099101", "99284", "Level 4 ER Visit", 1250.0, None, None, 2026, "hospital"),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO billing_metrics (
+                facility_id, avg_markup_vs_medicare, billing_grade, procedures_compared, state_rank
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            ("099101", 5.0, "D", 25, 1),
+        )
+
+    profile = get_procedure_profile("99284")
+    assert profile is not None
+    assert profile["header"]["medicare_rate"] is not None
+    assert profile["header"]["avg_markup"] is not None

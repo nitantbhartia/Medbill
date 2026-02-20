@@ -265,70 +265,26 @@ def _search_facilities(query: str, limit: int = 4, exact_only: bool = False) -> 
 
 
 def _build_home_procedure_cards() -> list[dict]:
-    cpts = [item["cpt_code"] for item in HOME_PROCEDURE_CARD_SPECS]
-    if not cpts:
-        return []
-    placeholders = ",".join("?" for _ in cpts)
-    with db.get_db() as conn:
-        procedure_rows = conn.execute(
-            f"""
-            SELECT
-                cpt_code,
-                MIN(description) AS description,
-                AVG(gross_charge) AS national_avg,
-                AVG(CASE WHEN facility_type = 'hospital' THEN gross_charge END) AS hospital_avg,
-                AVG(CASE WHEN facility_type = 'hospital' THEN markup_vs_medicare END) AS hospital_markup,
-                AVG(CASE WHEN facility_type = 'asc' THEN gross_charge END) AS asc_avg,
-                AVG(CASE WHEN facility_type = 'asc' THEN markup_vs_medicare END) AS asc_markup,
-                AVG(CASE WHEN facility_type = 'imaging_center' THEN gross_charge END) AS imaging_avg,
-                AVG(CASE WHEN facility_type = 'imaging_center' THEN markup_vs_medicare END) AS imaging_markup
-            FROM procedure_prices
-            WHERE cpt_code IN ({placeholders})
-            GROUP BY cpt_code
-            """,
-            cpts,
-        ).fetchall()
-        missing_cpts = [c for c in cpts if c not in {row["cpt_code"] for row in procedure_rows}]
-        fallback_rows = []
-        if missing_cpts:
-            fallback_rows = conn.execute(
-                f"""
-                SELECT
-                    cpt_code,
-                    MIN(description) AS description,
-                    AVG(gross_charge) AS national_avg,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'hospital' THEN gross_charge END) AS hospital_avg,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'hospital' THEN markup_vs_medicare END) AS hospital_markup,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'asc' THEN gross_charge END) AS asc_avg,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'asc' THEN markup_vs_medicare END) AS asc_markup,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'imaging_center' THEN gross_charge END) AS imaging_avg,
-                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'imaging_center' THEN markup_vs_medicare END) AS imaging_markup
-                FROM hospital_prices
-                WHERE cpt_code IN ({",".join("?" for _ in missing_cpts)})
-                GROUP BY cpt_code
-                """,
-                missing_cpts,
-            ).fetchall()
-    by_cpt = {row["cpt_code"]: dict(row) for row in procedure_rows}
-    for row in fallback_rows:
-        by_cpt.setdefault(row["cpt_code"], dict(row))
     cards = []
     for spec in HOME_PROCEDURE_CARD_SPECS:
-        row = by_cpt.get(spec["cpt_code"], {})
         secondary_type = spec.get("secondary_type") or ""
-        secondary_avg = row.get("asc_avg") if secondary_type == "asc" else row.get("imaging_avg")
-        secondary_markup = row.get("asc_markup") if secondary_type == "asc" else row.get("imaging_markup")
-        national = row.get("national_avg")
-        hospital_avg = row.get("hospital_avg")
+        profile = get_procedure_profile(spec["cpt_code"])
+        by_type = {(r.get("facility_type") or "").strip().lower(): r for r in (profile or {}).get("ranges_by_type", [])}
+        hospital = by_type.get("hospital", {})
+        secondary = by_type.get(secondary_type, {})
+        secondary_avg = secondary.get("avg_charge")
+        secondary_markup = secondary.get("avg_markup")
+        national = (profile or {}).get("header", {}).get("national_avg_charge")
+        hospital_avg = hospital.get("avg_charge")
         vs_hosp = ((hospital_avg - national) / national * 100) if national and hospital_avg else None
         vs_secondary = ((secondary_avg - national) / national * 100) if national and secondary_avg else None
         cards.append(
             {
                 "category": spec["category"],
-                "name": row.get("description") or spec["name"],
+                "name": (profile or {}).get("name") or spec["name"],
                 "cpt_code": spec["cpt_code"],
                 "hospital_avg": hospital_avg,
-                "hospital_markup": row.get("hospital_markup"),
+                "hospital_markup": hospital.get("avg_markup"),
                 "secondary_type": secondary_type,
                 "secondary_label": FACILITY_TYPE_LABELS.get(secondary_type, ""),
                 "secondary_avg": secondary_avg,

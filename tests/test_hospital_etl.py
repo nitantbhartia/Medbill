@@ -439,6 +439,36 @@ def test_home_procedure_cards_fallback_to_hospital_prices_when_procedure_prices_
     assert mri.get("hospital_markup") is not None
 
 
+def test_home_procedure_cards_derive_markup_from_medicare_rate_when_missing():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "76001", "name": "Derived Markup Hospital", "city": "Austin", "state": "TX", "slug": "derived-markup-hospital-austin"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+            ("99284", "0000000", 250.0, 250.0, 2026),
+        )
+        conn.execute(
+            """
+            INSERT INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, cash_price,
+                medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("076001", "99284", "Level 4 ER Visit", 1250.0, 900.0, None, None, 2026, "hospital"),
+        )
+        conn.execute("DELETE FROM procedure_prices WHERE cpt_code = '99284'")
+
+    cards = _build_home_procedure_cards()
+    er = next((c for c in cards if c.get("cpt_code") == "99284"), None)
+    assert er is not None
+    assert er.get("hospital_avg") == 1250.0
+    assert er.get("hospital_markup") is not None
+    assert float(er.get("hospital_markup")) >= 4.9
+
+
 def test_load_hcahps_handles_cms_coded_columns():
     _db._connection = None
     _db.init_db()
