@@ -21,6 +21,7 @@ from hospital_seo import (
     state_display_name,
 )
 from compare_pages import get_comparison_data, search_hospitals_for_compare
+from dispute_workflow import build_phone_script, get_outcome_stats
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
     get_procedure_profile,
@@ -62,6 +63,7 @@ async def landing(request: Request):
         {
             "request": request,
             "stats": stats,
+            "outcome_stats": get_outcome_stats(),
             "canonical_url": canonical_url,
             "og_title": "BillKarma - Check Medical Bills Against Federal Rates",
             "og_description": "Upload your medical bill. BillKarma flags errors, markups, and overcharges in 30 seconds.",
@@ -72,7 +74,7 @@ async def landing(request: Request):
 
 @app.get("/scan", response_class=HTMLResponse)
 async def scan_page(request: Request):
-    return templates.TemplateResponse("scan.html", {"request": request})
+    return templates.TemplateResponse("scan.html", {"request": request, "outcome_stats": get_outcome_stats()})
 
 
 @app.get("/confirm/{bill_id}", response_class=HTMLResponse)
@@ -91,13 +93,18 @@ async def results_page(request: Request, bill_id: int):
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
     log_audit(action="view_results_page", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
 
-    from negotiation import generate_phone_script, generate_message_script
-    phone_script = generate_phone_script(bill_id)
-    message_script = generate_message_script(bill_id)
+    from negotiation import generate_phone_script
+    phone_script = build_phone_script(bill_id) or generate_phone_script(bill_id)
+    outcome_stats = get_outcome_stats()
 
     return templates.TemplateResponse(
         "results.html",
-        {"request": request, "data": results, "phone_script": phone_script, "message_script": message_script},
+        {
+            "request": request,
+            "data": results,
+            "phone_script": phone_script,
+            "outcome_stats": outcome_stats,
+        },
     )
 
 

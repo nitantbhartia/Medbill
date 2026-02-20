@@ -12,6 +12,7 @@ import config
 import scanner
 import analyzer
 import negotiation
+from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
 from db import get_db
 from dispute_packet import generate_dispute_packet
 from appeal_playbooks import generate_appeal_playbook
@@ -328,76 +329,69 @@ async def get_dispute_packet(bill_id: int):
 
 @router.post("/dispute-letter/{bill_id}")
 async def get_dispute_letter(bill_id: int, payload: dict):
-    """
-    Generate a focused dispute letter from selected findings.
-    """
+    """Generate a structured dispute letter from selected findings."""
     selected_ids = payload.get("finding_ids", [])
-    requestor_name = payload.get("requestor_name", "Patient")
+    requestor_name = payload.get("requestor_name", "[Your Name]")
+    account_number = payload.get("account_number", "[Account Number]")
     if not isinstance(selected_ids, list):
         raise HTTPException(400, "finding_ids must be an array")
 
-    with get_db() as db:
-        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
-        if not bill:
-            raise HTTPException(404, "Bill not found")
-
-        if selected_ids:
-            placeholders = ",".join(["?"] * len(selected_ids))
-            rows = db.execute(
-                f"SELECT * FROM findings WHERE bill_id = ? AND id IN ({placeholders}) ORDER BY id",
-                [bill_id, *selected_ids],
-            ).fetchall()
-        else:
-            rows = db.execute("SELECT * FROM findings WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
-
-    if not rows:
-        raise HTTPException(400, "No findings available for dispute letter")
-
-    bill_dict = dict(bill)
-    bullets = []
-    total = 0.0
-    for row in rows:
-        detail = json.loads(row["details"] or "{}")
-        li = detail.get("line_item") or {}
-        cpt = li.get("cpt_code") or "N/A"
-        evidence = detail.get("evidence") or {}
-        source = evidence.get("source", "rule_engine")
-        est = float(detail.get("estimated_patient_savings") or row["potential_savings"] or 0.0)
-        total += est
-        bullets.append(
-            f"- {row['message']} (CPT: {cpt}, est. savings: ${est:,.2f})"
-        )
-
-    letter = (
-        f"Date: {datetime.utcnow().strftime('%Y-%m-%d')}\n\n"
-        f"To: Billing Department, {bill_dict.get('provider_name') or 'Provider'}\n"
-        f"Re: Account review request for bill #{bill_id}\n\n"
-        f"Hello,\n\n"
-        f"I am requesting an item-level review and correction of charges on my bill dated "
-        f"{bill_dict.get('bill_date') or 'N/A'}. I found the following issues in my audit:\n\n"
-        f"{chr(10).join(bullets)}\n\n"
-        f"Please send a corrected itemized statement and any rebill submissions to my insurer where applicable. "
-        f"The estimated patient-impact amount under review is ${total:,.2f}.\n\n"
-        f"Sincerely,\n"
-        f"{requestor_name}\n"
+    result = build_dispute_letter(
+        bill_id,
+        finding_ids=selected_ids or None,
+        requestor_name=requestor_name,
+        account_number=account_number,
     )
+    if not result:
+        raise HTTPException(404, "Bill not found or no findings available")
+
     log_audit(
         action="generate_dispute_letter",
         resource_type="bill",
         resource_id=str(bill_id),
         bill_id=bill_id,
-        metadata={"finding_count": len(rows), "estimated_patient_impact": round(total, 2)},
+        metadata={"finding_count": result["finding_count"], "total_disputed": result["total_disputed"]},
     )
+    return {"status": "ok", "data": {**result, "bill_id": bill_id}}
 
-    return {
-        "status": "ok",
-        "data": {
-            "bill_id": bill_id,
-            "finding_count": len(rows),
-            "estimated_patient_impact": round(total, 2),
-            "letter": letter,
-        },
-    }
+
+@router.get("/dispute-phone-script/{bill_id}")
+async def get_dispute_phone_script(bill_id: int):
+    """Generate a structured phone script for disputing flagged charges."""
+    script = build_phone_script(bill_id)
+    if not script:
+        raise HTTPException(404, "Bill not found or no findings")
+    return {"status": "ok", "data": {"script": script}}
+
+
+@router.get("/dispute-stats")
+async def dispute_stats():
+    """Return aggregate dispute outcome stats (shown on site once 50+ outcomes exist)."""
+    return {"status": "ok", "data": get_outcome_stats()}
+
+
+@router.post("/concierge-interest")
+async def record_concierge_interest(
+    email: str = Form(...),
+    disputed_amount: float = Form(0),
+    bill_context: str = Form(""),
+):
+    """Capture email and disputed amount from success-fee prompt (interest only, no enrollment)."""
+    email = (email or "").strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(400, "Valid email required")
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO concierge_interest (email, disputed_amount, bill_context) VALUES (?, ?, ?)",
+            (email, disputed_amount, bill_context[:500] if bill_context else ""),
+        )
+    log_audit(
+        action="concierge_interest",
+        resource_type="concierge",
+        resource_id=email,
+        metadata={"disputed_amount": disputed_amount},
+    )
+    return {"status": "ok", "data": {"queued": True}}
 
 
 @router.get("/appeal-playbook/{bill_id}")

@@ -1020,6 +1020,12 @@
                     <span class="metric-val">8x</span>
                     <span class="metric-lbl">avg markup over Medicare rates</span>
                 </div>
+                {% if outcome_stats and outcome_stats.show_stat %}
+                <div class="metric">
+                    <span class="metric-val">${{ "%.0f"|format(outcome_stats.median_recovered) }}</span>
+                    <span class="metric-lbl">median recovered per dispute &mdash; {{ outcome_stats.total_disputes }} verified outcomes</span>
+                </div>
+                {% endif %}
             </div>
         </section>
 
