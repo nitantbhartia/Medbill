@@ -20,6 +20,11 @@ from hospital_seo import (
     resolve_hospital_slug,
     state_display_name,
 )
+from procedure_pages import (
+    get_hospitals_near_zip_for_cpt,
+    get_procedure_profile,
+    get_top_cpt_codes,
+)
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -317,6 +322,60 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
         },
     )
+
+
+@app.get("/procedures/", response_class=HTMLResponse)
+async def procedure_index_page(request: Request):
+    procedures = get_top_cpt_codes(100)
+    # Group by body system
+    groups: dict[str, list] = {}
+    for p in procedures:
+        groups.setdefault(p["body_system"], []).append(p)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/"
+    return templates.TemplateResponse(
+        "procedures_index.html",
+        {
+            "request": request,
+            "groups": groups,
+            "total": len(procedures),
+            "canonical_url": canonical_url,
+            "og_title": "Procedure Cost Directory: Medicare Rates & Hospital Grades | BillKarma",
+            "og_description": "See Medicare rates, national average charges, and billing grades for 100 common procedures. Find the best-priced hospital near you.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/procedures/{cpt_code}/", response_class=HTMLResponse)
+async def procedure_detail_page(request: Request, cpt_code: str):
+    profile = get_procedure_profile(cpt_code)
+    if not profile:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{cpt_code}/"
+    seo = profile["seo"]
+    return templates.TemplateResponse(
+        "procedures_detail.html",
+        {
+            "request": request,
+            "data": profile,
+            "canonical_url": canonical_url,
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/api/procedures/{cpt_code}/hospitals")
+async def procedure_hospitals_by_zip(cpt_code: str, zip: str = ""):
+    """Return hospitals near a zip code with data for this CPT code (AJAX)."""
+    if not zip or len(zip) < 5:
+        return JSONResponse({"error": "zip required"}, status_code=400)
+    results = get_hospitals_near_zip_for_cpt(cpt_code, zip)
+    if not results:
+        return JSONResponse({"hospitals": [], "found": False})
+    return JSONResponse({"hospitals": results, "found": True})
 
 
 @app.get("/sitemap.xml")
