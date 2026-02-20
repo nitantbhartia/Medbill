@@ -354,11 +354,9 @@ class TestHospitalSeoPages:
         assert '<meta name="robots" content="index, follow">' in resp.text
         assert '"@type": "FAQPage"' in resp.text
 
-    def test_comparison_chart_shows_with_sufficient_sample(self):
+    def test_grade_gauge_shows_with_metrics(self):
         _seed_hospital()
-        original = config.ENABLE_MARKUP_COMPARISONS
-        config.ENABLE_MARKUP_COMPARISONS = True
-        # Build enough state + national metrics to cross sample threshold.
+        # Build enough state + national metrics to verify grade gauge renders.
         for i in range(130):
             fid = f"3{i:04d}"
             upsert_hospital_row(
@@ -381,13 +379,10 @@ class TestHospitalSeoPages:
                     (fid.zfill(6), 3.4 + (i % 5) * 0.1, 3.4, 4.2, 10, 10.0, "C"),
                 )
         clear_comparison_cache()
-        try:
-            resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
-            assert resp.status_code == 200
-            assert "Benchmark samples:" in resp.text
-            assert "Comparison chart hidden due to limited benchmark sample size." not in resp.text
-        finally:
-            config.ENABLE_MARKUP_COMPARISONS = original
+        resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
+        assert resp.status_code == 200
+        assert "Billing Grade Position" in resp.text
+        assert "Benchmark samples:" not in resp.text
 
     def test_data_quality_endpoint(self):
         _seed_hospital()

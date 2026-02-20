@@ -57,6 +57,7 @@ def _run_migrations(db):
             "evidence_json": "TEXT",
         },
     )
+    ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
 
     # Geo mapping table (for ZIP -> Medicare locality/region)
     db.execute(

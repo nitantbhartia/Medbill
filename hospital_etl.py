@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import re
 import tempfile
 from urllib.error import URLError
 from urllib.parse import urlparse
@@ -368,6 +369,30 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
         )
 
 
+def _parse_cms_lat_lon(row: dict) -> tuple[float | None, float | None]:
+    """Extract lat/lon from CMS row. Tries explicit columns then 'Location' field."""
+    lat = parse_float(first(row, ("Latitude", "lat", "LAT")))
+    lon = parse_float(first(row, ("Longitude", "Long", "LON", "lng", "Lon")))
+    if lat is not None and lon is not None:
+        return lat, lon
+    # CMS sometimes encodes as "POINT (lon lat)" or "lat, lon"
+    loc = str(first(row, ("Location", "location")) or "").strip()
+    if not loc:
+        return None, None
+    # POINT (-97.512 36.567) format
+    m = re.search(r"POINT\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*\)", loc, re.I)
+    if m:
+        return float(m.group(2)), float(m.group(1))  # lat, lon (POINT is lon lat)
+    # "lat, lon" format
+    parts = loc.split(",")
+    if len(parts) == 2:
+        try:
+            return float(parts[0].strip()), float(parts[1].strip())
+        except ValueError:
+            pass
+    return None, None
+
+
 def load_cms_general(path: str) -> int:
     rows = load_csv_rows(path)
     count = 0
@@ -378,6 +403,7 @@ def load_cms_general(path: str) -> int:
         city = first(row, ("City", "City/Town", "city"))
         if not fid or not name or not state or not city:
             continue
+        lat, lon = _parse_cms_lat_lon(row)
         upsert_hospital_row(
             {
                 "facility_id": fid,
@@ -399,6 +425,8 @@ def load_cms_general(path: str) -> int:
                 "state_slug": state_slug_from_code(str(state)),
                 "city_slug": city_slug_from_name(str(city)),
                 "cms_data_updated": first(row, ("Last Updated", "Date", "last_updated")),
+                "lat": lat,
+                "lon": lon,
             }
         )
         count += 1
