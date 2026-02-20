@@ -125,8 +125,13 @@ def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> 
                     AVG(CASE WHEN ap.facility_type = 'asc' THEN ap.gross_charge END) AS asc_avg,
                     AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
                 FROM all_prices ap
-                WHERE lower(trim(ap.cpt_code)) = lower(trim(?))
-                   OR lower(trim(ap.description)) = lower(trim(?))
+                WHERE (
+                    lower(trim(ap.cpt_code)) = lower(trim(?))
+                    OR lower(trim(ap.description)) = lower(trim(?))
+                )
+                  AND ap.gross_charge IS NOT NULL
+                  AND ap.gross_charge > 0
+                  AND ap.gross_charge <= 1000000
                 GROUP BY ap.cpt_code
                 LIMIT ?
                 """,
@@ -143,7 +148,10 @@ def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> 
                     AVG(CASE WHEN ap.facility_type = 'asc' THEN ap.gross_charge END) AS asc_avg,
                     AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
                 FROM all_prices ap
-                WHERE ap.cpt_code LIKE ? OR ap.description LIKE ?
+                WHERE (ap.cpt_code LIKE ? OR ap.description LIKE ?)
+                  AND ap.gross_charge IS NOT NULL
+                  AND ap.gross_charge > 0
+                  AND ap.gross_charge <= 1000000
                 GROUP BY ap.cpt_code
                 ORDER BY
                     CASE
@@ -179,6 +187,9 @@ def _search_procedures(query: str, limit: int = 5, exact_only: bool = False) -> 
                         AVG(CASE WHEN ap.facility_type = 'imaging_center' THEN ap.gross_charge END) AS imaging_avg
                     FROM all_prices ap
                     WHERE ap.cpt_code IN ({placeholders})
+                      AND ap.gross_charge IS NOT NULL
+                      AND ap.gross_charge > 0
+                      AND ap.gross_charge <= 1000000
                     GROUP BY ap.cpt_code
                     ORDER BY ap.cpt_code
                     LIMIT ?

@@ -642,6 +642,83 @@ def test_upsert_facility_procedure_price_imaging_modifier_uses_pfs():
     assert round(row["medicare_benchmark_rate"], 2) == 210.00
 
 
+def test_upsert_hospital_price_discards_implausible_charges():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "94001", "name": "Charge Sanitizer Hospital", "city": "Austin", "state": "TX", "slug": "charge-sanitizer-austin"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+            ("70551", "0000000", 200.0, 200.0, 2026),
+        )
+
+    upsert_hospital_price(
+        "94001",
+        {
+            "cpt_code": "70551",
+            "description": "MRI BRAIN STEM W/O DYE",
+            "gross_charge": 7_055_101.0,
+            "cash_price": 1_500_000.0,
+        },
+        data_year=2026,
+    )
+    with get_db() as conn:
+        row = conn.execute(
+            """
+            SELECT gross_charge, cash_price, markup_vs_medicare
+            FROM hospital_prices
+            WHERE facility_id = '094001' AND cpt_code = '70551' AND data_year = 2026
+            """
+        ).fetchone()
+    assert row is not None
+    assert row["gross_charge"] is None
+    assert row["cash_price"] is None
+    assert row["markup_vs_medicare"] is None
+
+
+def test_upsert_facility_procedure_price_discards_implausible_charge_for_non_hospital():
+    _db._connection = None
+    _db.init_db()
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT INTO facilities (facility_id, name, city, state, state_slug, city_slug, slug, facility_type)
+            VALUES ('img999', 'Imaging Sanitizer', 'Austin', 'TX', 'tx', 'austin', 'imaging-sanitizer-austin-imaging-center', 'imaging_center')
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO hospital_opps_rates (cpt_code, apc, description, national_payment_rate, effective_year)
+            VALUES ('70553', '5571', 'MRI', 317.0, 2026)
+            """
+        )
+
+    upsert_facility_procedure_price(
+        "img999",
+        {
+            "cpt_code": "70553",
+            "description": "MRI BRAIN W CONTRAST",
+            "gross_charge": 9_999_999.0,
+        },
+        "imaging_center",
+        data_year=2026,
+    )
+    with get_db() as conn:
+        row = conn.execute(
+            """
+            SELECT gross_charge, markup_vs_medicare, medicare_benchmark_rate
+            FROM procedure_prices
+            WHERE facility_id = 'img999' AND cpt_code = '70553' AND data_year = 2026
+            """
+        ).fetchone()
+    assert row is not None
+    assert row["gross_charge"] is None
+    assert row["markup_vs_medicare"] is None
+    assert row["medicare_benchmark_rate"] == 317.0
+
+
 def test_refresh_facility_transparency_tracks_non_hospital_parse_results():
     _db._connection = None
     _db.init_db()

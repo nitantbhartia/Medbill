@@ -18,6 +18,7 @@ from enrichment import (
     _normalize_name,
     _title_case_address,
     coverage_report,
+    extract_asc_and_imaging_from_pos,
     load_pos_file,
     match_pos_to_hospitals,
     update_beds_from_pos,
@@ -40,12 +41,16 @@ from hospital_seo import (
 # Helper: write a minimal POS CSV to a temp file
 # ---------------------------------------------------------------------------
 
-def _write_pos_csv(rows: list[dict]) -> str:
+def _write_pos_csv(rows: list[dict], extra_fields: list[str] | None = None) -> str:
     fields = [
         "PRVDR_NUM", "FAC_NAME", "ST_ADR", "CITY_NAME", "STATE_CD",
         "ZIP_CD", "LATITUDE", "LONGITUDE", "CRTFD_BED_CNT",
         "GNRL_CNTL_TYPE_CD", "GNRL_FAC_TYPE_CD", "ORGNL_PRTCPTN_DT", "PHNE_NUM",
     ]
+    if extra_fields:
+        for field in extra_fields:
+            if field not in fields:
+                fields.append(field)
     fd, path = tempfile.mkstemp(suffix=".csv")
     with os.fdopen(fd, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
@@ -206,6 +211,118 @@ class TestPosFileLoading:
         with get_db() as db:
             row = db.execute("SELECT ccn FROM cms_pos_enrichment WHERE ccn = '001234'").fetchone()
         assert row is not None
+        os.unlink(path)
+
+
+class TestNonHospitalExtraction:
+    def test_extracts_legacy_asc_and_imaging_codes(self):
+        with get_db() as db:
+            db.execute(
+                """
+                INSERT OR REPLACE INTO facilities (
+                    facility_id, name, city, state, state_slug, city_slug, slug, facility_type
+                ) VALUES ('450123', 'Parent Hospital', 'Austin', 'TX', 'tx', 'austin', 'parent-hospital-austin', 'hospital')
+                """
+            )
+            db.execute(
+                """
+                INSERT OR REPLACE INTO hospitals (
+                    facility_id, name, city, state, slug, state_slug, city_slug
+                ) VALUES ('450123', 'Parent Hospital', 'Austin', 'TX', 'parent-hospital-austin', 'tx', 'austin')
+                """
+            )
+
+        path = _write_pos_csv(
+            [
+                {
+                    "PRVDR_NUM": "111111",
+                    "FAC_NAME": "Austin Surgery Center",
+                    "CITY_NAME": "AUSTIN",
+                    "STATE_CD": "TX",
+                    "ZIP_CD": "78701",
+                    "GNRL_CNTL_TYPE_CD": "05",
+                    "GNRL_FAC_TYPE_CD": "17",
+                    "ORGNL_PRTCPTN_DT": "20210101",
+                    "CRTFCTN_DT": "20210101",
+                },
+                {
+                    "PRVDR_NUM": "222222",
+                    "FAC_NAME": "Austin Advanced Imaging",
+                    "CITY_NAME": "AUSTIN",
+                    "STATE_CD": "TX",
+                    "ZIP_CD": "78702",
+                    "GNRL_CNTL_TYPE_CD": "05",
+                    "GNRL_FAC_TYPE_CD": "28",
+                    "ORGNL_PRTCPTN_DT": "20210101",
+                    "CRTFCTN_DT": "20210101",
+                },
+            ],
+            extra_fields=["CRTFCTN_DT"],
+        )
+        counts = extract_asc_and_imaging_from_pos(path, strict_min_expected=0)
+        assert counts["asc"] == 1
+        assert counts["imaging_center"] == 1
+        with get_db() as db:
+            asc = db.execute("SELECT facility_type FROM facilities WHERE facility_id = 'asc-111111'").fetchone()
+            img = db.execute("SELECT facility_type FROM facilities WHERE facility_id = 'img-222222'").fetchone()
+        assert asc["facility_type"] == "asc"
+        assert img["facility_type"] == "imaging_center"
+        os.unlink(path)
+
+    def test_extracts_fallback_schema_using_flags_and_name_markers(self):
+        path = _write_pos_csv(
+            [
+                {
+                    "PRVDR_NUM": "333333",
+                    "FAC_NAME": "Capital Ambulatory Surgery Center",
+                    "CITY_NAME": "HOUSTON",
+                    "STATE_CD": "TX",
+                    "ZIP_CD": "77001",
+                    "GNRL_CNTL_TYPE_CD": "05",
+                    "GNRL_FAC_TYPE_CD": "",
+                    "FREESTNDNG_ASC_SW": "Y",
+                    "CRTFCTN_DT": "20220101",
+                    "ORGNL_PRTCPTN_DT": "20220101",
+                },
+                {
+                    "PRVDR_NUM": "444444",
+                    "FAC_NAME": "River City Imaging",
+                    "CITY_NAME": "HOUSTON",
+                    "STATE_CD": "TX",
+                    "ZIP_CD": "77002",
+                    "GNRL_CNTL_TYPE_CD": "05",
+                    "GNRL_FAC_TYPE_CD": "",
+                    "RDLGY_SRVC_CD": "Y",
+                    "CRTFCTN_DT": "20220101",
+                    "ORGNL_PRTCPTN_DT": "20220101",
+                },
+            ],
+            extra_fields=["FREESTNDNG_ASC_SW", "RDLGY_SRVC_CD", "CRTFCTN_DT"],
+        )
+        counts = extract_asc_and_imaging_from_pos(path, strict_min_expected=0)
+        assert counts["asc"] == 1
+        assert counts["imaging_center"] == 1
+        os.unlink(path)
+
+    def test_raises_when_non_hospital_extraction_volume_is_suspiciously_low(self):
+        path = _write_pos_csv(
+            [
+                {
+                    "PRVDR_NUM": "555555",
+                    "FAC_NAME": "Single Tiny Extract",
+                    "CITY_NAME": "HOUSTON",
+                    "STATE_CD": "TX",
+                    "ZIP_CD": "77001",
+                    "GNRL_CNTL_TYPE_CD": "05",
+                    "GNRL_FAC_TYPE_CD": "17",
+                    "CRTFCTN_DT": "20220101",
+                    "ORGNL_PRTCPTN_DT": "20220101",
+                },
+            ],
+            extra_fields=["CRTFCTN_DT"],
+        )
+        with pytest.raises(RuntimeError):
+            extract_asc_and_imaging_from_pos(path, strict_min_expected=5)
         os.unlink(path)
 
 

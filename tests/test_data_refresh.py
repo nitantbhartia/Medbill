@@ -4,6 +4,7 @@ import os
 import tempfile
 
 from data_refresh import (
+    refresh_all_from_directory,
     refresh_asc_rates,
     data_health_check,
     refresh_medicare_rates,
@@ -125,6 +126,50 @@ class TestRefreshZipLatLon:
                 assert row["city"] == "San Diego"
         finally:
             os.unlink(path)
+
+    def test_skips_malformed_rows(self):
+        csv_content = (
+            "ZIP,LAT,LON,STATE,CITY\n"
+            "badzip,32.79,-117.17,CA,San Diego\n"
+            "92111,notalat,-117.17,CA,San Diego\n"
+            "92112,32.80,-117.18,CA,San Diego\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            f.flush()
+            path = f.name
+
+        try:
+            count = refresh_zip_latlon(path)
+            assert count == 1
+            with get_db() as db:
+                row = db.execute("SELECT COUNT(*) AS cnt FROM zip_latlon WHERE zip = '92112'").fetchone()
+                assert row["cnt"] == 1
+        finally:
+            os.unlink(path)
+
+
+class TestRefreshAllFromDirectory:
+    def test_refresh_all_loads_zip_files(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "zip_locality_map.csv"), "w", encoding="utf-8") as f:
+                f.write("ZIP_PREFIX,LOCALITY,STATE,REGION\n92111,0000000,CA,west\n")
+            with open(os.path.join(d, "zip_latlon.csv"), "w", encoding="utf-8") as f:
+                f.write("ZIP,LAT,LON,STATE,CITY\n92111,32.7972,-117.1708,CA,San Diego\n")
+
+            out = refresh_all_from_directory(d)
+            assert out["zip_locality_map.csv"] == 1
+            assert out["zip_latlon.csv"] == 1
+
+            with get_db() as db:
+                loc = db.execute(
+                    "SELECT state FROM zip_locality_map WHERE zip_prefix = '92111'"
+                ).fetchone()
+                geo = db.execute(
+                    "SELECT city FROM zip_latlon WHERE zip = '92111'"
+                ).fetchone()
+                assert loc["state"] == "CA"
+                assert geo["city"] == "San Diego"
 
 
 class TestRefreshAscRates:

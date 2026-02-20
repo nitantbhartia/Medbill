@@ -57,6 +57,17 @@ def parse_float(value: str | int | float | None) -> float | None:
         return None
 
 
+def _sanitize_price_value(value: float | None, upper_bound: float = 1_000_000.0) -> float | None:
+    """Drop impossible/invalid charges to prevent parser artifacts from polluting aggregates."""
+    if value is None:
+        return None
+    if value <= 0:
+        return None
+    if value > upper_bound:
+        return None
+    return float(value)
+
+
 def numeric_by_patterns(row: dict, patterns: tuple[str, ...]) -> float | None:
     # Try exact/known columns first via `first`.
     val = parse_float(first(row, patterns))
@@ -417,7 +428,11 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
     if not facility_id:
         return
     medicare = get_medicare_rate_for_facility(facility_id, row["cpt_code"])
-    gross = row.get("gross_charge")
+    gross = _sanitize_price_value(parse_float(row.get("gross_charge")))
+    cash = _sanitize_price_value(parse_float(row.get("cash_price")))
+    min_negotiated = _sanitize_price_value(parse_float(row.get("min_negotiated_rate")))
+    max_negotiated = _sanitize_price_value(parse_float(row.get("max_negotiated_rate")))
+    avg_negotiated = _sanitize_price_value(parse_float(row.get("avg_negotiated_rate")))
     markup = (gross / medicare) if (gross is not None and medicare and medicare > 0) else None
     year = data_year or date.today().year
 
@@ -447,11 +462,11 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 facility_id,
                 row["cpt_code"],
                 row.get("description"),
-                row.get("gross_charge"),
-                row.get("cash_price"),
-                row.get("min_negotiated_rate"),
-                row.get("max_negotiated_rate"),
-                row.get("avg_negotiated_rate"),
+                gross,
+                cash,
+                min_negotiated,
+                max_negotiated,
+                avg_negotiated,
                 medicare,
                 markup,
                 year,
@@ -482,12 +497,12 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 facility_id,
                 row["cpt_code"],
                 row.get("description"),
-                row.get("gross_charge"),
-                row.get("cash_price"),
+                gross,
+                cash,
                 medicare,
-                row.get("avg_negotiated_rate"),
-                row.get("min_negotiated_rate"),
-                row.get("max_negotiated_rate"),
+                avg_negotiated,
+                min_negotiated,
+                max_negotiated,
                 None,
             ),
         )
@@ -509,7 +524,11 @@ def upsert_facility_procedure_price(
     if not facility_id:
         return
     benchmark_type, benchmark_rate = resolve_benchmark_for_row(facility_id, ftype, row)
-    gross = row.get("gross_charge")
+    gross = _sanitize_price_value(parse_float(row.get("gross_charge")))
+    cash = _sanitize_price_value(parse_float(row.get("cash_price")))
+    min_negotiated = _sanitize_price_value(parse_float(row.get("min_negotiated_rate")))
+    max_negotiated = _sanitize_price_value(parse_float(row.get("max_negotiated_rate")))
+    avg_negotiated = _sanitize_price_value(parse_float(row.get("avg_negotiated_rate")))
     markup = (gross / benchmark_rate) if (gross is not None and benchmark_rate and benchmark_rate > 0) else None
     year = data_year or date.today().year
 
@@ -539,11 +558,11 @@ def upsert_facility_procedure_price(
                 facility_id,
                 row["cpt_code"],
                 row.get("description"),
-                row.get("gross_charge"),
-                row.get("cash_price"),
-                row.get("min_negotiated_rate"),
-                row.get("max_negotiated_rate"),
-                row.get("avg_negotiated_rate"),
+                gross,
+                cash,
+                min_negotiated,
+                max_negotiated,
+                avg_negotiated,
                 benchmark_rate,
                 markup,
                 year,

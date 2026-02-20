@@ -92,7 +92,7 @@ def load_dolthub_hospitals() -> list[dict]:
     return rows
 
 
-def match_hospitals(limit: int) -> tuple[dict[str, str], list[dict]]:
+def match_hospitals(limit: int) -> tuple[dict[str, dict], list[dict]]:
     with sqlite3.connect(config.DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         ours = conn.execute(
@@ -115,28 +115,36 @@ def match_hospitals(limit: int) -> tuple[dict[str, str], list[dict]]:
         by_exact[key_exact].append(row)
         by_name_state[key_name_state].append(row)
 
-    facility_to_npi: dict[str, str] = {}
+    facility_matches: dict[str, dict] = {}
     for h in ours:
         key_exact = (norm_name(h.get("name")), norm_city(h.get("city")), (h.get("state") or "").upper())
         cands = by_exact.get(key_exact, [])
         if len(cands) == 1:
-            facility_to_npi[h["facility_id"]] = cands[0]["npi_number"]
+            facility_matches[h["facility_id"]] = {
+                "npi": cands[0]["npi_number"],
+                "method": "exact_name_city_state",
+                "confidence": 1.0,
+            }
             continue
 
         key_name_state = (norm_name(h.get("name")), (h.get("state") or "").upper())
         cands = by_name_state.get(key_name_state, [])
         if len(cands) == 1:
-            facility_to_npi[h["facility_id"]] = cands[0]["npi_number"]
+            facility_matches[h["facility_id"]] = {
+                "npi": cands[0]["npi_number"],
+                "method": "name_state_single_candidate",
+                "confidence": 0.7,
+            }
 
-    return facility_to_npi, dolt
+    return facility_matches, dolt
 
 
 def _chunks(values: list[str], size: int) -> list[list[str]]:
     return [values[i : i + size] for i in range(0, len(values), size)]
 
 
-def load_prices_for_matches(facility_to_npi: dict[str, str], year: int) -> dict[str, int]:
-    npi_to_facility = {npi: fid for fid, npi in facility_to_npi.items()}
+def load_prices_for_matches(facility_matches: dict[str, dict], year: int) -> dict[str, int]:
+    npi_to_facility = {m["npi"]: fid for fid, m in facility_matches.items()}
     npis = list(npi_to_facility.keys())
     if not npis:
         return {"rows": 0, "facilities": 0}
@@ -208,7 +216,8 @@ def load_prices_for_matches(facility_to_npi: dict[str, str], year: int) -> dict[
                 facility_hits.add(facility_id)
                 total_rows += 1
 
-        for facility_id, npi in facility_to_npi.items():
+        for facility_id, match in facility_matches.items():
+            npi = match["npi"]
             parsed = facility_id in facility_hits
             conn.execute(
                 """
@@ -235,6 +244,26 @@ def load_prices_for_matches(facility_to_npi: dict[str, str], year: int) -> dict[
                     1 if parsed else 0,
                 ),
             )
+            conn.execute(
+                """
+                INSERT INTO data_source_crosswalk (
+                    source_name, source_entity_id, facility_id,
+                    match_method, match_confidence, last_verified_at
+                ) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(source_name, source_entity_id) DO UPDATE SET
+                    facility_id=excluded.facility_id,
+                    match_method=excluded.match_method,
+                    match_confidence=excluded.match_confidence,
+                    last_verified_at=CURRENT_TIMESTAMP
+                """,
+                (
+                    "dolthub_hospital_price_transparency",
+                    npi,
+                    facility_id,
+                    match.get("method"),
+                    match.get("confidence"),
+                ),
+            )
         conn.commit()
 
     return {"rows": total_rows, "facilities": len(facility_hits)}
@@ -247,17 +276,17 @@ def main() -> None:
     args = parser.parse_args()
 
     db.init_db()
-    facility_to_npi, _ = match_hospitals(limit=args.limit)
-    loaded = load_prices_for_matches(facility_to_npi, year=args.year)
+    facility_matches, _ = match_hospitals(limit=args.limit)
+    loaded = load_prices_for_matches(facility_matches, year=args.year)
     log_refresh(
         "dolthub_pricing",
         loaded["rows"],
         "success" if loaded["rows"] else "partial",
-        f"matched_facilities={len(facility_to_npi)} loaded_facilities={loaded['facilities']}",
+        f"matched_facilities={len(facility_matches)} loaded_facilities={loaded['facilities']}",
     )
     print(
         {
-            "matched_facilities": len(facility_to_npi),
+            "matched_facilities": len(facility_matches),
             "loaded_facilities": loaded["facilities"],
             "rows_loaded": loaded["rows"],
         }

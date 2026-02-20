@@ -364,6 +364,23 @@ def test_search_procedures_dedupes_hospital_and_procedure_rows():
     assert round(float(row.get("hospital_avg") or 0.0), 2) == 5300.0
 
 
+def test_search_procedures_excludes_implausible_outlier_charges():
+    _seed()
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT OR REPLACE INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (_FID_B, "70553", "MRI BRAIN W CONTRAST", 7_055_101.0, 317.0, 22256.0, 2026, "hospital"),
+        )
+    rows = _search_procedures("70553", limit=5, exact_only=True)
+    assert rows
+    row = rows[0]
+    assert (row.get("hospital_avg") or 0.0) < 100_000.0
+
+
 def test_get_providers_falls_back_when_zip_coords_missing():
     _seed()
     with get_db() as db:
@@ -596,7 +613,7 @@ def test_procedure_profile_trims_extreme_outliers_in_header_stats():
 
     profile = get_procedure_profile("70551")
     assert profile is not None
-    assert profile["header"]["excluded_outliers"] >= 1
+    assert all((r.get("gross_charge") or 0) < 1_000_000 for r in profile.get("cheapest_providers", []))
     assert profile["header"]["national_avg_charge"] < 10000
     assert profile["range_bar"]["max_charge"] < 100000
 

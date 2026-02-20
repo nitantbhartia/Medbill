@@ -42,6 +42,7 @@ CMS_CARE_COMPARE_API = "https://data.cms.gov/provider-data/api/1/datastore/query
 
 ASC_FACILITY_TYPE_CODES = {"17"}
 IMAGING_FACILITY_TYPE_CODES = {"28", "33"}
+_KNOWN_HOSPITAL_FACILITY_TYPE_CODES = {"01", "02", "03", "04", "05", "06", "07", "11"}
 
 # CMS GNRL_CNTL_TYPE_CD → display value mapping
 OWNERSHIP_CODE_MAP = {
@@ -167,6 +168,75 @@ def _guess_imaging_modalities(name: str) -> list[str]:
     return modalities
 
 
+def _is_truthy_flag(value: str | None) -> bool:
+    txt = (value or "").strip().upper()
+    return txt in {"Y", "YES", "TRUE", "T", "1"}
+
+
+def _classify_non_hospital_facility_type(row: dict) -> str | None:
+    """
+    Return 'asc' / 'imaging_center' for known non-hospital POS rows.
+
+    CMS has changed POS schemas over time. We first use explicit legacy
+    facility type codes, then conservative fallback signals for newer files.
+    """
+    fac_type = (row.get("GNRL_FAC_TYPE_CD") or "").strip()
+    if fac_type in ASC_FACILITY_TYPE_CODES:
+        return "asc"
+    if fac_type in IMAGING_FACILITY_TYPE_CODES:
+        return "imaging_center"
+
+    # Guard against misclassifying hospital rows in newer POS extracts.
+    if fac_type in _KNOWN_HOSPITAL_FACILITY_TYPE_CODES:
+        return None
+
+    name = (row.get("FAC_NAME") or row.get("ORGANIZATION_NAME") or "").lower()
+    if not name:
+        return None
+
+    # ASC fallback: explicit ASC flags + surgery-center style names.
+    if _is_truthy_flag(row.get("FREESTNDNG_ASC_SW")) or (row.get("ASC_BGN_SRVC_DT") or "").strip():
+        return "asc"
+    asc_name_markers = (
+        "ambulatory surgery",
+        "surgery center",
+        "surgical center",
+        "endoscopy center",
+        "outpatient surgery",
+    )
+    if any(marker in name for marker in asc_name_markers):
+        return "asc"
+
+    # Imaging fallback: name markers + imaging service flags.
+    imaging_name_markers = (
+        "imaging",
+        "radiology",
+        "diagnostic",
+        "mri",
+        "ct",
+        "x-ray",
+        "xray",
+        "ultrasound",
+        "mamm",
+        "pet",
+    )
+    imaging_service_flags = (
+        "RDLGY_SRVC_CD",
+        "DGNSTC_RDLGY_SRVC_CD",
+        "MGNTC_RSNC_IMG_SRVC_CD",
+        "CT_SCAN_SRVC_CD",
+        "PET_SCAN_SRVC_CD",
+        "NUCLR_MDCN_SRVC_CD",
+        "DGNSTC_XRAY_ONST_NRSDNT_SW",
+        "DGNSTC_XRAY_ONST_RSDNT_SW",
+    )
+    if any(marker in name for marker in imaging_name_markers):
+        return "imaging_center"
+    if any(_is_truthy_flag(row.get(flag)) for flag in imaging_service_flags):
+        return "imaging_center"
+    return None
+
+
 def _is_valid_coord(lat: float | None, lon: float | None) -> bool:
     if lat is None or lon is None:
         return False
@@ -260,7 +330,10 @@ def load_pos_file(csv_path: str) -> int:
     return len(rows)
 
 
-def extract_asc_and_imaging_from_pos(csv_path: str) -> dict[str, int]:
+def extract_asc_and_imaging_from_pos(
+    csv_path: str,
+    strict_min_expected: int = 50,
+) -> dict[str, int]:
     """
     Extract ASC and imaging-center facilities from CMS POS CSV and upsert into facilities.
     Returns counts by facility type.
@@ -297,12 +370,8 @@ def extract_asc_and_imaging_from_pos(csv_path: str) -> dict[str, int]:
     with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for src in reader:
-            fac_type = (src.get("GNRL_FAC_TYPE_CD") or "").strip()
-            if fac_type in ASC_FACILITY_TYPE_CODES:
-                facility_type = "asc"
-            elif fac_type in IMAGING_FACILITY_TYPE_CODES:
-                facility_type = "imaging_center"
-            else:
+            facility_type = _classify_non_hospital_facility_type(src)
+            if not facility_type:
                 continue
 
             cert_dt = (src.get("CRTFCTN_DT") or src.get("ORGNL_PRTCPTN_DT") or "").strip()
@@ -422,6 +491,14 @@ def extract_asc_and_imaging_from_pos(csv_path: str) -> dict[str, int]:
                 row,
             )
             inserted[row[10]] += 1
+
+    total = inserted["asc"] + inserted["imaging_center"]
+    if total < strict_min_expected:
+        raise RuntimeError(
+            "Non-hospital POS extraction returned suspiciously low volume "
+            f"(asc={inserted['asc']}, imaging={inserted['imaging_center']}). "
+            "CMS schema likely changed; update extractor mapping before continuing."
+        )
 
     log.info("Extracted non-hospital facilities from POS: %s", inserted)
     return inserted

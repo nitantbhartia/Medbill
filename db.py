@@ -578,6 +578,35 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_fair_bands_geo ON fair_price_bands(geo_scope, geo_value)")
     db.execute(
         """
+        CREATE TABLE IF NOT EXISTS data_source_crosswalk (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source_name TEXT NOT NULL,
+            source_entity_id TEXT NOT NULL,
+            facility_id TEXT NOT NULL,
+            match_method TEXT,
+            match_confidence REAL,
+            last_verified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(source_name, source_entity_id)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_crosswalk_facility ON data_source_crosswalk(facility_id)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS data_quality_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT NOT NULL,
+            coverage_json TEXT,
+            checks_json TEXT,
+            notes TEXT
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_quality_runs_date ON data_quality_runs(run_date)")
+    db.execute(
+        """
         CREATE TABLE IF NOT EXISTS dispute_claims (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             bill_id INTEGER NOT NULL REFERENCES bills(id),

@@ -308,6 +308,40 @@ def _resolve_state_from_zip(zip_code: str) -> str | None:
     return None
 
 
+def _resolve_county_from_zip(zip_code: str) -> str | None:
+    clean = (zip_code or "").strip()[:5]
+    if len(clean) != 5 or not clean.isdigit():
+        return None
+    with get_db() as db:
+        row = db.execute(
+            """
+            SELECT county, COUNT(*) AS cnt
+            FROM (
+                SELECT TRIM(county) AS county
+                FROM facilities
+                WHERE zip IS NOT NULL
+                  AND substr(zip, 1, 5) = ?
+                  AND county IS NOT NULL
+                  AND trim(county) <> ''
+                UNION ALL
+                SELECT TRIM(county) AS county
+                FROM hospitals
+                WHERE zip IS NOT NULL
+                  AND substr(zip, 1, 5) = ?
+                  AND county IS NOT NULL
+                  AND trim(county) <> ''
+            ) c
+            GROUP BY county
+            ORDER BY cnt DESC, county ASC
+            LIMIT 1
+            """,
+            (clean, clean),
+        ).fetchone()
+    if row and row["county"]:
+        return str(row["county"]).strip().upper()
+    return None
+
+
 def get_top_cpt_codes(limit: int = 100) -> list[dict]:
     """Return top CPT codes ranked by provider coverage, with basic stats."""
     with get_db() as db:
@@ -331,9 +365,12 @@ def get_top_cpt_codes(limit: int = 100) -> list[dict]:
                 ) AS description
             FROM all_prices hp
             WHERE hp.gross_charge IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
               AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) IS NOT NULL
               AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) > 0
               AND hp.markup_vs_medicare IS NOT NULL
+              AND hp.markup_vs_medicare BETWEEN 0.1 AND 150.0
             GROUP BY hp.cpt_code
             ORDER BY provider_count DESC, markup_variance DESC
             LIMIT ?
@@ -406,8 +443,12 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
               AND ({resolved_rate_expr}) IS NOT NULL
               AND ({resolved_rate_expr}) > 0
+              AND ({resolved_markup_expr}) IS NOT NULL
+              AND ({resolved_markup_expr}) BETWEEN 0.1 AND 150.0
             """,
             (cpt_code,),
         ).fetchall()
@@ -439,7 +480,10 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
               AND ({resolved_markup_expr}) IS NOT NULL
+              AND ({resolved_markup_expr}) BETWEEN 0.1 AND 150.0
               AND COALESCE(f.name, h.name) IS NOT NULL
             ORDER BY ({resolved_markup_expr}) ASC
             LIMIT 30
@@ -467,6 +511,8 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
                 WHERE hp.cpt_code != ?
                   AND CAST(hp.cpt_code AS INTEGER) BETWEEN ? AND ?
                   AND hp.gross_charge IS NOT NULL
+                  AND hp.gross_charge > 0
+                  AND hp.gross_charge <= 1000000
                 GROUP BY hp.cpt_code
                 ORDER BY hospital_count DESC
                 LIMIT 3
@@ -697,6 +743,9 @@ def get_providers_near_zip_for_cpt(
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
+              AND hp.markup_vs_medicare BETWEEN 0.1 AND 150.0
               AND COALESCE(f.lat, h.lat) BETWEEN ? AND ?
               AND COALESCE(f.lon, h.lon) BETWEEN ? AND ?
               AND COALESCE(f.name, h.name) IS NOT NULL
@@ -796,6 +845,9 @@ def _get_nearest_same_state_providers_for_cpt(
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
+              AND hp.markup_vs_medicare BETWEEN 0.1 AND 150.0
               AND COALESCE(f.name, h.name) IS NOT NULL
               AND UPPER(COALESCE(f.state, h.state)) = ?
               AND COALESCE(f.lat, h.lat) IS NOT NULL
@@ -886,6 +938,9 @@ def _get_providers_without_zip_coords(
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
+              AND hp.gross_charge > 0
+              AND hp.gross_charge <= 1000000
+              AND hp.markup_vs_medicare BETWEEN 0.1 AND 150.0
               AND COALESCE(f.name, h.name) IS NOT NULL
               {where_state}
               {where_type}

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from db import get_db
-from procedure_pages import _classify_cpt, get_procedure_profile
+from procedure_pages import _ALL_PRICES_CTE, _classify_cpt, _trim_outlier_rows, get_procedure_profile
 
 _SLUG_TO_CPT = {
     "mri-cost": "70551",
@@ -123,37 +123,39 @@ def get_content_page_data(slug: str) -> dict | None:
     procedure_type = _classify_cpt(cfg.cpt_code)
 
     with get_db() as db:
-        state_rows = db.execute(
-            """
+        state_price_rows = db.execute(
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
                 COALESCE(f.state, h.state) AS state,
-                AVG(p.gross_charge) AS avg_charge
-            FROM (
-                SELECT facility_id, cpt_code, gross_charge, data_year, COALESCE(facility_type, 'hospital') AS facility_type
-                FROM procedure_prices
-                UNION ALL
-                SELECT hp.facility_id, hp.cpt_code, hp.gross_charge, hp.data_year, COALESCE(hp.facility_type, 'hospital') AS facility_type
-                FROM hospital_prices hp
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM procedure_prices pp
-                    WHERE pp.facility_id = hp.facility_id
-                      AND pp.cpt_code = hp.cpt_code
-                      AND COALESCE(pp.data_year, -1) = COALESCE(hp.data_year, -1)
-                      AND COALESCE(pp.facility_type, 'hospital') = COALESCE(hp.facility_type, 'hospital')
-                )
-            ) p
-            LEFT JOIN facilities f ON f.facility_id = p.facility_id
-            LEFT JOIN hospitals h ON h.facility_id = p.facility_id
-            WHERE p.cpt_code = ?
-              AND p.gross_charge IS NOT NULL
+                hp.gross_charge
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
+            WHERE hp.cpt_code = ?
+              AND hp.gross_charge IS NOT NULL
               AND COALESCE(f.state, h.state) IS NOT NULL
-            GROUP BY COALESCE(f.state, h.state)
-            ORDER BY avg_charge ASC
-            LIMIT 20
             """,
             (cfg.cpt_code,),
         ).fetchall()
+
+    grouped: dict[str, list[dict]] = {}
+    for row in state_price_rows:
+        state = (row["state"] or "").strip().upper()
+        if not state:
+            continue
+        grouped.setdefault(state, []).append({"gross_charge": row["gross_charge"]})
+
+    state_rows = []
+    for state, rows in grouped.items():
+        trimmed, _ = _trim_outlier_rows(rows, "gross_charge")
+        usable = trimmed or rows
+        charges = [float(r["gross_charge"]) for r in usable if r.get("gross_charge") is not None]
+        if not charges:
+            continue
+        state_rows.append({"state": state, "avg_charge": sum(charges) / len(charges)})
+    state_rows.sort(key=lambda r: r["avg_charge"])
+    state_rows = state_rows[:20]
 
     by_type = []
     for row in (profile.get("ranges_by_type") or []):
@@ -166,7 +168,7 @@ def get_content_page_data(slug: str) -> dict | None:
     profile["content_slug"] = slug
     profile["default_facility_type"] = cfg.default_facility_type
     profile["by_facility_type"] = by_type
-    profile["state_averages"] = [dict(r) for r in state_rows]
+    profile["state_averages"] = state_rows
     profile["excluded_outliers"] = (profile.get("header") or {}).get("excluded_outliers", 0)
     profile["is_imaging_content"] = procedure_type == "imaging"
     profile["is_colonoscopy_content"] = cfg.cpt_code == "45378"
