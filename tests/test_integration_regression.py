@@ -34,13 +34,11 @@ class TestLandingPageRegression:
         html = resp.text
 
         # Core value prop + key interaction controls should stay stable.
-        assert "hospitals set the prices. we check the math." in html
-        assert 'id="dropZone"' in html
-        assert 'id="startAudit"' in html
-        assert "Check My Bill Free" in html
-        assert "Your data stays private" in html
-        assert "How it works" in html
-        assert "/api/scan" in html
+        assert "Compare prices across hospitals, surgery centers, and imaging centers" in html
+        assert 'id="heroSearchForm"' in html
+        assert 'id="heroSearch"' in html
+        assert 'id="facilityCardsGrid"' in html
+        assert 'id="procedureCardsGrid"' in html
 
 
 class TestPageFlowRegression:

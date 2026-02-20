@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 
 import config
@@ -641,7 +642,8 @@ def get_stats() -> dict:
     """Get aggregate stats for the live counter, cached for STATS_CACHE_TTL_SECONDS."""
     global _stats_cache, _stats_cache_ts
     now = time.monotonic()
-    if _stats_cache and (now - _stats_cache_ts) < config.STATS_CACHE_TTL_SECONDS:
+    use_cache = os.getenv("DB_PATH") != ":memory:"
+    if use_cache and _stats_cache and (now - _stats_cache_ts) < config.STATS_CACHE_TTL_SECONDS:
         return _stats_cache
 
     with get_db() as db:
@@ -653,9 +655,11 @@ def get_stats() -> dict:
             "(SELECT COUNT(*) FROM dispute_outcomes) as dispute_outcomes_count "
             "FROM bills WHERE total_findings > 0"
         ).fetchone()
-    _stats_cache = dict(row)
-    _stats_cache_ts = now
-    return _stats_cache
+    payload = dict(row)
+    if use_cache:
+        _stats_cache = payload
+        _stats_cache_ts = now
+    return payload
 
 
 def get_effectiveness_metrics() -> dict:

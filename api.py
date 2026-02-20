@@ -63,6 +63,7 @@ CLAIM_TRANSITIONS = {
 
 @router.post("/scan")
 async def scan_bill(
+    request: Request,
     images: list[UploadFile] = File(...),
     eob_images: list[UploadFile] | None = File(None),
     zip_code: str = Form("00000"),
