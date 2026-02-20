@@ -320,6 +320,109 @@ def clear_comparison_cache() -> None:
     _comparison_cache.clear()
 
 
+def get_grade_distribution() -> dict[str, int]:
+    """Count hospitals per billing grade for the homepage visualization."""
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT billing_grade, COUNT(*) AS n
+            FROM billing_metrics
+            WHERE billing_grade IS NOT NULL AND billing_grade != ''
+            GROUP BY billing_grade
+            """
+        ).fetchall()
+    return {row["billing_grade"]: row["n"] for row in rows}
+
+
+def get_sample_hospitals(count: int = 6) -> list[dict]:
+    """Select diverse hospital cards for homepage showcase.
+
+    Picks 1 A/B, 2 C, 2 D/F, 1 with highest single-procedure markup.
+    All from different states, with at least 10 procedures compared.
+    """
+    with get_db() as db:
+        buckets = [
+            (("A", "B"), 1),
+            (("C",), 2),
+            (("D", "F"), 2),
+        ]
+        seen_states: set[str] = set()
+        results: list[dict] = []
+
+        for grades, limit in buckets:
+            placeholders = ",".join("?" * len(grades))
+            params: list = list(grades)
+            state_clause = ""
+            if seen_states:
+                state_clause = " AND h.state NOT IN (%s)" % ",".join("?" * len(seen_states))
+                params.extend(seen_states)
+            params.append(limit)
+
+            rows = db.execute(
+                f"""
+                SELECT h.facility_id, h.name, h.city, h.state, h.slug,
+                       h.state_slug, h.city_slug,
+                       m.billing_grade, m.avg_markup_vs_medicare,
+                       m.procedures_compared
+                FROM hospitals h
+                JOIN billing_metrics m ON m.facility_id = h.facility_id
+                WHERE m.billing_grade IN ({placeholders})
+                  AND m.avg_markup_vs_medicare IS NOT NULL
+                  AND m.procedures_compared >= 10
+                  {state_clause}
+                ORDER BY m.procedures_compared DESC
+                LIMIT ?
+                """,
+                params,
+            ).fetchall()
+
+            for row in rows:
+                item = dict(row)
+                item["name"] = _display_name(item.get("name"), item.get("facility_id"))
+                item["city"] = _display_city(item.get("city"))
+                item["state"] = state_display_name(item.get("state"))
+                results.append(item)
+                seen_states.add(item["state"])
+
+        # Fill remaining slot: hospital with the most dramatic single-procedure markup
+        if len(results) < count:
+            existing_ids = [r["facility_id"] for r in results]
+            id_clause = ""
+            params2: list = []
+            if existing_ids:
+                id_clause = "AND h.facility_id NOT IN (%s)" % ",".join("?" * len(existing_ids))
+                params2 = list(existing_ids)
+
+            dramatic = db.execute(
+                f"""
+                SELECT h.facility_id, h.name, h.city, h.state, h.slug,
+                       h.state_slug, h.city_slug,
+                       m.billing_grade, m.avg_markup_vs_medicare,
+                       m.procedures_compared,
+                       p.description AS standout_procedure,
+                       p.markup_vs_medicare AS standout_markup
+                FROM hospitals h
+                JOIN billing_metrics m ON m.facility_id = h.facility_id
+                JOIN hospital_prices p ON p.facility_id = h.facility_id
+                WHERE m.procedures_compared >= 10
+                  AND p.markup_vs_medicare IS NOT NULL
+                  {id_clause}
+                ORDER BY p.markup_vs_medicare DESC
+                LIMIT 1
+                """,
+                params2,
+            ).fetchone()
+
+            if dramatic:
+                item = dict(dramatic)
+                item["name"] = _display_name(item.get("name"), item.get("facility_id"))
+                item["city"] = _display_city(item.get("city"))
+                item["state"] = state_display_name(item.get("state"))
+                results.append(item)
+
+    return results[:count]
+
+
 def get_state_index_stats() -> list[dict]:
     with get_db() as db:
         rows = db.execute(
@@ -898,8 +1001,10 @@ def find_hospitals(query: str, limit: int = 20) -> list[dict]:
     with get_db() as db:
         rows = db.execute(
             """
-            SELECT h.name, h.city, h.state, h.slug, h.state_slug, h.city_slug
+            SELECT h.name, h.city, h.state, h.slug, h.state_slug, h.city_slug,
+                   m.billing_grade
             FROM hospitals h
+            LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
             WHERE h.name LIKE ? OR h.city LIKE ? OR h.state LIKE ?
             ORDER BY
               CASE WHEN lower(h.name) LIKE lower(?) THEN 0 ELSE 1 END,
