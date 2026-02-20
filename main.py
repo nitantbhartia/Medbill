@@ -20,6 +20,7 @@ from hospital_seo import (
     resolve_hospital_slug,
     state_display_name,
 )
+from compare_pages import get_comparison_data, search_hospitals_for_compare
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
     get_procedure_profile,
@@ -376,6 +377,55 @@ async def procedure_hospitals_by_zip(cpt_code: str, zip: str = ""):
     if not results:
         return JSONResponse({"hospitals": [], "found": False})
     return JSONResponse({"hospitals": results, "found": True})
+
+
+@app.get("/api/hospitals/search")
+async def hospital_search_api(q: str = ""):
+    """JSON hospital autocomplete for comparison tool."""
+    results = search_hospitals_for_compare(q) if len(q.strip()) >= 2 else []
+    return JSONResponse({"results": results})
+
+
+@app.get("/compare/", response_class=HTMLResponse)
+async def compare_index(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
+    return templates.TemplateResponse(
+        "compare_index.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Hospital Comparison Tool | BillKarma",
+            "og_description": "Compare any two hospitals side-by-side: billing grade, markup vs Medicare, CMS stars, and procedure prices.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
+async def compare_detail(request: Request, fid_a: str, fid_b: str):
+    data = get_comparison_data(fid_a, fid_b)
+    if not data:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "message": "One or both hospitals not found."},
+        )
+    name_a = data["a"]["name"]
+    name_b = data["b"]["name"]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
+    return templates.TemplateResponse(
+        "compare_detail.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": canonical_url,
+            "og_title": f"{name_a} vs {name_b} | BillKarma",
+            "og_description": (
+                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
+                "See which hospital charges less relative to Medicare."
+            ),
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/sitemap.xml")

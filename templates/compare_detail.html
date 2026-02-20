@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}{{ data.a.name }} vs {{ data.b.name }} | Hospital Comparison | BillKarma{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-6">
+    <a href="/" class="hover:underline">Home</a> /
+    <a href="/compare/" class="hover:underline">Compare Hospitals</a> /
+    <span class="text-gray-700">{{ data.a.name }} vs {{ data.b.name }}</span>
+  </nav>
+
+  <!-- Page title -->
+  <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
+    {{ data.a.name }} vs {{ data.b.name }}
+  </h1>
+  <p class="text-gray-500 text-sm mb-8">
+    {{ data.a.city }}, {{ data.a.state }} ·
+    {{ data.b.city }}, {{ data.b.state }}
+    {% if data.distance_miles %}· {{ data.distance_miles }} mi apart{% endif %}
+  </p>
+
+  <!-- ========== VERDICT BANNER ========== -->
+  {% set v = data.verdict %}
+  <div class="rounded-2xl p-6 mb-8 {% if v.winner == 'a' %}bg-lime-50 border border-lime-200{% elif v.winner == 'b' %}bg-blue-50 border border-blue-200{% else %}bg-gray-50 border border-gray-200{% endif %}">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex-1">
+        <div class="text-xs font-bold uppercase tracking-widest mb-1
+          {% if v.winner == 'a' %}text-lime-700{% elif v.winner == 'b' %}text-blue-700{% else %}text-gray-500{% endif %}">
+          {% if v.winner == 'a' or v.winner == 'b' %}Better Value{% elif v.winner == 'tie' %}Tie{% else %}Insufficient Data{% endif %}
+        </div>
+        <p class="text-gray-800 font-medium text-sm">{{ v.summary }}</p>
+      </div>
+      {% if v.winner == 'a' and v.savings_if_choose_a > 0 %}
+      <div class="text-right flex-shrink-0">
+        <div class="text-2xl font-extrabold text-lime-700">${{ "{:,.0f}".format(v.savings_if_choose_a) }}</div>
+        <div class="text-xs text-gray-500">avg savings vs {{ data.b.name[:25] }}</div>
+      </div>
+      {% elif v.winner == 'b' and v.savings_if_choose_b > 0 %}
+      <div class="text-right flex-shrink-0">
+        <div class="text-2xl font-extrabold text-blue-700">${{ "{:,.0f}".format(v.savings_if_choose_b) }}</div>
+        <div class="text-xs text-gray-500">avg savings vs {{ data.a.name[:25] }}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ========== SIDE-BY-SIDE STAT CARDS ========== -->
+  <section class="mb-10">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Head-to-Head Comparison</h2>
+    <div class="grid grid-cols-3 gap-0 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+      <!-- Header row -->
+      <div class="bg-gray-50 border-b border-gray-200 p-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Metric</div>
+      <div class="bg-lime-50 border-b border-gray-200 p-4">
+        <div class="font-bold text-gray-900 text-sm truncate">{{ data.a.name }}</div>
+        <div class="text-xs text-gray-500 truncate">{{ data.a.city }}, {{ data.a.state }}</div>
+      </div>
+      <div class="bg-blue-50 border-b border-gray-200 p-4">
+        <div class="font-bold text-gray-900 text-sm truncate">{{ data.b.name }}</div>
+        <div class="text-xs text-gray-500 truncate">{{ data.b.city }}, {{ data.b.state }}</div>
+      </div>
+
+      <!-- Billing Grade -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">Billing Grade</div>
+      <div class="border-b border-gray-100 p-4">
+        {% if data.a.billing_grade %}
+        <span class="inline-block px-2 py-0.5 rounded text-sm font-bold {{ data.a.grade_badge }}">{{ data.a.billing_grade }}</span>
+        {% else %}<span class="text-sm text-gray-400">N/A</span>{% endif %}
+      </div>
+      <div class="border-b border-gray-100 p-4">
+        {% if data.b.billing_grade %}
+        <span class="inline-block px-2 py-0.5 rounded text-sm font-bold {{ data.b.grade_badge }}">{{ data.b.billing_grade }}</span>
+        {% else %}<span class="text-sm text-gray-400">N/A</span>{% endif %}
+      </div>
+
+      <!-- Avg Markup vs Medicare -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">Avg Markup vs Medicare</div>
+      <div class="border-b border-gray-100 p-4 text-sm font-semibold {% if data.a.avg_markup_vs_medicare and data.b.avg_markup_vs_medicare and data.a.avg_markup_vs_medicare < data.b.avg_markup_vs_medicare %}text-green-700{% else %}text-gray-800{% endif %}">
+        {% if data.a.avg_markup_vs_medicare %}{{ "%.1f"|format(data.a.avg_markup_vs_medicare) }}x{% else %}<span class="text-gray-400">N/A</span>{% endif %}
+      </div>
+      <div class="border-b border-gray-100 p-4 text-sm font-semibold {% if data.a.avg_markup_vs_medicare and data.b.avg_markup_vs_medicare and data.b.avg_markup_vs_medicare < data.a.avg_markup_vs_medicare %}text-green-700{% else %}text-gray-800{% endif %}">
+        {% if data.b.avg_markup_vs_medicare %}{{ "%.1f"|format(data.b.avg_markup_vs_medicare) }}x{% else %}<span class="text-gray-400">N/A</span>{% endif %}
+      </div>
+
+      <!-- CMS Stars -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">CMS Star Rating</div>
+      <div class="border-b border-gray-100 p-4 text-sm">
+        {% if data.a.cms_star_rating %}{{ "★" * data.a.cms_star_rating }}{{ "☆" * (5 - data.a.cms_star_rating) }}
+        {% else %}<span class="text-gray-400">N/A</span>{% endif %}
+      </div>
+      <div class="border-b border-gray-100 p-4 text-sm">
+        {% if data.b.cms_star_rating %}{{ "★" * data.b.cms_star_rating }}{{ "☆" * (5 - data.b.cms_star_rating) }}
+        {% else %}<span class="text-gray-400">N/A</span>{% endif %}
+      </div>
+
+      <!-- Ownership -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">Ownership</div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">{{ data.a.ownership_label }}</div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">{{ data.b.ownership_label }}</div>
+
+      <!-- Procedures Compared -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">Procedures on File</div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">
+        {% if data.a.procedures_compared %}{{ "{:,}".format(data.a.procedures_compared) }}{% else %}<span class="text-gray-400">—</span>{% endif %}
+      </div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">
+        {% if data.b.procedures_compared %}{{ "{:,}".format(data.b.procedures_compared) }}{% else %}<span class="text-gray-400">—</span>{% endif %}
+      </div>
+
+      <!-- State Rank -->
+      <div class="border-b border-gray-100 p-4 text-sm font-medium text-gray-600">State Rank (markup)</div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">
+        {% if data.a.state_rank %}#{{ data.a.state_rank }} in {{ data.a.state }}{% else %}<span class="text-gray-400">—</span>{% endif %}
+      </div>
+      <div class="border-b border-gray-100 p-4 text-sm text-gray-700">
+        {% if data.b.state_rank %}#{{ data.b.state_rank }} in {{ data.b.state }}{% else %}<span class="text-gray-400">—</span>{% endif %}
+      </div>
+
+      <!-- Price Transparency -->
+      <div class="p-4 text-sm font-medium text-gray-600">Price Transparency</div>
+      <div class="p-4 text-sm">
+        {% if data.a.has_transparency %}<span class="text-green-600 font-medium">Published</span>{% else %}<span class="text-gray-400">Not available</span>{% endif %}
+      </div>
+      <div class="p-4 text-sm">
+        {% if data.b.has_transparency %}<span class="text-green-600 font-medium">Published</span>{% else %}<span class="text-gray-400">Not available</span>{% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PROCEDURE PRICE COMPARISON ========== -->
+  {% if data.common_procedures %}
+  <section class="mb-10">
+    <h2 class="text-lg font-bold text-gray-800 mb-1">Procedure Price Comparison</h2>
+    <p class="text-sm text-gray-500 mb-4">
+      {{ data.verdict.common_count }} shared procedure{% if data.verdict.common_count != 1 %}s{% endif %} found.
+      <span class="text-lime-700 font-medium">Green</span> = lower charge.
+    </p>
+    <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Procedure</th>
+            <th class="text-right px-4 py-3 font-semibold text-lime-700">{{ data.a.name[:22] }}…</th>
+            <th class="text-right px-4 py-3 font-semibold text-blue-700">{{ data.b.name[:22] }}…</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-500">Medicare Rate</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-500">Savings</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for p in data.common_procedures %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 text-gray-800 font-medium">
+              {{ p.name }}
+              <div class="text-xs text-gray-400 font-normal">CPT {{ p.cpt_code }}</div>
+            </td>
+            <td class="px-4 py-3 text-right {% if p.cheaper == 'a' %}text-green-700 font-semibold{% else %}text-gray-700{% endif %}">
+              ${{ "{:,.0f}".format(p.charge_a) }}
+              {% if p.cheaper == 'a' %}<span class="text-xs ml-1">✓</span>{% endif %}
+            </td>
+            <td class="px-4 py-3 text-right {% if p.cheaper == 'b' %}text-green-700 font-semibold{% else %}text-gray-700{% endif %}">
+              ${{ "{:,.0f}".format(p.charge_b) }}
+              {% if p.cheaper == 'b' %}<span class="text-xs ml-1">✓</span>{% endif %}
+            </td>
+            <td class="px-4 py-3 text-right text-gray-500">
+              {% if p.medicare_rate %}${{ "{:,.0f}".format(p.medicare_rate) }}{% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-3 text-right text-gray-600">
+              {% if p.savings > 0 %}${{ "{:,.0f}".format(p.savings) }}{% else %}—{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs text-gray-400 mt-2">Prices are gross charges from hospital price transparency files. Your actual cost may differ based on insurance.</p>
+  </section>
+  {% else %}
+  <div class="mb-10 bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-sm text-yellow-800">
+    No common procedures found in price transparency data for these two hospitals.
+    Individual hospital pages may still have pricing information.
+  </div>
+  {% endif %}
+
+  <!-- ========== QUALITY COMPARISON ========== -->
+  <section class="mb-10">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Quality & Financial Assistance</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Hospital A quality card -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="w-3 h-3 rounded-full bg-lime-400 mt-1 flex-shrink-0"></span>
+          <div>
+            <div class="font-bold text-gray-900">{{ data.a.name }}</div>
+            <div class="text-xs text-gray-500">{{ data.a.city }}, {{ data.a.state }}</div>
+          </div>
+        </div>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Ownership</dt>
+            <dd class="font-medium text-gray-800">{{ data.a.ownership_label }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">CMS Stars</dt>
+            <dd class="font-medium text-gray-800">
+              {% if data.a.cms_star_rating %}{{ data.a.cms_star_rating }}/5{% else %}Not rated{% endif %}
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Charity care</dt>
+            <dd class="font-medium text-gray-800">
+              {% if data.a.charity_pct %}{{ data.a.charity_pct }}% of revenue{% else %}Not reported{% endif %}
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Financial assistance</dt>
+            <dd class="font-medium {% if data.a.has_financial_assistance %}text-green-700{% else %}text-gray-500{% endif %}">
+              {% if data.a.has_financial_assistance %}Available{% else %}Unknown{% endif %}
+            </dd>
+          </div>
+        </dl>
+        <a href="/hospitals/{{ data.a.state_slug }}/{{ data.a.city_slug }}/{{ data.a.slug }}/"
+           class="mt-5 block text-center text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg py-2 hover:bg-gray-50">
+          Full Profile →
+        </a>
+      </div>
+
+      <!-- Hospital B quality card -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></span>
+          <div>
+            <div class="font-bold text-gray-900">{{ data.b.name }}</div>
+            <div class="text-xs text-gray-500">{{ data.b.city }}, {{ data.b.state }}</div>
+          </div>
+        </div>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Ownership</dt>
+            <dd class="font-medium text-gray-800">{{ data.b.ownership_label }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">CMS Stars</dt>
+            <dd class="font-medium text-gray-800">
+              {% if data.b.cms_star_rating %}{{ data.b.cms_star_rating }}/5{% else %}Not rated{% endif %}
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Charity care</dt>
+            <dd class="font-medium text-gray-800">
+              {% if data.b.charity_pct %}{{ data.b.charity_pct }}% of revenue{% else %}Not reported{% endif %}
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Financial assistance</dt>
+            <dd class="font-medium {% if data.b.has_financial_assistance %}text-green-700{% else %}text-gray-500{% endif %}">
+              {% if data.b.has_financial_assistance %}Available{% else %}Unknown{% endif %}
+            </dd>
+          </div>
+        </dl>
+        <a href="/hospitals/{{ data.b.state_slug }}/{{ data.b.city_slug }}/{{ data.b.slug }}/"
+           class="mt-5 block text-center text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg py-2 hover:bg-gray-50">
+          Full Profile →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SHAREABLE LINK + CTAs ========== -->
+  <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mb-10">
+    <h2 class="text-base font-bold text-gray-800 mb-3">Share This Comparison</h2>
+    <div class="flex items-center gap-3">
+      <input
+        id="shareUrl"
+        type="text"
+        readonly
+        value="{{ canonical_url }}"
+        class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 bg-gray-50"
+      />
+      <button onclick="copyUrl()" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-700">
+        Copy
+      </button>
+    </div>
+    <p id="copyMsg" class="hidden text-xs text-green-600 mt-2">Link copied!</p>
+  </section>
+
+  <!-- Bottom CTAs -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+    <a href="/compare/"
+       class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+      ⚖️ New Comparison
+    </a>
+    <a href="/scan"
+       class="flex items-center gap-2 bg-lime-400 rounded-xl p-4 hover:bg-lime-500 font-medium text-gray-900">
+      🧾 Scan Your Bill Free
+    </a>
+    <a href="/procedures/"
+       class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+      📋 Procedure Price Guide
+    </a>
+  </div>
+
+</div>
+
+<script>
+function copyUrl() {
+  navigator.clipboard.writeText(document.getElementById('shareUrl').value).then(() => {
+    document.getElementById('copyMsg').classList.remove('hidden');
+    setTimeout(() => document.getElementById('copyMsg').classList.add('hidden'), 2000);
+  });
+}
+</script>
+{% endblock %}

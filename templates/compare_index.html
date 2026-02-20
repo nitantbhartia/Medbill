@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Compare Hospitals | BillKarma{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-6">
+    <a href="/" class="hover:underline">Home</a> /
+    <span class="text-gray-700">Compare Hospitals</span>
+  </nav>
+
+  <!-- Header -->
+  <div class="mb-10">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-3">Hospital Comparison Tool</h1>
+    <p class="text-gray-600 text-lg">
+      Pick any two hospitals to compare their billing grades, markup vs Medicare,
+      CMS quality stars, and procedure prices side by side.
+    </p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <form id="compareForm" class="space-y-6">
+
+      <!-- Hospital A -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Hospital A</label>
+        <div class="relative">
+          <input
+            id="searchA"
+            type="text"
+            autocomplete="off"
+            placeholder="Search by hospital name, city, or state…"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+          />
+          <input type="hidden" id="fidA" name="fid_a" />
+          <div id="resultsA" class="hidden absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"></div>
+        </div>
+        <div id="selectedA" class="hidden mt-2 flex items-center gap-2 text-sm text-gray-700">
+          <span class="inline-block w-2 h-2 rounded-full bg-lime-500"></span>
+          <span id="selectedAName" class="font-medium"></span>
+          <button type="button" onclick="clearA()" class="ml-auto text-gray-400 hover:text-gray-600 text-xs">✕ Clear</button>
+        </div>
+      </div>
+
+      <!-- VS divider -->
+      <div class="flex items-center gap-4">
+        <div class="flex-1 border-t border-gray-200"></div>
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">vs</span>
+        <div class="flex-1 border-t border-gray-200"></div>
+      </div>
+
+      <!-- Hospital B -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Hospital B</label>
+        <div class="relative">
+          <input
+            id="searchB"
+            type="text"
+            autocomplete="off"
+            placeholder="Search by hospital name, city, or state…"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+          />
+          <input type="hidden" id="fidB" name="fid_b" />
+          <div id="resultsB" class="hidden absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"></div>
+        </div>
+        <div id="selectedB" class="hidden mt-2 flex items-center gap-2 text-sm text-gray-700">
+          <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
+          <span id="selectedBName" class="font-medium"></span>
+          <button type="button" onclick="clearB()" class="ml-auto text-gray-400 hover:text-gray-600 text-xs">✕ Clear</button>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        id="compareBtn"
+        disabled
+        class="w-full py-3 rounded-lg bg-gray-300 text-gray-500 font-semibold text-sm cursor-not-allowed transition-all"
+      >
+        Compare Hospitals
+      </button>
+    </form>
+  </div>
+
+  <!-- How it works -->
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm text-gray-600">
+    <div class="flex flex-col gap-2">
+      <div class="text-xl">📊</div>
+      <div class="font-semibold text-gray-800">Billing Grade</div>
+      <div>See which hospital charges closer to Medicare rates — A through F.</div>
+    </div>
+    <div class="flex flex-col gap-2">
+      <div class="text-xl">💰</div>
+      <div class="font-semibold text-gray-800">Procedure Prices</div>
+      <div>Compare up to 20 shared procedures with dollar savings highlighted.</div>
+    </div>
+    <div class="flex flex-col gap-2">
+      <div class="text-xl">🔗</div>
+      <div class="font-semibold text-gray-800">Shareable URL</div>
+      <div>Every comparison gets its own permanent link you can share or bookmark.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let _fidA = null, _fidB = null;
+
+function updateBtn() {
+  const btn = document.getElementById('compareBtn');
+  if (_fidA && _fidB) {
+    btn.disabled = false;
+    btn.className = 'w-full py-3 rounded-lg bg-lime-400 text-gray-900 font-semibold text-sm hover:bg-lime-500 transition-all cursor-pointer';
+  } else {
+    btn.disabled = true;
+    btn.className = 'w-full py-3 rounded-lg bg-gray-300 text-gray-500 font-semibold text-sm cursor-not-allowed transition-all';
+  }
+}
+
+function clearA() {
+  _fidA = null;
+  document.getElementById('fidA').value = '';
+  document.getElementById('searchA').value = '';
+  document.getElementById('selectedA').classList.add('hidden');
+  updateBtn();
+}
+
+function clearB() {
+  _fidB = null;
+  document.getElementById('fidB').value = '';
+  document.getElementById('searchB').value = '';
+  document.getElementById('selectedB').classList.add('hidden');
+  updateBtn();
+}
+
+function makeAutocomplete(inputId, resultsId, selectedId, selectedNameId, fidHiddenId, onSelect) {
+  const input = document.getElementById(inputId);
+  const results = document.getElementById(resultsId);
+  let timer = null;
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (q.length < 2) { results.classList.add('hidden'); return; }
+    timer = setTimeout(() => {
+      fetch(`/api/hospitals/search?q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(data => {
+          results.innerHTML = '';
+          if (!data.results || !data.results.length) {
+            results.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">No hospitals found</div>';
+          } else {
+            data.results.forEach(h => {
+              const el = document.createElement('button');
+              el.type = 'button';
+              el.className = 'w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-0';
+              el.innerHTML = `<div class="font-medium text-gray-900">${h.name}</div>
+                <div class="text-xs text-gray-500">${h.city}, ${h.state} · ${h.billing_grade ? 'Grade ' + h.billing_grade : 'No grade'}</div>`;
+              el.addEventListener('click', () => {
+                onSelect(h);
+                document.getElementById(selectedNameId).textContent = `${h.name} — ${h.city}, ${h.state}`;
+                document.getElementById(selectedId).classList.remove('hidden');
+                document.getElementById(fidHiddenId).value = h.facility_id;
+                input.value = h.name;
+                results.classList.add('hidden');
+                updateBtn();
+              });
+              results.appendChild(el);
+            });
+          }
+          results.classList.remove('hidden');
+        });
+    }, 200);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !results.contains(e.target)) {
+      results.classList.add('hidden');
+    }
+  });
+}
+
+makeAutocomplete('searchA', 'resultsA', 'selectedA', 'selectedAName', 'fidA', (h) => { _fidA = h.facility_id; });
+makeAutocomplete('searchB', 'resultsB', 'selectedB', 'selectedBName', 'fidB', (h) => { _fidB = h.facility_id; });
+
+document.getElementById('compareForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (_fidA && _fidB) {
+    window.location.href = `/compare/${_fidA}/vs/${_fidB}/`;
+  }
+});
+</script>
+{% endblock %}
