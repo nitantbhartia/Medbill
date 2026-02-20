@@ -373,6 +373,72 @@ def test_get_providers_falls_back_when_zip_coords_missing():
     assert all("name" in r and r["name"] for r in rows)
 
 
+def test_get_providers_without_coords_prefers_zip_state_over_national_cheapest():
+    _seed()
+    with get_db() as db:
+        db.execute("DELETE FROM zip_latlon")
+        db.execute(
+            "INSERT OR REPLACE INTO zip_locality_map (zip_prefix, locality, state, region) VALUES (?, ?, ?, ?)",
+            ("627", "L0001", "IL", "Midwest"),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facilities (
+                facility_id, name, address, city, state, state_slug, city_slug, zip,
+                facility_type, is_hospital_owned, slug, accepts_medicare
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "asc-fl-cheap",
+                "Florida Discount Center",
+                "1 Palm Dr",
+                "Miami",
+                "FL",
+                "fl",
+                "miami",
+                "33101",
+                "asc",
+                0,
+                "florida-discount-center-miami-surgery-center",
+                1,
+            ),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facility_billing_metrics (
+                facility_id, facility_type, avg_markup, median_markup, max_markup,
+                procedures_compared, billing_grade, benchmark_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("asc-fl-cheap", "asc", 1.1, 1.1, 1.1, 10, "A", "asc"),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge,
+                medicare_rate, markup_vs_medicare, data_year,
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "asc-fl-cheap",
+                "27447",
+                "TOTAL KNEE REPLACEMENT",
+                100.0,
+                90.0,
+                1.1,
+                2025,
+                "asc",
+                "asc",
+                90.0,
+            ),
+        )
+
+    rows = get_providers_near_zip_for_cpt("27447", "62701", limit=10, facility_type="all")
+    assert rows
+    assert all((r.get("state") or "").upper() == "IL" for r in rows)
+
+
 def test_get_top_cpt_codes_returns_list():
     _seed()
     codes = get_top_cpt_codes(10)

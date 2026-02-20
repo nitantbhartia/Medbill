@@ -256,6 +256,58 @@ def get_zip_latlon(zip_code: str) -> tuple[float, float] | None:
     return (float(row["lat"]), float(row["lon"])) if row else None
 
 
+def _resolve_state_from_zip(zip_code: str) -> str | None:
+    clean = (zip_code or "").strip()[:5]
+    if len(clean) != 5 or not clean.isdigit():
+        return None
+    prefix = clean[:3]
+    with get_db() as db:
+        # Prefer explicit ZIP centroid mapping when available.
+        row = db.execute(
+            "SELECT state FROM zip_latlon WHERE zip = ? AND state IS NOT NULL AND trim(state) <> '' LIMIT 1",
+            (clean,),
+        ).fetchone()
+        if row and row["state"]:
+            return str(row["state"]).strip().upper()
+
+        # Fallback to ZIP prefix -> state mapping used by locality benchmarks.
+        row = db.execute(
+            "SELECT state FROM zip_locality_map WHERE zip_prefix = ? AND state IS NOT NULL AND trim(state) <> '' LIMIT 1",
+            (prefix,),
+        ).fetchone()
+        if row and row["state"]:
+            return str(row["state"]).strip().upper()
+
+        # Last resort: infer from facilities/hospitals that carry this exact ZIP.
+        row = db.execute(
+            """
+            SELECT state, COUNT(*) AS cnt
+            FROM (
+                SELECT UPPER(state) AS state
+                FROM facilities
+                WHERE zip IS NOT NULL
+                  AND substr(zip, 1, 5) = ?
+                  AND state IS NOT NULL
+                  AND trim(state) <> ''
+                UNION ALL
+                SELECT UPPER(state) AS state
+                FROM hospitals
+                WHERE zip IS NOT NULL
+                  AND substr(zip, 1, 5) = ?
+                  AND state IS NOT NULL
+                  AND trim(state) <> ''
+            ) s
+            GROUP BY state
+            ORDER BY cnt DESC, state ASC
+            LIMIT 1
+            """,
+            (clean, clean),
+        ).fetchone()
+        if row and row["state"]:
+            return str(row["state"]).strip().upper()
+    return None
+
+
 def get_top_cpt_codes(limit: int = 100) -> list[dict]:
     """Return top CPT codes ranked by provider coverage, with basic stats."""
     with get_db() as db:
@@ -588,6 +640,7 @@ def get_providers_near_zip_for_cpt(
     if not coords:
         return _get_providers_without_zip_coords(
             cpt_code=cpt_code,
+            zip_code=zip_code,
             limit=limit,
             facility_type=facility_type,
             grade_ab_only=grade_ab_only,
@@ -683,6 +736,7 @@ def get_providers_near_zip_for_cpt(
 
 def _get_providers_without_zip_coords(
     cpt_code: str,
+    zip_code: str,
     limit: int,
     facility_type: str,
     grade_ab_only: bool,
@@ -696,7 +750,12 @@ def _get_providers_without_zip_coords(
 
     with get_db() as db:
         where_type = ""
+        where_state = ""
         params: list = [cpt_code]
+        state = _resolve_state_from_zip(zip_code)
+        if state:
+            where_state = " AND UPPER(COALESCE(f.state, h.state)) = ?"
+            params.append(state)
         if normalized_type != "all":
             where_type = " AND COALESCE(f.facility_type, hp.facility_type, 'hospital') = ?"
             params.append(normalized_type)
@@ -726,6 +785,7 @@ def _get_providers_without_zip_coords(
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
               AND COALESCE(f.name, h.name) IS NOT NULL
+              {where_state}
               {where_type}
             ORDER BY hp.gross_charge ASC
             LIMIT 500
