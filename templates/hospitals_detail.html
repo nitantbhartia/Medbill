@@ -7,49 +7,71 @@
 <script type="application/ld+json">{{ data.seo.hospital_schema_json | safe }}</script>
 <script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
 <script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
+<style>
+    .hospital-hero {
+        background-color: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 48px 24px 40px;
+        margin-bottom: 32px;
+    }
+    .hospital-hero-inner { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+    .hospital-hero .breadcrumb { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+    .hospital-hero .breadcrumb a { color: rgba(255,255,255,0.8); text-decoration: underline; }
+    .hospital-hero .breadcrumb a:hover { color: #fff; }
+    .hospital-hero h1 { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.025em; margin-bottom: 6px; }
+    .hospital-hero .location { font-size: 0.95rem; color: rgba(255,255,255,0.85); }
+    .hospital-hero .details { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+    .hospital-hero .details .pe-badge { color: #FCD34D; font-weight: 600; }
+    .hospital-hero .updated { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    @media (max-width: 640px) {
+        .hospital-hero { padding: 32px 16px 28px; border-radius: 0 0 24px 24px; }
+        .hospital-hero h1 { font-size: 1.5rem; }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto px-5 py-10"
+<div class="hospital-hero">
+    <div class="hospital-hero-inner">
+        <div class="breadcrumb">
+            <a href="/hospitals/">Hospitals</a> &rsaquo;
+            <a href="/hospitals/{{ data.hospital.state_slug }}/">{{ data.hospital.state }}</a> &rsaquo;
+            <a href="/hospitals/{{ data.hospital.state_slug }}/{{ data.hospital.city_slug }}/">{{ data.hospital.city }}</a> &rsaquo;
+            {{ data.hospital.name }}
+        </div>
+        <h1>{{ data.hospital.name }}</h1>
+        <p class="location">
+            {{ data.hospital.city }}, {{ data.hospital.state }}{% if data.hospital.zip %} {{ data.hospital.zip }}{% endif %}
+            {% if data.hospital.phone %}&middot; {{ data.hospital.phone }}{% endif %}
+        </p>
+        <p class="details">
+            {% if data.hospital.hospital_type %}{{ data.hospital.hospital_type }}{% endif %}
+            {% set own_display = data.hospital.ownership_type or data.hospital.ownership %}
+            {% if own_display and own_display not in ("Unknown", "") %} &middot; {{ own_display }}{% elif own_display %} &middot; Not confirmed{% endif %}
+            {% if data.hospital.hospital_size %} &middot; {{ data.hospital.hospital_size }}{% elif data.hospital.bed_count %} &middot; {{ data.hospital.bed_count }} beds{% endif %}
+            {% if data.hospital.is_pe_owned %} &middot; <span class="pe-badge">Private Equity Owned</span>{% endif %}
+        </p>
+        <p class="updated">
+            Data last updated:
+            <strong>
+            {%- if data.section_updated and data.section_updated.pricing -%}
+                {{ data.section_updated.pricing[:10] }}
+            {%- elif data.section_updated and data.section_updated.metrics -%}
+                {{ data.section_updated.metrics[:10] }}
+            {%- else -%}
+                Not available
+            {%- endif -%}
+            </strong>
+        </p>
+    </div>
+</div>
+
+<section class="max-w-6xl mx-auto px-5 pb-10"
   data-primary-charge="{{ data.prices[0].gross_charge if data.prices else '' }}">
 
     {% include '_insurance_bar.html' %}
 
-    <div class="text-xs text-gray-500 mb-2">
-        <a class="underline hover:text-gray-700" href="/hospitals/">Hospitals</a>
-        &rsaquo;
-        <a class="underline hover:text-gray-700" href="/hospitals/{{ data.hospital.state_slug }}/">{{ data.hospital.state }}</a>
-        &rsaquo;
-        <a class="underline hover:text-gray-700" href="/hospitals/{{ data.hospital.state_slug }}/{{ data.hospital.city_slug }}/">{{ data.hospital.city }}</a>
-        &rsaquo; {{ data.hospital.name }}
-    </div>
-
-    <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ data.hospital.name }}</h1>
-    <p class="text-sm text-gray-600 mt-1">
-        {{ data.hospital.city }}, {{ data.hospital.state }}{% if data.hospital.zip %} {{ data.hospital.zip }}{% endif %}
-        {% if data.hospital.phone %}&middot; {{ data.hospital.phone }}{% endif %}
-    </p>
-    <p class="text-xs text-gray-500 mt-1">
-        {% if data.hospital.hospital_type %}{{ data.hospital.hospital_type }}{% endif %}
-        {% set own_display = data.hospital.ownership_type or data.hospital.ownership %}
-        {% if own_display and own_display not in ("Unknown", "") %} &middot; {{ own_display }}{% elif own_display %} &middot; Not confirmed{% endif %}
-        {% if data.hospital.hospital_size %} &middot; {{ data.hospital.hospital_size }}{% elif data.hospital.bed_count %} &middot; {{ data.hospital.bed_count }} beds{% endif %}
-        {% if data.hospital.is_pe_owned %} &middot; <span class="text-amber-600 font-medium">Private Equity Owned</span>{% endif %}
-    </p>
-    <p class="text-xs text-gray-400 mt-1">
-        Data last updated:
-        <strong>
-        {%- if data.section_updated and data.section_updated.pricing -%}
-            {{ data.section_updated.pricing[:10] }}
-        {%- elif data.section_updated and data.section_updated.metrics -%}
-            {{ data.section_updated.metrics[:10] }}
-        {%- else -%}
-            Not available
-        {%- endif -%}
-        </strong>
-    </p>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-2 mb-8">
         <div class="rounded-lg border border-gray-200 p-4">
             <div class="text-xs text-gray-500 uppercase">Billing Grade</div>
             {% set grade = data.hospital.billing_grade or "N/A" %}
