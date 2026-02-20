@@ -439,6 +439,15 @@ def test_get_providers_without_coords_prefers_zip_state_over_national_cheapest()
     assert all((r.get("state") or "").upper() == "IL" for r in rows)
 
 
+def test_get_providers_without_coords_returns_empty_when_zip_unresolvable():
+    _seed()
+    with get_db() as db:
+        db.execute("DELETE FROM zip_latlon")
+        db.execute("DELETE FROM zip_locality_map")
+    rows = get_providers_near_zip_for_cpt("27447", "92111", limit=10, facility_type="all")
+    assert rows == []
+
+
 def test_get_top_cpt_codes_returns_list():
     _seed()
     codes = get_top_cpt_codes(10)

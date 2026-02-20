@@ -747,12 +747,16 @@ def _get_providers_without_zip_coords(
     allowed = {"all", "hospital", "asc", "imaging_center"}
     if normalized_type not in allowed:
         normalized_type = "all"
+    zip_clean = (zip_code or "").strip()[:5]
+    state = _resolve_state_from_zip(zip_clean)
+    if zip_clean and state is None:
+        # Avoid showing misleading nationwide "nearby" results when geo resolution fails.
+        return []
 
     with get_db() as db:
         where_type = ""
         where_state = ""
         params: list = [cpt_code]
-        state = _resolve_state_from_zip(zip_code)
         if state:
             where_state = " AND UPPER(COALESCE(f.state, h.state)) = ?"
             params.append(state)
