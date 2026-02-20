@@ -4,17 +4,35 @@
 
 {% block head %}
 <meta name="description" content="{{ og_description }}">
+<style>
+    .proc-hero {
+        background-color: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 48px 24px 40px;
+        margin-bottom: 32px;
+    }
+    .proc-hero-inner { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+    .proc-hero .breadcrumb { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+    .proc-hero .breadcrumb a { color: rgba(255,255,255,0.8); text-decoration: underline; }
+    .proc-hero h1 { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.025em; margin-bottom: 6px; }
+    .proc-hero p { font-size: 0.95rem; color: rgba(255,255,255,0.8); }
+    @media (max-width: 640px) {
+        .proc-hero { padding: 32px 16px 28px; border-radius: 0 0 24px 24px; }
+        .proc-hero h1 { font-size: 1.5rem; }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto px-5 py-10">
-    <div class="text-xs text-gray-500 mb-2">
-        <a class="underline hover:text-gray-700" href="/hospitals/">Hospitals</a> &rsaquo; Procedure Costs
+<div class="proc-hero">
+    <div class="proc-hero-inner">
+        <div class="breadcrumb"><a href="/hospitals/">Hospitals</a> &rsaquo; Procedure Costs</div>
+        <h1>Procedure Cost Directory</h1>
+        <p>{{ total }} procedures from hospital price transparency data. See Medicare rates, national averages, and billing grades.</p>
     </div>
-    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">Procedure Cost Directory</h1>
-    <p class="text-sm text-gray-600 mb-8">
-        {{ total }} procedures from hospital price transparency data. See Medicare rates, national averages, and billing grades.
-    </p>
+</div>
+
+<section class="max-w-6xl mx-auto px-5 pb-10">
 
     {% for system_name, procedures in groups.items() %}
     <div class="mb-10">
