@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("prior-authorization", {
     "title": "Prior Authorization: Why Insurance Delays Your Care (And How to Fight Back)",
-    "meta_description": "Insurance prior authorization delays affect 1 in 4 patients. Learn what triggers PA requirements, why requests get denied, and how to appeal a denial to get the care you need.",
+    "meta_description": "Insurance plans improperly denied 13% of valid prior auth requests, yet 75% of appeals succeed. Learn what triggers PA requirements, why requests get denied, and how to appeal.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Insurance Basics",
@@ -157,6 +157,10 @@ register("prior-authorization", {
     <strong>75% of appealed PA denials are overturned.</strong> If your PA was denied, appeal it &mdash; especially if the service is genuinely medically necessary. Most initial denials are not final decisions. See our <a href="/guides/how-to-appeal-an-insurance-denial">insurance denial appeal guide</a> for a step-by-step process.
 </div>
 
+<div class="key-takeaway">
+    <strong>Already received a bill from a denied service?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we check whether the underlying charges are accurately coded, which is often the root cause of a PA denial and the strongest basis for an appeal.
+</div>
+
 <h2 id="how-to-appeal">5. How to appeal a prior authorization denial</h2>
 
 <h3>Step 1: Get the denial letter and read it carefully</h3>
@@ -186,6 +190,10 @@ register("prior-authorization", {
 <p>If waiting for a standard appeal timeline would seriously jeopardize your health or your ability to regain maximum function, you can request an <strong>expedited (urgent) appeal</strong>. The plan must respond within 72 hours. To qualify for expedited review, your physician typically needs to document that the standard timeline poses a health risk.</p>
 
 <p>For situations where care is already happening (e.g., a hospitalization that might be terminated mid-stay due to a PA denial), you can request a <strong>concurrent review appeal</strong>. You have the right to remain in the hospital while this appeal is processed, and the plan cannot terminate coverage during the appeal period without giving you at least a day&rsquo;s notice.</p>
+
+<div class="key-takeaway">
+    <strong>Need the CPT code for your procedure?</strong> Use our <a href="/calculator">free calculator</a> to look up any service code &mdash; having the exact CPT code is the first step in verifying whether your plan requires PA and what the Medicare rate should be.
+</div>
 
 <p>Emergency care is never subject to prior authorization requirements. Under federal law (and the ACA), emergency services must be covered at in-network cost-sharing regardless of network status, without requiring PA. If an insurer tries to retroactively deny a genuine emergency visit as &ldquo;non-emergency,&rdquo; you can appeal citing the prudent layperson standard: the ER visit was appropriate because a reasonable person with the same symptoms would have believed they needed emergency care.</p>
 

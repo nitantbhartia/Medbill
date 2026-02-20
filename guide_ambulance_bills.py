@@ -96,6 +96,10 @@ register("how-to-fight-an-ambulance-bill", {
 
 {_embed(mode="cost", title="Look up your ambulance code", subtitle="Enter the HCPCS code from your bill to see what Medicare pays.")}
 
+<div class="key-takeaway">
+    <strong>Does your ambulance bill list ALS when the crew only gave you basic care?</strong> Use our <a href="/calculator">free calculator</a> &mdash; enter the HCPCS code from your bill to see exactly what Medicare reimburses for that service level in your area.
+</div>
+
 <h2 id="common-errors">3. Common ambulance billing errors</h2>
 
 <div class="bill-example">
@@ -166,6 +170,10 @@ register("how-to-fight-an-ambulance-bill", {
     <li><strong>Request external review if internal appeal fails.</strong> Under the ACA, you have the right to an independent external review for denied claims. The external reviewer's decision is binding on the insurer.</li>
 </ol>
 
+<div class="key-takeaway">
+    <strong>Not sure if your insurer underpaid your ambulance claim?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we'll flag every line item that looks mispriced and give you the numbers you need before you file an appeal.
+</div>
+
 <div class="case-study">
     <h3>Example: Denied "non-emergency" claim reversed on appeal</h3>
     <p>A patient was transported by ambulance after a fall at home with suspected hip fracture. The insurer denied the claim as a "non-emergency transport" because the patient was conscious. The patient obtained a letter from the ER physician confirming that moving the patient by car would have risked worsening the fracture and that ambulance transport was the medically appropriate method.</p>
@@ -196,6 +204,10 @@ register("how-to-fight-an-ambulance-bill", {
 </div>
 
 <p>Ready to check whether your ambulance charges were reasonable? <a href="/scan">Upload your bill to BillKarma</a> and we'll compare every line against Medicare rates automatically.</p>
+
+<div class="key-takeaway">
+    <strong>Ready to settle your ambulance bill for less?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we'll identify billing errors and show you the Medicare benchmark so you walk into the negotiation knowing exactly what to offer.
+</div>
 
 <h2 id="air-ambulance">7. Air ambulance: a special case</h2>
 

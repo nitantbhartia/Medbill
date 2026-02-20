@@ -90,6 +90,10 @@ register("hospital-financial-assistance-charity-care", {
 
 <p><strong>Important:</strong> These are typical thresholds. Some hospitals are more generous. Major health systems like Kaiser Permanente, Providence, and CommonSpirit offer assistance up to 400% FPL or higher. A few hospitals extend partial discounts up to 500% FPL. Always check your specific hospital&rsquo;s policy.</p>
 
+<div class="key-takeaway">
+    <strong>Not sure what your hospital offers?</strong> Browse our <a href="/hospitals/">hospital directory</a> &mdash; every listing shows the hospital&rsquo;s nonprofit status, income thresholds, and financial assistance policy details so you know exactly what you&rsquo;re eligible for before you apply.
+</div>
+
 <p>Beyond income, hospitals may also consider:</p>
 
 <ul>
@@ -177,6 +181,10 @@ register("hospital-financial-assistance-charity-care", {
 
 <div class="key-takeaway">
     <strong>Don&rsquo;t give up after one denial.</strong> Many patients are initially denied for fixable reasons like a missing document or an incomplete form. Resubmitting with complete information often results in approval. Hospitals process thousands of these applications and understand that paperwork gets lost or overlooked.
+</div>
+
+<div class="key-takeaway">
+    <strong>Ready to take the first step on your bill?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag overcharges, identify CPT codes billed above Medicare rates, and give you a prioritized list of issues to raise when you submit your financial assistance application.
 </div>
 
 <h2 id="annotated-example">5. Annotated example: what a successful application looks like</h2>
@@ -282,6 +290,10 @@ register("hospital-financial-assistance-charity-care", {
 <p>A denial is not the final answer. You can appeal with additional documentation, escalate to the patient advocate, or file a complaint with your state attorney general&rsquo;s consumer protection division. Hospitals take state AG inquiries seriously because they can trigger broader investigations into billing practices.</p>
 
 <h2 id="case-studies">7. Real patient results</h2>
+
+<div class="key-takeaway">
+    <strong>Want to know your hospital&rsquo;s track record before you apply?</strong> Our <a href="/hospitals/">hospital directory</a> includes transparency grades, average charity care spending, and reported income thresholds so you can walk into the process knowing what to expect.
+</div>
 
 <div class="case-study">
     <h3>Case study 1: $45,000 hospital stay reduced to $9,000</h3>

@@ -70,6 +70,10 @@ register("how-to-negotiate-medical-bills", {
     <strong>The math is on your side.</strong> If Medicare pays $1,500 for a service and the hospital accepts it, that means the service costs the hospital less than $1,500 to provide. Anything you pay above that is profit margin&mdash;and it&rsquo;s negotiable.
 </div>
 
+<div class="key-takeaway">
+    <strong>Want to know the Medicare rate for your exact charges?</strong> Use our <a href="/calculator">free calculator</a> &mdash; enter any CPT code from your itemized bill to instantly see what Medicare pays, which is the strongest negotiation anchor you can bring to the call.
+</div>
+
 <h2 id="preparation">2. Preparation: what to know before you call</h2>
 
 <p>Negotiation without data is just begging. Here&rsquo;s what to gather first:</p>
@@ -92,6 +96,10 @@ register("how-to-negotiate-medical-bills", {
 
 <p><strong>Best for:</strong> Uninsured patients, or insured patients whose plan didn&rsquo;t cover the service.</p>
 <p><strong>Typical result:</strong> 30&ndash;60% reduction.</p>
+
+<div class="key-takeaway">
+    <strong>Ready to see exactly what&rsquo;s wrong with your bill before you call?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; our automated audit flags overcharges, duplicate codes, and unbundling violations so you walk into the negotiation with a concrete list of issues.
+</div>
 
 <div class="case-study">
     <h3>Phone script</h3>
@@ -151,6 +159,10 @@ register("how-to-negotiate-medical-bills", {
     <p><strong>Step 1:</strong> <a href="/guides/how-to-dispute-a-medical-bill">Dispute</a> any clear errors (duplicates, unbundling, services not received). Get these removed first.</p>
     <p><strong>Step 2:</strong> Once the corrected bill arrives, negotiate the remaining charges using Strategies 1&ndash;4 above.</p>
     <p>This works because the hospital now sees you as an informed, engaged patient&mdash;which makes them more willing to negotiate on price.</p>
+</div>
+
+<div class="key-takeaway">
+    <strong>Not sure which errors to dispute before you negotiate?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we automatically detect duplicate charges, upcoding, and unbundled codes so you know exactly what to challenge before you pick up the phone.
 </div>
 
 <h2 id="financial-assistance">4. Financial assistance programs</h2>

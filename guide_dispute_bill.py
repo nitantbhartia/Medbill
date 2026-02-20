@@ -116,6 +116,10 @@ register("how-to-dispute-a-medical-bill", {
     <strong>Pro tip:</strong> Write down the name of every person you speak with, the date and time of the call, and any reference or case numbers. If you need to escalate later, this documentation is essential.
 </div>
 
+<div class="key-takeaway">
+    <strong>Wondering how much you could realistically recover?</strong> Use the <a href="/calculator">BillKarma cost calculator</a> to compare each disputed charge against the Medicare rate and estimate your potential savings before you make the call.
+</div>
+
 <p>Want a custom dispute script generated from your specific bill? <a href="/scan">Upload your bill to BillKarma</a> and we&rsquo;ll create a personalized phone script and dispute letter automatically.</p>
 
 <h2 id="what-to-dispute">4. What&rsquo;s worth disputing (and what isn&rsquo;t)</h2>
@@ -134,6 +138,10 @@ register("how-to-dispute-a-medical-bill", {
         <tr><td>Services not received</td><td>Varies</td><td>Easy &mdash; compare to discharge summary</td></tr>
     </tbody>
 </table>
+
+<div class="key-takeaway">
+    <strong>Ready to find what to dispute on your bill?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we scan every line item against Medicare rates and flag duplicates, unbundling errors, and overpriced charges so you know exactly where to focus your dispute.
+</div>
 
 <table>
     <thead>
@@ -181,6 +189,10 @@ register("how-to-dispute-a-medical-bill", {
 <p><strong>During the dispute:</strong> Pay the undisputed portion of your bill on time. Request in writing that the disputed amount not be sent to collections while the review is active. Most hospitals will agree to this.</p>
 
 <h2 id="real-examples">7. Real dispute results</h2>
+
+<div class="key-takeaway">
+    <strong>Want to see what errors are hiding in your bill before you dispute?</strong> <a href="/scan">Run your bill through BillKarma</a> &mdash; our scanner automatically identifies billing errors like the ones below and generates a dispute-ready summary you can send directly to the hospital.
+</div>
 
 <div class="case-study">
     <h3>Example 1: ER visit &mdash; $1,289 in errors found, $940 reduced</h3>

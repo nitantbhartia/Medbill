@@ -109,6 +109,10 @@ register("observation-status-billing", {
     </div>
 </div>
 
+<div class="key-takeaway">
+    <strong>Did your hospital bill arrive with charges you didn&rsquo;t expect?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we detect observation status billing patterns and show you exactly which line items are most likely misclassified.
+</div>
+
 <h2 id="snf-trap">3. The skilled nursing facility trap</h2>
 
 <p>This is the single most financially devastating consequence of observation status. Medicare&rsquo;s coverage of skilled nursing facility (SNF) care — rehabilitation after a hip replacement, stroke recovery, or similar needs — requires a qualifying inpatient hospital stay of at least three consecutive days.</p>
@@ -163,7 +167,15 @@ register("observation-status-billing", {
 <h3>State-level protections</h3>
 <p>Several states have enacted their own observation status laws giving patients additional rights, including the right to an expedited internal appeal while still hospitalized. States with such protections include Connecticut, Maryland, New York, and Pennsylvania. Check your state health department&rsquo;s website for current rules.</p>
 
+<div class="key-takeaway">
+    <strong>Ready to challenge your observation status classification?</strong> Browse <a href="/hospitals/">BillKarma&rsquo;s hospital billing profiles</a> to see how your facility compares on observation status rates and appeal outcomes before you file.
+</div>
+
 <h2 id="case-studies">6. Real-world case studies</h2>
+
+<div class="key-takeaway">
+    <strong>Wondering whether your stay should have been billed as inpatient?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we cross-reference your diagnosis codes and length of stay against Medicare&rsquo;s two-midnight rule to flag likely observation status misclassifications.
+</div>
 
 <div class="case-study">
     <h3>Case Study 1: The Hidden SNF Bill — $9,400</h3>

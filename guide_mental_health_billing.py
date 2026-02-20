@@ -91,6 +91,14 @@ register("mental-health-billing-and-parity-rights", {
     <strong>The simplest test for a parity violation:</strong> Take any restriction your insurer places on your mental health care — a visit limit, a prior auth requirement, a copay amount — and ask: &ldquo;Does this same restriction apply to an equivalent medical/surgical service?&rdquo; If the answer is no, you may have a parity violation. Write it down. You&rsquo;ll need the specific comparison when filing a complaint.
 </div>
 
+<div class="key-takeaway">
+    <strong>Spotted a visit cap or prior auth requirement that doesn't apply to your other medical care?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we identify parity discrepancies in your mental health claims that may entitle you to more coverage.
+</div>
+
+<div class="key-takeaway">
+    <strong>Are your mental health copays higher than what you pay for primary care?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we check whether your insurer is applying equal cost-sharing standards to mental health and medical services.
+</div>
+
 <div class="case-study">
     <h3>Example: Visit cap parity violation — $3,200 in denied claims reversed</h3>
     <p>A patient's employer health plan capped outpatient mental health therapy at 30 visits per year. Physical therapy had no annual visit limit. The patient had exceeded 30 therapy visits and was denied coverage for the remaining sessions. After filing a parity complaint with the Department of Labor (the agency overseeing employer plans), the insurer was required to retroactively cover all denied sessions and remove the visit cap. <strong>Total recovered: $3,200.</strong></p>
@@ -153,6 +161,10 @@ register("mental-health-billing-and-parity-rights", {
 <div class="case-study">
     <h3>Example: "Not medically necessary" denial reversed on external review</h3>
     <p>A patient receiving intensive outpatient therapy (IOP) for depression had claims denied after session 20, with the insurer citing "medical necessity not established." The treating psychiatrist submitted a letter documenting the patient's GAD-7 score, treatment response, and clinical rationale for continued care. The internal appeal was denied. On external review, the independent reviewer found the insurer's criteria more restrictive than evidence-based guidelines for equivalent medical conditions—a parity violation. All sessions were covered retroactively. <strong>Total recovered: $4,800.</strong></p>
+</div>
+
+<div class="key-takeaway">
+    <strong>Wondering how much your insurer should have paid for your denied therapy sessions?</strong> Use the <a href="/calculator">BillKarma cost calculator</a> &mdash; enter the CPT code from your denial letter to see the Medicare benchmark rate and gauge how far off your insurer's reimbursement actually was.
 </div>
 
 <h2 id="out-of-network">6. Out-of-network mental health rights</h2>

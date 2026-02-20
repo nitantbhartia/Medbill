@@ -84,6 +84,10 @@ register("why-lab-test-bills-are-so-high", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>Does your lab bill pass the Medicare rate test?</strong> Use our <a href="/calculator">free calculator</a> &mdash; enter the CPT code from your lab bill to see exactly how your charge compares to what Medicare pays for the same test.
+</div>
+
 <p>Look up any CPT code from your bill:</p>
 
 {_embed(mode="markup", title="Is your lab charge too high?", subtitle="Enter the CPT code and the amount you were charged.", height="420")}
@@ -162,6 +166,10 @@ register("why-lab-test-bills-are-so-high", {
 
 <p>A common example: the Basic Metabolic Panel (80048) includes sodium (84295), potassium (84132), chloride (82435), carbon dioxide (82374), glucose (82947), BUN (84520), creatinine (82565), and calcium (82310). Billing each of these eight components separately instead of using 80048 generates roughly $400–$600 more in charges for the exact same tests.</p>
 
+<div class="key-takeaway">
+    <strong>Think your lab billed individual tests instead of a panel?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we automatically detect unbundling violations and calculate the dollar amount you're owed back.
+</div>
+
 <div class="case-study">
     <h3>Real unbundling example: $487 billed instead of $14</h3>
     <p>A patient's hospital lab bill included eight separate line items for individual chemistry tests (sodium, potassium, chloride, CO2, glucose, BUN, creatinine, calcium)—all performed on the same date. Each was billed at $40–$80 individually, totaling $487. All eight are included in CPT 80048 (Basic Metabolic Panel), which Medicare reimburses at $14. The patient cited the NCCI bundling rules in a dispute letter. The hospital replaced the eight individual codes with CPT 80048. <strong>Total reduction: $473.</strong></p>
@@ -192,6 +200,10 @@ register("why-lab-test-bills-are-so-high", {
     <li><strong>Ask about self-pay rates.</strong> If you're uninsured, ask the lab's billing department for their self-pay rate before the draw. It's always lower than Chargemaster.</li>
     <li><strong>Review your EOB after the visit.</strong> Your Explanation of Benefits will show what your insurer paid and what you owe. Compare this against the bill. See our <a href="/guides/how-to-read-your-eob">EOB guide</a> for help.</li>
 </ul>
+
+<div class="key-takeaway">
+    <strong>Already got a lab bill you weren't expecting?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we'll check every line item against Medicare rates, flag any unbundled codes, and tell you exactly how much you can dispute.
+</div>
 
 <h2 id="faq">Frequently asked questions</h2>
 

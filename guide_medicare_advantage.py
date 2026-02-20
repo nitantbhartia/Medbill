@@ -136,6 +136,10 @@ register("medicare-advantage-billing", {
 <h3>e) Observation status (same risk as Original Medicare)</h3>
 <p>The same observation status trap that affects Original Medicare patients applies to MA enrollees &mdash; but the financial impact may differ depending on your plan&rsquo;s cost-sharing design. If you&rsquo;re hospitalized on an MA plan and expect to need skilled nursing facility care afterward, verify your admission status. See our <a href="/guides/observation-status-billing">observation status guide</a> for the full picture.</p>
 
+<div class="key-takeaway">
+    <strong>Received an unexpected charge on your MA plan?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag billing errors, upcoding, and charges processed at out-of-network rates that should have been covered at in-network cost-sharing.
+</div>
+
 <h2 id="prior-auth">5. Prior authorization in Medicare Advantage</h2>
 
 <p>Prior authorization is more extensive in MA plans than in Original Medicare. A 2023 KFF analysis found that the most common services requiring PA in MA plans included:</p>
@@ -186,6 +190,10 @@ register("medicare-advantage-billing", {
     <li>Citation of the 2023 CMS rule requiring MA plans to use Medicare coverage criteria</li>
     <li>Peer-reviewed clinical literature supporting the necessity of the service (especially for newer treatments)</li>
 </ul>
+
+<div class="key-takeaway">
+    <strong>Comparing MA plans during open enrollment?</strong> Our <a href="/hospitals/">hospital directory</a> shows transparency grades and pricing data for hospitals near you &mdash; use it to choose a plan whose network includes hospitals with strong billing accuracy records.
+</div>
 
 <h2 id="switching">7. Switching plans: what to watch for</h2>
 

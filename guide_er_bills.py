@@ -144,7 +144,15 @@ register("why-emergency-room-bills-are-so-high", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>What&rsquo;s the Medicare rate for your ER visit level?</strong> Use our <a href="/calculator?cpt=99284">free calculator</a> &mdash; enter the CPT code from your bill (99281&ndash;99285) to see what Medicare actually pays vs. what you were charged.
+</div>
+
 <p><strong>Common upcoding scenarios</strong> (where patients are often billed at a higher level than warranted):</p>
+
+<div class="key-takeaway">
+    <strong>Think you were upcoded?</strong> <a href="/scan">Scan your ER bill</a> &mdash; BillKarma compares your visit level against the clinical complexity documented in your bill and flags if the coding doesn&rsquo;t add up.
+</div>
 
 <div class="case-study">
     <h3>Sprained ankle billed as Level 4</h3>
@@ -190,6 +198,10 @@ register("why-emergency-room-bills-are-so-high", {
 <h3>f) File a formal dispute</h3>
 
 <p>For billing errors, duplicate charges, or excessive markups, file a written dispute with the billing department. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has templates and phone scripts you can use today.</p>
+
+<div class="key-takeaway">
+    <strong>Already have your ER bill in hand?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we&rsquo;ll flag overbilled line items, supply markups, and coding errors in seconds so you know exactly what to dispute.
+</div>
 
 <h2 id="er-vs-urgent">6. ER vs. urgent care: a cost comparison</h2>
 

@@ -6,7 +6,7 @@ article registers itself with the guides system and gets served at
 
 ---
 
-## Quality Checklist (target: 8+/10)
+## Quality Checklist (target: 9+/10)
 
 Before publishing, verify every item:
 
@@ -18,14 +18,17 @@ Before publishing, verify every item:
       and outcomes (use `.case-study` markup)
 - [ ] **2+ data tables** — comparisons, pricing breakdowns, or cost tables
 - [ ] **Calculator embed** — at least 1 `_embed()` call where the reader would
-      naturally want to look something up
+      naturally want to look something up (2 preferred)
 - [ ] **Internal links** — natural links to `/calculator`, `/scan`,
       `/hospitals/`, and other guides (minimum 4 internal links)
+- [ ] **3+ CTAs distributed throughout** — not just at the end. See CTA
+      placement rules below. At least one in the first half of the article.
 - [ ] **5+ FAQs** with FAQPage schema (structured in `faqs` list)
 - [ ] **Sources section** — 5+ authoritative external links (CMS, KFF, CFPB,
-      Health Affairs, etc.)
+      Health Affairs, etc.). Every stat in the lead paragraph must trace to
+      a named, specific source (no journal homepages — use DOIs or direct links)
 - [ ] **Key takeaway callouts** — 2+ `.key-takeaway` boxes for scannable
-      highlights
+      highlights (CTAs count toward this total)
 - [ ] **8th grade reading level** — plain language, jargon defined on first use
 - [ ] **Follows PRODUCT_CONTEXT.md** — approved language only, no forbidden
       terms
@@ -128,6 +131,45 @@ service)."}</p>
     <strong>{Bold summary.}</strong> {1-2 sentence supporting detail.}
 </div>
 
+<!-- CTA (CALL TO ACTION) — 3 required per article, placed at strategic points.
+     Use the key-takeaway class so they render as prominent lime-green boxes.
+     DO NOT cluster all CTAs at the end — place them where the reader is
+     most engaged, right after they've learned something actionable.
+
+     CTA #1 — Early (after the first major "here's the problem" section,
+               roughly 20-30% through the article). Best trigger: after a
+               data table showing markups/rates, or after an annotated bill.
+               Goal: catch readers who are already engaged and ready to act.
+
+     CTA #2 — Mid-article (after the "how to dispute/appeal/fix it" section,
+               roughly 50-60% through). Best trigger: after step-by-step
+               instructions. Goal: convert readers who just finished learning
+               exactly what to do.
+
+     CTA #3 — Pre-case-studies (just before the case studies section,
+               roughly 70-80% through). Best trigger: right before social
+               proof. Goal: catch readers whose confidence has built from
+               reading the guide but haven't acted yet.
+
+     The existing FAQ/end of article is not a required CTA placement —
+     it's too late. Most readers who reach the FAQ already decided whether
+     to act. -->
+
+<!-- CTA — Scan -->
+<div class="key-takeaway">
+    <strong>{Action hook — 5 words max.}</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; {one sentence on what we do for them, specific to this article's topic}.
+</div>
+
+<!-- CTA — Calculator -->
+<div class="key-takeaway">
+    <strong>{Action hook.}</strong> Use our <a href="/calculator">free calculator</a> to look up {specific thing relevant to this article} &mdash; {one sentence benefit}.
+</div>
+
+<!-- CTA — Hospital directory -->
+<div class="key-takeaway">
+    <strong>{Action hook.}</strong> Check our <a href="/hospitals/">hospital directory</a> &mdash; {one sentence on what they'll find there, specific to this article's context}.
+</div>
+
 <!-- CASE STUDY — use for real-world examples with dollar outcomes -->
 <div class="case-study">
     <h3>{Example title: brief description}</h3>
@@ -199,6 +241,58 @@ _embed(mode="markup", title="Is your charge too high?", subtitle="Enter the CPT 
 
 # Pre-fill a CPT code
 _embed(mode="cost", cpt="99284", title="Your ER visit level", subtitle="See what Medicare pays.")
+```
+
+---
+
+## CTA Placement Rules
+
+Every article must have **at least 3 CTAs** distributed across the article.
+A CTA is a `key-takeaway` div that contains a link to `/scan`, `/calculator`,
+`/hospitals/`, or a closely related guide. Do not cluster CTAs — spread them.
+
+### Required placement points
+
+| CTA | Position | Typical trigger | Preferred link |
+|---|---|---|---|
+| #1 | After first "problem" section (~25% in) | After a data table showing markups or a flagged bill example | `/scan` |
+| #2 | After "how to fix it" steps (~55% in) | After step-by-step dispute/appeal instructions | `/calculator` or `/scan` |
+| #3 | Just before case studies (~75% in) | Between the how-to section and the social-proof examples | `/scan` |
+
+### CTA copy rules
+
+- **Lead with action, not product.** "Think you were overcharged?" not
+  "BillKarma can help you."
+- **Be specific to the article's topic.** "Flag inflated drug charges" not
+  "check for billing errors."
+- **One sentence after the link.** Don't write a paragraph. The key-takeaway
+  box is already prominent — the copy just needs to complete the thought.
+- **Vary the destination.** Don't link to `/scan` three times in a row. Mix
+  `/scan`, `/calculator`, and `/hospitals/` across the three CTAs.
+
+### Example CTAs
+
+```html
+<!-- Scan CTA — after a data table showing markups -->
+<div class="key-takeaway">
+    <strong>Think you were charged for these?</strong> <a href="/scan">Upload
+    your bill to BillKarma</a> &mdash; we automatically flag charges that
+    exceed the Medicare rate and show you exactly how much each is inflated.
+</div>
+
+<!-- Calculator CTA — after explaining a billing code system -->
+<div class="key-takeaway">
+    <strong>Not sure what your code means?</strong> Use our
+    <a href="/calculator">free calculator</a> to look up what Medicare pays
+    for any CPT code on your bill.
+</div>
+
+<!-- Hospital directory CTA — after discussing network or facility issues -->
+<div class="key-takeaway">
+    <strong>Choosing a facility?</strong> Our
+    <a href="/hospitals/">hospital directory</a> shows pricing transparency
+    grades and billing accuracy data for hospitals near you.
+</div>
 ```
 
 ---
