@@ -444,6 +444,29 @@ def _run_migrations(db):
         """
     )
 
+    # Concierge interest queue (success-fee prompt captures)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS concierge_interest (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            disputed_amount REAL,
+            bill_context TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_concierge_created ON concierge_interest(created_at)")
+
+    # Additional fields for richer dispute tracking
+    ensure_columns(
+        "dispute_outcomes",
+        {
+            "dispute_stage": "TEXT",
+            "days_to_resolution": "INTEGER",
+        },
+    )
+
 
 SCHEMA = """
 -- Users

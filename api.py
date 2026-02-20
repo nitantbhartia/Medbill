@@ -9,9 +9,11 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 import config
+import email_service
 import scanner
 import analyzer
 import negotiation
+from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
 from db import get_db
 from dispute_packet import generate_dispute_packet
 from appeal_playbooks import generate_appeal_playbook
@@ -336,76 +338,190 @@ async def get_dispute_packet(bill_id: int):
 
 @router.post("/dispute-letter/{bill_id}")
 async def get_dispute_letter(bill_id: int, payload: dict):
-    """
-    Generate a focused dispute letter from selected findings.
-    """
+    """Generate a structured dispute letter from selected findings."""
     selected_ids = payload.get("finding_ids", [])
-    requestor_name = payload.get("requestor_name", "Patient")
+    requestor_name = payload.get("requestor_name", "[Your Name]")
+    account_number = payload.get("account_number", "[Account Number]")
     if not isinstance(selected_ids, list):
         raise HTTPException(400, "finding_ids must be an array")
 
-    with get_db() as db:
-        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
-        if not bill:
-            raise HTTPException(404, "Bill not found")
-
-        if selected_ids:
-            placeholders = ",".join(["?"] * len(selected_ids))
-            rows = db.execute(
-                f"SELECT * FROM findings WHERE bill_id = ? AND id IN ({placeholders}) ORDER BY id",
-                [bill_id, *selected_ids],
-            ).fetchall()
-        else:
-            rows = db.execute("SELECT * FROM findings WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
-
-    if not rows:
-        raise HTTPException(400, "No findings available for dispute letter")
-
-    bill_dict = dict(bill)
-    bullets = []
-    total = 0.0
-    for row in rows:
-        detail = json.loads(row["details"] or "{}")
-        li = detail.get("line_item") or {}
-        cpt = li.get("cpt_code") or "N/A"
-        evidence = detail.get("evidence") or {}
-        source = evidence.get("source", "rule_engine")
-        est = float(detail.get("estimated_patient_savings") or row["potential_savings"] or 0.0)
-        total += est
-        bullets.append(
-            f"- {row['message']} (CPT: {cpt}, est. savings: ${est:,.2f})"
-        )
-
-    letter = (
-        f"Date: {datetime.utcnow().strftime('%Y-%m-%d')}\n\n"
-        f"To: Billing Department, {bill_dict.get('provider_name') or 'Provider'}\n"
-        f"Re: Account review request for bill #{bill_id}\n\n"
-        f"Hello,\n\n"
-        f"I am requesting an item-level review and correction of charges on my bill dated "
-        f"{bill_dict.get('bill_date') or 'N/A'}. I found the following issues in my audit:\n\n"
-        f"{chr(10).join(bullets)}\n\n"
-        f"Please send a corrected itemized statement and any rebill submissions to my insurer where applicable. "
-        f"The estimated patient-impact amount under review is ${total:,.2f}.\n\n"
-        f"Sincerely,\n"
-        f"{requestor_name}\n"
+    result = build_dispute_letter(
+        bill_id,
+        finding_ids=selected_ids or None,
+        requestor_name=requestor_name,
+        account_number=account_number,
     )
+    if not result:
+        raise HTTPException(404, "Bill not found or no findings available")
+
     log_audit(
         action="generate_dispute_letter",
         resource_type="bill",
         resource_id=str(bill_id),
         bill_id=bill_id,
-        metadata={"finding_count": len(rows), "estimated_patient_impact": round(total, 2)},
+        metadata={"finding_count": result["finding_count"], "total_disputed": result["total_disputed"]},
     )
+    return {"status": "ok", "data": {**result, "bill_id": bill_id}}
 
-    return {
-        "status": "ok",
-        "data": {
-            "bill_id": bill_id,
-            "finding_count": len(rows),
-            "estimated_patient_impact": round(total, 2),
-            "letter": letter,
-        },
-    }
+
+@router.get("/dispute-phone-script/{bill_id}")
+async def get_dispute_phone_script(bill_id: int):
+    """Generate a structured phone script for disputing flagged charges."""
+    script = build_phone_script(bill_id)
+    if not script:
+        raise HTTPException(404, "Bill not found or no findings")
+    return {"status": "ok", "data": {"script": script}}
+
+
+@router.get("/dispute-stats")
+async def dispute_stats():
+    """Return aggregate dispute outcome stats (shown on site once 50+ outcomes exist)."""
+    return {"status": "ok", "data": get_outcome_stats()}
+
+
+@router.post("/concierge-interest")
+async def record_concierge_interest(
+    email: str = Form(...),
+    disputed_amount: float = Form(0),
+    bill_context: str = Form(""),
+):
+    """Capture email and disputed amount from success-fee prompt (interest only, no enrollment)."""
+    email = (email or "").strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(400, "Valid email required")
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO concierge_interest (email, disputed_amount, bill_context) VALUES (?, ?, ?)",
+            (email, disputed_amount, bill_context[:500] if bill_context else ""),
+        )
+    log_audit(
+        action="concierge_interest",
+        resource_type="concierge",
+        resource_id=email,
+        metadata={"disputed_amount": disputed_amount},
+    )
+    return {"status": "ok", "data": {"queued": True}}
+
+
+def _build_report_html(results: dict) -> str:
+    """Build an HTML email body from bill results."""
+    bill = results.get("bill", {})
+    findings = results.get("findings", [])
+    provider = bill.get("provider_name") or "your provider"
+    bill_date = bill.get("bill_date") or "N/A"
+    total_charged = bill.get("total_charged")
+    total_owes = bill.get("total_patient_owes")
+    savings = bill.get("total_potential_savings") or 0
+    bill_id = bill.get("id", "")
+    results_url = f"{config.APP_URL.rstrip('/')}/results/{bill_id}"
+
+    severity_colors = {"high": "#b91c1c", "medium": "#b45309", "low": "#1d4ed8"}
+
+    finding_rows = ""
+    for f in findings[:10]:  # cap at 10 in email
+        sev = f.get("severity", "low")
+        color = severity_colors.get(sev, "#374151")
+        est = f.get("potential_savings") or f.get("estimated_patient_savings") or 0
+        finding_rows += (
+            f'<tr>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:{color};font-weight:600;text-transform:uppercase;font-size:11px">{sev}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">{f.get("message", "")}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#059669;white-space:nowrap">'
+            f'{"$" + f"{est:,.2f}" if est else "—"}</td>'
+            f'</tr>'
+        )
+    if len(findings) > 10:
+        finding_rows += (
+            f'<tr><td colspan="3" style="padding:8px 12px;font-size:12px;color:#6b7280">'
+            f'…and {len(findings) - 10} more issues. View the full report online.</td></tr>'
+        )
+
+    charge_line = f"${total_charged:,.2f}" if total_charged else "N/A"
+    owes_line = f"${total_owes:,.2f}" if total_owes is not None else "N/A"
+
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;margin:0;padding:24px">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+    <div style="background:#0f766e;padding:24px 28px">
+      <p style="margin:0;color:#ccfbf1;font-size:13px;font-weight:600;letter-spacing:.05em">BILLKARMA REPORT</p>
+      <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:700">{len(findings)} issue{"s" if len(findings) != 1 else ""} found</h1>
+    </div>
+    <div style="padding:24px 28px">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Provider</td>
+          <td style="font-size:13px;color:#111827;font-weight:500;padding:4px 0">{provider}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Bill date</td>
+          <td style="font-size:13px;color:#111827;padding:4px 0">{bill_date}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Total charged</td>
+          <td style="font-size:13px;color:#111827;padding:4px 0">{charge_line}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">You owe</td>
+          <td style="font-size:13px;color:#111827;font-weight:600;padding:4px 0">{owes_line}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:#6b7280;padding:4px 0">Potential savings</td>
+          <td style="font-size:14px;color:#059669;font-weight:700;padding:4px 0">${savings:,.2f}</td>
+        </tr>
+      </table>
+      {"<h2 style='font-size:14px;font-weight:600;color:#111827;margin:0 0 12px'>Issues found</h2><table style='width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden'><thead><tr><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Severity</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Finding</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Est. savings</th></tr></thead><tbody>" + finding_rows + "</tbody></table>" if findings else "<p style='color:#059669;font-weight:600'>No significant issues found — your bill looks clean.</p>"}
+      <div style="margin-top:24px;text-align:center">
+        <a href="{results_url}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:600">View full report &amp; dispute tools →</a>
+      </div>
+    </div>
+    <div style="padding:16px 28px;border-top:1px solid #e5e7eb;background:#f9fafb">
+      <p style="margin:0;font-size:11px;color:#9ca3af">BillKarma compares charges against CMS Medicare rate data. This is not medical or legal advice.</p>
+    </div>
+  </div>
+</body></html>"""
+
+
+@router.post("/email-report")
+async def email_report(request: Request):
+    """Email a bill report to the user. Requires SENDGRID_API_KEY to deliver."""
+    body = await request.json()
+    bill_id = body.get("bill_id")
+    to_email = (body.get("email") or "").strip()
+
+    if not to_email:
+        raise HTTPException(400, "email is required")
+    if not bill_id:
+        raise HTTPException(400, "bill_id is required")
+
+    results = analyzer.get_bill_results(int(bill_id))
+    if not results:
+        raise HTTPException(404, "Bill not found")
+
+    bill = results["bill"]
+    findings_count = bill.get("total_findings") or len(results.get("findings", []))
+    savings = bill.get("total_potential_savings") or 0
+
+    subject = f"Your BillKarma report: {findings_count} issue{'s' if findings_count != 1 else ''} found"
+    if savings:
+        subject += f" — up to ${savings:,.0f} in potential savings"
+
+    html = _build_report_html(results)
+
+    try:
+        sent = email_service.send_email(to_email, subject, html)
+    except RuntimeError as e:
+        log.error("email_report delivery failed: %s", e)
+        raise HTTPException(503, "Email delivery failed. Check back later or copy your report manually.")
+
+    log_audit(
+        action="email_report",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=int(bill_id),
+        metadata={"email": to_email, "sent": sent},
+    )
+    return {"status": "ok", "data": {"sent": sent}}
 
 
 @router.get("/appeal-playbook/{bill_id}")
@@ -441,12 +557,15 @@ async def get_message_script(bill_id: int):
 @router.post("/negotiate/start")
 async def start_negotiation(
     bill_id: int = Form(...),
-    user_id: int = Form(...),
+    user_id: int = Form(None),
     account_number: str = Form(...),
     hospital_email: str = Form(""),
 ):
     """Create a new negotiation for a bill."""
-    neg_id = negotiation.create_negotiation(bill_id, user_id, account_number, hospital_email)
+    try:
+        neg_id = negotiation.create_negotiation(bill_id, user_id, account_number, hospital_email)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
     return {"status": "ok", "data": {"negotiation_id": neg_id}}
 
 

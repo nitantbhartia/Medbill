@@ -588,7 +588,12 @@
                 <span class="stat-number" style="font-size: 2.75rem;">1 in 4</span>
                 <span class="stat-label">Bills flagged for potential errors</span>
             </div>
-            {% if stats and stats.realized_savings and stats.realized_savings > 0 %}
+            {% if outcome_stats and outcome_stats.show_stat %}
+            <div class="stat-tile">
+                <span class="stat-number" data-prefix="$">{{ "%.0f"|format(outcome_stats.median_recovered) }}</span>
+                <span class="stat-label">Median recovered per dispute &mdash; {{ outcome_stats.total_disputes }} verified outcomes</span>
+            </div>
+            {% elif stats and stats.realized_savings and stats.realized_savings > 0 %}
             <div class="stat-tile">
                 <span class="stat-number" data-count-target="{{ stats.realized_savings|int }}" data-prefix="$">0</span>
                 <span class="stat-label">Average recovered per dispute</span>
