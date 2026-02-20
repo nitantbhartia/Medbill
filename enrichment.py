@@ -40,6 +40,9 @@ CMS_POS_API = (
 # CMS Care Compare hospital quality API
 CMS_CARE_COMPARE_API = "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0"
 
+ASC_FACILITY_TYPE_CODES = {"17"}
+IMAGING_FACILITY_TYPE_CODES = {"28", "33"}
+
 # CMS GNRL_CNTL_TYPE_CD → display value mapping
 OWNERSHIP_CODE_MAP = {
     "01": "Nonprofit (Church)",
@@ -141,6 +144,29 @@ def _title_case_address(raw: str | None) -> str | None:
     return txt
 
 
+def _slugify(value: str) -> str:
+    txt = re.sub(r"[^a-z0-9]+", "-", (value or "").strip().lower())
+    return re.sub(r"-+", "-", txt).strip("-")
+
+
+def _guess_imaging_modalities(name: str) -> list[str]:
+    n = (name or "").lower()
+    modalities = []
+    if "mri" in n or "magnetic resonance" in n:
+        modalities.append("MRI")
+    if "ct" in n or "cat scan" in n or "computed tomography" in n:
+        modalities.append("CT")
+    if "x-ray" in n or "xray" in n or "radiology" in n:
+        modalities.append("X-ray")
+    if "ultrasound" in n or "sonography" in n:
+        modalities.append("Ultrasound")
+    if "pet" in n:
+        modalities.append("PET")
+    if "mamm" in n:
+        modalities.append("Mammography")
+    return modalities
+
+
 def _is_valid_coord(lat: float | None, lon: float | None) -> bool:
     if lat is None or lon is None:
         return False
@@ -232,6 +258,173 @@ def load_pos_file(csv_path: str) -> int:
         )
     log.info("Loaded %d POS records", len(rows))
     return len(rows)
+
+
+def extract_asc_and_imaging_from_pos(csv_path: str) -> dict[str, int]:
+    """
+    Extract ASC and imaging-center facilities from CMS POS CSV and upsert into facilities.
+    Returns counts by facility type.
+    """
+    with get_db() as db:
+        # Candidate hospital/system names for ownership detection.
+        system_rows = db.execute(
+            """
+            SELECT DISTINCT COALESCE(parent_system, system_affiliation, name) AS system_name
+            FROM hospitals
+            WHERE COALESCE(parent_system, system_affiliation, name) IS NOT NULL
+            """
+        ).fetchall()
+        systems = [r["system_name"] for r in system_rows if (r["system_name"] or "").strip()]
+        parent_facility_rows = db.execute(
+            """
+            SELECT id, name, parent_system, system_affiliation
+            FROM facilities
+            WHERE facility_type = 'hospital'
+            """
+        ).fetchall()
+
+    normalized_systems = [(s, _normalize_name(s)) for s in systems]
+    parent_candidates = []
+    for r in parent_facility_rows:
+        for field in (r["name"], r["parent_system"], r["system_affiliation"]):
+            n = _normalize_name(field or "")
+            if n:
+                parent_candidates.append((r["id"], n))
+
+    inserted = {"asc": 0, "imaging_center": 0}
+    rows = []
+
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for src in reader:
+            fac_type = (src.get("GNRL_FAC_TYPE_CD") or "").strip()
+            if fac_type in ASC_FACILITY_TYPE_CODES:
+                facility_type = "asc"
+            elif fac_type in IMAGING_FACILITY_TYPE_CODES:
+                facility_type = "imaging_center"
+            else:
+                continue
+
+            cert_dt = (src.get("CRTFCTN_DT") or src.get("ORGNL_PRTCPTN_DT") or "").strip()
+            if not cert_dt:
+                continue
+
+            provider_num = (src.get("PRVDR_NUM") or "").strip().zfill(6)
+            if not provider_num or provider_num == "000000":
+                continue
+
+            name = (src.get("FAC_NAME") or src.get("ORGANIZATION_NAME") or "").strip()
+            state = (src.get("STATE_CD") or "").strip().upper()
+            city = (src.get("CITY_NAME") or "").strip().title()
+            if not (name and state and city):
+                continue
+
+            system_name = (src.get("ORGANIZATION_NAME") or src.get("ORG_NAME") or "").strip()
+            owner_probe = _normalize_name(f"{name} {system_name}")
+            is_hospital_owned = 0
+            matched_system = None
+            for raw_name, normalized in normalized_systems:
+                if normalized and normalized in owner_probe:
+                    matched_system = raw_name
+                    is_hospital_owned = 1
+                    break
+
+            parent_hospital_id = None
+            if is_hospital_owned and matched_system:
+                normalized_match = _normalize_name(matched_system)
+                for hid, candidate_norm in parent_candidates:
+                    if candidate_norm and candidate_norm in normalized_match:
+                        parent_hospital_id = hid
+                        break
+
+            state_slug = state.lower()
+            city_slug = _slugify(city)
+            base_slug = _slugify(name)
+            suffix = "surgery-center" if facility_type == "asc" else "imaging-center"
+            slug = f"{base_slug}-{city_slug}-{suffix}" if base_slug else f"{provider_num.lower()}-{suffix}"
+            facility_id = f"{'asc' if facility_type == 'asc' else 'img'}-{provider_num.lower()}"
+            ownership_code = (src.get("GNRL_CNTL_TYPE_CD") or "").strip().zfill(2)
+            ownership_type = OWNERSHIP_GROUP_MAP.get(ownership_code, "Unknown")
+            ownership_subtype = OWNERSHIP_CODE_MAP.get(ownership_code)
+            modalities = _guess_imaging_modalities(name) if facility_type == "imaging_center" else []
+            asc_specialties = []
+            if facility_type == "asc":
+                asc_specialties = ["general surgery"]
+                lowered = name.lower()
+                if "ortho" in lowered:
+                    asc_specialties.append("orthopedic")
+                if "gi" in lowered or "digest" in lowered:
+                    asc_specialties.append("GI")
+                if "eye" in lowered or "ophthal" in lowered:
+                    asc_specialties.append("ophthalmology")
+
+            rows.append(
+                (
+                    facility_id,
+                    name,
+                    (src.get("ST_ADR") or "").strip().title(),
+                    city,
+                    state,
+                    state_slug,
+                    city_slug,
+                    (src.get("ZIP_CD") or "").strip()[:5],
+                    (src.get("COUNTY_NAME") or "").strip().title() or None,
+                    _format_phone(src.get("PHNE_NUM")),
+                    facility_type,
+                    ownership_type,
+                    ownership_subtype,
+                    ownership_code,
+                    1,
+                    None,
+                    is_hospital_owned,
+                    parent_hospital_id,
+                    matched_system,
+                    json.dumps(sorted(set(asc_specialties))) if asc_specialties else None,
+                    json.dumps(sorted(set(modalities))) if modalities else None,
+                    slug,
+                )
+            )
+
+    with get_db() as db:
+        for row in rows:
+            db.execute(
+                """
+                INSERT INTO facilities (
+                    facility_id, name, address, city, state, state_slug, city_slug, zip, county, phone,
+                    facility_type, ownership_type, ownership_subtype, ownership_code,
+                    accepts_medicare, accepts_medicaid, is_hospital_owned, parent_hospital_id, parent_system,
+                    asc_specialties, imaging_modalities, slug
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    name=excluded.name,
+                    address=excluded.address,
+                    city=excluded.city,
+                    state=excluded.state,
+                    state_slug=excluded.state_slug,
+                    city_slug=excluded.city_slug,
+                    zip=excluded.zip,
+                    county=excluded.county,
+                    phone=excluded.phone,
+                    facility_type=excluded.facility_type,
+                    ownership_type=COALESCE(excluded.ownership_type, facilities.ownership_type),
+                    ownership_subtype=COALESCE(excluded.ownership_subtype, facilities.ownership_subtype),
+                    ownership_code=COALESCE(excluded.ownership_code, facilities.ownership_code),
+                    accepts_medicare=COALESCE(excluded.accepts_medicare, facilities.accepts_medicare),
+                    accepts_medicaid=COALESCE(excluded.accepts_medicaid, facilities.accepts_medicaid),
+                    is_hospital_owned=COALESCE(excluded.is_hospital_owned, facilities.is_hospital_owned),
+                    parent_hospital_id=COALESCE(excluded.parent_hospital_id, facilities.parent_hospital_id),
+                    parent_system=COALESCE(excluded.parent_system, facilities.parent_system),
+                    asc_specialties=COALESCE(excluded.asc_specialties, facilities.asc_specialties),
+                    imaging_modalities=COALESCE(excluded.imaging_modalities, facilities.imaging_modalities),
+                    slug=COALESCE(excluded.slug, facilities.slug),
+                    updated_at=CURRENT_TIMESTAMP
+                """,
+                row,
+            )
+            inserted[row[10]] += 1
+
+    log.info("Extracted non-hospital facilities from POS: %s", inserted)
+    return inserted
 
 
 # ---------------------------------------------------------------------------

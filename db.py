@@ -58,6 +58,15 @@ def _run_migrations(db):
         },
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
+    ensure_columns(
+        "hospitals",
+        {
+            "facility_type": "TEXT",
+            "accepts_medicare": "INTEGER",
+            "accepts_medicaid": "INTEGER",
+            "is_hospital_owned": "INTEGER DEFAULT 0",
+        },
+    )
 
     # ZIP code centroid coordinates (for procedure hospital finder)
     db.execute(
@@ -302,6 +311,51 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices2_facility ON hospital_prices(facility_id)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_hospital_prices2_cpt ON hospital_prices(cpt_code)")
+    ensure_columns(
+        "hospital_prices",
+        {
+            "facility_type": "TEXT",
+            "medicare_benchmark_type": "TEXT",
+            "medicare_benchmark_rate": "REAL",
+        },
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_proc_prices_facility_type ON hospital_prices(facility_type, cpt_code)"
+    )
+    db.execute("UPDATE hospital_prices SET facility_type = 'hospital' WHERE facility_type IS NULL OR TRIM(facility_type) = ''")
+    db.execute(
+        """
+        UPDATE hospital_prices
+        SET medicare_benchmark_type = COALESCE(medicare_benchmark_type, 'opps'),
+            medicare_benchmark_rate = COALESCE(medicare_benchmark_rate, medicare_rate)
+        WHERE facility_type = 'hospital'
+        """
+    )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS procedure_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT NOT NULL,
+            cpt_code TEXT NOT NULL,
+            description TEXT,
+            gross_charge REAL,
+            cash_price REAL,
+            min_negotiated_rate REAL,
+            max_negotiated_rate REAL,
+            avg_negotiated_rate REAL,
+            medicare_rate REAL,
+            markup_vs_medicare REAL,
+            data_year INTEGER,
+            facility_type TEXT,
+            medicare_benchmark_type TEXT,
+            medicare_benchmark_rate REAL,
+            UNIQUE(facility_id, cpt_code, data_year)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_proc_prices_facility ON procedure_prices(facility_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_proc_prices_cpt ON procedure_prices(cpt_code)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_proc_prices_type_cpt ON procedure_prices(facility_type, cpt_code)")
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS billing_metrics (
@@ -333,6 +387,96 @@ def _run_migrations(db):
         """
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_benchmark_scope ON benchmark_averages(scope)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS facilities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT UNIQUE,
+            name TEXT NOT NULL,
+            address TEXT,
+            city TEXT,
+            state TEXT,
+            state_slug TEXT,
+            city_slug TEXT,
+            zip TEXT,
+            county TEXT,
+            phone TEXT,
+            facility_type TEXT NOT NULL DEFAULT 'hospital',
+            ownership_type TEXT,
+            ownership_subtype TEXT,
+            ownership_code TEXT,
+            accepts_medicare INTEGER,
+            accepts_medicaid INTEGER,
+            is_hospital_owned INTEGER DEFAULT 0,
+            parent_hospital_id INTEGER REFERENCES facilities(id),
+            parent_system TEXT,
+            system_affiliation TEXT,
+            asc_specialties TEXT,
+            imaging_modalities TEXT,
+            lat REAL,
+            lon REAL,
+            slug TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CHECK (facility_type IN ('hospital', 'asc', 'imaging_center', 'urgent_care', 'lab'))
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_facilities_type ON facilities(facility_type)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_facilities_type_state ON facilities(facility_type, state)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_facilities_location ON facilities(state_slug, city_slug, slug)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS asc_medicare_rates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cpt_code TEXT NOT NULL,
+            description TEXT,
+            medicare_asc_rate REAL,
+            effective_year INTEGER,
+            is_covered_asc_procedure INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_asc_rates_cpt ON asc_medicare_rates(cpt_code, effective_year)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS facility_billing_metrics (
+            facility_id TEXT PRIMARY KEY,
+            facility_type TEXT NOT NULL,
+            avg_markup REAL,
+            median_markup REAL,
+            max_markup REAL,
+            procedures_compared INTEGER,
+            billing_grade TEXT,
+            benchmark_type TEXT,
+            computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_facility_metrics_type ON facility_billing_metrics(facility_type)")
+    db.execute(
+        """
+        INSERT OR IGNORE INTO facility_billing_metrics (
+            facility_id, facility_type, avg_markup, median_markup, max_markup,
+            procedures_compared, billing_grade, benchmark_type, computed_at
+        )
+        SELECT
+            bm.facility_id,
+            'hospital',
+            bm.avg_markup_vs_medicare,
+            bm.median_markup_vs_medicare,
+            bm.max_markup_vs_medicare,
+            bm.procedures_compared,
+            bm.billing_grade,
+            'opps',
+            bm.computed_at
+        FROM billing_metrics bm
+        """
+    )
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS hospital_content (
@@ -357,6 +501,59 @@ def _run_migrations(db):
         )
         """
     )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS price_observations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source_type TEXT NOT NULL,              -- mrf | user_bill | public_extract
+            source_ref TEXT NOT NULL,               -- stable source key to dedupe reloads
+            code_type TEXT NOT NULL DEFAULT 'CPT',
+            code TEXT NOT NULL,
+            facility_id TEXT,
+            payer TEXT,
+            plan_name TEXT,
+            place_of_service TEXT,
+            geo_zip5 TEXT,
+            geo_city TEXT,
+            geo_state TEXT,
+            billed_amount REAL,
+            allowed_amount REAL,
+            cash_price REAL,
+            gross_charge REAL,
+            medicare_rate REAL,
+            event_date DATE,
+            effective_year INTEGER,
+            confidence REAL DEFAULT 0.5,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(source_type, source_ref)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_code ON price_observations(code)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_geo_zip ON price_observations(geo_zip5)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_geo_state ON price_observations(geo_state)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_source ON price_observations(source_type)")
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS fair_price_bands (
+            geo_scope TEXT NOT NULL,                -- zip | city | state | national
+            geo_value TEXT NOT NULL,                -- zip: 33101, city: MIAMI|FL, state: FL, national: US
+            code_type TEXT NOT NULL DEFAULT 'CPT',
+            code TEXT NOT NULL,
+            sample_size INTEGER NOT NULL,
+            p25 REAL,
+            p50 REAL,
+            p75 REAL,
+            p90 REAL,
+            confidence_mean REAL,
+            method TEXT NOT NULL DEFAULT 'no_api_v1',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (geo_scope, geo_value, code_type, code, method)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_fair_bands_code ON fair_price_bands(code)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_fair_bands_geo ON fair_price_bands(geo_scope, geo_value)")
     db.execute(
         """
         CREATE TABLE IF NOT EXISTS dispute_claims (
@@ -518,6 +715,65 @@ def _run_migrations(db):
         """
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_enrichment_changelog_fid ON enrichment_changelog(facility_id)")
+
+    # Unified facilities mirror with discriminator for cross-facility queries.
+    db.execute(
+        """
+        INSERT INTO facilities (
+            facility_id, name, address, city, state, state_slug, city_slug, zip,
+            county, phone, facility_type, ownership_type, ownership_subtype, ownership_code,
+            accepts_medicare, accepts_medicaid, is_hospital_owned, parent_system,
+            system_affiliation, lat, lon, slug, updated_at
+        )
+        SELECT
+            h.facility_id,
+            h.name,
+            h.address,
+            h.city,
+            h.state,
+            h.state_slug,
+            h.city_slug,
+            h.zip,
+            h.county,
+            h.phone,
+            'hospital',
+            h.ownership_type,
+            h.ownership_subtype,
+            h.ownership_code,
+            1,
+            NULL,
+            0,
+            h.parent_system,
+            h.system_affiliation,
+            h.lat,
+            h.lon,
+            h.slug,
+            CURRENT_TIMESTAMP
+        FROM hospitals h
+        WHERE h.facility_id IS NOT NULL
+        ON CONFLICT(facility_id) DO UPDATE SET
+            name=excluded.name,
+            address=excluded.address,
+            city=excluded.city,
+            state=excluded.state,
+            state_slug=excluded.state_slug,
+            city_slug=excluded.city_slug,
+            zip=excluded.zip,
+            county=excluded.county,
+            phone=excluded.phone,
+            facility_type='hospital',
+            ownership_type=COALESCE(excluded.ownership_type, facilities.ownership_type),
+            ownership_subtype=COALESCE(excluded.ownership_subtype, facilities.ownership_subtype),
+            ownership_code=COALESCE(excluded.ownership_code, facilities.ownership_code),
+            accepts_medicare=COALESCE(facilities.accepts_medicare, 1),
+            parent_system=COALESCE(excluded.parent_system, facilities.parent_system),
+            system_affiliation=COALESCE(excluded.system_affiliation, facilities.system_affiliation),
+            lat=COALESCE(excluded.lat, facilities.lat),
+            lon=COALESCE(excluded.lon, facilities.lon),
+            slug=COALESCE(excluded.slug, facilities.slug),
+            updated_at=CURRENT_TIMESTAMP
+        """
+    )
 
     # Backward-compatible sync to canonical tables.
     db.execute(
@@ -1089,4 +1345,53 @@ CREATE TABLE IF NOT EXISTS data_refresh_log (
     status TEXT,
     notes TEXT
 );
+
+CREATE TABLE IF NOT EXISTS price_observations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_type TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    code_type TEXT NOT NULL DEFAULT 'CPT',
+    code TEXT NOT NULL,
+    facility_id TEXT,
+    payer TEXT,
+    plan_name TEXT,
+    place_of_service TEXT,
+    geo_zip5 TEXT,
+    geo_city TEXT,
+    geo_state TEXT,
+    billed_amount REAL,
+    allowed_amount REAL,
+    cash_price REAL,
+    gross_charge REAL,
+    medicare_rate REAL,
+    event_date DATE,
+    effective_year INTEGER,
+    confidence REAL DEFAULT 0.5,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_type, source_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_price_obs_code ON price_observations(code);
+CREATE INDEX IF NOT EXISTS idx_price_obs_geo_zip ON price_observations(geo_zip5);
+CREATE INDEX IF NOT EXISTS idx_price_obs_geo_state ON price_observations(geo_state);
+CREATE INDEX IF NOT EXISTS idx_price_obs_source ON price_observations(source_type);
+
+CREATE TABLE IF NOT EXISTS fair_price_bands (
+    geo_scope TEXT NOT NULL,
+    geo_value TEXT NOT NULL,
+    code_type TEXT NOT NULL DEFAULT 'CPT',
+    code TEXT NOT NULL,
+    sample_size INTEGER NOT NULL,
+    p25 REAL,
+    p50 REAL,
+    p75 REAL,
+    p90 REAL,
+    confidence_mean REAL,
+    method TEXT NOT NULL DEFAULT 'no_api_v1',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (geo_scope, geo_value, code_type, code, method)
+);
+
+CREATE INDEX IF NOT EXISTS idx_fair_bands_code ON fair_price_bands(code);
+CREATE INDEX IF NOT EXISTS idx_fair_bands_geo ON fair_price_bands(geo_scope, geo_value);
 """

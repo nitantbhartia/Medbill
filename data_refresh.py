@@ -146,6 +146,77 @@ def refresh_opps_rates(csv_path: str) -> int:
     return count
 
 
+def refresh_asc_rates(csv_path: str) -> int:
+    """
+    Load Medicare ASC fee schedule rates from a CMS-format CSV file.
+    Returns number of rows inserted.
+
+    Accepted column aliases:
+    - CPT code: HCPCS | CPT | CPT_CODE | CODE
+    - Description: SHORT_DESCRIPTOR | DESCRIPTION | DESC
+    - Rate: ASC_PAYMENT_RATE | PAYMENT_RATE | RATE | MEDICARE_ASC_RATE
+    - Year: EFFECTIVE_YEAR | YEAR
+    - Coverage indicator (optional):
+      FACILITY_INDICATOR | COVERED_INDICATOR | ASC_COVERED | PAYMENT_INDICATOR
+    """
+    import csv
+
+    def _cell(row: dict, *names: str) -> str:
+        for name in names:
+            value = row.get(name)
+            if value is not None and str(value).strip():
+                return str(value).strip()
+        return ""
+
+    rows = []
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            cpt_code = _cell(row, "HCPCS", "CPT", "CPT_CODE", "CODE")
+            if not cpt_code:
+                continue
+            year_raw = _cell(row, "EFFECTIVE_YEAR", "YEAR")
+            try:
+                effective_year = int(year_raw) if year_raw else date.today().year
+            except ValueError:
+                effective_year = date.today().year
+            indicator = _cell(
+                row,
+                "FACILITY_INDICATOR",
+                "COVERED_INDICATOR",
+                "ASC_COVERED",
+                "PAYMENT_INDICATOR",
+            ).upper()
+            is_covered = indicator not in {"N", "NO", "0", "NONCOVERED", "NOT COVERED"}
+            rows.append(
+                (
+                    cpt_code,
+                    _cell(row, "SHORT_DESCRIPTOR", "DESCRIPTION", "DESC"),
+                    _parse_float(_cell(row, "ASC_PAYMENT_RATE", "PAYMENT_RATE", "RATE", "MEDICARE_ASC_RATE")),
+                    effective_year,
+                    1 if is_covered else 0,
+                )
+            )
+
+    if not rows:
+        log.warning("No ASC rows parsed from %s", csv_path)
+        return 0
+
+    with get_db() as db:
+        db.execute("DELETE FROM asc_medicare_rates WHERE effective_year = ?", (rows[0][3],))
+        db.executemany(
+            """
+            INSERT INTO asc_medicare_rates (
+                cpt_code, description, medicare_asc_rate, effective_year, is_covered_asc_procedure
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            rows,
+        )
+
+    log.info("Loaded %d ASC rates from %s", len(rows), csv_path)
+    return len(rows)
+
+
 def refresh_benchmarks(csv_path: str) -> int:
     """
     Load procedure benchmark data from a CSV file.
@@ -247,6 +318,7 @@ def refresh_all_from_directory(data_dir: str) -> dict:
     loaders = {
         "medicare_pfs.csv": refresh_medicare_rates,
         "opps_rates.csv": refresh_opps_rates,
+        "asc_rates.csv": refresh_asc_rates,
         "ncci_edits.csv": refresh_ncci_edits,
         "procedure_benchmarks.csv": refresh_benchmarks,
         "zip_locality_map.csv": refresh_zip_localities,
@@ -339,7 +411,7 @@ def refresh_enrichment_quarterly(pos_csv_path: str) -> dict:
     from enrichment import (
         load_pos_file, match_pos_to_hospitals, update_ownership_from_pos,
         update_coordinates_from_pos, update_beds_from_pos,
-        standardize_addresses_from_pos, coverage_report,
+        standardize_addresses_from_pos, coverage_report, extract_asc_and_imaging_from_pos,
     )
 
     pos_count = load_pos_file(pos_csv_path)
@@ -348,6 +420,7 @@ def refresh_enrichment_quarterly(pos_csv_path: str) -> dict:
     coords_updated, _ = update_coordinates_from_pos(matched)
     beds_updated = update_beds_from_pos(matched)
     addr_updated = standardize_addresses_from_pos(matched)
+    non_hospital = extract_asc_and_imaging_from_pos(pos_csv_path)
     cov = coverage_report()
 
     with get_db() as db:
@@ -357,7 +430,7 @@ def refresh_enrichment_quarterly(pos_csv_path: str) -> dict:
                 "cms_pos_quarterly",
                 ownership_updated + coords_updated + beds_updated,
                 "ok",
-                f"pos_loaded={pos_count} matched={len(matched)} ownership={ownership_updated} coords={coords_updated}",
+                f"pos_loaded={pos_count} matched={len(matched)} ownership={ownership_updated} coords={coords_updated} asc={non_hospital.get('asc', 0)} imaging={non_hospital.get('imaging_center', 0)}",
             ),
         )
     log.info("Quarterly enrichment complete: %d matched, %d ownership, %d coords", len(matched), ownership_updated, coords_updated)
@@ -368,6 +441,7 @@ def refresh_enrichment_quarterly(pos_csv_path: str) -> dict:
         "coordinates_updated": coords_updated,
         "beds_updated": beds_updated,
         "addresses_updated": addr_updated,
+        "non_hospital_facilities": non_hospital,
         "coverage": cov,
     }
 
@@ -447,7 +521,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python data_refresh.py <command> [csv_path]")
         print(
-            "Commands: health-check, refresh-pfs, refresh-opps, refresh-ncci, "
+            "Commands: health-check, refresh-pfs, refresh-opps, refresh-asc, refresh-ncci, "
             "refresh-benchmarks, refresh-zip-localities, refresh-all, "
             "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )
@@ -487,6 +561,10 @@ if __name__ == "__main__":
         count = refresh_opps_rates(sys.argv[2])
         print(f"Loaded {count} OPPS rates.")
 
+    elif cmd == "refresh-asc" and len(sys.argv) == 3:
+        count = refresh_asc_rates(sys.argv[2])
+        print(f"Loaded {count} ASC rates.")
+
     elif cmd == "refresh-ncci" and len(sys.argv) == 3:
         count = refresh_ncci_edits(sys.argv[2])
         print(f"Loaded {count} NCCI edits.")
@@ -507,7 +585,7 @@ if __name__ == "__main__":
 
     else:
         print(
-            "Unknown command. Use: health-check, refresh-pfs, refresh-opps, "
+            "Unknown command. Use: health-check, refresh-pfs, refresh-opps, refresh-asc, "
             "refresh-ncci, refresh-benchmarks, refresh-zip-localities, refresh-all, "
             "enrich-weekly, enrich-quarterly <pos_csv>, enrich-annual <hcris_csv>"
         )

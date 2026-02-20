@@ -50,6 +50,34 @@ _GRADE_BADGE_CLASSES = {
     "D": "bg-orange-100 text-orange-700",
     "F": "bg-red-100 text-red-700",
 }
+_FACILITY_TYPE_LABELS = {
+    "hospital": "Hospital",
+    "asc": "Surgery Center",
+    "imaging_center": "Imaging Center",
+}
+_BENCHMARK_TYPE_LABELS = {
+    "opps": "Medicare OPPS",
+    "asc": "Medicare ASC",
+    "pfs": "Physician Fee Schedule",
+    "clfs": "Clinical Lab Fee Schedule",
+}
+_ALL_PRICES_CTE = """
+WITH all_prices AS (
+    SELECT
+        facility_id, cpt_code, description, gross_charge, cash_price,
+        min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
+        medicare_rate, markup_vs_medicare, data_year,
+        facility_type, medicare_benchmark_type, medicare_benchmark_rate
+    FROM hospital_prices
+    UNION ALL
+    SELECT
+        facility_id, cpt_code, description, gross_charge, cash_price,
+        min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
+        medicare_rate, markup_vs_medicare, data_year,
+        facility_type, medicare_benchmark_type, medicare_benchmark_rate
+    FROM procedure_prices
+)
+"""
 _BODY_SYSTEMS: list[tuple[int, int, str]] = [
     (10000, 19999, "Skin & Soft Tissue"),
     (20000, 29999, "Musculoskeletal"),
@@ -85,6 +113,32 @@ def _classify_cpt(cpt_code: str) -> str:
     if 10000 <= n <= 69999:
         return "surgical"
     return "outpatient"
+
+
+def _facility_type_for_cpt(cpt_code: str) -> str:
+    t = _classify_cpt(cpt_code)
+    if t == "imaging":
+        return "imaging_center"
+    if t == "surgical":
+        return "asc"
+    return "hospital"
+
+
+def _parse_sort(sort_by: str) -> str:
+    value = (sort_by or "").strip().lower()
+    return value if value in {"patient_cost", "markup"} else "patient_cost"
+
+
+def _provider_profile_url(row: dict) -> str:
+    state_slug = row.get("state_slug") or ""
+    city_slug = row.get("city_slug") or ""
+    slug = row.get("slug") or ""
+    ftype = row.get("facility_type") or "hospital"
+    if ftype == "asc":
+        return f"/surgery-centers/{state_slug}/{city_slug}/{slug}/"
+    if ftype == "imaging_center":
+        return f"/imaging/{state_slug}/{city_slug}/{slug}/"
+    return f"/hospitals/{state_slug}/{city_slug}/{slug}/"
 
 
 def _friendly_name(cpt_code: str, raw_description: str) -> str:
@@ -149,15 +203,16 @@ def get_zip_latlon(zip_code: str) -> tuple[float, float] | None:
 
 
 def get_top_cpt_codes(limit: int = 100) -> list[dict]:
-    """Return top CPT codes ranked by hospital coverage, with basic stats."""
+    """Return top CPT codes ranked by provider coverage, with basic stats."""
     with get_db() as db:
         rows = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
                 hp.cpt_code,
-                COUNT(DISTINCT hp.facility_id) AS hospital_count,
+                COUNT(DISTINCT hp.facility_id) AS provider_count,
                 AVG(hp.gross_charge) AS avg_charge,
-                AVG(hp.medicare_rate) AS avg_medicare_rate,
+                AVG(COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate)) AS avg_medicare_rate,
                 AVG(hp.markup_vs_medicare) AS avg_markup,
                 (AVG(hp.markup_vs_medicare * hp.markup_vs_medicare)
                  - AVG(hp.markup_vs_medicare) * AVG(hp.markup_vs_medicare)) AS markup_variance,
@@ -168,13 +223,13 @@ def get_top_cpt_codes(limit: int = 100) -> list[dict]:
                        AND mr.description IS NOT NULL
                      ORDER BY mr.effective_year DESC LIMIT 1)
                 ) AS description
-            FROM hospital_prices hp
+            FROM all_prices hp
             WHERE hp.gross_charge IS NOT NULL
-              AND hp.medicare_rate IS NOT NULL
-              AND hp.medicare_rate > 0
+              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) IS NOT NULL
+              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) > 0
               AND hp.markup_vs_medicare IS NOT NULL
             GROUP BY hp.cpt_code
-            ORDER BY hospital_count DESC, markup_variance DESC
+            ORDER BY provider_count DESC, markup_variance DESC
             LIMIT ?
             """,
             (limit,),
@@ -187,6 +242,8 @@ def get_top_cpt_codes(limit: int = 100) -> list[dict]:
         name = _friendly_name(cpt, d.get("description") or "")
         result.append({
             **d,
+            # Backward compatible alias used by templates/tests.
+            "hospital_count": d.get("provider_count", 0),
             "name": name,
             "body_system": _body_system(cpt),
             "procedure_type": _classify_cpt(cpt),
@@ -198,11 +255,12 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
     """Return full data dict for a procedure detail page."""
     with get_db() as db:
         header_row = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
-                COUNT(DISTINCT hp.facility_id) AS hospital_count,
+                COUNT(DISTINCT hp.facility_id) AS provider_count,
                 AVG(hp.gross_charge) AS avg_charge,
-                AVG(hp.medicare_rate) AS avg_medicare_rate,
+                AVG(COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate)) AS avg_medicare_rate,
                 MIN(hp.gross_charge) AS min_charge,
                 MAX(hp.gross_charge) AS max_charge,
                 AVG(hp.markup_vs_medicare) AS avg_markup,
@@ -213,50 +271,86 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
                        AND mr.description IS NOT NULL
                      ORDER BY mr.effective_year DESC LIMIT 1)
                 ) AS description
-            FROM hospital_prices hp
+            FROM all_prices hp
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
-              AND hp.medicare_rate IS NOT NULL
-              AND hp.medicare_rate > 0
+              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) IS NOT NULL
+              AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) > 0
             """,
             (cpt_code,),
         ).fetchone()
 
-        if not header_row or not header_row["hospital_count"]:
+        if not header_row or not header_row["provider_count"]:
             return None
 
         grade_rows = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
-                m.billing_grade,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
                 AVG(hp.gross_charge) AS avg_charge,
-                AVG(hp.medicare_rate) AS avg_medicare_rate,
-                COUNT(*) AS hospital_count
-            FROM hospital_prices hp
-            JOIN billing_metrics m ON m.facility_id = hp.facility_id
+                AVG(COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate)) AS avg_medicare_rate,
+                COUNT(*) AS provider_count
+            FROM all_prices hp
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
+            LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
-              AND m.billing_grade IS NOT NULL
-            GROUP BY m.billing_grade
-            ORDER BY m.billing_grade
+              AND COALESCE(fm.billing_grade, m.billing_grade) IS NOT NULL
+            GROUP BY COALESCE(fm.billing_grade, m.billing_grade)
+            ORDER BY COALESCE(fm.billing_grade, m.billing_grade)
             """,
             (cpt_code,),
         ).fetchall()
 
         cheapest = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
-                h.name, h.city, h.state, h.state_slug, h.city_slug, h.slug,
-                m.billing_grade,
-                hp.gross_charge, hp.medicare_rate, hp.markup_vs_medicare
-            FROM hospital_prices hp
-            JOIN hospitals h ON h.facility_id = hp.facility_id
+                COALESCE(f.name, h.name) AS name,
+                COALESCE(f.city, h.city) AS city,
+                COALESCE(f.state, h.state) AS state,
+                COALESCE(f.state_slug, h.state_slug) AS state_slug,
+                COALESCE(f.city_slug, h.city_slug) AS city_slug,
+                COALESCE(f.slug, h.slug) AS slug,
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
+                COALESCE(f.is_hospital_owned, 0) AS is_hospital_owned,
+                hp.gross_charge,
+                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                COALESCE(hp.medicare_benchmark_type, CASE WHEN COALESCE(f.facility_type, hp.facility_type, 'hospital') = 'asc' THEN 'asc' ELSE 'opps' END) AS medicare_benchmark_type,
+                hp.markup_vs_medicare
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
+              AND COALESCE(f.name, h.name) IS NOT NULL
             ORDER BY hp.markup_vs_medicare ASC
-            LIMIT 10
+            LIMIT 30
+            """,
+            (cpt_code,),
+        ).fetchall()
+
+        type_ranges_rows = db.execute(
+            f"""
+            {_ALL_PRICES_CTE}
+            SELECT
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
+                COUNT(*) AS provider_count,
+                MIN(hp.gross_charge) AS min_charge,
+                MAX(hp.gross_charge) AS max_charge,
+                AVG(hp.gross_charge) AS avg_charge,
+                AVG(hp.markup_vs_medicare) AS avg_markup
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            WHERE hp.cpt_code = ?
+              AND hp.gross_charge IS NOT NULL
+              AND hp.markup_vs_medicare IS NOT NULL
+            GROUP BY COALESCE(f.facility_type, hp.facility_type, 'hospital')
             """,
             (cpt_code,),
         ).fetchall()
@@ -264,7 +358,8 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
         try:
             cpt_n = int(cpt_code)
             related_rows = db.execute(
-                """
+                f"""
+                {_ALL_PRICES_CTE}
                 SELECT
                     hp.cpt_code,
                     COUNT(DISTINCT hp.facility_id) AS hospital_count,
@@ -276,7 +371,7 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
                            AND mr.description IS NOT NULL
                          ORDER BY mr.effective_year DESC LIMIT 1)
                     ) AS description
-                FROM hospital_prices hp
+                FROM all_prices hp
                 WHERE hp.cpt_code != ?
                   AND CAST(hp.cpt_code AS INTEGER) BETWEEN ? AND ?
                   AND hp.gross_charge IS NOT NULL
@@ -299,6 +394,7 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
     by_grade = [
         {
             **dict(gr),
+            "hospital_count": gr["provider_count"],
             "patient_cost": round(gr["avg_charge"] * 0.20, 2) if gr["avg_charge"] else None,
             "color": _GRADE_COLORS.get(gr["billing_grade"] or "", "#9ca3af"),
             "badge_class": _grade_badge_class(gr["billing_grade"]),
@@ -307,9 +403,29 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
     ]
 
     cheapest_list = [
-        {**dict(r), "badge_class": _grade_badge_class(r["billing_grade"])}
+        {
+            **dict(r),
+            "facility_type_label": _FACILITY_TYPE_LABELS.get(r["facility_type"] or "hospital", "Provider"),
+            "benchmark_label": _BENCHMARK_TYPE_LABELS.get(r["medicare_benchmark_type"] or "opps", "Medicare"),
+            "ownership_badge": "Hospital-owned" if r["is_hospital_owned"] else "Independent",
+            "profile_url": _provider_profile_url(dict(r)),
+            "badge_class": _grade_badge_class(r["billing_grade"]),
+        }
         for r in cheapest
-    ]
+    ][:10]
+
+    ranges_by_type = []
+    for row in type_ranges_rows:
+        ftype = row["facility_type"] or "hospital"
+        if ftype not in {"hospital", "asc", "imaging_center"}:
+            continue
+        ranges_by_type.append(
+            {
+                **dict(row),
+                "facility_type_label": _FACILITY_TYPE_LABELS.get(ftype, ftype.title()),
+                "benchmark_label": "ASC rate" if ftype == "asc" else "Medicare",
+            }
+        )
 
     related = [
         {
@@ -353,51 +469,91 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
         "header": {
             "medicare_rate": medicare_rate,
             "national_avg_charge": avg_charge,
-            "hospital_count": header["hospital_count"],
+            "provider_count": header["provider_count"],
+            "hospital_count": header["provider_count"],
             "avg_markup": header.get("avg_markup"),
         },
         "by_grade": by_grade,
         "range_bar": range_bar,
-        "cheapest_hospitals": cheapest_list,
+        "cheapest_hospitals": [r for r in cheapest_list if r.get("facility_type") == "hospital"][:10],
+        "cheapest_providers": cheapest_list,
+        "ranges_by_type": ranges_by_type,
         "faq": _build_procedure_faq(name, cpt_code, procedure_type, medicare_rate, avg_charge),
         "related": related,
-        "seo": _build_procedure_seo(name, cpt_code, medicare_rate, avg_charge, header["hospital_count"]),
+        "seo": _build_procedure_seo(name, cpt_code, medicare_rate, avg_charge, header["provider_count"]),
     }
 
 
-def get_hospitals_near_zip_for_cpt(cpt_code: str, zip_code: str, limit: int = 10) -> list[dict]:
-    """Return up to `limit` hospitals within 75 miles of zip with data for this CPT code."""
+def get_providers_near_zip_for_cpt(
+    cpt_code: str,
+    zip_code: str,
+    limit: int = 10,
+    facility_type: str = "all",
+    grade_ab_only: bool = False,
+    sort_by: str = "patient_cost",
+) -> list[dict]:
+    """Return up to `limit` providers near zip for a CPT code across facility types."""
     coords = get_zip_latlon(zip_code)
     if not coords:
         return []
     zip_lat, zip_lon = coords
     lat_delta = _PROCEDURE_RADIUS_MILES / 69.0
     lon_delta = _PROCEDURE_RADIUS_MILES / max(69.17 * math.cos(math.radians(zip_lat)), 0.1)
+    sort_key = _parse_sort(sort_by)
+    normalized_type = (facility_type or "all").strip().lower()
+    allowed = {"all", "hospital", "asc", "imaging_center"}
+    if normalized_type not in allowed:
+        normalized_type = "all"
 
     with get_db() as db:
+        where_type = ""
+        params: list = [cpt_code]
+        params.extend(
+            [
+                zip_lat - lat_delta,
+                zip_lat + lat_delta,
+                zip_lon - lon_delta,
+                zip_lon + lon_delta,
+            ]
+        )
+        if normalized_type != "all":
+            where_type = " AND COALESCE(f.facility_type, hp.facility_type, 'hospital') = ?"
+            params.append(normalized_type)
         candidates = db.execute(
-            """
+            f"""
+            {_ALL_PRICES_CTE}
             SELECT
-                h.name, h.city, h.state, h.state_slug, h.city_slug, h.slug,
-                h.lat, h.lon,
-                m.billing_grade,
-                hp.gross_charge, hp.medicare_rate, hp.markup_vs_medicare
-            FROM hospital_prices hp
-            JOIN hospitals h ON h.facility_id = hp.facility_id
+                COALESCE(f.name, h.name) AS name,
+                COALESCE(f.city, h.city) AS city,
+                COALESCE(f.state, h.state) AS state,
+                COALESCE(f.state_slug, h.state_slug) AS state_slug,
+                COALESCE(f.city_slug, h.city_slug) AS city_slug,
+                COALESCE(f.slug, h.slug) AS slug,
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
+                COALESCE(f.lat, h.lat) AS lat,
+                COALESCE(f.lon, h.lon) AS lon,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
+                COALESCE(f.is_hospital_owned, 0) AS is_hospital_owned,
+                hp.gross_charge,
+                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                COALESCE(hp.medicare_benchmark_type, CASE WHEN COALESCE(f.facility_type, hp.facility_type, 'hospital') = 'asc' THEN 'asc' ELSE 'opps' END) AS medicare_benchmark_type,
+                hp.markup_vs_medicare
+            FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN hospitals h ON h.facility_id = hp.facility_id
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
             LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND hp.markup_vs_medicare IS NOT NULL
-              AND h.lat BETWEEN ? AND ?
-              AND h.lon BETWEEN ? AND ?
+              AND COALESCE(f.lat, h.lat) BETWEEN ? AND ?
+              AND COALESCE(f.lon, h.lon) BETWEEN ? AND ?
+              AND COALESCE(f.name, h.name) IS NOT NULL
+              {where_type}
             ORDER BY hp.gross_charge ASC
-            LIMIT 50
+            LIMIT 250
             """,
-            (
-                cpt_code,
-                zip_lat - lat_delta, zip_lat + lat_delta,
-                zip_lon - lon_delta, zip_lon + lon_delta,
-            ),
+            tuple(params),
         ).fetchall()
 
     results = []
@@ -406,14 +562,37 @@ def get_hospitals_near_zip_for_cpt(cpt_code: str, zip_code: str, limit: int = 10
             continue
         dist = _haversine_miles(zip_lat, zip_lon, row["lat"], row["lon"])
         if dist <= _PROCEDURE_RADIUS_MILES:
+            if grade_ab_only and (row["billing_grade"] or "").upper() not in {"A", "B"}:
+                continue
+            charge = row["gross_charge"] or 0.0
             results.append({
                 **dict(row),
+                "facility_type_label": _FACILITY_TYPE_LABELS.get(row["facility_type"] or "hospital", "Provider"),
+                "ownership_badge": "Hospital-owned" if row["is_hospital_owned"] else "Independent",
+                "benchmark_label": _BENCHMARK_TYPE_LABELS.get(row["medicare_benchmark_type"] or "opps", "Medicare"),
+                "profile_url": _provider_profile_url(dict(row)),
+                "estimated_patient_cost": round(charge * 0.20, 2) if charge else None,
                 "distance_miles": round(dist, 1),
                 "badge_class": _grade_badge_class(row["billing_grade"]),
             })
 
-    results.sort(key=lambda r: r["gross_charge"] or 0)
+    if sort_key == "markup":
+        results.sort(key=lambda r: (r["markup_vs_medicare"] is None, r["markup_vs_medicare"] or 0.0))
+    else:
+        results.sort(key=lambda r: (r["estimated_patient_cost"] is None, r["estimated_patient_cost"] or 0.0))
     return results[:limit]
+
+
+def get_hospitals_near_zip_for_cpt(cpt_code: str, zip_code: str, limit: int = 10) -> list[dict]:
+    """Backward-compatible wrapper for hospital-only provider search."""
+    return get_providers_near_zip_for_cpt(
+        cpt_code=cpt_code,
+        zip_code=zip_code,
+        limit=limit,
+        facility_type="hospital",
+        grade_ab_only=False,
+        sort_by="patient_cost",
+    )
 
 
 def _build_procedure_faq(

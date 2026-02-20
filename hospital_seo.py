@@ -270,6 +270,53 @@ def upsert_hospital_row(row: dict) -> None:
             ),
         )
 
+        db.execute(
+            """
+            INSERT INTO facilities (
+                facility_id, name, address, city, state, state_slug, city_slug, zip, county, phone,
+                facility_type, ownership_type, accepts_medicare, is_hospital_owned, parent_system,
+                system_affiliation, lat, lon, slug
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'hospital', ?, 1, 0, ?, ?, ?, ?, ?)
+            ON CONFLICT(facility_id) DO UPDATE SET
+                name=excluded.name,
+                address=excluded.address,
+                city=excluded.city,
+                state=excluded.state,
+                state_slug=excluded.state_slug,
+                city_slug=excluded.city_slug,
+                zip=excluded.zip,
+                county=excluded.county,
+                phone=excluded.phone,
+                facility_type='hospital',
+                ownership_type=COALESCE(excluded.ownership_type, facilities.ownership_type),
+                accepts_medicare=COALESCE(facilities.accepts_medicare, 1),
+                parent_system=COALESCE(excluded.parent_system, facilities.parent_system),
+                system_affiliation=COALESCE(excluded.system_affiliation, facilities.system_affiliation),
+                lat=COALESCE(excluded.lat, facilities.lat),
+                lon=COALESCE(excluded.lon, facilities.lon),
+                slug=COALESCE(excluded.slug, facilities.slug),
+                updated_at=CURRENT_TIMESTAMP
+            """,
+            (
+                facility_id,
+                row.get("name"),
+                row.get("address"),
+                city,
+                state,
+                state_slug,
+                city_slug,
+                row.get("zip"),
+                row.get("county"),
+                row.get("phone"),
+                row.get("ownership_type"),
+                row.get("parent_system"),
+                row.get("system_affiliation"),
+                row.get("lat"),
+                row.get("lon"),
+                slug,
+            ),
+        )
+
         # Backward-compatible mirror for existing routes/code paths.
         db.execute(
             """
@@ -1402,6 +1449,118 @@ def recompute_billing_metrics() -> int:
                 "UPDATE billing_metrics SET state_rank = ?, national_percentile = ? WHERE facility_id = ?",
                 (state_rank, percentile, row["facility_id"]),
             )
+
+    clear_comparison_cache()
+    return upserted
+
+
+def recompute_facility_billing_metrics() -> int:
+    """Compute billing metrics across hospitals, ASCs, and imaging centers."""
+    with get_db() as db:
+        facilities = db.execute(
+            """
+            SELECT facility_id, facility_type
+            FROM facilities
+            WHERE facility_type IN ('hospital', 'asc', 'imaging_center')
+            """
+        ).fetchall()
+        upserted = 0
+
+        for f in facilities:
+            facility_id = f["facility_id"]
+            facility_type = f["facility_type"] or "hospital"
+            benchmark_type = "asc" if facility_type == "asc" else "opps"
+
+            if facility_type == "asc":
+                rows = db.execute(
+                    """
+                    SELECT hp.gross_charge, hp.cash_price, hp.markup_vs_medicare
+                    FROM hospital_prices hp
+                    WHERE hp.facility_id = ?
+                      AND hp.gross_charge IS NOT NULL
+                      AND hp.markup_vs_medicare IS NOT NULL
+                      AND (
+                        hp.medicare_benchmark_type = 'asc'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM asc_medicare_rates ar
+                            WHERE ar.cpt_code = hp.cpt_code
+                              AND ar.is_covered_asc_procedure = 1
+                              AND (hp.data_year IS NULL OR ar.effective_year = hp.data_year)
+                        )
+                      )
+                    """,
+                    (facility_id,),
+                ).fetchall()
+            else:
+                rows = db.execute(
+                    """
+                    SELECT gross_charge, cash_price, markup_vs_medicare
+                    FROM hospital_prices
+                    WHERE facility_id = ?
+                      AND gross_charge IS NOT NULL
+                      AND markup_vs_medicare IS NOT NULL
+                    """,
+                    (facility_id,),
+                ).fetchall()
+
+            markups = [
+                float(r["markup_vs_medicare"])
+                for r in rows
+                if r["markup_vs_medicare"] is not None and 0.5 <= float(r["markup_vs_medicare"]) <= 150.0
+            ]
+
+            if len(markups) < 3:
+                db.execute(
+                    """
+                    INSERT INTO facility_billing_metrics (
+                        facility_id, facility_type, procedures_compared, billing_grade, benchmark_type, computed_at
+                    ) VALUES (?, ?, ?, 'N/A', ?, CURRENT_TIMESTAMP)
+                    ON CONFLICT(facility_id) DO UPDATE SET
+                        facility_type=excluded.facility_type,
+                        procedures_compared=excluded.procedures_compared,
+                        billing_grade='N/A',
+                        benchmark_type=excluded.benchmark_type,
+                        computed_at=CURRENT_TIMESTAMP
+                    """,
+                    (facility_id, facility_type, len(markups), benchmark_type),
+                )
+                upserted += 1
+                continue
+
+            avg_markup = sum(markups) / len(markups)
+            med_markup = sorted(markups)[len(markups) // 2]
+            max_markup = max(markups)
+            grade = _grade_from_avg_markup(avg_markup)
+
+            db.execute(
+                """
+                INSERT INTO facility_billing_metrics (
+                    facility_id, facility_type, avg_markup, median_markup,
+                    max_markup, procedures_compared, billing_grade, benchmark_type, computed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    facility_type=excluded.facility_type,
+                    avg_markup=excluded.avg_markup,
+                    median_markup=excluded.median_markup,
+                    max_markup=excluded.max_markup,
+                    procedures_compared=excluded.procedures_compared,
+                    billing_grade=excluded.billing_grade,
+                    benchmark_type=excluded.benchmark_type,
+                    computed_at=CURRENT_TIMESTAMP
+                """,
+                (
+                    facility_id,
+                    facility_type,
+                    round(avg_markup, 2),
+                    round(med_markup, 2),
+                    round(max_markup, 2),
+                    len(markups),
+                    grade,
+                    benchmark_type,
+                ),
+            )
+            upserted += 1
 
     clear_comparison_cache()
     return upserted

@@ -17,6 +17,7 @@ from db import get_db  # noqa: E402
 from hospital_seo import upsert_hospital_row  # noqa: E402
 from main import app  # noqa: E402
 from procedure_pages import (  # noqa: E402
+    get_providers_near_zip_for_cpt,
     get_procedure_profile,
     get_top_cpt_codes,
     get_zip_latlon,
@@ -98,6 +99,60 @@ def _seed():
                 """,
                 (fid, "27447", "TOTAL KNEE REPLACEMENT", charge, 2000.0, markup, 2025),
             )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facilities (
+                facility_id, name, address, city, state, state_slug, city_slug, zip,
+                facility_type, is_hospital_owned, slug, lat, lon, accepts_medicare
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "asc-100001",
+                "Independent Surgery Partners",
+                "300 Pine St",
+                "Springfield",
+                "IL",
+                "il",
+                "springfield",
+                "62701",
+                "asc",
+                0,
+                "independent-surgery-partners-springfield-surgery-center",
+                39.7825,
+                -89.6510,
+                1,
+            ),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facility_billing_metrics (
+                facility_id, facility_type, avg_markup, median_markup, max_markup,
+                procedures_compared, billing_grade, benchmark_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("asc-100001", "asc", 2.0, 2.0, 2.0, 6, "A", "asc"),
+        )
+        db.execute(
+            """
+            INSERT OR IGNORE INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge,
+                medicare_rate, markup_vs_medicare, data_year,
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "asc-100001",
+                "27447",
+                "TOTAL KNEE REPLACEMENT",
+                2400.0,
+                1200.0,
+                2.0,
+                2025,
+                "asc",
+                "asc",
+                1200.0,
+            ),
+        )
         # Seed imaging code (CPT 70553 — brain MRI)
         for fid, charge, markup in [(_FID_A, 3100.0, 1.8), (_FID_B, 7500.0, 4.4)]:
             db.execute(
@@ -109,6 +164,60 @@ def _seed():
                 """,
                 (fid, "70553", "MRI BRAIN W CONTRAST", charge, 1720.0, markup, 2025),
             )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facilities (
+                facility_id, name, address, city, state, state_slug, city_slug, zip,
+                facility_type, is_hospital_owned, slug, lat, lon, accepts_medicare
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "img-200001",
+                "Springfield Advanced Imaging",
+                "400 Lake St",
+                "Springfield",
+                "IL",
+                "il",
+                "springfield",
+                "62701",
+                "imaging_center",
+                1,
+                "springfield-advanced-imaging-springfield-imaging-center",
+                39.7830,
+                -89.6495,
+                1,
+            ),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO facility_billing_metrics (
+                facility_id, facility_type, avg_markup, median_markup, max_markup,
+                procedures_compared, billing_grade, benchmark_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("img-200001", "imaging_center", 3.2, 3.2, 3.2, 8, "C", "opps"),
+        )
+        db.execute(
+            """
+            INSERT OR IGNORE INTO procedure_prices (
+                facility_id, cpt_code, description, gross_charge,
+                medicare_rate, markup_vs_medicare, data_year,
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "img-200001",
+                "70553",
+                "MRI BRAIN W CONTRAST",
+                900.0,
+                300.0,
+                3.0,
+                2025,
+                "imaging_center",
+                "opps",
+                300.0,
+            ),
+        )
         # Seed zip lat/lon for zip 62701
         try:
             db.execute(
@@ -181,7 +290,7 @@ def test_procedure_detail_shows_hospital_finder():
     _seed()
     resp = client.get("/procedures/27447/")
     assert resp.status_code == 200
-    assert "Find Hospitals Near You" in resp.text
+    assert "Find Providers Near You" in resp.text
 
 
 def test_api_hospitals_by_zip_requires_zip():
@@ -196,6 +305,25 @@ def test_api_hospitals_by_zip_returns_results():
     assert resp.status_code == 200
     data = resp.json()
     assert "hospitals" in data
+
+
+def test_api_providers_by_zip_returns_mixed_facility_types():
+    _seed()
+    resp = client.get("/api/procedures/27447/providers?zip=62701")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "providers" in data
+    types = {r["facility_type"] for r in data["providers"]}
+    assert "hospital" in types
+    assert "asc" in types
+
+
+def test_get_providers_asc_uses_asc_benchmark_type():
+    _seed()
+    rows = get_providers_near_zip_for_cpt("27447", "62701", limit=20, facility_type="asc")
+    assert rows
+    assert all(r["facility_type"] == "asc" for r in rows)
+    assert all(r["medicare_benchmark_type"] == "asc" for r in rows)
 
 
 def test_get_top_cpt_codes_returns_list():

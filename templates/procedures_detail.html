@@ -37,7 +37,7 @@
             CPT {{ data.cpt_code }}
             {% if data.header.medicare_rate %}&nbsp;&middot;&nbsp;Medicare rate: <strong>${{ "{:,.0f}".format(data.header.medicare_rate) }}</strong>{% endif %}
             {% if data.header.national_avg_charge %}&nbsp;&middot;&nbsp;National avg charge: <strong>${{ "{:,.0f}".format(data.header.national_avg_charge) }}</strong>{% endif %}
-            &nbsp;&middot;&nbsp;BillKarma data from <strong>{{ "{:,}".format(data.header.hospital_count) }}</strong> hospitals
+            &nbsp;&middot;&nbsp;BillKarma data from <strong>{{ "{:,}".format(data.header.provider_count or data.header.hospital_count) }}</strong> providers
         </p>
     </div>
 </div>
@@ -156,9 +156,55 @@
     </div>
     {% endif %}
 
-    {# SECTION 4: Hospital Finder #}
+    {% if data.ranges_by_type %}
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-3">Find Hospitals Near You for This Procedure</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-3">What This Procedure Typically Costs by Facility Type</h2>
+        <div class="rounded-lg border border-gray-200 bg-white divide-y divide-gray-100">
+            {% for row in data.ranges_by_type %}
+            <div class="p-5">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="font-semibold text-gray-800">{{ row.facility_type_label }}</div>
+                    <div class="text-xs text-gray-500">{{ row.provider_count }} providers</div>
+                </div>
+                <div class="text-sm text-gray-700 mb-2">
+                    {% if row.min_charge %}${{ "{:,.0f}".format(row.min_charge) }}{% else %}N/A{% endif %}
+                    <span class="text-gray-400 mx-2">—</span>
+                    {% if row.max_charge %}${{ "{:,.0f}".format(row.max_charge) }}{% else %}N/A{% endif %}
+                    <span class="text-gray-400 mx-2">|</span>
+                    Avg:
+                    {% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}N/A{% endif %}
+                    {% if row.avg_markup %}
+                    <span class="text-gray-500">({{ "%.1fx"|format(row.avg_markup) }} {{ row.benchmark_label }})</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# SECTION 4: Provider Finder #}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">Find Providers Near You for This Procedure</h2>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+            <select id="facility-type-filter" class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="all">All facility types</option>
+                <option value="hospital">Hospitals</option>
+                <option value="asc">Surgery centers</option>
+                {% if data.procedure_type == 'imaging' %}
+                <option value="imaging_center">Imaging centers</option>
+                {% endif %}
+            </select>
+            <select id="sort-filter" class="border border-gray-300 rounded px-3 py-2 text-sm">
+                <option value="patient_cost">Sort: est. patient cost</option>
+                <option value="markup">Sort: markup ratio</option>
+            </select>
+            <label class="inline-flex items-center gap-2 border border-gray-300 rounded px-3 py-2 text-sm">
+                <input id="grade-filter" type="checkbox">
+                Grade A-B only
+            </label>
+        </div>
 
         <form id="zip-form" class="flex gap-2 mb-4" onsubmit="searchByZip(event)">
             <input id="zip-input" type="text" maxlength="5" placeholder="Enter ZIP code"
@@ -170,30 +216,41 @@
 
         {# Default: 10 lowest-markup nationally #}
         <div id="default-results">
-            {% if data.cheapest_hospitals %}
+            {% if data.cheapest_providers %}
             <p class="text-xs text-gray-500 mb-3">
-                Showing 10 hospitals with the lowest markup for this procedure nationally.
-                Enter your ZIP code above to see hospitals near you.
+                Showing 10 lowest-markup providers nationally across hospitals, surgery centers, and imaging centers.
+                Enter ZIP code to compare local providers side by side.
             </p>
             <div class="rounded-lg border border-gray-200 overflow-hidden">
                 <table class="min-w-full text-sm">
                     <thead>
                         <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
-                            <th class="px-4 py-3 font-semibold">Hospital</th>
+                            <th class="px-4 py-3 font-semibold">Provider</th>
+                            <th class="px-4 py-3 font-semibold">Type</th>
                             <th class="px-4 py-3 font-semibold">Location</th>
                             <th class="px-4 py-3 font-semibold">Grade</th>
                             <th class="px-4 py-3 font-semibold">Charge</th>
-                            <th class="px-4 py-3 font-semibold">Medicare Rate</th>
+                            <th class="px-4 py-3 font-semibold">Benchmark</th>
                             <th class="px-4 py-3 font-semibold">Markup</th>
                             <th class="bk-oop-th hidden px-4 py-3 font-semibold text-blue-700">Your Est. Cost</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in data.cheapest_hospitals %}
+                        {% for row in data.cheapest_providers %}
                         <tr class="border-b border-gray-100 hover:bg-gray-50" data-charge="{{ row.gross_charge or '' }}">
                             <td class="px-4 py-3">
-                                <a href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/"
+                                <a href="{{ row.profile_url }}"
                                    class="font-medium text-accent-700 hover:text-accent-800">{{ row.name }}</a>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">
+                                    {{ row.facility_type_label }}
+                                </span>
+                                {% if row.facility_type != 'hospital' %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {% if row.is_hospital_owned %}bg-amber-100 text-amber-800{% else %}bg-green-100 text-green-700{% endif %}">
+                                    {{ row.ownership_badge }}
+                                </span>
+                                {% endif %}
                             </td>
                             <td class="px-4 py-3 text-gray-500">{{ row.city }}, {{ row.state }}</td>
                             <td class="px-4 py-3">
@@ -206,6 +263,9 @@
                             </td>
                             <td class="px-4 py-3 text-gray-500">
                                 {% if row.medicare_rate %}${{ "{:,.0f}".format(row.medicare_rate) }}{% else %}N/A{% endif %}
+                                {% if row.benchmark_label %}
+                                <div class="text-[11px] text-gray-400">{{ row.benchmark_label }}</div>
+                                {% endif %}
                             </td>
                             <td class="px-4 py-3">
                                 {% if row.markup_vs_medicare %}{{ "%.1fx"|format(row.markup_vs_medicare) }}{% else %}N/A{% endif %}
@@ -217,7 +277,7 @@
                 </table>
             </div>
             {% else %}
-            <p class="text-gray-500 text-sm">No hospital pricing data available for this procedure.</p>
+            <p class="text-gray-500 text-sm">No provider pricing data available for this procedure.</p>
             {% endif %}
         </div>
     </div>
@@ -323,42 +383,48 @@ async function searchByZip(e) {
     }
     const resultsDiv = document.getElementById('zip-results');
     const defaultDiv = document.getElementById('default-results');
+    const facilityType = document.getElementById('facility-type-filter').value;
+    const sort = document.getElementById('sort-filter').value;
+    const gradeOnly = document.getElementById('grade-filter').checked ? 1 : 0;
     resultsDiv.textContent = 'Searching…';
     resultsDiv.classList.remove('hidden');
     defaultDiv.classList.add('hidden');
 
     try {
-        const resp = await fetch(`/api/procedures/{{ data.cpt_code }}/hospitals?zip=${zip}`);
+        const resp = await fetch(`/api/procedures/{{ data.cpt_code }}/providers?zip=${zip}&facility_type=${encodeURIComponent(facilityType)}&sort=${encodeURIComponent(sort)}&grade_ab_only=${gradeOnly}`);
         const json = await resp.json();
-        if (!json.found || !json.hospitals.length) {
-            resultsDiv.innerHTML = '<p class="text-gray-500">No hospitals with pricing data for this procedure found within 75 miles. ' +
+        if (!json.found || !json.providers.length) {
+            resultsDiv.innerHTML = '<p class="text-gray-500">No providers with pricing data for this procedure found within 75 miles. ' +
                 'Try a different ZIP or <a href="/hospitals/" class="underline">browse the full directory</a>.</p>';
             return;
         }
-        let html = '<p class="text-xs text-gray-500 mb-3">Hospitals within 75 miles sorted by lowest charge for this procedure.</p>' +
+        let html = '<p class="text-xs text-gray-500 mb-3">Providers within 75 miles, sorted by your selected option.</p>' +
             '<div class="rounded-lg border border-gray-200 overflow-hidden">' +
             '<table class="min-w-full text-sm">' +
             '<thead><tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">' +
-            '<th class="px-4 py-3 font-semibold">Hospital</th>' +
+            '<th class="px-4 py-3 font-semibold">Provider</th>' +
+            '<th class="px-4 py-3 font-semibold">Type</th>' +
             '<th class="px-4 py-3 font-semibold">Location</th>' +
             '<th class="px-4 py-3 font-semibold">Grade</th>' +
             '<th class="px-4 py-3 font-semibold">Charge</th>' +
-            '<th class="px-4 py-3 font-semibold">Medicare</th>' +
+            '<th class="px-4 py-3 font-semibold">Benchmark</th>' +
             '<th class="px-4 py-3 font-semibold">Markup</th>' +
             '<th class="px-4 py-3 font-semibold">Distance</th>' +
             '</tr></thead><tbody>';
-        for (const h of json.hospitals) {
-            const grade = h.billing_grade || 'N/A';
-            const charge = h.gross_charge ? '$' + h.gross_charge.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
-            const medicare = h.medicare_rate ? '$' + h.medicare_rate.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
-            const markup = h.markup_vs_medicare ? h.markup_vs_medicare.toFixed(1) + 'x' : 'N/A';
-            const dist = h.distance_miles ? h.distance_miles + ' mi' : '';
+        for (const p of json.providers) {
+            const grade = p.billing_grade || 'N/A';
+            const charge = p.gross_charge ? '$' + p.gross_charge.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
+            const benchmark = p.medicare_rate ? '$' + p.medicare_rate.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
+            const markup = p.markup_vs_medicare ? p.markup_vs_medicare.toFixed(1) + 'x' : 'N/A';
+            const dist = p.distance_miles ? p.distance_miles + ' mi' : '';
+            const ownership = p.facility_type === 'hospital' ? '' : `<div class="text-[11px] text-gray-500">${p.ownership_badge || ''}</div>`;
             html += `<tr class="border-b border-gray-100 hover:bg-gray-50">` +
-                `<td class="px-4 py-3"><a href="/hospitals/${h.state_slug}/${h.city_slug}/${h.slug}/" class="font-medium text-accent-700 hover:text-accent-800">${h.name}</a></td>` +
-                `<td class="px-4 py-3 text-gray-500">${h.city}, ${h.state}</td>` +
-                `<td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${h.badge_class}">${grade}</span></td>` +
+                `<td class="px-4 py-3"><a href="${p.profile_url}" class="font-medium text-accent-700 hover:text-accent-800">${p.name}</a></td>` +
+                `<td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">${p.facility_type_label || 'Provider'}</span>${ownership}</td>` +
+                `<td class="px-4 py-3 text-gray-500">${p.city}, ${p.state}</td>` +
+                `<td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${p.badge_class}">${grade}</span></td>` +
                 `<td class="px-4 py-3 font-medium">${charge}</td>` +
-                `<td class="px-4 py-3 text-gray-500">${medicare}</td>` +
+                `<td class="px-4 py-3 text-gray-500">${benchmark}<div class="text-[11px] text-gray-400">${p.benchmark_label || 'Medicare'}</div></td>` +
                 `<td class="px-4 py-3">${markup}</td>` +
                 `<td class="px-4 py-3 text-gray-500">${dist}</td>` +
                 `</tr>`;

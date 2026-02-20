@@ -17,6 +17,7 @@ class TestDatabaseInit:
             "hospitals", "hcahps_scores", "transparency_files",
             "hospital_prices", "billing_metrics", "benchmark_averages",
             "hospital_content", "data_refresh_log",
+            "facilities", "asc_medicare_rates", "facility_billing_metrics", "procedure_prices",
         ]
         with get_db() as db:
             rows = db.execute(
@@ -39,6 +40,7 @@ class TestDatabaseInit:
             "idx_hospitals_slug_scope", "idx_hospitals_state", "idx_hospitals_city_state",
             "idx_transparency_status", "idx_hospital_prices2_facility",
             "idx_hospital_prices2_cpt", "idx_benchmark_scope",
+            "idx_facilities_type", "idx_asc_rates_cpt", "idx_facility_metrics_type", "idx_proc_prices_cpt",
         ]
         with get_db() as db:
             rows = db.execute(

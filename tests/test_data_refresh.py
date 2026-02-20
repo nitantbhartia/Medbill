@@ -4,6 +4,7 @@ import os
 import tempfile
 
 from data_refresh import (
+    refresh_asc_rates,
     data_health_check,
     refresh_medicare_rates,
     refresh_ncci_edits,
@@ -93,5 +94,34 @@ class TestRefreshZipLocalities:
                     "SELECT region FROM zip_locality_map WHERE zip_prefix = '33021'"
                 ).fetchone()
                 assert row["region"] == "southeast"
+        finally:
+            os.unlink(path)
+
+
+class TestRefreshAscRates:
+    def test_load_csv(self):
+        csv_content = (
+            "HCPCS,SHORT_DESCRIPTOR,ASC_PAYMENT_RATE,EFFECTIVE_YEAR,FACILITY_INDICATOR\n"
+            "45378,DIAGNOSTIC COLONOSCOPY,164.00,2026,Y\n"
+            "99900,NONCOVERED TEST,10.00,2026,N\n"
+        )
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(csv_content)
+            f.flush()
+            path = f.name
+
+        try:
+            count = refresh_asc_rates(path)
+            assert count == 2
+            with get_db() as db:
+                row = db.execute(
+                    "SELECT medicare_asc_rate, is_covered_asc_procedure FROM asc_medicare_rates WHERE cpt_code = '45378'"
+                ).fetchone()
+                assert row["medicare_asc_rate"] == 164.00
+                assert row["is_covered_asc_procedure"] == 1
+                row2 = db.execute(
+                    "SELECT is_covered_asc_procedure FROM asc_medicare_rates WHERE cpt_code = '99900'"
+                ).fetchone()
+                assert row2["is_covered_asc_procedure"] == 0
         finally:
             os.unlink(path)

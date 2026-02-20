@@ -24,8 +24,10 @@ from hospital_seo import (
 )
 from compare_pages import get_comparison_data, search_hospitals_for_compare
 from dispute_workflow import build_phone_script, get_outcome_stats
+from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_state_index
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
+    get_providers_near_zip_for_cpt,
     get_procedure_profile,
     get_top_cpt_codes,
 )
@@ -369,6 +371,120 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
     )
 
 
+@app.get("/surgery-centers/", response_class=HTMLResponse)
+async def surgery_centers_index(request: Request):
+    states = get_facility_state_index("asc")
+    return templates.TemplateResponse(
+        "facilities_index.html",
+        {
+            "request": request,
+            "states": states,
+            "title": "Find Ambulatory Surgery Centers Near You",
+            "label": "Surgery Centers",
+            "base_path": "/surgery-centers/",
+        },
+    )
+
+
+@app.get("/surgery-centers/{state_slug}/", response_class=HTMLResponse)
+async def surgery_centers_state(request: Request, state_slug: str):
+    facilities = get_facilities_in_scope("asc", state_slug=state_slug)
+    return templates.TemplateResponse(
+        "facilities_state.html",
+        {
+            "request": request,
+            "facilities": facilities,
+            "state_slug": state_slug,
+            "label": "Surgery Centers",
+            "base_path": "/surgery-centers/",
+        },
+    )
+
+
+@app.get("/surgery-centers/{state_slug}/{city_slug}/", response_class=HTMLResponse)
+async def surgery_centers_city(request: Request, state_slug: str, city_slug: str):
+    facilities = get_facilities_in_scope("asc", state_slug=state_slug, city_slug=city_slug)
+    return templates.TemplateResponse(
+        "facilities_city.html",
+        {
+            "request": request,
+            "facilities": facilities,
+            "state_slug": state_slug,
+            "city_slug": city_slug,
+            "label": "Surgery Centers",
+            "base_path": "/surgery-centers/",
+        },
+    )
+
+
+@app.get("/surgery-centers/{state_slug}/{city_slug}/{slug}/", response_class=HTMLResponse)
+async def surgery_centers_detail(request: Request, state_slug: str, city_slug: str, slug: str):
+    data = get_facility_profile("asc", state_slug, city_slug, slug)
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
+    return templates.TemplateResponse(
+        "facilities_detail.html",
+        {"request": request, "data": data, "label": "Ambulatory Surgery Center", "base_path": "/surgery-centers/"},
+    )
+
+
+@app.get("/imaging/", response_class=HTMLResponse)
+async def imaging_index(request: Request):
+    states = get_facility_state_index("imaging_center")
+    return templates.TemplateResponse(
+        "facilities_index.html",
+        {
+            "request": request,
+            "states": states,
+            "title": "Find Imaging Centers Near You",
+            "label": "Imaging Centers",
+            "base_path": "/imaging/",
+        },
+    )
+
+
+@app.get("/imaging/{state_slug}/", response_class=HTMLResponse)
+async def imaging_state(request: Request, state_slug: str):
+    facilities = get_facilities_in_scope("imaging_center", state_slug=state_slug)
+    return templates.TemplateResponse(
+        "facilities_state.html",
+        {
+            "request": request,
+            "facilities": facilities,
+            "state_slug": state_slug,
+            "label": "Imaging Centers",
+            "base_path": "/imaging/",
+        },
+    )
+
+
+@app.get("/imaging/{state_slug}/{city_slug}/", response_class=HTMLResponse)
+async def imaging_city(request: Request, state_slug: str, city_slug: str):
+    facilities = get_facilities_in_scope("imaging_center", state_slug=state_slug, city_slug=city_slug)
+    return templates.TemplateResponse(
+        "facilities_city.html",
+        {
+            "request": request,
+            "facilities": facilities,
+            "state_slug": state_slug,
+            "city_slug": city_slug,
+            "label": "Imaging Centers",
+            "base_path": "/imaging/",
+        },
+    )
+
+
+@app.get("/imaging/{state_slug}/{city_slug}/{slug}/", response_class=HTMLResponse)
+async def imaging_detail(request: Request, state_slug: str, city_slug: str, slug: str):
+    data = get_facility_profile("imaging_center", state_slug, city_slug, slug)
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
+    return templates.TemplateResponse(
+        "facilities_detail.html",
+        {"request": request, "data": data, "label": "Imaging Center", "base_path": "/imaging/"},
+    )
+
+
 @app.get("/procedures/", response_class=HTMLResponse)
 async def procedure_index_page(request: Request):
     procedures = get_top_cpt_codes(100)
@@ -421,6 +537,31 @@ async def procedure_hospitals_by_zip(cpt_code: str, zip: str = ""):
     if not results:
         return JSONResponse({"hospitals": [], "found": False})
     return JSONResponse({"hospitals": results, "found": True})
+
+
+@app.get("/api/procedures/{cpt_code}/providers")
+async def procedure_providers_by_zip(
+    cpt_code: str,
+    zip: str = "",
+    facility_type: str = "all",
+    sort: str = "patient_cost",
+    grade_ab_only: int = 0,
+    limit: int = 10,
+):
+    """Return providers near zip for this CPT code across facility types."""
+    if not zip or len(zip) < 5:
+        return JSONResponse({"error": "zip required"}, status_code=400)
+    results = get_providers_near_zip_for_cpt(
+        cpt_code=cpt_code,
+        zip_code=zip,
+        limit=max(1, min(limit, 50)),
+        facility_type=facility_type,
+        grade_ab_only=bool(int(grade_ab_only)),
+        sort_by=sort,
+    )
+    if not results:
+        return JSONResponse({"providers": [], "found": False})
+    return JSONResponse({"providers": results, "found": True})
 
 
 @app.get("/api/hospitals/search")

@@ -310,8 +310,9 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
             INSERT INTO hospital_prices (
                 facility_id, cpt_code, description, gross_charge, cash_price,
                 min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
-                medicare_rate, markup_vs_medicare, data_year
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                medicare_rate, markup_vs_medicare, data_year,
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(facility_id, cpt_code, data_year) DO UPDATE SET
                 description=excluded.description,
                 gross_charge=excluded.gross_charge,
@@ -320,7 +321,10 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 max_negotiated_rate=excluded.max_negotiated_rate,
                 avg_negotiated_rate=excluded.avg_negotiated_rate,
                 medicare_rate=excluded.medicare_rate,
-                markup_vs_medicare=excluded.markup_vs_medicare
+                markup_vs_medicare=excluded.markup_vs_medicare,
+                facility_type='hospital',
+                medicare_benchmark_type='opps',
+                medicare_benchmark_rate=excluded.medicare_rate
             """,
             (
                 facility_id,
@@ -334,6 +338,9 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 medicare,
                 markup,
                 year,
+                "hospital",
+                "opps",
+                medicare,
             ),
         )
         # Backward-compatible mirror.

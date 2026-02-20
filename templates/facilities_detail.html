@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.name }} {{ label }} Prices & Grade | BillKarma{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 py-10">
+    <div class="mb-5">
+        <div class="text-sm text-gray-500 mb-1">{{ label }}</div>
+        <h1 class="text-3xl font-bold text-gray-900">{{ data.name }}</h1>
+        <div class="text-sm text-gray-600 mt-1">{{ data.city }}, {{ data.state }} {{ data.zip or "" }}</div>
+        <div class="flex flex-wrap gap-2 mt-3">
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">
+                Grade {{ data.billing_grade or "N/A" }}
+            </span>
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold {% if data.is_hospital_owned %}bg-amber-100 text-amber-800{% else %}bg-green-100 text-green-700{% endif %}">
+                {% if data.is_hospital_owned %}Hospital-owned{% else %}Independent{% endif %}
+            </span>
+            {% if data.avg_markup %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
+                Avg {{ "%.1fx"|format(data.avg_markup) }} benchmark
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if data.asc_specialties %}
+    <div class="mb-5">
+        <h2 class="text-lg font-bold text-gray-800 mb-2">Specialties</h2>
+        <div class="flex flex-wrap gap-2">
+            {% for s in data.asc_specialties %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">{{ s }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data.imaging_modalities %}
+    <div class="mb-5">
+        <h2 class="text-lg font-bold text-gray-800 mb-2">Modalities</h2>
+        <div class="flex flex-wrap gap-2">
+            {% for m in data.imaging_modalities %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-700">{{ m }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="rounded-lg border border-gray-200 overflow-hidden bg-white">
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                    <th class="px-4 py-3 font-semibold">CPT</th>
+                    <th class="px-4 py-3 font-semibold">Procedure</th>
+                    <th class="px-4 py-3 font-semibold">Charge</th>
+                    <th class="px-4 py-3 font-semibold">Benchmark</th>
+                    <th class="px-4 py-3 font-semibold">Markup</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in data.prices %}
+                <tr class="border-b border-gray-100">
+                    <td class="px-4 py-3 font-mono">{{ p.cpt_code }}</td>
+                    <td class="px-4 py-3">{{ p.description or "N/A" }}</td>
+                    <td class="px-4 py-3">{% if p.gross_charge %}${{ "{:,.0f}".format(p.gross_charge) }}{% else %}N/A{% endif %}</td>
+                    <td class="px-4 py-3">{% if p.benchmark_rate %}${{ "{:,.0f}".format(p.benchmark_rate) }}{% else %}N/A{% endif %}</td>
+                    <td class="px-4 py-3">{% if p.markup_vs_medicare %}{{ "%.1fx"|format(p.markup_vs_medicare) }}{% else %}N/A{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

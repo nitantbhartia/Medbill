@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ label }} in {{ state_slug|upper }} | BillKarma{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 py-10">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ label }} in {{ state_slug|upper }}</h1>
+    <div class="rounded-lg border border-gray-200 overflow-hidden bg-white">
+        <table class="min-w-full text-sm">
+            <thead>
+                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                    <th class="px-4 py-3 font-semibold">Facility</th>
+                    <th class="px-4 py-3 font-semibold">City</th>
+                    <th class="px-4 py-3 font-semibold">Grade</th>
+                    <th class="px-4 py-3 font-semibold">Avg Markup</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in facilities %}
+                <tr class="border-b border-gray-100">
+                    <td class="px-4 py-3">
+                        <a href="{{ base_path }}{{ f.state_slug }}/{{ f.city_slug }}/{{ f.slug }}/" class="text-accent-700 font-medium hover:text-accent-800">
+                            {{ f.name }}
+                        </a>
+                    </td>
+                    <td class="px-4 py-3 text-gray-600">{{ f.city }}</td>
+                    <td class="px-4 py-3">{{ f.billing_grade or "N/A" }}</td>
+                    <td class="px-4 py-3">{% if f.avg_markup %}{{ "%.1fx"|format(f.avg_markup) }}{% else %}N/A{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
