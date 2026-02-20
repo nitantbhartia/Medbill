@@ -87,7 +87,7 @@ register("anesthesia-billing", {
         <tr><td>Laparoscopic abdominal surgery</td><td>00840</td><td>7</td></tr>
         <tr><td>Cesarean delivery</td><td>01963</td><td>7</td></tr>
         <tr><td>Vaginal delivery (neuraxial)</td><td>01967</td><td>5</td></tr>
-        <tr><td>Cardiac catheterization</td><td>00524</td><td>8</td></tr>
+        <tr><td>Lumbar spine procedures</td><td>00630</td><td>7</td></tr>
         <tr><td>Open heart surgery</td><td>00566</td><td>25</td></tr>
     </tbody>
 </table>
@@ -109,6 +109,10 @@ register("anesthesia-billing", {
 </table>
 
 <p><strong>Conversion Factor</strong> is the dollar amount per unit, negotiated between the anesthesiology group and your insurer. Medicare pays approximately <strong>$26 per unit</strong> (the exact figure varies by geographic area and is updated annually by CMS). Commercial insurers negotiate higher rates, typically <strong>$60&ndash;$150 per unit</strong>. If the anesthesiologist is out-of-network, they may charge $150&ndash;$400+ per unit at their full chargemaster rate.</p>
+
+<div class="key-takeaway">
+    <strong>Not sure what your anesthesia CPT code means?</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare pays for any anesthesia code &mdash; then compare it to what you were actually charged.
+</div>
 
 <h2 id="reading-your-bill">3. Reading your anesthesia bill</h2>
 
@@ -161,6 +165,10 @@ register("anesthesia-billing", {
 
 <h3>d) Wrong billing modifier</h3>
 <p>When a physician anesthesiologist supervises more than four CRNAs simultaneously, the supervision ceases to qualify as &ldquo;medical direction&rdquo; under Medicare rules. In that scenario, the physician cannot bill modifier QK (medical direction of 2&ndash;4 individuals) and the CRNA should bill modifier QZ (CRNA without physician medical direction). Billing QK when the physician was managing more than four CRNAs is technically improper. This is an issue mainly for Medicare/Medicaid patients, not most commercial insurance.</p>
+
+<div class="key-takeaway">
+    <strong>Found a potential problem on your anesthesia bill?</strong> <a href="/scan">Upload your full bill to BillKarma</a> &mdash; we audit every line item, including anesthesia charges, and flag anything that doesn&rsquo;t match what Medicare allows.
+</div>
 
 <h2 id="nsa-protection">5. No Surprises Act protections for anesthesia</h2>
 

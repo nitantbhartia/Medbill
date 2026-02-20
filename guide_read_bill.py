@@ -135,6 +135,10 @@ register("how-to-read-your-medical-bill", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>Spotted a code you don&rsquo;t recognize?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we decode every CPT code, compare it to Medicare rates, and tell you exactly which charges are out of line.
+</div>
+
 <p><strong>Why this matters:</strong> The CPT code determines what Medicare pays for a service. If the code on your bill is wrong (a higher-level code than what was performed), you&rsquo;re being overcharged. This is called <em>upcoding</em>.</p>
 
 <p>Look up any CPT code from your bill to see what Medicare pays for it in your area:</p>
@@ -146,6 +150,10 @@ register("how-to-read-your-medical-bill", {
 <h3>a) Price markup beyond reasonable rates</h3>
 
 <p>Hospitals set their own prices (the &ldquo;chargemaster&rdquo;), which can be 3x to 10x what Medicare pays for the same service. While some markup is expected, charges above 3&ndash;5x Medicare rates are a red flag. A 2022 study in <em>Health Affairs</em> found that the average hospital charges <a href="https://www.healthaffairs.org/doi/10.1377/hlthaff.2020.00893" target="_blank" rel="noopener">3.4x their costs</a>.</p>
+
+<div class="key-takeaway">
+    <strong>Think your bill has errors?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we flag every charge that doesn&rsquo;t match Medicare rates and show you where to push back.
+</div>
 
 <div class="case-study">
     <h3>Example: CT scan of the abdomen</h3>
@@ -227,6 +235,10 @@ register("how-to-read-your-medical-bill", {
     <li><strong>Send it to the billing department</strong> via certified mail or the hospital&rsquo;s patient portal. Keep copies of everything.</li>
     <li><strong>Follow up in 30 days</strong> if you don&rsquo;t hear back. Escalate to the patient advocate if billing doesn&rsquo;t respond. You can also file a complaint with your state insurance commissioner.</li>
 </ol>
+
+<div class="key-takeaway">
+    <strong>Not sure how your charges stack up?</strong> Use the <a href="/calculator">BillKarma cost calculator</a> to enter any CPT code and see what Medicare actually pays for that service in your zip code.
+</div>
 
 <p>If this feels like a lot of work, you can <a href="/scan">upload your bill to BillKarma</a> and we&rsquo;ll do the entire audit automatically&mdash;comparing every line item against federal pricing data and generating a dispute letter for you in 30 seconds.</p>
 

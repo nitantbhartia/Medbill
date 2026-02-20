@@ -87,6 +87,10 @@ register("no-surprises-act-explained", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>Seeing charges on your bill that look out-of-network?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we automatically identify which charges fall under No Surprises Act protections and show you exactly what you should owe instead.
+</div>
+
 <h2 id="how-it-works">3. How the protections work in practice</h2>
 
 <p>Here&rsquo;s what happens behind the scenes when the NSA applies to your bill:</p>
@@ -97,6 +101,10 @@ register("no-surprises-act-explained", {
     <li><strong>You pay only in-network cost-sharing.</strong> Your deductible, copay, and coinsurance are based on your plan&rsquo;s in-network rates. No balance billing.</li>
     <li><strong>Provider and insurer negotiate.</strong> If the provider and insurer disagree on payment, they enter an Independent Dispute Resolution (IDR) process. This happens between them&mdash;you are not involved and owe nothing additional.</li>
 </ol>
+
+<div class="key-takeaway">
+    <strong>Did your ER visit produce bills from multiple providers you never chose?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we break down every charge and highlight which ones qualify for No Surprises Act protection so you know exactly what to dispute.
+</div>
 
 <div class="case-study">
     <h3>Example: How the NSA saves you money</h3>
@@ -196,6 +204,10 @@ register("no-surprises-act-explained", {
 
 <div class="key-takeaway">
     <strong>Keep all documents.</strong> Save your <a href="/guides/understanding-explanation-of-benefits">EOB</a>, the surprise bill, any good faith estimates, and records of all phone calls. These are your evidence if you need to file a formal complaint. Need help writing a dispute letter? See our <a href="/guides/how-to-dispute-a-medical-bill">step-by-step dispute guide</a>.
+</div>
+
+<div class="key-takeaway">
+    <strong>Want to know what hospitals in your area typically charge for common procedures?</strong> Check <a href="/hospitals/">BillKarma&rsquo;s hospital directory</a> &mdash; it shows real pricing data so you can compare facilities and arrive at your next appointment armed with facts.
 </div>
 
 <h2 id="real-examples">7. Real examples of No Surprises Act protections</h2>

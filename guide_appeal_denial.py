@@ -109,6 +109,10 @@ register("how-to-appeal-insurance-denial", {
     </div>
 </div>
 
+<div class="key-takeaway">
+    <strong>Got a denial notice like this one?</strong> <a href="/scan">Upload your EOB to BillKarma</a> &mdash; we flag whether the underlying procedure codes were billed correctly, which can reveal the fastest path to overturning a denial.
+</div>
+
 <p>Here&rsquo;s what to look for on your denial notice:</p>
 
 <ul>
@@ -187,9 +191,17 @@ register("how-to-appeal-insurance-denial", {
 
 <p>After submitting, call the appeals department 5&ndash;7 business days later to confirm receipt and ask for a timeline. The insurer must respond within 30 days for non-urgent appeals.</p>
 
+<div class="key-takeaway">
+    <strong>Wondering what the denied service actually should have cost?</strong> Use the <a href="/calculator">BillKarma pricing calculator</a> to see the Medicare benchmark for your CPT code &mdash; knowing that number before you write your appeal letter gives you a concrete figure to reference.
+</div>
+
 <h2 id="appeal-letter">5. Appeal letter template</h2>
 
 <p>Here&rsquo;s a complete sample appeal letter for a &ldquo;not medically necessary&rdquo; MRI denial. Adapt this to your situation by replacing the bracketed information:</p>
+
+<div class="key-takeaway">
+    <strong>Not sure if your denial is worth fighting?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we identify coding errors and overcharges that strengthen your appeal and show exactly how much money is on the table.
+</div>
 
 <div class="case-study">
     <h3>Sample appeal letter &mdash; &ldquo;not medically necessary&rdquo; MRI denial</h3>

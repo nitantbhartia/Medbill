@@ -133,6 +133,10 @@ register("understanding-explanation-of-benefits", {
     <strong>The catch:</strong> If the hospital sends a bill for $4,847 (the billed amount) instead of $196 (what the EOB says you owe), you need to call billing immediately. This happens more often than you&rsquo;d think&mdash;especially if insurance payment hasn&rsquo;t been applied yet.
 </div>
 
+<div class="key-takeaway">
+    <strong>Numbers on your EOB look off?</strong> <a href="/scan">Upload your EOB to BillKarma</a> &mdash; we automatically parse every line item and flag totals that don&rsquo;t add up so you know exactly where to push back.
+</div>
+
 <h2 id="key-numbers">4. The 5 key numbers on every EOB</h2>
 
 <h3>a) Billed amount (provider&rsquo;s charge)</h3>
@@ -173,6 +177,14 @@ register("understanding-explanation-of-benefits", {
         <tr><td>CPT codes</td><td>99284, 71046, 80053, 85025, 96374</td><td>Should match</td><td>Different codes on the bill vs. EOB suggest a billing or coding error.</td></tr>
     </tbody>
 </table>
+
+<div class="key-takeaway">
+    <strong>Wondering if your patient responsibility is correct?</strong> Use the <a href="/calculator">BillKarma calculator</a> to check whether your deductible, coinsurance, and copay math lines up with what your EOB says you owe.
+</div>
+
+<div class="key-takeaway">
+    <strong>Ready to compare your EOB against your bill line by line?</strong> <a href="/scan">Scan your documents with BillKarma</a> &mdash; we match each service on your EOB to the corresponding charge on your bill and surface any amounts that don&rsquo;t align.
+</div>
 
 <div class="case-study">
     <h3>Common scenario: bill doesn&rsquo;t match EOB</h3>

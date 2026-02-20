@@ -77,6 +77,10 @@ register("how-much-does-mri-ct-scan-cost", {
 </table>
 
 <div class="key-takeaway">
+    <strong>Wondering what your MRI or CT scan should actually cost?</strong> Use our <a href="/calculator">free calculator</a> &mdash; enter the CPT code from your imaging bill to see what Medicare pays versus what you were charged.
+</div>
+
+<div class="key-takeaway">
     <strong>The facility matters more than the scan.</strong> The single biggest thing you can do to lower your imaging cost is to get your scan at a freestanding imaging center instead of a hospital outpatient department. The machines are the same. The radiologists reading the images often work at both locations. The only difference is the facility fee&mdash;and it can cost you thousands.
 </div>
 
@@ -193,7 +197,15 @@ register("how-much-does-mri-ct-scan-cost", {
 
 <p>The American College of Radiology&rsquo;s Appropriateness Criteria provide evidence-based guidelines on when imaging is warranted. A good doctor will welcome these questions.</p>
 
+<div class="key-takeaway">
+    <strong>Already have an imaging bill you think is too high?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we&rsquo;ll flag every overcharge and show you exactly which line items to dispute.
+</div>
+
 <h2 id="case-studies">6. Real-world case studies</h2>
+
+<div class="key-takeaway">
+    <strong>Facing a large imaging charge before your scan even happens?</strong> <a href="/scan">Scan your estimate or referral with BillKarma</a> &mdash; we&rsquo;ll compare the CPT codes against Medicare rates so you know what&rsquo;s fair before you pay.
+</div>
 
 <div class="case-study">
     <h3>Case study 1: Knee MRI &mdash; hospital vs. imaging center</h3>

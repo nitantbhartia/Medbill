@@ -129,6 +129,10 @@ register("balance-billing", {
     <li>If a provider disputes the insurer&rsquo;s payment amount, they must use the federal independent dispute resolution (IDR) process &mdash; not bill the patient. The patient&rsquo;s cost-sharing is fixed at the in-network level regardless of the IDR outcome.</li>
 </ul>
 
+<div class="key-takeaway">
+    <strong>Not sure if your provider is in-network?</strong> Check our <a href="/hospitals/">hospital directory</a> for network and transparency data &mdash; and if you&rsquo;ve already received a surprise bill, <a href="/scan">upload it to BillKarma</a> so we can flag whether charges were processed at the right rates.
+</div>
+
 <h2 id="gaps">4. Gaps in the law: what NSA doesn&rsquo;t cover</h2>
 
 <h3>Ground ambulance (the biggest gap)</h3>
@@ -186,6 +190,10 @@ register("balance-billing", {
 
 <div class="key-takeaway">
     <strong>Do not pay a balance bill while you&rsquo;re investigating it.</strong> Tell the provider you are reviewing the bill for compliance with the No Surprises Act. Ask them to hold the account from collections during the review period. Most providers will comply with a reasonable request while a formal dispute is pending.
+</div>
+
+<div class="key-takeaway">
+    <strong>Have an unexpected bill in hand?</strong> <a href="/scan">Scan it with BillKarma</a> first &mdash; we identify whether charges were processed at in-network or out-of-network rates and flag any other billing discrepancies before you make your first call.
 </div>
 
 <div class="case-study">

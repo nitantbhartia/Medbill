@@ -168,6 +168,10 @@ register("medical-bill-collections-rights", {
     <li><strong>Is the collector legitimate?</strong> Scam calls posing as medical debt collectors are common. Verify the agency by contacting the original hospital and confirming they assigned or sold the debt.</li>
 </ul>
 
+<div class="key-takeaway">
+    <strong>Spotted something off on your collection notice?</strong> <a href="/scan">Upload your original bill to BillKarma</a> &mdash; our audit checks for billing errors, duplicate charges, and insurance gaps that could reduce or eliminate what you actually owe.
+</div>
+
 <h2 id="six-steps">4. 6 steps to resolve medical debt in collections</h2>
 
 <h3>Step 1: Don&rsquo;t panic (and don&rsquo;t pay immediately)</h3>
@@ -246,6 +250,10 @@ register("medical-bill-collections-rights", {
 
 <p>Even after your bill has been sold to a collector, the original hospital&rsquo;s billing department can still review and correct errors. If you find billing mistakes&mdash;duplicate charges, unbundled codes, or insurance that was never filed&mdash;call the hospital directly. Ask them to issue a corrected statement and notify the collection agency of the reduced balance. The hospital has a financial incentive to help, because billing errors can trigger compliance issues for them.</p>
 
+<div class="key-takeaway">
+    <strong>Did your dispute letter uncover errors in the original bill?</strong> <a href="/scan">Run your itemized statement through BillKarma</a> &mdash; the scan flags common collection-stage mistakes like unbundled codes and uncredited insurance payments that support a formal dispute.
+</div>
+
 <h2 id="negotiation">6. Negotiation strategies for medical debt in collections</h2>
 
 <p>Here&rsquo;s the fact that changes everything: <strong>collectors buy medical debt for pennies on the dollar</strong>. The typical purchase price is 4&ndash;7 cents per dollar of face value. That means a collector who bought your $5,000 debt probably paid $200&ndash;$350 for it. Any payment above that is profit for them.</p>
@@ -267,6 +275,10 @@ register("medical-bill-collections-rights", {
 </div>
 
 <h2 id="case-studies">7. Real case studies</h2>
+
+<div class="key-takeaway">
+    <strong>Wondering how much your hospital charges compared to what Medicare pays?</strong> Check our <a href="/hospitals/">hospital pricing directory</a> to see your facility&rsquo;s charity care policy and price transparency data before negotiating a settlement.
+</div>
 
 <div class="case-study">
     <h3>Case study 1: $4,200 ER bill &mdash; billing errors found, then settled</h3>

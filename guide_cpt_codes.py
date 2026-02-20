@@ -85,6 +85,10 @@ register("what-are-cpt-codes", {
 
 <p>Within each category, codes are typically ordered from simpler/lower-cost to more complex/higher-cost. In E/M codes, for example, 99202 is a brief new patient office visit and 99205 is the most complex new patient visit. The difference in billing between 99203 and 99205 can be $150&ndash;$300 per visit.</p>
 
+<div class="key-takeaway">
+    <strong>Wondering what category your billed code falls into?</strong> Run any CPT code through our <a href="/calculator">free calculator</a> to see its official Medicare rate and how your charge compares to the national benchmark.
+</div>
+
 <h2 id="common-codes">3. Common CPT codes and what they cost</h2>
 
 <p>These are the codes you&rsquo;re most likely to see on a routine medical bill, along with the 2026 Medicare national average reimbursement rate (non-facility setting):</p>
@@ -169,6 +173,10 @@ register("what-are-cpt-codes", {
     </li>
 </ol>
 
+<div class="key-takeaway">
+    <strong>Ready to put this process to work on your own bill?</strong> Upload your bill to our <a href="/scan">free scanner</a> and we&rsquo;ll automatically flag duplicate codes, upcoded E/M levels, and unbundled lab charges in seconds.
+</div>
+
 <h2 id="real-bill">6. An annotated bill with CPT errors</h2>
 
 <div class="bill-example">
@@ -198,6 +206,10 @@ register("what-are-cpt-codes", {
 </div>
 
 <h2 id="case-studies">7. Real-world case studies</h2>
+
+<div class="key-takeaway">
+    <strong>Seeing a CPT code on your bill that doesn&rsquo;t add up?</strong> Check what Medicare actually pays for that procedure with our <a href="/calculator">free calculator</a> &mdash; knowing the benchmark is the first step to a successful dispute.
+</div>
 
 <div class="case-study">
     <h3>Case Study 1: E/M Upcoding — $1,200 Recovered</h3>

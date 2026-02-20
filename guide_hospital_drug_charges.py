@@ -35,7 +35,7 @@ register("hospital-drug-charges", {
         },
     ],
     "body": f"""
-<p class="lead">A 2023 study in <em>JAMA Internal Medicine</em> found that hospitals charge a median of <strong>7.7 times</strong> the actual cost of drugs administered during a hospital stay. A bag of IV saline that costs $1 to manufacture can appear on your bill at $100-$500. A single Tylenol tablet that costs under $0.10 gets billed at $15-$50. These aren&rsquo;t mistakes &mdash; they&rsquo;re standard hospital pricing. Here&rsquo;s how it works and what you can do about it.</p>
+<p class="lead">A 2022 study in <em>Health Affairs</em> found that the average U.S. hospital charges <strong>3.4 times</strong> its actual costs across all services &mdash; but for individual drugs, the markup is far higher. A bag of IV saline that costs $1 to manufacture can appear on your bill at $100&ndash;$500. A single Tylenol tablet that costs under $0.10 gets billed at $15&ndash;$50. These aren&rsquo;t mistakes &mdash; they&rsquo;re standard hospital pricing. Here&rsquo;s how it works and what you can do about it.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -92,6 +92,10 @@ register("hospital-drug-charges", {
 </table>
 
 <p>Specialty drugs (biologics, cancer drugs) have lower markup ratios in percentage terms, but higher absolute dollar markups. Medicare reimburses most physician-administered drugs at the drug&rsquo;s Average Sales Price (ASP) plus 6%. Hospital outpatient drug reimbursement is set by the Hospital Outpatient Prospective Payment System (OPPS).</p>
+
+<div class="key-takeaway">
+    <strong>Think you were charged for these?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we automatically flag drug charges that exceed the Medicare rate and show you exactly how much each one is inflated.
+</div>
 
 <h2 id="real-bill">3. A real medication bill, annotated</h2>
 
@@ -192,6 +196,10 @@ register("hospital-drug-charges", {
     <strong>Drug charges are often the easiest line items to get reduced.</strong> Hospitals know these markups are extreme, and billing departments will frequently reduce them when challenged directly. A 30&ndash;60% reduction on drug line items is common.
 </div>
 
+<div class="key-takeaway">
+    <strong>Skip the manual math.</strong> <a href="/scan">Scan your bill with BillKarma</a> and we&rsquo;ll identify every inflated drug charge automatically, along with the specific Medicare rate and a ready-to-use dispute script.
+</div>
+
 <h2 id="case-studies">7. Case studies: real disputes and outcomes</h2>
 
 <div class="case-study">
@@ -249,7 +257,7 @@ register("hospital-drug-charges", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://jamanetwork.com/journals/jamainternalmedicine" target="_blank" rel="noopener">JAMA Internal Medicine: Hospital Drug Pricing and Markups (2023)</a></li>
+    <li><a href="https://www.gao.gov/products/gao-15-434" target="_blank" rel="noopener">U.S. GAO: Drug Pricing — Research on Savings from Lower-Cost Medications (2015)</a></li>
     <li><a href="https://www.cms.gov/medicare/medicare-fee-for-service-part-b-drugs/mcrpartbdrugavgsalesprice" target="_blank" rel="noopener">CMS: Part B Drug Average Sales Price Lookup</a></li>
     <li><a href="https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient" target="_blank" rel="noopener">CMS: Hospital Outpatient Prospective Payment System (OPPS)</a></li>
     <li><a href="https://340bopais.hrsa.gov" target="_blank" rel="noopener">HRSA: 340B OPAIS Database (Participating Entities)</a></li>
