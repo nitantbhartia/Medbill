@@ -170,16 +170,27 @@
             position: relative; max-width: 600px; margin-top: 36px;
         }
         .search-input {
-            width: 100%; padding: 20px 120px 20px 28px;
-            border-radius: var(--radius-pill); border: none;
-            font-size: 1rem; font-weight: 500; outline: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%; padding: 22px 132px 22px 30px;
+            border-radius: var(--radius-pill); border: 2px solid rgba(255,255,255,0.8);
+            font-size: 1.05rem; font-weight: 600; outline: none;
+            box-shadow: 0 16px 46px rgba(0,0,0,0.22);
             font-family: var(--font-main); color: var(--c-black);
         }
-        .search-input::placeholder { color: #999; }
+        .search-input::placeholder { color: #71717A; }
         .search-btn-wrap {
             position: absolute; right: 8px; top: 50%;
             transform: translateY(-50%);
+        }
+        .search-btn-wrap .btn-primary {
+            background-color: var(--c-green-dark);
+            border-color: var(--c-green-dark);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+            font-weight: 700;
+            padding: 12px 24px;
+        }
+        .search-btn-wrap .btn-primary:hover {
+            background-color: var(--c-green);
+            border-color: var(--c-green);
         }
 
         /* --- Autocomplete (shared with homepage.js) --- */
@@ -237,7 +248,7 @@
         }
         .stat-bar-fill { height: 100%; border-radius: 2px; }
         .text-green { color: var(--c-green); }
-        .text-orange { color: var(--c-orange); }
+        .text-orange { color: #C66B3D; }
         .text-gray { color: var(--c-gray-text); }
         .stat-card-dark {
             background: var(--c-black); color: var(--c-white);
@@ -291,7 +302,7 @@
             transition: height 1s ease-out;
         }
         .bar-green { background-color: var(--c-green); }
-        .bar-black { background-color: var(--c-black); }
+        .bar-black { background-color: #D69E2E; }
         .bar-orange { background-color: var(--c-orange); }
         .bar-label {
             position: absolute; bottom: -28px; left: 50%;
@@ -512,6 +523,7 @@
             <a href="/guides/hospital-billing-grades-explained" class="nav-link">Methodology</a>
             <a href="/hospitals/" class="nav-link">Hospitals</a>
             <a href="/procedures/" class="nav-link">Procedures</a>
+            <a href="/compare/" class="nav-link">Compare</a>
             <a href="/guides/" class="nav-link">Guides</a>
         </div>
         <div class="nav-right">
@@ -577,9 +589,9 @@
         </div>
         <div class="stat-card animate-up delay-3">
             <span class="stat-label">Bills Flagged</span>
-            <span class="stat-number text-orange">1 in 4</span>
+            <span class="stat-number text-gray">1 in 4</span>
             <div class="stat-bar">
-                <div class="stat-bar-fill" style="width: 45%; background: var(--c-orange);"></div>
+                <div class="stat-bar-fill" style="width: 38%; background: #C79A6A;"></div>
             </div>
         </div>
         <div class="stat-card stat-card-dark animate-up delay-3">
@@ -631,13 +643,14 @@
     </div>
 </main>
 
-<!-- ========== COMPARE LOCAL CARE ========== -->
+<!-- ========== COMPARE SAMPLE ========== -->
 <section class="comparison-section">
     <div class="container">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px;">
-            <h2 class="section-heading" style="margin-bottom: 0;">Compare local care</h2>
+            <h2 class="section-heading" style="margin-bottom: 0;">See how hospitals compare</h2>
             <a href="/compare/" class="btn btn-outline" style="background: var(--c-white);">Compare hospitals</a>
         </div>
+        <p style="color: var(--c-gray-text); font-size: 0.95rem; margin-bottom: 20px;">Sample from our directory</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             {% set card_colors = {"A": "#00824F", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
             {% set card_grade_classes = {"A": "grade-a", "B": "grade-b", "C": "grade-c", "D": "grade-d", "F": "grade-f"} %}
