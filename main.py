@@ -275,15 +275,34 @@ def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
             SELECT
                 f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug,
                 f.facility_type, f.is_hospital_owned,
-                COALESCE(fbm.billing_grade, bm.billing_grade) AS billing_grade,
-                COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.billing_grade
+                    ELSE fbm.billing_grade
+                END AS billing_grade,
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
+                    ELSE fbm.avg_markup
+                END AS avg_markup
             FROM facilities f
             LEFT JOIN facility_billing_metrics fbm ON fbm.facility_id = f.facility_id
             LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
             WHERE f.facility_type IN ('hospital', 'asc', 'imaging_center')
-              AND COALESCE(fbm.billing_grade, bm.billing_grade) IS NOT NULL
-              AND COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) IS NOT NULL
-            ORDER BY COALESCE(fbm.avg_markup, bm.avg_markup_vs_medicare) DESC
+              AND (
+                (f.facility_type = 'hospital' AND bm.billing_grade IN ('A','B','C','D','F') AND bm.avg_markup_vs_medicare IS NOT NULL)
+                OR
+                (f.facility_type != 'hospital' AND fbm.billing_grade IN ('A','B','C','D','F') AND fbm.avg_markup IS NOT NULL)
+              )
+              AND (
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
+                    ELSE fbm.avg_markup
+                END
+              ) BETWEEN 0.5 AND 150.0
+            ORDER BY
+              CASE
+                  WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
+                  ELSE fbm.avg_markup
+              END DESC
             LIMIT 300
             """
         ).fetchall()

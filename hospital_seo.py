@@ -519,15 +519,29 @@ def get_sample_facilities(count: int = 6) -> list[dict]:
             """
             SELECT
                 f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug, f.facility_type,
-                COALESCE(fm.billing_grade, bm.billing_grade) AS billing_grade,
-                COALESCE(fm.avg_markup, bm.avg_markup_vs_medicare) AS avg_markup_vs_medicare
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.billing_grade
+                    ELSE fm.billing_grade
+                END AS billing_grade,
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
+                    ELSE fm.avg_markup
+                END AS avg_markup_vs_medicare
             FROM facilities f
             LEFT JOIN facility_billing_metrics fm ON fm.facility_id = f.facility_id
             LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
             WHERE f.slug IS NOT NULL
               AND f.state_slug IS NOT NULL
+              AND (
+                (f.facility_type = 'hospital' AND bm.billing_grade IN ('A','B','C','D','F') AND bm.avg_markup_vs_medicare IS NOT NULL)
+                OR
+                (f.facility_type != 'hospital' AND fm.billing_grade IN ('A','B','C','D','F') AND fm.avg_markup IS NOT NULL)
+              )
             ORDER BY
-              CASE COALESCE(fm.billing_grade, bm.billing_grade)
+              CASE
+                WHEN f.facility_type = 'hospital' THEN bm.billing_grade
+                ELSE fm.billing_grade
+              END
                 WHEN 'A' THEN 1 WHEN 'B' THEN 2 WHEN 'C' THEN 3 WHEN 'D' THEN 4 WHEN 'F' THEN 5 ELSE 6 END,
               f.name
             LIMIT 300
@@ -1503,10 +1517,16 @@ def recompute_billing_metrics() -> int:
                 db.execute(
                     """
                     INSERT INTO billing_metrics (
-                        facility_id, procedures_compared, billing_grade, computed_at
-                    ) VALUES (?, ?, 'N/A', CURRENT_TIMESTAMP)
+                        facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                        max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
+                        billing_grade, computed_at
+                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', CURRENT_TIMESTAMP)
                     ON CONFLICT(facility_id) DO UPDATE SET
+                        avg_markup_vs_medicare=NULL,
+                        median_markup_vs_medicare=NULL,
+                        max_markup_vs_medicare=NULL,
                         procedures_compared=excluded.procedures_compared,
+                        cash_discount_avg_pct=NULL,
                         billing_grade='N/A',
                         computed_at=CURRENT_TIMESTAMP
                     """,
@@ -1524,10 +1544,16 @@ def recompute_billing_metrics() -> int:
                 db.execute(
                     """
                     INSERT INTO billing_metrics (
-                        facility_id, procedures_compared, billing_grade, computed_at
-                    ) VALUES (?, ?, 'N/A', CURRENT_TIMESTAMP)
+                        facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                        max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
+                        billing_grade, computed_at
+                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', CURRENT_TIMESTAMP)
                     ON CONFLICT(facility_id) DO UPDATE SET
+                        avg_markup_vs_medicare=NULL,
+                        median_markup_vs_medicare=NULL,
+                        max_markup_vs_medicare=NULL,
                         procedures_compared=excluded.procedures_compared,
+                        cash_discount_avg_pct=NULL,
                         billing_grade='N/A',
                         computed_at=CURRENT_TIMESTAMP
                     """,
@@ -1662,14 +1688,19 @@ def recompute_facility_billing_metrics() -> int:
                 if r["markup_vs_medicare"] is not None and 0.5 <= float(r["markup_vs_medicare"]) <= 150.0
             ]
 
-            if len(markups) < 3:
+            min_points = 5 if facility_type == "hospital" else 3
+            if len(markups) < min_points:
                 db.execute(
                     """
                     INSERT INTO facility_billing_metrics (
-                        facility_id, facility_type, procedures_compared, billing_grade, benchmark_type, computed_at
-                    ) VALUES (?, ?, ?, 'N/A', ?, CURRENT_TIMESTAMP)
+                        facility_id, facility_type, avg_markup, median_markup,
+                        max_markup, procedures_compared, billing_grade, benchmark_type, computed_at
+                    ) VALUES (?, ?, NULL, NULL, NULL, ?, 'N/A', ?, CURRENT_TIMESTAMP)
                     ON CONFLICT(facility_id) DO UPDATE SET
                         facility_type=excluded.facility_type,
+                        avg_markup=NULL,
+                        median_markup=NULL,
+                        max_markup=NULL,
                         procedures_compared=excluded.procedures_compared,
                         billing_grade='N/A',
                         benchmark_type=excluded.benchmark_type,

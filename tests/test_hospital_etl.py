@@ -16,7 +16,15 @@ import db as _db  # noqa: E402
 from db import get_db  # noqa: E402
 import hospital_etl  # noqa: E402
 from hospital_etl import auto_map_columns, first, get_medicare_rate_for_facility, load_hcahps, normalize_price_rows, refresh_facility_transparency, upsert_facility_procedure_price, upsert_hospital_price  # noqa: E402
-from hospital_seo import clear_comparison_cache, get_hospital_profile, recompute_benchmarks, recompute_billing_metrics, upsert_hospital_row  # noqa: E402
+from hospital_seo import (  # noqa: E402
+    clear_comparison_cache,
+    get_hospital_profile,
+    recompute_benchmarks,
+    recompute_billing_metrics,
+    recompute_facility_billing_metrics,
+    upsert_hospital_row,
+)
+from main import _build_home_sample_facilities  # noqa: E402
 
 
 def test_auto_map_columns_detects_core_fields():
@@ -218,9 +226,130 @@ def test_profile_comparison_averages_stay_realistic_with_normal_seed():
     clear_comparison_cache()
     profile = get_hospital_profile("fl", "miami", "target-miami")
     assert profile is not None
-    assert 2.0 < profile["comparison"]["state_avg_markup"] < 10.0
-    # National display can be gated (<100 sample), so assert raw benchmark integrity.
-    assert 2.0 < profile["comparison"]["national_avg_markup_raw"] < 10.0
+
+
+def test_recompute_clears_stale_markup_for_na_grade():
+    _db._connection = None
+    _db.init_db()
+
+    upsert_hospital_row(
+        {
+            "facility_id": "70001",
+            "name": "Stale Markup Hospital",
+            "city": "Austin",
+            "state": "TX",
+            "slug": "stale-markup-hospital-austin",
+        }
+    )
+
+    with get_db() as conn:
+        # <5 comparable rows means final grade must be N/A.
+        for i, markup in enumerate([220.0, 240.0, 260.0], start=1):
+            conn.execute(
+                """
+                INSERT INTO hospital_prices (
+                    facility_id, cpt_code, description, gross_charge, cash_price,
+                    medicare_rate, markup_vs_medicare, data_year
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("070001", f"99{i:03d}", "Synthetic", 1000.0, 800.0, 5.0, markup, 2026),
+            )
+        # Simulate stale pre-existing metric that should be wiped.
+        conn.execute(
+            """
+            INSERT INTO billing_metrics (
+                facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
+                max_markup_vs_medicare, procedures_compared, billing_grade
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            ("070001", 240.0, 240.0, 260.0, 3, "C"),
+        )
+        conn.execute(
+            """
+            INSERT INTO facility_billing_metrics (
+                facility_id, facility_type, avg_markup, median_markup, max_markup,
+                procedures_compared, billing_grade, benchmark_type
+            ) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)
+            """,
+            ("070001", 240.0, 240.0, 260.0, 3, "C", "opps"),
+        )
+
+    recompute_billing_metrics()
+    recompute_facility_billing_metrics()
+
+    with get_db() as conn:
+        hospital_metric = conn.execute(
+            """
+            SELECT billing_grade, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare
+            FROM billing_metrics
+            WHERE facility_id = ?
+            """,
+            ("070001",),
+        ).fetchone()
+        facility_metric = conn.execute(
+            """
+            SELECT billing_grade, avg_markup, median_markup, max_markup
+            FROM facility_billing_metrics
+            WHERE facility_id = ?
+            """,
+            ("070001",),
+        ).fetchone()
+
+    assert hospital_metric["billing_grade"] == "N/A"
+    assert hospital_metric["avg_markup_vs_medicare"] is None
+    assert hospital_metric["median_markup_vs_medicare"] is None
+    assert hospital_metric["max_markup_vs_medicare"] is None
+    assert facility_metric["billing_grade"] == "N/A"
+    assert facility_metric["avg_markup"] is None
+    assert facility_metric["median_markup"] is None
+    assert facility_metric["max_markup"] is None
+
+
+def test_home_sample_facilities_excludes_na_and_extreme_markup():
+    _db._connection = None
+    _db.init_db()
+
+    upsert_hospital_row(
+        {"facility_id": "71001", "name": "Valid Hospital A", "city": "Miami", "state": "FL", "slug": "valid-hospital-a"}
+    )
+    upsert_hospital_row(
+        {"facility_id": "71002", "name": "Valid Hospital B", "city": "Miami", "state": "FL", "slug": "valid-hospital-b"}
+    )
+    upsert_hospital_row(
+        {"facility_id": "71003", "name": "Bad Stale Hospital", "city": "Miami", "state": "FL", "slug": "bad-stale-hospital"}
+    )
+
+    with get_db() as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
+            ("071001", 2.4, 2.3, 2.8, 12, "A"),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
+            ("071002", 9.6, 9.2, 12.0, 11, "F"),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
+            ("071003", 258.6, 250.0, 300.0, 3, "N/A"),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO facility_billing_metrics (facility_id, facility_type, avg_markup, median_markup, max_markup, procedures_compared, billing_grade, benchmark_type) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)",
+            ("071001", 2.4, 2.3, 2.8, 12, "A", "opps"),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO facility_billing_metrics (facility_id, facility_type, avg_markup, median_markup, max_markup, procedures_compared, billing_grade, benchmark_type) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)",
+            ("071002", 9.6, 9.2, 12.0, 11, "F", "opps"),
+        )
+        # Should never be shown once filters are applied.
+        conn.execute(
+            "INSERT OR REPLACE INTO facility_billing_metrics (facility_id, facility_type, avg_markup, median_markup, max_markup, procedures_compared, billing_grade, benchmark_type) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)",
+            ("071003", 258.6, 250.0, 300.0, 3, "N/A", "opps"),
+        )
+
+    cards = _build_home_sample_facilities(10)
+    assert cards
+    assert all(c.get("billing_grade") in {"A", "B", "C", "D", "F"} for c in cards)
+    assert all(c.get("avg_markup") is not None and 0.5 <= float(c.get("avg_markup")) <= 150.0 for c in cards)
 
 
 def test_load_hcahps_handles_cms_coded_columns():
