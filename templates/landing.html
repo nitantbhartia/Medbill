@@ -192,6 +192,13 @@
             background-color: var(--c-green);
             border-color: var(--c-green);
         }
+        .grade-microcopy {
+            margin-top: 12px; font-size: 0.86rem; color: rgba(255,255,255,0.84);
+        }
+        .grade-microcopy a {
+            color: #FFFFFF; font-weight: 700; text-decoration: underline;
+            text-underline-offset: 2px;
+        }
 
         /* --- Autocomplete (shared with homepage.js) --- */
         .ac-results {
@@ -325,6 +332,25 @@
             transform: translateY(-3px);
             box-shadow: 0 12px 32px rgba(0,0,0,0.08);
         }
+        .hospital-card-link {
+            color: inherit; text-decoration: none; display: block;
+        }
+        .hospital-card-actions {
+            margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px;
+            align-items: center;
+        }
+        .risk-chip {
+            font-size: 0.74rem; font-weight: 700; letter-spacing: 0.04em;
+            text-transform: uppercase; color: #8A2C0D; background: #FFF0EB;
+            border-radius: 999px; padding: 5px 10px;
+        }
+        .action-link {
+            font-size: 0.82rem; font-weight: 700; text-decoration: none;
+            border-radius: 999px; padding: 6px 10px; border: 1px solid;
+        }
+        .action-link.compare { color: var(--c-green-dark); border-color: #9BD2B8; background: #F2FAF6; }
+        .action-link.negotiate { color: #8A2C0D; border-color: #F4B89E; background: #FFF7F3; }
+        .action-link.compare:hover, .action-link.negotiate:hover { filter: brightness(0.98); }
         .grade-badge {
             width: 48px; height: 48px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -566,6 +592,9 @@
                 </div>
                 <div id="heroResults" class="ac-results"></div>
             </div>
+            <p class="grade-microcopy">
+                Grades compare hospital charges to 2026 Medicare rates (A: <=2x, F: >8x). <a href="/guides/hospital-billing-grades-explained">About the grade</a>
+            </p>
         </div>
     </div>
 </section>
@@ -655,29 +684,39 @@
             {% set card_colors = {"A": "#00824F", "B": "#38A169", "C": "#D69E2E", "D": "#DD6B20", "F": "#E53E3E"} %}
             {% set card_grade_classes = {"A": "grade-a", "B": "grade-b", "C": "grade-c", "D": "grade-d", "F": "grade-f"} %}
             {% for h in sample_hospitals[:6] %}
-            <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/" class="hospital-card fade-up">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                    <div>
-                        <span class="stat-label">{{ h.city }}, {{ h.state }}</span>
-                        <h3 style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">{{ h.name }}</h3>
+            {% set high_risk = (h.billing_grade in ["D", "F"]) or ((h.avg_markup_vs_medicare or 0) >= 5) %}
+            <article class="hospital-card fade-up">
+                <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/" class="hospital-card-link">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div>
+                            <span class="stat-label">{{ h.city }}, {{ h.state }}</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">{{ h.name }}</h3>
+                        </div>
+                        <div class="grade-badge {{ card_grade_classes.get(h.billing_grade, 'grade-na') }}">
+                            {{ h.billing_grade or "—" }}
+                        </div>
                     </div>
-                    <div class="grade-badge {{ card_grade_classes.get(h.billing_grade, 'grade-na') }}">
-                        {{ h.billing_grade or "—" }}
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 16px;">
+                        <div>
+                            <span class="stat-label" style="display: block; margin-bottom: 4px;">Avg Markup</span>
+                            <span class="stat-number" style="font-size: 2.5rem; color: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">
+                                {{ "%.1f"|format(h.avg_markup_vs_medicare) }}x
+                            </span>
+                        </div>
+                        {% set markup_pct = [[(h.avg_markup_vs_medicare / 10 * 100)|int, 100]|min, 5]|max %}
+                        <div class="donut-chart" style="background: conic-gradient({{ card_colors.get(h.billing_grade, '#9CA3AF') }} 0% {{ markup_pct }}%, #E5E5E5 {{ markup_pct }}% 100%);">
+                            <div class="donut-inner"></div>
+                        </div>
                     </div>
+                </a>
+                {% if high_risk %}
+                <div class="hospital-card-actions">
+                    <span class="risk-chip">Higher-risk pricing</span>
+                    <a class="action-link compare" href="/compare/">Compare alternatives</a>
+                    <a class="action-link negotiate" href="/scan">Negotiate this bill</a>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 16px;">
-                    <div>
-                        <span class="stat-label" style="display: block; margin-bottom: 4px;">Avg Markup</span>
-                        <span class="stat-number" style="font-size: 2.5rem; color: {{ card_colors.get(h.billing_grade, '#9CA3AF') }};">
-                            {{ "%.1f"|format(h.avg_markup_vs_medicare) }}x
-                        </span>
-                    </div>
-                    {% set markup_pct = [[(h.avg_markup_vs_medicare / 10 * 100)|int, 100]|min, 5]|max %}
-                    <div class="donut-chart" style="background: conic-gradient({{ card_colors.get(h.billing_grade, '#9CA3AF') }} 0% {{ markup_pct }}%, #E5E5E5 {{ markup_pct }}% 100%);">
-                        <div class="donut-inner"></div>
-                    </div>
-                </div>
-            </a>
+                {% endif %}
+            </article>
             {% endfor %}
         </div>
         <div style="text-align: center; margin-top: 32px;">
