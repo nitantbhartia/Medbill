@@ -35,7 +35,7 @@ register("hospital-cash-pay-self-pay-discount", {
         },
     ],
     "body": f"""
-<p class="lead">The average hospital&rsquo;s discounted cash price is <strong>52% below the gross charge</strong> for the same procedure, according to BillKarma&rsquo;s analysis of CMS price transparency files. And with more than 60% of Americans now enrolled in high-deductible health plans, millions of patients are effectively paying cash for much of their care anyway &mdash; just at the gross charge rate, without realizing a lower cash price exists. Here&rsquo;s how to find it, use it, and negotiate it further.</p>
+<p class="lead">The average hospital&rsquo;s discounted cash price is <strong>52% below the gross charge</strong> for the same procedure, according to BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files. And with more than 60% of Americans now enrolled in high-deductible health plans, millions of patients are effectively paying cash for much of their care anyway &mdash; just at the gross charge rate, without realizing a lower cash price exists. Here&rsquo;s how to find it, use it, and negotiate it further.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>

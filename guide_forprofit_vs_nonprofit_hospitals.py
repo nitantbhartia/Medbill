@@ -35,7 +35,7 @@ register("for-profit-vs-nonprofit-hospital-billing", {
         },
     ],
     "body": f"""
-<p class="lead">Nonprofit hospitals receive <strong>$28 billion in annual tax exemptions</strong> &mdash; yet BillKarma&rsquo;s analysis of CMS price transparency data finds that more than 1 in 3 hospitals with an F billing grade (charging over 8 times the Medicare rate) are nonprofits operating with federal tax-exempt status. The nonprofit label is a tax classification, not a promise of fair billing. Here&rsquo;s what ownership type actually means for your bill &mdash; and what the law requires each type to give you.</p>
+<p class="lead">Nonprofit hospitals receive <strong>$28 billion in annual tax exemptions</strong> &mdash; yet BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files finds that more than 1 in 3 hospitals with an F billing grade (charging over 8 times the Medicare rate) are nonprofits operating with federal tax-exempt status. The nonprofit label is a tax classification, not a promise of fair billing. Here&rsquo;s what ownership type actually means for your bill &mdash; and what the law requires each type to give you.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
