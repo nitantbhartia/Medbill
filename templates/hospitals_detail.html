@@ -1,48 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.hospital.name }} Billing Review & Prices | BillKarma{% endblock %}
+{% block title %}{{ data.seo.page_title }}{% endblock %}
 
 {% block head %}
-<meta name="description" content="{{ meta_description if meta_description else (data.hospital.name ~ ' billing review, prices vs Medicare, financial assistance, and dispute tips.') }}">
-<script type="application/ld+json">
-{{ data.content.structured_data_json | safe if data.content and data.content.structured_data_json else '{"@context":"https://schema.org","@type":"MedicalOrganization","name":"' ~ data.hospital.name ~ '"}' }}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Is {{ data.hospital.name }} nonprofit?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "{{ 'Yes' if data.hospital.nonprofit_status_label == 'Yes' else ('No' if data.hospital.nonprofit_status_label == 'No' else 'Nonprofit status is not available in current data.') }}"
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does {{ data.hospital.name }} charge for common procedures?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "This page compares hospital charges against Medicare benchmarks. Current average markup is {{ ('%.1fx'|format(data.hospital.avg_markup_vs_medicare)) if data.hospital.avg_markup_vs_medicare is not none else 'not available' }}."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does {{ data.hospital.name }} offer financial assistance?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "{% if data.financials and (data.financials.fa_application_url or data.financials.financial_assistance_url) %}Yes. A financial assistance link is listed on this page.{% else %}A financial assistance link is not listed in current data; contact hospital billing for details.{% endif %}"
-      }
-    }
-  ]
-}
-</script>
+<meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.hospital_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
 {% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto px-5 py-10">
+<section class="max-w-6xl mx-auto px-5 py-10"
+  data-primary-charge="{{ data.prices[0].gross_charge if data.prices else '' }}">
+
+    {% include '_insurance_bar.html' %}
+
     <div class="text-xs text-gray-500 mb-2">
         <a class="underline hover:text-gray-700" href="/hospitals/">Hospitals</a>
         &rsaquo;
@@ -61,6 +33,18 @@
         {% if data.hospital.hospital_type %}{{ data.hospital.hospital_type }}{% endif %}
         {% if data.hospital.ownership %} &middot; {{ data.hospital.ownership }}{% endif %}
         {% if data.hospital.bed_count %} &middot; {{ data.hospital.bed_count }} beds{% endif %}
+    </p>
+    <p class="text-xs text-gray-400 mt-1">
+        Data last updated:
+        <strong>
+        {%- if data.section_updated and data.section_updated.pricing -%}
+            {{ data.section_updated.pricing[:10] }}
+        {%- elif data.section_updated and data.section_updated.metrics -%}
+            {{ data.section_updated.metrics[:10] }}
+        {%- else -%}
+            Not available
+        {%- endif -%}
+        </strong>
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-6 mb-8">
@@ -230,11 +214,12 @@
                     {% endif %}
                     <th class="py-2 pr-3">Medicare</th>
                     <th class="py-2 pr-3">Markup</th>
+                    <th class="bk-oop-th hidden py-2 pr-3 text-blue-700">Your Est. Cost</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in data.prices[:30] %}
-                <tr class="border-b border-gray-100">
+                <tr class="border-b border-gray-100" data-charge="{{ row.gross_charge or '' }}">
                     <td class="py-2 pr-3 font-mono">{{ row.cpt_code }}</td>
                     <td class="py-2 pr-3">{{ row.description }}</td>
                     <td class="py-2 pr-3">{{ "$%.2f"|format(row.gross_charge) if row.gross_charge is not none else "N/A" }}</td>
@@ -250,6 +235,7 @@
                             N/A
                         {% endif %}
                     </td>
+                    <td class="bk-oop-td hidden py-2 pr-3 text-blue-700 font-semibold">—</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -324,6 +310,15 @@
         <div class="text-sm text-gray-500">Nearby hospitals with comparable billing data are unavailable.</div>
         {% endif %}
     </div>
+
+    <details class="mb-6 rounded-lg border border-gray-200">
+        <summary class="cursor-pointer px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 select-none">How we grade this hospital</summary>
+        <div class="px-5 pb-5 pt-3 text-sm text-gray-600 space-y-3">
+            <p>BillKarma calculates billing grades by comparing each hospital's gross charges to the 2026 Medicare Outpatient Prospective Payment System (OPPS) rate for the same CPT codes. We download and parse each hospital's CMS-mandated price transparency file, match procedure codes to Medicare benchmarks, calculate a markup ratio for each matched procedure, and average those ratios across all matched procedures to produce the hospital's overall markup.</p>
+            <p><strong>Grade thresholds:</strong> A&nbsp;=&nbsp;2.0x Medicare or less &middot; B&nbsp;=&nbsp;2.1x–3.0x &middot; C&nbsp;=&nbsp;3.1x–5.0x &middot; D&nbsp;=&nbsp;5.1x–8.0x &middot; F&nbsp;=&nbsp;More than 8.0x Medicare</p>
+            <p><strong>Data sources:</strong> CMS Hospital Price Transparency files (updated annually), CMS OPPS 2026 Final Rule, CMS Hospital Compare (star ratings). Grades are recalculated when hospitals post updated price files. Last file parse date is shown above.</p>
+        </div>
+    </details>
 
     <div class="text-xs text-gray-500 border-t border-gray-100 pt-5">
         Data sourced from CMS and hospital-published pricing files. Actual charges vary. Not medical, legal, or financial advice.

@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.seo.page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ data.seo.meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-5 py-10"
+  data-primary-charge="{{ data.header.national_avg_charge or '' }}">
+
+    {% include '_insurance_bar.html' %}
+
+    {# Breadcrumb #}
+    <div class="text-xs text-gray-500 mb-3">
+        <a class="underline hover:text-gray-700" href="/hospitals/">Hospitals</a>
+        &rsaquo; <a class="underline hover:text-gray-700" href="/procedures/">Procedures</a>
+        &rsaquo; {{ data.name }}
+    </div>
+
+    {# SECTION 1: Page Header #}
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-1">
+        {{ data.name }}: What It Costs and What's Fair
+    </h1>
+    <p class="text-sm text-gray-500 mb-4">
+        CPT {{ data.cpt_code }}
+        {% if data.header.medicare_rate %}&nbsp;·&nbsp;Medicare rate: <strong>${{ "{:,.0f}".format(data.header.medicare_rate) }}</strong>{% endif %}
+        {% if data.header.national_avg_charge %}&nbsp;·&nbsp;National avg charge: <strong>${{ "{:,.0f}".format(data.header.national_avg_charge) }}</strong>{% endif %}
+        &nbsp;·&nbsp;BillKarma data from <strong>{{ "{:,}".format(data.header.hospital_count) }}</strong> hospitals
+    </p>
+    <p class="text-gray-700 mb-8 leading-relaxed max-w-3xl">{{ data.description }}</p>
+
+    {# SECTION 2: Cost by Grade Table #}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">Cost by Billing Grade</h2>
+        {% if data.by_grade %}
+        <div class="rounded-lg border border-gray-200 overflow-hidden">
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                        <th class="px-4 py-3 font-semibold">Grade</th>
+                        <th class="px-4 py-3 font-semibold">Avg Hospital Charge</th>
+                        <th class="px-4 py-3 font-semibold">Medicare Rate</th>
+                        <th class="px-4 py-3 font-semibold">Est. Patient Cost*</th>
+                        <th class="px-4 py-3 font-semibold">Hospitals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.by_grade %}
+                    <tr class="border-b border-gray-100">
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold {{ row.badge_class }}">
+                                {{ row.billing_grade or "N/A" }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 font-medium">
+                            {% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}N/A{% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-500">
+                            {% if row.avg_medicare_rate %}${{ "{:,.0f}".format(row.avg_medicare_rate) }}{% else %}N/A{% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if row.patient_cost %}${{ "{:,.0f}".format(row.patient_cost) }}{% else %}N/A{% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-500">{{ row.hospital_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">
+            *Estimated patient cost assumes 20% coinsurance after deductible is met.
+            Actual cost depends on your specific plan, deductible status, and network.
+        </p>
+        {% else %}
+        <p class="text-gray-500 text-sm">Grade breakdown not available — insufficient data for this procedure.</p>
+        {% endif %}
+    </div>
+
+    {# SECTION 3: Cost Range Visualization #}
+    {% if data.range_bar.min_charge and data.range_bar.max_charge %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">Cost Range Across Hospitals</h2>
+        <div class="rounded-lg border border-gray-200 p-5 bg-white">
+            <div class="text-xs text-gray-500 mb-2 flex justify-between">
+                <span>Min: ${{ "{:,.0f}".format(data.range_bar.min_charge) }}</span>
+                <span>Max: ${{ "{:,.0f}".format(data.range_bar.max_charge) }}</span>
+            </div>
+            {# SVG bar #}
+            <svg width="100%" height="60" viewBox="0 0 600 60" preserveAspectRatio="none" class="block">
+                {# Grade zone backgrounds #}
+                {% if data.range_bar.zone_a_end is not none %}
+                <rect x="0" y="10" width="{{ (data.range_bar.zone_a_end * 600)|round|int }}" height="20" fill="#dcfce7" rx="0"/>
+                {% endif %}
+                {% if data.range_bar.zone_a_end is not none and data.range_bar.zone_b_end is not none %}
+                <rect x="{{ (data.range_bar.zone_a_end * 600)|round|int }}" y="10"
+                      width="{{ ((data.range_bar.zone_b_end - data.range_bar.zone_a_end) * 600)|round|int }}" height="20" fill="#fefce8"/>
+                {% endif %}
+                {% if data.range_bar.zone_b_end is not none and data.range_bar.zone_c_end is not none %}
+                <rect x="{{ (data.range_bar.zone_b_end * 600)|round|int }}" y="10"
+                      width="{{ ((data.range_bar.zone_c_end - data.range_bar.zone_b_end) * 600)|round|int }}" height="20" fill="#fff7ed"/>
+                {% endif %}
+                {% if data.range_bar.zone_c_end is not none and data.range_bar.zone_d_end is not none %}
+                <rect x="{{ (data.range_bar.zone_c_end * 600)|round|int }}" y="10"
+                      width="{{ ((data.range_bar.zone_d_end - data.range_bar.zone_c_end) * 600)|round|int }}" height="20" fill="#fff1f0"/>
+                {% endif %}
+                {% if data.range_bar.zone_d_end is not none %}
+                <rect x="{{ (data.range_bar.zone_d_end * 600)|round|int }}" y="10"
+                      width="{{ ((1.0 - data.range_bar.zone_d_end) * 600)|round|int }}" height="20" fill="#fee2e2"/>
+                {% endif %}
+                {# Full range bar #}
+                <rect x="0" y="18" width="600" height="4" fill="#e5e7eb" rx="2"/>
+                {# Medicare reference line #}
+                {% if data.range_bar.medicare_pos is not none %}
+                {% set mx = (data.range_bar.medicare_pos * 600)|round|int %}
+                <line x1="{{ mx }}" y1="8" x2="{{ mx }}" y2="32" stroke="#2563eb" stroke-width="2"/>
+                <text x="{{ mx }}" y="48" text-anchor="middle" font-size="8" fill="#2563eb" font-weight="600">
+                    Medicare{% if data.range_bar.medicare_rate %}: ${{ "{:,.0f}".format(data.range_bar.medicare_rate) }}{% endif %}
+                </text>
+                {% endif %}
+                {# National average reference line #}
+                {% if data.range_bar.avg_pos is not none %}
+                {% set ax = (data.range_bar.avg_pos * 600)|round|int %}
+                <line x1="{{ ax }}" y1="8" x2="{{ ax }}" y2="32" stroke="#6b7280" stroke-width="2" stroke-dasharray="3,2"/>
+                <text x="{{ ax }}" y="58" text-anchor="middle" font-size="8" fill="#6b7280">
+                    Avg{% if data.range_bar.avg_charge %}: ${{ "{:,.0f}".format(data.range_bar.avg_charge) }}{% endif %}
+                </text>
+                {% endif %}
+            </svg>
+            <div class="flex gap-4 mt-3 text-xs text-gray-500">
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-green-100"></span> Grade A (≤2x Medicare)</span>
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-yellow-50"></span> Grade B (2–3x)</span>
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-orange-50"></span> Grade C (3–5x)</span>
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-red-50"></span> Grade D/F (5x+)</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# SECTION 4: Hospital Finder #}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">Find Hospitals Near You for This Procedure</h2>
+
+        <form id="zip-form" class="flex gap-2 mb-4" onsubmit="searchByZip(event)">
+            <input id="zip-input" type="text" maxlength="5" placeholder="Enter ZIP code"
+                   class="border border-gray-300 rounded px-3 py-2 text-sm w-40" inputmode="numeric"/>
+            <button type="submit" class="bg-accent-700 text-white text-sm font-semibold px-4 py-2 rounded-lg">Search</button>
+        </form>
+
+        <div id="zip-results" class="hidden mb-4 text-sm text-gray-600"></div>
+
+        {# Default: 10 lowest-markup nationally #}
+        <div id="default-results">
+            {% if data.cheapest_hospitals %}
+            <p class="text-xs text-gray-500 mb-3">
+                Showing 10 hospitals with the lowest markup for this procedure nationally.
+                Enter your ZIP code above to see hospitals near you.
+            </p>
+            <div class="rounded-lg border border-gray-200 overflow-hidden">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
+                            <th class="px-4 py-3 font-semibold">Hospital</th>
+                            <th class="px-4 py-3 font-semibold">Location</th>
+                            <th class="px-4 py-3 font-semibold">Grade</th>
+                            <th class="px-4 py-3 font-semibold">Charge</th>
+                            <th class="px-4 py-3 font-semibold">Medicare Rate</th>
+                            <th class="px-4 py-3 font-semibold">Markup</th>
+                            <th class="bk-oop-th hidden px-4 py-3 font-semibold text-blue-700">Your Est. Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data.cheapest_hospitals %}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50" data-charge="{{ row.gross_charge or '' }}">
+                            <td class="px-4 py-3">
+                                <a href="/hospitals/{{ row.state_slug }}/{{ row.city_slug }}/{{ row.slug }}/"
+                                   class="font-medium text-accent-700 hover:text-accent-800">{{ row.name }}</a>
+                            </td>
+                            <td class="px-4 py-3 text-gray-500">{{ row.city }}, {{ row.state }}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold {{ row.badge_class }}">
+                                    {{ row.billing_grade or "N/A" }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 font-medium">
+                                {% if row.gross_charge %}${{ "{:,.0f}".format(row.gross_charge) }}{% else %}N/A{% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-gray-500">
+                                {% if row.medicare_rate %}${{ "{:,.0f}".format(row.medicare_rate) }}{% else %}N/A{% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if row.markup_vs_medicare %}{{ "%.1fx"|format(row.markup_vs_medicare) }}{% else %}N/A{% endif %}
+                            </td>
+                            <td class="bk-oop-td hidden px-4 py-3 text-blue-700 font-semibold">—</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-sm">No hospital pricing data available for this procedure.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# SECTION 5: Fair Price Explainer #}
+    {% if data.header.medicare_rate %}
+    <div class="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-6">
+        <h2 class="text-lg font-bold text-blue-900 mb-2">What Is a Fair Price for This Procedure?</h2>
+        <p class="text-sm text-blue-800 leading-relaxed mb-2">
+            Medicare pays <strong>${{ "{:,.0f}".format(data.header.medicare_rate) }}</strong> for {{ data.name }}
+            (CPT {{ data.cpt_code }}). This rate is set by CMS based on the actual cost of delivering the procedure,
+            including physician time, overhead, and equipment. It's the most reliable national benchmark for
+            what the procedure is worth.
+        </p>
+        <p class="text-sm text-blue-800 leading-relaxed mb-2">
+            A hospital charging <strong>${{ "{:,.0f}".format(data.header.medicare_rate * 2) }}</strong>
+            (2x Medicare) or less earns an A billing grade — these are the most fairly priced facilities
+            for this procedure.
+            {% if data.header.national_avg_charge %}
+            The national average charge is
+            <strong>${{ "{:,.0f}".format(data.header.national_avg_charge) }}</strong>
+            ({{ "%.1fx"|format(data.header.avg_markup) }} Medicare).
+            {% endif %}
+        </p>
+        <p class="text-sm text-blue-800 leading-relaxed">
+            If your bill shows more than <strong>${{ "{:,.0f}".format(data.header.medicare_rate * 3) }}</strong>
+            (3x Medicare) for this procedure, it may be worth reviewing the charges carefully.
+            <a href="/scan" class="underline font-semibold">Upload your bill to check →</a>
+        </p>
+    </div>
+    {% endif %}
+
+    {# SECTION 6: Procedure FAQ #}
+    {% if data.faq %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+            {% for item in data.faq %}
+            <details class="rounded-lg border border-gray-200 bg-white">
+                <summary class="px-5 py-4 cursor-pointer font-semibold text-gray-800 text-sm">
+                    {{ item.q }}
+                </summary>
+                <div class="px-5 pb-5 pt-2 text-sm text-gray-600 leading-relaxed">
+                    {{ item.a }}
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# SECTION 7: Internal Links #}
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% if data.related %}
+        <div class="rounded-lg border border-gray-200 p-5 bg-white">
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Related Procedures</h3>
+            <ul class="space-y-2">
+                {% for r in data.related %}
+                <li>
+                    <a href="/procedures/{{ r.cpt_code }}/"
+                       class="text-sm text-accent-700 hover:text-accent-800 underline">{{ r.name }}</a>
+                    {% if r.avg_charge %}
+                    <span class="text-xs text-gray-400"> · avg ${{ "{:,.0f}".format(r.avg_charge) }}</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="rounded-lg border border-gray-200 p-5 bg-white">
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Check Your Hospital</h3>
+            <p class="text-xs text-gray-500 mb-3">
+                See billing grades for hospitals in your state.
+            </p>
+            <a href="/hospitals/" class="text-sm text-accent-700 hover:text-accent-800 underline font-medium">
+                Browse Hospital Directory →
+            </a>
+        </div>
+
+        <div class="rounded-lg border border-gray-200 p-5 bg-white">
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Got a Bill for This Procedure?</h3>
+            <p class="text-xs text-gray-500 mb-3">
+                Upload your bill to check for errors and overcharges against federal rates.
+            </p>
+            <a href="/scan" class="text-sm font-bold bg-accent-700 text-white px-4 py-2 rounded-lg inline-block">
+                Scan My Bill Free →
+            </a>
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function searchByZip(e) {
+    e.preventDefault();
+    const zip = document.getElementById('zip-input').value.trim();
+    if (zip.length !== 5 || isNaN(zip)) {
+        alert('Please enter a valid 5-digit ZIP code.');
+        return;
+    }
+    const resultsDiv = document.getElementById('zip-results');
+    const defaultDiv = document.getElementById('default-results');
+    resultsDiv.textContent = 'Searching…';
+    resultsDiv.classList.remove('hidden');
+    defaultDiv.classList.add('hidden');
+
+    try {
+        const resp = await fetch(`/api/procedures/{{ data.cpt_code }}/hospitals?zip=${zip}`);
+        const json = await resp.json();
+        if (!json.found || !json.hospitals.length) {
+            resultsDiv.innerHTML = '<p class="text-gray-500">No hospitals with pricing data for this procedure found within 75 miles. ' +
+                'Try a different ZIP or <a href="/hospitals/" class="underline">browse the full directory</a>.</p>';
+            return;
+        }
+        let html = '<p class="text-xs text-gray-500 mb-3">Hospitals within 75 miles sorted by lowest charge for this procedure.</p>' +
+            '<div class="rounded-lg border border-gray-200 overflow-hidden">' +
+            '<table class="min-w-full text-sm">' +
+            '<thead><tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">' +
+            '<th class="px-4 py-3 font-semibold">Hospital</th>' +
+            '<th class="px-4 py-3 font-semibold">Location</th>' +
+            '<th class="px-4 py-3 font-semibold">Grade</th>' +
+            '<th class="px-4 py-3 font-semibold">Charge</th>' +
+            '<th class="px-4 py-3 font-semibold">Medicare</th>' +
+            '<th class="px-4 py-3 font-semibold">Markup</th>' +
+            '<th class="px-4 py-3 font-semibold">Distance</th>' +
+            '</tr></thead><tbody>';
+        for (const h of json.hospitals) {
+            const grade = h.billing_grade || 'N/A';
+            const charge = h.gross_charge ? '$' + h.gross_charge.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
+            const medicare = h.medicare_rate ? '$' + h.medicare_rate.toLocaleString('en-US', {maximumFractionDigits: 0}) : 'N/A';
+            const markup = h.markup_vs_medicare ? h.markup_vs_medicare.toFixed(1) + 'x' : 'N/A';
+            const dist = h.distance_miles ? h.distance_miles + ' mi' : '';
+            html += `<tr class="border-b border-gray-100 hover:bg-gray-50">` +
+                `<td class="px-4 py-3"><a href="/hospitals/${h.state_slug}/${h.city_slug}/${h.slug}/" class="font-medium text-accent-700 hover:text-accent-800">${h.name}</a></td>` +
+                `<td class="px-4 py-3 text-gray-500">${h.city}, ${h.state}</td>` +
+                `<td class="px-4 py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${h.badge_class}">${grade}</span></td>` +
+                `<td class="px-4 py-3 font-medium">${charge}</td>` +
+                `<td class="px-4 py-3 text-gray-500">${medicare}</td>` +
+                `<td class="px-4 py-3">${markup}</td>` +
+                `<td class="px-4 py-3 text-gray-500">${dist}</td>` +
+                `</tr>`;
+        }
+        html += '</tbody></table></div>';
+        resultsDiv.innerHTML = html;
+    } catch (err) {
+        resultsDiv.innerHTML = '<p class="text-red-500">Search failed. Please try again.</p>';
+        defaultDiv.classList.remove('hidden');
+    }
+}
+</script>
+{% endblock %}

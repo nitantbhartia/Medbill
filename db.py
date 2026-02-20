@@ -59,6 +59,20 @@ def _run_migrations(db):
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
 
+    # ZIP code centroid coordinates (for procedure hospital finder)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS zip_latlon (
+            zip TEXT PRIMARY KEY,
+            lat REAL NOT NULL,
+            lon REAL NOT NULL,
+            state TEXT,
+            city TEXT
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_zip_latlon_state ON zip_latlon(state)")
+
     # Geo mapping table (for ZIP -> Medicare locality/region)
     db.execute(
         """

@@ -8,6 +8,7 @@ import re
 import time
 from collections import defaultdict
 
+from config import APP_URL
 from db import get_db
 
 GRADE_THRESHOLDS = (
@@ -18,6 +19,9 @@ GRADE_THRESHOLDS = (
 )
 STATE_COMPARISON_MIN_SAMPLE_SIZE = 25
 NEARBY_RADIUS_MILES = 50.0
+# Highest-search-volume procedures for FAQ Q2, checked in priority order
+FAQ_PRIORITY_CPTS = ("27447", "70553", "45378", "27130", "74178", "71045")
+NATIONAL_AVG_MARKUP = 3.4  # approximate for FAQ answers
 _EARTH_RADIUS_MILES = 3958.8
 # ~1 degree lat ≈ 69 miles; padding for lon variation at different latitudes
 _LAT_DEGREE_MILES = 69.0
@@ -882,6 +886,15 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
     for key, value in list(section_updated.items()):
         section_updated[key] = str(value) if value not in (None, "") else None
 
+    seo = generate_seo_elements(
+        hospital_d=hospital_d,
+        prices_d=prices_d,
+        financials_d=financials_d,
+        state_code=state_code or "",
+        state_slug=hospital_d["state_slug"],
+        city_slug=hospital_d["city_slug"],
+    )
+
     return {
         "hospital": hospital_d,
         "quality": quality_d,
@@ -901,6 +914,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "nearby": nearby,
         "nearby_all_shown": nearby_all_shown,
         "section_updated": section_updated,
+        "seo": seo,
     }
 
 
@@ -1475,3 +1489,231 @@ def upsert_hospital_directory_row(row: dict) -> None:
 def get_state_hospitals_legacy(state_slug: str, limit: int = 200) -> list[dict]:
     rows, _ = get_state_hospitals(state_slug=state_slug, per_page=limit)
     return rows
+
+
+# ---------------------------------------------------------------------------
+# SEO + structured data generation
+# ---------------------------------------------------------------------------
+
+def _truncate_name(name: str, max_len: int) -> str:
+    """Truncate hospital name to max_len chars, appending '...' if cut."""
+    if len(name) <= max_len:
+        return name
+    return name[: max_len - 3].rstrip() + "..."
+
+
+def _get_national_avg_charge(cpt_code: str) -> float | None:
+    """Return national average gross charge for a CPT code from benchmark_averages."""
+    try:
+        with get_db() as db:
+            row = db.execute(
+                "SELECT avg_gross_charge FROM benchmark_averages WHERE scope = 'national' AND cpt_code = ?",
+                (cpt_code,),
+            ).fetchone()
+        return float(row["avg_gross_charge"]) if row and row["avg_gross_charge"] else None
+    except Exception:
+        return None
+
+
+def _build_page_title(name: str) -> str:
+    suffix = " Billing Grade & Prices | BillKarma"
+    max_name = 60 - len(suffix)
+    return _truncate_name(name, max_name) + suffix
+
+
+def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
+    name = hospital_d.get("name", "")
+    city = hospital_d.get("city", "")
+    state_code = hospital_d.get("_state_code") or ""  # raw abbreviation stored by caller
+    grade = hospital_d.get("billing_grade") or "N/A"
+    markup = hospital_d.get("avg_markup_vs_medicare")
+    proc_count = hospital_d.get("procedures_compared") or len(prices_d)
+
+    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
+    loc = f" in {city}, {state_code}" if city and state_code else ""
+    proc_txt = f"See {proc_count} procedure prices, " if proc_count else "See procedure prices, "
+
+    desc = (
+        f"{name}{loc} has a BillKarma billing grade of {grade} "
+        f"with an average markup of {markup_txt} Medicare. "
+        f"{proc_txt}compare nearby hospitals, and scan your bill free."
+    )
+    if len(desc) <= 155:
+        return desc
+    # Truncate at last word boundary before 152 chars, append ellipsis
+    cut = desc[:152]
+    last_space = cut.rfind(" ")
+    return (cut[:last_space] if last_space > 100 else cut) + "..."
+
+
+def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict) -> dict:
+    name = hospital_d.get("name", "This hospital")
+    grade = hospital_d.get("billing_grade") or "N/A"
+    markup = hospital_d.get("avg_markup_vs_medicare")
+    procedures = hospital_d.get("procedures_compared") or len(prices_d)
+    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
+    ownership_label = hospital_d.get("nonprofit_status_label", "Unknown")
+
+    # Q1: billing grade
+    q1_answer = (
+        f"BillKarma gives {name} a billing grade of {grade}. "
+        f"This grade is based on an average markup of {markup_txt} Medicare rates "
+        f"across {procedures} procedures in their CMS-published price transparency file."
+    )
+    if grade in ("F", "D"):
+        q1_answer += f" This is above the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare."
+    elif grade in ("A", "B"):
+        q1_answer += (
+            f" This is below the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare, "
+            "making it one of the more fairly priced hospitals in the area."
+        )
+
+    # Q2: procedure price — first priority CPT found in hospital data
+    prices_by_cpt = {p["cpt_code"]: p for p in prices_d if p.get("cpt_code")}
+    q2_proc = next((prices_by_cpt[c] for c in FAQ_PRIORITY_CPTS if c in prices_by_cpt), None)
+    if q2_proc:
+        cpt = q2_proc["cpt_code"]
+        proc_name = q2_proc.get("description") or f"CPT {cpt}"
+        charge = q2_proc.get("gross_charge")
+        medicare = q2_proc.get("medicare_rate")
+        proc_markup = q2_proc.get("markup_vs_medicare")
+        charge_txt = f"${charge:,.2f}" if charge else "not reported"
+        medicare_txt = f"${medicare:,.2f}" if medicare else "not available"
+        markup_proc_txt = f"{proc_markup:.1f}x" if isinstance(proc_markup, (int, float)) else "unknown"
+        national_avg = _get_national_avg_charge(cpt)
+        nat_txt = f" The national average charge for this procedure is approximately ${national_avg:,.0f}." if national_avg else ""
+        q2_question = f"How much does {proc_name} cost at {name}?"
+        q2_answer = (
+            f"{name} lists {proc_name} (CPT {cpt}) at {charge_txt}. "
+            f"The Medicare rate for this procedure is {medicare_txt}, "
+            f"making this a {markup_proc_txt} markup.{nat_txt}"
+        )
+    else:
+        q2_question = f"How much do common procedures cost at {name}?"
+        q2_answer = (
+            f"{name} has an average markup of {markup_txt} Medicare rates. "
+            "See the procedure price table on this page for specific CPT codes and charges."
+        )
+
+    # Q3: financial assistance
+    if "nonprofit" in ownership_label.lower():
+        q3_answer = (
+            f"{name} is a nonprofit hospital and is required under IRS Section 501(r) to maintain "
+            "a written financial assistance policy. Contact their billing department to request the "
+            "Financial Assistance Policy (FAP) application. Eligibility typically covers patients up "
+            "to 200–400% of the Federal Poverty Level, though thresholds vary by hospital."
+        )
+    elif "for-profit" in ownership_label.lower() or "proprietary" in ownership_label.lower():
+        q3_answer = (
+            f"{name} is a for-profit hospital with no federal charity care requirement. However, "
+            "most for-profit hospitals offer self-pay discounts. Ask their billing department "
+            "specifically for the 'self-pay discount rate' or 'cash settlement rate' — many "
+            "for-profit hospitals offer 40–60% off gross charges for cash-paying patients."
+        )
+    elif "government" in ownership_label.lower():
+        q3_answer = (
+            f"{name} is a government-owned hospital and typically offers sliding-scale financial "
+            "assistance programs with broader income eligibility than private hospitals. "
+            "Contact their billing department for income-based assistance options."
+        )
+    else:
+        q3_answer = (
+            f"Contact {name}'s billing department to ask about financial assistance programs. "
+            "Request their written financial assistance policy and ask about income eligibility thresholds."
+        )
+
+    return {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": f"What is {name}'s billing grade?",
+                "acceptedAnswer": {"@type": "Answer", "text": q1_answer},
+            },
+            {
+                "@type": "Question",
+                "name": q2_question,
+                "acceptedAnswer": {"@type": "Answer", "text": q2_answer},
+            },
+            {
+                "@type": "Question",
+                "name": f"Does {name} offer financial assistance?",
+                "acceptedAnswer": {"@type": "Answer", "text": q3_answer},
+            },
+        ],
+    }
+
+
+def _build_breadcrumb_schema(hospital_d: dict, state_slug: str, city_slug: str) -> dict:
+    base = APP_URL.rstrip("/")
+    state_display = hospital_d.get("state") or state_slug
+    city_display = hospital_d.get("city") or city_slug
+    name = hospital_d.get("name", "")
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "BillKarma", "item": f"{base}/"},
+            {"@type": "ListItem", "position": 2, "name": "Hospitals", "item": f"{base}/hospitals/"},
+            {"@type": "ListItem", "position": 3, "name": state_display, "item": f"{base}/hospitals/{state_slug}/"},
+            {"@type": "ListItem", "position": 4, "name": city_display, "item": f"{base}/hospitals/{state_slug}/{city_slug}/"},
+            {"@type": "ListItem", "position": 5, "name": name, "item": f"{base}/hospitals/{state_slug}/{city_slug}/{hospital_d.get('slug', '')}/"},
+        ],
+    }
+
+
+def _build_hospital_schema(hospital_d: dict, state_code: str) -> dict:
+    schema: dict = {
+        "@context": "https://schema.org",
+        "@type": "Hospital",
+        "name": hospital_d.get("name", ""),
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": hospital_d.get("address") or "",
+            "addressLocality": hospital_d.get("city") or "",
+            "addressRegion": state_code or "",
+            "postalCode": hospital_d.get("zip") or "",
+            "addressCountry": "US",
+        },
+    }
+    if hospital_d.get("phone"):
+        schema["telephone"] = hospital_d["phone"]
+    stars = hospital_d.get("cms_star_rating")
+    if stars and isinstance(stars, (int, float)):
+        schema["aggregateRating"] = {
+            "@type": "AggregateRating",
+            "ratingValue": int(stars),
+            "bestRating": 5,
+            "worstRating": 1,
+            "ratingCount": 1,
+            "description": "CMS Hospital Compare overall star rating",
+        }
+    return schema
+
+
+def generate_seo_elements(
+    hospital_d: dict,
+    prices_d: list[dict],
+    financials_d: dict,
+    state_code: str,
+    state_slug: str,
+    city_slug: str,
+) -> dict:
+    """Return dict of SEO metadata and JSON-LD schema strings for a hospital page."""
+    # Stash raw state code for meta description builder
+    hospital_d["_state_code"] = state_code
+
+    page_title = _build_page_title(hospital_d.get("name", ""))
+    meta_description = _build_meta_description(hospital_d, prices_d)
+    faq_schema = _build_faq_schema(hospital_d, prices_d, financials_d)
+    breadcrumb_schema = _build_breadcrumb_schema(hospital_d, state_slug, city_slug)
+    hospital_schema = _build_hospital_schema(hospital_d, state_code)
+
+    return {
+        "page_title": page_title,
+        "meta_description": meta_description,
+        "faq_schema_json": json.dumps(faq_schema, ensure_ascii=False),
+        "breadcrumb_schema_json": json.dumps(breadcrumb_schema, ensure_ascii=False),
+        "hospital_schema_json": json.dumps(hospital_schema, ensure_ascii=False),
+    }

@@ -22,6 +22,12 @@ from hospital_seo import (
     resolve_hospital_slug,
     state_display_name,
 )
+from compare_pages import get_comparison_data, search_hospitals_for_compare
+from procedure_pages import (
+    get_hospitals_near_zip_for_cpt,
+    get_procedure_profile,
+    get_top_cpt_codes,
+)
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -336,30 +342,124 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
         return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"})
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{canonical_slug or hospital_slug}/"
 
-    hospital_name = profile["hospital"]["name"]
-    city_name = profile["hospital"]["city"]
-    state_name = profile["hospital"]["state"]
-    markup = profile["hospital"].get("avg_markup_vs_medicare")
-    markup_text = f"{markup:.1f}x Medicare rates" if isinstance(markup, (int, float)) else "billing and pricing benchmarks"
-    seo_description = (
-        f"{hospital_name} billing review in {city_name}, {state_name}. "
-        f"See {markup_text}, financial assistance, and dispute tips."
-    )
-
+    seo = profile["seo"]
     return templates.TemplateResponse(
         "hospitals_detail.html",
         {
             "request": request,
             "data": profile,
             "canonical_url": canonical_url,
-            "og_title": f"{hospital_name} Billing Review & Prices | BillKarma",
-            "og_description": seo_description,
-            "meta_description": seo_description,
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
             "meta_robots": "index, follow",
             "enable_affiliate_slots": config.ENABLE_AFFILIATE_SLOTS,
             "affiliate_url": config.AFFILIATE_URL,
             "enable_hospital_claim": config.ENABLE_HOSPITAL_CLAIM,
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
+        },
+    )
+
+
+@app.get("/procedures/", response_class=HTMLResponse)
+async def procedure_index_page(request: Request):
+    procedures = get_top_cpt_codes(100)
+    # Group by body system
+    groups: dict[str, list] = {}
+    for p in procedures:
+        groups.setdefault(p["body_system"], []).append(p)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/"
+    return templates.TemplateResponse(
+        "procedures_index.html",
+        {
+            "request": request,
+            "groups": groups,
+            "total": len(procedures),
+            "canonical_url": canonical_url,
+            "og_title": "Procedure Cost Directory: Medicare Rates & Hospital Grades | BillKarma",
+            "og_description": "See Medicare rates, national average charges, and billing grades for 100 common procedures. Find the best-priced hospital near you.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/procedures/{cpt_code}/", response_class=HTMLResponse)
+async def procedure_detail_page(request: Request, cpt_code: str):
+    profile = get_procedure_profile(cpt_code)
+    if not profile:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{cpt_code}/"
+    seo = profile["seo"]
+    return templates.TemplateResponse(
+        "procedures_detail.html",
+        {
+            "request": request,
+            "data": profile,
+            "canonical_url": canonical_url,
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/api/procedures/{cpt_code}/hospitals")
+async def procedure_hospitals_by_zip(cpt_code: str, zip: str = ""):
+    """Return hospitals near a zip code with data for this CPT code (AJAX)."""
+    if not zip or len(zip) < 5:
+        return JSONResponse({"error": "zip required"}, status_code=400)
+    results = get_hospitals_near_zip_for_cpt(cpt_code, zip)
+    if not results:
+        return JSONResponse({"hospitals": [], "found": False})
+    return JSONResponse({"hospitals": results, "found": True})
+
+
+@app.get("/api/hospitals/search")
+async def hospital_search_api(q: str = ""):
+    """JSON hospital autocomplete for comparison tool."""
+    results = search_hospitals_for_compare(q) if len(q.strip()) >= 2 else []
+    return JSONResponse({"results": results})
+
+
+@app.get("/compare/", response_class=HTMLResponse)
+async def compare_index(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
+    return templates.TemplateResponse(
+        "compare_index.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Hospital Comparison Tool | BillKarma",
+            "og_description": "Compare any two hospitals side-by-side: billing grade, markup vs Medicare, CMS stars, and procedure prices.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
+async def compare_detail(request: Request, fid_a: str, fid_b: str):
+    data = get_comparison_data(fid_a, fid_b)
+    if not data:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "message": "One or both hospitals not found."},
+        )
+    name_a = data["a"]["name"]
+    name_b = data["b"]["name"]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
+    return templates.TemplateResponse(
+        "compare_detail.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": canonical_url,
+            "og_title": f"{name_a} vs {name_b} | BillKarma",
+            "og_description": (
+                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
+                "See which hospital charges less relative to Medicare."
+            ),
+            "meta_robots": "index, follow",
         },
     )
 
