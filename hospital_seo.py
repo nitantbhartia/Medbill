@@ -802,6 +802,28 @@ def _robust_average_markups(markups: list[float], low_q: float = 0.05, high_q: f
     return sum(trimmed) / len(trimmed)
 
 
+def _filter_markup_outliers(markups: list[float], hard_min: float = 0.5, hard_max: float = 150.0) -> list[float]:
+    """Apply hard bounds, then trim statistical outliers via IQR when sample size is sufficient."""
+    clean = sorted(
+        float(v)
+        for v in markups
+        if isinstance(v, (int, float)) and hard_min <= float(v) <= hard_max
+    )
+    if len(clean) < 8:
+        return clean
+
+    q1 = clean[int((len(clean) - 1) * 0.25)]
+    q3 = clean[int((len(clean) - 1) * 0.75)]
+    iqr = q3 - q1
+    if iqr <= 0:
+        return clean
+
+    low = max(hard_min, q1 - 1.5 * iqr)
+    high = min(hard_max, q3 + 1.5 * iqr)
+    trimmed = [v for v in clean if low <= v <= high]
+    return trimmed if trimmed else clean
+
+
 def _comparison_averages_for_state(state_code: str | None) -> dict[str, float | None]:
     key = (state_code or "").upper()
     cached = _comparison_cache.get(key)
@@ -1513,7 +1535,8 @@ def recompute_billing_metrics() -> int:
                 (f["facility_id"],),
             ).fetchall()
 
-            if len(rows) < 5:
+            min_points = 10
+            if len(rows) < min_points:
                 db.execute(
                     """
                     INSERT INTO billing_metrics (
@@ -1535,12 +1558,9 @@ def recompute_billing_metrics() -> int:
                 upserted += 1
                 continue
 
-            markups = [
-                float(r["markup_vs_medicare"])
-                for r in rows
-                if r["markup_vs_medicare"] is not None and 0.5 <= float(r["markup_vs_medicare"]) <= 150.0
-            ]
-            if len(markups) < 5:
+            raw_markups = [float(r["markup_vs_medicare"]) for r in rows if r["markup_vs_medicare"] is not None]
+            markups = _filter_markup_outliers(raw_markups)
+            if len(markups) < min_points:
                 db.execute(
                     """
                     INSERT INTO billing_metrics (
@@ -1682,13 +1702,10 @@ def recompute_facility_billing_metrics() -> int:
                     (facility_id,),
                 ).fetchall()
 
-            markups = [
-                float(r["markup_vs_medicare"])
-                for r in rows
-                if r["markup_vs_medicare"] is not None and 0.5 <= float(r["markup_vs_medicare"]) <= 150.0
-            ]
+            raw_markups = [float(r["markup_vs_medicare"]) for r in rows if r["markup_vs_medicare"] is not None]
+            markups = _filter_markup_outliers(raw_markups)
 
-            min_points = 5 if facility_type == "hospital" else 3
+            min_points = 10 if facility_type == "hospital" else 5
             if len(markups) < min_points:
                 db.execute(
                     """

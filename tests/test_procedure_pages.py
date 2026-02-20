@@ -429,3 +429,78 @@ def test_procedure_detail_seo_description():
     desc = profile["seo"]["meta_description"]
     assert "27447" in desc
     assert len(desc) <= 155
+
+
+def test_procedure_profile_trims_extreme_outliers_in_header_stats():
+    _seed()
+    with get_db() as db:
+        # Add one extreme malformed charge and one normal peer for CPT 70551.
+        upsert_hospital_row(
+            {
+                "facility_id": "99003",
+                "name": "Outlier Test Hospital",
+                "city": "Springfield",
+                "state": "IL",
+                "slug": "outlier-test-hospital-springfield",
+                "lat": 39.78,
+                "lon": -89.66,
+            }
+        )
+        upsert_hospital_row(
+            {
+                "facility_id": "99004",
+                "name": "Normal Test Hospital",
+                "city": "Springfield",
+                "state": "IL",
+                "slug": "normal-test-hospital-springfield",
+                "lat": 39.79,
+                "lon": -89.64,
+            }
+        )
+        db.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+            ("099003", 5000.0, 8, "F"),
+        )
+        db.execute(
+            "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?)",
+            ("099004", 4.0, 8, "C"),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099003", "70551", "MRI BRAIN STEM W/O DYE", 7055101.0, 195.0, 36180.0, 2026),
+        )
+        db.execute(
+            """
+            INSERT OR REPLACE INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099004", "70551", "MRI BRAIN STEM W/O DYE", 3800.0, 195.0, 19.5, 2026),
+        )
+
+    profile = get_procedure_profile("70551")
+    assert profile is not None
+    assert profile["header"]["excluded_outliers"] >= 1
+    assert profile["header"]["national_avg_charge"] < 10000
+    assert profile["range_bar"]["max_charge"] < 100000
+
+
+def test_procedure_profile_keeps_mri_acronym_in_name():
+    _seed()
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT OR REPLACE INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, medicare_rate, markup_vs_medicare, data_year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("099001", "70551", "MRI BRAIN STEM W/O DYE", 3000.0, 195.0, 15.3, 2026),
+        )
+    profile = get_procedure_profile("70551")
+    assert profile is not None
+    assert "MRI" in profile["name"]
+    assert "Mri" not in profile["name"]

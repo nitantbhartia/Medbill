@@ -123,29 +123,6 @@ def get_content_page_data(slug: str) -> dict | None:
     procedure_type = _classify_cpt(cfg.cpt_code)
 
     with get_db() as db:
-        rows = db.execute(
-            """
-            SELECT
-                COALESCE(f.facility_type, p.facility_type, 'hospital') AS facility_type,
-                COUNT(*) AS providers,
-                MIN(p.gross_charge) AS min_charge,
-                MAX(p.gross_charge) AS max_charge,
-                AVG(p.gross_charge) AS avg_charge,
-                AVG(p.markup_vs_medicare) AS avg_markup
-            FROM (
-                SELECT facility_id, cpt_code, gross_charge, markup_vs_medicare, facility_type FROM hospital_prices
-                UNION ALL
-                SELECT facility_id, cpt_code, gross_charge, markup_vs_medicare, facility_type FROM procedure_prices
-            ) p
-            LEFT JOIN facilities f ON f.facility_id = p.facility_id
-            WHERE p.cpt_code = ?
-              AND p.gross_charge IS NOT NULL
-            GROUP BY COALESCE(f.facility_type, p.facility_type, 'hospital')
-            ORDER BY avg_charge
-            """,
-            (cfg.cpt_code,),
-        ).fetchall()
-
         state_rows = db.execute(
             """
             SELECT
@@ -169,9 +146,10 @@ def get_content_page_data(slug: str) -> dict | None:
         ).fetchall()
 
     by_type = []
-    for row in rows:
+    for row in (profile.get("ranges_by_type") or []):
         d = dict(row)
-        d["label"] = _facility_type_label(d["facility_type"] or "hospital")
+        d["providers"] = d.get("provider_count")
+        d["label"] = _facility_type_label(d.get("facility_type") or "hospital")
         by_type.append(d)
 
     profile["content_heading"] = cfg.heading
@@ -179,6 +157,7 @@ def get_content_page_data(slug: str) -> dict | None:
     profile["default_facility_type"] = cfg.default_facility_type
     profile["by_facility_type"] = by_type
     profile["state_averages"] = [dict(r) for r in state_rows]
+    profile["excluded_outliers"] = (profile.get("header") or {}).get("excluded_outliers", 0)
     profile["is_imaging_content"] = procedure_type == "imaging"
     profile["is_colonoscopy_content"] = cfg.cpt_code == "45378"
     profile["is_er_content"] = cfg.cpt_code == "99284"

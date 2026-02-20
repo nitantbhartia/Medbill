@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 
 from db import get_db
 
@@ -148,9 +149,54 @@ def _friendly_name(cpt_code: str, raw_description: str) -> str:
     if not desc:
         return f"CPT {cpt_code}"
     # Truncate to 60 chars at word boundary
+    def _format_desc(text: str) -> str:
+        out = text.title()
+        out = re.sub(r"\bMri\b", "MRI", out)
+        out = re.sub(r"\bCt\b", "CT", out)
+        out = re.sub(r"\bEcg\b", "ECG", out)
+        out = re.sub(r"\bGi\b", "GI", out)
+        out = re.sub(r"\bEr\b", "ER", out)
+        return out
+
     if len(desc) <= 60:
-        return desc.title()
-    return desc[:57].rsplit(" ", 1)[0].title() + "..."
+        return _format_desc(desc)
+    return _format_desc(desc[:57].rsplit(" ", 1)[0]) + "..."
+
+
+def _quantile(values_sorted: list[float], p: float) -> float:
+    if not values_sorted:
+        return 0.0
+    p = max(0.0, min(1.0, p))
+    idx = int((len(values_sorted) - 1) * p)
+    return float(values_sorted[idx])
+
+
+def _trim_outlier_rows(rows: list[dict], value_key: str = "gross_charge") -> tuple[list[dict], int]:
+    sane_rows = [
+        r for r in rows
+        if r.get(value_key) is not None
+        and float(r[value_key]) > 0
+        and float(r[value_key]) <= 1_000_000.0
+    ]
+    sanity_removed = len(rows) - len(sane_rows)
+    values = sorted(float(r[value_key]) for r in sane_rows)
+    n = len(values)
+    if n < 12:
+        return sane_rows if sane_rows else rows, sanity_removed
+    q1 = _quantile(values, 0.25)
+    q3 = _quantile(values, 0.75)
+    iqr = max(q3 - q1, 0.0)
+    upper = q3 + (3.0 * iqr)
+    if upper <= 0:
+        return rows, 0
+    trimmed = [r for r in sane_rows if r.get(value_key) is not None and float(r[value_key]) <= upper]
+    removed = len(sane_rows) - len(trimmed)
+    if removed <= 0:
+        return sane_rows if sane_rows else rows, sanity_removed
+    # Guardrail: if filter is too aggressive, keep raw rows.
+    if removed > int(len(sane_rows) * 0.30):
+        return sane_rows if sane_rows else rows, sanity_removed
+    return trimmed, removed + sanity_removed
 
 
 def _procedure_description(name: str, cpt_code: str, procedure_type: str) -> str:
@@ -254,16 +300,16 @@ def get_top_cpt_codes(limit: int = 100) -> list[dict]:
 def get_procedure_profile(cpt_code: str) -> dict | None:
     """Return full data dict for a procedure detail page."""
     with get_db() as db:
-        header_row = db.execute(
+        detail_rows = db.execute(
             f"""
             {_ALL_PRICES_CTE}
             SELECT
-                COUNT(DISTINCT hp.facility_id) AS provider_count,
-                AVG(hp.gross_charge) AS avg_charge,
-                AVG(COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate)) AS avg_medicare_rate,
-                MIN(hp.gross_charge) AS min_charge,
-                MAX(hp.gross_charge) AS max_charge,
-                AVG(hp.markup_vs_medicare) AS avg_markup,
+                hp.facility_id,
+                hp.gross_charge,
+                COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) AS medicare_rate,
+                hp.markup_vs_medicare,
+                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
+                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
                 COALESCE(
                     NULLIF(TRIM(hp.description), ''),
                     (SELECT mr.description FROM medicare_rates mr
@@ -272,36 +318,19 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
                      ORDER BY mr.effective_year DESC LIMIT 1)
                 ) AS description
             FROM all_prices hp
+            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
+            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
+            LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
             WHERE hp.cpt_code = ?
               AND hp.gross_charge IS NOT NULL
               AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) IS NOT NULL
               AND COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate) > 0
             """,
             (cpt_code,),
-        ).fetchone()
-
-        if not header_row or not header_row["provider_count"]:
-            return None
-
-        grade_rows = db.execute(
-            f"""
-            {_ALL_PRICES_CTE}
-            SELECT
-                COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
-                AVG(hp.gross_charge) AS avg_charge,
-                AVG(COALESCE(hp.medicare_benchmark_rate, hp.medicare_rate)) AS avg_medicare_rate,
-                COUNT(*) AS provider_count
-            FROM all_prices hp
-            LEFT JOIN facility_billing_metrics fm ON fm.facility_id = hp.facility_id
-            LEFT JOIN billing_metrics m ON m.facility_id = hp.facility_id
-            WHERE hp.cpt_code = ?
-              AND hp.gross_charge IS NOT NULL
-              AND COALESCE(fm.billing_grade, m.billing_grade) IS NOT NULL
-            GROUP BY COALESCE(fm.billing_grade, m.billing_grade)
-            ORDER BY COALESCE(fm.billing_grade, m.billing_grade)
-            """,
-            (cpt_code,),
         ).fetchall()
+
+        if not detail_rows:
+            return None
 
         cheapest = db.execute(
             f"""
@@ -335,26 +364,6 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             (cpt_code,),
         ).fetchall()
 
-        type_ranges_rows = db.execute(
-            f"""
-            {_ALL_PRICES_CTE}
-            SELECT
-                COALESCE(f.facility_type, hp.facility_type, 'hospital') AS facility_type,
-                COUNT(*) AS provider_count,
-                MIN(hp.gross_charge) AS min_charge,
-                MAX(hp.gross_charge) AS max_charge,
-                AVG(hp.gross_charge) AS avg_charge,
-                AVG(hp.markup_vs_medicare) AS avg_markup
-            FROM all_prices hp
-            LEFT JOIN facilities f ON f.facility_id = hp.facility_id
-            WHERE hp.cpt_code = ?
-              AND hp.gross_charge IS NOT NULL
-              AND hp.markup_vs_medicare IS NOT NULL
-            GROUP BY COALESCE(f.facility_type, hp.facility_type, 'hospital')
-            """,
-            (cpt_code,),
-        ).fetchall()
-
         try:
             cpt_n = int(cpt_code)
             related_rows = db.execute(
@@ -384,23 +393,59 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
         except (ValueError, TypeError):
             related_rows = []
 
-    header = dict(header_row)
+    detail = [dict(r) for r in detail_rows]
+    filtered_detail, excluded_outliers = _trim_outlier_rows(detail, "gross_charge")
+    if not filtered_detail:
+        filtered_detail = detail
+        excluded_outliers = 0
+
+    provider_ids = {r["facility_id"] for r in filtered_detail if r.get("facility_id")}
+    avg_charge = (sum(float(r["gross_charge"]) for r in filtered_detail) / len(filtered_detail)) if filtered_detail else None
+    avg_medicare_rate = (
+        sum(float(r["medicare_rate"]) for r in filtered_detail) / len(filtered_detail)
+        if filtered_detail
+        else None
+    )
+    markups = [float(r["markup_vs_medicare"]) for r in filtered_detail if r.get("markup_vs_medicare") is not None]
+    header = {
+        "provider_count": len(provider_ids),
+        "avg_charge": avg_charge,
+        "avg_medicare_rate": avg_medicare_rate,
+        "min_charge": min(float(r["gross_charge"]) for r in filtered_detail) if filtered_detail else None,
+        "max_charge": max(float(r["gross_charge"]) for r in filtered_detail) if filtered_detail else None,
+        "avg_markup": (sum(markups) / len(markups)) if markups else None,
+        "description": next((r.get("description") for r in filtered_detail if (r.get("description") or "").strip()), None),
+        "excluded_outliers": excluded_outliers,
+    }
     desc_raw = header.get("description") or ""
     name = _friendly_name(cpt_code, desc_raw)
     procedure_type = _classify_cpt(cpt_code)
     medicare_rate = header.get("avg_medicare_rate")
     avg_charge = header.get("avg_charge")
 
-    by_grade = [
-        {
-            **dict(gr),
-            "hospital_count": gr["provider_count"],
-            "patient_cost": round(gr["avg_charge"] * 0.20, 2) if gr["avg_charge"] else None,
-            "color": _GRADE_COLORS.get(gr["billing_grade"] or "", "#9ca3af"),
-            "badge_class": _grade_badge_class(gr["billing_grade"]),
-        }
-        for gr in grade_rows
-    ]
+    by_grade_map: dict[str, list[dict]] = {}
+    for r in filtered_detail:
+        g = (r.get("billing_grade") or "").strip()
+        if not g:
+            continue
+        by_grade_map.setdefault(g, []).append(r)
+    by_grade = []
+    for grade in sorted(by_grade_map):
+        rows = by_grade_map[grade]
+        g_charge = sum(float(r["gross_charge"]) for r in rows) / len(rows)
+        g_medicare = sum(float(r["medicare_rate"]) for r in rows) / len(rows)
+        by_grade.append(
+            {
+                "billing_grade": grade,
+                "avg_charge": g_charge,
+                "avg_medicare_rate": g_medicare,
+                "provider_count": len(rows),
+                "hospital_count": len(rows),
+                "patient_cost": round(g_charge * 0.20, 2),
+                "color": _GRADE_COLORS.get(grade, "#9ca3af"),
+                "badge_class": _grade_badge_class(grade),
+            }
+        )
 
     cheapest_list = [
         {
@@ -414,14 +459,27 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
         for r in cheapest
     ][:10]
 
+    by_type_map: dict[str, list[dict]] = {}
+    for r in filtered_detail:
+        if r.get("markup_vs_medicare") is None:
+            continue
+        ftype = (r.get("facility_type") or "hospital").strip().lower()
+        by_type_map.setdefault(ftype, []).append(r)
+
     ranges_by_type = []
-    for row in type_ranges_rows:
-        ftype = row["facility_type"] or "hospital"
+    for ftype, rows in by_type_map.items():
         if ftype not in {"hospital", "asc", "imaging_center"}:
             continue
+        charges = [float(r["gross_charge"]) for r in rows]
+        type_markups = [float(r["markup_vs_medicare"]) for r in rows if r.get("markup_vs_medicare") is not None]
         ranges_by_type.append(
             {
-                **dict(row),
+                "facility_type": ftype,
+                "provider_count": len(rows),
+                "min_charge": min(charges),
+                "max_charge": max(charges),
+                "avg_charge": sum(charges) / len(charges),
+                "avg_markup": (sum(type_markups) / len(type_markups)) if type_markups else None,
                 "facility_type_label": _FACILITY_TYPE_LABELS.get(ftype, ftype.title()),
                 "benchmark_label": "ASC rate" if ftype == "asc" else "Medicare",
             }
@@ -472,6 +530,7 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             "provider_count": header["provider_count"],
             "hospital_count": header["provider_count"],
             "avg_markup": header.get("avg_markup"),
+            "excluded_outliers": header.get("excluded_outliers", 0),
         },
         "by_grade": by_grade,
         "range_bar": range_bar,

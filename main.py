@@ -270,7 +270,7 @@ def _build_home_procedure_cards() -> list[dict]:
         return []
     placeholders = ",".join("?" for _ in cpts)
     with db.get_db() as conn:
-        rows = conn.execute(
+        procedure_rows = conn.execute(
             f"""
             SELECT
                 cpt_code,
@@ -288,7 +288,30 @@ def _build_home_procedure_cards() -> list[dict]:
             """,
             cpts,
         ).fetchall()
-    by_cpt = {row["cpt_code"]: dict(row) for row in rows}
+        missing_cpts = [c for c in cpts if c not in {row["cpt_code"] for row in procedure_rows}]
+        fallback_rows = []
+        if missing_cpts:
+            fallback_rows = conn.execute(
+                f"""
+                SELECT
+                    cpt_code,
+                    MIN(description) AS description,
+                    AVG(gross_charge) AS national_avg,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'hospital' THEN gross_charge END) AS hospital_avg,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'hospital' THEN markup_vs_medicare END) AS hospital_markup,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'asc' THEN gross_charge END) AS asc_avg,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'asc' THEN markup_vs_medicare END) AS asc_markup,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'imaging_center' THEN gross_charge END) AS imaging_avg,
+                    AVG(CASE WHEN COALESCE(facility_type, 'hospital') = 'imaging_center' THEN markup_vs_medicare END) AS imaging_markup
+                FROM hospital_prices
+                WHERE cpt_code IN ({",".join("?" for _ in missing_cpts)})
+                GROUP BY cpt_code
+                """,
+                missing_cpts,
+            ).fetchall()
+    by_cpt = {row["cpt_code"]: dict(row) for row in procedure_rows}
+    for row in fallback_rows:
+        by_cpt.setdefault(row["cpt_code"], dict(row))
     cards = []
     for spec in HOME_PROCEDURE_CARD_SPECS:
         row = by_cpt.get(spec["cpt_code"], {})
@@ -320,8 +343,9 @@ def _build_home_procedure_cards() -> list[dict]:
 
 def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
     with db.get_db() as conn:
-        rows = conn.execute(
-            """
+        def _fetch_rows(min_procedures: int):
+            return conn.execute(
+                """
             SELECT
                 f.facility_id, f.name, f.city, f.state, f.state_slug, f.city_slug, f.slug,
                 f.facility_type, f.is_hospital_owned,
@@ -332,7 +356,11 @@ def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
                 CASE
                     WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
                     ELSE fbm.avg_markup
-                END AS avg_markup
+                END AS avg_markup,
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.procedures_compared
+                    ELSE fbm.procedures_compared
+                END AS procedures_compared
             FROM facilities f
             LEFT JOIN facility_billing_metrics fbm ON fbm.facility_id = f.facility_id
             LEFT JOIN billing_metrics bm ON bm.facility_id = f.facility_id
@@ -348,14 +376,26 @@ def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
                     ELSE fbm.avg_markup
                 END
               ) BETWEEN 0.5 AND 150.0
+              AND (
+                CASE
+                    WHEN f.facility_type = 'hospital' THEN bm.procedures_compared
+                    ELSE fbm.procedures_compared
+                END
+              ) >= ?
             ORDER BY
               CASE
                   WHEN f.facility_type = 'hospital' THEN bm.avg_markup_vs_medicare
                   ELSE fbm.avg_markup
               END DESC
             LIMIT 300
-            """
-        ).fetchall()
+            """,
+                (min_procedures,),
+            ).fetchall()
+        rows = _fetch_rows(20)
+        if not rows:
+            rows = _fetch_rows(10)
+        if not rows:
+            rows = _fetch_rows(5)
     items = [dict(r) for r in rows]
     for item in items:
         item["url"] = _facility_profile_url(item)

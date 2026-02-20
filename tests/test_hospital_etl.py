@@ -24,7 +24,7 @@ from hospital_seo import (  # noqa: E402
     recompute_facility_billing_metrics,
     upsert_hospital_row,
 )
-from main import _build_home_sample_facilities  # noqa: E402
+from main import _build_home_procedure_cards, _build_home_sample_facilities  # noqa: E402
 
 
 def test_auto_map_columns_detects_core_fields():
@@ -66,7 +66,18 @@ def test_metrics_compute_grade_and_benchmarks():
 
     with get_db() as conn:
         # Insert latest medicare reference for CPTs used.
-        for cpt, rate in [("99285", 227.0), ("99284", 157.0), ("99283", 98.0), ("99282", 52.0), ("99281", 27.0)]:
+        for cpt, rate in [
+            ("99285", 500.0),
+            ("99284", 500.0),
+            ("99283", 500.0),
+            ("99282", 500.0),
+            ("99281", 500.0),
+            ("99291", 500.0),
+            ("99292", 500.0),
+            ("93000", 500.0),
+            ("80053", 500.0),
+            ("74177", 500.0),
+        ]:
             conn.execute(
                 "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
                 (cpt, "0000000", rate, rate, 2026),
@@ -82,8 +93,8 @@ def test_metrics_compute_grade_and_benchmarks():
         }
     )
 
-    # >= 5 rows to get non-N/A grade
-    for cpt in ["99285", "99284", "99283", "99282", "99281"]:
+    # >=10 rows to get non-N/A grade
+    for cpt in ["99285", "99284", "99283", "99282", "99281", "99291", "99292", "93000", "80053", "74177"]:
         upsert_hospital_price(
             "10001",
             {
@@ -243,7 +254,7 @@ def test_recompute_clears_stale_markup_for_na_grade():
     )
 
     with get_db() as conn:
-        # <5 comparable rows means final grade must be N/A.
+        # <10 comparable rows means final grade must be N/A.
         for i, markup in enumerate([220.0, 240.0, 260.0], start=1):
             conn.execute(
                 """
@@ -305,6 +316,55 @@ def test_recompute_clears_stale_markup_for_na_grade():
     assert facility_metric["max_markup"] is None
 
 
+def test_recompute_billing_metrics_trims_outlier_markups():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {
+            "facility_id": "74001",
+            "name": "Outlier General",
+            "city": "Dallas",
+            "state": "TX",
+            "slug": "outlier-general-dallas",
+        }
+    )
+    with get_db() as conn:
+        base_markups = [2.2, 2.3, 2.4, 2.5, 2.1, 2.6, 2.7, 2.4, 2.5, 2.3]
+        for i, markup in enumerate(base_markups, start=1):
+            conn.execute(
+                """
+                INSERT INTO hospital_prices (
+                    facility_id, cpt_code, description, gross_charge, cash_price,
+                    medicare_rate, markup_vs_medicare, data_year
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                ("074001", f"84{i:03d}", "Synthetic", markup * 100.0, markup * 80.0, 100.0, markup, 2026),
+            )
+        # Extreme but in-range value that should be dropped by IQR trimming.
+        conn.execute(
+            """
+            INSERT INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, cash_price,
+                medicare_rate, markup_vs_medicare, data_year
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("074001", "84999", "Synthetic Outlier", 12000.0, 9000.0, 100.0, 120.0, 2026),
+        )
+
+    recompute_billing_metrics()
+
+    with get_db() as conn:
+        metric = conn.execute(
+            "SELECT avg_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade FROM billing_metrics WHERE facility_id = ?",
+            ("074001",),
+        ).fetchone()
+    assert metric is not None
+    assert metric["procedures_compared"] == 10
+    assert metric["avg_markup_vs_medicare"] < 3.0
+    assert metric["max_markup_vs_medicare"] < 3.0
+    assert metric["billing_grade"] in {"A", "B"}
+
+
 def test_home_sample_facilities_excludes_na_and_extreme_markup():
     _db._connection = None
     _db.init_db()
@@ -322,11 +382,11 @@ def test_home_sample_facilities_excludes_na_and_extreme_markup():
     with get_db() as conn:
         conn.execute(
             "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
-            ("071001", 2.4, 2.3, 2.8, 12, "A"),
+            ("071001", 2.4, 2.3, 2.8, 24, "A"),
         )
         conn.execute(
             "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
-            ("071002", 9.6, 9.2, 12.0, 11, "F"),
+            ("071002", 9.6, 9.2, 12.0, 22, "F"),
         )
         conn.execute(
             "INSERT OR REPLACE INTO billing_metrics (facility_id, avg_markup_vs_medicare, median_markup_vs_medicare, max_markup_vs_medicare, procedures_compared, billing_grade) VALUES (?, ?, ?, ?, ?, ?)",
@@ -334,11 +394,11 @@ def test_home_sample_facilities_excludes_na_and_extreme_markup():
         )
         conn.execute(
             "INSERT OR REPLACE INTO facility_billing_metrics (facility_id, facility_type, avg_markup, median_markup, max_markup, procedures_compared, billing_grade, benchmark_type) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)",
-            ("071001", 2.4, 2.3, 2.8, 12, "A", "opps"),
+            ("071001", 2.4, 2.3, 2.8, 24, "A", "opps"),
         )
         conn.execute(
             "INSERT OR REPLACE INTO facility_billing_metrics (facility_id, facility_type, avg_markup, median_markup, max_markup, procedures_compared, billing_grade, benchmark_type) VALUES (?, 'hospital', ?, ?, ?, ?, ?, ?)",
-            ("071002", 9.6, 9.2, 12.0, 11, "F", "opps"),
+            ("071002", 9.6, 9.2, 12.0, 22, "F", "opps"),
         )
         # Should never be shown once filters are applied.
         conn.execute(
@@ -350,6 +410,33 @@ def test_home_sample_facilities_excludes_na_and_extreme_markup():
     assert cards
     assert all(c.get("billing_grade") in {"A", "B", "C", "D", "F"} for c in cards)
     assert all(c.get("avg_markup") is not None and 0.5 <= float(c.get("avg_markup")) <= 150.0 for c in cards)
+    assert all(int(c.get("procedures_compared") or 0) >= 20 for c in cards)
+
+
+def test_home_procedure_cards_fallback_to_hospital_prices_when_procedure_prices_missing():
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row(
+        {"facility_id": "75001", "name": "Fallback Hospital", "city": "Austin", "state": "TX", "slug": "fallback-hospital-austin"}
+    )
+    with get_db() as conn:
+        conn.execute(
+            """
+            INSERT INTO hospital_prices (
+                facility_id, cpt_code, description, gross_charge, cash_price,
+                medicare_rate, markup_vs_medicare, data_year, facility_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            ("075001", "70551", "MRI Brain W/O Contrast", 2400.0, 1200.0, 300.0, 8.0, 2026, "hospital"),
+        )
+        # Ensure no procedure_prices rows exist for this CPT.
+        conn.execute("DELETE FROM procedure_prices WHERE cpt_code = '70551'")
+
+    cards = _build_home_procedure_cards()
+    mri = next((c for c in cards if c.get("cpt_code") == "70551"), None)
+    assert mri is not None
+    assert mri.get("hospital_avg") is not None
+    assert mri.get("hospital_markup") is not None
 
 
 def test_load_hcahps_handles_cms_coded_columns():
