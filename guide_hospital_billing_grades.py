@@ -35,7 +35,7 @@ register("hospital-billing-grades-explained", {
         },
     ],
     "body": f"""
-<p class="lead">Your hospital has a billing grade — A through F — based on how much it charges compared to what Medicare pays for the same procedures. According to BillKarma&rsquo;s analysis of CMS price transparency data, the average U.S. hospital charges <strong>3.4 times</strong> the Medicare rate, which puts most hospitals in the C range. An A-grade hospital charges 2x Medicare or less. An F-grade hospital charges more than 8x &mdash; that&rsquo;s a $12,800 bill for a procedure Medicare values at $1,600.</p>
+<p class="lead">Your hospital has a billing grade — A through F — based on how much it charges compared to what Medicare pays for the same procedures. According to BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files, the average U.S. hospital charges <strong>3.4 times</strong> the Medicare rate, which puts most hospitals in the C range. An A-grade hospital charges 2x Medicare or less. An F-grade hospital charges more than 8x &mdash; that&rsquo;s a $12,800 bill for a procedure Medicare values at $1,600.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>

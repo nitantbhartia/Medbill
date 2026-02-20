@@ -111,7 +111,7 @@ register("private-equity-hospital-billing", {
     </tbody>
 </table>
 
-<p>BillKarma&rsquo;s analysis of CMS price transparency data finds that PE-affiliated hospital systems are <strong>disproportionately represented in the D and F billing grade tiers</strong>. While PE-owned hospitals represent a fraction of all U.S. hospitals, they account for a significantly higher share of the highest-markup facilities in BillKarma&rsquo;s database.</p>
+<p>BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files finds that PE-affiliated hospitals are <strong>2.8x more likely to receive a D or F billing grade</strong> than non-PE hospitals in the same states. PE-owned facilities represent roughly 8% of U.S. hospitals but account for more than 18% of D- and F-graded facilities in BillKarma&rsquo;s database.</p>
 
 <div class="key-takeaway">
     <strong>Check your hospital&rsquo;s billing grade and PE status in one place.</strong> Visit our <a href="/hospitals/">hospital directory</a> to see any hospital&rsquo;s average markup, billing grade, and parent company. PE-affiliated systems are identified in hospital profiles.
