@@ -299,6 +299,7 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
 
     Picks 1 A/B, 2 C, 2 D/F, 1 with highest single-procedure markup.
     All from different states, with at least 10 procedures compared.
+    Uses state_slug (raw code) for dedup to match the SQL column.
     """
     with get_db() as db:
         buckets = [
@@ -314,7 +315,7 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
             params: list = list(grades)
             state_clause = ""
             if seen_states:
-                state_clause = " AND h.state NOT IN (%s)" % ",".join("?" * len(seen_states))
+                state_clause = " AND h.state_slug NOT IN (%s)" % ",".join("?" * len(seen_states))
                 params.extend(seen_states)
             params.append(limit)
 
@@ -338,20 +339,24 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
 
             for row in rows:
                 item = dict(row)
+                seen_states.add(item["state_slug"])
                 item["name"] = _display_name(item.get("name"), item.get("facility_id"))
                 item["city"] = _display_city(item.get("city"))
                 item["state"] = state_display_name(item.get("state"))
                 results.append(item)
-                seen_states.add(item["state"])
 
         # Fill remaining slot: hospital with the most dramatic single-procedure markup
         if len(results) < count:
             existing_ids = [r["facility_id"] for r in results]
             id_clause = ""
+            state_clause = ""
             params2: list = []
             if existing_ids:
                 id_clause = "AND h.facility_id NOT IN (%s)" % ",".join("?" * len(existing_ids))
-                params2 = list(existing_ids)
+                params2.extend(existing_ids)
+            if seen_states:
+                state_clause = "AND h.state_slug NOT IN (%s)" % ",".join("?" * len(seen_states))
+                params2.extend(seen_states)
 
             dramatic = db.execute(
                 f"""
@@ -367,6 +372,7 @@ def get_sample_hospitals(count: int = 6) -> list[dict]:
                 WHERE m.procedures_compared >= 10
                   AND p.markup_vs_medicare IS NOT NULL
                   {id_clause}
+                  {state_clause}
                 ORDER BY p.markup_vs_medicare DESC
                 LIMIT 1
                 """,
