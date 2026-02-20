@@ -4,73 +4,492 @@
 
 {% block head %}
 <meta name="description" content="{{ data.seo.meta_description }}">
+{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+<meta property="og:title" content="{{ data.content_heading }} | BillKarma">
+<meta property="og:description" content="{{ data.seo.meta_description }}">
+<meta name="robots" content="{{ meta_robots|default('index, follow') }}">
+
+{% if data.faq %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for faq in data.faq %}
+        {
+            "@type": "Question",
+            "name": "{{ faq.q | replace('"', '\\"') }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ faq.a | replace('"', '\\"') }}"
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endif %}
+
+<style>
+    .proc-guide-hero {
+        background-color: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 56px 24px 48px;
+        margin-bottom: 0;
+    }
+    .proc-guide-hero-inner { max-width: 72rem; margin: 0 auto; }
+    .proc-guide-hero .breadcrumb {
+        font-size: 0.75rem; color: rgba(255,255,255,0.7);
+        margin-bottom: 12px;
+    }
+    .proc-guide-hero .breadcrumb a { color: rgba(255,255,255,0.8); text-decoration: underline; }
+    .proc-guide-hero h1 {
+        font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em;
+        line-height: 1.1; color: #fff; margin-bottom: 24px;
+    }
+    .hero-stats-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 16px; max-width: 660px;
+    }
+    .hero-stat {
+        background: rgba(255,255,255,0.12); border-radius: 16px;
+        padding: 18px 20px;
+    }
+    .hero-stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .hero-stat-value { font-size: 1.7rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; line-height: 1; }
+    .hero-stat-sub { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+    .hero-stat-note { font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-top: 6px; font-style: italic; }
+
+    .hero-zip-row { margin-top: 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .hero-zip-input {
+        padding: 12px 18px; border-radius: 999px; border: 2px solid rgba(255,255,255,0.5);
+        font-size: 0.95rem; outline: none; font-family: inherit; width: 180px;
+        background: rgba(255,255,255,0.1); color: #fff;
+    }
+    .hero-zip-input::placeholder { color: rgba(255,255,255,0.6); }
+    .hero-zip-btn {
+        padding: 12px 24px; border-radius: 999px; background: #fff;
+        color: var(--bk-green); font-weight: 700; font-size: 0.9rem;
+        text-decoration: none; border: none; cursor: pointer; display: inline-block;
+        transition: background 0.15s;
+    }
+    .hero-zip-btn:hover { background: rgba(255,255,255,0.9); }
+
+    .proc-guide-body { max-width: 72rem; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .answer-box {
+        background: #F0FAF5; border: 1px solid #A7D9C0; border-radius: 16px;
+        padding: 24px 28px; margin-bottom: 40px;
+    }
+    .answer-box-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--bk-green); margin-bottom: 8px; }
+    .answer-box p { font-size: 1.05rem; line-height: 1.65; color: #1A1A1A; margin: 0; }
+
+    .section-h2 {
+        font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+        color: #111827; margin-bottom: 16px; margin-top: 48px;
+    }
+    .section-h2:first-child { margin-top: 0; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .data-table th {
+        text-align: left; padding: 10px 14px;
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.04em; color: #6B7280; background: #F9FAFB;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid #F3F4F6; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover td { background: #F9FAFB; }
+    .table-wrap { border: 1px solid #E5E7EB; border-radius: 14px; overflow: hidden; margin-bottom: 8px; }
+    .table-source { font-size: 0.72rem; color: #9CA3AF; margin-bottom: 32px; }
+
+    .fair-price-box {
+        border: 1px solid #C7D2FE; background: #EEF2FF; border-radius: 16px;
+        padding: 24px 28px; margin: 40px 0;
+    }
+    .fair-price-box h3 { font-size: 1.1rem; font-weight: 700; color: #3730A3; margin-bottom: 14px; }
+    .fair-price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #C7D2FE; }
+    .fair-price-row:last-child { border-bottom: none; }
+    .fair-price-label { font-size: 0.88rem; color: #374151; }
+    .fair-price-value { font-size: 1rem; font-weight: 700; color: #111827; }
+    .fair-price-note { font-size: 0.84rem; color: #4338CA; margin-top: 14px; line-height: 1.5; }
+
+    .cta-box {
+        background: var(--bk-black); color: #fff; border-radius: 20px;
+        padding: 28px 32px; margin: 40px 0;
+        display: flex; align-items: center; justify-content: space-between; gap: 24px;
+        flex-wrap: wrap;
+    }
+    .cta-box-copy p { margin: 0 0 4px; font-size: 1rem; font-weight: 600; }
+    .cta-box-copy span { font-size: 0.85rem; color: rgba(255,255,255,0.65); }
+    .cta-box-btn {
+        background: #fff; color: var(--bk-black); font-weight: 700; font-size: 0.9rem;
+        padding: 12px 24px; border-radius: 999px; text-decoration: none;
+        white-space: nowrap; flex-shrink: 0;
+    }
+    .cta-box-btn:hover { background: #f3f4f6; }
+
+    .colonoscopy-notice {
+        border: 1px solid #FCD34D; background: #FFFBEB; border-radius: 12px;
+        padding: 16px 20px; margin-bottom: 32px; font-size: 0.9rem; color: #78350F;
+        line-height: 1.55;
+    }
+    .er-notice {
+        border: 1px solid #FECACA; background: #FFF5F5; border-radius: 12px;
+        padding: 16px 20px; margin-bottom: 32px; font-size: 0.9rem; color: #7F1D1D;
+        line-height: 1.55;
+    }
+
+    .ask-list { list-style: none; padding: 0; margin: 0; }
+    .ask-list li {
+        display: flex; align-items: flex-start; gap: 12px;
+        padding: 12px 0; border-bottom: 1px solid #F3F4F6;
+        font-size: 0.95rem; color: #374151; line-height: 1.5;
+    }
+    .ask-list li:last-child { border-bottom: none; }
+    .ask-num {
+        flex-shrink: 0; width: 26px; height: 26px;
+        background: var(--bk-green); color: #fff; border-radius: 50%;
+        font-size: 0.78rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+
+    .faq-list { margin: 0; }
+    .faq-item { border-bottom: 1px solid #E5E7EB; padding: 20px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-size: 1rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .faq-a { font-size: 0.92rem; color: #374151; line-height: 1.65; }
+
+    .finder-box {
+        background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 16px;
+        padding: 28px 32px; margin: 40px 0; text-align: center;
+    }
+    .finder-box h3 { font-size: 1.1rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .finder-box p { font-size: 0.9rem; color: #6B7280; margin-bottom: 20px; }
+    .finder-form { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .finder-zip {
+        padding: 11px 18px; border: 1.5px solid #D1D5DB; border-radius: 999px;
+        font-size: 0.95rem; outline: none; font-family: inherit; width: 160px;
+    }
+    .finder-zip:focus { border-color: var(--bk-green); }
+    .finder-btn {
+        padding: 11px 22px; background: var(--bk-green); color: #fff;
+        font-weight: 700; font-size: 0.9rem; border-radius: 999px;
+        border: none; cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .finder-btn:hover { background: var(--bk-green-dark); }
+    .finder-browse { font-size: 0.85rem; color: var(--bk-green); font-weight: 600; margin-top: 14px; display: block; text-decoration: none; }
+    .finder-browse:hover { text-decoration: underline; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .related-card {
+        border: 1px solid #E5E7EB; border-radius: 12px; padding: 16px 18px;
+        text-decoration: none; color: #111827; font-size: 0.88rem; font-weight: 600;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .related-card:hover { border-color: var(--bk-green); box-shadow: 0 2px 8px rgba(0,130,79,0.1); }
+    .related-card-sub { font-size: 0.78rem; color: #6B7280; font-weight: 400; margin-top: 4px; }
+
+    .footer-cta-row {
+        display: flex; gap: 12px; flex-wrap: wrap;
+        margin-top: 48px; padding-top: 40px; border-top: 1px solid #E5E7EB;
+    }
+    .footer-cta-btn {
+        padding: 12px 24px; border-radius: 999px; font-weight: 700;
+        font-size: 0.9rem; text-decoration: none; flex: 1; text-align: center;
+        min-width: 180px;
+    }
+    .footer-cta-primary { background: var(--bk-green); color: #fff; }
+    .footer-cta-primary:hover { background: var(--bk-green-dark); }
+    .footer-cta-secondary { border: 1.5px solid #D1D5DB; color: #374151; background: #fff; }
+    .footer-cta-secondary:hover { border-color: #374151; }
+
+    @media (max-width: 768px) {
+        .proc-guide-hero h1 { font-size: 1.7rem; }
+        .hero-stats-grid { grid-template-columns: 1fr 1fr; }
+        .hero-stats-grid .hero-stat:last-child { grid-column: span 2; }
+        .related-grid { grid-template-columns: 1fr; }
+        .proc-guide-body { padding: 32px 20px 60px; }
+    }
+    @media (max-width: 480px) {
+        .hero-stats-grid { grid-template-columns: 1fr; }
+        .hero-stats-grid .hero-stat:last-child { grid-column: span 1; }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto px-5 py-10">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ data.content_heading }}</h1>
-    <p class="text-sm text-gray-600 mb-5">
-        CPT {{ data.cpt_code }} · National benchmark rate:
-        {% if data.header.medicare_rate %}${{ "{:,.0f}".format(data.header.medicare_rate) }}{% else %}N/A{% endif %}
-    </p>
+{# ── HERO ─────────────────────────────────────────────────────────── #}
+<div class="proc-guide-hero">
+    <div class="proc-guide-hero-inner">
+        <div class="breadcrumb">
+            <a href="/procedures/">Procedures</a> &rsaquo; {{ data.name }}
+        </div>
+        <h1>{{ data.content_heading }}</h1>
 
+        {% set hosp = namespace(avg=None, markup=None) %}
+        {% set alt = namespace(avg=None, markup=None, label="") %}
+        {% for t in data.by_facility_type %}
+            {% if t.facility_type == 'hospital' %}
+                {% set hosp.avg = t.avg_charge %}
+                {% set hosp.markup = t.avg_markup %}
+            {% elif t.facility_type == data.default_facility_type %}
+                {% set alt.avg = t.avg_charge %}
+                {% set alt.markup = t.avg_markup %}
+                {% set alt.label = t.label %}
+            {% endif %}
+        {% endfor %}
+        {% if not alt.label %}
+            {% for t in data.by_facility_type %}
+                {% if t.facility_type != 'hospital' and not alt.avg %}
+                    {% set alt.avg = t.avg_charge %}
+                    {% set alt.markup = t.avg_markup %}
+                    {% set alt.label = t.label %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="hero-stats-grid">
+            <div class="hero-stat">
+                <div class="hero-stat-label">Hospital avg</div>
+                <div class="hero-stat-value">{% if hosp.avg %}${{ "{:,.0f}".format(hosp.avg) }}{% else %}—{% endif %}</div>
+                {% if hosp.markup %}<div class="hero-stat-sub">{{ "%.1f"|format(hosp.markup) }}x Medicare</div>{% endif %}
+            </div>
+            {% if alt.avg %}
+            <div class="hero-stat">
+                <div class="hero-stat-label">{{ alt.label }} avg</div>
+                <div class="hero-stat-value">${{ "{:,.0f}".format(alt.avg) }}</div>
+                {% if alt.markup %}<div class="hero-stat-sub">{{ "%.1f"|format(alt.markup) }}x Medicare</div>{% endif %}
+            </div>
+            {% endif %}
+            <div class="hero-stat">
+                <div class="hero-stat-label">Medicare rate</div>
+                <div class="hero-stat-value">{% if data.header.medicare_rate %}${{ "{:,.0f}".format(data.header.medicare_rate) }}{% else %}—{% endif %}</div>
+                <div class="hero-stat-note">CPT {{ data.cpt_code }} · reference rate</div>
+            </div>
+        </div>
+
+        <div class="hero-zip-row">
+            <form action="/procedures/{{ data.cpt_code }}/" method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <input name="zip" type="text" class="hero-zip-input" placeholder="Enter zip code" maxlength="5" pattern="[0-9]{5}">
+                <button type="submit" class="hero-zip-btn">Find facilities near me →</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# ── BODY ──────────────────────────────────────────────────────────── #}
+<div class="proc-guide-body">
+
+    {# Procedure-specific notices #}
     {% if data.is_colonoscopy_content %}
-    <div class="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-        Preventive vs diagnostic colonoscopy billing can change out-of-pocket costs significantly. Confirm which billing pathway your procedure will use before scheduling.
+    <div class="colonoscopy-notice">
+        <strong>Preventive vs. diagnostic billing matters.</strong> A preventive colonoscopy (routine screening) is typically covered 100% by insurance with no cost-sharing. If your doctor removes a polyp or treats a finding, it may be rebilled as diagnostic — changing your out-of-pocket cost significantly. Always confirm which billing pathway applies before your procedure.
+    </div>
+    {% endif %}
+    {% if data.is_er_content %}
+    <div class="er-notice">
+        <strong>ER billing has two separate charges.</strong> The facility fee (from the hospital) and the physician fee (from the ER doctor) are billed separately. You may receive two bills from different entities, both of which need to be reviewed for accuracy.
     </div>
     {% endif %}
 
-    <div class="mb-6 rounded-lg border border-gray-200 bg-white overflow-hidden">
-        <table class="min-w-full text-sm">
+    {# SECTION 1 — Quick Answer #}
+    <div class="answer-box">
+        <div class="answer-box-label">The Short Answer</div>
+        <p>
+            BillKarma analysis of {{ "{:,}".format(data.header.provider_count or data.header.hospital_count or 0) }} facilities finds
+            {% if hosp.avg %}the average hospital charge for {{ data.name }} is <strong>${{ "{:,.0f}".format(hosp.avg) }}</strong>{% if hosp.markup %} — {{ "%.1f"|format(hosp.markup) }}x the Medicare reference rate of {% if data.header.medicare_rate %}${{ "{:,.0f}".format(data.header.medicare_rate) }}{% endif %}{% endif %}.{% else %}limited pricing data for this procedure.{% endif %}
+            {% if alt.avg and alt.label %}{{ alt.label }} average <strong>${{ "{:,.0f}".format(alt.avg) }}</strong> for the same procedure.{% endif %}
+            {% if data.header.medicare_rate %}A fair market price is typically 1.5–2.5x the Medicare rate, or <strong>${{ "{:,.0f}".format((data.header.medicare_rate * 1.5)|int) }}–${{ "{:,.0f}".format((data.header.medicare_rate * 2.5)|int) }}</strong>.{% endif %}
+        </p>
+    </div>
+
+    {# SECTION 2 — Cost by Facility Type #}
+    {% if data.by_facility_type %}
+    <h2 class="section-h2">Cost by facility type</h2>
+    {% if data.is_imaging_content %}
+    <p style="color:#374151;font-size:0.95rem;line-height:1.6;margin-bottom:16px;">For imaging procedures, choosing an independent imaging center over a hospital outpatient department is the single biggest factor affecting your cost. Hospital-owned imaging departments bill facility fees that independent centers do not.</p>
+    {% endif %}
+    <div class="table-wrap">
+        <table class="data-table">
             <thead>
-                <tr class="text-left text-gray-500 bg-gray-50 border-b border-gray-200">
-                    <th class="px-4 py-3 font-semibold">Facility Type</th>
-                    <th class="px-4 py-3 font-semibold">Range</th>
-                    <th class="px-4 py-3 font-semibold">Average</th>
-                    <th class="px-4 py-3 font-semibold">Avg Markup</th>
-                    <th class="px-4 py-3 font-semibold">Providers</th>
+                <tr>
+                    <th>Facility Type</th>
+                    <th>Avg Charge</th>
+                    <th>vs. Medicare</th>
+                    <th>Range</th>
+                    <th>Providers</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in data.by_facility_type %}
-                <tr class="border-b border-gray-100">
-                    <td class="px-4 py-3 font-medium">{{ row.label }}</td>
-                    <td class="px-4 py-3">
-                        {% if row.min_charge %}${{ "{:,.0f}".format(row.min_charge) }}{% else %}N/A{% endif %}
-                        —
-                        {% if row.max_charge %}${{ "{:,.0f}".format(row.max_charge) }}{% else %}N/A{% endif %}
+                <tr>
+                    <td style="font-weight:600;">{{ row.label }}</td>
+                    <td style="font-weight:700;">{% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}—{% endif %}</td>
+                    <td>{% if row.avg_markup %}{{ "%.1f"|format(row.avg_markup) }}x{% else %}—{% endif %}</td>
+                    <td style="color:#6B7280;">
+                        {% if row.min_charge %}${{ "{:,.0f}".format(row.min_charge) }}{% else %}—{% endif %}
+                        –
+                        {% if row.max_charge %}${{ "{:,.0f}".format(row.max_charge) }}{% else %}—{% endif %}
                     </td>
-                    <td class="px-4 py-3">{% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}N/A{% endif %}</td>
-                    <td class="px-4 py-3">{% if row.avg_markup %}{{ "%.1fx"|format(row.avg_markup) }}{% else %}N/A{% endif %}</td>
-                    <td class="px-4 py-3">{{ row.providers }}</td>
+                    <td style="color:#6B7280;">{{ "{:,}".format(row.providers) }}</td>
+                </tr>
+                {% endfor %}
+                {% if data.header.medicare_rate %}
+                <tr style="background:#F0FAF5;">
+                    <td style="font-weight:600;color:var(--bk-green);">Medicare Rate</td>
+                    <td style="font-weight:700;color:var(--bk-green);">${{ "{:,.0f}".format(data.header.medicare_rate) }}</td>
+                    <td style="color:var(--bk-green);">1.0x</td>
+                    <td style="color:#6B7280;">Reference</td>
+                    <td style="color:#6B7280;">—</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <p class="table-source">Source: BillKarma analysis of {{ "{:,}".format(data.header.provider_count or 0) }} facilities · Data current 2026</p>
+    {% endif %}
+
+    {# SECTION 3 — Cost by Billing Grade #}
+    {% if data.by_grade %}
+    <h2 class="section-h2">How billing grade affects your cost</h2>
+    <p style="color:#374151;font-size:0.95rem;line-height:1.6;margin-bottom:16px;">BillKarma grades hospitals A–F based on their average charges vs. Medicare rates. Choosing a Grade A or B facility for this procedure can save hundreds or thousands of dollars.</p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Grade</th>
+                    <th>What it means</th>
+                    <th>Avg Charge</th>
+                    <th>vs. Medicare</th>
+                    <th>Est. Patient Cost*</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data.by_grade %}
+                <tr>
+                    <td>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold {{ row.badge_class }}">
+                            {{ row.billing_grade or "N/A" }}
+                        </span>
+                    </td>
+                    <td style="color:#6B7280;font-size:0.85rem;">
+                        {% if row.billing_grade == 'A' %}≤ 2x Medicare (fair)
+                        {% elif row.billing_grade == 'B' %}2–3x Medicare (moderate)
+                        {% elif row.billing_grade == 'C' %}3–5x Medicare (elevated)
+                        {% elif row.billing_grade == 'D' %}5–8x Medicare (high)
+                        {% elif row.billing_grade == 'F' %}8x+ Medicare (predatory)
+                        {% else %}Not graded{% endif %}
+                    </td>
+                    <td style="font-weight:600;">{% if row.avg_charge %}${{ "{:,.0f}".format(row.avg_charge) }}{% else %}—{% endif %}</td>
+                    <td>{% if row.avg_markup %}{{ "%.1f"|format(row.avg_markup) }}x{% else %}—{% endif %}</td>
+                    <td>{% if row.patient_cost %}${{ "{:,.0f}".format(row.patient_cost) }}{% else %}—{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <p class="table-source">*Estimated patient cost assumes 20% coinsurance after deductible · Source: BillKarma 2026</p>
+    {% endif %}
 
-    {% if data.state_averages %}
-    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-4">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">Average Cost by State</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-            {% for s in data.state_averages %}
-            <div class="rounded border border-gray-100 p-2">
-                <div class="text-gray-500">{{ s.state }}</div>
-                <div class="font-semibold">{% if s.avg_charge %}${{ "{:,.0f}".format(s.avg_charge) }}{% else %}N/A{% endif %}</div>
-            </div>
+    {# SECTION 4 — Facility Finder #}
+    <div class="finder-box">
+        <h3>Find {{ data.name }} near you</h3>
+        <p>See grades, prices, and distance for hospitals{% if data.is_imaging_content %}, imaging centers{% else %}, surgery centers{% endif %} in your area.</p>
+        <div class="finder-form">
+            <form action="/procedures/{{ data.cpt_code }}/" method="get" style="display:contents;">
+                <input name="zip" type="text" class="finder-zip" placeholder="Zip code" maxlength="5" pattern="[0-9]{5}">
+                <button type="submit" class="finder-btn">Search →</button>
+            </form>
+        </div>
+        <a href="/procedures/{{ data.cpt_code }}/" class="finder-browse">Browse all providers for CPT {{ data.cpt_code }} →</a>
+    </div>
+
+    {# SECTION 5 — Fair Price #}
+    {% if data.header.medicare_rate %}
+    <div class="fair-price-box">
+        <h3>What is a fair price for {{ data.name }}?</h3>
+        <div class="fair-price-row">
+            <span class="fair-price-label">Medicare reference rate (CPT {{ data.cpt_code }})</span>
+            <span class="fair-price-value">${{ "{:,.0f}".format(data.header.medicare_rate) }}</span>
+        </div>
+        <div class="fair-price-row">
+            <span class="fair-price-label">Fair market range (1.5–2.5x Medicare)</span>
+            <span class="fair-price-value">${{ "{:,.0f}".format((data.header.medicare_rate * 1.5)|int) }} – ${{ "{:,.0f}".format((data.header.medicare_rate * 2.5)|int) }}</span>
+        </div>
+        {% if hosp.avg %}
+        <div class="fair-price-row">
+            <span class="fair-price-label">National hospital average</span>
+            <span class="fair-price-value">${{ "{:,.0f}".format(hosp.avg) }}</span>
+        </div>
+        {% endif %}
+        {% if data.by_grade %}
+            {% for row in data.by_grade %}{% if row.billing_grade == 'A' and row.avg_charge %}
+        <div class="fair-price-row">
+            <span class="fair-price-label">BillKarma Grade A facilities average</span>
+            <span class="fair-price-value">${{ "{:,.0f}".format(row.avg_charge) }}</span>
+        </div>
+            {% endif %}{% endfor %}
+        {% endif %}
+        <p class="fair-price-note">If you are quoted more than ${{ "{:,.0f}".format((data.header.medicare_rate * 2.5)|int) }}, ask questions or search for a lower-cost alternative. BillKarma grades hospitals A–F based on how their charges compare to this benchmark.</p>
+    </div>
+    {% endif %}
+
+    {# CTA — Bill Scanner #}
+    <div class="cta-box">
+        <div class="cta-box-copy">
+            <p>Already had this procedure?</p>
+            <span>Check if you were overcharged — in 30 seconds.</span>
+        </div>
+        <a href="/scan" class="cta-box-btn">Scan My Bill Free →</a>
+    </div>
+
+    {# SECTION 6 — What to Ask #}
+    {% if data.what_to_ask %}
+    <h2 class="section-h2">Questions to ask before scheduling {{ data.name }}</h2>
+    <ol class="ask-list">
+        {% for q in data.what_to_ask %}
+        <li>
+            <span class="ask-num">{{ loop.index }}</span>
+            <span>{{ q }}</span>
+        </li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {# SECTION 7 — FAQs #}
+    {% if data.faq %}
+    <h2 class="section-h2">Frequently asked questions</h2>
+    <div class="faq-list">
+        {% for item in data.faq %}
+        <div class="faq-item">
+            <div class="faq-q">{{ item.q }}</div>
+            <div class="faq-a">{{ item.a }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Footer CTA #}
+    <div class="footer-cta-row">
+        <a href="/procedures/{{ data.cpt_code }}/" class="footer-cta-btn footer-cta-primary">Find {{ data.name }} providers near you →</a>
+        <a href="/scan" class="footer-cta-btn footer-cta-secondary">Scan My Bill Free →</a>
+    </div>
+
+    {# Related Procedures #}
+    {% if data.related %}
+    <div style="margin-top: 48px;">
+        <h2 class="section-h2" style="margin-top:0;">Related procedures</h2>
+        <div class="related-grid">
+            {% for rel in data.related[:3] %}
+            <a href="/procedures/{{ rel.cpt_code }}/" class="related-card">
+                {{ rel.name }}
+                <div class="related-card-sub">CPT {{ rel.cpt_code }}</div>
+            </a>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    <div class="rounded-lg border border-blue-200 bg-blue-50 p-5">
-        <h2 class="text-lg font-bold text-blue-900 mb-2">Find Providers Near You</h2>
-        <p class="text-sm text-blue-800 mb-2">
-            Use the procedure finder to compare charges and billing grades across hospitals, surgery centers, and imaging centers near you.
-        </p>
-        <a href="/procedures/{{ data.cpt_code }}/" class="text-sm font-semibold text-accent-700 underline">
-            Open provider comparison for CPT {{ data.cpt_code }} →
-        </a>
-    </div>
-</section>
+</div>
 {% endblock %}
