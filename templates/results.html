@@ -12,7 +12,7 @@
 <section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
     <!-- Breadcrumb -->
     <div class="text-xs text-gray-400 mb-6 flex items-center gap-1.5">
-        <span>Scan</span><span>&rsaquo;</span><span>Confirm</span><span>&rsaquo;</span>
+        <span>Upload</span><span>&rsaquo;</span><span>Confirm</span><span>&rsaquo;</span>
         <span class="text-gray-700 font-medium">Results</span>
     </div>
 
@@ -62,7 +62,7 @@
         <div class="bg-black text-white px-6 py-5">
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Want us to handle it?</p>
             <h2 class="text-xl font-bold mb-1">
-                Fight this bill for ${{ dispute_fee_dollars|default(49) }}
+                Fight this bill for ${{ dispute_fee_dollars|default(29) }}
             </h2>
             <p class="text-sm text-gray-300">
                 We send the dispute letter and follow up automatically for 45 days. No savings? Full refund.
@@ -87,6 +87,7 @@
         </div>
     </div>
 
+    <!-- Confidence split -->
     <div class="mb-8 grid gap-3 sm:grid-cols-2">
         <div class="border border-green-200 bg-green-50 rounded-md p-4">
             <h2 class="text-xs uppercase tracking-wide text-green-700 font-semibold mb-1">High-confidence issues</h2>
@@ -139,34 +140,31 @@
         </div>
     </div>
 
-    <!-- ========== COMPONENT 1: DISPUTE PACKET ========== -->
-    <div class="mb-8 border border-gray-200 rounded-md p-5" id="dispute-packet">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Your Dispute Packet — Ready to Send</h2>
+    <!-- Dispute Letter -->
+    <div class="mb-10 border border-gray-200 rounded-md p-5">
+        <h2 class="text-sm font-semibold text-gray-900 mb-1">Your Dispute Letter</h2>
         <p class="text-xs text-gray-500 mb-4">
-            We've prepared a dispute letter and phone script based on your flagged items.
-            Download and start your dispute today.
+            Enter your name to generate a pre-filled dispute letter based on the findings above.
         </p>
 
-        <!-- Personalization inputs -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">Your name</label>
-                <input id="requestor-name" type="text" placeholder="[Your Name]"
+                <input id="requestor-name" type="text" placeholder="Jane Smith"
                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-700 mb-1">Account / Invoice number</label>
-                <input id="account-number" type="text" placeholder="Optional"
+                <label class="block text-xs font-medium text-gray-700 mb-1">Account / Invoice number <span class="font-normal text-gray-400">(optional)</span></label>
+                <input id="account-number" type="text" placeholder="e.g. 123456789"
                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
             </div>
         </div>
 
         <button id="gen-letter-btn"
                 class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-            Generate Dispute Letter
+            Generate Letter
         </button>
 
-        <!-- Letter output (hidden until generated) -->
         <div id="letter-output" class="hidden mt-5">
             <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-3 max-h-96 overflow-y-auto">
                 <pre id="letter-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
@@ -178,235 +176,33 @@
                 <button id="download-pdf-btn" class="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Download as PDF
                 </button>
-                <button id="download-doc-btn" class="text-xs font-medium px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                    Download Word doc
-                </button>
             </div>
-            <p class="mt-3 text-xs text-gray-400">
-                Fill in the bracketed fields before sending. The PDF opens a print dialog — use "Save as PDF" in print settings.
-            </p>
         </div>
     </div>
 
-    <!-- ========== COMPONENT 2: PHONE SCRIPT ========== -->
-    {% if phone_script %}
-    <details class="mb-8 border border-gray-200 rounded-md">
-        <summary class="flex items-center justify-between p-5 cursor-pointer select-none">
-            <span class="text-sm font-semibold text-gray-900">Prefer to call? Here's exactly what to say.</span>
-            <span class="text-xs text-gray-500">Tap to expand</span>
-        </summary>
-        <div class="border-t border-gray-200 p-5">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-xs text-gray-500">Structured script with objection handlers and note-taking guide.</span>
-                <button type="button" id="copy-phone-btn" class="text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors px-3 py-1.5">
-                    <span id="copy-phone-text">Copy</span>
-                </button>
-            </div>
-            <div class="bg-gray-50 border border-gray-200 rounded-md p-4">
-                <pre class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed" id="phone-script-text">{{ phone_script }}</pre>
-            </div>
-        </div>
-    </details>
-    {% endif %}
-
-    <!-- Next steps -->
-    <div class="mb-8 border border-gray-200 rounded-md p-5">
-        <h2 class="text-sm font-semibold text-gray-900 mb-3">Next steps</h2>
-        <ol class="space-y-3 text-sm text-gray-600">
-            <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</span>
-                <div><span class="font-medium text-gray-900">Download your dispute packet</span> &mdash; generate the letter above and download PDF or Word.</div>
-            </li>
-            <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</span>
-                <div><span class="font-medium text-gray-900">Send or call</span> &mdash; mail or email the letter, or use the phone script above. Tuesday–Thursday, 9–11am is best.</div>
-            </li>
-            <li class="flex gap-2.5">
-                <span class="flex-shrink-0 w-5 h-5 bg-accent-700 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</span>
-                <div><span class="font-medium text-gray-900">Track your outcome below</span> &mdash; update the tracker as your dispute progresses.</div>
-            </li>
-        </ol>
-    </div>
-
-    <!-- ========== COMPONENT 3: OUTCOME TRACKER ========== -->
-    <div class="mb-8 border border-gray-200 rounded-md p-5" id="outcome-tracker">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Dispute Tracker</h2>
-        <p class="text-xs text-gray-500 mb-4">Click each stage as your dispute progresses. Your progress is saved automatically.</p>
-
-        <!-- Stage progression -->
-        <div class="flex flex-col sm:flex-row gap-2 mb-5" id="stage-buttons">
-            <button class="stage-btn flex-1 text-xs px-3 py-2 rounded-md border font-medium transition-colors" data-stage="packet_ready">
-                ✓ 1. Packet Ready
-            </button>
-            <button class="stage-btn flex-1 text-xs px-3 py-2 rounded-md border font-medium transition-colors" data-stage="contacted_billing">
-                2. Contacted Billing
-            </button>
-            <button class="stage-btn flex-1 text-xs px-3 py-2 rounded-md border font-medium transition-colors" data-stage="under_review">
-                3. Under Review
-            </button>
-            <button class="stage-btn flex-1 text-xs px-3 py-2 rounded-md border font-medium transition-colors" data-stage="resolved">
-                4. Resolved
-            </button>
-        </div>
-
-        <div id="stage-feedback" class="text-xs text-gray-500 mb-4"></div>
-
-        <!-- Resolved: outcome question -->
-        <div id="resolved-outcome" class="hidden border-t border-gray-100 pt-4">
-            <p class="text-sm font-medium text-gray-800 mb-3">Great — what happened?</p>
-            <div class="flex flex-col gap-2">
-                <button data-outcome="reduced" class="outcome-btn text-sm text-left px-4 py-2.5 rounded-md border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-colors">
-                    💰 Charges were reduced — how much did you save?
-                </button>
-                <button data-outcome="denied" class="outcome-btn text-sm text-left px-4 py-2.5 rounded-md border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-colors">
-                    ✗ Dispute was denied — we can help escalate
-                </button>
-                <button data-outcome="pending" class="outcome-btn text-sm text-left px-4 py-2.5 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors">
-                    ⏳ Still waiting / no response
-                </button>
-            </div>
-        </div>
-
-        <!-- Reduced: savings capture -->
-        <div id="savings-capture" class="hidden border-t border-gray-100 pt-4">
-            <p class="text-sm font-semibold text-green-700 mb-3">You saved money — that's great!</p>
-            <div class="flex items-end gap-3 mb-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Amount saved ($)</label>
-                    <input id="amount-saved" type="number" min="0" step="0.01" placeholder="0.00"
-                           class="w-32 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-400"/>
-                </div>
-                <button id="save-outcome-btn" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors">
-                    Record
-                </button>
-            </div>
-            <label class="flex items-center gap-2 text-xs text-gray-500 mb-3">
-                <input type="checkbox" id="share-anon" class="rounded border-gray-300"/>
-                Share my result anonymously to help other patients
-            </label>
-            <div id="outcome-saved-msg" class="hidden text-sm text-green-700 font-medium"></div>
-        </div>
-
-        <!-- Denied: escalate to dispute service -->
-        <div id="success-fee-prompt" class="hidden border-t border-gray-100 pt-4">
-            <div class="bg-green-50 border border-green-200 rounded-md p-4">
-                <h3 class="text-sm font-bold text-green-900 mb-1">Let us fight it for you.</h3>
-                <p class="text-xs text-green-800 mb-3">
-                    Dispute stalled? BillKarma handles everything — formal letters, automated follow-ups, 45 days of pressure.
-                    Flat fee. No savings? Full refund.
-                </p>
-                <a id="fight-bill-link" href="/dispute/activate/{{ data.bill.id }}"
-                   class="inline-flex px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors">
-                    Fight This Bill →
+    <!-- Two-path CTA -->
+    <div class="mb-10">
+        <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-4">Choose how to proceed</p>
+        <div class="grid sm:grid-cols-2 gap-4">
+            <!-- Paid path -->
+            <div class="rounded-xl border-2 border-green-600 bg-green-50 p-5 flex flex-col">
+                <p class="text-xs font-semibold uppercase tracking-wide text-green-700 mb-1">Recommended</p>
+                <h3 class="text-base font-bold text-gray-900 mb-1">We handle everything</h3>
+                <p class="text-xs text-gray-600 mb-4 flex-1">We send the letter, follow up for 45 days, and fight back if they push back. No savings? Full refund.</p>
+                <a href="/dispute/activate/{{ data.bill.id }}"
+                   class="block text-center px-4 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                    Fight This Bill — ${{ dispute_fee_dollars|default(29) }} →
                 </a>
             </div>
-        </div>
-
-        <!-- Pending: check-in prompt -->
-        <div id="pending-prompt" class="hidden border-t border-gray-100 pt-4">
-            <p class="text-xs text-gray-600">
-                No problem — disputes can take 30 days. Come back here to update your outcome when you hear back.
-                If they don't respond within 30 days, you can file a complaint with your
-                <a href="https://www.naag.org" target="_blank" rel="noopener" class="underline text-accent-700">state Attorney General</a>.
-            </p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Email report -->
-    <div class="border border-gray-200 rounded-md p-5 mb-8">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Email this report</h2>
-        <p class="text-xs text-gray-500 mb-3">We'll send you a PDF with all findings and scripts.</p>
-        <form id="email-report-form" class="flex flex-col sm:flex-row gap-2">
-            <input type="email" id="report-email" name="email" placeholder="you@example.com" required
-                   class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500"/>
-            <button type="submit" id="send-report-btn"
-                    class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-                <span id="send-report-text">Send</span>
-            </button>
-        </form>
-        <div id="email-success" class="hidden mt-2 text-xs text-green-700">Sent! Check your inbox.</div>
-        <div id="email-error" class="hidden mt-2 text-xs text-red-600">Could not send. Try again.</div>
-    </div>
-
-
-    <!-- Negotiation -->
-    {% if data.findings and data.findings | length > 0 %}
-    <div class="mb-8 border border-gray-200 rounded-md p-5" id="negotiate-section">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Send a dispute email</h2>
-        <p class="text-xs text-gray-500 mb-4">We'll draft a professional dispute email you can send directly or copy to your email client.</p>
-
-        <!-- Step 1: Start form -->
-        <div id="neg-start-form">
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Account / invoice number <span class="text-red-400">*</span></label>
-                    <input type="text" id="neg-account" placeholder="e.g. 123456789"
-                           class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500"/>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Hospital billing email <span class="font-normal text-gray-400">(optional — for direct send)</span></label>
-                    <input type="email" id="neg-hospital-email" placeholder="billing@hospital.org"
-                           class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500"/>
-                </div>
-                <button type="button" id="neg-start-btn"
-                        class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-                    Draft dispute email
+            <!-- Free path -->
+            <div class="rounded-xl border border-gray-200 bg-white p-5 flex flex-col">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Free</p>
+                <h3 class="text-base font-bold text-gray-900 mb-1">Do it yourself</h3>
+                <p class="text-xs text-gray-600 mb-4 flex-1">Download your dispute letter and send it directly to the hospital billing department.</p>
+                <button id="diy-download-btn"
+                        class="block w-full text-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                    Download Letter — Free →
                 </button>
-                <div id="neg-start-error" class="hidden text-xs text-red-600"></div>
-            </div>
-        </div>
-
-        <!-- Step 2: Generate / draft view -->
-        <div id="neg-draft-view" class="hidden">
-            <div id="neg-generating" class="hidden">
-                <div class="flex items-center gap-2 text-sm text-accent-800 bg-accent-50 border border-accent-200 rounded-md px-4 py-3">
-                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                    </svg>
-                    <span>Drafting your dispute email…</span>
-                </div>
-            </div>
-            <div id="neg-draft-content" class="hidden space-y-3">
-                <div class="rounded-md bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-800" id="neg-patient-summary"></div>
-                <div>
-                    <p class="text-xs font-medium text-gray-600 mb-1">Subject</p>
-                    <p class="text-sm text-gray-900 font-medium" id="neg-subject"></p>
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-600 mb-1">Body</p>
-                    <textarea id="neg-body" rows="10" readonly
-                              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-gray-50 font-mono resize-y focus:outline-none"></textarea>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" id="neg-approve-btn"
-                            class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-                        <span id="neg-approve-text">Approve &amp; send</span>
-                    </button>
-                    <button type="button" id="neg-copy-btn"
-                            class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                        <span id="neg-copy-text">Copy to clipboard</span>
-                    </button>
-                </div>
-                <div id="neg-approve-note" class="text-xs text-gray-400"></div>
-                <div id="neg-draft-error" class="hidden text-xs text-red-600"></div>
-            </div>
-        </div>
-
-        <!-- Step 3: Sent confirmation -->
-        <div id="neg-sent-view" class="hidden">
-            <div class="rounded-md bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800 font-medium mb-3" id="neg-sent-msg"></div>
-            <div>
-                <p class="text-xs font-medium text-gray-700 mb-1">Record a hospital response</p>
-                <p class="text-xs text-gray-500 mb-2">Paste what they wrote back and we'll recommend your next step.</p>
-                <textarea id="neg-response-text" rows="4" placeholder="Paste hospital response here…"
-                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 resize-none mb-2"></textarea>
-                <button type="button" id="neg-record-btn"
-                        class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-                    Analyze response
-                </button>
-                <div id="neg-response-result" class="hidden mt-3 text-sm text-gray-700 rounded-md border border-gray-200 p-4 bg-gray-50"></div>
             </div>
         </div>
     </div>
@@ -414,7 +210,7 @@
 
     <div class="text-center">
         <a href="/scan" class="text-sm text-accent-700 font-medium hover:text-accent-800 transition-colors">
-            Scan another bill
+            Upload another bill
         </a>
     </div>
 </section>
@@ -424,19 +220,6 @@
 <script>
 (function() {
     var billId = '{{ data.bill.id if data and data.bill else "" }}';
-    var totalDisputed = {{ data.total_gross_potential_savings | default(0) | round(2) }};
-    var TRACKER_KEY = 'bk_dispute_' + billId;
-
-    // ---- Utility ----
-    function copyText(sourceId, btnTextId) {
-        var el = document.getElementById(sourceId);
-        var btn = document.getElementById(btnTextId);
-        if (!el || !btn) return;
-        navigator.clipboard.writeText(el.textContent.trim()).then(function() {
-            btn.textContent = 'Copied!';
-            setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
-        });
-    }
 
     function selectedFindingIds() {
         return Array.from(document.querySelectorAll('.finding-selector:checked'))
@@ -444,38 +227,59 @@
             .filter(Number.isFinite);
     }
 
-    // ---- Phone script copy ----
-    var copyPhoneBtn = document.getElementById('copy-phone-btn');
-    if (copyPhoneBtn) copyPhoneBtn.addEventListener('click', function() { copyText('phone-script-text', 'copy-phone-text'); });
+    function generateLetter(onSuccess) {
+        var genBtn = document.getElementById('gen-letter-btn');
+        var letterText = document.getElementById('letter-text');
 
-    // ---- Dispute letter ----
+        if (letterText && letterText.textContent.trim()) {
+            onSuccess(letterText.textContent);
+            return;
+        }
+
+        if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Generating…'; }
+
+        var payload = {
+            finding_ids: selectedFindingIds(),
+            requestor_name: (document.getElementById('requestor-name').value || '').trim() || '[Your Name]',
+            account_number: (document.getElementById('account-number').value || '').trim() || '[Account Number]'
+        };
+
+        fetch('/api/dispute-letter/' + billId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(function(r) { if (!r.ok) throw new Error('Could not generate letter'); return r.json(); })
+        .then(function(d) {
+            letterText.textContent = d.data.letter;
+            document.getElementById('letter-output').classList.remove('hidden');
+            onSuccess(d.data.letter);
+        })
+        .catch(function(err) { alert(err.message || 'Failed to generate letter.'); })
+        .finally(function() {
+            if (genBtn) { genBtn.disabled = false; genBtn.textContent = 'Generate Letter'; }
+        });
+    }
+
+    function downloadPdf(letterContent) {
+        var w = window.open('', '_blank');
+        var safe = letterContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        w.document.write(
+            '<html><head><title>Dispute Letter</title>' +
+            '<style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;font-size:12pt}' +
+            'pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>' +
+            '<body><pre>' + safe + '</pre></body></html>'
+        );
+        w.document.close();
+        w.focus();
+        setTimeout(function() { w.print(); }, 400);
+    }
+
+    // Generate letter button
     var genBtn = document.getElementById('gen-letter-btn');
-    var letterOutput = document.getElementById('letter-output');
-    var letterText = document.getElementById('letter-text');
-
     if (genBtn) {
         genBtn.addEventListener('click', function() {
-            genBtn.disabled = true;
-            genBtn.textContent = 'Generating…';
-            var payload = {
-                finding_ids: selectedFindingIds(),
-                requestor_name: document.getElementById('requestor-name').value.trim() || '[Your Name]',
-                account_number: document.getElementById('account-number').value.trim() || '[Account Number]'
-            };
-            fetch('/api/dispute-letter/' + billId, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(function(r) { if (!r.ok) throw new Error('Could not generate letter'); return r.json(); })
-            .then(function(d) {
-                letterText.textContent = d.data.letter;
-                letterOutput.classList.remove('hidden');
-                // Auto-advance tracker to packet_ready
-                setStage('packet_ready');
-            })
-            .catch(function(err) { alert(err.message || 'Failed to generate letter.'); })
-            .finally(function() { genBtn.disabled = false; genBtn.textContent = 'Generate Dispute Letter'; });
+            generateLetter(function() {});
         });
     }
 
@@ -483,6 +287,7 @@
     var copyLetterBtn = document.getElementById('copy-letter-btn');
     if (copyLetterBtn) {
         copyLetterBtn.addEventListener('click', function() {
+            var letterText = document.getElementById('letter-text');
             navigator.clipboard.writeText(letterText.textContent.trim()).then(function() {
                 document.getElementById('copy-letter-text').textContent = 'Copied!';
                 setTimeout(function() { document.getElementById('copy-letter-text').textContent = 'Copy to clipboard'; }, 2000);
@@ -490,302 +295,29 @@
         });
     }
 
-    // PDF download — opens print dialog
+    // Download PDF from letter section
     var pdfBtn = document.getElementById('download-pdf-btn');
     if (pdfBtn) {
         pdfBtn.addEventListener('click', function() {
-            var letter = letterText.textContent;
+            var letter = document.getElementById('letter-text').textContent;
             if (!letter.trim()) { alert('Generate the letter first.'); return; }
-            var w = window.open('', '_blank');
-            var safe = letter.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            w.document.write(
-                '<html><head><title>Dispute Letter</title>' +
-                '<style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;font-size:12pt}' +
-                'pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>' +
-                '<body><pre>' + safe + '</pre></body></html>'
-            );
-            w.document.close();
-            w.focus();
-            setTimeout(function() { w.print(); }, 400);
+            downloadPdf(letter);
         });
     }
 
-    // Word doc download
-    var docBtn = document.getElementById('download-doc-btn');
-    if (docBtn) {
-        docBtn.addEventListener('click', function() {
-            var letter = letterText.textContent;
-            if (!letter.trim()) { alert('Generate the letter first.'); return; }
-            var safe = letter.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            var html = "<html xmlns:o='urn:schemas-microsoft-com:office:office'><head>" +
-                "<meta charset='utf-8'><title>Dispute Letter</title></head><body>" +
-                "<pre style='font-family:Georgia;font-size:12pt;line-height:1.6'>" + safe + "</pre></body></html>";
-            var blob = new Blob([html], { type: 'application/msword' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url; a.download = 'dispute-letter.doc';
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); URL.revokeObjectURL(url);
-        });
-    }
-
-    // ---- Outcome Tracker (localStorage) ----
-    var STAGES = ['packet_ready', 'contacted_billing', 'under_review', 'resolved'];
-    var STAGE_LABELS = {
-        packet_ready: 'Dispute packet generated.',
-        contacted_billing: 'Contacted billing — check back if you don\'t hear within 5 business days.',
-        under_review: 'Under review — hospitals must respond within 30 days.',
-        resolved: 'Resolved — record your outcome below.'
-    };
-
-    function getTracker() {
-        try { return JSON.parse(localStorage.getItem(TRACKER_KEY) || 'null') || { stage: 'packet_ready', outcome: null }; }
-        catch { return { stage: 'packet_ready', outcome: null }; }
-    }
-
-    function saveTracker(data) {
-        data.updated_at = new Date().toISOString();
-        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
-    }
-
-    function renderTracker() {
-        var t = getTracker();
-        var activeIdx = STAGES.indexOf(t.stage);
-        document.querySelectorAll('.stage-btn').forEach(function(btn, i) {
-            btn.className = 'stage-btn flex-1 text-xs px-3 py-2 rounded-md border font-medium transition-colors ';
-            if (i < activeIdx) btn.className += 'bg-gray-100 border-gray-200 text-gray-500 line-through';
-            else if (i === activeIdx) btn.className += 'bg-accent-700 border-accent-700 text-white';
-            else btn.className += 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50';
-        });
-        var fb = document.getElementById('stage-feedback');
-        if (fb) fb.textContent = STAGE_LABELS[t.stage] || '';
-
-        // Show resolved sub-sections
-        var resolvedDiv = document.getElementById('resolved-outcome');
-        var savingsDiv = document.getElementById('savings-capture');
-        var feeDiv = document.getElementById('success-fee-prompt');
-        var pendingDiv = document.getElementById('pending-prompt');
-        if (resolvedDiv) resolvedDiv.classList.toggle('hidden', t.stage !== 'resolved' || !!t.outcome);
-        if (savingsDiv) savingsDiv.classList.toggle('hidden', t.outcome !== 'reduced');
-        if (feeDiv) feeDiv.classList.toggle('hidden', t.outcome !== 'denied');
-        if (pendingDiv) pendingDiv.classList.toggle('hidden', t.outcome !== 'pending');
-    }
-
-    function setStage(stage) {
-        var t = getTracker();
-        var newIdx = STAGES.indexOf(stage);
-        var curIdx = STAGES.indexOf(t.stage);
-        if (newIdx > curIdx || (stage === 'packet_ready' && curIdx === 0)) {
-            t.stage = stage;
-            saveTracker(t);
-            renderTracker();
-        }
-    }
-
-    document.querySelectorAll('.stage-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() { setStage(btn.getAttribute('data-stage')); });
-    });
-
-    document.querySelectorAll('.outcome-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var outcome = btn.getAttribute('data-outcome');
-            var t = getTracker();
-            t.outcome = outcome;
-            saveTracker(t);
-            renderTracker();
-        });
-    });
-
-    // --- Negotiation workflow ---
-    var negId = null;
-    var negMessageId = null;
-    var negHospitalEmail = '';
-
-    var negStartBtn = document.getElementById('neg-start-btn');
-    if (negStartBtn) {
-        negStartBtn.addEventListener('click', function() {
-            var account = (document.getElementById('neg-account').value || '').trim();
-            var hospEmail = (document.getElementById('neg-hospital-email').value || '').trim();
-            var errEl = document.getElementById('neg-start-error');
-            if (!account) { errEl.textContent = 'Account number is required.'; errEl.classList.remove('hidden'); return; }
-            errEl.classList.add('hidden');
-            negHospitalEmail = hospEmail;
-            negStartBtn.disabled = true;
-
-            var form = new FormData();
-            form.append('bill_id', billId);
-            form.append('user_id', '{{ data.bill.user_id if data and data.bill and data.bill.user_id else "" }}');
-            form.append('account_number', account);
-            form.append('hospital_email', hospEmail);
-
-            fetch('/api/negotiate/start', { method: 'POST', body: form })
-                .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed to start'); }); return r.json(); })
-                .then(function(data) {
-                    negId = data.data.negotiation_id;
-                    document.getElementById('neg-start-form').classList.add('hidden');
-                    document.getElementById('neg-draft-view').classList.remove('hidden');
-                    document.getElementById('neg-generating').classList.remove('hidden');
-                    return fetch('/api/negotiate/' + negId + '/generate', { method: 'POST' });
-                })
-                .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed to generate'); }); return r.json(); })
-                .then(function(data) {
-                    var d = data.data;
-                    negMessageId = d.message_id;
-                    document.getElementById('neg-generating').classList.add('hidden');
-                    document.getElementById('neg-draft-content').classList.remove('hidden');
-                    document.getElementById('neg-patient-summary').textContent = d.patient_summary || '';
-                    document.getElementById('neg-subject').textContent = d.subject || '';
-                    document.getElementById('neg-body').value = d.body || '';
-                    var note = document.getElementById('neg-approve-note');
-                    if (negHospitalEmail) {
-                        note.textContent = 'Approve & Send will email this to ' + negHospitalEmail + '.';
-                    } else {
-                        note.textContent = 'No hospital email provided — use Copy to clipboard to send manually.';
-                        document.getElementById('neg-approve-btn').textContent = 'Mark as approved';
-                    }
-                })
-                .catch(function(err) {
-                    document.getElementById('neg-generating').classList.add('hidden');
-                    var errEl = document.getElementById('neg-start-error');
-                    errEl.textContent = err.message || 'Could not draft email. Try again.';
-                    errEl.classList.remove('hidden');
-                    document.getElementById('neg-start-form').classList.remove('hidden');
-                    document.getElementById('neg-draft-view').classList.add('hidden');
-                    negStartBtn.disabled = false;
-                });
-        });
-    }
-
-    var negApproveBtn = document.getElementById('neg-approve-btn');
-    if (negApproveBtn) {
-        negApproveBtn.addEventListener('click', function() {
-            if (!negMessageId) return;
-            negApproveBtn.disabled = true;
-            document.getElementById('neg-approve-text').textContent = 'Sending…';
-
-            fetch('/api/negotiate/message/' + negMessageId + '/approve', { method: 'POST' })
-                .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed'); }); return r.json(); })
-                .then(function() {
-                    document.getElementById('neg-draft-view').classList.add('hidden');
-                    document.getElementById('neg-sent-view').classList.remove('hidden');
-                    var msg = negHospitalEmail
-                        ? 'Email sent to ' + negHospitalEmail + '. Check back when they respond.'
-                        : 'Dispute email approved. Send it manually and record the response when they reply.';
-                    document.getElementById('neg-sent-msg').textContent = msg;
-                })
-                .catch(function(err) {
-                    document.getElementById('neg-draft-error').textContent = err.message || 'Could not send. Try again.';
-                    document.getElementById('neg-draft-error').classList.remove('hidden');
-                    negApproveBtn.disabled = false;
-                    document.getElementById('neg-approve-text').textContent = negHospitalEmail ? 'Approve & send' : 'Mark as approved';
-                });
-        });
-    }
-
-    var negCopyBtn = document.getElementById('neg-copy-btn');
-    if (negCopyBtn) {
-        negCopyBtn.addEventListener('click', function() {
-            var body = document.getElementById('neg-body');
-            if (!body) return;
-            navigator.clipboard.writeText(body.value).then(function() {
-                document.getElementById('neg-copy-text').textContent = 'Copied!';
-                setTimeout(function() { document.getElementById('neg-copy-text').textContent = 'Copy to clipboard'; }, 2000);
+    // DIY download — generate if needed, then PDF
+    var diyBtn = document.getElementById('diy-download-btn');
+    if (diyBtn) {
+        diyBtn.addEventListener('click', function() {
+            diyBtn.textContent = 'Preparing…';
+            diyBtn.disabled = true;
+            generateLetter(function(letter) {
+                downloadPdf(letter);
+                diyBtn.textContent = 'Download Letter — Free →';
+                diyBtn.disabled = false;
             });
         });
     }
-
-    var negRecordBtn = document.getElementById('neg-record-btn');
-    if (negRecordBtn) {
-        negRecordBtn.addEventListener('click', function() {
-            var responseText = (document.getElementById('neg-response-text').value || '').trim();
-            if (!responseText || !negId) return;
-            negRecordBtn.disabled = true;
-
-            var form = new FormData();
-            form.append('body', responseText);
-            fetch('/api/negotiate/' + negId + '/response', { method: 'POST', body: form })
-                .then(function(r) { if (!r.ok) throw new Error('Failed to analyze'); return r.json(); })
-                .then(function(data) {
-                    var d = data.data || {};
-                    var el = document.getElementById('neg-response-result');
-                    el.innerHTML = '<strong>Outcome: ' + (d.outcome || 'unknown').replace(/_/g, ' ') + '</strong><br>' +
-                        (d.next_action ? '<span class="text-gray-600">Next step: ' + d.next_action + '</span><br>' : '') +
-                        (d.patient_summary ? '<span class="text-gray-500 text-xs">' + d.patient_summary + '</span>' : '');
-                    el.classList.remove('hidden');
-                    negRecordBtn.disabled = false;
-                })
-                .catch(function() { negRecordBtn.disabled = false; });
-        });
-    }
-    // --- End negotiation ---
-
-    // Savings capture
-    var saveOutcomeBtn = document.getElementById('save-outcome-btn');
-    if (saveOutcomeBtn) {
-        saveOutcomeBtn.addEventListener('click', function() {
-            var amount = parseFloat(document.getElementById('amount-saved').value || '0') || 0;
-            var shareAnon = document.getElementById('share-anon').checked;
-            var t = getTracker();
-            t.amount_saved = amount;
-            saveTracker(t);
-
-            var form = new FormData();
-            form.append('bill_id', billId);
-            form.append('outcome', 'reduced');
-            form.append('final_patient_owes', Math.max(0, totalDisputed - amount));
-            form.append('share_publicly', shareAnon ? 'true' : 'false');
-            fetch('/api/dispute-outcome', { method: 'POST', body: form }).catch(function() {});
-
-            var msg = document.getElementById('outcome-saved-msg');
-            if (msg) {
-                msg.textContent = amount > 0
-                    ? 'Saved! You recovered $' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' — that\'s ' + (amount / Math.max(1, totalDisputed) * 100).toFixed(0) + '% of the disputed amount.'
-                    : 'Outcome recorded.';
-                msg.classList.remove('hidden');
-            }
-            saveOutcomeBtn.disabled = true;
-        });
-    }
-
-    // Concierge interest form
-    var conciergeForm = document.getElementById('concierge-form');
-    if (conciergeForm) {
-        conciergeForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var email = document.getElementById('concierge-email').value.trim();
-            var form = new FormData();
-            form.append('email', email);
-            form.append('disputed_amount', totalDisputed);
-            form.append('bill_context', 'bill_id=' + billId);
-            fetch('/api/concierge-interest', { method: 'POST', body: form })
-                .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
-                .then(function() { document.getElementById('concierge-success').classList.remove('hidden'); conciergeForm.classList.add('hidden'); })
-                .catch(function() { alert('Could not submit — please try again.'); });
-        });
-    }
-
-    // Email report
-    var emailForm = document.getElementById('email-report-form');
-    if (emailForm) {
-        emailForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var email = document.getElementById('report-email').value.trim();
-            var sendBtn = document.getElementById('send-report-btn');
-            var sendText = document.getElementById('send-report-text');
-            sendBtn.disabled = true; sendText.textContent = 'Sending…';
-            fetch('/api/email-report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bill_id: '{{ data.bill.id if data and data.bill else "" }}', email: email })
-            })
-            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
-            .then(function() { document.getElementById('email-success').classList.remove('hidden'); sendText.textContent = 'Sent'; })
-            .catch(function() { document.getElementById('email-error').classList.remove('hidden'); sendBtn.disabled = false; sendText.textContent = 'Send'; });
-        });
-    }
-
-    // Initialize tracker on load
-    renderTracker();
 
 })();
 </script>
