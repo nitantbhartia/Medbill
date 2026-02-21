@@ -21,6 +21,8 @@ from db import get_db
 from dispute_packet import generate_dispute_packet
 from appeal_playbooks import generate_appeal_playbook
 from provider_intelligence import get_provider_intelligence
+from tools_catalog import get_tool
+from tools_engine import run_tool, hash_payload
 from compliance import (
     scrub_extracted_data,
     record_consent,
@@ -62,6 +64,11 @@ CLAIM_TRANSITIONS = {
     "resolved": set(),
     "denied": set(),
 }
+
+
+def _validate_email(email: str) -> bool:
+    token = (email or "").strip()
+    return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", token))
 
 
 @router.post("/scan")
@@ -869,6 +876,76 @@ async def calculator_markup_check(cpt_code: str, charged: float, zip_code: str =
         }
 
     return {"status": "ok", "data": result}
+
+
+@router.post("/tools/{slug}/run")
+async def run_tool_endpoint(slug: str, request: Request):
+    """Run a deterministic tool workflow and persist run metadata."""
+    tool = get_tool(slug)
+    if not tool:
+        raise HTTPException(404, "Tool not found")
+
+    payload = await request.json()
+    if not isinstance(payload, dict):
+        raise HTTPException(400, "Payload must be a JSON object")
+
+    try:
+        result = run_tool(slug, payload)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    except Exception as exc:
+        log.error("tools_run failed for %s: %s", slug, exc, exc_info=True)
+        raise HTTPException(500, "Tool run failed")
+
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT INTO tool_runs (tool_slug, input_hash, input_json, result_state, result_json)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                slug,
+                hash_payload(payload),
+                json.dumps(payload),
+                result.get("result_state"),
+                json.dumps(result),
+            ),
+        )
+    return result
+
+
+@router.post("/tools/lead-capture")
+async def tool_lead_capture(request: Request):
+    """Capture tool lead emails for lifecycle follow-up (no immediate drip send)."""
+    payload = await request.json()
+    if not isinstance(payload, dict):
+        raise HTTPException(400, "Payload must be a JSON object")
+
+    email = (payload.get("email") or "").strip().lower()
+    tool_slug = (payload.get("tool_slug") or "").strip()
+    lead_magnet_key = (payload.get("lead_magnet_key") or "").strip()
+    context = payload.get("context")
+
+    if not _validate_email(email):
+        raise HTTPException(400, "Valid email required")
+    if not get_tool(tool_slug):
+        raise HTTPException(400, "Unknown tool_slug")
+
+    with get_db() as db:
+        db.execute(
+            """
+            INSERT INTO tool_leads (email, tool_slug, lead_magnet_key, payload_json)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                email,
+                tool_slug,
+                lead_magnet_key or None,
+                json.dumps(context) if context is not None else None,
+            ),
+        )
+
+    return {"status": "ok", "data": {"captured": True}}
 
 
 @router.get("/ops/ocr-benchmark")

@@ -37,6 +37,7 @@ from procedure_pages import (
     get_top_cpt_codes,
 )
 from procedure_content import get_content_page_data
+from tools_catalog import list_tools, get_tool
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -585,6 +586,43 @@ async def guides_index(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Guides | BillKarma",
             "og_description": "Free guides on how to read, dispute, and reduce medical bills.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/tools/", response_class=HTMLResponse)
+async def tools_index(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/"
+    tools = list_tools()
+    return templates.TemplateResponse(
+        "tools_index.html",
+        {
+            "request": request,
+            "tools": tools,
+            "canonical_url": canonical_url,
+            "og_title": "BillKarma Free Medical Billing Tools",
+            "og_description": "Free calculators and generators to check billing errors, rights, and dispute options.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/tools/{slug}/", response_class=HTMLResponse)
+async def tool_detail(request: Request, slug: str):
+    tool = get_tool(slug)
+    if not tool:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Tool not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/{slug}/"
+    return templates.TemplateResponse(
+        "tool_page.html",
+        {
+            "request": request,
+            "tool": tool,
+            "canonical_url": canonical_url,
+            "og_title": f"{tool['title']} | BillKarma",
+            "og_description": tool.get("description"),
+            "meta_description": tool.get("description"),
             "meta_robots": "index, follow",
         },
     )
@@ -1155,7 +1193,8 @@ async def hospital_sitemap_v2():
 
     base = config.APP_URL.rstrip("/")
     guide_paths = [f"/guides/{slug}" for slug in get_guide_slugs()]
-    paths = ["/", "/guides/", "/calculator", *guide_paths, *get_hospital_sitemap_paths()]
+    tool_paths = ["/tools/", *[f"/tools/{tool['slug']}/" for tool in list_tools()]]
+    paths = ["/", "/guides/", "/calculator", *guide_paths, *tool_paths, *get_hospital_sitemap_paths()]
     urlset = "".join(
         f"<url><loc>{base}{path}</loc></url>"
         for path in paths

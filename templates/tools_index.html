@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}BillKarma Free Tools | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="Free medical billing tools to estimate fair prices, check rights, and generate dispute letters.">
+<link rel="canonical" href="{{ canonical_url }}">
+<style>
+    .tools-hero {
+        background: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 56px 24px 52px;
+        margin-bottom: 36px;
+    }
+    .tools-hero-inner { max-width: 1100px; margin: 0 auto; }
+    .tools-hero h1 { color: #fff; font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .tools-hero p { color: rgba(255,255,255,0.85); max-width: 68ch; font-weight: 500; }
+
+    .tools-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 72px; }
+    .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 14px;
+    }
+    .tool-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 22px;
+        border: 1px solid var(--bk-gray-border);
+        border-radius: 22px;
+        background: #fff;
+    }
+    .tool-meta { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--bk-secondary); }
+    .tool-title { font-size: 1.08rem; font-weight: 800; color: var(--bk-black); letter-spacing: -0.02em; }
+    .tool-desc { color: var(--bk-secondary); font-size: 0.92rem; line-height: 1.45; }
+    .tool-link {
+        margin-top: auto;
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        text-decoration: none;
+        background: var(--bk-black);
+        color: #fff;
+        font-size: 0.84rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 10px 16px;
+    }
+
+    @media (max-width: 768px) {
+        .tools-hero { padding: 36px 18px 34px; border-radius: 0 0 24px 24px; }
+        .tools-hero h1 { font-size: 1.7rem; }
+        .tools-wrap { padding: 0 18px 48px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="tools-hero">
+    <div class="tools-hero-inner">
+        <h1>BillKarma Free Tools</h1>
+        <p>Each tool helps you identify overcharges, rights, or negotiation leverage, then routes you to a full bill audit when you're ready.</p>
+    </div>
+</section>
+
+<section class="tools-wrap">
+    <div class="tools-grid">
+        {% for tool in tools %}
+        <article class="tool-card">
+            <div class="tool-meta">{{ tool.category }}</div>
+            <h2 class="tool-title">{{ tool.title }}</h2>
+            <p class="tool-desc">{{ tool.description }}</p>
+            <a class="tool-link" href="/tools/{{ tool.slug }}/">Open Tool &rarr;</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

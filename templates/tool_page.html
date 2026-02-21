@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tool.title }} | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ tool.description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<style>
+    .tool-hero {
+        background: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 48px 24px 40px;
+        margin-bottom: 32px;
+    }
+    .tool-hero-inner { max-width: 980px; margin: 0 auto; }
+    .tool-hero .meta { font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.75); font-weight: 700; margin-bottom: 6px; }
+    .tool-hero h1 { color: #fff; font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .tool-hero p { color: rgba(255,255,255,0.85); max-width: 70ch; }
+
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 0 24px 72px; }
+    .tool-card {
+        border: 1px solid var(--bk-gray-border);
+        border-radius: 22px;
+        background: #fff;
+        padding: 28px;
+        margin-bottom: 16px;
+    }
+    .tool-inline {
+        background: #f6fbf8;
+        border: 1px solid #d7eade;
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-size: 0.9rem;
+        color: #1f5139;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+    .tool-form { display: grid; gap: 14px; }
+    .tool-field { display: flex; flex-direction: column; gap: 6px; }
+    .tool-field label { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--bk-secondary); }
+    .tool-field input, .tool-field textarea, .tool-field select {
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 11px 12px;
+        font: inherit;
+        font-size: 0.95rem;
+    }
+    .tool-submit {
+        background: var(--bk-black);
+        color: #fff;
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 20px;
+        width: fit-content;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .tool-results {
+        border-top: 1px solid #e5e7eb;
+        margin-top: 20px;
+        padding-top: 16px;
+    }
+    .result-headline { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .result-summary { color: #374151; margin-bottom: 12px; }
+    .result-details {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 14px;
+        overflow-x: auto;
+    }
+    .result-kv { display: grid; gap: 6px; }
+    .result-kv div { font-size: 0.88rem; color: #374151; }
+    .result-kv strong { color: #111827; }
+
+    .result-cta {
+        background: var(--bk-green);
+        border-radius: 14px;
+        color: #fff;
+        padding: 18px;
+    }
+    .result-cta h3 { font-size: 1.04rem; font-weight: 800; margin-bottom: 4px; }
+    .result-cta p { color: rgba(255,255,255,0.88); font-size: 0.92rem; }
+    .cta-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .cta-primary, .cta-secondary {
+        text-decoration: none;
+        border-radius: 999px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        padding: 10px 14px;
+    }
+    .cta-primary { background: #fff; color: var(--bk-green); }
+    .cta-secondary { border: 1px solid rgba(255,255,255,0.6); color: #fff; }
+    .cta-footnote { margin-top: 8px; font-size: 0.75rem; color: rgba(255,255,255,0.75); }
+
+    .tool-email-capture {
+        border: 1px solid var(--bk-gray-border);
+        border-radius: 18px;
+        background: #fff;
+        padding: 22px;
+    }
+    .tool-email-capture h3 { font-size: 1.02rem; font-weight: 800; margin-bottom: 6px; }
+    .tool-email-capture p { color: #4b5563; margin-bottom: 12px; }
+    .lead-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .lead-form input {
+        flex: 1;
+        min-width: 220px;
+        border: 1px solid #d1d5db;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+    }
+    .lead-form button {
+        border: 0;
+        border-radius: 999px;
+        background: var(--bk-black);
+        color: #fff;
+        font-weight: 700;
+        padding: 10px 14px;
+        font-size: 0.84rem;
+        cursor: pointer;
+    }
+    .lead-status { margin-top: 8px; font-size: 0.84rem; color: #065f46; font-weight: 600; }
+
+    @media (max-width: 768px) {
+        .tool-hero { padding: 36px 18px 30px; border-radius: 0 0 24px 24px; }
+        .tool-hero h1 { font-size: 1.48rem; }
+        .tool-wrap { padding: 0 18px 48px; }
+        .tool-card { padding: 18px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="tool-hero">
+    <div class="tool-hero-inner">
+        <div class="meta">{{ tool.category }}</div>
+        <h1>{{ tool.title }}</h1>
+        <p>{{ tool.description }}</p>
+    </div>
+</section>
+
+<section class="tool-wrap">
+    <div class="tool-card">
+        <div class="tool-inline">{{ tool.inline_nudge }}</div>
+        {% if tool.primary_input_hint %}
+        <p style="font-size:0.82rem;color:#4b5563;margin-bottom:10px;">{{ tool.primary_input_hint }}</p>
+        {% endif %}
+        <form id="tool-run-form" class="tool-form" novalidate>
+            {% include "_tool_form_fields.html" %}
+            <button type="submit" class="tool-submit" id="tool-submit">Run Tool</button>
+        </form>
+
+        {% include "_tool_result_panel.html" %}
+    </div>
+
+    {% include "_tool_email_capture.html" %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.BILLKARMA_TOOL = {{ tool | tojson }};
+</script>
+<script src="/static/js/tools.js" defer></script>
+{% endblock %}

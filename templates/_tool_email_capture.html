@@ -1,0 +1,9 @@
+<section class="tool-email-capture">
+    <h3>{{ tool.lead_magnet.title }}</h3>
+    <p>{{ tool.lead_magnet.description }}</p>
+    <form id="tool-lead-form" class="lead-form" novalidate>
+        <input id="lead-email" name="email" type="email" placeholder="Enter email" required>
+        <button type="submit">{{ tool.lead_magnet.button_label or "Send Me the Guide" }}</button>
+    </form>
+    <p id="lead-status" class="lead-status" hidden></p>
+</section>

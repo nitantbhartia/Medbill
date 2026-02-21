@@ -1,0 +1,16 @@
+{% for field in tool.form_fields %}
+<div class="tool-field">
+    <label for="field-{{ field.name }}">{{ field.label }}</label>
+    {% if field.type == 'textarea' %}
+    <textarea id="field-{{ field.name }}" name="{{ field.name }}" rows="{{ field.rows or 5 }}" placeholder="{{ field.placeholder or '' }}"></textarea>
+    {% elif field.type == 'select' %}
+    <select id="field-{{ field.name }}" name="{{ field.name }}">
+        {% for opt in field.options %}
+        <option value="{{ opt }}">{{ opt.replace('_', ' ')|title }}</option>
+        {% endfor %}
+    </select>
+    {% else %}
+    <input id="field-{{ field.name }}" name="{{ field.name }}" type="{{ field.type or 'text' }}" placeholder="{{ field.placeholder or '' }}"/>
+    {% endif %}
+</div>
+{% endfor %}
