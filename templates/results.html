@@ -56,6 +56,67 @@
         {% endif %}
     </div>
 
+    <!-- Hospital context -->
+    {% set h = data.hospital_match %}
+    {% if h %}
+    {% set grade = h.billing_grade or '' %}
+    {% set grade_color = 'text-green-700 bg-green-50 border-green-200' if grade in ['A','B'] else 'text-amber-700 bg-amber-50 border-amber-200' if grade == 'C' else 'text-red-700 bg-red-50 border-red-200' if grade in ['D','F'] else 'text-gray-600 bg-gray-50 border-gray-200' %}
+    <div class="mb-8 border border-gray-200 rounded-md p-4">
+        <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="min-w-0">
+                {% if h.slug and h.state_slug and h.city_slug %}
+                <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/"
+                   class="text-sm font-semibold text-gray-900 hover:underline">{{ h.name }}</a>
+                {% else %}
+                <span class="text-sm font-semibold text-gray-900">{{ h.name }}</span>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-0.5">{{ h.city }}, {{ h.state }}{% if h.phone %} &middot; {{ h.phone }}{% endif %}</p>
+            </div>
+            <div class="flex flex-shrink-0 items-center gap-2">
+                {% if grade %}
+                <span class="text-xs font-bold px-2 py-0.5 rounded border {{ grade_color }}">Grade {{ grade }}</span>
+                {% endif %}
+                {% if h.is_pe_owned %}
+                <span class="text-xs px-2 py-0.5 rounded border text-red-700 bg-red-50 border-red-200">PE-Owned</span>
+                {% elif h.is_nonprofit %}
+                <span class="text-xs px-2 py-0.5 rounded border text-blue-700 bg-blue-50 border-blue-200">Nonprofit</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-600">
+            {% if h.avg_markup_vs_medicare %}
+            <span><span class="font-medium text-gray-900">{{ "%.1f" | format(h.avg_markup_vs_medicare) }}x</span> avg markup vs Medicare</span>
+            {% endif %}
+            {% if h.hospital_type %}
+            <span class="text-gray-400">{{ h.hospital_type }}</span>
+            {% endif %}
+            {% if h.bed_count %}
+            <span class="text-gray-400">{{ h.bed_count }} beds</span>
+            {% endif %}
+            {% if h.cms_star_rating %}
+            <span class="text-gray-400">{{ h.cms_star_rating }}★ CMS rating</span>
+            {% endif %}
+        </div>
+        {% if h.has_financial_assistance and h.fa_application_url %}
+        <p class="mt-2 text-xs text-blue-700">
+            This hospital has a financial assistance program &mdash;
+            <a href="{{ h.fa_application_url }}" target="_blank" rel="noopener" class="underline">apply here</a>.
+        </p>
+        {% endif %}
+        {% if h.slug and h.state_slug and h.city_slug %}
+        <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/"
+           class="mt-3 inline-block text-xs text-accent-700 hover:text-accent-800 font-medium">
+            View full hospital profile →
+        </a>
+        {% endif %}
+    </div>
+    {% elif data.bill.provider_name %}
+    <div class="mb-8 border border-gray-200 rounded-md p-4">
+        <p class="text-xs text-gray-500 mb-0.5">Provider on your bill</p>
+        <p class="text-sm font-semibold text-gray-900">{{ data.bill.provider_name }}</p>
+    </div>
+    {% endif %}
+
     {% if data.findings and data.findings | length > 0 %}
     <!-- Fight This Bill CTA -->
     <div class="mb-8 rounded-xl overflow-hidden border border-gray-200">
