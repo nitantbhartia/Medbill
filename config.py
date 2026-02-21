@@ -35,6 +35,25 @@ SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
 # Stripe
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_REPORT = os.getenv("STRIPE_PRICE_REPORT", "")  # $19 report
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL", f"{os.getenv('APP_URL', 'https://billkarma.app')}/dispute/payment-success?session_id={{CHECKOUT_SESSION_ID}}")
+STRIPE_CANCEL_URL = os.getenv("STRIPE_CANCEL_URL", f"{os.getenv('APP_URL', 'https://billkarma.app')}/results/{{bill_id}}")
+
+# Dispute flat-fee tiers (bill_total -> fee_cents)
+# Under $1k: $29, $1k-$5k: $49, $5k-$20k: $99, Over $20k: $149
+DISPUTE_FEE_TIERS = [
+    (1000, 2900),
+    (5000, 4900),
+    (20000, 9900),
+    (float("inf"), 14900),
+]
+DISPUTE_FOLLOWUP_DAYS = [7, 14, 30, 45]
+DISPUTE_MAX_DAYS = 45
+
+# Twilio (for fax sending — optional)
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_FAX_FROM = os.getenv("TWILIO_FAX_FROM", "")
 
 # Directory monetization toggles
 ENABLE_AFFILIATE_SLOTS = os.getenv("ENABLE_AFFILIATE_SLOTS", "false").lower() == "true"

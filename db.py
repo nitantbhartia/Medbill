@@ -1445,4 +1445,69 @@ CREATE TABLE IF NOT EXISTS fair_price_bands (
 
 CREATE INDEX IF NOT EXISTS idx_fair_bands_code ON fair_price_bands(code);
 CREATE INDEX IF NOT EXISTS idx_fair_bands_geo ON fair_price_bands(geo_scope, geo_value);
+
+CREATE TABLE IF NOT EXISTS dispute_payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    stripe_session_id TEXT UNIQUE,
+    stripe_payment_intent_id TEXT UNIQUE,
+    amount_cents INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    patient_email TEXT,
+    refunded_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_dispute_payments_bill ON dispute_payments(bill_id);
+CREATE INDEX IF NOT EXISTS idx_dispute_payments_session ON dispute_payments(stripe_session_id);
+
+CREATE TABLE IF NOT EXISTS esign_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    patient_name TEXT NOT NULL,
+    patient_email TEXT NOT NULL,
+    hipaa_signed_at TIMESTAMP,
+    rep_signed_at TIMESTAMP,
+    tos_signed_at TIMESTAMP,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_esign_bill ON esign_records(bill_id);
+
+CREATE TABLE IF NOT EXISTS dispute_cases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    payment_id INTEGER REFERENCES dispute_payments(id),
+    patient_name TEXT NOT NULL,
+    patient_email TEXT NOT NULL,
+    patient_address TEXT,
+    account_number TEXT,
+    hospital_billing_email TEXT,
+    hospital_billing_fax TEXT,
+    status TEXT NOT NULL DEFAULT 'paid',
+    is_nonprofit INTEGER DEFAULT 0,
+    financial_assistance_filed INTEGER DEFAULT 0,
+    initial_sent_at TIMESTAMP,
+    followups_sent INTEGER DEFAULT 0,
+    next_followup_at DATE,
+    resolved_at TIMESTAMP,
+    outcome TEXT,
+    actual_savings REAL,
+    refunded_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_dispute_cases_bill ON dispute_cases(bill_id);
+CREATE INDEX IF NOT EXISTS idx_dispute_cases_status ON dispute_cases(status);
+CREATE INDEX IF NOT EXISTS idx_dispute_cases_followup ON dispute_cases(next_followup_at);
+
+CREATE TABLE IF NOT EXISTS followup_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES dispute_cases(id),
+    followup_number INTEGER NOT NULL,
+    scheduled_for DATE NOT NULL,
+    sent_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_followup_case ON followup_queue(case_id);
+CREATE INDEX IF NOT EXISTS idx_followup_scheduled ON followup_queue(scheduled_for, sent_at);
 """

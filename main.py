@@ -8,6 +8,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResp
 
 import config
 import db
+import dispute_service
+import esign as esign_module
+import payment as payment_module
 from api import router as api_router
 from analyzer import get_bill_results, get_stats
 from compliance import log_audit
@@ -489,6 +492,10 @@ async def results_page(request: Request, bill_id: int):
     phone_script = build_phone_script(bill_id) or generate_phone_script(bill_id)
     outcome_stats = get_outcome_stats()
 
+    bill = results.get("bill") or {}
+    bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
+    fee_cents = payment_module.calculate_fee(bill_total)
+
     return templates.TemplateResponse(
         "results.html",
         {
@@ -496,6 +503,7 @@ async def results_page(request: Request, bill_id: int):
             "data": results,
             "phone_script": phone_script,
             "outcome_stats": outcome_stats,
+            "dispute_fee_dollars": fee_cents / 100,
         },
     )
 
@@ -1236,6 +1244,78 @@ async def ops_data_quality():
         "last_refresh_by_source": {r["source"]: r["last_refresh"] for r in refreshes},
     }
     return JSONResponse(payload)
+
+
+@app.get("/dispute/activate/{bill_id}", response_class=HTMLResponse)
+async def dispute_activate_page(request: Request, bill_id: int):
+    """Show the dispute activation page with e-sign + payment flow."""
+    results = get_bill_results(bill_id)
+    if not results:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+
+    bill = results.get("bill") or {}
+    findings = results.get("findings") or []
+    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
+    fee_cents = payment_module.calculate_fee(bill_total)
+
+    return templates.TemplateResponse(
+        "dispute_activate.html",
+        {
+            "request": request,
+            "bill_id": bill_id,
+            "provider_name": bill.get("provider_name") or "",
+            "potential_savings": total_savings,
+            "finding_count": len(findings),
+            "fee_dollars": fee_cents / 100,
+            "hipaa_text": esign_module.get_hipaa_text(
+                patient_name="[Your Name]",
+                provider_name=bill.get("provider_name") or "the provider",
+            ),
+            "rep_text": esign_module.get_rep_designation_text(
+                patient_name="[Your Name]",
+                provider_name=bill.get("provider_name") or "the provider",
+            ),
+            "tos_text": esign_module.get_tos_text(),
+        },
+    )
+
+
+@app.get("/dispute/payment-success", response_class=HTMLResponse)
+async def dispute_payment_success(request: Request, session_id: str = ""):
+    """Post-payment success page. JS activates the dispute."""
+    return templates.TemplateResponse(
+        "payment_success.html",
+        {
+            "request": request,
+            "session_id": session_id,
+        },
+    )
+
+
+@app.get("/dispute/dashboard", response_class=HTMLResponse)
+async def dispute_dashboard_page(
+    request: Request,
+    case: int = 0,
+    bill: int = 0,
+):
+    """Show dispute status dashboard for a case or bill."""
+    summary: dict = {"has_case": False}
+
+    if case:
+        case_data = dispute_service.get_case(case)
+        if case_data:
+            summary = dispute_service.get_dispute_summary(case_data["bill_id"])
+    elif bill:
+        summary = dispute_service.get_dispute_summary(bill)
+
+    return templates.TemplateResponse(
+        "dispute_dashboard.html",
+        {
+            "request": request,
+            "summary": summary,
+        },
+    )
 
 
 if __name__ == "__main__":
