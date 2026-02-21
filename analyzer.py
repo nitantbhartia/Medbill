@@ -1,7 +1,9 @@
 import json
 import logging
 import os
+import re
 import time
+from difflib import SequenceMatcher
 
 import config
 from db import get_db
@@ -580,6 +582,63 @@ def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict,
     return bill_id
 
 
+_HOSPITAL_GENERIC = frozenset({"the", "of", "and", "at", "a", "an", "inc", "llc", "ltd"})
+
+
+def _norm_hospital_name(name: str) -> str:
+    txt = re.sub(r"[^a-z0-9\s]", " ", name.lower())
+    return re.sub(r"\s+", " ", txt).strip()
+
+
+def find_hospital_match(provider_name: str, zip_code: str | None) -> dict | None:
+    """Fuzzy-match a bill's provider_name against the hospitals table. Returns the best match or None."""
+    if not provider_name or len(provider_name.strip()) < 4:
+        return None
+    tokens = [t for t in _norm_hospital_name(provider_name).split()
+              if t not in _HOSPITAL_GENERIC and len(t) > 2]
+    if not tokens:
+        return None
+
+    keyword = tokens[0]
+    pattern = f"%{keyword}%"
+    base_query = """
+        SELECT h.facility_id, h.name, h.city, h.state, h.zip, h.phone,
+               h.hospital_type, h.is_nonprofit, h.ownership, h.ownership_type,
+               h.is_pe_owned, h.pe_firm, h.slug, h.state_slug, h.city_slug,
+               h.cms_star_rating, h.bed_count,
+               m.avg_markup_vs_medicare, m.billing_grade, m.national_percentile,
+               f.charity_care_pct, f.has_financial_assistance, f.fa_application_url
+        FROM hospitals h
+        LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+        LEFT JOIN hospital_financials f ON f.facility_id = h.facility_id
+        WHERE h.name LIKE ?
+    """
+    with get_db() as db:
+        candidates = []
+        if zip_code:
+            rows = db.execute(base_query + " AND h.zip = ? LIMIT 10", (pattern, zip_code)).fetchall()
+            candidates = [dict(r) for r in rows]
+        if not candidates:
+            rows = db.execute(base_query + " LIMIT 30", (pattern,)).fetchall()
+            candidates = [dict(r) for r in rows]
+
+    if not candidates:
+        return None
+
+    norm_q = _norm_hospital_name(provider_name)
+    best, best_score = None, 0.0
+    for c in candidates:
+        score = SequenceMatcher(None, norm_q, _norm_hospital_name(c["name"])).ratio()
+        if score > best_score:
+            best_score, best = score, c
+
+    if best_score < 0.45:
+        return None
+
+    best["match_confidence"] = round(best_score, 2)
+    return best
+
+
 def get_bill_results(bill_id: int) -> dict | None:
     """Load a bill and its findings from the database."""
     with get_db() as db:
@@ -624,13 +683,19 @@ def get_bill_results(bill_id: int) -> dict | None:
         for f in normalized_findings
     )
 
+    bill_dict = dict(bill)
+    hospital_match = find_hospital_match(
+        bill_dict.get("provider_name"), bill_dict.get("zip_code")
+    )
+
     return {
-        "bill": dict(bill),
+        "bill": bill_dict,
         "line_items": li_dicts,
         "findings": normalized_findings,
         "has_patient_data": has_patient_data,
         "has_insurance_data": has_insurance_data,
         "total_gross_potential_savings": round(total_gross, 2),
+        "hospital_match": hospital_match,
     }
 
 
