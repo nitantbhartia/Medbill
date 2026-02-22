@@ -67,3 +67,13 @@ import guide_hospital_billing_errors
 import guide_private_equity_hospitals
 import guide_hospital_cash_pay
 import guide_hospital_price_transparency
+import guide_copay_deductible
+import guide_inpatient_outpatient
+import guide_maternity_bill
+import guide_physical_therapy_billing
+import guide_out_of_pocket_maximum
+import guide_dispute_letter_template
+import guide_telehealth_billing
+import guide_urgent_care_billing
+import guide_medical_billing_advocate
+import guide_medical_debt_statute
