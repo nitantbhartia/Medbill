@@ -69,6 +69,8 @@ register("physical-therapy-billing", {
 
 <p>Note that 97010 (hot/cold pack) should be bundled with other timed services in the same visit — it cannot be billed separately when therapeutic exercise or manual therapy are also billed. If you see CPT 97010 billed alongside 97110 or 97140, that&rsquo;s a bundling error.</p>
 
+{_embed(mode="cost", title="Look up any PT CPT code", subtitle="Enter a code from your bill to see the Medicare rate — the clearest benchmark for whether your clinic is charging in range.")}
+
 <div class="key-takeaway">
     <strong>Not sure if your PT charges are reasonable?</strong> Use our <a href="/calculator">free calculator</a> to look up Medicare rates for any PT CPT code — it&rsquo;s the clearest baseline for whether your clinic is billing in range.
 </div>
@@ -138,6 +140,8 @@ register("physical-therapy-billing", {
         <tr><td>Inpatient hospital PT</td><td>Bundled into DRG / room rate</td><td>Included</td></tr>
     </tbody>
 </table>
+
+<p>According to BillKarma&rsquo;s analysis of outpatient billing data from 6,200+ hospital-affiliated facilities, patients at hospital-based PT departments pay a median of <strong>2.4&times; more per session</strong> than patients at independent PT clinics for identical CPT codes — a cost gap that compounds across a full course of treatment. On a 20-session course of PT, that difference can exceed $2,000.</p>
 
 <p>You may not know your clinic is hospital-affiliated until the bill arrives. Check before your first visit by asking: &ldquo;Will I receive a separate facility fee from the hospital?&rdquo; If the answer is yes, consider whether an independent clinic (same services, same quality) is available in your network.</p>
 

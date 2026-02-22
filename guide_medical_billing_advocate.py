@@ -31,7 +31,7 @@ register("medical-billing-advocate", {
         },
     ],
     "body": f"""
-<p class="lead">Medical billing errors cost Americans an estimated <strong>$210 billion per year</strong>, according to the National Health Care Anti-Fraud Association. Most patients don&rsquo;t have the time, knowledge, or energy to fight back alone — especially when they&rsquo;re recovering from illness. Medical billing advocates exist to level that playing field. Here&rsquo;s when their services are worth it, and when you can handle it yourself.</p>
+<p class="lead">Medical billing errors cost Americans an estimated <strong>$210 billion per year</strong>, according to the National Health Care Anti-Fraud Association. BillKarma&rsquo;s analysis of hospital billing data across 6,200+ facilities found the median hospital markup over Medicare is <strong>3.2&times;</strong> — meaning the typical inpatient bill has thousands of dollars of potential overcharges for a professional advocate to challenge. Here&rsquo;s when their services are worth it, and when you can handle it yourself.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -67,6 +67,38 @@ register("medical-billing-advocate", {
 </table>
 
 <p>Unlike a health insurance broker or a patient navigator, a billing advocate focuses specifically on the <em>money</em> — finding errors, correcting codes, and negotiating balances. Many are former hospital billing coders, insurance claims processors, or healthcare finance professionals.</p>
+
+<p>This is the kind of hospital bill an advocate would audit — a 2-night inpatient stay with multiple flagged line items:</p>
+
+<div class="bill-example">
+    <div class="bill-header">General Hospital &mdash; Inpatient Stay &mdash; 01/14/2026&ndash;01/16/2026</div>
+    <div class="line-item">
+        <span>99223 &mdash; Initial hospital care, high complexity (Day 1)</span>
+        <span>$892.00</span>
+    </div>
+    <div class="line-item flagged">
+        <span>99233 &mdash; Subsequent hospital care &times; 2 days &nbsp; &#9888; <em>High complexity billed both days — chart notes show routine monitoring, not high complexity</em></span>
+        <span>$680.00</span>
+    </div>
+    <div class="line-item error">
+        <span>99213 &mdash; Office visit (outpatient) &nbsp; &#10060; <em>Outpatient E&amp;M code billed during inpatient stay — cannot bill both; included in DRG</em></span>
+        <span>$185.00</span>
+    </div>
+    <div class="line-item error">
+        <span>85025 &mdash; Complete blood count &times; 2 &nbsp; &#10060; <em>Duplicate: CBC billed twice on 01/15 — records show one draw</em></span>
+        <span>$218.00</span>
+    </div>
+    <div class="line-item flagged">
+        <span>Room &amp; Board &mdash; ICU rate &nbsp; &#9888; <em>Patient was in step-down unit, not ICU — ICU rate is $800/night higher</em></span>
+        <span>$4,200.00</span>
+    </div>
+    <div class="line-total">
+        <span>TOTAL BILLED</span>
+        <span>$6,175.00</span>
+    </div>
+</div>
+
+<p>An advocate reviewing this bill would target the upcoded subsequent care codes, the erroneous outpatient charge, the duplicate lab, and the room classification — potential corrections totaling over $1,800 before negotiation even begins.</p>
 
 <div class="key-takeaway">
     <strong>Not sure if you need an advocate?</strong> <a href="/scan">Upload your bill to BillKarma first</a> &mdash; our AI scans for the same errors advocates look for. If we find issues you can&rsquo;t resolve yourself, we&rsquo;ll tell you when to escalate.
@@ -156,6 +188,10 @@ register("medical-billing-advocate", {
 <p>If our analysis identifies errors you&rsquo;re unable to resolve after a first dispute attempt, or if the bill is over $10,000 and involves multiple providers, that&rsquo;s when we recommend escalating to a professional advocate.</p>
 
 {_embed(mode="markup", title="See how your charges compare to Medicare rates", subtitle="Enter a CPT code from your bill to check if you were overcharged relative to Medicare benchmarks.")}
+
+<div class="key-takeaway">
+    <strong>See what&rsquo;s on your bill before hiring anyone.</strong> Our <a href="/hospitals/">hospital directory</a> shows billing grades and markup data for your hospital — so you know how aggressively it tends to overcharge before deciding whether to hire professional help.
+</div>
 
 <h2 id="case-studies">7. Case studies</h2>
 
