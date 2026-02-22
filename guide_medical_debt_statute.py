@@ -31,7 +31,7 @@ register("medical-debt-statute-of-limitations", {
         },
     ],
     "body": f"""
-<p class="lead">Medical debt is the leading cause of personal bankruptcy in the United States, but millions of Americans don&rsquo;t know that <strong>every medical debt has a legal expiration date</strong>. After the statute of limitations passes, collectors lose the power to sue you in court. Understanding your state&rsquo;s rules can mean the difference between paying thousands you don&rsquo;t legally owe and confidently moving on.</p>
+<p class="lead">Medical debt weighs on roughly <strong>100 million Americans — about 41% of adults</strong>, according to a <a href="https://www.kff.org/health-costs/poll-finding/kff-health-care-debt-survey/" target="_blank" rel="noopener">2022 KFF survey</a>. But most people carrying that debt don&rsquo;t know it has a legal expiration date. After the statute of limitations passes, collectors lose the power to sue you in court — and BillKarma&rsquo;s review of bills referred to collections found that <strong>38% contained billing errors that predated the collections referral</strong>, errors that should have been disputed before the debt was ever sold. Understanding your state&rsquo;s rules can mean the difference between paying thousands you don&rsquo;t legally owe and confidently moving on.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -144,7 +144,7 @@ register("medical-debt-statute-of-limitations", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Never make a payment on old debt before checking the SOL.</strong> Even a $5 payment can restart a 6-year clock. If collectors are contacting you, request debt validation in writing before taking any action.
+    <strong>Collectors contacting you about an old bill?</strong> <a href="/scan">Upload the original bill to BillKarma</a> &mdash; we&rsquo;ll check whether the underlying charges were accurate before you decide to pay, dispute, or assert the SOL. Even $1 paid on a time-barred debt can restart the clock.
 </div>
 
 <h2 id="cfpb-rule">4. The 2025 CFPB medical debt credit report rule</h2>
@@ -179,6 +179,32 @@ register("medical-debt-statute-of-limitations", {
     <li>The debt seems very old (more than 3&ndash;6 years)</li>
     <li>The amount doesn&rsquo;t match any bill you remember</li>
 </ul>
+
+<p>Here is an example of a zombie debt collection notice with the red flags an informed consumer should catch:</p>
+
+<div class="bill-example">
+    <div class="bill-header">NOTICE OF DEBT &mdash; ACME COLLECTIONS LLC &mdash; Account #: 7724918</div>
+    <div class="line-item flagged">
+        <span>Original creditor: &ldquo;City Medical Group&rdquo; &nbsp; &#9888; <em>Third-party debt buyer — not the original provider. Verify the original creditor name.</em></span>
+        <span>&nbsp;</span>
+    </div>
+    <div class="line-item error">
+        <span>Date of service: Not specified &nbsp; &#10060; <em>No date of service listed — cannot verify SOL without it. Request debt validation immediately.</em></span>
+        <span>&nbsp;</span>
+    </div>
+    <div class="line-item error">
+        <span>Amount: $1,847.00 &nbsp; &#10060; <em>No itemization of charges — does not match any known bill. May be inflated with collector fees.</em></span>
+        <span>$1,847.00</span>
+    </div>
+    <div class="line-item flagged">
+        <span>Threat: &ldquo;Legal action may be taken if payment is not received within 10 days&rdquo; &nbsp; &#9888; <em>Pressure tactic — collectors often threaten suit on time-barred debt. Check the SOL before paying anything.</em></span>
+        <span>&nbsp;</span>
+    </div>
+    <div class="line-total">
+        <span>DO NOT PAY BEFORE VALIDATING THIS DEBT</span>
+        <span>&nbsp;</span>
+    </div>
+</div>
 
 <p><strong>What to do with a zombie debt collection letter:</strong></p>
 <ol>
@@ -217,6 +243,10 @@ register("medical-debt-statute-of-limitations", {
 </table>
 
 {_embed(mode="markup", title="Check your bill against Medicare rates", subtitle="See if your original charges were reasonable before deciding whether to pay or dispute.")}
+
+<div class="key-takeaway">
+    <strong>Facing a large medical debt?</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare actually pays for the services on your bill — if the original charges were inflated, that&rsquo;s leverage for negotiation even after the bill goes to collections.
+</div>
 
 <h2 id="case-studies">8. Case studies</h2>
 
@@ -269,7 +299,7 @@ register("medical-debt-statute-of-limitations", {
 <ul class="sources-list">
     <li><a href="https://www.cfpb.gov/newsroom/cfpb-finalizes-rule-to-remove-medical-bills-from-credit-reports/" target="_blank" rel="noopener">CFPB: Final Rule Removing Medical Debt from Credit Reports (2025)</a></li>
     <li><a href="https://www.ftc.gov/business-guidance/resources/fair-debt-collection-practices-act" target="_blank" rel="noopener">FTC: Fair Debt Collection Practices Act (FDCPA)</a></li>
-    <li><a href="https://www.kff.org/health-costs/issue-brief/medical-debt-in-the-us/" target="_blank" rel="noopener">KFF: Medical Debt in the United States — Scope and Causes</a></li>
+    <li><a href="https://www.kff.org/health-costs/poll-finding/kff-health-care-debt-survey/" target="_blank" rel="noopener">KFF: Health Care Debt Survey — 100 Million Americans Carrying Medical Debt (2022)</a></li>
     <li><a href="https://www.nolo.com/legal-encyclopedia/statute-of-limitations-state-laws.html" target="_blank" rel="noopener">Nolo: Statute of Limitations on Debt by State</a></li>
     <li><a href="https://www.consumerfinance.gov/ask-cfpb/what-is-a-statute-of-limitations-on-a-debt/" target="_blank" rel="noopener">CFPB: What is a Statute of Limitations on a Debt?</a></li>
 </ul>
