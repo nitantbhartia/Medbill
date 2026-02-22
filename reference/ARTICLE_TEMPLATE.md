@@ -6,41 +6,72 @@ article registers itself with the guides system and gets served at
 
 ---
 
-## Quality Checklist (target: 9+/10)
+## Quality Checklist (target: 9.5+/10)
 
-Before publishing, verify every item:
+**Before finishing, score every item below. If any box is unchecked, fix it
+and re-score. Do not commit until every box is checked.**
 
-- [ ] **Lead paragraph** has a specific stat and dollar amount (not generic)
+- [ ] **Lead paragraph** has a specific stat and dollar amount (not generic).
+      The lead stat should be cited to a named source inline.
 - [ ] **Table of contents** with anchor links to every section
-- [ ] **Annotated example** — a real-looking bill, EOB, or document with
-      highlighted errors and dollar amounts (use `.bill-example` markup)
+- [ ] **Annotated example** — every article must have a `.bill-example` block.
+      For billing-focused topics: use a hospital or clinic bill. For non-billing
+      topics (advocacy, debt, statute of limitations, insurance appeals): use
+      the most relevant document — a collections notice, EOB, denial letter,
+      or dispute letter — annotated with `.line-item`, `.line-item.flagged`,
+      and `.line-item.error` rows showing real dollar amounts. There is always
+      a relevant document. Do not skip this.
 - [ ] **3+ case studies** — concrete examples with CPT codes, dollar amounts,
       and outcomes (use `.case-study` markup)
 - [ ] **2+ data tables** — comparisons, pricing breakdowns, or cost tables
-- [ ] **Calculator embed** — at least 1 `_embed()` call where the reader would
-      naturally want to look something up (2 preferred)
+- [ ] **Calculator embed** — at least 1 `_embed()` call. If no CPT code is
+      obvious, use `mode="markup"` with a generic title — it always applies.
+      Do not skip this because the topic feels indirect.
 - [ ] **Internal links** — natural links to `/calculator`, `/scan`,
       `/hospitals/`, and other guides (minimum 4 internal links)
-- [ ] **3+ CTAs distributed throughout** — not just at the end. See CTA
-      placement rules below. At least one in the first half of the article.
+- [ ] **Exactly 3 CTAs distributed throughout** — placed at ~25%, ~55%, and
+      ~75% through the article. NOT at the end. NOT 2. See CTA placement
+      rules below. All 3 are `.key-takeaway` divs with links to `/scan`,
+      `/calculator`, or `/hospitals/`. Vary the destination across the 3.
 - [ ] **5+ FAQs** with FAQPage schema (structured in `faqs` list)
 - [ ] **BillKarma proprietary data** — at least 1 stat framed as "According to
       BillKarma's analysis of X,XXX hospitals..." or "BillKarma data shows..."
       Pull real numbers from the hospital database (markup medians, grade
       distributions, error rates, transparency scores). This is the content
       that earns AI citations and backlinks — external sources alone won't.
-      If the article topic has no obvious BillKarma angle, find one: grade
-      distributions for the relevant hospital type, markup comparison by
-      ownership category, share of hospitals flagged for the specific error
-      being discussed.
+      Every topic has a BillKarma angle — find it:
+      - Bill errors/disputes → "X% of [bill type] reviewed by BillKarma contained..."
+      - Advocacy/debt/legal → "BillKarma's review of [N] hospitals found the
+        median markup is Xx, meaning a professional advocate reviewing a
+        typical bill has $X,XXX in potential savings to work with"
+      - Insurance/coverage → "BillKarma data shows X% of [payer type] denials
+        for [topic] are successfully overturned on first appeal"
+      If you cannot find a natural stat, frame BillKarma's hospital grade or
+      markup data as context for the reader's decision. Do not skip this.
 - [ ] **Sources section** — 5+ authoritative external links (CMS, KFF, CFPB,
       Health Affairs, etc.). Every stat in the lead paragraph must trace to
       a named, specific source (no journal homepages — use DOIs or direct links)
-- [ ] **Key takeaway callouts** — 2+ `.key-takeaway` boxes for scannable
-      highlights (CTAs count toward this total)
 - [ ] **8th grade reading level** — plain language, jargon defined on first use
 - [ ] **Follows PRODUCT_CONTEXT.md** — approved language only, no forbidden
       terms
+
+### Self-review scoring
+
+After writing the article, count your checked boxes above. The scoring is:
+
+| Checked | Score | Action |
+|---------|-------|--------|
+| 12/12 | 9.5–10 | ✅ Done — commit and push |
+| 11/12 | ~8.5 | ❌ Find the gap, fix it, re-check |
+| 10/12 | ~7.5 | ❌ Two gaps — fix both before continuing |
+| ≤9/12 | <7 | ❌ Do not publish — rewrite the weak sections |
+
+**Common failure modes to catch before scoring:**
+- Only 2 CTAs instead of 3 (most common failure)
+- Skipped `.bill-example` because topic "isn't about billing"
+- No BillKarma proprietary stat — only external sources cited
+- Missing calculator embed because "no obvious CPT code"
+- Lead stat is vague ("billing errors are common") instead of cited and specific
 
 ---
 
