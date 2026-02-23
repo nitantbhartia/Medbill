@@ -37,6 +37,7 @@ from procedure_pages import (
     get_top_cpt_codes,
 )
 from procedure_content import get_content_page_data
+from tools_catalog import list_tools, get_tool
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -585,6 +586,43 @@ async def guides_index(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Guides | BillKarma",
             "og_description": "Free guides on how to read, dispute, and reduce medical bills.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/tools/", response_class=HTMLResponse)
+async def tools_index(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/"
+    tools = list_tools()
+    return templates.TemplateResponse(
+        "tools_index.html",
+        {
+            "request": request,
+            "tools": tools,
+            "canonical_url": canonical_url,
+            "og_title": "BillKarma Free Medical Billing Tools",
+            "og_description": "Free calculators and generators to check billing errors, rights, and dispute options.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/tools/{slug}/", response_class=HTMLResponse)
+async def tool_detail(request: Request, slug: str):
+    tool = get_tool(slug)
+    if not tool:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Tool not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/{slug}/"
+    return templates.TemplateResponse(
+        "tool_page.html",
+        {
+            "request": request,
+            "tool": tool,
+            "canonical_url": canonical_url,
+            "og_title": f"{tool['title']} | BillKarma",
+            "og_description": tool.get("description"),
+            "meta_description": tool.get("description"),
             "meta_robots": "index, follow",
         },
     )
@@ -1160,6 +1198,7 @@ async def guides_sitemap():
     static_urls = [
         (f"{base}/", "2026-02-01", "1.0"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
+        (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/calculator", "2026-02-01", "0.7"),
     ]
     static_entries = "".join(
@@ -1170,10 +1209,14 @@ async def guides_sitemap():
         f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
     )
+    tool_entries = "".join(
+        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
+        for tool in list_tools()
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}</urlset>"
+        f"{static_entries}{guide_entries}{tool_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 

@@ -897,6 +897,40 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_concierge_created ON concierge_interest(created_at)")
 
+    # Tool suite persistence (SEO tools hub)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS tool_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tool_slug TEXT NOT NULL,
+            input_hash TEXT NOT NULL,
+            input_json TEXT,
+            result_state TEXT,
+            result_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_runs_slug ON tool_runs(tool_slug)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_runs_created ON tool_runs(created_at)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_runs_hash ON tool_runs(input_hash)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS tool_leads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            tool_slug TEXT NOT NULL,
+            lead_magnet_key TEXT,
+            payload_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_leads_email ON tool_leads(email)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_leads_slug ON tool_leads(tool_slug)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_tool_leads_created ON tool_leads(created_at)")
+
     # Additional fields for richer dispute tracking
     ensure_columns(
         "dispute_outcomes",
