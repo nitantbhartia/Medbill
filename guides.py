@@ -23,6 +23,14 @@ def get_guide_slugs() -> list[str]:
     return list(GUIDES.keys())
 
 
+def get_guides_for_sitemap() -> list[tuple[str, str]]:
+    """Return (slug, published_date) pairs for all guides, sorted newest first."""
+    return [
+        (slug, g.get("published", "2026-01-01"))
+        for slug, g in sorted(GUIDES.items(), key=lambda x: x[1].get("published", ""), reverse=True)
+    ]
+
+
 def _embed(mode="cost", cpt="", title="", subtitle="", height="380"):
     """Return an iframe snippet for embedding a calculator in article body."""
     params = f"mode={mode}"
@@ -77,3 +85,13 @@ import guide_telehealth_billing
 import guide_urgent_care_billing
 import guide_medical_billing_advocate
 import guide_medical_debt_statute
+import guide_california_medical_billing
+import guide_texas_hospital_charity_care
+import guide_florida_hospital_billing_rights
+import guide_new_york_medical_billing_laws
+import guide_illinois_hospital_charity_care
+import guide_pennsylvania_hospital_charity_care
+import guide_georgia_hospital_billing_rights
+import guide_ohio_hospital_billing_rights
+import guide_north_carolina_medical_debt
+import guide_michigan_hospital_billing_rights
