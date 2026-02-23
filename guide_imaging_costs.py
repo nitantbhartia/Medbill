@@ -203,10 +203,6 @@ register("how-much-does-mri-ct-scan-cost", {
 
 <h2 id="case-studies">6. Real-world case studies</h2>
 
-<div class="key-takeaway">
-    <strong>Facing a large imaging charge before your scan even happens?</strong> <a href="/scan">Scan your estimate or referral with BillKarma</a> &mdash; we&rsquo;ll compare the CPT codes against Medicare rates so you know what&rsquo;s fair before you pay.
-</div>
-
 <div class="case-study">
     <h3>Case study 1: Knee MRI &mdash; hospital vs. imaging center</h3>
     <p>A patient was referred for a knee MRI (CPT 73721) after a sports injury. Their orthopedist&rsquo;s office scheduled the scan at the hospital outpatient department by default.</p>

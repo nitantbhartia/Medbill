@@ -201,6 +201,8 @@ Example: &ldquo;Line item: CPT 99284 (Emergency Department Visit, Level 4) bille
     <li><strong>BillKarma dispute service:</strong> <a href="/dispute/activate">Let us handle it</a> — we send formal disputes, follow up for 45 days, and have a track record of resolving cases that patients couldn&rsquo;t resolve alone. Flat fee, full refund if unresolved.</li>
 </ol>
 
+<div class="key-takeaway"><strong>See what's on your bill first.</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag every charge that exceeds the Medicare rate and show exact savings before you write the letter.</div>
+
 <h2 id="case-studies">8. Case studies</h2>
 
 <div class="case-study">

@@ -93,10 +93,6 @@ register("how-much-does-surgery-cost", {
     </tbody>
 </table>
 
-<div class="key-takeaway">
-    <strong>Wondering how your surgery charge compares to what Medicare pays?</strong> <a href="/calculator">Use BillKarma&rsquo;s cost calculator</a> &mdash; enter the CPT code from your bill and instantly see the Medicare rate so you know whether you&rsquo;re being charged a fair price.
-</div>
-
 <p>The Medicare rate includes both the physician fee and the facility fee. It represents what the federal government has determined the procedure is worth. When a hospital charges $45,000 for a knee arthroscopy that Medicare values at $3,800, that&rsquo;s a <strong>12x markup</strong>.</p>
 
 <p>Look up the CPT code from your surgery bill to see what Medicare pays:</p>

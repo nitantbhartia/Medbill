@@ -186,6 +186,9 @@ register("telehealth-billing", {
 
 {_embed(mode="cost", title="Look up the Medicare telehealth rate", subtitle="Enter the CPT code from your telehealth bill (e.g., 99213, 99214) to see what Medicare pays.")}
 
+
+<div class="key-takeaway"><strong>Check your telehealth charges.</strong> <a href="/scan">Upload your bill to BillKarma</a> — we flag telehealth charges that were billed at in-person rates and identify mismatched place-of-service codes.</div>
+
 <h2 id="case-studies">8. Case studies</h2>
 
 <div class="case-study">

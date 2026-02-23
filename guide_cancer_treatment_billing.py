@@ -321,12 +321,6 @@ register("cancer-treatment-billing-guide", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> If you cannot afford your cancer treatment costs, apply for manufacturer patient
-  assistance and hospital charity care before your first payment is due. These programs are underused &mdash; most
-  patients who apply and qualify receive substantial help, sometimes eliminating costs entirely.
-  Check our <a href="/hospitals/">hospital directory</a> to see which hospitals in your area offer charity care, what their income thresholds are, and how their overall billing transparency scores compare.
-</div>
 <div class="case-study">
   <h3>$12,000 Drug Billing Error Caught: Wrong Dosage Billed</h3>
   <p>
@@ -344,6 +338,13 @@ register("cancer-treatment-billing-guide", {
     <strong>Lesson:</strong> Always compare J-code unit counts on your bill against the dose documented in your
     treatment summary. Dosage in milligrams divided by 10 should equal the number of units billed.
   </p>
+</div>
+
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> If you cannot afford your cancer treatment costs, apply for manufacturer patient
+  assistance and hospital charity care before your first payment is due. These programs are underused &mdash; most
+  patients who apply and qualify receive substantial help, sometimes eliminating costs entirely.
+  Check our <a href="/hospitals/">hospital directory</a> to see which hospitals in your area offer charity care, what their income thresholds are, and how their overall billing transparency scores compare.
 </div>
 
 <div class="case-study">

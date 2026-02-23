@@ -107,6 +107,8 @@ register("common-hospital-billing-errors", {
 
 <p><strong>How to dispute it:</strong> Call the billing department and ask for a &ldquo;level review.&rdquo; Reference the specific CPT code, the Medicare rate differential, and your clinical notes. Say: &ldquo;CPT 99285 requires high-complexity medical decision-making. My visit involved [describe actual treatment]. I&rsquo;d like to request a coding review for downgrade to [lower level].&rdquo; Hospitals adjust ER levels routinely when challenged with documentation.</p>
 
+<div class="key-takeaway"><strong>Think your bill has errors?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we automatically flag duplicate charges, unbundled codes, and items that exceed the Medicare rate.</div>
+
 <h3 id="error-duplicates">Error 2: Duplicate charges</h3>
 
 <p><strong>What it is:</strong> The same service, medication, or supply billed more than once. Duplicate charges are especially common on multi-day inpatient stays where billing systems may log daily charges and individual administrations separately. IV bags, daily medications, and routine labs are the most frequently duplicated items.</p>

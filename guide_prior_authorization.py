@@ -92,6 +92,10 @@ register("prior-authorization", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>75% of appealed PA denials are overturned.</strong> If your PA was denied, appeal it &mdash; especially if the service is genuinely medically necessary. Most initial denials are not final decisions. See our <a href="/guides/how-to-appeal-an-insurance-denial">insurance denial appeal guide</a> for a step-by-step process.
+</div>
+
 <p><strong>How to check before you schedule:</strong> Call the member services number on your insurance card and ask: &ldquo;Does procedure code [CPT code] require prior authorization under my plan?&rdquo; Your doctor&rsquo;s office should also check as a routine step, but verifying yourself prevents surprises. Use our <a href="/calculator">calculator</a> to look up CPT codes if you don&rsquo;t have the code handy.</p>
 
 <h2 id="how-pa-works">3. How the prior authorization process works</h2>
@@ -152,10 +156,6 @@ register("prior-authorization", {
         <tr><td>Incomplete information</td><td>Documentation package was missing required elements</td><td>Call the insurer and ask exactly what documentation is needed, then resubmit</td></tr>
     </tbody>
 </table>
-
-<div class="key-takeaway">
-    <strong>75% of appealed PA denials are overturned.</strong> If your PA was denied, appeal it &mdash; especially if the service is genuinely medically necessary. Most initial denials are not final decisions. See our <a href="/guides/how-to-appeal-an-insurance-denial">insurance denial appeal guide</a> for a step-by-step process.
-</div>
 
 <div class="key-takeaway">
     <strong>Already received a bill from a denied service?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we check whether the underlying charges are accurately coded, which is often the root cause of a PA denial and the strongest basis for an appeal.

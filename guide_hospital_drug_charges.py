@@ -193,10 +193,6 @@ register("hospital-drug-charges", {
 <p>Use the <a href="/guides/how-to-dispute-a-medical-bill">dispute script from our billing dispute guide</a>. For drug charges specifically, say: &ldquo;I&rsquo;d like to understand the charge for [drug name] on my itemized bill. Can you tell me the acquisition cost and your calculation for the billed amount?&rdquo; Most billing staff will offer a reduction rather than explain the markup in detail. Also <a href="/scan">upload your bill to BillKarma</a> for an automated line-by-line audit.</p>
 
 <div class="key-takeaway">
-    <strong>Drug charges are often the easiest line items to get reduced.</strong> Hospitals know these markups are extreme, and billing departments will frequently reduce them when challenged directly. A 30&ndash;60% reduction on drug line items is common.
-</div>
-
-<div class="key-takeaway">
     <strong>Skip the manual math.</strong> <a href="/scan">Scan your bill with BillKarma</a> and we&rsquo;ll identify every inflated drug charge automatically, along with the specific Medicare rate and a ready-to-use dispute script.
 </div>
 

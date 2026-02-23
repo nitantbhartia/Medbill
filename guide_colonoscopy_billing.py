@@ -188,13 +188,13 @@ register("colonoscopy-billing", {
     <li><strong>Short-term health plans:</strong> These plans are not subject to ACA preventive coverage requirements and may charge for colonoscopies entirely.</li>
 </ul>
 
-<div class="key-takeaway">
-    <strong>Want to know if your hospital charged a fair price for your colonoscopy?</strong> Use the <a href="/calculator">BillKarma calculator</a> to enter your CPT code and see what the Medicare rate is for your area &mdash; then compare it to what you were billed.
-</div>
-
 <h2 id="read-eob">4. How to read your colonoscopy EOB</h2>
 
 <p>Your Explanation of Benefits (EOB) is the document your insurer sends after processing a claim. It is not a bill &mdash; it is a statement of what was billed, what your insurer paid, and what you owe. For a colonoscopy with polyp removal, your EOB is the first document to examine when you receive an unexpected bill.</p>
+
+<div class="key-takeaway">
+    <strong>Want to know if your hospital charged a fair price for your colonoscopy?</strong> Use the <a href="/calculator">BillKarma calculator</a> to enter your CPT code and see what the Medicare rate is for your area &mdash; then compare it to what you were billed.
+</div>
 
 <p>Look for these specific fields on your EOB:</p>
 

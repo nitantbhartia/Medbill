@@ -66,9 +66,7 @@ register("how-to-negotiate-medical-bills", {
 
 <p>Nobody pays the sticker price except uninsured patients who don&rsquo;t know they can negotiate. The &ldquo;billed amount&rdquo; is a starting point, not a final price.</p>
 
-<div class="key-takeaway">
-    <strong>The math is on your side.</strong> If Medicare pays $1,500 for a service and the hospital accepts it, that means the service costs the hospital less than $1,500 to provide. Anything you pay above that is profit margin&mdash;and it&rsquo;s negotiable.
-</div>
+
 
 <div class="key-takeaway">
     <strong>Want to know the Medicare rate for your exact charges?</strong> Use our <a href="/calculator">free calculator</a> &mdash; enter any CPT code from your itemized bill to instantly see what Medicare pays, which is the strongest negotiation anchor you can bring to the call.
@@ -97,9 +95,7 @@ register("how-to-negotiate-medical-bills", {
 <p><strong>Best for:</strong> Uninsured patients, or insured patients whose plan didn&rsquo;t cover the service.</p>
 <p><strong>Typical result:</strong> 30&ndash;60% reduction.</p>
 
-<div class="key-takeaway">
-    <strong>Ready to see exactly what&rsquo;s wrong with your bill before you call?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; our automated audit flags overcharges, duplicate codes, and unbundling violations so you walk into the negotiation with a concrete list of issues.
-</div>
+
 
 <div class="case-study">
     <h3>Phone script</h3>
@@ -125,6 +121,11 @@ register("how-to-negotiate-medical-bills", {
     <p><strong>Ask:</strong> &ldquo;Medicare pays $248 for this CT scan. I&rsquo;m being charged $2,400&mdash;nearly 10x the Medicare rate. I&rsquo;d like to request a reduction to $744, which is 3x the Medicare rate and still well above what Medicare and most insurance plans pay.&rdquo;</p>
     <p><strong>Result:</strong> Hospital agreed to $850. <strong>Savings: $1,550.</strong></p>
 </div>
+
+<div class="key-takeaway">
+    <strong>Ready to see exactly what&rsquo;s wrong with your bill before you call?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; our automated audit flags overcharges, duplicate codes, and unbundling violations so you walk into the negotiation with a concrete list of issues.
+</div>
+
 
 <h3>Strategy 3: Offer a lump-sum settlement</h3>
 
@@ -161,9 +162,7 @@ register("how-to-negotiate-medical-bills", {
     <p>This works because the hospital now sees you as an informed, engaged patient&mdash;which makes them more willing to negotiate on price.</p>
 </div>
 
-<div class="key-takeaway">
-    <strong>Not sure which errors to dispute before you negotiate?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we automatically detect duplicate charges, upcoding, and unbundled codes so you know exactly what to challenge before you pick up the phone.
-</div>
+
 
 <h2 id="financial-assistance">4. Financial assistance programs</h2>
 
@@ -203,6 +202,11 @@ register("how-to-negotiate-medical-bills", {
 <div class="case-study">
     <h3>The deferred interest trap</h3>
     <p>A patient puts a $3,000 medical bill on CareCredit with a &ldquo;0% for 12 months&rdquo; promotion. They pay $2,800 of the $3,000 by month 12 but miss the full payoff by $200. Result: they owe <strong>retroactive interest on the original $3,000</strong> at 26.99% APR&mdash;an additional <strong>$809</strong>. Always use the hospital&rsquo;s direct payment plan instead.</p>
+
+
+<div class="key-takeaway">
+    <strong>Not sure which errors to dispute before you negotiate?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we automatically detect duplicate charges, upcoding, and unbundled codes so you know exactly what to challenge before you pick up the phone.
+</div>
 </div>
 
 <h2 id="when-to-get-help">6. When to hire a professional negotiator</h2>

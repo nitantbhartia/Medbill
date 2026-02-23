@@ -222,9 +222,6 @@ register("how-to-fight-an-ambulance-bill", {
     <li><strong>State complaints</strong> — File a complaint with your state insurance commissioner if an air ambulance company balance bills you after a 2022 flight. The CFPB and your state AG's office also accept these complaints.</li>
 </ul>
 
-<div class="key-takeaway">
-    <strong>If you received an air ambulance bill after January 2022</strong>, the provider cannot legally bill you more than your in-network cost-sharing amount. Any balance billing is a No Surprises Act violation. File a complaint at <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a>.
-</div>
 
 <h2 id="faq">Frequently asked questions</h2>
 

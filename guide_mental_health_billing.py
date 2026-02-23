@@ -95,9 +95,7 @@ register("mental-health-billing-and-parity-rights", {
     <strong>Spotted a visit cap or prior auth requirement that doesn't apply to your other medical care?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we identify parity discrepancies in your mental health claims that may entitle you to more coverage.
 </div>
 
-<div class="key-takeaway">
-    <strong>Are your mental health copays higher than what you pay for primary care?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we check whether your insurer is applying equal cost-sharing standards to mental health and medical services.
-</div>
+
 
 <div class="case-study">
     <h3>Example: Visit cap parity violation — $3,200 in denied claims reversed</h3>
@@ -157,6 +155,11 @@ register("mental-health-billing-and-parity-rights", {
     <li><strong>Request the insurer's criteria.</strong> Ask them to provide the specific clinical criteria they use to determine medical necessity for mental health. Compare this against the criteria they use for medical/surgical decisions. Divergence is evidence of a parity violation. <em>Example: if your insurer requires &ldquo;documented treatment progress within 6 sessions&rdquo; for therapy but has no equivalent progress requirement for physical therapy, that&rsquo;s a red flag.</em></li>
     <li><strong>Request external review if the internal appeal is denied.</strong> Under the ACA, you have the right to an independent external review by a third party. The external reviewer&rsquo;s decision is binding on the insurer — meaning if they rule in your favor, the insurer <em>must</em> pay. Mental health denials are frequently overturned at this stage.</li>
 </ol>
+
+<div class="key-takeaway">
+    <strong>Are your mental health copays higher than what you pay for primary care?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we check whether your insurer is applying equal cost-sharing standards to mental health and medical services.
+</div>
+
 
 <div class="case-study">
     <h3>Example: "Not medically necessary" denial reversed on external review</h3>

@@ -113,10 +113,6 @@ register("how-to-dispute-a-medical-bill", {
 </div>
 
 <div class="key-takeaway">
-    <strong>Pro tip:</strong> Write down the name of every person you speak with, the date and time of the call, and any reference or case numbers. If you need to escalate later, this documentation is essential.
-</div>
-
-<div class="key-takeaway">
     <strong>Wondering how much you could realistically recover?</strong> Use the <a href="/calculator">BillKarma cost calculator</a> to compare each disputed charge against the Medicare rate and estimate your potential savings before you make the call.
 </div>
 

@@ -255,6 +255,8 @@ register("hospital-cash-pay-self-pay-discount", {
     <p>He applied the same analysis to three other imaging studies that year and saved $340 total by choosing cash &mdash; while correctly running a $6,800 surgery through insurance in October, by which point his deductible was nearly met from a prior hospitalization.</p>
 </div>
 
+<div class="key-takeaway"><strong>Compare before you pay.</strong> Our <a href="/hospitals/">hospital directory</a> shows cash-pay rates, pricing transparency grades, and billing accuracy data so you can pick the best-value facility near you.</div>
+
 <div class="case-study">
     <h3>Case 3: Patient discovers cash price is higher than in-network rate &mdash; and uses insurance instead</h3>
     <p>A patient in Texas scheduled a chest X-ray (CPT 71046) and ER level 3 visit follow-up (CPT 99283) at a large regional hospital. The hospital&rsquo;s posted discounted cash price was $380 for the two services combined. Medicare&rsquo;s rates: $13 (71046) + $106 (99283) = $119 combined.</p>

@@ -181,6 +181,9 @@ register("urgent-care-billing", {
 
 {_embed(mode="cost", title="Look up the urgent care visit Medicare rate", subtitle="Enter the CPT code from your urgent care bill (e.g., 99213, 99214) to see the Medicare benchmark rate.")}
 
+
+<div class="key-takeaway"><strong>Compare urgent care costs near you.</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare pays for any CPT code you see on your urgent care bill.</div>
+
 <h2 id="case-studies">7. Case studies</h2>
 
 <div class="case-study">
