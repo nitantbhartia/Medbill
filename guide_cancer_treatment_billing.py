@@ -246,6 +246,55 @@ register("cancer-treatment-billing-guide", {
   a charity care application from the hospital financial counseling office. Apply before your first bill is due.
 </p>
 
+<table>
+  <thead>
+    <tr>
+      <th>Program</th>
+      <th>Who Qualifies</th>
+      <th>Max Benefit</th>
+      <th>How to Apply</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Hospital Charity Care</td>
+      <td>Income below 200&ndash;400% FPL (varies by hospital); uninsured or underinsured</td>
+      <td>100% of bill (full forgiveness at many nonprofit hospitals)</td>
+      <td>Request financial counselor at hospital billing office; apply before first bill is due</td>
+    </tr>
+    <tr>
+      <td>Manufacturer PAPs (e.g., Genentech, BMS, Merck)</td>
+      <td>Uninsured or underinsured; income typically below 400&ndash;600% FPL</td>
+      <td>Free drug for duration of treatment (value: $10,000&ndash;$200,000+/year)</td>
+      <td>Apply at manufacturer&rsquo;s website or through oncology social worker; reapply annually</td>
+    </tr>
+    <tr>
+      <td>CancerCare Co-Payment Assistance Foundation</td>
+      <td>Diagnosed with specific cancers; income and insurance criteria vary by fund</td>
+      <td>$500&ndash;$2,000 per grant for drug copays</td>
+      <td>Apply online at cancercare.org; funds available while grants last&mdash;apply early</td>
+    </tr>
+    <tr>
+      <td>Patient Advocate Foundation Co-Pay Relief</td>
+      <td>Diagnosed with qualifying disease; income below set threshold; insured</td>
+      <td>Up to $10,000/year for copays, deductibles, and coinsurance</td>
+      <td>Apply at patientadvocate.org; disease-specific funds may have waitlists</td>
+    </tr>
+    <tr>
+      <td>NeedyMeds</td>
+      <td>Any patient seeking drug or cost assistance; no income requirement to search</td>
+      <td>Varies by program found (aggregates hundreds of PAPs and state funds)</td>
+      <td>Search free at needymeds.org by drug name or diagnosis; no registration required</td>
+    </tr>
+    <tr>
+      <td>HealthWell Foundation</td>
+      <td>Diagnosed with qualifying chronic or life-threatening illness; insured; income below 500% FPL</td>
+      <td>Up to $10,000&ndash;$15,000/year depending on disease fund</td>
+      <td>Apply at healthwellfoundation.org; check open disease funds before applying</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="bill-example">6. Reading a Chemotherapy Bill</h2>
 <div class="bill-example">
   <div class="line-item">Facility fee &mdash; hospital outpatient | $2,800</div>
@@ -375,7 +424,7 @@ register("cancer-treatment-billing-guide", {
   <strong>Key Takeaway 3:</strong> If you cannot afford your cancer treatment costs, apply for manufacturer patient
   assistance and hospital charity care before your first payment is due. These programs are underused &mdash; most
   patients who apply and qualify receive substantial help, sometimes eliminating costs entirely.
-  <a href="/guides/hospital-bill-charity-care">Read our guide to hospital charity care applications.</a>
+  Check our <a href="/hospitals/">hospital directory</a> to see which hospitals in your area offer charity care, what their income thresholds are, and how their overall billing transparency scores compare.
 </div>
 
 <div class="faq-section">

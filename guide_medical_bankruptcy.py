@@ -215,8 +215,59 @@ register("medical-bankruptcy-guide", {
 <h2 id="alternatives">6. Alternatives to Try First (In Order)</h2>
 <p>
   Bankruptcy should be a last resort for most patients, not a first response to a large medical bill. Work through
-  these alternatives in order before filing.
+  these alternatives in order before filing. The table below compares them by how much debt you can realistically
+  eliminate, so you can start with the highest-impact option.
 </p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Typical Debt Eliminated</th>
+      <th>Time Required</th>
+      <th>Credit Impact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Charity care application</td>
+      <td>Up to 100% (if income-eligible)</td>
+      <td>2&ndash;6 weeks for approval</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>Billing error dispute</td>
+      <td>10&ndash;40% (errors are common)</td>
+      <td>2&ndash;8 weeks to resolve</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>Negotiate lump-sum payment plan</td>
+      <td>0% (balance preserved; prevents collections)</td>
+      <td>Immediate; ongoing monthly</td>
+      <td>None while plan is active</td>
+    </tr>
+    <tr>
+      <td>Medical debt settlement</td>
+      <td>40&ndash;80% (settle for 20&ndash;60&cent; on the dollar)</td>
+      <td>1&ndash;3 months to negotiate</td>
+      <td>Moderate (settled account notation)</td>
+    </tr>
+    <tr>
+      <td>State protection laws</td>
+      <td>Varies (credit reporting ban, interest cap, extended plans)</td>
+      <td>Immediate if applicable</td>
+      <td>None to minimal</td>
+    </tr>
+    <tr>
+      <td>Chapter 7 bankruptcy</td>
+      <td>Up to 100% of unsecured debt</td>
+      <td>4&ndash;6 months to discharge</td>
+      <td>Severe (10 years on credit report)</td>
+    </tr>
+  </tbody>
+</table>
+
 <p>
   <strong>1. Apply for hospital charity care.</strong> Nonprofit hospitals are required to have charity care
   policies. If your income is below 200&ndash;400% of the federal poverty level (thresholds vary), you may
@@ -246,12 +297,31 @@ register("medical-bankruptcy-guide", {
 
 <h2 id="bill-example">7. Bill Example: $87,000 Medical Debt Situation</h2>
 <div class="bill-example">
-  <div class="line-item">St. Regional Hospital &mdash; 6-day inpatient stay (appendectomy + complications) | $54,200</div>
-  <div class="line-item">Surgical group &mdash; surgeon + assistant surgeon | $12,400</div>
-  <div class="line-item">Anesthesiology Associates | $4,800</div>
-  <div class="line-item">Radiology Partners &mdash; CT scans &times;3, X-rays &times;4 | $6,100</div>
-  <div class="line-item">Post-acute rehabilitation center &mdash; 12 days | $9,500</div>
-  <div class="line-total">Total medical debt: $87,000 | Patient income: $38,000/year | Assets: renting, no savings above $2,000</div>
+    <div class="bill-header">Medical Debt Summary &mdash; Patient: D. Rivera &mdash; Income: $38,000/yr</div>
+    <div class="line-item flagged">
+        <span>44205 &mdash; Inpatient stay, 6 days &mdash; St. Regional Hospital &nbsp; &#9888; <em>Chargemaster rate 4.1x Medicare &mdash; charity care not applied</em></span>
+        <span>$54,200</span>
+    </div>
+    <div class="line-item">
+        <span>44950 &mdash; Appendectomy, surgical group</span>
+        <span>$12,400</span>
+    </div>
+    <div class="line-item error">
+        <span>00840 &mdash; Anesthesia &nbsp; &#10005; <em>Billed by out-of-network provider &mdash; potential No Surprises Act violation</em></span>
+        <span>$4,800</span>
+    </div>
+    <div class="line-item flagged">
+        <span>74178 &mdash; CT abdomen/pelvis &times;3 &nbsp; &#9888; <em>Repeat CT on day 3 not in clinical notes &mdash; possible duplicate</em></span>
+        <span>$6,100</span>
+    </div>
+    <div class="line-item">
+        <span>97535 &mdash; Post-acute rehabilitation, 12 days</span>
+        <span>$9,500</span>
+    </div>
+    <div class="line-total">
+        <span>TOTAL BILLED (before disputes)</span>
+        <span>$87,000</span>
+    </div>
 </div>
 <p>
   <strong>Bankruptcy analysis:</strong> At $38,000 annual income with minimal assets, this patient likely passes
@@ -371,7 +441,7 @@ register("medical-bankruptcy-guide", {
   <strong>Key Takeaway 1:</strong> Before considering bankruptcy, apply for hospital charity care. If your income
   is below 200&ndash;400% of the federal poverty level, you may qualify for complete bill forgiveness &mdash;
   eliminating the debt without the credit impact, attorney fees, or long-term consequences of bankruptcy.
-  <a href="/guides/hospital-bill-charity-care">Read the complete guide to hospital charity care applications.</a>
+  <a href="/scan">Upload your bill to BillKarma</a> to check for billing errors and overcharges that may reduce your balance before you apply for charity care.
 </div>
 
 <div class="key-takeaway">
@@ -379,14 +449,14 @@ register("medical-bankruptcy-guide", {
   your assets are below your state&rsquo;s exemption limits, Chapter 7 bankruptcy is a legitimate and legally
   sanctioned tool. It eliminates the debt in 4&ndash;6 months for a total cost of $2,000&ndash;$4,000 &mdash;
   far less than years of minimum payments on an unresolvable balance.
-  <a href="/calculator">Use our medical debt affordability calculator to assess your repayment capacity.</a>
+  Use our <a href="/calculator">free calculator</a> to assess your repayment capacity and compare it against the cost of filing.
 </div>
 
 <div class="key-takeaway">
   <strong>Key Takeaway 3:</strong> The moment a bankruptcy petition is filed, the automatic stay stops all collection
   activity immediately. If you are being harassed by collectors, facing wage garnishment, or at risk of a bank
   levy on medical debt, filing bankruptcy ends those actions on the day of filing.
-  <a href="/guides/medical-debt-collectors">Read our guide on your rights when medical debt is in collections.</a>
+  Before that point, check our <a href="/hospitals/">hospital directory</a> to see if your provider has a history of billing errors or an above-average markup &mdash; information that can strengthen a charity care or dispute claim.
 </div>
 
 <div class="faq-section">
