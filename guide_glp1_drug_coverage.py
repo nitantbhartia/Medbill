@@ -456,6 +456,13 @@ costs at facilities near you before committing to a specific clinic.</p>
 
 <h2 id="case-studies">9. Case studies</h2>
 
+<div class="key-takeaway">
+  <strong>See what GLP-1 drug administration costs at hospitals near you.</strong>
+  If you receive injections in a clinical setting, hospital and clinic prices for the same
+  J-code service vary by as much as 400%. <a href="/hospitals/">Use BillKarma&rsquo;s hospital
+  price comparison tool</a> to find lower-cost providers in your area before your next appointment.
+</div>
+
 <div class="case-study">
   <h3>Case Study 1: Diabetic patient denied Ozempic due to wrong NDC</h3>
   <p>A 58-year-old patient with well-documented type 2 diabetes received a prescription for Ozempic
@@ -510,12 +517,6 @@ costs at facilities near you before committing to a specific clinic.</p>
   versions before use, as FDA policy continues to evolve.</em></p>
 </div>
 
-<div class="key-takeaway">
-  <strong>See what GLP-1 drug administration costs at hospitals near you.</strong>
-  If you receive injections in a clinical setting, hospital and clinic prices for the same
-  J-code service vary by as much as 400%. <a href="/hospitals/">Use BillKarma&rsquo;s hospital
-  price comparison tool</a> to find lower-cost providers in your area before your next appointment.
-</div>
 
 <h2 id="faq">Frequently asked questions</h2>
 

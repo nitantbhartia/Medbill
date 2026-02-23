@@ -188,6 +188,12 @@ register("workers-compensation-medical-billing", {
     </tr>
   </tbody>
 </table>
+<div class="key-takeaway">
+  <strong>Key Takeaway 1:</strong> Under a valid workers comp claim, you should pay nothing for medical treatment
+  related to your work injury. If you receive a bill, do not pay it. Contact your WC claims adjuster immediately,
+  provide the provider with your claim number, and ask the provider to resubmit to the correct payer.
+  <a href="/scan">Upload a workers comp bill to BillKarma to identify incorrect billing patterns.</a>
+</div>
 
 <h2 id="bill-example">6. Bill Example: Incorrect Billing on a WC Claim</h2>
 <div class="bill-example">
@@ -199,6 +205,12 @@ register("workers-compensation-medical-billing", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> A denied workers comp claim is not the end. Most denials can be appealed before
+  a state workers comp board. Workers comp attorneys typically work on contingency &mdash; you pay nothing unless
+  they win. Consult an attorney before concluding you have no recourse.
+  <a href="/hospitals/">Read our guide to disputing medical bills during insurance claim disputes.</a>
+</div>
 <div class="case-study">
   <h3>Disputed Claim Leaves Patient with $28,000 in Medical Bills</h3>
   <p>
@@ -334,6 +346,12 @@ register("workers-compensation-medical-billing", {
   after you file a WC claim, that may be illegal retaliation. An attorney can advise on both the WC claim and
   the employment law claim.
 </p>
+<div class="key-takeaway">
+  <strong>Key Takeaway 2:</strong> Before seeing any specialist, physical therapist, or non-emergency provider
+  under a workers comp claim, confirm in writing that the visit is pre-authorized by your WC insurer. Unauthorized
+  treatment can be denied and billed to you personally, even when your underlying claim is accepted.
+  <a href="/calculator">Estimate your workers comp medical cost exposure during a claim dispute.</a>
+</div>
 
 <h2 id="ime-billing">9. IME Billing</h2>
 <p>
@@ -371,26 +389,8 @@ register("workers-compensation-medical-billing", {
 
 {_embed("workers-compensation-medical-billing")}
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 1:</strong> Under a valid workers comp claim, you should pay nothing for medical treatment
-  related to your work injury. If you receive a bill, do not pay it. Contact your WC claims adjuster immediately,
-  provide the provider with your claim number, and ask the provider to resubmit to the correct payer.
-  <a href="/scan">Upload a workers comp bill to BillKarma to identify incorrect billing patterns.</a>
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 2:</strong> Before seeing any specialist, physical therapist, or non-emergency provider
-  under a workers comp claim, confirm in writing that the visit is pre-authorized by your WC insurer. Unauthorized
-  treatment can be denied and billed to you personally, even when your underlying claim is accepted.
-  <a href="/calculator">Estimate your workers comp medical cost exposure during a claim dispute.</a>
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> A denied workers comp claim is not the end. Most denials can be appealed before
-  a state workers comp board. Workers comp attorneys typically work on contingency &mdash; you pay nothing unless
-  they win. Consult an attorney before concluding you have no recourse.
-  <a href="/hospitals/">Read our guide to disputing medical bills during insurance claim disputes.</a>
-</div>
 
 <div class="faq-section">
   <h2 id="faqs">Frequently Asked Questions</h2>

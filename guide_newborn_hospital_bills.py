@@ -139,6 +139,16 @@ register(
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 1</h3>
+  <p>
+    You will receive two separate bills for a single birth. Request itemized versions of both before
+    paying either one. The newborn&rsquo;s bill is especially prone to nursery day miscounts and
+    NICU level errors. Use the <a href="/scan">BillKarma scanner</a> to upload and audit both bills
+    in minutes and identify errors before you pay.
+  </p>
+</div>
+
 <h2 id="what-is-on-the-bill">3. What&rsquo;s on a Newborn Hospital Bill</h2>
 <p>
   A newborn&rsquo;s hospital bill typically contains several standard line items plus any procedure-specific charges.
@@ -278,12 +288,35 @@ register(
   your insurer before paying.
 </p>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 2</h3>
+  <p>
+    Newborn screenings, hearing tests, and vaccines should be covered at 100% under ACA-compliant plans
+    as preventive care. If you see any patient cost-sharing for these line items, call your insurer before
+    paying. Preventive care billing errors are common and easy to reverse. Use our
+    <a href="/calculator">out-of-pocket cost estimator</a> to see what you should realistically owe
+    for a hospital birth in your area.
+  </p>
+</div>
+
 <h2 id="nicu-billing">6. NICU Billing: Special Considerations</h2>
 <p>
   NICU billing is among the most complex in hospital medicine. A premature or medically fragile newborn
   may be in the NICU for weeks or months, generating bills that run into six figures. Several specific
   issues make NICU billing a high-priority audit target.
 </p>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 3</h3>
+  <p>
+    If you are uninsured or underinsured, apply for Medicaid or CHIP for your newborn within 60 days
+    of delivery. Retroactive coverage can eliminate the baby&rsquo;s hospital bill entirely.
+    Apply even if you think you don&rsquo;t qualify&mdash;newborn eligibility rules are more generous
+    than adult eligibility in most states. Read our full guide on
+    <a href="/guides/hospital-financial-assistance-guide">hospital financial assistance programs</a>
+    to see what else you may qualify for.
+  </p>
+</div>
 
 <div class="case-study">
   <h3>Case Study: NICU Billing Error &mdash; $8,400 Overbill Caught</h3>
@@ -387,39 +420,6 @@ register(
     </tr>
   </tbody>
 </table>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 1</h3>
-  <p>
-    You will receive two separate bills for a single birth. Request itemized versions of both before
-    paying either one. The newborn&rsquo;s bill is especially prone to nursery day miscounts and
-    NICU level errors. Use the <a href="/scan">BillKarma scanner</a> to upload and audit both bills
-    in minutes and identify errors before you pay.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 2</h3>
-  <p>
-    Newborn screenings, hearing tests, and vaccines should be covered at 100% under ACA-compliant plans
-    as preventive care. If you see any patient cost-sharing for these line items, call your insurer before
-    paying. Preventive care billing errors are common and easy to reverse. Use our
-    <a href="/calculator">out-of-pocket cost estimator</a> to see what you should realistically owe
-    for a hospital birth in your area.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 3</h3>
-  <p>
-    If you are uninsured or underinsured, apply for Medicaid or CHIP for your newborn within 60 days
-    of delivery. Retroactive coverage can eliminate the baby&rsquo;s hospital bill entirely.
-    Apply even if you think you don&rsquo;t qualify&mdash;newborn eligibility rules are more generous
-    than adult eligibility in most states. Read our full guide on
-    <a href="/guides/hospital-financial-assistance-guide">hospital financial assistance programs</a>
-    to see what else you may qualify for.
-  </p>
-</div>
 
 {_embed("newborn-bill-auditor")}
 

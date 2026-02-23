@@ -121,6 +121,16 @@ register(
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 1</h3>
+  <p>
+    Don&rsquo;t elect COBRA automatically. Spend 30 minutes on HealthCare.gov entering your expected
+    income before you decide. If you qualify for a subsidy, the marketplace will almost certainly be cheaper.
+    Use our <a href="/calculator">COBRA vs. ACA cost calculator</a> to run both scenarios side by side
+    in under 2 minutes.
+  </p>
+</div>
+
 <p>
   These are national averages. If your employer was unusually generous with their premium share,
   or if you worked in a high-cost metropolitan area, your COBRA cost could be significantly higher.
@@ -260,6 +270,28 @@ register(
   may cost less than resetting your deductible on a new plan.
 </p>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 2</h3>
+  <p>
+    If you have a medical event during your 60-day COBRA election window, you can elect retroactively
+    and get the event covered. This is one of COBRA&rsquo;s most powerful features&mdash;but you must
+    pay all retroactive premiums immediately. If you receive any medical care after job loss and before
+    enrolling in new coverage, use the <a href="/scan">BillKarma scanner</a> to make sure those bills
+    are processed correctly once your coverage is confirmed.
+  </p>
+</div>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 3</h3>
+  <p>
+    The 30-day COBRA payment grace period is not a safety net&mdash;it&rsquo;s a hard deadline.
+    Missing it ends your coverage permanently. Set a calendar reminder the moment you elect COBRA.
+    Check our <a href="/hospitals/">hospital directory</a> to see pricing transparency grades for facilities
+    you&rsquo;re considering&mdash;if COBRA network continuity is your reason for electing, make sure the
+    hospital you&rsquo;re staying in-network with is actually worth the premium.
+  </p>
+</div>
+
 <div class="case-study">
   <h3>Case Study: COBRA Was the Right Call &mdash; Cancer Treatment Continuity</h3>
   <p>
@@ -361,38 +393,6 @@ register(
   mini-COBRA is unavailable, job loss is still a Special Enrollment Period for the ACA marketplace.
   You have 60 days to enroll.
 </p>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 1</h3>
-  <p>
-    Don&rsquo;t elect COBRA automatically. Spend 30 minutes on HealthCare.gov entering your expected
-    income before you decide. If you qualify for a subsidy, the marketplace will almost certainly be cheaper.
-    Use our <a href="/calculator">COBRA vs. ACA cost calculator</a> to run both scenarios side by side
-    in under 2 minutes.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 2</h3>
-  <p>
-    If you have a medical event during your 60-day COBRA election window, you can elect retroactively
-    and get the event covered. This is one of COBRA&rsquo;s most powerful features&mdash;but you must
-    pay all retroactive premiums immediately. If you receive any medical care after job loss and before
-    enrolling in new coverage, use the <a href="/scan">BillKarma scanner</a> to make sure those bills
-    are processed correctly once your coverage is confirmed.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 3</h3>
-  <p>
-    The 30-day COBRA payment grace period is not a safety net&mdash;it&rsquo;s a hard deadline.
-    Missing it ends your coverage permanently. Set a calendar reminder the moment you elect COBRA.
-    Check our <a href="/hospitals/">hospital directory</a> to see pricing transparency grades for facilities
-    you&rsquo;re considering&mdash;if COBRA network continuity is your reason for electing, make sure the
-    hospital you&rsquo;re staying in-network with is actually worth the premium.
-  </p>
-</div>
 
 {_embed("cobra-cost-calculator")}
 

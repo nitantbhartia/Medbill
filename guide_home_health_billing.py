@@ -296,6 +296,10 @@ register("home-health-billing", {
 
 <h2 id="case-studies">8. Case studies</h2>
 
+<div class="key-takeaway">
+    <strong>Facing a home health billing dispute?</strong> See how other patients' home health agencies are rated on billing accuracy in our <a href="/hospitals/">facility directory</a> — and find out if yours has a history of billing irregularities flagged by Medicare audits.
+</div>
+
 <div class="case-study">
     <h3>Post-hip-replacement: 18 visits billed, 12 in the log — $2,400 recovered</h3>
     <p>A 74-year-old patient in Ohio received home health after a total hip replacement. Her Medicare Summary Notice showed 18 skilled nursing and physical therapy visits billed over a 60-day period (two 30-day episodes). When her daughter requested the clinical visit log, it documented 12 visits. Six visits billed by the agency — at roughly $140 each — had no corresponding entry in the clinical record. The family submitted a written dispute referencing the specific dates and HCPCS codes billed versus what the log showed. The agency resubmitted corrected claims to Medicare. The patient's share of costs was adjusted downward by <strong>$2,400</strong> in total episode billing.</p>
@@ -340,9 +344,6 @@ register("home-health-billing", {
     </div>
 </div>
 
-<div class="key-takeaway">
-    <strong>Facing a home health billing dispute?</strong> See how other patients' home health agencies are rated on billing accuracy in our <a href="/hospitals/">facility directory</a> — and find out if yours has a history of billing irregularities flagged by Medicare audits.
-</div>
 
 <h2 id="sources">10. Sources</h2>
 

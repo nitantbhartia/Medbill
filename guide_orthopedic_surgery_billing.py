@@ -164,6 +164,13 @@ register("orthopedic-surgery-billing-costs", {
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <strong>Key Takeaway 1:</strong> The implant is often the largest and most negotiable cost in orthopedic surgery.
+  Always request the implant manufacturer name and catalog number from your operative report, then research
+  the product&rsquo;s list price before accepting your bill.
+  <a href="/scan">Upload your orthopedic bill for BillKarma&rsquo;s implant charge analysis.</a>
+</div>
+
 <h2 id="how-to-compare">4. How to Compare Hospitals for Orthopedic Surgery</h2>
 <p>
   Federal price transparency rules (effective January 2021, enforcement stepped up in 2023) require hospitals to
@@ -232,6 +239,13 @@ register("orthopedic-surgery-billing-costs", {
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <strong>Key Takeaway 2:</strong> Hospital price transparency rules require facilities to publish their negotiated
+  rates by insurer for every procedure. Comparing in-network options before scheduling can reduce your out-of-pocket
+  cost by $3,000&ndash;$15,000 for a joint replacement.
+  <a href="/hospitals/">Compare hospital grades and pricing for orthopedic procedures in your area.</a>
+</div>
+
 <h2 id="implant-billing">5. Implant Billing</h2>
 <p>
   Implant costs are the least transparent element of any orthopedic bill. Hospitals are not legally required to
@@ -267,6 +281,12 @@ register("orthopedic-surgery-billing-costs", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> For eligible patients, outpatient joint replacement at an ambulatory surgery
+  center costs 40&ndash;60% less than at a hospital outpatient department with comparable surgical outcomes.
+  Ask your surgeon whether you are a candidate before assuming you must have surgery in a hospital.
+  <a href="/calculator">Calculate your estimated out-of-pocket cost for orthopedic surgery.</a>
+</div>
 <div class="case-study">
   <h3>$14,000 Savings by Choosing a Different In-Network Hospital</h3>
   <p>
@@ -354,27 +374,6 @@ register("orthopedic-surgery-billing-costs", {
 <p>7. If I need post-surgical physical therapy, can you recommend an in-network PT provider near me?</p>
 
 {_embed("orthopedic-surgery-billing-costs")}
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 1:</strong> The implant is often the largest and most negotiable cost in orthopedic surgery.
-  Always request the implant manufacturer name and catalog number from your operative report, then research
-  the product&rsquo;s list price before accepting your bill.
-  <a href="/scan">Upload your orthopedic bill for BillKarma&rsquo;s implant charge analysis.</a>
-</div>
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 2:</strong> Hospital price transparency rules require facilities to publish their negotiated
-  rates by insurer for every procedure. Comparing in-network options before scheduling can reduce your out-of-pocket
-  cost by $3,000&ndash;$15,000 for a joint replacement.
-  <a href="/hospitals/">Compare hospital grades and pricing for orthopedic procedures in your area.</a>
-</div>
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> For eligible patients, outpatient joint replacement at an ambulatory surgery
-  center costs 40&ndash;60% less than at a hospital outpatient department with comparable surgical outcomes.
-  Ask your surgeon whether you are a candidate before assuming you must have surgery in a hospital.
-  <a href="/calculator">Calculate your estimated out-of-pocket cost for orthopedic surgery.</a>
-</div>
 
 <div class="faq-section">
   <h2 id="faqs">Frequently Asked Questions</h2>

@@ -211,6 +211,12 @@ register("medical-bankruptcy-guide", {
     </tr>
   </tbody>
 </table>
+<div class="key-takeaway">
+  <strong>Key Takeaway 1:</strong> Before considering bankruptcy, apply for hospital charity care. If your income
+  is below 200&ndash;400% of the federal poverty level, you may qualify for complete bill forgiveness &mdash;
+  eliminating the debt without the credit impact, attorney fees, or long-term consequences of bankruptcy.
+  <a href="/scan">Upload your bill to BillKarma</a> to check for billing errors and overcharges that may reduce your balance before you apply for charity care.
+</div>
 
 <h2 id="alternatives">6. Alternatives to Try First (In Order)</h2>
 <p>
@@ -294,6 +300,13 @@ register("medical-bankruptcy-guide", {
   debt from appearing on credit reports, capping interest on medical debt, or requiring extended payment plans.
   Check your state&rsquo;s current medical debt protections before filing bankruptcy.
 </p>
+<div class="key-takeaway">
+  <strong>Key Takeaway 2:</strong> If your medical debt-to-income ratio makes repayment genuinely impossible and
+  your assets are below your state&rsquo;s exemption limits, Chapter 7 bankruptcy is a legitimate and legally
+  sanctioned tool. It eliminates the debt in 4&ndash;6 months for a total cost of $2,000&ndash;$4,000 &mdash;
+  far less than years of minimum payments on an unresolvable balance.
+  Use our <a href="/calculator">free calculator</a> to assess your repayment capacity and compare it against the cost of filing.
+</div>
 
 <h2 id="bill-example">7. Bill Example: $87,000 Medical Debt Situation</h2>
 <div class="bill-example">
@@ -332,6 +345,12 @@ register("medical-bankruptcy-guide", {
 </p>
 
 <h2 id="case-studies">8. Case Studies</h2>
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> The moment a bankruptcy petition is filed, the automatic stay stops all collection
+  activity immediately. If you are being harassed by collectors, facing wage garnishment, or at risk of a bank
+  levy on medical debt, filing bankruptcy ends those actions on the day of filing.
+  Before that point, check our <a href="/hospitals/">hospital directory</a> to see if your provider has a history of billing errors or an above-average markup &mdash; information that can strengthen a charity care or dispute claim.
+</div>
 <div class="case-study">
   <h3>Chapter 7 Discharges $124,000 in Medical Debt: The Right Call</h3>
   <p>
@@ -437,27 +456,8 @@ register("medical-bankruptcy-guide", {
 
 {_embed("medical-bankruptcy-guide")}
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 1:</strong> Before considering bankruptcy, apply for hospital charity care. If your income
-  is below 200&ndash;400% of the federal poverty level, you may qualify for complete bill forgiveness &mdash;
-  eliminating the debt without the credit impact, attorney fees, or long-term consequences of bankruptcy.
-  <a href="/scan">Upload your bill to BillKarma</a> to check for billing errors and overcharges that may reduce your balance before you apply for charity care.
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 2:</strong> If your medical debt-to-income ratio makes repayment genuinely impossible and
-  your assets are below your state&rsquo;s exemption limits, Chapter 7 bankruptcy is a legitimate and legally
-  sanctioned tool. It eliminates the debt in 4&ndash;6 months for a total cost of $2,000&ndash;$4,000 &mdash;
-  far less than years of minimum payments on an unresolvable balance.
-  Use our <a href="/calculator">free calculator</a> to assess your repayment capacity and compare it against the cost of filing.
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> The moment a bankruptcy petition is filed, the automatic stay stops all collection
-  activity immediately. If you are being harassed by collectors, facing wage garnishment, or at risk of a bank
-  levy on medical debt, filing bankruptcy ends those actions on the day of filing.
-  Before that point, check our <a href="/hospitals/">hospital directory</a> to see if your provider has a history of billing errors or an above-average markup &mdash; information that can strengthen a charity care or dispute claim.
-</div>
 
 <div class="faq-section">
   <h2 id="faqs">Frequently Asked Questions</h2>

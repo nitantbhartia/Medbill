@@ -187,6 +187,13 @@ register("cancer-treatment-billing-guide", {
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <strong>Key Takeaway 1:</strong> Compare J-code unit counts on every chemotherapy bill against your documented
+  dose. Dosage (mg) &divide; 10 = units that should be billed. Errors in unit counts are among the most common
+  and most expensive billing mistakes in oncology.
+  <a href="/scan">Upload your cancer bill to BillKarma for a line-by-line review.</a>
+</div>
+
 <h2 id="copay-accumulators">4. Copay Accumulator Programs</h2>
 <p>
   Copay accumulator programs are one of the most financially dangerous features in modern insurance plans for
@@ -295,6 +302,13 @@ register("cancer-treatment-billing-guide", {
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <strong>Key Takeaway 2:</strong> Before starting any manufacturer copay assistance program, call your insurer
+  and ask whether your plan uses a copay accumulator or maximizer. If it does, that assistance may not count
+  toward your deductible, creating a mid-year financial crisis when the assistance card runs out.
+  <a href="/calculator">Use our out-of-pocket calculator to model your annual cancer treatment costs.</a>
+</div>
+
 <h2 id="bill-example">6. Reading a Chemotherapy Bill</h2>
 <div class="bill-example">
   <div class="line-item">Facility fee &mdash; hospital outpatient | $2,800</div>
@@ -307,6 +321,12 @@ register("cancer-treatment-billing-guide", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> If you cannot afford your cancer treatment costs, apply for manufacturer patient
+  assistance and hospital charity care before your first payment is due. These programs are underused &mdash; most
+  patients who apply and qualify receive substantial help, sometimes eliminating costs entirely.
+  Check our <a href="/hospitals/">hospital directory</a> to see which hospitals in your area offer charity care, what their income thresholds are, and how their overall billing transparency scores compare.
+</div>
 <div class="case-study">
   <h3>$12,000 Drug Billing Error Caught: Wrong Dosage Billed</h3>
   <p>
@@ -405,27 +425,6 @@ register("cancer-treatment-billing-guide", {
 </p>
 
 {_embed("cancer-treatment-billing-guide")}
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 1:</strong> Compare J-code unit counts on every chemotherapy bill against your documented
-  dose. Dosage (mg) &divide; 10 = units that should be billed. Errors in unit counts are among the most common
-  and most expensive billing mistakes in oncology.
-  <a href="/scan">Upload your cancer bill to BillKarma for a line-by-line review.</a>
-</div>
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 2:</strong> Before starting any manufacturer copay assistance program, call your insurer
-  and ask whether your plan uses a copay accumulator or maximizer. If it does, that assistance may not count
-  toward your deductible, creating a mid-year financial crisis when the assistance card runs out.
-  <a href="/calculator">Use our out-of-pocket calculator to model your annual cancer treatment costs.</a>
-</div>
-
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> If you cannot afford your cancer treatment costs, apply for manufacturer patient
-  assistance and hospital charity care before your first payment is due. These programs are underused &mdash; most
-  patients who apply and qualify receive substantial help, sometimes eliminating costs entirely.
-  Check our <a href="/hospitals/">hospital directory</a> to see which hospitals in your area offer charity care, what their income thresholds are, and how their overall billing transparency scores compare.
-</div>
 
 <div class="faq-section">
   <h2 id="faqs">Frequently Asked Questions</h2>

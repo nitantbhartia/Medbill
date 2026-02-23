@@ -118,6 +118,16 @@ register(
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 1</h3>
+  <p>
+    Always audit your medical bill before paying it with HSA or FSA funds. Paying an erroneous charge
+    with tax-advantaged dollars doesn&rsquo;t make the error free&mdash;it still costs you money you
+    shouldn&rsquo;t owe. Use the <a href="/scan">BillKarma bill scanner</a> to verify every line item
+    before you tap your HSA.
+  </p>
+</div>
+
 <h2 id="2026-limits">2. 2026 Contribution Limits and Eligibility</h2>
 <p>
   To contribute to an HSA, you must be enrolled in a High-Deductible Health Plan (HDHP).
@@ -274,6 +284,16 @@ register(
   to your checking account tax-free.
 </p>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 2</h3>
+  <p>
+    If you can afford to pay medical bills out of pocket, consider doing so and reimbursing yourself
+    from your HSA years later after the funds have grown. There is no deadline on HSA reimbursements&mdash;
+    just save your receipts. Use our <a href="/calculator">HSA growth calculator</a> to see what
+    your balance could be worth in 10 or 20 years.
+  </p>
+</div>
+
 <div class="bill-example">
   <h3>Sample $4,800 Hospital Bill Paid via HSA</h3>
   <div class="line-item">
@@ -319,6 +339,16 @@ register(
   medical bills&mdash;bills you&rsquo;ve kept receipts for&mdash;and you&rsquo;ve just converted decades
   of investment gains into tax-free income.
 </p>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 3</h3>
+  <p>
+    FSA dollars evaporate if you don&rsquo;t use them. Before your plan year ends, check your FSA balance
+    and spend down remaining funds on eligible expenses&mdash;glasses, dental, prescriptions.
+    Read our guide on <a href="/guides/how-to-read-an-eob">how to read your Explanation of Benefits</a>
+    to make sure the bills you&rsquo;re paying are actually yours to pay.
+  </p>
+</div>
 
 <div class="case-study">
   <h3>Case Study: HSA Triple Tax Advantage vs. Credit Card</h3>
@@ -378,36 +408,6 @@ register(
   Once enrolled in Medicare, your existing HSA balance remains yours to use tax-free for qualified expenses&mdash;
   including Medicare premiums, which are a rare exception to the general rule against using HSA funds for insurance.
 </p>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 1</h3>
-  <p>
-    Always audit your medical bill before paying it with HSA or FSA funds. Paying an erroneous charge
-    with tax-advantaged dollars doesn&rsquo;t make the error free&mdash;it still costs you money you
-    shouldn&rsquo;t owe. Use the <a href="/scan">BillKarma bill scanner</a> to verify every line item
-    before you tap your HSA.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 2</h3>
-  <p>
-    If you can afford to pay medical bills out of pocket, consider doing so and reimbursing yourself
-    from your HSA years later after the funds have grown. There is no deadline on HSA reimbursements&mdash;
-    just save your receipts. Use our <a href="/calculator">HSA growth calculator</a> to see what
-    your balance could be worth in 10 or 20 years.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 3</h3>
-  <p>
-    FSA dollars evaporate if you don&rsquo;t use them. Before your plan year ends, check your FSA balance
-    and spend down remaining funds on eligible expenses&mdash;glasses, dental, prescriptions.
-    Read our guide on <a href="/guides/how-to-read-an-eob">how to read your Explanation of Benefits</a>
-    to make sure the bills you&rsquo;re paying are actually yours to pay.
-  </p>
-</div>
 
 {_embed("hsa-fsa-calculator")}
 
