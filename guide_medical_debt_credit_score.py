@@ -106,6 +106,16 @@ register(
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 1</h3>
+  <p>
+    If you have a medical collection under $500, it should have been removed from your credit report
+    under the 2025 CFPB rule. Pull your reports at AnnualCreditReport.com and verify. If it&rsquo;s still there,
+    file a dispute. Use the <a href="/scan">BillKarma bill scanner</a> to identify any billing errors
+    before debt reaches collections.
+  </p>
+</div>
+
 <h2 id="how-it-gets-reported">2. How Medical Debt Gets on Your Credit Report</h2>
 <p>
   Medical debt doesn&rsquo;t appear on your credit report the moment you receive a bill. There&rsquo;s a
@@ -231,6 +241,26 @@ register(
   the 30-day window, the entry must be deleted.
 </p>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 2</h3>
+  <p>
+    The scoring model matters. Ask your lender which FICO version they use. If they use FICO 9 or VantageScore 4.0,
+    a paid medical collection won&rsquo;t hurt you at all. If they use FICO 8, paying the collection reduces
+    &mdash;but doesn&rsquo;t eliminate&mdash;the negative impact. See how your bill decisions affect your financial
+    options with our <a href="/calculator">medical debt calculator</a>.
+  </p>
+</div>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 3</h3>
+  <p>
+    You have 30 days from a debt collector&rsquo;s first contact to request debt validation.
+    During this window, they cannot continue collection activity. Use it. Read our full guide on
+    <a href="/guides/how-to-dispute-a-medical-bill">how to dispute a medical bill</a> for templates
+    and scripts for every step of the process.
+  </p>
+</div>
+
 <div class="case-study">
   <h3>Case Study: Successful Dispute &mdash; Wrong Person</h3>
   <p>
@@ -290,36 +320,6 @@ register(
   Set up a payment plan&mdash;most hospitals would rather receive $50/month than sell your debt
   to a collection agency for $0.15 on the dollar.
 </p>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 1</h3>
-  <p>
-    If you have a medical collection under $500, it should have been removed from your credit report
-    under the 2025 CFPB rule. Pull your reports at AnnualCreditReport.com and verify. If it&rsquo;s still there,
-    file a dispute. Use the <a href="/scan">BillKarma bill scanner</a> to identify any billing errors
-    before debt reaches collections.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 2</h3>
-  <p>
-    The scoring model matters. Ask your lender which FICO version they use. If they use FICO 9 or VantageScore 4.0,
-    a paid medical collection won&rsquo;t hurt you at all. If they use FICO 8, paying the collection reduces
-    &mdash;but doesn&rsquo;t eliminate&mdash;the negative impact. See how your bill decisions affect your financial
-    options with our <a href="/calculator">medical debt calculator</a>.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 3</h3>
-  <p>
-    You have 30 days from a debt collector&rsquo;s first contact to request debt validation.
-    During this window, they cannot continue collection activity. Use it. Read our full guide on
-    <a href="/guides/how-to-dispute-a-medical-bill">how to dispute a medical bill</a> for templates
-    and scripts for every step of the process.
-  </p>
-</div>
 
 {_embed("medical-debt-credit-calculator")}
 

@@ -125,6 +125,15 @@ register(
   </tbody>
 </table>
 
+<div class="key-takeaway">
+  <h3>Key Takeaway 1</h3>
+  <p>
+    Always compare your actual bill to your Medicare Summary Notice before paying anything.
+    The MSN tells you the maximum you legally owe&mdash;if your bill exceeds that amount, dispute it.
+    Use the <a href="/scan">BillKarma bill scanner</a> to cross-reference charges against Medicare rates instantly.
+  </p>
+</div>
+
 <p>
   The absence of an out-of-pocket maximum under Original Medicare is one of the most consequential facts
   in healthcare finance. A 90-day hospital stay with complications can generate tens of thousands of dollars
@@ -232,6 +241,15 @@ register(
   Medicare billing errors are not rare edge cases&mdash;they&rsquo;re routine. The complexity of the system,
   combined with high billing volume, means errors slip through constantly. Here are the most impactful ones to watch for.
 </p>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 2</h3>
+  <p>
+    If you were kept overnight in the hospital, confirm in writing whether you were admitted as an inpatient
+    or placed under observation. The difference can cost you thousands in SNF care. See how observation status
+    affects your bill with our <a href="/calculator">Medicare cost calculator</a>.
+  </p>
+</div>
 
 <div class="case-study">
   <h3>Error Type 1: Wrong Provider Participation Status</h3>
@@ -381,24 +399,6 @@ register(
   <strong>Levels 4&ndash;5: Medicare Appeals Council and Federal Court</strong> are available for high-stakes disputes
   and are rarely needed for billing errors (as opposed to coverage denials).
 </p>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 1</h3>
-  <p>
-    Always compare your actual bill to your Medicare Summary Notice before paying anything.
-    The MSN tells you the maximum you legally owe&mdash;if your bill exceeds that amount, dispute it.
-    Use the <a href="/scan">BillKarma bill scanner</a> to cross-reference charges against Medicare rates instantly.
-  </p>
-</div>
-
-<div class="key-takeaway">
-  <h3>Key Takeaway 2</h3>
-  <p>
-    If you were kept overnight in the hospital, confirm in writing whether you were admitted as an inpatient
-    or placed under observation. The difference can cost you thousands in SNF care. See how observation status
-    affects your bill with our <a href="/calculator">Medicare cost calculator</a>.
-  </p>
-</div>
 
 <div class="key-takeaway">
   <h3>Key Takeaway 3</h3>

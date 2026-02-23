@@ -306,10 +306,6 @@ register("sleep-study-billing", {
 
 <p>DME suppliers sometimes ship supplies more frequently than the replacement schedule allows and bill your insurance accordingly. If your EOBs show CPAP supply claims more frequently than these intervals, that is a billing irregularity worth investigating.</p>
 
-<div class="key-takeaway">
-    <strong>Tracking your CPAP bills?</strong> Use our <a href="/calculator">free cost calculator</a> to see what Medicare allows for each CPAP supply code and compare it to what your DME supplier is charging. If their price is more than 2&ndash;3x the Medicare rate, ask for a lower-cost alternative or switch suppliers.
-</div>
-
 <h2 id="interpretation-fee">6. The &ldquo;interpretation fee&rdquo; you didn&rsquo;t expect</h2>
 
 <p>One of the most common complaints in sleep medicine billing is the separate physician bill that arrives weeks after the sleep study, from a doctor the patient never met or does not remember. This is the <strong>professional interpretation fee</strong>, and it is a legitimate &mdash; but poorly communicated &mdash; part of how sleep studies are billed.</p>
@@ -367,6 +363,10 @@ register("sleep-study-billing", {
 <p>If the billing department does not resolve your dispute, you can file an appeal through your insurer&rsquo;s formal appeals process, file a complaint with your state insurance commissioner, or for Medicare beneficiaries, request a Medicare redetermination. See <a href="/guides/dispute-bill">our complete bill dispute guide</a> for templates and escalation steps. Use <a href="/hospitals/">our hospital directory</a> to see other patients&rsquo; billing experiences at your sleep lab.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+
+<div class="key-takeaway">
+    <strong>Choosing a sleep center?</strong> Our <a href="/hospitals/">hospital directory</a> shows pricing transparency grades and billing accuracy data for sleep centers near you.
+</div>
 
 <div class="case-study">
     <h3>Case Study 1: CPAP rental billed 18 months past purchase cap &mdash; $2,160 recovered</h3>

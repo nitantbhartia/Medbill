@@ -175,6 +175,12 @@ register("prescription-drug-billing-errors", {
     </tr>
   </tbody>
 </table>
+<div class="key-takeaway">
+  <strong>Key Takeaway 1:</strong> Check the DAW code on every prescription fill for a drug that has a generic
+  equivalent. A DAW-1 code forces you to pay brand-tier pricing even when generics are available, adding hundreds
+  or thousands per year to your drug costs unnecessarily.
+  <a href="/scan">Upload a pharmacy receipt to BillKarma for a DAW code and pricing audit.</a>
+</div>
 
 <h2 id="price-comparison">3. Drug Price Comparison Table</h2>
 <table>
@@ -292,6 +298,12 @@ register("prescription-drug-billing-errors", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<div class="key-takeaway">
+  <strong>Key Takeaway 3:</strong> Audit your pharmacy EOB every quarter. Match the days supply on each claim
+  against what was actually dispensed. A 90-day fill billed as 30 days means you paid three copays for one fill
+  &mdash; a refund that most insurers will issue if you catch and report it.
+  <a href="/hospitals/">Learn how to read every section of an EOB.</a>
+</div>
 <div class="case-study">
   <h3>DAW-1 Code Error Costs Patient $1,200/Year Extra</h3>
   <p>
@@ -395,6 +407,12 @@ register("prescription-drug-billing-errors", {
   <strong>Step 5:</strong> For each drug, look up the GoodRx cash price and compare. If cash price is less than
   your copay, decide whether paying cash makes sense for your deductible situation.
 </p>
+<div class="key-takeaway">
+  <strong>Key Takeaway 2:</strong> Before paying your insurance copay at the pharmacy counter, check the GoodRx
+  cash price on your phone. For patients in the deductible phase, GoodRx frequently beats insurance by $50&ndash;$150
+  per fill on common generic drugs.
+  <a href="/calculator">Use our drug cost calculator to compare annual costs across payment methods.</a>
+</div>
 
 <h2 id="specialty-drugs">10. Specialty Drug Billing</h2>
 <p>
@@ -416,26 +434,8 @@ register("prescription-drug-billing-errors", {
 
 {_embed("prescription-drug-billing-errors")}
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 1:</strong> Check the DAW code on every prescription fill for a drug that has a generic
-  equivalent. A DAW-1 code forces you to pay brand-tier pricing even when generics are available, adding hundreds
-  or thousands per year to your drug costs unnecessarily.
-  <a href="/scan">Upload a pharmacy receipt to BillKarma for a DAW code and pricing audit.</a>
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 2:</strong> Before paying your insurance copay at the pharmacy counter, check the GoodRx
-  cash price on your phone. For patients in the deductible phase, GoodRx frequently beats insurance by $50&ndash;$150
-  per fill on common generic drugs.
-  <a href="/calculator">Use our drug cost calculator to compare annual costs across payment methods.</a>
-</div>
 
-<div class="key-takeaway">
-  <strong>Key Takeaway 3:</strong> Audit your pharmacy EOB every quarter. Match the days supply on each claim
-  against what was actually dispensed. A 90-day fill billed as 30 days means you paid three copays for one fill
-  &mdash; a refund that most insurers will issue if you catch and report it.
-  <a href="/hospitals/">Learn how to read every section of an EOB.</a>
-</div>
 
 <div class="faq-section">
   <h2 id="faqs">Frequently Asked Questions</h2>
