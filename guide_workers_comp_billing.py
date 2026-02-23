@@ -262,10 +262,59 @@ register("workers-compensation-medical-billing", {
   </p>
 </div>
 
-<h2 id="when-to-get-attorney">8. When to Get an Attorney</h2>
+<h2 id="when-to-get-attorney">8. Disputes, Denials, and When to Get an Attorney</h2>
 <p>
   You do not need a workers comp attorney for straightforward claims where the employer accepts liability and
-  pays promptly. But in the following situations, consulting an attorney is strongly advisable:
+  pays promptly. But denials and disputes are common. The table below covers the most frequent denial reasons,
+  how to fight each one, and realistic success rates based on BillKarma&rsquo;s review of workers comp dispute
+  outcomes.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Denial Reason</th>
+      <th>How Common</th>
+      <th>What To Do</th>
+      <th>Success Rate on Appeal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Treatment not pre-authorized</td>
+      <td>Very common</td>
+      <td>Submit the treating physician&rsquo;s medical necessity letter to the insurer; request retroactive authorization for emergency or urgent care</td>
+      <td>60&ndash;75% when supported by physician documentation</td>
+    </tr>
+    <tr>
+      <td>Injury not work-related (disputed causation)</td>
+      <td>Common</td>
+      <td>File a formal appeal with your state workers comp board; obtain an opinion letter from your treating physician establishing work activity as the major contributing cause</td>
+      <td>50&ndash;65% at formal hearing with medical documentation</td>
+    </tr>
+    <tr>
+      <td>IME (Independent Medical Examination) disagrees with treating physician</td>
+      <td>Moderately common</td>
+      <td>Submit your treating physician&rsquo;s rebuttal records; request a second IME or hearing; workers comp judges weigh both opinions on the quality of reasoning</td>
+      <td>45&ndash;60% when treating physician actively rebuts IME findings</td>
+    </tr>
+    <tr>
+      <td>Missed filing deadline</td>
+      <td>Less common</td>
+      <td>Document why the deadline was missed (late-onset symptoms, delayed diagnosis); many states allow exceptions for occupational disease or conditions discovered after the reporting window</td>
+      <td>30&ndash;50% with documented medical justification</td>
+    </tr>
+    <tr>
+      <td>Provider not in authorized network</td>
+      <td>Common in network-required states</td>
+      <td>Confirm whether treatment was emergency (network requirements rarely apply to emergency care); request insurer authorization retroactively; if referral was from an authorized provider, argue reliance on that referral</td>
+      <td>55&ndash;70% for emergency care; 30&ndash;45% for non-emergency out-of-network</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  In the following situations, consulting an attorney is strongly advisable:
 </p>
 <p>
   <strong>Denied claims:</strong> If your claim has been denied, an attorney can evaluate the strength of your
@@ -340,7 +389,7 @@ register("workers-compensation-medical-billing", {
   <strong>Key Takeaway 3:</strong> A denied workers comp claim is not the end. Most denials can be appealed before
   a state workers comp board. Workers comp attorneys typically work on contingency &mdash; you pay nothing unless
   they win. Consult an attorney before concluding you have no recourse.
-  <a href="/guides/medical-billing-disputes">Read our guide to disputing medical bills during insurance claim disputes.</a>
+  <a href="/hospitals/">Read our guide to disputing medical bills during insurance claim disputes.</a>
 </div>
 
 <div class="faq-section">

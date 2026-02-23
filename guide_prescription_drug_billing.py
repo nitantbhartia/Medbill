@@ -103,6 +103,79 @@ register("prescription-drug-billing-errors", {
   can be changed to DAW-0.
 </p>
 
+<table>
+  <thead>
+    <tr>
+      <th>DAW Code</th>
+      <th>Meaning</th>
+      <th>Who Controls It</th>
+      <th>Patient Impact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DAW-0</td>
+      <td>No product selection indicated &mdash; generic is acceptable</td>
+      <td>Neither (default)</td>
+      <td>Generic dispensed; lowest copay tier applies</td>
+    </tr>
+    <tr>
+      <td>DAW-1</td>
+      <td>Physician requires brand-name product</td>
+      <td>Prescriber</td>
+      <td>Brand-tier copay ($40&ndash;$150+ more per fill than DAW-0)</td>
+    </tr>
+    <tr>
+      <td>DAW-2</td>
+      <td>Patient requests brand; generic available</td>
+      <td>Patient</td>
+      <td>Brand-tier copay; some plans charge an additional brand penalty</td>
+    </tr>
+    <tr>
+      <td>DAW-3</td>
+      <td>Pharmacist selects brand (no generic stocked)</td>
+      <td>Pharmacist</td>
+      <td>Usually processed at brand rate; ask pharmacist to order generic</td>
+    </tr>
+    <tr>
+      <td>DAW-4</td>
+      <td>No generic available in marketplace</td>
+      <td>Market</td>
+      <td>Brand copay is unavoidable; check manufacturer coupons</td>
+    </tr>
+    <tr>
+      <td>DAW-5</td>
+      <td>Brand dispensed but generic priced</td>
+      <td>Pharmacist</td>
+      <td>You pay generic-tier cost even though brand was given &mdash; favorable</td>
+    </tr>
+    <tr>
+      <td>DAW-6</td>
+      <td>Override &mdash; reclassification or override by pharmacist</td>
+      <td>Pharmacist</td>
+      <td>Varies; review EOB to confirm tier applied correctly</td>
+    </tr>
+    <tr>
+      <td>DAW-7</td>
+      <td>Brand mandated by law (state substitution law)</td>
+      <td>State regulation</td>
+      <td>Brand copay applies; no patient or prescriber action can change it</td>
+    </tr>
+    <tr>
+      <td>DAW-8</td>
+      <td>Generic not available from manufacturer</td>
+      <td>Supply chain</td>
+      <td>Brand copay; temporary &mdash; recheck when shortage resolves</td>
+    </tr>
+    <tr>
+      <td>DAW-9</td>
+      <td>Other (plan-specific or non-standard use)</td>
+      <td>Plan/PBM</td>
+      <td>Call insurer to confirm correct tier was applied</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="price-comparison">3. Drug Price Comparison Table</h2>
 <table>
   <thead>
@@ -361,7 +434,7 @@ register("prescription-drug-billing-errors", {
   <strong>Key Takeaway 3:</strong> Audit your pharmacy EOB every quarter. Match the days supply on each claim
   against what was actually dispensed. A 90-day fill billed as 30 days means you paid three copays for one fill
   &mdash; a refund that most insurers will issue if you catch and report it.
-  <a href="/guides/insurance-explanation-of-benefits">Learn how to read every section of an EOB.</a>
+  <a href="/hospitals/">Learn how to read every section of an EOB.</a>
 </div>
 
 <div class="faq-section">

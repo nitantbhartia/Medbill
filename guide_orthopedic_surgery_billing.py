@@ -189,6 +189,49 @@ register("orthopedic-surgery-billing-costs", {
   with equivalent surgical outcomes.
 </p>
 
+<table>
+  <thead>
+    <tr>
+      <th>Procedure</th>
+      <th>Hospital Outpatient Average</th>
+      <th>ASC Average</th>
+      <th>Typical Savings</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Knee Arthroscopy (29881)</td>
+      <td>$11,800</td>
+      <td>$5,200</td>
+      <td>$6,600 (56%)</td>
+    </tr>
+    <tr>
+      <td>Rotator Cuff Repair (29827)</td>
+      <td>$23,400</td>
+      <td>$11,100</td>
+      <td>$12,300 (53%)</td>
+    </tr>
+    <tr>
+      <td>ACL Reconstruction (27407)</td>
+      <td>$31,500</td>
+      <td>$13,800</td>
+      <td>$17,700 (56%)</td>
+    </tr>
+    <tr>
+      <td>Total Hip Replacement (27130)</td>
+      <td>$40,200</td>
+      <td>$20,600</td>
+      <td>$19,600 (49%)</td>
+    </tr>
+    <tr>
+      <td>Carpal Tunnel Release (64721)</td>
+      <td>$5,900</td>
+      <td>$2,100</td>
+      <td>$3,800 (64%)</td>
+    </tr>
+  </tbody>
+</table>
+
 <h2 id="implant-billing">5. Implant Billing</h2>
 <p>
   Implant costs are the least transparent element of any orthopedic bill. Hospitals are not legally required to

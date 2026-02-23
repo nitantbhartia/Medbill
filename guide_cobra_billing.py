@@ -287,6 +287,31 @@ register(
   </p>
 </div>
 
+<div class="case-study">
+  <h3>Case Study: Missed 60-Day Election Window &mdash; $14,000 Stuck With Patient</h3>
+  <p>
+    A 29-year-old restaurant worker in Dallas was laid off in September. Her employer&rsquo;s group plan ended
+    immediately. She received the COBRA election notice by mail but set it aside while job hunting, assuming
+    she had &ldquo;plenty of time.&rdquo; Sixty-two days after her coverage ended, she went to an urgent care
+    clinic for what turned out to be appendicitis requiring emergency surgery. She elected COBRA the next day.
+  </p>
+  <p>
+    The problem: her 60-day election window had already closed two days earlier. Her COBRA election was invalid.
+    The insurer rejected it. The $14,200 in emergency surgical bills landed entirely on her as an uninsured patient.
+    Her employer had fewer than 20 employees, so federal COBRA did not apply&mdash;but Texas mini-COBRA (which
+    applies to employers with 2&ndash;19 employees) did. Because she had also missed the Texas continuation
+    election deadline, she had no coverage continuation option available.
+  </p>
+  <p>
+    She negotiated with the hospital directly using the uninsured self-pay rate and reduced the bill to $8,600.
+    The remaining $8,600 went to collections.
+    <strong>Total preventable cost: $14,200 &mdash; avoided with a single action on day 1.</strong>
+    The lesson: treat the COBRA election notice as a 60-day countdown starting the day coverage ends.
+    Calendar it immediately. If your employer has fewer than 20 employees, separately research your state&rsquo;s
+    mini-COBRA rules&mdash;the deadlines and procedures are different from federal COBRA.
+  </p>
+</div>
+
 <h2 id="mini-cobra">6. State Continuation Coverage (Mini-COBRA)</h2>
 <p>
   Federal COBRA only applies to employers with 20 or more employees. If you work for a smaller company,
@@ -363,8 +388,9 @@ register(
   <p>
     The 30-day COBRA payment grace period is not a safety net&mdash;it&rsquo;s a hard deadline.
     Missing it ends your coverage permanently. Set a calendar reminder the moment you elect COBRA.
-    Read our guide on <a href="/guides/how-to-read-an-eob">how to read an Explanation of Benefits</a>
-    to make sure COBRA claims are being processed correctly during your continuation period.
+    Check our <a href="/hospitals/">hospital directory</a> to see pricing transparency grades for facilities
+    you&rsquo;re considering&mdash;if COBRA network continuity is your reason for electing, make sure the
+    hospital you&rsquo;re staying in-network with is actually worth the premium.
   </p>
 </div>
 
