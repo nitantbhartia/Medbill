@@ -1140,25 +1140,51 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 
 
 @app.get("/sitemap.xml")
-async def sitemap_main():
-    return RedirectResponse(url="/sitemap-hospitals.xml", status_code=301)
+async def sitemap_index():
+    base = config.APP_URL.rstrip("/")
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"<sitemap><loc>{base}/sitemap-guides.xml</loc></sitemap>"
+        f"<sitemap><loc>{base}/sitemap-hospitals.xml</loc></sitemap>"
+        "</sitemapindex>"
+    )
+    return Response(content=xml, media_type="application/xml")
 
 
-@app.get("/hospitals/sitemap.xml")
-async def hospital_sitemap():
-    return RedirectResponse(url="/sitemap-hospitals.xml", status_code=301)
+@app.get("/sitemap-guides.xml")
+async def guides_sitemap():
+    from guides import get_guides_for_sitemap
+
+    base = config.APP_URL.rstrip("/")
+    static_urls = [
+        (f"{base}/", "2026-02-01", "1.0"),
+        (f"{base}/guides/", "2026-02-01", "0.8"),
+        (f"{base}/calculator", "2026-02-01", "0.7"),
+    ]
+    static_entries = "".join(
+        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
+        for loc, lastmod, priority in static_urls
+    )
+    guide_entries = "".join(
+        f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
+        for slug, published in get_guides_for_sitemap()
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{static_entries}{guide_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
 
 
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
-    from guides import get_guide_slugs
-
     base = config.APP_URL.rstrip("/")
-    guide_paths = [f"/guides/{slug}" for slug in get_guide_slugs()]
-    paths = ["/", "/guides/", "/calculator", *guide_paths, *get_hospital_sitemap_paths()]
+    hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
-        f"<url><loc>{base}{path}</loc></url>"
-        for path in paths
+        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
+        for path in hospital_paths
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -1166,6 +1192,11 @@ async def hospital_sitemap_v2():
         f"{urlset}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/hospitals/sitemap.xml")
+async def hospital_sitemap_legacy():
+    return RedirectResponse(url="/sitemap-hospitals.xml", status_code=301)
 
 
 @app.get("/robots.txt")
