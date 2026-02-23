@@ -281,17 +281,6 @@ register(
   </p>
 </div>
 
-<div class="key-takeaway">
-  <h3>Key Takeaway 3</h3>
-  <p>
-    The 30-day COBRA payment grace period is not a safety net&mdash;it&rsquo;s a hard deadline.
-    Missing it ends your coverage permanently. Set a calendar reminder the moment you elect COBRA.
-    Check our <a href="/hospitals/">hospital directory</a> to see pricing transparency grades for facilities
-    you&rsquo;re considering&mdash;if COBRA network continuity is your reason for electing, make sure the
-    hospital you&rsquo;re staying in-network with is actually worth the premium.
-  </p>
-</div>
-
 <div class="case-study">
   <h3>Case Study: COBRA Was the Right Call &mdash; Cancer Treatment Continuity</h3>
   <p>
@@ -316,6 +305,17 @@ register(
     $4,880 in excess premiums for the same coverage tier, same network area, with no ongoing treatment
     that required network continuity. A 30-minute comparison at the outset of his job loss would have
     saved him nearly $5,000.
+  </p>
+</div>
+
+<div class="key-takeaway">
+  <h3>Key Takeaway 3</h3>
+  <p>
+    The 30-day COBRA payment grace period is not a safety net&mdash;it&rsquo;s a hard deadline.
+    Missing it ends your coverage permanently. Set a calendar reminder the moment you elect COBRA.
+    Check our <a href="/hospitals/">hospital directory</a> to see pricing transparency grades for facilities
+    you&rsquo;re considering&mdash;if COBRA network continuity is your reason for electing, make sure the
+    hospital you&rsquo;re staying in-network with is actually worth the premium.
   </p>
 </div>
 

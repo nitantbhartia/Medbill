@@ -65,6 +65,10 @@ register("why-emergency-room-bills-are-so-high", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>What&rsquo;s the Medicare rate for your ER visit level?</strong> Use our <a href="/calculator?cpt=99284">free calculator</a> &mdash; enter the CPT code from your bill (99281&ndash;99285) to see what Medicare actually pays vs. what you were charged.
+</div>
+
 <p>The facility fee alone accounts for 40&ndash;60% of most ER bills. It&rsquo;s set by the ER visit level (Level 1&ndash;5), which the hospital assigns based on the complexity of your visit. This is where the most money hides.</p>
 
 <h2 id="real-er-bill">2. A real ER bill, annotated</h2>
@@ -143,10 +147,6 @@ register("why-emergency-room-bills-are-so-high", {
         <tr><td>Level 5</td><td>99285</td><td>Life-threatening, immediate intervention (e.g., stroke, major trauma)</td><td>~$528</td><td>$2,800&ndash;$5,000+</td></tr>
     </tbody>
 </table>
-
-<div class="key-takeaway">
-    <strong>What&rsquo;s the Medicare rate for your ER visit level?</strong> Use our <a href="/calculator?cpt=99284">free calculator</a> &mdash; enter the CPT code from your bill (99281&ndash;99285) to see what Medicare actually pays vs. what you were charged.
-</div>
 
 <p><strong>Common upcoding scenarios</strong> (where patients are often billed at a higher level than warranted):</p>
 

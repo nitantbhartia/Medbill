@@ -270,9 +270,7 @@ register("medical-bill-collections-rights", {
     <li><strong>Request a payment plan if you can&rsquo;t pay a lump sum.</strong> Many collectors will accept monthly payments, though the total settlement amount may be higher than a lump-sum offer.</li>
 </ol>
 
-<div class="key-takeaway">
-    <strong>Never pay a collector without a written settlement agreement.</strong> Verbal promises mean nothing. Get the settlement terms&mdash;the exact amount, the &ldquo;settled in full&rdquo; language, and the credit reporting commitment&mdash;in writing before you send a single dollar.
-</div>
+
 
 <h2 id="case-studies">7. Real case studies</h2>
 

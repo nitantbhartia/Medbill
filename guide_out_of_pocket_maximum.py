@@ -172,6 +172,9 @@ register("out-of-pocket-maximum", {
     <li><strong>Flag the date you hit your OOP max</strong> — once you hit it, any new bills for covered in-network services should show $0 patient responsibility. If they don&rsquo;t, call the provider&rsquo;s billing department immediately with your insurer&rsquo;s accumulator statement as proof.</li>
 </ol>
 
+
+<div class="key-takeaway"><strong>Check if you were charged past your maximum.</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we compare your charges against your out-of-pocket maximum and flag any cost-sharing that appears incorrect.</div>
+
 <h2 id="case-studies">7. Case studies</h2>
 
 <div class="case-study">

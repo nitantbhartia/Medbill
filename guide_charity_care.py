@@ -180,10 +180,6 @@ register("hospital-financial-assistance-charity-care", {
 </ol>
 
 <div class="key-takeaway">
-    <strong>Don&rsquo;t give up after one denial.</strong> Many patients are initially denied for fixable reasons like a missing document or an incomplete form. Resubmitting with complete information often results in approval. Hospitals process thousands of these applications and understand that paperwork gets lost or overlooked.
-</div>
-
-<div class="key-takeaway">
     <strong>Ready to take the first step on your bill?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag overcharges, identify CPT codes billed above Medicare rates, and give you a prioritized list of issues to raise when you submit your financial assistance application.
 </div>
 

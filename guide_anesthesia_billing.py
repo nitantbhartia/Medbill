@@ -215,6 +215,8 @@ register("anesthesia-billing", {
 
 <h2 id="case-studies">7. Case studies: anesthesia disputes resolved</h2>
 
+<div class="key-takeaway"><strong>Not sure what you were charged for?</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare pays for any anesthesia CPT code on your bill.</div>
+
 <div class="case-study">
     <h3>Case Study 1: Out-of-network anesthesia bill, NSA violation — $1,840 eliminated</h3>
     <p>A patient scheduled a knee arthroscopy at an in-network hospital. The surgeon was in-network. After surgery, he received a separate bill for $1,840 from &ldquo;Allied Anesthesia Services&rdquo; &mdash; a group that was out-of-network with his insurer. His insurer&rsquo;s EOB showed the claim was processed at out-of-network rates, leaving him with $1,840 in patient responsibility.</p>

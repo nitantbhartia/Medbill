@@ -211,6 +211,9 @@ register("texas-hospital-charity-care", {
     <strong>Ready to audit your Texas hospital bill?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we flag every charge above Medicare rates, identify E&M upcoding, supply charge inflation, and balance billing violations, and generate a dispute letter ready to send to the Texas Department of Insurance or the hospital billing department.
 </div>
 
+
+<div class="key-takeaway"><strong>See what Texas hospitals actually charge.</strong> Our <a href="/hospitals/">hospital directory</a> shows charity care eligibility thresholds and billing accuracy grades for every major Texas hospital.</div>
+
 <h2 id="case-studies">8. Real patient results</h2>
 
 <div class="case-study">

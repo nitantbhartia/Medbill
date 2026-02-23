@@ -199,10 +199,6 @@ register("how-to-appeal-insurance-denial", {
 
 <p>Here&rsquo;s a complete sample appeal letter for a &ldquo;not medically necessary&rdquo; MRI denial. Adapt this to your situation by replacing the bracketed information:</p>
 
-<div class="key-takeaway">
-    <strong>Not sure if your denial is worth fighting?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we identify coding errors and overcharges that strengthen your appeal and show exactly how much money is on the table.
-</div>
-
 <div class="case-study">
     <h3>Sample appeal letter &mdash; &ldquo;not medically necessary&rdquo; MRI denial</h3>
     <p><em>[Your Name]<br>[Your Address]<br>[City, State, ZIP]<br>[Date]</em></p>
@@ -271,6 +267,10 @@ register("how-to-appeal-insurance-denial", {
 <p>Check how your denied service compares to standard pricing. This can strengthen your case by showing the service is routine and commonly covered:</p>
 
 {_embed(mode="markup", title="Check pricing for your denied service", subtitle="Enter the CPT code and billed amount from your denial notice.", height="420")}
+
+<div class="key-takeaway">
+    <strong>Not sure if your denial is worth fighting?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we identify coding errors and overcharges that strengthen your appeal and show exactly how much money is on the table.
+</div>
 
 <h2 id="real-results">7. Real appeal results (case studies)</h2>
 

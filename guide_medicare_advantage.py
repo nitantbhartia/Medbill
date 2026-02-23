@@ -101,6 +101,11 @@ register("medicare-advantage-billing", {
     </tbody>
 </table>
 
+<div class="key-takeaway">
+    <strong>Compare Medicare Advantage plans by hospital.</strong> Our <a href="/hospitals/">hospital directory</a> shows which facilities are in-network for common Medicare Advantage plans and how they grade on billing accuracy.
+</div>
+
+
 <p><strong>Always verify network status before scheduling care.</strong> Call the plan&rsquo;s member services line or use the plan&rsquo;s online directory to confirm your specific providers are in-network. Provider directories are sometimes outdated &mdash; calling the provider&rsquo;s office to confirm their current insurance contracts is the safest step.</p>
 
 <h2 id="common-problems">4. Common Medicare Advantage billing problems</h2>

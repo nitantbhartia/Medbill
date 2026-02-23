@@ -135,10 +135,6 @@ register("how-to-read-your-medical-bill", {
     </tbody>
 </table>
 
-<div class="key-takeaway">
-    <strong>Spotted a code you don&rsquo;t recognize?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we decode every CPT code, compare it to Medicare rates, and tell you exactly which charges are out of line.
-</div>
-
 <p><strong>Why this matters:</strong> The CPT code determines what Medicare pays for a service. If the code on your bill is wrong (a higher-level code than what was performed), you&rsquo;re being overcharged. This is called <em>upcoding</em>.</p>
 
 <p>Look up any CPT code from your bill to see what Medicare pays for it in your area:</p>
