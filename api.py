@@ -704,6 +704,7 @@ async def email_report(request: Request):
         raise HTTPException(400, "email is required")
     if not bill_id:
         raise HTTPException(400, "bill_id is required")
+    require_bill_access(request, int(bill_id))
 
     require_bill_access(request, int(bill_id))
 
