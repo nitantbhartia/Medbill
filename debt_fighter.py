@@ -1,8 +1,36 @@
 """Medical debt fighting tools: SOL calculator, FDCPA letters, charity care, settlement offers."""
 import logging
-from datetime import date, timedelta
+import re
+from datetime import date
 
 log = logging.getLogger(__name__)
+
+# Oldest reasonable date for medical billing
+_MIN_DATE = date(1990, 1, 1)
+
+
+def _sanitize_text(value: str) -> str:
+    """Strip newlines and control characters from user input.
+
+    Prevents injection of extra lines/sections into generated letters.
+    """
+    cleaned = re.sub(r"[\n\r\t]+", " ", value)
+    cleaned = re.sub(r"[^\x20-\x7E]", "", cleaned)
+    return cleaned.strip()
+
+
+def _validate_amount(value: str) -> str:
+    """Validate that amount looks like a dollar figure. Returns cleaned string."""
+    cleaned = re.sub(r"[,$\s]", "", value.strip())
+    try:
+        num = float(cleaned)
+    except ValueError:
+        raise ValueError(f"Invalid amount: {value}")
+    if num <= 0:
+        raise ValueError("Amount must be positive")
+    if num > 10_000_000:
+        raise ValueError("Amount exceeds reasonable limit")
+    return f"{num:,.2f}"
 
 # Statute of limitations by state (years). Source: state civil procedure codes.
 # "partial_resets_sol" = making a partial payment restarts the clock.
@@ -106,10 +134,19 @@ def check_sol(state: str, start_date: str) -> dict:
     except (ValueError, TypeError):
         return {"status": "error", "message": "Invalid date format. Use YYYY-MM-DD."}
 
+    today = date.today()
+    if dt > today:
+        return {"status": "error", "message": "Date cannot be in the future."}
+    if dt < _MIN_DATE:
+        return {"status": "error", "message": "Date must be after 1990."}
+
     info = SOL_BY_STATE[code]
     sol_years = info["years"]
-    expiry = date(dt.year + sol_years, dt.month, dt.day)
-    today = date.today()
+    # Handle leap year edge case (Feb 29 + N years may land on non-leap year)
+    try:
+        expiry = date(dt.year + sol_years, dt.month, dt.day)
+    except ValueError:
+        expiry = date(dt.year + sol_years, dt.month, dt.day - 1)
     expired = today >= expiry
 
     return {
@@ -140,6 +177,14 @@ def generate_fdcpa_letter(
     The letter invokes 15 U.S.C. § 1692g(b) to dispute the debt
     and demand validation. It does NOT acknowledge the debt as valid.
     """
+    user_name = _sanitize_text(user_name)
+    user_address = _sanitize_text(user_address)
+    collector_name = _sanitize_text(collector_name)
+    collector_address = _sanitize_text(collector_address)
+    account_number = _sanitize_text(account_number)
+    amount = _validate_amount(amount)
+    date_of_notice = _sanitize_text(date_of_notice)
+
     today_str = date.today().strftime("%B %d, %Y")
 
     letter = f"""{user_name}
@@ -271,6 +316,14 @@ def generate_settlement_letter(
     Does NOT acknowledge the debt as valid. Conditions payment on written
     confirmation of credit bureau deletion.
     """
+    user_name = _sanitize_text(user_name)
+    user_address = _sanitize_text(user_address)
+    collector_name = _sanitize_text(collector_name)
+    collector_address = _sanitize_text(collector_address)
+    account_number = _sanitize_text(account_number)
+    original_amount = _validate_amount(original_amount)
+    offer_amount = _validate_amount(offer_amount)
+
     today_str = date.today().strftime("%B %d, %Y")
 
     letter = f"""{user_name}
