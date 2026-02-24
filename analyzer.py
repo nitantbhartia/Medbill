@@ -250,6 +250,55 @@ def _sum_patient_responsibility(items: list[dict]) -> float | None:
     return max(0.0, round(sum(values), 2))
 
 
+def _infer_total_patient_owes(extracted_data: dict) -> str | None:
+    """Infer patient balance when bill-level total_patient_owes is missing.
+
+    Returns a source key when inferred, otherwise None.
+    """
+    current = extracted_data.get("total_patient_owes")
+    try:
+        if current is not None and float(current) > 0:
+            return None
+    except (TypeError, ValueError):
+        pass
+
+    line_items = extracted_data.get("line_items", [])
+    if not line_items:
+        return None
+
+    # Best signal: explicit per-line patient responsibility values.
+    from_line_items = _sum_patient_responsibility(line_items)
+    if from_line_items is not None and from_line_items > 0:
+        extracted_data["total_patient_owes"] = round(from_line_items, 2)
+        return "line_item_patient_responsibility"
+
+    # Fallback for insurer-style statements: charged - insurance paid - adjustments.
+    try:
+        total_charged = float(extracted_data.get("total_charged") or 0)
+    except (TypeError, ValueError):
+        total_charged = 0.0
+    if total_charged <= 0:
+        return None
+
+    paid_total = 0.0
+    adj_total = 0.0
+    has_insurance_fields = False
+    for item in line_items:
+        if item.get("insurance_paid") is not None:
+            has_insurance_fields = True
+            paid_total += float(item.get("insurance_paid") or 0)
+        if item.get("insurance_adjustment") is not None:
+            has_insurance_fields = True
+            adj_total += float(item.get("insurance_adjustment") or 0)
+
+    if not has_insurance_fields:
+        return None
+
+    inferred = max(0.0, total_charged - paid_total - adj_total)
+    extracted_data["total_patient_owes"] = round(min(inferred, total_charged), 2)
+    return "charged_minus_insurance"
+
+
 def _apply_patient_impact_savings(finding: dict, bill_patient_owes: float | None) -> None:
     """Convert raw savings into patient-impact estimate when possible."""
     gross = float(finding.get("potential_savings") or 0.0)
@@ -418,6 +467,12 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     line_items = extracted_data.get("line_items", [])
 
+    inferred_patient_owes_source = _infer_total_patient_owes(extracted_data)
+    if inferred_patient_owes_source:
+        warnings.append(
+            "Estimated patient balance from insurance/billing breakdown because explicit outstanding balance was not detected."
+        )
+
     # Prorate bill-level patient_owes to line items so savings are patient-centric
     _prorate_patient_responsibility(extracted_data)
 
@@ -562,6 +617,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
+        "patient_owes_inferred_source": inferred_patient_owes_source,
         "has_patient_data": has_patient_data,
         "savings_prorated": savings_prorated,
         "adaptive_thresholds": {

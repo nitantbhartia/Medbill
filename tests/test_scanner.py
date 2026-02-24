@@ -75,6 +75,42 @@ class TestAddConfidenceFlags:
         assert result["line_items"][1]["confidence"] == "low"
         assert result["line_items"][2]["confidence"] == "medium"
 
+    def test_backfills_total_patient_owes_from_line_patient_responsibility(self):
+        extracted = {
+            "total_charged": 740.62,
+            "total_patient_owes": None,
+            "line_items": [
+                {"cpt_code": "99396", "description": "Preventive Visit", "charged_amount": 331.00, "patient_responsibility": 50.00},
+                {"cpt_code": "99214", "description": "Office Visit", "charged_amount": 409.62, "patient_responsibility": 52.09},
+            ],
+        }
+        result = _add_confidence_flags(extracted)
+        assert result["total_patient_owes"] == 102.09
+
+    def test_backfills_total_patient_owes_from_insurance_math(self):
+        extracted = {
+            "total_charged": 740.62,
+            "total_patient_owes": None,
+            "line_items": [
+                {"cpt_code": "99396", "description": "Preventive Visit", "charged_amount": 331.00, "insurance_paid": 300.00, "insurance_adjustment": 0.0},
+                {"cpt_code": "99214", "description": "Office Visit", "charged_amount": 409.62, "insurance_paid": 338.53, "insurance_adjustment": 0.0},
+            ],
+        }
+        result = _add_confidence_flags(extracted)
+        assert result["total_patient_owes"] == 102.09
+
+    def test_does_not_override_existing_total_patient_owes(self):
+        extracted = {
+            "total_charged": 740.62,
+            "total_patient_owes": 99.00,
+            "line_items": [
+                {"cpt_code": "99396", "description": "Preventive Visit", "charged_amount": 331.00, "insurance_paid": 300.00},
+                {"cpt_code": "99214", "description": "Office Visit", "charged_amount": 409.62, "insurance_paid": 338.53},
+            ],
+        }
+        result = _add_confidence_flags(extracted)
+        assert result["total_patient_owes"] == 99.00
+
 
 class TestOcrQualityScoring:
     def test_quality_score_penalizes_reconciliation_mismatch(self):

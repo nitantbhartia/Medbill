@@ -37,7 +37,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1">Address</label>
-                    <input type="text" id="user_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                    <input type="text" id="user_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1">Collection Agency Address</label>
-                    <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    <input type="text" id="collector_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1">Account Number</label>
@@ -86,6 +86,40 @@
 {% block scripts %}
 <script>
 let letterText = '';
+
+function initSettleDebtAddressAutofill() {
+    if (!(window.google && google.maps && google.maps.places)) {
+        return;
+    }
+    var userAddressEl = document.getElementById('user_address');
+    var collectorAddressEl = document.getElementById('collector_address');
+
+    if (userAddressEl) {
+        var userAutocomplete = new google.maps.places.Autocomplete(userAddressEl, {
+            types: ['address'],
+            fields: ['formatted_address']
+        });
+        userAutocomplete.addListener('place_changed', function() {
+            var place = userAutocomplete.getPlace();
+            if (place && place.formatted_address) {
+                userAddressEl.value = place.formatted_address;
+            }
+        });
+    }
+
+    if (collectorAddressEl) {
+        var collectorAutocomplete = new google.maps.places.Autocomplete(collectorAddressEl, {
+            types: ['address'],
+            fields: ['formatted_address']
+        });
+        collectorAutocomplete.addListener('place_changed', function() {
+            var place = collectorAutocomplete.getPlace();
+            if (place && place.formatted_address) {
+                collectorAddressEl.value = place.formatted_address;
+            }
+        });
+    }
+}
 
 function showForm() {
     document.getElementById('form-section').classList.remove('hidden');
@@ -140,5 +174,14 @@ function downloadLetter() {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+window.initSettleDebtAddressAutofill = initSettleDebtAddressAutofill;
 </script>
+{% if config.GOOGLE_PLACES_API_KEY %}
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_PLACES_API_KEY }}&libraries=places&callback=initSettleDebtAddressAutofill"
+></script>
+{% endif %}
 {% endblock %}

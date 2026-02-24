@@ -88,9 +88,11 @@ CRITICAL RULES:
 - The "line_items" field MUST be an array containing ALL line items from the bill.
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
+- For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
 - CPT codes may be labeled "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
 - Some bills show only descriptions without codes — still extract those items.
 - EOBs (Explanation of Benefits) have a different layout than hospital bills — handle both.
+- For insurer portal/EOB layouts, do NOT confuse total_charged with total_patient_owes. If both are present, extract both.
 - Medical bills format varies widely. Look for tables, grids, or lists of services.
 
 Return valid JSON only. No markdown, no preamble."""
@@ -150,6 +152,32 @@ def _add_confidence_flags(extracted: dict) -> dict:
     # Normalize bill-level totals
     extracted["total_charged"] = _coerce_numeric(extracted.get("total_charged"))
     extracted["total_patient_owes"] = _coerce_numeric(extracted.get("total_patient_owes"))
+
+    # Backfill missing patient-owes using line-level insurance breakdowns.
+    if not extracted.get("total_patient_owes"):
+        line_items = extracted.get("line_items", [])
+        line_resp_values = [
+            float(item.get("patient_responsibility"))
+            for item in line_items
+            if item.get("patient_responsibility") is not None
+        ]
+        if line_resp_values:
+            extracted["total_patient_owes"] = round(max(0.0, sum(line_resp_values)), 2)
+        elif extracted.get("total_charged"):
+            total_charged = float(extracted.get("total_charged") or 0.0)
+            insurance_paid = sum(
+                float(item.get("insurance_paid") or 0.0)
+                for item in line_items
+                if item.get("insurance_paid") is not None
+            )
+            insurance_adj = sum(
+                float(item.get("insurance_adjustment") or 0.0)
+                for item in line_items
+                if item.get("insurance_adjustment") is not None
+            )
+            if insurance_paid or insurance_adj:
+                inferred = max(0.0, total_charged - insurance_paid - insurance_adj)
+                extracted["total_patient_owes"] = round(min(inferred, total_charged), 2)
 
     return extracted
 

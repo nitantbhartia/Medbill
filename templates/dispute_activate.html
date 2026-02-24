@@ -87,7 +87,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">Mailing address</label>
-                    <input id="patient-address" type="text" placeholder="123 Main St, City, ST 12345"
+                    <input id="patient-address" type="text" autocomplete="street-address" placeholder="123 Main St, City, ST 12345"
                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"/>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -274,6 +274,26 @@ const DOC_NAMES = {
 const signed = { hipaa_authorization: false, representative_designation: false, terms_of_service: false };
 let activeDoc = null;
 
+function initDisputeActivateAddressAutofill() {
+    if (!(window.google && google.maps && google.maps.places)) {
+        return;
+    }
+    var patientAddressEl = document.getElementById('patient-address');
+    if (!patientAddressEl) {
+        return;
+    }
+    var patientAutocomplete = new google.maps.places.Autocomplete(patientAddressEl, {
+        types: ['address'],
+        fields: ['formatted_address']
+    });
+    patientAutocomplete.addListener('place_changed', function() {
+        var place = patientAutocomplete.getPlace();
+        if (place && place.formatted_address) {
+            patientAddressEl.value = place.formatted_address;
+        }
+    });
+}
+
 function updatePayButton() {
     const allSigned = Object.values(signed).every(Boolean);
     document.getElementById('proceed-to-pay').disabled = !allSigned;
@@ -396,5 +416,14 @@ document.getElementById('proceed-to-pay').addEventListener('click', async () => 
         btn.textContent = `Pay $${FEE_DOLLARS} and Fight This Bill →`;
     }
 });
+
+window.initDisputeActivateAddressAutofill = initDisputeActivateAddressAutofill;
 </script>
+{% if config.GOOGLE_PLACES_API_KEY %}
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_PLACES_API_KEY }}&libraries=places&callback=initDisputeActivateAddressAutofill"
+></script>
+{% endif %}
 {% endblock %}
