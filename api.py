@@ -47,6 +47,7 @@ router = APIRouter(prefix="/api")
 
 _rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 _tools_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+_debt_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 
 
 def _check_rate_limit(ip: str) -> bool:
@@ -71,6 +72,33 @@ def _check_tools_rate_limit(ip: str) -> bool:
         return False
     _tools_rate_buckets[ip].append(now)
     return True
+
+
+def _check_debt_rate_limit(ip: str) -> bool:
+    """Rate limit for debt-letter tools to prevent generation/send abuse."""
+    now = time.monotonic()
+    window = config.DEBT_RATE_LIMIT_WINDOW_SECONDS
+    bucket = _debt_rate_buckets[ip]
+    _debt_rate_buckets[ip] = [t for t in bucket if now - t < window]
+    if len(_debt_rate_buckets[ip]) >= config.DEBT_RATE_LIMIT_REQUESTS:
+        return False
+    _debt_rate_buckets[ip].append(now)
+    return True
+
+
+def _request_client_key(request: Request) -> str:
+    """Best-effort real client identifier across direct and proxied traffic."""
+    forwarded = (request.headers.get("cf-connecting-ip") or "").strip()
+    if forwarded:
+        return forwarded
+    xff = (request.headers.get("x-forwarded-for") or "").strip()
+    if xff:
+        # First hop is the original client in standard XFF format.
+        return xff.split(",", 1)[0].strip()
+    xri = (request.headers.get("x-real-ip") or "").strip()
+    if xri:
+        return xri
+    return request.client.host if request.client else "unknown"
 
 
 ALLOWED_MIME_TYPES = {
@@ -129,7 +157,7 @@ async def scan_bill(
         raise HTTPException(400, "No files uploaded")
 
     # Rate limit by client IP
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _request_client_key(request)
     if not _check_rate_limit(client_ip):
         raise HTTPException(
             429,
@@ -993,7 +1021,7 @@ async def calculator_markup_check(cpt_code: str, charged: float, zip_code: str =
 @router.post("/tools/{slug}/run")
 async def run_tool_endpoint(slug: str, request: Request):
     """Run a deterministic tool workflow and persist run metadata."""
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _request_client_key(request)
     if not _check_tools_rate_limit(client_ip):
         raise HTTPException(
             429,
@@ -1038,7 +1066,7 @@ async def run_tool_endpoint(slug: str, request: Request):
 @router.post("/tools/lead-capture")
 async def tool_lead_capture(request: Request):
     """Capture tool lead emails for lifecycle follow-up (no immediate drip send)."""
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _request_client_key(request)
     if not _check_tools_rate_limit(client_ip):
         raise HTTPException(
             429,
@@ -1552,9 +1580,9 @@ import debt_fighter
 
 
 def _debt_rate_check(request: Request):
-    """Rate-limit debt fighter endpoints (same limits as /scan)."""
-    client_ip = request.client.host if request.client else "unknown"
-    if not _check_rate_limit(client_ip):
+    """Rate-limit debt fighter endpoints with separate tighter limits."""
+    client_ip = _request_client_key(request)
+    if not _check_debt_rate_limit(client_ip):
         raise HTTPException(429, "Too many requests. Please try again later.")
 
 
@@ -1647,12 +1675,40 @@ async def generate_fdcpa_letter(request: Request):
 
 @router.post("/collection-notice/send")
 async def send_fdcpa_letter(request: Request):
-    """Send the FDCPA letter via certified mail (Lob integration placeholder)."""
+    """Send the FDCPA letter via certified mail (requires successful Stripe payment)."""
     _debt_rate_check(request)
     body = await request.json()
+    debt_letter_id = body.get("debt_letter_id")
     letter_text = (body.get("letter_text") or "").strip()
+    if not debt_letter_id:
+        raise HTTPException(400, "debt_letter_id is required")
     if not letter_text:
         raise HTTPException(400, "letter_text is required")
+
+    with get_db() as db:
+        row = db.execute(
+            "SELECT id, stripe_payment_id FROM debt_letters WHERE id = ?",
+            (debt_letter_id,),
+        ).fetchone()
+    if not row:
+        raise HTTPException(404, "Letter not found")
+
+    stripe_session_id = (row["stripe_payment_id"] or "").strip()
+    if not stripe_session_id:
+        raise HTTPException(402, "Payment required before sending")
+
+    try:
+        session = payment_module.get_session(stripe_session_id)
+    except RuntimeError as exc:
+        log.warning("Failed to verify Stripe payment for debt_letter_id=%s: %s", debt_letter_id, exc)
+        raise HTTPException(502, "Unable to verify payment status")
+
+    if session.get("payment_status") != "paid":
+        raise HTTPException(402, "Payment required before sending")
+
+    metadata = session.get("metadata") or {}
+    if str(metadata.get("debt_letter_id") or "") not in {"", str(debt_letter_id)}:
+        raise HTTPException(403, "Payment does not match this letter")
 
     if not config.LOB_API_KEY:
         return {
