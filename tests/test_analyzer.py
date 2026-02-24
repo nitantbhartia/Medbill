@@ -209,3 +209,55 @@ class TestProration:
         result = analyze_bill(bill, "33021")
         if result["total_findings"] > 0:
             assert result["total_potential_savings"] <= 200.0
+
+    def test_infers_patient_owes_from_insurance_breakdown_when_missing(self):
+        bill = {
+            "total_charged": 740.62,
+            "line_items": [
+                {
+                    "cpt_code": "99214",
+                    "description": "Office visit established",
+                    "charged_amount": 350.30,
+                    "insurance_paid": 300.00,
+                    "insurance_adjustment": 0.0,
+                    "quantity": 1,
+                },
+                {
+                    "cpt_code": "99396",
+                    "description": "Preventive visit",
+                    "charged_amount": 390.32,
+                    "insurance_paid": 338.53,
+                    "insurance_adjustment": 0.0,
+                    "quantity": 1,
+                },
+            ],
+        }
+        result = analyze_bill(bill, "33021")
+        assert result["patient_owes"] == 102.09
+        assert result["patient_owes_inferred_source"] == "charged_minus_insurance"
+        assert result["total_potential_savings"] <= 102.09
+
+    def test_infers_patient_owes_from_line_responsibility_when_missing(self):
+        bill = {
+            "total_charged": 1000.0,
+            "line_items": [
+                {
+                    "cpt_code": "99214",
+                    "description": "Office visit established",
+                    "charged_amount": 600.0,
+                    "patient_responsibility": 60.0,
+                    "quantity": 1,
+                },
+                {
+                    "cpt_code": "99213",
+                    "description": "Office visit",
+                    "charged_amount": 400.0,
+                    "patient_responsibility": 40.0,
+                    "quantity": 1,
+                },
+            ],
+        }
+        result = analyze_bill(bill, "33021")
+        assert result["patient_owes"] == 100.0
+        assert result["patient_owes_inferred_source"] == "line_item_patient_responsibility"
+        assert result["total_potential_savings"] <= 100.0

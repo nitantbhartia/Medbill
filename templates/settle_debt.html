@@ -37,7 +37,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1 flex items-center gap-1">Address<span class="bk-tip" data-tip="Your current mailing address. Used as the return address on the letter so the collector can send a written agreement back to you. Always get the agreement in writing before sending any payment."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                    <input type="text" id="user_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                    <input type="text" id="user_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1 flex items-center gap-1">Collection Agency Address<span class="bk-tip" data-tip="The mailing address to send the settlement letter. Use the address from their most recent notice — send via certified mail so you have proof of delivery."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                    <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    <input type="text" id="collector_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1 flex items-center gap-1">Account Number<span class="bk-tip" data-tip="The account or reference number from the collection notice. This is how the collector identifies your debt in their system."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
@@ -86,6 +86,40 @@
 {% block scripts %}
 <script>
 let letterText = '';
+
+function initSettleDebtAddressAutofill() {
+    if (!(window.google && google.maps && google.maps.places)) {
+        return;
+    }
+    var userAddressEl = document.getElementById('user_address');
+    var collectorAddressEl = document.getElementById('collector_address');
+
+    if (userAddressEl) {
+        var userAutocomplete = new google.maps.places.Autocomplete(userAddressEl, {
+            types: ['address'],
+            fields: ['formatted_address']
+        });
+        userAutocomplete.addListener('place_changed', function() {
+            var place = userAutocomplete.getPlace();
+            if (place && place.formatted_address) {
+                userAddressEl.value = place.formatted_address;
+            }
+        });
+    }
+
+    if (collectorAddressEl) {
+        var collectorAutocomplete = new google.maps.places.Autocomplete(collectorAddressEl, {
+            types: ['address'],
+            fields: ['formatted_address']
+        });
+        collectorAutocomplete.addListener('place_changed', function() {
+            var place = collectorAutocomplete.getPlace();
+            if (place && place.formatted_address) {
+                collectorAddressEl.value = place.formatted_address;
+            }
+        });
+    }
+}
 
 function showForm() {
     document.getElementById('form-section').classList.remove('hidden');
@@ -140,5 +174,14 @@ function downloadLetter() {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+window.initSettleDebtAddressAutofill = initSettleDebtAddressAutofill;
 </script>
+{% if config.GOOGLE_PLACES_API_KEY %}
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_PLACES_API_KEY }}&libraries=places&callback=initSettleDebtAddressAutofill"
+></script>
+{% endif %}
 {% endblock %}

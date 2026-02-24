@@ -2,6 +2,7 @@ import collections
 import json
 import logging
 import re
+import secrets
 import time
 from datetime import datetime
 
@@ -37,6 +38,7 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
 _rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+_tools_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 
 
 def _check_rate_limit(ip: str) -> bool:
@@ -48,6 +50,18 @@ def _check_rate_limit(ip: str) -> bool:
     if len(_rate_buckets[ip]) >= config.RATE_LIMIT_REQUESTS:
         return False
     _rate_buckets[ip].append(now)
+    return True
+
+
+def _check_tools_rate_limit(ip: str) -> bool:
+    """Rate limit for tool APIs to reduce abuse and noisy scans."""
+    now = time.monotonic()
+    window = config.TOOLS_RATE_LIMIT_WINDOW_SECONDS
+    bucket = _tools_rate_buckets[ip]
+    _tools_rate_buckets[ip] = [t for t in bucket if now - t < window]
+    if len(_tools_rate_buckets[ip]) >= config.TOOLS_RATE_LIMIT_REQUESTS:
+        return False
+    _tools_rate_buckets[ip].append(now)
     return True
 
 
@@ -69,6 +83,38 @@ CLAIM_TRANSITIONS = {
 def _validate_email(email: str) -> bool:
     token = (email or "").strip()
     return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", token))
+
+
+async def _parse_json_object(request: Request) -> dict:
+    try:
+        payload = await request.json()
+    except json.JSONDecodeError:
+        raise HTTPException(400, "Invalid JSON payload")
+    if not isinstance(payload, dict):
+        raise HTTPException(400, "Payload must be a JSON object")
+    return payload
+
+
+def _assert_payload_size(payload: dict, limit_bytes: int, message: str) -> None:
+    size = len(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+    if size > limit_bytes:
+        raise HTTPException(413, message)
+
+
+def _require_admin_access(request: Request) -> None:
+    """Require explicit admin token in production; fallback localhost-only in debug."""
+    token = (config.ADMIN_API_TOKEN or "").strip()
+    if token:
+        presented = request.headers.get("x-admin-token", "")
+        if not presented or not secrets.compare_digest(presented, token):
+            raise HTTPException(403, "Admin token required")
+        return
+
+    if config.DEBUG:
+        return
+    client_ip = request.client.host if request.client else "unknown"
+    if client_ip not in ("127.0.0.1", "::1"):
+        raise HTTPException(403, "Admin token required")
 
 
 @router.post("/scan")
@@ -918,13 +964,22 @@ async def calculator_markup_check(cpt_code: str, charged: float, zip_code: str =
 @router.post("/tools/{slug}/run")
 async def run_tool_endpoint(slug: str, request: Request):
     """Run a deterministic tool workflow and persist run metadata."""
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_tools_rate_limit(client_ip):
+        raise HTTPException(
+            429,
+            f"Too many tool requests. Max {config.TOOLS_RATE_LIMIT_REQUESTS} per window.",
+        )
     tool = get_tool(slug)
     if not tool:
         raise HTTPException(404, "Tool not found")
 
-    payload = await request.json()
-    if not isinstance(payload, dict):
-        raise HTTPException(400, "Payload must be a JSON object")
+    payload = await _parse_json_object(request)
+    _assert_payload_size(
+        payload,
+        config.MAX_TOOL_PAYLOAD_BYTES,
+        f"Payload too large. Limit is {config.MAX_TOOL_PAYLOAD_BYTES} bytes.",
+    )
 
     try:
         result = run_tool(slug, payload)
@@ -954,9 +1009,19 @@ async def run_tool_endpoint(slug: str, request: Request):
 @router.post("/tools/lead-capture")
 async def tool_lead_capture(request: Request):
     """Capture tool lead emails for lifecycle follow-up (no immediate drip send)."""
-    payload = await request.json()
-    if not isinstance(payload, dict):
-        raise HTTPException(400, "Payload must be a JSON object")
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_tools_rate_limit(client_ip):
+        raise HTTPException(
+            429,
+            f"Too many tool requests. Max {config.TOOLS_RATE_LIMIT_REQUESTS} per window.",
+        )
+
+    payload = await _parse_json_object(request)
+    _assert_payload_size(
+        payload,
+        config.MAX_TOOL_CONTEXT_BYTES,
+        f"Payload too large. Limit is {config.MAX_TOOL_CONTEXT_BYTES} bytes.",
+    )
 
     email = (payload.get("email") or "").strip().lower()
     tool_slug = (payload.get("tool_slug") or "").strip()
@@ -967,6 +1032,8 @@ async def tool_lead_capture(request: Request):
         raise HTTPException(400, "Valid email required")
     if not get_tool(tool_slug):
         raise HTTPException(400, "Unknown tool_slug")
+    if context is not None and not isinstance(context, (dict, list, str, int, float, bool)):
+        raise HTTPException(400, "context must be a JSON scalar, array, or object")
 
     with get_db() as db:
         db.execute(
@@ -978,7 +1045,7 @@ async def tool_lead_capture(request: Request):
                 email,
                 tool_slug,
                 lead_magnet_key or None,
-                json.dumps(context) if context is not None else None,
+                json.dumps(context, ensure_ascii=False) if context is not None else None,
             ),
         )
 
@@ -986,8 +1053,9 @@ async def tool_lead_capture(request: Request):
 
 
 @router.get("/ops/ocr-benchmark")
-async def ocr_benchmark():
+async def ocr_benchmark(request: Request):
     """Run OCR benchmark over local fixture manifest."""
+    _require_admin_access(request)
     manifest = "data/ocr_benchmark/manifest.json"
     try:
         result = run_manifest(manifest)
@@ -1030,7 +1098,8 @@ async def capture_consent(
 
 
 @router.get("/bills/{bill_id}/export")
-async def export_bill(bill_id: int):
+async def export_bill(request: Request, bill_id: int):
+    _require_admin_access(request)
     payload = export_bill_data(bill_id)
     if not payload:
         raise HTTPException(404, "Bill not found")
@@ -1039,7 +1108,8 @@ async def export_bill(bill_id: int):
 
 
 @router.delete("/bills/{bill_id}")
-async def delete_bill(bill_id: int):
+async def delete_bill(request: Request, bill_id: int):
+    _require_admin_access(request)
     deleted = delete_bill_data(bill_id)
     if not deleted:
         raise HTTPException(404, "Bill not found")
@@ -1055,7 +1125,10 @@ async def delete_bill(bill_id: int):
 
 
 @router.post("/compliance/purge-old")
-async def purge_old(days: int = Form(365)):
+async def purge_old(request: Request, days: int = Form(365)):
+    _require_admin_access(request)
+    if days < 1 or days > 3650:
+        raise HTTPException(400, "days must be between 1 and 3650")
     deleted = purge_old_data(days=days)
     log_audit(action="purge_old_data", resource_type="compliance", resource_id=str(days), metadata={"deleted": deleted})
     return {"status": "ok", "data": {"deleted_bills": deleted, "days": days}}
@@ -1136,6 +1209,9 @@ async def stripe_webhook(request: Request):
     """Handle Stripe webhook events (payment.completed, charge.refunded)."""
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
+
+    if not config.STRIPE_WEBHOOK_SECRET and not config.DEBUG:
+        raise HTTPException(503, "Webhook secret not configured")
 
     if config.STRIPE_WEBHOOK_SECRET:
         if not payment_module.verify_webhook_signature(payload, sig_header, config.STRIPE_WEBHOOK_SECRET):
@@ -1356,11 +1432,7 @@ async def escalate_dispute(case_id: int):
 @router.post("/dispute/run-followups")
 async def run_followups(request: Request):
     """Admin endpoint: process all overdue follow-ups."""
-    # Basic security: only allow from localhost in production
-    client_ip = request.client.host if request.client else "unknown"
-    if not config.DEBUG and client_ip not in ("127.0.0.1", "::1"):
-        raise HTTPException(403, "Admin only")
-
+    _require_admin_access(request)
     sent = dispute_service.process_due_followups()
     return {"status": "ok", "data": {"followups_sent": sent}}
 

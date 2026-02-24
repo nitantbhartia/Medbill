@@ -76,7 +76,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user-address">Your Address<span class="bk-tip" data-tip="Your current home mailing address. Used as the return address on the application letter and to establish that you reside in the hospital's service area."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                        <input type="text" id="user-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                        <input type="text" id="user-address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -104,7 +104,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="hosp-address">Hospital Address<span class="bk-tip" data-tip="The hospital's billing department mailing address. Find it on your bill. If it shows a P.O. Box, use that for mail. If you're hand-delivering, use the physical address."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                        <input type="text" id="hosp-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Hospital Blvd, City, ST 12345">
+                        <input type="text" id="hosp-address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Hospital Blvd, City, ST 12345">
                     </div>
                 </div>
             </div>
@@ -207,6 +207,43 @@
 {% block scripts %}
 <script>
 (function() {
+    function initAddressAutofillInner() {
+        if (!window.google || !window.google.maps || !window.google.maps.places) return;
+        var userAddressEl = document.getElementById('user-address');
+        var hospitalAddressEl = document.getElementById('hosp-address');
+
+        if (userAddressEl) {
+            var userAutocomplete = new google.maps.places.Autocomplete(userAddressEl, {
+                fields: ['formatted_address'],
+                types: ['address'],
+                componentRestrictions: { country: ['us'] },
+            });
+            userAutocomplete.addListener('place_changed', function() {
+                var place = userAutocomplete.getPlace();
+                if (place && place.formatted_address) {
+                    userAddressEl.value = place.formatted_address;
+                }
+            });
+        }
+
+        if (hospitalAddressEl) {
+            var hospitalAutocomplete = new google.maps.places.Autocomplete(hospitalAddressEl, {
+                fields: ['formatted_address'],
+                types: ['address'],
+                componentRestrictions: { country: ['us'] },
+            });
+            hospitalAutocomplete.addListener('place_changed', function() {
+                var place = hospitalAutocomplete.getPlace();
+                if (place && place.formatted_address) {
+                    hospitalAddressEl.value = place.formatted_address;
+                }
+            });
+        }
+    }
+
+    // Global callback target for Google Places script.
+    window.initCharityApplyAddressAutofill = initAddressAutofillInner;
+
     function esc(s) { var el = document.createElement('span'); el.textContent = String(s); return el.innerHTML; }
     function show(id) { document.getElementById(id).classList.remove('hidden'); }
     function hide(id) { document.getElementById(id).classList.add('hidden'); }
@@ -499,4 +536,10 @@
     };
 })();
 </script>
+{% if config.GOOGLE_PLACES_API_KEY %}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_PLACES_API_KEY }}&libraries=places&callback=initCharityApplyAddressAutofill"
+    async
+    defer></script>
+{% endif %}
 {% endblock %}

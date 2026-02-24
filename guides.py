@@ -110,3 +110,20 @@ import guide_glp1_drug_coverage
 import guide_cardiac_billing
 import guide_sleep_study_billing
 import guide_home_health_billing
+# Debt Collection Defense guides
+import guide_fdcpa_rights
+import guide_debt_validation_letter
+import guide_medical_debt_lawsuit_defense
+import guide_stop_debt_collector_calls
+import guide_zombie_medical_debt
+# Bill Affordability guides
+import guide_cant_afford_medical_bill
+import guide_hospital_payment_plans
+import guide_medical_bill_hardship
+import guide_uninsured_hospital_bills
+import guide_medical_bill_income_discounts
+# Pay-for-Delete / Settlement guides
+import guide_pay_for_delete_medical_debt
+import guide_medical_debt_settlement
+# Medical Debt Forgiveness
+import guide_medical_debt_forgiveness

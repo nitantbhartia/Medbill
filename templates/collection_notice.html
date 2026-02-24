@@ -128,16 +128,16 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user_street">Street Address<span class="bk-tip" data-tip="Your current home street address. Used as the return address on the letter — legally required so the collector can respond in writing."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                    <input type="text" id="user_street" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St">
+                    <input type="text" id="user_street" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St">
                 </div>
                 <div class="grid grid-cols-6 gap-3">
                     <div class="col-span-2">
                         <label class="block text-sm font-semibold mb-1" for="user_city">City</label>
-                        <input type="text" id="user_city" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                        <input type="text" id="user_city" required autocomplete="address-level2" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-sm font-semibold mb-1" for="user_state">State</label>
-                        <select id="user_state" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                        <select id="user_state" required autocomplete="address-level1" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                             <option value="">--</option>
                             {% for s in states %}
                             <option value="{{ s.code }}">{{ s.name }}</option>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user_zip">ZIP<span class="bk-tip" data-tip="Your 5-digit zip code. Collectors are required to verify that the address you provide is valid before taking legal action."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                        <input type="text" id="user_zip" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" maxlength="5" pattern="[0-9]{5}" inputmode="numeric">
+                        <input type="text" id="user_zip" required autocomplete="postal-code" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" maxlength="5" pattern="[0-9]{5}" inputmode="numeric">
                     </div>
                 </div>
             </div>
@@ -171,7 +171,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="collector_address">Collection Agency Address<span class="bk-tip" data-tip="The mailing address from the collection notice. Use the address listed for correspondence or responses — sometimes different from the company's main office. Include suite number if shown."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                    <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Collection Ave, Suite 100, City, ST 12345">
+                    <input type="text" id="collector_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Collection Ave, Suite 100, City, ST 12345">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -297,6 +297,66 @@
 
 {% block scripts %}
 <script>
+function _bkGetPlaceComponent(place, kind) {
+    if (!place || !place.address_components) return '';
+    for (var i = 0; i < place.address_components.length; i++) {
+        var comp = place.address_components[i];
+        if (comp.types && comp.types.indexOf(kind) >= 0) {
+            return comp.short_name || comp.long_name || '';
+        }
+    }
+    return '';
+}
+
+function _bkFillUserAddressFromPlace(place) {
+    var streetNumber = _bkGetPlaceComponent(place, 'street_number');
+    var route = _bkGetPlaceComponent(place, 'route');
+    var city = _bkGetPlaceComponent(place, 'locality')
+        || _bkGetPlaceComponent(place, 'postal_town')
+        || _bkGetPlaceComponent(place, 'sublocality');
+    var state = _bkGetPlaceComponent(place, 'administrative_area_level_1');
+    var zip = _bkGetPlaceComponent(place, 'postal_code');
+
+    var street = (streetNumber && route) ? (streetNumber + ' ' + route) : (route || (place.name || ''));
+    if (street) document.getElementById('user_street').value = street;
+    if (city) document.getElementById('user_city').value = city;
+    if (state) document.getElementById('user_state').value = state;
+    if (zip) document.getElementById('user_zip').value = zip;
+}
+
+function initAddressAutofill() {
+    if (!window.google || !window.google.maps || !window.google.maps.places) return;
+
+    var userStreetEl = document.getElementById('user_street');
+    var collectorAddressEl = document.getElementById('collector_address');
+
+    if (userStreetEl) {
+        var userAutocomplete = new google.maps.places.Autocomplete(userStreetEl, {
+            fields: ['address_components', 'formatted_address', 'name'],
+            types: ['address'],
+            componentRestrictions: { country: ['us'] },
+        });
+        userAutocomplete.addListener('place_changed', function() {
+            var place = userAutocomplete.getPlace();
+            _bkFillUserAddressFromPlace(place);
+        });
+    }
+
+    if (collectorAddressEl) {
+        var collectorAutocomplete = new google.maps.places.Autocomplete(collectorAddressEl, {
+            fields: ['formatted_address'],
+            types: ['address'],
+            componentRestrictions: { country: ['us'] },
+        });
+        collectorAutocomplete.addListener('place_changed', function() {
+            var place = collectorAutocomplete.getPlace();
+            if (place && place.formatted_address) {
+                collectorAddressEl.value = place.formatted_address;
+            }
+        });
+    }
+}
+
 function esc(s) {
     var el = document.createElement('span');
     el.textContent = s;
@@ -732,4 +792,10 @@ function printLetter() {
     window.print();
 }
 </script>
+{% if config.GOOGLE_PLACES_API_KEY %}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config.GOOGLE_PLACES_API_KEY }}&libraries=places&callback=initAddressAutofill"
+    async
+    defer></script>
+{% endif %}
 {% endblock %}
