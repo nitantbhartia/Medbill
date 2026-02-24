@@ -705,6 +705,8 @@ async def email_report(request: Request):
     if not bill_id:
         raise HTTPException(400, "bill_id is required")
 
+    require_bill_access(request, int(bill_id))
+
     results = analyzer.get_bill_results(int(bill_id))
     if not results:
         raise HTTPException(404, "Bill not found")
