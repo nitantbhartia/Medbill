@@ -37,10 +37,9 @@ class TestLandingPageRegression:
         html = resp.text
 
         # Core value prop + key interaction controls should stay stable.
-        assert "Compare prices across hospitals, surgery centers, and imaging centers" in html
-        assert 'id="heroSearchForm"' in html
-        assert 'id="heroSearch"' in html
-        assert 'id="facilityCardsGrid"' in html
+        assert "Search your procedure on BillKarma" in html
+        assert 'id="mobileMenuSearch"' in html
+        assert 'id="mobileMenuResults"' in html
         assert 'id="procedureCardsGrid"' in html
 
 

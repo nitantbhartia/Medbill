@@ -74,6 +74,13 @@ STATS_CACHE_TTL_SECONDS = 60
 # Rate limiting for /api/scan (per IP, in-memory)
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "10"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "3600"))
+TOOLS_RATE_LIMIT_REQUESTS = int(os.getenv("TOOLS_RATE_LIMIT_REQUESTS", "60"))
+TOOLS_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("TOOLS_RATE_LIMIT_WINDOW_SECONDS", "3600"))
+MAX_TOOL_PAYLOAD_BYTES = int(os.getenv("MAX_TOOL_PAYLOAD_BYTES", "32768"))
+MAX_TOOL_CONTEXT_BYTES = int(os.getenv("MAX_TOOL_CONTEXT_BYTES", "8192"))
+
+# Admin API access for destructive/ops endpoints
+ADMIN_API_TOKEN = os.getenv("ADMIN_API_TOKEN", "")
 
 # Adaptive thresholds cache TTL (outcomes data changes slowly)
 ADAPTIVE_THRESHOLDS_CACHE_TTL_SECONDS = 300
