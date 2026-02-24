@@ -71,20 +71,20 @@
                 <h2 class="font-bold text-base mb-4">Your Information</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="user-name">Full Name</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user-name">Full Name<span class="bk-tip" data-tip="Your legal name as it should appear on the charity care application letter. This is sent to the hospital as the patient's name."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="user-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="user-address">Your Address</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user-address">Your Address<span class="bk-tip" data-tip="Your current home mailing address. Used as the return address on the application letter and to establish that you reside in the hospital's service area."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="user-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1" for="user-income">Annual Income ($)</label>
+                            <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user-income">Annual Income ($)<span class="bk-tip" data-tip="Your total gross household income before taxes. Use your most recent federal tax return (line 11 — Adjusted Gross Income) as a guide. Include all sources: wages, Social Security, disability, etc."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                             <input type="number" id="user-income" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="45000">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-1" for="user-household">Household Size</label>
+                            <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user-household">Household Size<span class="bk-tip" data-tip="Count everyone in your home who shares finances — yourself, spouse or partner, and any dependents. Used to calculate your income as a percentage of the Federal Poverty Level."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                             <select id="user-household" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                                 <option value="4" selected>4</option><option value="5">5</option>
@@ -99,11 +99,11 @@
                 <h2 class="font-bold text-base mb-4">Hospital Information</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="hosp-name">Hospital Name</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="hosp-name">Hospital Name<span class="bk-tip" data-tip="The full legal name of the hospital, exactly as it appears on your bill. This is the entity the letter is addressed to."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="hosp-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="General Hospital">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="hosp-address">Hospital Address</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="hosp-address">Hospital Address<span class="bk-tip" data-tip="The hospital's billing department mailing address. Find it on your bill. If it shows a P.O. Box, use that for mail. If you're hand-delivering, use the physical address."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="hosp-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Hospital Blvd, City, ST 12345">
                     </div>
                 </div>
@@ -114,16 +114,16 @@
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1" for="acct-num">Account Number</label>
+                            <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="acct-num">Account Number<span class="bk-tip" data-tip="The account or patient number on your hospital bill. Usually labeled 'Account #' or 'Patient Account'. This lets the billing department locate your specific record."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                             <input type="text" id="acct-num" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-1" for="bill-amount">Bill Amount ($)</label>
+                            <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="bill-amount">Bill Amount ($)<span class="bk-tip" data-tip="The total amount owed as shown on your most recent bill or statement, before any payments you've made. Round to the nearest dollar is fine."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                             <input type="text" id="bill-amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="dos">Date of Service</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="dos">Date of Service<span class="bk-tip" data-tip="The date you received care at the hospital. Find it on your bill — often labeled 'Date of Service' or 'DOS'. If multiple visits, use the first date or the date of the main procedure."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="date" id="dos" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                     </div>
                 </div>
@@ -179,7 +179,8 @@
                     </div>
                     <p class="text-xs text-gray-600 mb-3 flex-1">We mail your cover letter via USPS Certified Mail directly to the hospital billing department. You get a tracking number by email.</p>
                     <div id="send-error" class="hidden mb-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
-                    <input type="email" id="send-email" placeholder="Your email (for tracking)" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
+                    <div class="flex items-center gap-1 mb-1"><label class="text-xs font-medium text-gray-700">Your email</label><span class="bk-tip" data-tip="We'll email you a USPS tracking number when your letter is mailed so you can confirm delivery. Use the email address you check regularly."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></div>
+                    <input type="email" id="send-email" placeholder="you@example.com" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
                     <button id="send-btn" onclick="sendCertifiedMail()" class="w-full bg-green-600 text-white font-bold py-3 rounded-full text-sm hover:bg-green-700 transition">Pay $9 &amp; Send</button>
                 </div>
             </div>
