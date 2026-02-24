@@ -172,6 +172,85 @@ def _finding_paragraph(
     )
 
 
+def build_appeal_letter(
+    bill_id: int,
+    requestor_name: str = "[Your Name]",
+    policy_number: str = "[Policy Number]",
+) -> dict | None:
+    """Build an insurance appeal letter for denied claims based on findings.
+
+    Returns a dict with keys: letter, provider, finding_count.
+    Returns None if the bill has no findings.
+    """
+    with get_db() as db:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        if not bill:
+            return None
+        rows = db.execute(
+            "SELECT * FROM findings WHERE bill_id = ? ORDER BY id", (bill_id,)
+        ).fetchall()
+
+    if not rows:
+        return None
+
+    bill = dict(bill)
+    provider = bill.get("provider_name") or "[Hospital/Provider Name]"
+    service_date = bill.get("bill_date") or "[Date of Service]"
+    today = date.today().strftime("%B %d, %Y")
+
+    issues = []
+    total_disputed = 0.0
+    for row in rows:
+        detail = json.loads(row["details"] or "{}")
+        li = detail.get("line_item") or {}
+        cpt = li.get("cpt_code") or row["cpt_code"] or "N/A"
+        desc = li.get("description") or "this service"
+        billed = float(li.get("charged_amount") or 0.0)
+        savings = float(row["potential_savings"] or 0.0)
+        total_disputed += savings
+        issues.append(f"CPT {cpt} ({desc.title()}) — billed ${billed:,.2f}, potential overcharge ${savings:,.2f}")
+
+    issues_text = "\n".join(f"  {i+1}. {issue}" for i, issue in enumerate(issues))
+
+    letter = (
+        f"{today}\n\n"
+        f"{requestor_name}\n"
+        f"[Your Address]\n"
+        f"[Your Phone / Email]\n\n"
+        f"Insurance Appeals Department\n"
+        f"[Insurance Company Name]\n"
+        f"[Insurance Company Address]\n\n"
+        f"Re: Appeal of Claim Denial\n"
+        f"    Policy Number: {policy_number}\n"
+        f"    Provider: {provider}\n"
+        f"    Date of Service: {service_date}\n\n"
+        f"Dear Appeals Department,\n\n"
+        f"I am writing to formally appeal the denial of my claim for services received "
+        f"at {provider} on {service_date}. After reviewing my Explanation of Benefits and "
+        f"the itemized bill, I believe the following charges were improperly processed or denied:\n\n"
+        f"{issues_text}\n\n"
+        f"I am requesting that you:\n"
+        f"  1. Re-review this claim with the supporting documentation enclosed.\n"
+        f"  2. Provide a detailed written explanation if the denial is upheld.\n"
+        f"  3. Process any eligible charges for reimbursement.\n\n"
+        f"Under my policy and applicable state insurance regulations, I have the right to "
+        f"appeal claim denials. If this internal appeal is denied, I reserve the right to "
+        f"request an external review by an independent reviewer.\n\n"
+        f"Enclosed: Itemized bill, Explanation of Benefits, and supporting documentation.\n\n"
+        f"Please respond within 30 days as required.\n\n"
+        f"Sincerely,\n\n"
+        f"{requestor_name}\n"
+    )
+
+    return {
+        "letter": letter,
+        "provider": provider,
+        "service_date": service_date,
+        "total_disputed": round(total_disputed, 2),
+        "finding_count": len(rows),
+    }
+
+
 def build_phone_script(bill_id: int) -> str | None:
     """Build a structured phone script for disputing flagged items."""
     with get_db() as db:

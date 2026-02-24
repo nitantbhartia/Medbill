@@ -12,7 +12,7 @@ import dispute_service
 import esign as esign_module
 import payment as payment_module
 from api import router as api_router
-from analyzer import get_bill_results, get_stats
+from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
     find_hospitals,
@@ -497,6 +497,41 @@ async def results_page(request: Request, bill_id: int):
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
     fee_cents = payment_module.calculate_fee(bill_total)
 
+    # Evidence types for this bill
+    with db.get_db() as dbconn:
+        evidence_rows = dbconn.execute(
+            "SELECT DISTINCT evidence_type FROM evidence_uploads WHERE bill_id = ?", (bill_id,)
+        ).fetchall()
+    evidence_types = {r["evidence_type"] for r in evidence_rows}
+    has_eob = "eob_page" in evidence_types
+    has_portal = "portal_screenshot" in evidence_types
+
+    # Case summary with win probability + confidence
+    findings = results.get("findings") or []
+    case_summary = compute_case_summary(findings, has_eob=has_eob, has_portal=has_portal)
+
+    # Build evidence chips for each finding
+    import json as _json
+    for f in findings:
+        chips = []
+        evidence = {}
+        try:
+            evidence = _json.loads(f.get("evidence_json") or "{}") if isinstance(f.get("evidence_json"), str) else (f.get("evidence_json") or {})
+        except (ValueError, TypeError):
+            pass
+        source = f.get("evidence_source") or evidence.get("source", "")
+        anchor = evidence.get("source_anchor") or {}
+
+        if anchor.get("line_index") is not None:
+            chips.append({"type": "bill", "label": f"Bill line {anchor['line_index'] + 1}", "index": anchor["line_index"], "snippet": anchor.get("snippet", "")})
+        if "medicare" in source.lower() or "cms" in source.lower():
+            chips.append({"type": "bill", "label": "Medicare rate", "index": 0, "snippet": source})
+        if f.get("finding_type") == "eob_reconciliation" or "eob" in source.lower():
+            chips.append({"type": "eob", "label": "EOB mismatch", "index": 0, "snippet": ""})
+        if "benchmark" in source.lower():
+            chips.append({"type": "bill", "label": "Regional benchmark", "index": 0, "snippet": source})
+        f["evidence_chips"] = chips
+
     return templates.TemplateResponse(
         "results.html",
         {
@@ -505,6 +540,7 @@ async def results_page(request: Request, bill_id: int):
             "phone_script": phone_script,
             "outcome_stats": outcome_stats,
             "dispute_fee_dollars": fee_cents / 100,
+            "case_summary": case_summary,
         },
     )
 
