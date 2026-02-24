@@ -169,56 +169,17 @@
         .ac-empty { padding: 16px 18px; font-size: 0.86rem; color: #4B5563; }
         .ac-empty a { color: var(--c-green-dark); font-weight: 700; text-decoration: none; }
 
-        /* Stats bar */
-        .stats-bar { margin-top: -48px; margin-bottom: 80px; position: relative; z-index: 10; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-card {
-            background: var(--c-white); padding: 28px;
-            border-radius: var(--radius-card);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            border: 1px solid var(--c-gray-border);
-            display: flex; flex-direction: column; justify-content: space-between; min-height: 160px;
-        }
-        .stat-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--c-gray-text); }
-        .stat-number { font-size: 2.6rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
-        .stat-sub { font-size: 0.78rem; color: #6B7280; margin-top: 6px; }
-        .stat-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; }
-        .stat-bar-fill { height: 100%; border-radius: 2px; }
-        .text-green { color: var(--c-green); }
-        .text-gray { color: var(--c-gray-text); }
         .section-heading { font-size: 2.4rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 8px; }
 
-        /* Procedure section */
-        .procedure-section { margin-bottom: 80px; }
-        .section-eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--c-green); margin-bottom: 8px; }
-        .grade-inline {
-            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-            font-size: 0.82rem; color: var(--c-gray-text); margin-bottom: 24px;
-        }
-        .grade-inline-dots { display: flex; gap: 4px; flex-shrink: 0; }
-        .grade-pill {
-            width: 26px; height: 26px; border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.75rem;
-        }
-        .grade-a { background: #E6F4EA; color: var(--c-green); }
-        .grade-b { background: #E6F4EA; color: #38A169; }
-        .grade-c { background: #FEF9E6; color: #D69E2E; }
-        .grade-d { background: #FFF0EB; color: #DD6B20; }
-        .grade-f { background: #FDE8E8; color: #B91C1C; }
-        .grade-inline a { color: var(--c-green); font-weight: 700; text-decoration: none; white-space: nowrap; }
-        .grade-inline a:hover { text-decoration: underline; }
+        /* Stat strip */
+        .stat-strip { background: #F5F5F5; border-top: 1px solid var(--c-gray-border); border-bottom: 1px solid var(--c-gray-border); padding: 24px 0; }
+        .stat-strip-inner { display: flex; align-items: center; justify-content: center; gap: 0; }
+        .stat-strip-item { display: flex; align-items: baseline; gap: 10px; padding: 0 48px; flex: 1; justify-content: center; }
+        .stat-strip-num { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; color: var(--c-black); white-space: nowrap; }
+        .stat-strip-label { font-size: 0.875rem; color: var(--c-gray-text); line-height: 1.3; }
+        .stat-strip-divider { width: 1px; height: 32px; background: var(--c-gray-border); flex-shrink: 0; }
 
-        .procedure-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-        .procedure-card {
-            background: #fff; border: 1px solid var(--c-gray-border); border-radius: 20px;
-            padding: 20px; display: flex; flex-direction: column; gap: 8px;
-        }
-        .procedure-category { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280; }
-        .procedure-name { font-size: 0.95rem; font-weight: 600; line-height: 1.3; }
-        .procedure-price { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; margin-top: 4px; }
-        .procedure-markup { font-size: 0.82rem; color: var(--c-gray-text); }
-        .procedure-cta { margin-top: auto; padding-top: 8px; }
+        .section-eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--c-green); margin-bottom: 8px; }
 
         footer { padding: 80px 0; border-top: 1px solid var(--c-gray-border); }
         .footer-grid { display: flex; justify-content: space-between; gap: 48px; }
@@ -226,9 +187,6 @@
         .footer-col a { display: block; color: var(--c-gray-text); text-decoration: none; font-size: 0.875rem; padding: 3px 0; transition: color 0.15s; }
         .footer-col a:hover { color: var(--c-black); }
 
-        @media (max-width: 1024px) {
-            .procedure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
         .fd-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .fd-tools-grid a:hover { border-color: var(--c-green); }
 
@@ -237,19 +195,17 @@
             .hero h1 { font-size: 2.25rem; }
             .hero-sub { font-size: 1rem; }
             .section-heading { font-size: 1.9rem; }
-            .stats-bar { display: none; }
+            .stat-strip-inner { flex-direction: column; gap: 16px; }
+            .stat-strip-item { padding: 0; justify-content: flex-start; }
+            .stat-strip-divider { display: none; }
             .footer-grid { flex-direction: column; gap: 32px; }
             .hero-blob { display: none; }
-            .procedure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .procedure-grid .procedure-card:nth-child(n+3) { display: none; }
             .how-it-works-section { padding: 56px 0 !important; }
             .how-it-works-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 24px !important; }
             .how-it-works-heading { margin-bottom: 32px !important; }
             .fd-tools-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
-            .procedure-grid { grid-template-columns: 1fr; }
-            .procedure-grid .procedure-card:nth-child(n+3) { display: none; }
             .how-it-works-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
         }
         @media print {
@@ -380,6 +336,27 @@
     </div>
 </section>
 
+<div class="stat-strip">
+    <div class="container">
+        <div class="stat-strip-inner">
+            <div class="stat-strip-item">
+                <span class="stat-strip-num">1 in 3</span>
+                <span class="stat-strip-label">Americans carry medical debt</span>
+            </div>
+            <div class="stat-strip-divider"></div>
+            <div class="stat-strip-item">
+                <span class="stat-strip-num">3.4×</span>
+                <span class="stat-strip-label">avg hospital markup over Medicare</span>
+            </div>
+            <div class="stat-strip-divider"></div>
+            <div class="stat-strip-item">
+                <span class="stat-strip-num">1 in 4</span>
+                <span class="stat-strip-label">bills contain errors you can dispute</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Action plan -->
 <section style="padding: 64px 0 48px; background: #fff;">
     <div class="container">
@@ -451,64 +428,6 @@
         </div>
     </div>
 </section>
-
-<div class="container stats-bar">
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label">Graded Facilities</span>
-            <span class="stat-number text-green" data-count-target="{{ graded_facility_count or 14000 }}" data-suffix="+">0</span>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width: 86%; background: var(--c-green);"></div></div>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Avg Hospital Markup</span>
-            <span class="stat-number" data-count-target="3.4" data-suffix="x">0</span>
-            <div class="stat-sub">vs. what Medicare pays — that's your overcharge</div>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width: 65%; background: var(--c-black);"></div></div>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Bills with errors</span>
-            <span class="stat-number text-gray">1 in 4</span>
-            <div class="stat-sub">Duplicate charges, upcoding, unbundling</div>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width: 38%; background: #C79A6A;"></div></div>
-        </div>
-    </div>
-</div>
-
-<main class="container">
-    <div class="procedure-section">
-        <p class="section-eyebrow">Already know your procedure?</p>
-        <h2 class="section-heading">Check what it should cost</h2>
-        <div class="grade-inline">
-            <div class="grade-inline-dots">
-                <span class="grade-pill grade-a">A</span>
-                <span class="grade-pill grade-b">B</span>
-                <span class="grade-pill grade-c">C</span>
-                <span class="grade-pill grade-d">D</span>
-                <span class="grade-pill grade-f">F</span>
-            </div>
-            <span>Facilities graded A–F on markup vs. Medicare. A = fair (≤2×) · F = predatory (&gt;8×).</span>
-            <a href="/guides/hospital-billing-grades-explained">Read methodology →</a>
-        </div>
-
-        <div class="procedure-grid" id="procedureCardsGrid">
-            {% set shown = namespace(count=0) %}
-            {% for p in procedure_cards %}{% if p.hospital_avg and shown.count < 4 %}{% set shown.count = shown.count + 1 %}
-            <article class="procedure-card">
-                <div class="procedure-category">{{ p.category|upper }}</div>
-                <div class="procedure-name">{{ p.name }}</div>
-                <div class="procedure-price">${{ "{:,.0f}".format(p.hospital_avg) }}</div>
-                <div class="procedure-markup">{{ "%.1f"|format(p.hospital_markup) }}x Medicare · hospital avg</div>
-                <div class="procedure-cta"><a href="{{ p.url }}" class="btn btn-outline" style="background:#fff; width: 100%;">Compare prices →</a></div>
-            </article>
-            {% endif %}{% endfor %}
-        </div>
-
-        <div style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
-            <a href="/procedures/" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.9rem;">View all procedures →</a>
-            <a href="/find/" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.9rem;">Browse all facilities →</a>
-        </div>
-    </div>
-</main>
 
 <footer>
     <div class="container">
