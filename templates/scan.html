@@ -50,7 +50,7 @@
         <!-- Optional EOB upload -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-                Upload EOB (optional)
+                Upload EOB <span class="text-gray-400 font-normal text-xs">(optional)</span>
             </label>
             <p class="text-xs text-gray-400 mb-2">Adding your Explanation of Benefits improves insurance mismatch detection.</p>
             <input type="file"
@@ -60,6 +60,29 @@
                    multiple
                    class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
         </div>
+
+        <!-- Portal screenshots -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Insurance portal screenshots <span class="text-gray-400 font-normal text-xs">(optional)</span>
+            </label>
+            <p class="text-xs text-gray-400 mb-2">Screenshots from your insurance portal showing balances, messages, or claim details strengthen your dispute.</p>
+            <input type="file"
+                   id="portal-input"
+                   name="portal_images"
+                   accept="image/*,.pdf"
+                   multiple
+                   class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
+        </div>
+
+        <!-- Evidence strength chips -->
+        <div id="evidence-chips" class="hidden flex gap-2 flex-wrap items-center">
+            <span class="text-xs text-gray-500 font-medium">Evidence:</span>
+            <span id="chip-bill" class="hidden text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Bill</span>
+            <span id="chip-eob" class="hidden text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">EOB</span>
+            <span id="chip-portal" class="hidden text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">Portal</span>
+        </div>
+        <p id="evidence-strength" class="hidden text-xs font-medium mt-1"></p>
 
         <div id="capture-quality" class="hidden text-xs rounded-md border px-3 py-2"></div>
 
@@ -105,14 +128,30 @@
             </button>
         </div>
 
-        <!-- Processing -->
-        <div id="processing-status" class="hidden">
-            <div class="flex items-center gap-2.5 text-sm text-accent-800 bg-accent-50 border border-accent-200 rounded-md px-4 py-3">
-                <svg class="animate-spin w-4 h-4 text-accent-600 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
-                <span id="status-text">Uploading your bill...</span>
+        <!-- Staged processing steps -->
+        <div id="processing-status" class="hidden bg-accent-50 border border-accent-200 rounded-xl px-5 py-4">
+            <p class="text-xs font-semibold text-accent-700 uppercase tracking-wide mb-3">Analyzing your bill</p>
+            <div class="space-y-2.5" id="processing-steps">
+                <div class="step flex items-center gap-2.5 text-sm" id="step-upload" data-status="pending">
+                    <span class="step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                    <span class="step-label text-gray-400">Uploading files...</span>
+                </div>
+                <div class="step flex items-center gap-2.5 text-sm" id="step-extract" data-status="pending">
+                    <span class="step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                    <span class="step-label text-gray-400">Extracting line items...</span>
+                </div>
+                <div class="step flex items-center gap-2.5 text-sm hidden" id="step-eob" data-status="pending">
+                    <span class="step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                    <span class="step-label text-gray-400">Matching EOB to bill...</span>
+                </div>
+                <div class="step flex items-center gap-2.5 text-sm" id="step-analyze" data-status="pending">
+                    <span class="step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                    <span class="step-label text-gray-400">Detecting billing errors...</span>
+                </div>
+                <div class="step flex items-center gap-2.5 text-sm" id="step-savings" data-status="pending">
+                    <span class="step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                    <span class="step-label text-gray-400">Calculating savings...</span>
+                </div>
             </div>
         </div>
 
@@ -144,7 +183,37 @@
     var zipCode = document.getElementById('zip-code');
     var eobInput = document.getElementById('eob-input');
     var qualityBox = document.getElementById('capture-quality');
+    var portalInput = document.getElementById('portal-input');
+    var evidenceChips = document.getElementById('evidence-chips');
+    var evidenceStrength = document.getElementById('evidence-strength');
     var selectedFiles = [];
+
+    function updateEvidenceChips() {
+        var hasBill = selectedFiles.length > 0;
+        var hasEob = eobInput && eobInput.files && eobInput.files.length > 0;
+        var hasPortal = portalInput && portalInput.files && portalInput.files.length > 0;
+        var count = (hasBill ? 1 : 0) + (hasEob ? 1 : 0) + (hasPortal ? 1 : 0);
+
+        document.getElementById('chip-bill').classList.toggle('hidden', !hasBill);
+        document.getElementById('chip-eob').classList.toggle('hidden', !hasEob);
+        document.getElementById('chip-portal').classList.toggle('hidden', !hasPortal);
+        evidenceChips.classList.toggle('hidden', count === 0);
+
+        if (count >= 3) {
+            evidenceStrength.textContent = 'Strong evidence package — better dispute outcomes';
+            evidenceStrength.className = 'text-xs font-medium mt-1 text-green-700';
+            evidenceStrength.classList.remove('hidden');
+        } else if (count === 2) {
+            evidenceStrength.textContent = 'Good evidence — add more to strengthen your case';
+            evidenceStrength.className = 'text-xs font-medium mt-1 text-accent-700';
+            evidenceStrength.classList.remove('hidden');
+        } else {
+            evidenceStrength.classList.add('hidden');
+        }
+    }
+
+    if (eobInput) eobInput.addEventListener('change', updateEvidenceChips);
+    if (portalInput) portalInput.addEventListener('change', updateEvidenceChips);
 
     function openFilePicker() {
         if (!fileInput) return;
@@ -245,6 +314,7 @@
         Array.from(e.target.files || []).forEach(function(f) { selectedFiles.push(f); });
         renderPreviews();
         updateSubmitState();
+        updateEvidenceChips();
         fileInput.value = '';
     });
 
@@ -263,6 +333,24 @@
         updateSubmitState();
     });
 
+    function advanceStep(stepId) {
+        var el = document.getElementById(stepId);
+        if (!el) return;
+        el.dataset.status = 'active';
+        el.querySelector('.step-icon').className = 'step-icon flex-shrink-0 w-5 h-5 rounded-full border-2 border-accent-500 flex items-center justify-center';
+        el.querySelector('.step-icon').innerHTML = '<svg class="animate-spin w-3 h-3 text-accent-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>';
+        el.querySelector('.step-label').className = 'step-label text-accent-800 font-medium';
+    }
+
+    function completeStep(stepId) {
+        var el = document.getElementById(stepId);
+        if (!el) return;
+        el.dataset.status = 'done';
+        el.querySelector('.step-icon').className = 'step-icon flex-shrink-0 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center';
+        el.querySelector('.step-icon').innerHTML = '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+        el.querySelector('.step-label').className = 'step-label text-gray-600';
+    }
+
     scanForm.addEventListener('submit', function(e) {
         e.preventDefault();
         if (selectedFiles.length === 0) return;
@@ -273,19 +361,34 @@
         processingStatus.classList.remove('hidden');
         errorDisplay.classList.add('hidden');
 
+        var hasEob = eobInput && eobInput.files && eobInput.files.length > 0;
+        if (hasEob) document.getElementById('step-eob').classList.remove('hidden');
+
         var formData = new FormData();
         selectedFiles.forEach(function(file) { formData.append('images', file); });
         Array.from(eobInput.files || []).forEach(function(file) { formData.append('eob_images', file); });
+        Array.from(portalInput.files || []).forEach(function(file) { formData.append('portal_images', file); });
         formData.append('zip_code', zipCode.value.trim());
 
         var emailVal = document.getElementById('email').value.trim();
         if (emailVal) formData.append('email', emailVal);
 
-        statusText.textContent = 'Uploading your bill...';
+        // Staged progress animation
+        advanceStep('step-upload');
+        var steps = ['step-upload', 'step-extract'];
+        if (hasEob) steps.push('step-eob');
+        steps.push('step-analyze', 'step-savings');
+        var stepIdx = 0;
+        var stepTimer = setInterval(function() {
+            if (stepIdx < steps.length) {
+                completeStep(steps[stepIdx]);
+                stepIdx++;
+                if (stepIdx < steps.length) advanceStep(steps[stepIdx]);
+            }
+        }, 2500);
 
         fetch('/api/scan', { method: 'POST', body: formData })
         .then(function(res) {
-            statusText.textContent = 'Analyzing line items...';
             if (!res.ok) {
                 return res.text().then(function(text) {
                     var detail = 'Upload failed. Please try again.';
@@ -296,15 +399,18 @@
             return res.json();
         })
         .then(function(data) {
+            clearInterval(stepTimer);
+            // Complete all remaining steps
+            steps.forEach(function(s) { completeStep(s); });
             var billId = data.data && data.data.bill_id;
             if (billId) {
-                statusText.textContent = 'Done! Redirecting...';
-                window.location.href = '/confirm/' + billId;
+                setTimeout(function() { window.location.href = '/confirm/' + billId; }, 600);
             } else {
                 throw new Error('No bill ID returned.');
             }
         })
         .catch(function(err) {
+            clearInterval(stepTimer);
             submitBtn.disabled = false;
             submitText.textContent = 'Analyze my bill';
             submitSpinner.classList.add('hidden');

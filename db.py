@@ -972,6 +972,30 @@ def _run_migrations(db):
         except Exception:
             pass  # Column already exists
 
+    # Evidence uploads tracking (bill pages, EOB pages, portal screenshots)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS evidence_uploads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bill_id INTEGER NOT NULL REFERENCES bills(id),
+            evidence_type TEXT NOT NULL,
+            file_index INTEGER DEFAULT 0,
+            original_filename TEXT,
+            created_at TEXT DEFAULT (datetime('now'))
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_evidence_bill ON evidence_uploads(bill_id)")
+
+    # Autopilot enhancements on dispute_cases
+    ensure_columns(
+        "dispute_cases",
+        {
+            "preferred_channels": "TEXT DEFAULT 'email'",
+            "strategy_notes": "TEXT DEFAULT '[]'",
+        },
+    )
+
 
 SCHEMA = """
 -- Users

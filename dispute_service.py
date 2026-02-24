@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import date, timedelta
 
@@ -31,6 +32,7 @@ def activate_dispute(
     account_number: str,
     hospital_billing_email: str,
     hospital_billing_fax: str = "",
+    preferred_channels: str = "email",
 ) -> int:
     """Create an active dispute case after payment is confirmed.
 
@@ -55,13 +57,14 @@ def activate_dispute(
             INSERT INTO dispute_cases (
                 bill_id, payment_id, patient_name, patient_email,
                 patient_address, account_number, hospital_billing_email,
-                hospital_billing_fax, status, is_nonprofit
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
+                hospital_billing_fax, status, is_nonprofit, preferred_channels
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
             """,
             (
                 bill_id, payment_id, patient_name, patient_email,
                 patient_address, account_number, hospital_billing_email,
                 hospital_billing_fax, 1 if is_nonprofit else 0,
+                preferred_channels or "email",
             ),
         )
         case_id = db.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
@@ -87,6 +90,9 @@ def activate_dispute(
     # File financial assistance if nonprofit
     if is_nonprofit:
         _file_financial_assistance(case_id, bill_id, patient_name, patient_address)
+
+    # Add initial strategy note
+    add_strategy_note(case_id, "Dispute initiated. Letter sent to billing department.")
 
     return case_id
 
@@ -206,6 +212,44 @@ def _file_financial_assistance(
         )
 
 
+def add_strategy_note(case_id: int, note_text: str) -> None:
+    """Append an AI strategy note to a dispute case."""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT strategy_notes FROM dispute_cases WHERE id = ?", (case_id,)
+        ).fetchone()
+        if not row:
+            return
+        notes = json.loads(row["strategy_notes"] or "[]")
+        notes.append({"date": date.today().isoformat(), "text": note_text})
+        db.execute(
+            "UPDATE dispute_cases SET strategy_notes = ? WHERE id = ?",
+            (json.dumps(notes), case_id),
+        )
+
+
+def pause_dispute(case_id: int) -> None:
+    """Pause follow-ups for a dispute case."""
+    with get_db() as db:
+        db.execute(
+            "UPDATE dispute_cases SET status = 'paused' WHERE id = ?", (case_id,)
+        )
+    add_strategy_note(case_id, "Follow-ups paused by patient request.")
+
+
+def escalate_dispute(case_id: int) -> None:
+    """Mark a dispute case as escalated."""
+    with get_db() as db:
+        db.execute(
+            "UPDATE dispute_cases SET status = 'escalated' WHERE id = ?", (case_id,)
+        )
+    add_strategy_note(
+        case_id,
+        "Case escalated. Consider filing a complaint with your state insurance commissioner "
+        "or Attorney General's office if the hospital remains unresponsive.",
+    )
+
+
 def get_case(case_id: int) -> dict | None:
     """Get a dispute case by ID."""
     with get_db() as db:
@@ -305,6 +349,8 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
             (case_id,),
         )
 
+    add_strategy_note(case_id, f"Follow-up #{followup_number} sent. No response received yet.")
+
     # If this is the last follow-up, check if we should auto-refund
     if followup_number >= len(config.DISPUTE_FOLLOWUP_DAYS):
         _check_auto_refund(case_id)
@@ -394,6 +440,12 @@ def get_dispute_summary(bill_id: int) -> dict:
     case = dict(case)
     followups = get_followups_for_case(case["id"])
 
+    strategy_notes = []
+    try:
+        strategy_notes = json.loads(case.get("strategy_notes") or "[]")
+    except (ValueError, TypeError):
+        pass
+
     return {
         "has_case": True,
         "case_id": case["id"],
@@ -410,4 +462,6 @@ def get_dispute_summary(bill_id: int) -> dict:
         "financial_assistance_filed": bool(case["financial_assistance_filed"]),
         "followups": followups,
         "created_at": case["created_at"],
+        "preferred_channels": case.get("preferred_channels") or "email",
+        "strategy_notes": strategy_notes,
     }

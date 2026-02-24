@@ -339,6 +339,70 @@ def _prorate_patient_responsibility(extracted_data: dict) -> None:
             item["_patient_resp_prorated"] = True
 
 
+def compute_case_summary(findings: list[dict], has_eob: bool = False, has_portal: bool = False) -> dict:
+    """Aggregate findings into a case summary with win probability and confidence."""
+    if not findings:
+        return {
+            "potential_savings": 0, "issue_count": 0,
+            "severity_breakdown": {"high": 0, "medium": 0, "low": 0, "informational": 0},
+            "win_probability": 0, "confidence_score": 0, "summary_text": "",
+            "evidence_types": ["bill"] + (["eob"] if has_eob else []) + (["portal"] if has_portal else []),
+        }
+
+    severity_counts = {"high": 0, "medium": 0, "low": 0, "informational": 0}
+    total_savings = 0.0
+    confidence_sum = 0
+    conf_map = {"high": 3, "medium": 2, "low": 1}
+
+    for f in findings:
+        sev = f.get("severity", "low")
+        severity_counts[sev] = severity_counts.get(sev, 0) + 1
+        total_savings += float(f.get("potential_savings") or 0)
+        confidence_sum += conf_map.get(f.get("confidence", "low"), 1)
+
+    n = len(findings)
+    avg_confidence = confidence_sum / n
+    confidence_score = round(min(avg_confidence / 3 * 100, 100))
+
+    base_prob = min(severity_counts["high"] * 25 + severity_counts["medium"] * 15, 80)
+    evidence_bonus = (10 if has_eob else 0) + (5 if has_portal else 0)
+    win_probability = min(base_prob + evidence_bonus, 95)
+
+    summary_text = _build_summary_text(n, severity_counts, total_savings, win_probability)
+
+    return {
+        "potential_savings": round(total_savings, 2),
+        "issue_count": n,
+        "severity_breakdown": severity_counts,
+        "win_probability": win_probability,
+        "confidence_score": confidence_score,
+        "summary_text": summary_text,
+        "evidence_types": ["bill"] + (["eob"] if has_eob else []) + (["portal"] if has_portal else []),
+    }
+
+
+def _build_summary_text(n: int, severity: dict, savings: float, win_prob: int) -> str:
+    """Build a plain-English summary for the case summary card."""
+    parts = []
+    if severity.get("high"):
+        parts.append(f"{severity['high']} high-confidence billing error{'s' if severity['high'] != 1 else ''}")
+    if severity.get("medium"):
+        parts.append(f"{severity['medium']} issue{'s' if severity['medium'] != 1 else ''} worth reviewing")
+
+    if not parts:
+        return "We found some potential issues but none with strong enough evidence to dispute confidently."
+
+    finding_desc = " and ".join(parts)
+    text = f"We found {finding_desc} totaling ${savings:,.0f} in potential savings."
+    if win_prob >= 70:
+        text += " Based on the evidence strength, this is a strong case to dispute."
+    elif win_prob >= 40:
+        text += " With the right approach, there's a reasonable chance of getting a reduction."
+    else:
+        text += " The evidence is limited, but it's still worth raising these issues."
+    return text
+
+
 def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     """
     Run all analysis checks against extracted bill data.

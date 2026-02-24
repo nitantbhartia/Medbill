@@ -76,6 +76,7 @@ async def scan_bill(
     request: Request,
     images: list[UploadFile] = File(...),
     eob_images: list[UploadFile] | None = File(None),
+    portal_images: list[UploadFile] | None = File(None),
     zip_code: str = Form("00000"),
     email: str = Form(""),
 ):
@@ -98,7 +99,7 @@ async def scan_bill(
 
     # Validate each uploaded file
     max_bytes = config.MAX_UPLOAD_SIZE_MB * 1024 * 1024
-    all_uploads = list(images) + (list(eob_images) if eob_images else [])
+    all_uploads = list(images) + (list(eob_images) if eob_images else []) + (list(portal_images) if portal_images else [])
     for upload in all_uploads:
         if not upload or not upload.filename:
             continue
@@ -161,6 +162,28 @@ async def scan_bill(
                 extracted = analyzer.merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
         analysis = analyzer.analyze_bill(extracted, zip_code)
         bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
+
+        # Track all evidence uploads
+        with get_db() as db:
+            for i, f in enumerate(images):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'bill_page', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+            for i, f in enumerate(eob_images or []):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'eob_page', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+            for i, f in enumerate(portal_images or []):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'portal_screenshot', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+
         log_audit(
             action="scan_and_analyze",
             resource_type="bill",
@@ -174,6 +197,8 @@ async def scan_bill(
         raise HTTPException(500, f"Failed to analyze bill: {e}")
 
     extraction_meta = extracted.get("_extraction_meta", {})
+    has_eob = bool(eob_images and any(f and f.filename for f in eob_images))
+    has_portal = bool(portal_images and any(f and f.filename for f in portal_images))
     return {
         "status": "ok",
         "data": {
@@ -184,6 +209,7 @@ async def scan_bill(
                 "score": extraction_meta.get("quality_score"),
                 "variant": extraction_meta.get("selected_variant"),
             },
+            "evidence_types": ["bill"] + (["eob"] if has_eob else []) + (["portal"] if has_portal else []),
         },
     }
 
@@ -542,6 +568,17 @@ async def get_appeal_playbook(bill_id: int):
     if not playbook:
         raise HTTPException(404, "Bill not found")
     return {"status": "ok", "data": playbook}
+
+
+@router.get("/appeal-template/{bill_id}")
+async def get_appeal_template(bill_id: int):
+    """Generate an insurance appeal letter from findings."""
+    from dispute_workflow import build_appeal_letter
+    result = build_appeal_letter(bill_id)
+    if not result:
+        raise HTTPException(404, "Bill not found or no findings")
+    log_audit(action="generate_appeal_template", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return {"status": "ok", "data": result}
 
 
 @router.get("/phone-script/{bill_id}")
@@ -1193,6 +1230,7 @@ async def activate_dispute(
     account_number: str = Form(""),
     hospital_billing_email: str = Form(""),
     hospital_billing_fax: str = Form(""),
+    preferred_channels: str = Form("email"),
 ):
     """Activate a paid dispute case after payment and e-sign completion."""
     # Verify all docs are signed
@@ -1225,6 +1263,7 @@ async def activate_dispute(
             account_number=account_number,
             hospital_billing_email=hospital_billing_email,
             hospital_billing_fax=hospital_billing_fax,
+            preferred_channels=preferred_channels,
         )
     except Exception as exc:
         log.error("Failed to activate dispute for bill %d: %s", bill_id, exc)
@@ -1284,6 +1323,34 @@ async def request_refund(case_id: int):
     log_audit(action="dispute_refunded", resource_type="dispute_case", resource_id=str(case_id))
 
     return {"status": "ok", "data": {"refunded": refunded}}
+
+
+@router.post("/dispute/{case_id}/pause")
+async def pause_dispute(case_id: int):
+    """Pause follow-ups for a dispute case."""
+    case = dispute_service.get_case(case_id)
+    if not case:
+        raise HTTPException(404, "Case not found")
+    if case["status"] not in ("active", "sent"):
+        raise HTTPException(400, f"Cannot pause a case with status '{case['status']}'")
+
+    dispute_service.pause_dispute(case_id)
+    log_audit(action="dispute_paused", resource_type="dispute_case", resource_id=str(case_id))
+    return {"status": "ok", "data": {"case_id": case_id, "new_status": "paused"}}
+
+
+@router.post("/dispute/{case_id}/escalate")
+async def escalate_dispute(case_id: int):
+    """Escalate a dispute case."""
+    case = dispute_service.get_case(case_id)
+    if not case:
+        raise HTTPException(404, "Case not found")
+    if case["status"] not in ("active", "sent"):
+        raise HTTPException(400, f"Cannot escalate a case with status '{case['status']}'")
+
+    dispute_service.escalate_dispute(case_id)
+    log_audit(action="dispute_escalated", resource_type="dispute_case", resource_id=str(case_id))
+    return {"status": "ok", "data": {"case_id": case_id, "escalated": True}}
 
 
 @router.post("/dispute/run-followups")
