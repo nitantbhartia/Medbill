@@ -65,10 +65,14 @@
 (async function activateDispute() {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
+    const activatingEl = document.getElementById('activating');
+    const activatedViewEl = document.getElementById('activated-view');
+    const activationErrorEl = document.getElementById('activation-error');
+    const dashboardLinkEl = document.getElementById('dashboard-link');
 
     if (!sessionId) {
-        document.getElementById('activating').classList.add('hidden');
-        document.getElementById('activated-view').classList.remove('hidden');
+        activatingEl.classList.add('hidden');
+        activatedViewEl.classList.remove('hidden');
         return;
     }
 
@@ -78,10 +82,36 @@
         details = JSON.parse(sessionStorage.getItem('bk_dispute') || '{}');
     } catch (e) {}
 
+    // Fallback when sessionStorage is unavailable (cross-device, cleared storage).
     if (!details.bill_id) {
-        // Nothing to activate without bill details
-        document.getElementById('activating').classList.add('hidden');
-        document.getElementById('activated-view').classList.remove('hidden');
+        try {
+            const lookupResp = await fetch('/api/dispute/session/' + encodeURIComponent(sessionId));
+            const lookup = await lookupResp.json();
+            if (lookupResp.ok && lookup.data) {
+                if (lookup.data.case_id) {
+                    activatingEl.classList.add('hidden');
+                    dashboardLinkEl.href = `/dispute/dashboard?case=${lookup.data.case_id}`;
+                    activatedViewEl.classList.remove('hidden');
+                    return;
+                }
+                details = {
+                    bill_id: lookup.data.bill_id,
+                    patient_name: lookup.data.patient_name || '',
+                    patient_email: lookup.data.patient_email || '',
+                    patient_address: lookup.data.patient_address || '',
+                    account_number: lookup.data.account_number || '',
+                    hospital_billing_email: '',
+                    hospital_billing_fax: '',
+                    preferred_channels: 'email'
+                };
+            }
+        } catch (_e) {}
+    }
+
+    if (!details.bill_id) {
+        activatingEl.classList.add('hidden');
+        activatedViewEl.classList.remove('hidden');
+        activationErrorEl.classList.remove('hidden');
         return;
     }
 
@@ -95,25 +125,25 @@
         fd.append('account_number', details.account_number || '');
         fd.append('hospital_billing_email', details.hospital_billing_email || '');
         fd.append('hospital_billing_fax', details.hospital_billing_fax || '');
+        fd.append('preferred_channels', details.preferred_channels || 'email');
 
         const resp = await fetch('/api/dispute/activate', { method: 'POST', body: fd });
         const data = await resp.json();
 
-        document.getElementById('activating').classList.add('hidden');
+        activatingEl.classList.add('hidden');
 
         if (resp.ok && data.data && data.data.case_id) {
             sessionStorage.removeItem('bk_dispute');
-            const link = document.getElementById('dashboard-link');
-            link.href = `/dispute/dashboard?case=${data.data.case_id}`;
-            document.getElementById('activated-view').classList.remove('hidden');
+            dashboardLinkEl.href = `/dispute/dashboard?case=${data.data.case_id}`;
+            activatedViewEl.classList.remove('hidden');
         } else {
-            document.getElementById('activation-error').classList.remove('hidden');
-            document.getElementById('activated-view').classList.remove('hidden');
+            activationErrorEl.classList.remove('hidden');
+            activatedViewEl.classList.remove('hidden');
         }
     } catch (err) {
-        document.getElementById('activating').classList.add('hidden');
-        document.getElementById('activation-error').classList.remove('hidden');
-        document.getElementById('activated-view').classList.remove('hidden');
+        activatingEl.classList.add('hidden');
+        activationErrorEl.classList.remove('hidden');
+        activatedViewEl.classList.remove('hidden');
     }
 })();
 </script>

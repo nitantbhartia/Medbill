@@ -1023,6 +1023,15 @@ CREATE TABLE IF NOT EXISTS bills (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Session-scoped access to bills (no-login ownership model)
+CREATE TABLE IF NOT EXISTS bill_access_sessions (
+    session_id TEXT NOT NULL,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (session_id, bill_id)
+);
+CREATE INDEX IF NOT EXISTS idx_bill_access_bill ON bill_access_sessions(bill_id);
+
 -- Extracted line items
 CREATE TABLE IF NOT EXISTS line_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

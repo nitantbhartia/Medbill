@@ -4,7 +4,8 @@ import os
 APP_NAME = "BillKarma"
 APP_URL = os.getenv("APP_URL", "https://billkarma.app")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
-DEBUG = os.getenv("DEBUG", "true").lower() == "true"
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+ENV = os.getenv("ENV", "development").lower()
 
 # Database
 DB_PATH = os.getenv("DB_PATH", "data/app.db")

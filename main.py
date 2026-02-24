@@ -38,6 +38,7 @@ from procedure_pages import (
 )
 from procedure_content import get_content_page_data
 from tools_catalog import list_tools, get_tool
+from access_control import require_bill_access, require_case_access
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -47,6 +48,18 @@ logging.basicConfig(
 app = FastAPI(title=config.APP_NAME)
 app.include_router(api_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if not config.DEBUG:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+    return response
 
 templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
@@ -425,6 +438,14 @@ def _build_home_sample_facilities(limit: int = 6) -> list[dict]:
 
 @app.on_event("startup")
 def startup():
+    if config.ENV == "production":
+        if config.DEBUG:
+            raise RuntimeError("DEBUG must be false in production")
+        if not config.SECRET_KEY or config.SECRET_KEY == "change-me-in-production":
+            raise RuntimeError("SECRET_KEY must be configured in production")
+        if not config.ADMIN_API_TOKEN:
+            raise RuntimeError("ADMIN_API_TOKEN must be configured in production")
+
     db.init_db()
     if config.AUTO_BOOTSTRAP_HOSPITAL_DATA:
         from hospital_bootstrap import ensure_hospital_data_bootstrap
@@ -475,6 +496,7 @@ async def scan_page(request: Request):
 
 @app.get("/confirm/{bill_id}", response_class=HTMLResponse)
 async def confirm_page(request: Request, bill_id: int):
+    require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
@@ -484,6 +506,7 @@ async def confirm_page(request: Request, bill_id: int):
 
 @app.get("/results/{bill_id}", response_class=HTMLResponse)
 async def results_page(request: Request, bill_id: int):
+    require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
@@ -1216,12 +1239,27 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 @app.get("/sitemap.xml")
 async def sitemap_index():
     base = config.APP_URL.rstrip("/")
+    hospital_paths = get_hospital_sitemap_paths()
+    core_urls = [
+        (f"{base}/", "2026-02-01", "1.0"),
+        (f"{base}/guides/", "2026-02-01", "0.8"),
+        (f"{base}/tools/", "2026-02-01", "0.8"),
+        (f"{base}/fight-debt", "2026-02-24", "0.9"),
+        (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
+        (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
+    ]
+    core_entries = "".join(
+        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
+        for loc, lastmod, priority in core_urls
+    )
+    hospital_entries = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
+        for path in hospital_paths
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
-        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"<sitemap><loc>{base}/sitemap-guides.xml</loc></sitemap>"
-        f"<sitemap><loc>{base}/sitemap-hospitals.xml</loc></sitemap>"
-        "</sitemapindex>"
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{core_entries}{hospital_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1265,6 +1303,16 @@ async def guides_sitemap():
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
+    core_entries = "".join(
+        [
+            f"<url><loc>{base}/</loc><lastmod>2026-02-01</lastmod><priority>1.0</priority></url>",
+            f"<url><loc>{base}/tools/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>",
+        ]
+    )
+    tool_entries = "".join(
+        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
+        for tool in list_tools()
+    )
     hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
@@ -1273,7 +1321,7 @@ async def hospital_sitemap_v2():
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{urlset}</urlset>"
+        f"{core_entries}{tool_entries}{urlset}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1364,6 +1412,7 @@ async def ops_data_quality():
 @app.get("/dispute/activate/{bill_id}", response_class=HTMLResponse)
 async def dispute_activate_page(request: Request, bill_id: int):
     """Show the dispute activation page with e-sign + payment flow."""
+    require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
@@ -1418,10 +1467,12 @@ async def dispute_dashboard_page(
     summary: dict = {"has_case": False}
 
     if case:
+        require_case_access(request, case)
         case_data = dispute_service.get_case(case)
         if case_data:
             summary = dispute_service.get_dispute_summary(case_data["bill_id"])
     elif bill:
+        require_bill_access(request, bill)
         summary = dispute_service.get_dispute_summary(bill)
 
     return templates.TemplateResponse(

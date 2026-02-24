@@ -33,9 +33,12 @@ def clear_tool_buckets():
 @pytest.fixture()
 def prod_mode(monkeypatch):
     old_debug = config.DEBUG
+    old_env = config.ENV
     monkeypatch.setattr(config, "DEBUG", False)
+    monkeypatch.setattr(config, "ENV", "production")
     yield
     monkeypatch.setattr(config, "DEBUG", old_debug)
+    monkeypatch.setattr(config, "ENV", old_env)
 
 
 def test_tools_run_rejects_invalid_json_body():
