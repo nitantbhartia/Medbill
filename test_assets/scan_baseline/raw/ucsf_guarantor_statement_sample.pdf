@@ -1,0 +1,629 @@
+
+
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+	<link rel="stylesheet" type="text/css" href=/assets/ucsf/main.css?v=9cc847420db0c106c2a7f983614e5eab />
+
+	
+
+
+<!-- OneTrust Cookies Consent Notice start for ucsfhealth.org -->
+<script type="text/javascript" src="https://cdn.cookielaw.org/consent/15542477-8150-45a3-9953-e94fa799e80a/OtAutoBlock.js" ></script>
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="15542477-8150-45a3-9953-e94fa799e80a" ></script>
+<script type="text/javascript">
+  function OptanonWrapper() { 
+    // Check if banner div is available
+    if (document.getElementById('onetrust-banner-sdk')) {
+        // Get the buttons and container
+        var acceptBtn = document.getElementById("onetrust-accept-btn-handler");
+        var declineBtn = document.getElementById("onetrust-reject-all-handler");
+        var cookieSettingsBtn = document.getElementById("onetrust-pc-btn-handler");
+        var btnContainer = document.getElementById("onetrust-button-group");
+        // Set the order you want below...
+        btnContainer.append(acceptBtn, cookieSettingsBtn, declineBtn)
+    }
+  }
+</script>
+<!-- OneTrust Cookies Consent Notice end for ucsfhealth.org -->
+
+<!-- ucsf data layer -->
+<script src="https://datalayer.ucsfhealth.org/ucsf-data-layer.js" defer></script>
+
+<!-- ucsf  marketing data layer -->
+<script src="https://datalayer.ucsfhealth.org/ucsfhealth-marketing-data-layer.js" defer></script>
+
+<!-- adobe experience platform tag -->
+<script type="text/plain" class="optanon-category-C0007" src="https://assets.adobedtm.com/db5f13cb240b/b1130ce1ceae/launch-db8f55f3e131.min.js" defer></script>
+
+
+
+    <title>404</title>
+
+
+
+
+    <link href="/-/media/project/ucsf/ucsf-health/header/favicon-32x32.png?rev=e809a21b00b748a3abf7a90f0667e530" rel="shortcut icon" />
+
+
+<link rel="canonical" href="https://www.ucsfhealth.org/404" />
+
+
+
+
+
+<meta property="og:title"  content="404" /><meta property="og:description"  content="404" /><meta property="og:url"  content="https://www.ucsfhealth.org/404" />
+
+
+
+
+
+<meta property="twitter:title"  content="404" /><meta property="twitter:card"  content="summary_large_image" /><meta property="twitter:description"  content="404" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+
+
+<link rel="manifest" href="/manifest.json" />
+
+
+
+<meta name="format-detection" content="telephone=no">
+
+
+
+	
+</head>
+<body class="default-device bodyclass">
+	<a href="#content" class="skip-to-content">Skip to Main Content</a>
+	
+
+
+
+	<div id="wrapper">
+		<!-- #header -->
+		<header>
+			<div id="header" class="container-fluid">
+				
+
+
+    <div class="component rich-text paragraph1 ie-warning-banner">
+        <div class="component-content">
+<p>
+Looks like you&rsquo;re visiting UCSF Health on Internet Explorer. For the best experience, try <a rel="noopener noreferrer" href="https://www.google.com/chrome/" target="_blank">Chrome </a>or <a rel="noopener noreferrer" href="https://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</p>        </div>
+    </div>
+<div class="component">
+	<div class="component-content">
+
+		<div class="component">
+	<div class="component-content">
+		<div class="nav-search-overlay">
+			<div class="search-content">
+				<div class="search-header">
+					<img src="/-/media/project/ucsf/ucsf-health/images/logos/logo.png?h=76&amp;iar=0&amp;w=626&amp;rev=d583395ce9c04ec6a83dff0c67ef2e4c&amp;hash=661B5B6BDD2F563F400E662FE64AFB1B" alt="UCSF Health" width="626" height="76" />
+					<div class="search-close"></div>
+				</div>
+				<div class="search-form-wrapper">
+					<form data-autocomplete="/ucsfapi/search/getsuggestions"
+						  class="search-form display1" action="/search">
+						<div>
+							<input aria-label="search text" type="text" name="searchterms" placeholder="What can we help you find?" autocomplete="off" />
+							<button aria-label="search" type="submit" class="icon-ui-search"></button>
+						</div>
+					</form>
+					<div class="popular-searches autocomplete-results font-larger">
+						<div class="eyebrow">Popular Searches</div>
+						<form action="/search">
+								<button class="paragraph1" name="searchterms" value="Find a Doctor">Find a Doctor</button>
+								<button class="paragraph1" name="searchterms" value=" Refer a Patient"> Refer a Patient</button>
+								<button class="paragraph1" name="searchterms" value=" Clinics"> Clinics</button>
+								<button class="paragraph1" name="searchterms" value=" Conditions"> Conditions</button>
+								<button class="paragraph1" name="searchterms" value=" Treatments"> Treatments</button>
+								<button class="paragraph1" name="searchterms" value=" Locations &amp; Directions"> Locations &amp; Directions</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+		<div class="nav-wrapper">
+			<div class="top-nav-wrapper">
+				<div class="top-nav">
+					<div class="title">
+						<a rel="noopener noreferrer" title="University of California San Francisco" href="https://www.ucsf.edu/" target="_blank">University of California San Francisco</a>
+					</div>
+				</div>
+			</div>
+			<div class="main-nav-wrapper">
+					<div class="main-nav container">
+						<input type="checkbox" id="mobile_nav_toggle" class="mobile-nav-check" aria-label="mobile_nav_toggle" />
+						<label class="mobile-nav-toggle" for="mobile_nav_toggle" aria-label="mobile_nav_toggle_label">
+							<div></div>
+						</label>
+						<div class="logo">
+							<a title="UCSF Home" href="/"><img src="/-/media/project/ucsf/ucsf-health/ezgifcom-gif-maker.png?h=27&amp;iar=0&amp;w=150&amp;rev=b49aee14cf934fb086632358c341cf97&amp;hash=1AC27DE6EDF5C0B6D348A6BD0A43F39F" alt="" width="150" height="27" /></a>
+						</div>
+						<span aria-label="search" class="nav-search "><span class="icon-ui-search"></span></span>
+
+						<div class="menu-content-wrapper">
+							<ul class="menu">
+									<li data-main-nav-name="Conditions &amp; Treatments">
+										<a>Conditions &amp; Treatments</a>
+										<div class="sub-nav container">
+											<a href="#" class="sub-nav-close">Conditions &amp; Treatments</a>
+												<div>
+													<a href="/treatments/responsive-neurostimulation" target="_self">
+														<img loading="lazy" src="/-/media/project/ucsf/ucsf-health/images/navigation/responsive-neurostimulation-376x188-2x.jpg?h=376&amp;iar=0&amp;w=752&amp;rev=7bc0bac0377344428084efa41ab4e936&amp;hash=A66A813384EF7C69793C8691B939DA7C" alt="" width="752" height="376" />
+														<span class="eyebrow">EPILEPSY BREAKTHROUGH</span>
+														<div class="paragraph1">
+<p><span>Stopping Seizures Before They Start</span></p>
+</div>
+													</a>
+												</div>
+																							<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/conditions">Find Conditions</a></p>
+																</li>
+																<li>
+																	<p><a href="/treatments">Find Treatments</a></p>
+																</li>
+																<li>
+																	<p><a rel="noopener noreferrer" href="https://clinicaltrials.ucsf.edu" target="_blank">Clinical Trials</a></p>
+																</li>
+																<li>
+																	<p><a href="/education">Patient Education</a></p>
+																</li>
+																<li>
+																	<p><a href="/medical-tests">Medical Tests</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+										</div>
+									</li>
+									<li data-main-nav-name="Doctors">
+										<a>Doctors</a>
+										<div class="sub-nav container">
+											<a href="#" class="sub-nav-close">Doctors</a>
+												<div>
+													<a href="/doctor-stories/jasleen-kukreja" target="_self">
+														<img loading="lazy" src="/-/media/project/ucsf/ucsf-health/images/navigation/jasleen-kukreja-376x188-2x.jpg?h=376&amp;iar=0&amp;w=752&amp;rev=4c99176bf937490b84533ea4639c34a3&amp;hash=A0AE58BF1530A6B90620551336B15D91" alt="" width="752" height="376" />
+														<span class="eyebrow">MEET OUR DOCTORS</span>
+														<div class="paragraph1">Dr. Jasleen Kukreja and the Life-Saving Gift of Breath</div>
+													</a>
+												</div>
+																							<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/find-a-doctor">Find a Doctor</a></p>
+																</li>
+																<li>
+																	<p><a href="/doctor-stories">Doctor Stories</a></p>
+																</li>
+																<li>
+																	<p><a href="/second-opinion">Get a Second Opinion</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+										</div>
+									</li>
+									<li data-main-nav-name="Clinics &amp; Locations">
+										<a>Clinics &amp; Locations</a>
+										<div class="sub-nav container">
+											<a href="#" class="sub-nav-close">Clinics &amp; Locations</a>
+												<div>
+													<a href="/lp/precision-cancer-medicine-building" target="_self">
+														<img loading="lazy" src="/-/media/project/ucsf/ucsf-health/images/navigation/pcmb-376x188-2x.jpg?h=376&amp;iar=0&amp;w=752&amp;rev=22258558633e46a99e3c385cbd9a55c5&amp;hash=05AAC46BF10ED201FACE98AB601B0F90" alt="" width="752" height="376" />
+														<span class="eyebrow">BAKAR PRECISION CANCER MEDICINE BUILDING</span>
+														<div class="paragraph1">Care, Convenience and Support at New Cancer Facility</div>
+													</a>
+												</div>
+																							<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/clinics">Find a Clinic</a></p>
+																</li>
+																<li>
+																	<p><a href="/locations">Locations &amp; Directions</a></p>
+																</li>
+																<li>
+																	<p><a href="/list-of-clinics/urgent-care">Urgent Care</a></p>
+																</li>
+																<li>
+																	<p><a href="/clinics/emergency-department">Emergency Care</a></p>
+																</li>
+																<li>
+																	<p><a href="/about/our-affiliates">Partners &amp; Affiliates</a></p>
+																</li>
+																<li>
+																	<p><a rel="noopener noreferrer" href="https://www.ucsfbenioffchildrens.org/" target="_blank">UCSF Benioff Children&#39;s Hospitals</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+										</div>
+									</li>
+									<li data-main-nav-name="Patients &amp; Visitors">
+										<a>Patients &amp; Visitors</a>
+										<div class="sub-nav container">
+											<a href="#" class="sub-nav-close">Patients &amp; Visitors</a>
+												<div>
+													<a href="" target="_self">
+														<img loading="lazy" src="/-/media/project/ucsf/ucsf-health/images/navigation/10-ways-to-get-the-most-from-doctor-visit-376x188-2x.jpg?h=376&amp;iar=0&amp;w=752&amp;rev=1199bec48a1f436e89d93f92a605fdae&amp;hash=37D3E3AF37E3D449EC8779910E4D3D0A" alt="" width="752" height="376" />
+														<span class="eyebrow">KNOW BEFORE YOU GO</span>
+														<div class="paragraph1"> 10 Ways to Get the Most Out of Your Doctor&rsquo;s Visit</div>
+													</a>
+												</div>
+																							<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/your-hospital-stay">Your Hospital Stay</a></p>
+																</li>
+																<li>
+																	<p><a href="/for-visitors">For Visitors</a></p>
+																</li>
+																<li>
+																	<p><a href="/services/international-services">International Services</a></p>
+																</li>
+																<li>
+																	<p><a href="/education/self-care-for-caregivers">For Caregivers</a></p>
+																</li>
+																<li>
+																	<p><a href="/services">Support, Services &amp; Groups</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+												<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/billing-and-insurance">Billing &amp; Insurance</a></p>
+																</li>
+																<li>
+																	<p><a href="/billing-and-insurance/help-paying-your-bill">Help Paying Your Bill</a></p>
+																</li>
+																<li>
+																	<p><a href="/about/pricing-transparency">Pricing Transparency</a></p>
+																</li>
+																<li>
+																	<p><a href="/about/our-340b-story">340B Drug Pricing Program</a></p>
+																</li>
+																<li>
+																	<p><a href="/medical-records">Medical Records</a></p>
+																</li>
+																<li>
+																	<p><a href="/services/patient-relations">Patient Relations</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+										</div>
+									</li>
+									<li data-main-nav-name="Why Choose Us?">
+										<a>Why Choose Us?</a>
+										<div class="sub-nav container">
+											<a href="#" class="sub-nav-close">Why Choose Us?</a>
+												<div>
+													<a href="" target="_self">
+														<img loading="lazy" src="/-/media/project/ucsf/ucsf-health/images/navigation/usnews-376x188-2x.jpg?h=376&amp;iar=0&amp;w=752&amp;rev=ceea5c834962474892a11e0877a76c60&amp;hash=5FDAA3936F2E054CC1408DDD1B92EB2B" alt="" width="752" height="376" />
+														<span class="eyebrow">U.S. News Best Hospital Rankings</span>
+														<div class="paragraph1">UCSF Health Ranked Among Nation's Top 10 Hospitals</div>
+													</a>
+												</div>
+																							<div class="meta-links">
+													<div class="component-content">
+														<ul class="use-arrow-icon">
+																<li>
+																	<p><a href="/about/our-mission">Our Mission</a></p>
+																</li>
+																<li>
+																	<p><a title="Quality of Patient Care" href="/about/quality-of-patient-care">Quality of Patient Care</a></p>
+																</li>
+																<li>
+																	<p><a href="/patient-stories">Patient Stories</a></p>
+																</li>
+																<li>
+																	<p><a href="/about/diversity-at-ucsf-health">Embracing Diversity</a></p>
+																</li>
+																<li>
+																	<p><a href="/about/our-leadership">Our Leadership</a></p>
+																</li>
+														</ul>
+													</div>
+												</div>
+										</div>
+									</li>
+							</ul>
+
+							<ul class="top-menu">
+									<li><a href="/refer-a-patient">Refer a Patient</a></li>
+																	<li><a href="/mychart">MyChart</a></li>
+																	<li><a href="/request-an-appointment">Request Appointment</a></li>
+																	<li><a href="/second-opinion">Get a Second Opinion</a></li>
+																	<li><a class="call-us">Call us: (888) 689-8273</a></li>
+							</ul>
+
+							<div class="mobile-nav-footer">
+								<a rel="noopener noreferrer" title="University of California San Francisco" href="https://www.ucsf.edu/" target="_blank">University of California San Francisco</a>
+							</div>
+						</div>
+
+					</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+			</div>
+		</header>
+		<!-- /#header -->
+		<!-- #content -->
+		<main>
+			
+
+			<div id="content" class="container">
+					<div class="component not-found component col-xs-12">
+		<div class="component-content">
+<div class="image-wrapper"><img src="/-/media/project/ucsf/ucsf-health/content/404/404-ucsf-236-1440x805-2x.jpg?rev=e80eea86b7494facaa8ddc2e85c22278" alt="Researcher in a lab looking into a microscope as part of the U C S F error message page." /></div><div class="image-wrapper-mobile"><img src="/-/media/project/ucsf/ucsf-health/content/404/404-ucsf-236-320x305-2x.jpg?rev=5c9ac8a0f1af48e9834380947ab1110e" alt="" /></div><div class="content-wrapper"><h1 class="field-title">404</h1><h2 class="field-description">We were unable to find the page you&#39;re looking for</h2><div class="component not-found-search col-xs-12">
+	<div class="component-content">
+		<div class="search-form-wrapper">
+			<form class="search-form" action="/search" 
+			      data-autocomplete="/ucsfapi/genericsitesearch/getgenericsuggestions">
+				<div class="search-wrapper">
+					<input aria-label="search text" type="text" placeholder="Search" name="searchterms" />
+					<button aria-label="search" class="icon-ui-search"></button>
+					<div class="autocomplete-results"></div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>		</div>
+	</div>
+
+			</div>
+		</main>
+		<!-- /#content -->
+		<!-- #footer -->
+		<footer>
+			<div id="footer" class="container">
+				
+
+<div class="component footer-values col-xs-12">
+	<div class="component-content">
+<div></div>	</div>
+</div>
+
+<div class="component footer-content col-xs-12">
+	<div class="component-content">
+<div class="container"><div class="top-row">
+<div class="component image file-type-icon-media-link logo">
+    <div class="component-content">
+<img src="/-/media/project/ucsf/ucsf-health/images/logos/logowhite.png?h=26&amp;iar=0&amp;w=141&amp;rev=7a07669440bb454d9c7c3ef29f025f8b&amp;hash=F3B696610C78F98E03B340A55F44AC06" alt="UCSF Health" width="141" height="26" data-variantitemid="{43F4CA98-D35D-4B36-8558-CADA034604A7}" data-variantfieldname="Image" loading="lazy" />    </div>
+</div>
+<div class="top-social-row">
+<div class="component link-list social-footer">
+	<div class="component-content">
+		<div class="eyebrow">Follow UCSF Health:</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="https://www.facebook.com/UCSFMedicalCenter/" target="_blank"  title="Facebook"><span class="icon-social-facebook"></span></a>				</li>
+				<li class="item1 even">
+<a href="https://x.com/ucsfhospitals" target="_blank"  title="X"><span class="icon-social-twitter"></span></a>				</li>
+				<li class="item2 odd">
+<a href="https://www.youtube.com/user/UCSFMedicalCenter" target="_blank"  title="https://www.youtube.com/user/UCSFMedicalCenter"><span class="icon-social-youtube"></span></a>				</li>
+				<li class="item3 even">
+<a href="https://www.instagram.com/ucsfhealth/" target="_blank"  title="Instagram"><span class="icon-social-instagram"></span></a>				</li>
+				<li class="item4 odd last">
+<a href="https://www.linkedin.com/company/ucsfhealth" target="_blank"  title="Linkedin"><span class="icon-social-linkedin"></span></a>				</li>
+		</ul>
+	</div>
+</div>
+</div></div>
+
+
+<div class="component row-splitter">
+        <div class=" footer-nav container-fluid">
+            <div class="row">
+                
+<div class="component link-list col-md-6 col-lg">
+	<div class="component-content">
+		<div class="eyebrow">Getting Care</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="/find-a-doctor" data-variantitemid="{1AC773C8-F17A-4A0B-9496-DE34B3FDA596}" data-variantfieldname="Link">Find a Doctor</a>				</li>
+				<li class="item1 even">
+<a href="/clinics/emergency-department" data-variantitemid="{9AF6DB09-5E16-4E8F-AE94-621AFDFC7840}" title="Emergency Care" data-variantfieldname="Link">Emergency Care</a>				</li>
+				<li class="item2 odd">
+<a href="/list-of-clinics/primary-care" data-variantitemid="{B7B3FA6B-B1BD-4342-8EAF-4B60DB4294CD}" title="Primary Care" data-variantfieldname="Link">Primary Care</a>				</li>
+				<li class="item3 even">
+<a href="/clinics" data-variantitemid="{5A958CEB-5CC1-4ACA-9A21-8AD13E8349DD}" data-variantfieldname="Link">All Medical Services</a>				</li>
+				<li class="item4 odd">
+<a href="/services/international-services" data-variantitemid="{BF8BF095-A11D-46C5-95FF-AC0B07430B42}" data-variantfieldname="Link">International Services</a>				</li>
+				<li class="item5 even">
+<a href="/about/pricing-transparency" data-variantitemid="{3FD4811E-789A-4F66-8CBD-63505BDFC762}" data-variantfieldname="Link">Price Transparency</a>				</li>
+				<li class="item6 odd last">
+<a href="/billing-and-insurance/help-paying-your-bill" data-variantitemid="{508725AA-61CE-4A59-92B6-7E494C6C8EB2}" data-variantfieldname="Link">Help Paying Your Bill</a>				</li>
+		</ul>
+	</div>
+</div>
+
+<div class="component link-list col-md-6 col-lg">
+	<div class="component-content">
+		<div class="eyebrow">Getting Involved</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="https://giving.ucsf.edu/" rel="noopener noreferrer" data-variantitemid="{29C54385-66F4-48A6-A7D3-905A0308F392}" title="Donate" data-variantfieldname="Link" target="_blank">Donate</a>				</li>
+				<li class="item1 even">
+<a href="https://ucsfhealth.samaritan.com/" rel="noopener noreferrer" data-variantitemid="{C534900F-91C6-4E07-85A7-2772BA5A67CB}" title="Volunteer" data-variantfieldname="Link" target="_blank">Volunteer</a>				</li>
+				<li class="item2 odd last">
+<a href="/about/career-information" data-variantitemid="{509A4FEF-0D26-4AF6-9B81-9D3B10415AF4}" data-variantfieldname="Link">Join Our Team</a>				</li>
+		</ul>
+	</div>
+</div>
+
+<div class="component link-list col-md-6 col-lg">
+	<div class="component-content">
+		<div class="eyebrow">About Us</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="/locations" data-variantitemid="{F506296B-B7C2-4932-AA79-8ADBD7A5171F}" title="Locations &amp; Directions" data-variantfieldname="Link">Locations &amp; Directions</a>				</li>
+				<li class="item1 even">
+<a href="/contact-us" data-variantitemid="{D776CD8C-2EF9-4B7F-AED1-394868315243}" data-variantfieldname="Link">Contact Us</a>				</li>
+				<li class="item2 odd">
+<a href="/services/patient-relations" data-variantitemid="{9466A4FF-EEAE-47C6-8C3E-4486C4DEB05B}" data-variantfieldname="Link">Contact Patient Relations</a>				</li>
+				<li class="item3 even">
+<a href="https://www.ucsf.edu/news-media/journalists " rel="noopener noreferrer" data-variantitemid="{E2BC6CAA-8F60-46D7-9AFC-BD58E1D88C66}" data-variantfieldname="Link" target="_blank">Media Resources</a>				</li>
+				<li class="item4 odd">
+<a href="/services/accessibility-resources" data-variantitemid="{77A35480-B0AA-4719-807B-9342DB1F5184}" data-variantfieldname="Link">Accessibility Resources</a>				</li>
+				<li class="item5 even">
+<a href="/about/sexual-harassment-reporting-and-nondiscrimination-notice" data-variantitemid="{F15D3356-2084-49E7-BBB2-C93F06E7ABC1}" data-variantfieldname="Link">Report Misconduct</a>				</li>
+				<li class="item6 odd">
+<a href="/website-privacy-policy" data-variantitemid="{2BBA9C94-27D8-4C7D-BCFC-BFCF044153B4}" data-variantfieldname="Link">Website Privacy Policy</a>				</li>
+				<li class="item7 even">
+<a href="/about/quality-of-patient-care" data-variantitemid="{4FB09E1E-BF44-4F5C-8A02-D4FB43FB5626}" title="Quality of Patient Care" data-variantfieldname="Link">Quality of Patient Care</a>				</li>
+				<li class="item8 odd">
+<a href="/-/media/project/ucsf/ucsf-health/pdf/crisis-standards-of-care.pdf?rev=0d122f1cc1f5437aada5361d5f3ca7dc&amp;hash=6759377BF7908544EA7B188ADDC68A08" data-variantitemid="{90D74519-0779-4B00-BA3F-4AFB696BB4FC}" data-variantfieldname="Link">Crisis Standards of Care</a>				</li>
+				<li class="item9 even">
+<a href="/about" data-variantitemid="{F3E86A44-0143-4054-87F5-BE4D58DD4999}" data-variantfieldname="Link">Our Organization</a>				</li>
+				<li class="item10 odd">
+<a href="https://www.ucsf.edu/news" rel="noopener noreferrer" data-variantitemid="{5BC38D88-AC25-4465-9A7E-4333EC72E4AC}" data-variantfieldname="Link" target="_blank">UCSF News</a>				</li>
+				<li class="item11 even last">
+<a href="/-/media/project/ucsf/ucsf-health/pdf/ucsfhipaa-072021.pdf?rev=1ba3b481dc4a41fa9dbabb24299f34bb&amp;hash=0E63FF00C4BDCB9C50A33177E30FC62F" data-variantitemid="{CCEAAE80-5B3C-4FCF-95AF-C9874F0DB3D8}" data-variantfieldname="Link">Notice of Privacy Practices</a>				</li>
+		</ul>
+	</div>
+</div>
+
+<div class="component link-list col-md-6 col-lg">
+	<div class="component-content">
+		<div class="eyebrow">Research and Education</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="https://clinicaltrials.ucsf.edu/" rel="noopener noreferrer" data-variantitemid="{6CBDBDFF-26BD-45A3-8F4B-6C7183A10749}" data-variantfieldname="Link" target="_blank">Clinical Trials</a>				</li>
+				<li class="item1 even">
+<a href="https://www.ucsf.edu" rel="noopener noreferrer" data-variantitemid="{341E340D-5DEF-45BA-8E48-A5EE829E219B}" title="UC San Francisco" data-variantfieldname="Link" target="_blank">UC San Francisco</a>				</li>
+				<li class="item2 odd">
+<a href="https://medschool.ucsf.edu/" rel="noopener noreferrer" data-variantitemid="{00E9070A-B2F5-44EF-B191-C7FBB0AD38B2}" title="UCSF School of Medicine" data-variantfieldname="Link" target="_blank">UCSF School of Medicine</a>				</li>
+				<li class="item3 even">
+<a href="https://nursing.ucsf.edu/" rel="noopener noreferrer" data-variantitemid="{8DD32DF1-839D-4E91-9D76-4D67402FDBCB}" title="UCSF School of Nursing" data-variantfieldname="Link" target="_blank">UCSF School of Nursing</a>				</li>
+				<li class="item4 odd last">
+<a href="https://pharmacy.ucsf.edu/" rel="noopener noreferrer" data-variantitemid="{81ED1BDE-45E1-4CD5-AB43-EC570F877DB9}" title="UCSF School of Pharmacy" data-variantfieldname="Link" target="_blank">UCSF School of Pharmacy</a>				</li>
+		</ul>
+	</div>
+</div>
+
+<div class="component link-list col-md-6 col-lg">
+	<div class="component-content">
+		<div class="eyebrow">Referring Physicians</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="/refer-a-patient" data-variantitemid="{2215C675-3589-49C1-8DB2-D9357C299CD1}" title="Refer a Patient" data-variantfieldname="Link">Refer a Patient</a>				</li>
+				<li class="item1 even">
+<a href="/for-health-professionals/transfer-a-patient" data-variantitemid="{2CF89CF3-857D-4293-A6C3-AEACDFEE9F9F}" title="Transfer a Patient" data-variantfieldname="Link">Transfer a Patient</a>				</li>
+				<li class="item2 odd">
+<a href="/mdlink" data-variantitemid="{F216922D-7B96-45DF-A6F2-29AB25B350F2}" data-variantfieldname="Link">MDLink</a>				</li>
+				<li class="item3 even">
+<a href="/for-health-professionals/request-a-consultation" data-variantitemid="{9235B0AA-89B0-4E51-9C51-50388F4A46A5}" title="Request a Consultation" data-variantfieldname="Link">Request a Consultation</a>				</li>
+				<li class="item4 odd last">
+<a href="https://medconnection.ucsfhealth.org" rel="noopener noreferrer" data-variantitemid="{1EE9F372-4A58-4089-A473-B4D3A89B1820}" data-variantfieldname="Link" target="_blank">Physician Channel</a>				</li>
+		</ul>
+	</div>
+</div>
+
+            </div>
+        </div>
+        <div class=" bottom-social-row container-fluid">
+            <div class="row">
+                
+<div class="component link-list social-footer">
+	<div class="component-content">
+		<div class="eyebrow">Follow UCSF Health:</div>
+				<ul>
+				<li class="item0 odd first">
+<a href="https://www.facebook.com/UCSFMedicalCenter/" target="_blank"  title="Facebook"><span class="icon-social-facebook"></span></a>				</li>
+				<li class="item1 even">
+<a href="https://x.com/ucsfhospitals" target="_blank"  title="X"><span class="icon-social-twitter"></span></a>				</li>
+				<li class="item2 odd">
+<a href="https://www.youtube.com/user/UCSFMedicalCenter" target="_blank"  title="https://www.youtube.com/user/UCSFMedicalCenter"><span class="icon-social-youtube"></span></a>				</li>
+				<li class="item3 even">
+<a href="https://www.instagram.com/ucsfhealth/" target="_blank"  title="Instagram"><span class="icon-social-instagram"></span></a>				</li>
+				<li class="item4 odd last">
+<a href="https://www.linkedin.com/company/ucsfhealth" target="_blank"  title="Linkedin"><span class="icon-social-linkedin"></span></a>				</li>
+		</ul>
+	</div>
+</div>
+
+            </div>
+        </div>
+</div>
+
+    <div class="component rich-text copyright">
+        <div class="component-content">
+<span>© 2002 - </span><span>2026</span><span>.&nbsp;</span>The Regents of The University of California.        </div>
+    </div>
+
+<div class="component link-list footer-secondary-nav">
+	<div class="component-content">
+		<div class="eyebrow"></div>
+				<ul>
+				<li class="item0 odd first">
+<a href="/website-privacy-policy" data-variantitemid="{EE28BB0F-74F0-4D51-8EBE-B6C670E33A04}" data-variantfieldname="Link">Privacy Policy</a>				</li>
+				<li class="item1 even">
+<a href="/about/terms-of-use" data-variantitemid="{42863EE4-B140-4240-A7E0-A26699F458DC}" data-variantfieldname="Link">Terms and Conditions</a>				</li>
+				<li class="item2 odd last">
+<a data-variantitemid="{7AC8FA1E-4CD5-4BAE-A3B4-F9722170203D}" data-variantfieldname="Link">Some stock photos, posed by model.</a>				</li>
+		</ul>
+	</div>
+</div>
+</div>	</div>
+</div>
+
+			</div>
+		</footer>
+		<!-- /#footer -->
+	</div>
+	<script src=/assets/ucsf/main.js?v=fc3da29fef15f42892385817411ce1b2></script> 
+	
+
+
+<div class="share-menu">
+                    <span class="icon-ui-close"></span>
+                    <h4>Share</h4>
+                    <ul>
+                       <li class="email-link">
+                            <a href="#"><span class="icon-ui-mail"></span> Email Link</a>
+                        </li>
+                        <li class="copy-link">
+                            <span class="icon-ui-share"></span> Copy Link
+                            <span class="svg-ui-checkmark"></span>
+                        </li>
+                        <li class="facebook-share">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=" target="_blank" title="Share on Facebook" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.URL) + '&quote=' + encodeURIComponent(document.URL)); return false;"><span class="icon-social-facebook"></span> Share on Facebook</a>
+                        </li>
+                        <li class="linkedin-share">
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=" target="_blank" title="Share on LinkedIn"><span class="icon-social-linkedin"></span> Share on LinkedIn</a>
+                        </li>   
+                        <li class="twitter-share">
+                           <a href="https://twitter.com/intent/tweet?text=" target="_blank" title="Share on X"><span class="icon-social-twitter"></span> Share on X</a>
+                        </li>
+                    </ul>
+                </div>
+
+
+</body>
+</html>

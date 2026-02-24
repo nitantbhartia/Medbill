@@ -1,0 +1,3 @@
+local_path,doc_type,source_type,source_url,notes
+public/aetna_eob_sample.pdf,eob,public,https://assets.documentcloud.org/documents/1265368/aetna-explanation-of-benefits.pdf,Public sample EOB used for layout variance.
+public/atlanticare_sample_bill.png,bill_portal,public,https://www.atlanticare.org/sites/default/files/2024-11/a51f2ece21deff463f6eff170a1b1139.png,Portal-style billing snippet converted to PNG.

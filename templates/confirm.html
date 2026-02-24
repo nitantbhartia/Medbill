@@ -18,8 +18,20 @@
     </div>
 
     {% if data.bill %}
-    {% set extracted_sum = data.line_items | sum(attribute='charged_amount') if data.line_items else 0 %}
-    {% set bill_total = data.bill.total_charged if data.bill and data.bill.total_charged else 0 %}
+    {% set sums = namespace(charged=0, patient=0, has_patient=false) %}
+    {% for item in data.line_items %}
+        {% if item.charged_amount is not none %}
+            {% set sums.charged = sums.charged + item.charged_amount %}
+        {% endif %}
+        {% if item.patient_responsibility is not none %}
+            {% set sums.patient = sums.patient + item.patient_responsibility %}
+            {% set sums.has_patient = true %}
+        {% endif %}
+    {% endfor %}
+    {% set using_patient_basis = (data.bill.total_patient_owes is not none) and sums.has_patient %}
+    {% set extracted_sum = sums.patient if using_patient_basis else sums.charged %}
+    {% set bill_total = (data.bill.total_patient_owes if using_patient_basis else data.bill.total_charged) if data.bill else 0 %}
+    {% set recon_basis_label = 'patient responsibility' if using_patient_basis else 'billed charges' %}
     {% set recon_delta = (extracted_sum - bill_total) if bill_total else 0 %}
     {% set recon_pct = ((recon_delta | abs) / bill_total * 100) if bill_total else 0 %}
     <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 mb-6 pb-6 border-b border-gray-100">
@@ -52,6 +64,7 @@
                 · Delta: <strong>${{ "%.2f" | format(recon_delta) }}</strong>
             {% endif %}
         </p>
+        <p class="text-xs text-gray-500 mt-1">Basis: {{ recon_basis_label }}</p>
         <p class="text-xs mt-1 {% if bill_total and recon_pct > 2 %}text-amber-700{% else %}text-green-700{% endif %}">
             {% if bill_total and recon_pct > 2 %}
                 Reconciliation mismatch is above 2%. Review missing/incorrect line items before continuing.
