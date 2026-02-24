@@ -1,4 +1,5 @@
 import collections
+from html import escape as _he
 import json
 import logging
 import re
@@ -591,6 +592,10 @@ async def get_dispute_letter(request: Request, bill_id: int, payload: dict):
     account_number = payload.get("account_number", "[Account Number]")
     if not isinstance(selected_ids, list):
         raise HTTPException(400, "finding_ids must be an array")
+    if len(str(requestor_name)) > config.MAX_NAME_LEN:
+        raise HTTPException(400, f"requestor_name exceeds {config.MAX_NAME_LEN} characters")
+    if len(str(account_number)) > config.MAX_ACCOUNT_NUMBER_LEN:
+        raise HTTPException(400, f"account_number exceeds {config.MAX_ACCOUNT_NUMBER_LEN} characters")
 
     result = build_dispute_letter(
         bill_id,
@@ -673,7 +678,7 @@ def _build_report_html(results: dict) -> str:
         finding_rows += (
             f'<tr>'
             f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:{color};font-weight:600;text-transform:uppercase;font-size:11px">{sev}</td>'
-            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">{f.get("message", "")}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">{_he(f.get("message", ""))}</td>'
             f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#059669;white-space:nowrap">'
             f'{"$" + f"{est:,.2f}" if est else "—"}</td>'
             f'</tr>'
@@ -699,11 +704,11 @@ def _build_report_html(results: dict) -> str:
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
         <tr>
           <td style="font-size:12px;color:#6b7280;padding:4px 0">Provider</td>
-          <td style="font-size:13px;color:#111827;font-weight:500;padding:4px 0">{provider}</td>
+          <td style="font-size:13px;color:#111827;font-weight:500;padding:4px 0">{_he(provider)}</td>
         </tr>
         <tr>
           <td style="font-size:12px;color:#6b7280;padding:4px 0">Bill date</td>
-          <td style="font-size:13px;color:#111827;padding:4px 0">{bill_date}</td>
+          <td style="font-size:13px;color:#111827;padding:4px 0">{_he(bill_date)}</td>
         </tr>
         <tr>
           <td style="font-size:12px;color:#6b7280;padding:4px 0">Total charged</td>
@@ -838,30 +843,51 @@ async def start_negotiation(
     return {"status": "ok", "data": {"negotiation_id": neg_id}}
 
 
+def _require_negotiation_access(request: Request, negotiation_id: int) -> None:
+    with get_db() as db:
+        row = db.execute("SELECT bill_id FROM negotiations WHERE id = ?", (negotiation_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Negotiation not found")
+    require_bill_access(request, int(row["bill_id"]))
+
+
 @router.post("/negotiate/{negotiation_id}/generate")
-async def generate_email(negotiation_id: int):
+async def generate_email(request: Request, negotiation_id: int):
     """Generate the next dispute email draft."""
+    _require_negotiation_access(request, negotiation_id)
     email_data = negotiation.generate_dispute_email(negotiation_id)
     return {"status": "ok", "data": email_data}
 
 
 @router.post("/negotiate/message/{message_id}/approve")
-async def approve_message(message_id: int):
+async def approve_message(request: Request, message_id: int):
     """Approve and send a drafted negotiation email."""
+    with get_db() as db:
+        msg = db.execute(
+            "SELECT n.bill_id FROM negotiation_messages nm JOIN negotiations n ON n.id = nm.negotiation_id WHERE nm.id = ?",
+            (message_id,),
+        ).fetchone()
+    if not msg:
+        raise HTTPException(404, "Message not found")
+    require_bill_access(request, int(msg["bill_id"]))
     negotiation.approve_and_send(message_id)
     return {"status": "ok", "data": {"sent": True}}
 
 
 @router.post("/negotiate/{negotiation_id}/response")
-async def record_response(negotiation_id: int, body: str = Form(...)):
+async def record_response(request: Request, negotiation_id: int, body: str = Form(...)):
     """Record and parse a hospital response."""
+    _require_negotiation_access(request, negotiation_id)
+    if len(body) > config.MAX_NOTE_LEN:
+        raise HTTPException(400, f"Response body exceeds {config.MAX_NOTE_LEN} characters")
     analysis = negotiation.record_hospital_response(negotiation_id, body)
     return {"status": "ok", "data": analysis}
 
 
 @router.get("/negotiate/{negotiation_id}/copilot")
-async def negotiation_copilot(negotiation_id: int):
+async def negotiation_copilot(request: Request, negotiation_id: int):
     """Return stage tracking and recommended next reply."""
+    _require_negotiation_access(request, negotiation_id)
     data = negotiation.get_copilot_summary(negotiation_id)
     if not data:
         raise HTTPException(404, "Negotiation not found")
@@ -891,6 +917,8 @@ async def record_dispute_outcome(
         raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
     if final_patient_owes < 0:
         raise HTTPException(400, "final_patient_owes cannot be negative")
+    if len(notes) > config.MAX_NOTE_LEN:
+        raise HTTPException(400, f"notes exceeds {config.MAX_NOTE_LEN} characters")
 
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
@@ -1520,6 +1548,8 @@ async def record_esign(
     require_bill_access(request, bill_id)
     if doc_type not in esign_module.ALL_DOCS:
         raise HTTPException(400, f"doc_type must be one of: {', '.join(esign_module.ALL_DOCS)}")
+    if len(patient_name) > config.MAX_NAME_LEN:
+        raise HTTPException(400, f"patient_name exceeds {config.MAX_NAME_LEN} characters")
 
     if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", patient_email):
         raise HTTPException(400, "Invalid email address")
@@ -1809,6 +1839,18 @@ async def generate_fdcpa_letter(request: Request):
     missing = [f for f in required if not (body.get(f) or "").strip()]
     if missing:
         raise HTTPException(400, f"Missing required fields: {', '.join(missing)}")
+
+    _text_limits = [
+        ("user_name", config.MAX_NAME_LEN),
+        ("collector_name", config.MAX_NAME_LEN),
+        ("user_address", config.MAX_ADDRESS_LEN),
+        ("collector_address", config.MAX_ADDRESS_LEN),
+        ("account_number", config.MAX_ACCOUNT_NUMBER_LEN),
+        ("amount", config.MAX_AMOUNT_LEN),
+    ]
+    for field, limit in _text_limits:
+        if len((body.get(field) or "").strip()) > limit:
+            raise HTTPException(400, f"{field} exceeds {limit} characters")
 
     try:
         result = debt_fighter.generate_fdcpa_letter(
