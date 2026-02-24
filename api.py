@@ -584,7 +584,7 @@ def _build_report_html(results: dict) -> str:
 
 @router.post("/email-report")
 async def email_report(request: Request):
-    """Email a bill report to the user. Requires SENDGRID_API_KEY to deliver."""
+    """Email a bill report to the user. Requires RESEND_API_KEY to deliver."""
     body = await request.json()
     bill_id = body.get("bill_id")
     to_email = (body.get("email") or "").strip()
