@@ -1,104 +1,620 @@
 {% extends "base.html" %}
-{% block title %}Hospital Charity Care Eligibility Checker | BillKarma{% endblock %}
+{% block title %}Hospital Charity Care & Financial Assistance | BillKarma{% endblock %}
+
+{% block head %}
+<style>
+    @media print {
+        .bk-nav, .bk-footer, .no-print { display: none !important; }
+        body { background: #fff !important; }
+        #letter-preview { border: none !important; padding: 0 !important; font-size: 12pt !important; }
+        main { padding: 0 !important; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-extrabold tracking-tight mb-2">Do You Qualify for Hospital Financial Assistance?</h1>
-    <p class="text-gray-500 mb-10">Most nonprofit hospitals must forgive bills for patients under 200-400% of the Federal Poverty Level. Many people qualify and never apply.</p>
+    <p class="text-gray-500 mb-10">Most nonprofit hospitals are required to forgive or reduce bills for patients who can't afford them. Millions qualify every year and never apply. Let's find out if you're one of them.</p>
 
-    <form id="charity-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
-        <div>
-            <label class="block text-sm font-semibold mb-2" for="household_size">Household Size</label>
-            <select id="household_size" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600">
-                <option value="1">1 person</option>
-                <option value="2">2 people</option>
-                <option value="3">3 people</option>
-                <option value="4" selected>4 people</option>
-                <option value="5">5 people</option>
-                <option value="6">6 people</option>
-                <option value="7">7 people</option>
-                <option value="8">8+ people</option>
-            </select>
+    <!-- ========== SECTION 1: Hospital Search ========== -->
+    <section id="section-hospital" class="mb-10 no-print">
+        <h2 class="text-lg font-bold mb-4">Which hospital treated you?</h2>
+        <div class="relative">
+            <input type="text" id="hospital-search" autocomplete="off"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600"
+                placeholder="Start typing a hospital name...">
+            <div id="hospital-dropdown" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-72 overflow-y-auto"></div>
         </div>
-        <div>
-            <label class="block text-sm font-semibold mb-2" for="income">Annual Household Income ($)</label>
-            <input type="number" id="income" required min="1" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600" placeholder="45000">
-            <p class="text-xs text-gray-400 mt-1">Your total household income before taxes. Use your most recent tax return as a guide.</p>
+        <button id="skip-hospital-btn" class="mt-3 text-sm text-gray-500 hover:text-gray-700 underline">I don't know which hospital &mdash; skip to eligibility check</button>
+
+        <!-- Hospital detail card (hidden until selection) -->
+        <div id="hospital-detail" class="hidden mt-6 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+            <div class="flex items-start justify-between gap-4 mb-3">
+                <h3 id="hospital-detail-name" class="text-base font-bold"></h3>
+                <span id="hospital-detail-badge" class="text-xs font-bold px-3 py-1 rounded-full flex-shrink-0"></span>
+            </div>
+            <div id="hospital-detail-body" class="text-sm text-gray-600 space-y-2"></div>
         </div>
-        <button type="submit" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Check My Eligibility — Free</button>
-    </form>
+    </section>
 
-    <div id="charity-result" class="hidden mt-8 rounded-2xl p-8 border"></div>
+    <!-- ========== SECTION 2: Eligibility Check ========== -->
+    <section id="section-eligibility" class="mb-10 no-print">
+        <h2 class="text-lg font-bold mb-4">Check your eligibility</h2>
+        <form id="eligibility-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <div>
+                <label class="block text-sm font-semibold mb-2" for="household_size">Household Size</label>
+                <select id="household_size" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600">
+                    <option value="1">1 person</option>
+                    <option value="2">2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4" selected>4 people</option>
+                    <option value="5">5 people</option>
+                    <option value="6">6 people</option>
+                    <option value="7">7 people</option>
+                    <option value="8">8+ people</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-2" for="income">Annual Household Income ($)</label>
+                <input type="number" id="income" required min="0" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600" placeholder="45000">
+                <p class="text-xs text-gray-400 mt-1">Your total household income before taxes. Use your most recent tax return as a guide.</p>
+            </div>
+            <button type="submit" id="eligibility-btn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Check My Eligibility &mdash; Free</button>
+        </form>
 
-    <div class="mt-10 bg-gray-50 rounded-2xl p-6 border border-gray-200">
-        <h3 class="font-bold text-sm mb-2">How does hospital financial assistance work?</h3>
+        <!-- Eligibility result (hidden until check) -->
+        <div id="eligibility-result" class="hidden mt-8 rounded-2xl p-8 border">
+            <h3 id="elig-title" class="text-lg font-bold mb-2"></h3>
+            <p id="elig-message" class="mb-4"></p>
+            <div class="space-y-1 mb-4">
+                <p class="text-sm text-gray-600"><strong>Your income:</strong> <span id="elig-income"></span></p>
+                <p class="text-sm text-gray-600"><strong>Federal Poverty Level for your household:</strong> <span id="elig-fpl"></span></p>
+                <p class="text-sm text-gray-600"><strong>Your income as % of FPL:</strong> <span id="elig-pct"></span></p>
+            </div>
+            <!-- FPL visual bar -->
+            <div class="mb-4">
+                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                    <span>0%</span><span>100%</span><span>200%</span><span>300%</span><span>400%</span>
+                </div>
+                <div class="relative h-4 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 bg-green-500 rounded-full" style="width:25%"></div>
+                    <div class="absolute inset-y-0 bg-amber-400 rounded-full" style="left:25%;width:25%"></div>
+                    <div class="absolute inset-y-0 bg-orange-400 rounded-full" style="left:50%;width:25%"></div>
+                    <div class="absolute inset-y-0 bg-gray-400 rounded-full" style="left:75%;width:25%"></div>
+                    <div id="fpl-marker" class="absolute top-0 w-1 h-full bg-gray-900 rounded-full" style="left:0%"></div>
+                </div>
+                <p id="fpl-marker-label" class="text-xs font-semibold text-gray-700 mt-1"></p>
+            </div>
+            <p id="elig-disclaimer" class="text-xs text-gray-500"></p>
+        </div>
+
+        <!-- Eligibility error -->
+        <div id="eligibility-error" class="hidden mt-8 rounded-2xl p-8 border border-red-200 bg-red-50">
+            <p id="eligibility-error-msg" class="font-semibold text-red-800"></p>
+        </div>
+    </section>
+
+    <!-- ========== SECTION 3: Step-by-Step Process ========== -->
+    <section id="section-steps" class="hidden mb-10 no-print">
+        <h2 class="text-lg font-bold mb-4">How to apply &mdash; step by step</h2>
+        <div id="steps-list" class="space-y-3"></div>
+    </section>
+
+    <!-- ========== SECTION 4: Document Checklist ========== -->
+    <section id="section-docs" class="hidden mb-10 no-print">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold">Documents you'll need</h2>
+            <span id="docs-progress" class="text-sm font-semibold text-gray-500"></span>
+        </div>
+        <div id="docs-list" class="space-y-3"></div>
+    </section>
+
+    <!-- ========== SECTION 5: Application Letter Generator ========== -->
+    <section id="section-letter" class="hidden mb-10 no-print">
+        <h2 class="text-lg font-bold mb-4">Generate your cover letter</h2>
+        <p class="text-sm text-gray-500 mb-6">This letter accompanies your financial assistance application. It summarizes your situation and requests consideration under the hospital's charity care policy.</p>
+
+        <div id="letter-form-section">
+            <form id="letter-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h3 class="font-bold text-sm mb-2">Your Information</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Full Name</label>
+                        <input type="text" id="letter-user-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Your Address</label>
+                        <input type="text" id="letter-user-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-sm mb-2 mt-6">Hospital Information</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Hospital Name</label>
+                        <input type="text" id="letter-hospital-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Hospital Address</label>
+                        <input type="text" id="letter-hospital-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-sm mb-2 mt-6">Bill Details</h3>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Account Number</label>
+                            <input type="text" id="letter-account" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Bill Amount ($)</label>
+                            <input type="text" id="letter-bill-amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Date of Service</label>
+                        <input type="date" id="letter-dos" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" id="letter-btn" class="mt-4 w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Generate Cover Letter</button>
+            </form>
+        </div>
+
+        <!-- Letter result -->
+        <div id="letter-result" class="hidden">
+            <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
+                <h3 class="text-lg font-bold text-green-800 mb-1">Your cover letter is ready</h3>
+                <p class="text-sm text-green-700">Review it below, then print or download. Include it with your financial assistance application.</p>
+            </div>
+            <div id="letter-preview" class="bg-white border border-gray-300 rounded-xl p-8 font-mono text-sm leading-relaxed whitespace-pre-wrap mb-6"></div>
+            <div class="flex gap-3 mb-6 no-print">
+                <button onclick="printLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Print Letter</button>
+                <button onclick="downloadLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Download Letter</button>
+                <button onclick="editLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Edit</button>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 no-print">
+                <h3 class="font-bold text-amber-800 text-sm mb-2">How to send this</h3>
+                <p class="text-sm text-amber-700">Print this letter and include it with your completed financial assistance application. Send everything via certified mail or deliver it in person to the hospital's billing department. Keep copies of everything you send.</p>
+            </div>
+            <p id="letter-disclaimer" class="text-xs text-gray-500 mt-4"></p>
+        </div>
+    </section>
+
+    <!-- ========== How It Works (always visible) ========== -->
+    <section class="mt-10 bg-gray-50 rounded-2xl p-6 border border-gray-200 no-print">
+        <h3 class="font-bold text-sm mb-3">How does hospital financial assistance work?</h3>
         <ul class="text-sm text-gray-600 space-y-2">
-            <li><strong>IRS Section 501(r)</strong> requires nonprofit hospitals to offer Financial Assistance Programs (FAPs) to maintain tax-exempt status.</li>
-            <li>Hospitals must make these programs widely available and cannot deny care to patients who qualify.</li>
-            <li>Eligibility is based on household income relative to the Federal Poverty Level.</li>
-            <li>You can apply <strong>retroactively</strong> — even after a bill has gone to collections.</li>
+            <li><strong>Under IRS Section 501(r)</strong>, nonprofit hospitals must offer Financial Assistance Programs (FAPs) to maintain their tax-exempt status. This is federal law, not charity.</li>
+            <li>Hospitals must publicize their FAP, provide free applications, and cannot use aggressive collection tactics against patients who may qualify.</li>
+            <li>Eligibility is based on your household income relative to the <strong>Federal Poverty Level (FPL)</strong>. Most programs cover patients up to 200-400% of FPL.</li>
+            <li>You can apply <strong>retroactively</strong> &mdash; even after a bill has gone to collections.</li>
         </ul>
-    </div>
+    </section>
 
-    <div class="mt-6 text-center">
+    <div class="mt-6 text-center no-print">
         <a href="/hospitals/" class="text-sm font-semibold text-green-700 hover:underline">Check if your hospital is nonprofit in our directory</a>
         <span class="mx-2 text-gray-300">|</span>
         <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt tools</a>
     </div>
 
-    <p class="text-xs text-gray-400 mt-8 text-center">BillKarma is not a law firm. This is a self-help tool, not legal advice. Eligibility estimates are based on published federal poverty guidelines. Hospital income thresholds may vary.</p>
+    <p class="text-xs text-gray-400 mt-8 text-center no-print">BillKarma is not a law firm. This is a self-help tool, not legal advice. Eligibility estimates are based on published federal poverty guidelines. Hospital income thresholds vary. Consult an attorney for complex situations.</p>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.getElementById('charity-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const income = parseFloat(document.getElementById('income').value);
-    const householdSize = parseInt(document.getElementById('household_size').value);
+(function() {
+    // --- Utility ---
+    function esc(s) {
+        var el = document.createElement('span');
+        el.textContent = String(s);
+        return el.innerHTML;
+    }
 
-    const res = await fetch('/api/charity-care/check', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({income: income, household_size: householdSize})
+    function $(id) { return document.getElementById(id); }
+    function show(id) { $(id).classList.remove('hidden'); }
+    function hide(id) { $(id).classList.add('hidden'); }
+    function formatMoney(n) { return '$' + Number(n).toLocaleString(); }
+
+    // --- State ---
+    var selectedHospital = null;
+    var eligibilityData = null;
+    var letterText = '';
+    var searchTimer = null;
+    var checkedDocs = {};
+
+    // ================================================================
+    // SECTION 1: Hospital Search
+    // ================================================================
+    var searchInput = $('hospital-search');
+    var dropdown = $('hospital-dropdown');
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        var q = searchInput.value.trim();
+        if (q.length < 3) {
+            hide('hospital-dropdown');
+            return;
+        }
+        searchTimer = setTimeout(function() { searchHospitals(q); }, 300);
     });
-    const json = await res.json();
-    const box = document.getElementById('charity-result');
-    box.classList.remove('hidden');
 
-    function esc(s) { const t = document.createElement('span'); t.textContent = s; return t.innerHTML; }
+    searchInput.addEventListener('blur', function() {
+        setTimeout(function() { hide('hospital-dropdown'); }, 200);
+    });
 
-    if (!res.ok) {
-        box.className = 'mt-8 rounded-2xl p-8 border border-red-200 bg-red-50';
-        box.textContent = json.detail || 'Error checking eligibility';
-        box.className = 'mt-8 rounded-2xl p-8 border border-red-200 bg-red-50 font-semibold text-red-800';
-        return;
+    $('skip-hospital-btn').addEventListener('click', function() {
+        hide('hospital-detail');
+        selectedHospital = null;
+        searchInput.value = '';
+        $('section-eligibility').scrollIntoView({behavior: 'smooth'});
+    });
+
+    async function searchHospitals(q) {
+        try {
+            var res = await fetch('/api/charity-care/hospital-search?q=' + encodeURIComponent(q));
+            if (!res.ok) {
+                hide('hospital-dropdown');
+                return;
+            }
+            var json = await res.json();
+            var hospitals = json.data || json;
+            if (!hospitals.length) {
+                dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-400">No hospitals found</div>';
+                show('hospital-dropdown');
+                return;
+            }
+            var html = '';
+            hospitals.forEach(function(h) {
+                var badge = h.is_nonprofit
+                    ? '<span class="text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Nonprofit</span>'
+                    : '<span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">For-profit</span>';
+                html += '<button type="button" class="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center justify-between gap-2 border-b border-gray-100 last:border-0" data-fid="' + esc(h.facility_id) + '">'
+                    + '<div><div class="text-sm font-semibold">' + esc(h.name) + '</div>'
+                    + '<div class="text-xs text-gray-400">' + esc(h.city) + ', ' + esc(h.state) + '</div></div>'
+                    + badge + '</button>';
+            });
+            dropdown.innerHTML = html;
+            show('hospital-dropdown');
+
+            dropdown.querySelectorAll('button').forEach(function(btn) {
+                btn.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    selectHospital(btn.getAttribute('data-fid'));
+                });
+            });
+        } catch (err) {
+            hide('hospital-dropdown');
+        }
     }
 
-    const d = json.data;
-    let color, title;
-    if (d.eligibility === 'likely_full') {
-        color = 'green';
-        title = 'You likely qualify for full bill forgiveness';
-    } else if (d.eligibility === 'likely_partial' || d.eligibility === 'possible_partial') {
-        color = 'amber';
-        title = 'You may qualify for a significant discount';
-    } else {
-        color = 'gray';
-        title = 'You are above typical thresholds, but applying is still worth it';
+    async function selectHospital(facilityId) {
+        hide('hospital-dropdown');
+        try {
+            var res = await fetch('/api/charity-care/hospital/' + encodeURIComponent(facilityId));
+            if (!res.ok) return;
+            var json = await res.json();
+            var h = json.data || json;
+            selectedHospital = h;
+            searchInput.value = h.name || '';
+            renderHospitalDetail(h);
+        } catch (err) {
+            // Silently fail - user can still proceed
+        }
     }
 
-    box.className = 'mt-8 rounded-2xl p-8 border border-' + color + '-200 bg-' + color + '-50';
-    let html = '<h3 class="text-lg font-bold text-' + color + '-800 mb-2">' + esc(title) + '</h3>'
-        + '<p class="text-' + color + '-700 mb-4">' + esc(d.message) + '</p>'
-        + '<p class="text-sm text-gray-600 mb-1"><strong>Your income:</strong> $' + esc(d.income.toLocaleString()) + '</p>'
-        + '<p class="text-sm text-gray-600 mb-1"><strong>Federal Poverty Level for ' + esc(d.household_size) + '-person household:</strong> $' + esc(d.fpl.toLocaleString()) + '</p>'
-        + '<p class="text-sm text-gray-600 mb-4"><strong>Your income as % of FPL:</strong> ' + esc(d.fpl_percentage) + '%</p>'
-        + '<h4 class="font-bold text-sm mb-2">Next Steps</h4><ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">';
-    d.next_steps.forEach(function(step) { html += '<li>' + esc(step) + '</li>'; });
-    html += '</ol>';
-    html += '<p class="text-xs text-gray-500 mt-4">' + esc(d.disclaimer) + '</p>';
-    box.innerHTML = html;
-});
+    function renderHospitalDetail(h) {
+        $('hospital-detail-name').textContent = h.name || '';
+
+        var badgeEl = $('hospital-detail-badge');
+        if (h.is_nonprofit) {
+            badgeEl.textContent = 'Nonprofit';
+            badgeEl.className = 'text-xs font-bold px-3 py-1 rounded-full flex-shrink-0 bg-green-100 text-green-700';
+        } else {
+            badgeEl.textContent = 'For-profit';
+            badgeEl.className = 'text-xs font-bold px-3 py-1 rounded-full flex-shrink-0 bg-gray-100 text-gray-500';
+        }
+
+        var lines = [];
+
+        if (h.city && h.state) {
+            lines.push('<p>' + esc(h.city) + ', ' + esc(h.state) + '</p>');
+        }
+
+        if (h.is_nonprofit) {
+            lines.push('<div class="bg-green-50 border border-green-200 rounded-xl p-3 mt-2">'
+                + '<p class="text-green-800 font-semibold text-sm">This hospital is required by federal law to consider your application.</p>'
+                + '<p class="text-green-700 text-xs mt-1">Under IRS Section 501(r), nonprofit hospitals must offer a Financial Assistance Program.</p></div>');
+        } else {
+            lines.push('<div class="bg-gray-100 border border-gray-200 rounded-xl p-3 mt-2">'
+                + '<p class="text-gray-700 text-sm">For-profit hospitals are not legally required to offer financial assistance, but many still do. It is still worth asking.</p></div>');
+        }
+
+        if (h.has_financial_assistance) {
+            lines.push('<p class="mt-2"><strong>Financial Assistance:</strong> <span class="text-green-700 font-semibold">Available</span></p>');
+            if (h.fa_income_threshold) {
+                lines.push('<p><strong>Income threshold:</strong> ' + esc(h.fa_income_threshold) + '</p>');
+            }
+            if (h.financial_assistance_url) {
+                lines.push('<p><a href="' + esc(h.financial_assistance_url) + '" target="_blank" rel="noopener" class="text-green-700 font-semibold underline">View hospital\'s financial assistance policy</a></p>');
+            }
+            if (h.fa_application_url) {
+                lines.push('<p><a href="' + esc(h.fa_application_url) + '" target="_blank" rel="noopener" class="text-green-700 underline">Download application form</a></p>');
+            }
+        } else {
+            lines.push('<p class="mt-2"><strong>Financial Assistance:</strong> <span class="text-gray-500">Not confirmed</span></p>');
+        }
+
+        if (h.charity_care_pct) {
+            lines.push('<p><strong>Charity care spending:</strong> ' + esc(h.charity_care_pct) + '% of operating expenses</p>');
+        }
+
+        $('hospital-detail-body').innerHTML = lines.join('');
+        show('hospital-detail');
+    }
+
+    // ================================================================
+    // SECTION 2: Eligibility Check
+    // ================================================================
+    $('eligibility-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var income = parseFloat($('income').value);
+        var householdSize = parseInt($('household_size').value);
+
+        var btn = $('eligibility-btn');
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+
+        try {
+            var res = await fetch('/api/charity-care/check', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({income: income, household_size: householdSize})
+            });
+            var json = await res.json();
+
+            if (!res.ok) {
+                $('eligibility-error-msg').textContent = (json.detail || 'Error checking eligibility');
+                show('eligibility-error');
+                hide('eligibility-result');
+                return;
+            }
+
+            hide('eligibility-error');
+            var d = json.data || json;
+            eligibilityData = d;
+            renderEligibility(d);
+            renderSteps(d.next_steps);
+            renderDocuments(d.documents_needed);
+            show('section-letter');
+            prefillLetterForm();
+        } catch (err) {
+            $('eligibility-error-msg').textContent = 'Something went wrong. Please try again.';
+            show('eligibility-error');
+            hide('eligibility-result');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Check My Eligibility \u2014 Free';
+        }
+    });
+
+    function renderEligibility(d) {
+        var color, title;
+        if (d.eligibility === 'likely_full') {
+            color = 'green';
+            title = 'You likely qualify for full bill forgiveness';
+        } else if (d.eligibility === 'likely_partial' || d.eligibility === 'possible_partial') {
+            color = 'amber';
+            title = 'You may qualify for a significant discount';
+        } else {
+            color = 'gray';
+            title = "You're above typical thresholds, but applying is still worth it";
+        }
+
+        var box = $('eligibility-result');
+        box.className = 'mt-8 rounded-2xl p-8 border border-' + color + '-200 bg-' + color + '-50';
+
+        $('elig-title').className = 'text-lg font-bold mb-2 text-' + color + '-800';
+        $('elig-title').textContent = title;
+
+        $('elig-message').className = 'mb-4 text-' + color + '-700';
+        $('elig-message').textContent = d.message || '';
+
+        $('elig-income').textContent = formatMoney(d.income);
+        $('elig-fpl').textContent = formatMoney(d.fpl);
+        $('elig-pct').textContent = d.fpl_percentage + '%';
+
+        // FPL bar marker
+        var pct = Math.min(d.fpl_percentage, 400);
+        var markerLeft = (pct / 400) * 100;
+        $('fpl-marker').style.left = markerLeft + '%';
+        $('fpl-marker-label').textContent = 'You: ' + d.fpl_percentage + '% of FPL';
+
+        $('elig-disclaimer').textContent = d.disclaimer || '';
+
+        show('eligibility-result');
+        box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+
+    // ================================================================
+    // SECTION 3: Step-by-Step Process
+    // ================================================================
+    function renderSteps(steps) {
+        if (!steps || !steps.length) return;
+
+        var container = $('steps-list');
+        var html = '';
+        steps.forEach(function(step, i) {
+            var stepNum = step.step || (i + 1);
+            var title = step.title || step;
+            var detail = step.detail || '';
+            html += '<div class="border border-gray-200 rounded-xl overflow-hidden">'
+                + '<button type="button" class="step-toggle w-full text-left px-5 py-4 flex items-center gap-4 hover:bg-gray-50" data-idx="' + i + '">'
+                + '<span class="w-8 h-8 rounded-full bg-gray-900 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">' + esc(stepNum) + '</span>'
+                + '<span class="font-semibold text-sm flex-1">' + esc(title) + '</span>'
+                + '<svg class="step-chevron w-5 h-5 text-gray-400 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+                + '</button>';
+            if (detail) {
+                html += '<div class="step-detail hidden px-5 pb-4 pl-17 text-sm text-gray-600" style="padding-left:4.25rem;">' + esc(detail) + '</div>';
+            }
+            html += '</div>';
+        });
+        container.innerHTML = html;
+
+        container.querySelectorAll('.step-toggle').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var detail = btn.parentElement.querySelector('.step-detail');
+                if (!detail) return;
+                var chevron = btn.querySelector('.step-chevron');
+                detail.classList.toggle('hidden');
+                chevron.style.transform = detail.classList.contains('hidden') ? '' : 'rotate(180deg)';
+            });
+        });
+
+        show('section-steps');
+    }
+
+    // ================================================================
+    // SECTION 4: Document Checklist
+    // ================================================================
+    function renderDocuments(docs) {
+        if (!docs || !docs.length) return;
+
+        checkedDocs = {};
+        var totalItems = 0;
+        var container = $('docs-list');
+        var html = '';
+
+        docs.forEach(function(cat, catIdx) {
+            html += '<div class="border border-gray-200 rounded-xl overflow-hidden">'
+                + '<button type="button" class="doc-toggle w-full text-left px-5 py-4 flex items-center justify-between hover:bg-gray-50">'
+                + '<span class="font-semibold text-sm">' + esc(cat.name) + '</span>'
+                + '<svg class="doc-chevron w-5 h-5 text-gray-400 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+                + '</button>'
+                + '<div class="doc-items hidden px-5 pb-4 space-y-2">';
+
+            (cat.items || []).forEach(function(item, itemIdx) {
+                var key = catIdx + '-' + itemIdx;
+                totalItems++;
+                html += '<label class="flex items-start gap-3 cursor-pointer">'
+                    + '<input type="checkbox" class="doc-check mt-0.5 accent-green-600" data-key="' + key + '">'
+                    + '<span class="text-sm text-gray-600">' + esc(item) + '</span></label>';
+            });
+
+            html += '</div></div>';
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.doc-toggle').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var items = btn.parentElement.querySelector('.doc-items');
+                var chevron = btn.querySelector('.doc-chevron');
+                items.classList.toggle('hidden');
+                chevron.style.transform = items.classList.contains('hidden') ? '' : 'rotate(180deg)';
+            });
+        });
+
+        container.querySelectorAll('.doc-check').forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                checkedDocs[cb.getAttribute('data-key')] = cb.checked;
+                updateDocsProgress(totalItems);
+            });
+        });
+
+        updateDocsProgress(totalItems);
+        show('section-docs');
+    }
+
+    function updateDocsProgress(total) {
+        var checked = 0;
+        Object.keys(checkedDocs).forEach(function(k) { if (checkedDocs[k]) checked++; });
+        $('docs-progress').textContent = checked + ' of ' + total + ' documents gathered';
+    }
+
+    // ================================================================
+    // SECTION 5: Application Letter Generator
+    // ================================================================
+    function prefillLetterForm() {
+        if (selectedHospital) {
+            $('letter-hospital-name').value = selectedHospital.name || '';
+            var addr = '';
+            if (selectedHospital.city) addr += selectedHospital.city;
+            if (selectedHospital.state) addr += (addr ? ', ' : '') + selectedHospital.state;
+            $('letter-hospital-address').value = addr;
+        }
+    }
+
+    $('letter-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = $('letter-btn');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+
+        var body = {
+            user_name: $('letter-user-name').value,
+            user_address: $('letter-user-address').value,
+            hospital_name: $('letter-hospital-name').value,
+            hospital_address: $('letter-hospital-address').value,
+            account_number: $('letter-account').value,
+            bill_amount: $('letter-bill-amount').value.replace(/[,$]/g, ''),
+            date_of_service: $('letter-dos').value,
+            income: eligibilityData ? eligibilityData.income : parseFloat($('income').value) || 0,
+            household_size: eligibilityData ? eligibilityData.household_size : parseInt($('household_size').value) || 4
+        };
+
+        try {
+            var res = await fetch('/api/charity-care/application', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                var err = await res.json();
+                alert(err.detail || 'Error generating letter');
+                return;
+            }
+
+            var json = await res.json();
+            var d = json.data || json;
+            letterText = d.letter_text;
+            $('letter-preview').textContent = letterText;
+            $('letter-disclaimer').textContent = d.disclaimer || '';
+
+            hide('letter-form-section');
+            show('letter-result');
+            $('letter-result').scrollIntoView({behavior: 'smooth'});
+        } catch (err) {
+            alert('Something went wrong. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Generate Cover Letter';
+        }
+    });
+
+    window.printLetter = function() {
+        window.print();
+    };
+
+    window.downloadLetter = function() {
+        var blob = new Blob([letterText], {type: 'text/plain'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'Charity_Care_Cover_Letter.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    window.editLetter = function() {
+        show('letter-form-section');
+        hide('letter-result');
+        $('letter-form-section').scrollIntoView({behavior: 'smooth'});
+    };
+})();
 </script>
 {% endblock %}

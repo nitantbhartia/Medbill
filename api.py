@@ -1323,27 +1323,48 @@ async def sol_check(request: Request):
     return {"status": "ok", "data": result}
 
 
+@router.get("/collection-notice/letter-types")
+async def get_letter_types():
+    """Return available FDCPA letter types with descriptions."""
+    return {"status": "ok", "data": debt_fighter.LETTER_TYPES}
+
+
+@router.get("/collection-notice/rights")
+async def get_fdcpa_rights():
+    """Return FDCPA rights educational content."""
+    return {
+        "status": "ok",
+        "data": {
+            "rights": debt_fighter.FDCPA_RIGHTS,
+            "certified_mail_guide": debt_fighter.CERTIFIED_MAIL_GUIDE,
+        },
+    }
+
+
 @router.post("/collection-notice/generate")
 async def generate_fdcpa_letter(request: Request):
-    """Generate an FDCPA debt validation letter."""
+    """Generate an FDCPA letter (validation, cease & desist, or dispute)."""
     _debt_rate_check(request)
     body = await request.json()
 
+    letter_type = (body.get("letter_type") or "debt_validation").strip()
     required = ["user_name", "user_address", "collector_name", "collector_address",
-                "account_number", "amount", "date_of_notice"]
+                "account_number", "amount"]
     missing = [f for f in required if not (body.get(f) or "").strip()]
     if missing:
         raise HTTPException(400, f"Missing required fields: {', '.join(missing)}")
 
     try:
         result = debt_fighter.generate_fdcpa_letter(
+            letter_type=letter_type,
             user_name=body["user_name"].strip(),
             user_address=body["user_address"].strip(),
             collector_name=body["collector_name"].strip(),
             collector_address=body["collector_address"].strip(),
             account_number=body["account_number"].strip(),
             amount=body["amount"].strip(),
-            date_of_notice=body["date_of_notice"].strip(),
+            date_of_notice=(body.get("date_of_notice") or "").strip(),
+            dispute_reason=(body.get("dispute_reason") or "").strip(),
         )
     except ValueError as exc:
         raise HTTPException(400, str(exc))
@@ -1352,13 +1373,13 @@ async def generate_fdcpa_letter(request: Request):
         db.execute(
             "INSERT INTO debt_letters (letter_type, user_name, collector_name, account_number, amount, letter_text) "
             "VALUES (?, ?, ?, ?, ?, ?)",
-            ("fdcpa_validation", result["user_name"], result["collector_name"],
+            (letter_type, result["user_name"], result["collector_name"],
              result["account_number"], result["amount"], result["letter_text"]),
         )
 
     log_audit(action="generate_fdcpa_letter", resource_type="debt_letter",
               resource_id=result["account_number"],
-              metadata={"letter_type": "fdcpa_validation", "collector": result["collector_name"]})
+              metadata={"letter_type": letter_type, "collector": result["collector_name"]})
     return {"status": "ok", "data": result}
 
 
@@ -1376,19 +1397,43 @@ async def send_fdcpa_letter(request: Request):
             "status": "ok",
             "data": {
                 "sent": False,
-                "message": "Letter mailing is not configured yet. Download the letter and mail it yourself via USPS Certified Mail.",
+                "message": "Certified mail sending is coming soon. For now, download your letter and mail it yourself.",
+                "certified_mail_guide": debt_fighter.CERTIFIED_MAIL_GUIDE,
                 "letter_text": letter_text,
             },
         }
 
-    # Lob integration will go here when API key is configured
     return {
         "status": "ok",
         "data": {
             "sent": False,
             "message": "Lob integration pending. Download and mail the letter yourself via USPS Certified Mail.",
+            "certified_mail_guide": debt_fighter.CERTIFIED_MAIL_GUIDE,
         },
     }
+
+
+@router.get("/charity-care/hospital-search")
+async def search_hospitals_charity(request: Request):
+    """Search hospitals by name for charity care info."""
+    q = (request.query_params.get("q") or "").strip()
+    state = (request.query_params.get("state") or "").strip()
+    if len(q) < 2:
+        return {"status": "ok", "data": []}
+
+    with get_db() as db:
+        results = debt_fighter.search_hospitals_for_charity(db, q, state)
+    return {"status": "ok", "data": results}
+
+
+@router.get("/charity-care/hospital/{facility_id}")
+async def get_hospital_charity_detail(facility_id: str):
+    """Get detailed charity care info for a specific hospital."""
+    with get_db() as db:
+        result = debt_fighter.get_hospital_charity_detail(db, facility_id)
+    if not result:
+        raise HTTPException(404, "Hospital not found")
+    return {"status": "ok", "data": result}
 
 
 @router.post("/charity-care/check")
@@ -1412,6 +1457,49 @@ async def check_charity_care(request: Request):
     log_audit(action="charity_care_check", resource_type="debt_tool",
               resource_id="eligibility",
               metadata={"fpl_pct": result["fpl_percentage"], "eligibility": result["eligibility"]})
+    return {"status": "ok", "data": result}
+
+
+@router.post("/charity-care/application")
+async def generate_charity_application(request: Request):
+    """Generate a charity care application cover letter."""
+    _debt_rate_check(request)
+    body = await request.json()
+
+    required = ["user_name", "user_address", "hospital_name", "hospital_address",
+                "account_number", "bill_amount", "income", "household_size"]
+    missing = [f for f in required if not body.get(f)]
+    if missing:
+        raise HTTPException(400, f"Missing required fields: {', '.join(missing)}")
+
+    try:
+        income = float(body["income"])
+        household_size = int(body["household_size"])
+        result = debt_fighter.generate_charity_care_letter(
+            user_name=str(body["user_name"]).strip(),
+            user_address=str(body["user_address"]).strip(),
+            hospital_name=str(body["hospital_name"]).strip(),
+            hospital_address=str(body["hospital_address"]).strip(),
+            account_number=str(body["account_number"]).strip(),
+            bill_amount=str(body["bill_amount"]).strip(),
+            income=income,
+            household_size=household_size,
+            date_of_service=(body.get("date_of_service") or "").strip(),
+        )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO debt_letters (letter_type, user_name, account_number, amount, letter_text) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("charity_care_application", result["user_name"],
+             result["account_number"], result["bill_amount"], result["letter_text"]),
+        )
+
+    log_audit(action="generate_charity_letter", resource_type="debt_letter",
+              resource_id=result["account_number"],
+              metadata={"letter_type": "charity_care", "hospital": result["hospital_name"]})
     return {"status": "ok", "data": result}
 
 
