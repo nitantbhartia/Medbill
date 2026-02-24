@@ -120,8 +120,10 @@ document.getElementById('settle-form').addEventListener('submit', async function
     letterText = json.data.letter_text;
     document.getElementById('letter-preview').textContent = letterText;
 
+    function esc(s) { const t = document.createElement('span'); t.textContent = s; return t.innerHTML; }
+
     let warningsHtml = '<h3 class="font-bold text-red-800 text-sm mb-2">Important Warnings</h3><ul class="text-sm text-red-700 space-y-1">';
-    json.data.warnings.forEach(function(w) { warningsHtml += '<li>&#9888; ' + w + '</li>'; });
+    json.data.warnings.forEach(function(w) { warningsHtml += '<li>&#9888; ' + esc(w) + '</li>'; });
     warningsHtml += '</ul>';
     document.getElementById('warnings-box').innerHTML = warningsHtml;
 

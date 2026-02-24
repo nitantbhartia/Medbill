@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BillKarma — We Fight Unfair Medical Bills</title>
-    <meta name="description" content="Got a medical bill? Upload it. Free AI audit finds every overcharge. $29–149 to dispute it. No savings in 45 days? Full refund.">
+    <title>BillKarma — Fight Your Medical Debt</title>
+    <meta name="description" content="Got a medical bill or collection notice? BillKarma helps you dispute, negotiate, or eliminate medical debt with free tools, FDCPA letters, charity care checks, and AI bill audits.">
     <meta name="robots" content="{{ meta_robots|default('index, follow') }}">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="BillKarma — We Fight Unfair Medical Bills">
-    <meta property="og:description" content="Got a medical bill? Upload it. Free AI audit finds every overcharge. $29–149 to dispute it. No savings? Full refund.">
+    <meta property="og:title" content="BillKarma — Fight Your Medical Debt">
+    <meta property="og:description" content="Got a medical bill or collection notice? Dispute, negotiate, or eliminate your medical debt with free tools and guided letters.">
     <meta property="og:url" content="{{ canonical_url }}">
     <meta property="og:image" content="{{ request.base_url|string ~ 'static/img/billkarma-og.svg' }}">
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
@@ -229,6 +229,9 @@
         @media (max-width: 1024px) {
             .procedure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
+        .fd-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .fd-tools-grid a:hover { border-color: var(--c-green); }
+
         @media (max-width: 768px) {
             .hero { padding: 48px 0 80px; }
             .hero h1 { font-size: 2.25rem; }
@@ -242,6 +245,7 @@
             .how-it-works-section { padding: 56px 0 !important; }
             .how-it-works-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 24px !important; }
             .how-it-works-heading { margin-bottom: 32px !important; }
+            .fd-tools-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .procedure-grid { grid-template-columns: 1fr; }
@@ -273,7 +277,7 @@
         "@type": "Organization",
         "name": "BillKarma",
         "url": "{{ canonical_url }}",
-        "description": "Procedure-first medical cost transparency and bill analysis across hospitals, surgery centers, and imaging centers."
+        "description": "Free tools to fight unfair medical bills and debt. FDCPA letters, charity care checks, settlement tools, and AI bill audits."
     }
     </script>
     <script type="application/ld+json">
@@ -283,18 +287,18 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "How do I find out what a procedure should cost?",
+                "name": "How do I fight a medical debt in collections?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Search your procedure on BillKarma to see average costs at hospitals, surgery centers, and imaging centers near you, compared to Medicare reference rates. Facilities are graded A-F based on how their charges compare to Medicare rates."
+                    "text": "Send a debt validation letter under the FDCPA (Fair Debt Collection Practices Act). The collector must prove they own the debt and the amount is correct. BillKarma generates legally correct FDCPA letters you can send via certified mail."
                 }
             },
             {
                 "@type": "Question",
-                "name": "What is a hospital billing grade?",
+                "name": "Do I qualify for hospital financial assistance (charity care)?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "BillKarma grades hospitals A through F based on how their prices compare to Medicare reference rates. Grade A hospitals charge close to Medicare rates (fair pricing). Grade F hospitals charge 5x or more above Medicare rates (predatory pricing)."
+                    "text": "Most nonprofit hospitals must forgive bills for patients under 200-400% of the Federal Poverty Level under IRS Section 501(r). You can apply retroactively, even after a bill goes to collections. Use BillKarma's free eligibility checker to find out."
                 }
             },
             {
@@ -302,15 +306,15 @@
                 "name": "How do I check if my medical bill is correct?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Upload your bill to BillKarma's bill scanner. We compare every CPT code against Medicare rates and flag duplicates, unbundling errors, and inflated charges. Most users find at least one issue worth disputing."
+                    "text": "Upload your bill to BillKarma's free bill scanner. AI compares every CPT code against Medicare rates and flags duplicates, unbundling errors, and inflated charges. Most users find at least one issue worth disputing."
                 }
             },
             {
                 "@type": "Question",
-                "name": "Is it cheaper to use a surgery center than a hospital?",
+                "name": "What is the statute of limitations on medical debt?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "In most cases, yes. Ambulatory surgery centers (ASCs) typically charge 40-70% less than hospital outpatient departments for the same procedures. Search your procedure on BillKarma to compare prices across both facility types near you."
+                    "text": "The statute of limitations on medical debt varies by state, typically 3-10 years. After it expires, collectors can still contact you but generally cannot sue. Use BillKarma's free SOL calculator to check your state. Warning: making a partial payment may restart the clock in some states."
                 }
             }
         ]
@@ -322,13 +326,15 @@
     <div class="nav-inner">
         <a href="/" class="nav-logo"><div class="nav-logo-dot"></div>BillKarma</a>
         <div class="nav-center">
+            <a href="/fight-debt" class="nav-link">Fight Debt</a>
             <a href="/procedures/" class="nav-link">Procedures</a>
             <a href="/hospitals/" class="nav-link">Hospitals</a>
             <a href="/tools/" class="nav-link">Tools</a>
             <a href="/guides/" class="nav-link">Guides</a>
         </div>
         <div class="nav-right">
-            <a href="/scan" class="btn btn-primary">Upload My Bill ●</a>
+            <a href="/fight-debt" class="btn" style="background:#EB4C0A;color:#fff;font-weight:700;">Fight My Debt</a>
+            <a href="/scan" class="btn btn-primary">Scan My Bill</a>
         </div>
         <button class="nav-hamburger" id="navToggle" aria-label="Menu">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -342,12 +348,14 @@
         <input id="mobileMenuSearch" type="text" class="mobile-menu-input" placeholder="Search procedure or hospital" autocomplete="off">
         <div id="mobileMenuResults" class="ac-results"></div>
     </div>
+    <a href="/fight-debt">Fight Debt</a>
     <a href="/procedures/">Procedures</a>
     <a href="/hospitals/">Hospitals</a>
     <a href="/tools/">Tools</a>
     <a href="/guides/">Guides</a>
     <a href="/compare/">Compare</a>
-    <a href="/scan" class="mobile-cta">Upload My Bill</a>
+    <a href="/fight-debt" class="mobile-cta" style="background:#EB4C0A;">Fight My Debt</a>
+    <a href="/scan" class="mobile-cta">Scan My Bill</a>
 </div>
 
 <section class="hero">
@@ -360,11 +368,53 @@
     </div>
     <div class="container">
         <div style="max-width: 640px;">
-            <p class="hero-label">1 in 4 medical bills contains an error</p>
-            <h1>Got a medical bill?<br>Upload it. We fight it.</h1>
-            <p class="hero-sub">Free AI audit finds every overcharge. $29–149 to dispute it. No savings in 45 days? Full refund.</p>
-            <a href="/scan" class="btn-scan-hero" style="font-size: 1.1rem; padding: 16px 36px;">Upload My Bill Free →</a>
-            <p class="grade-microcopy" style="margin-top: 18px;">Backed by pricing data from 6,800+ hospitals. PDF or photo accepted.</p>
+            <p class="hero-label">Free tools to fight unfair medical debt</p>
+            <h1>Got a medical bill<br>you can't pay?<br>We'll help you fight it.</h1>
+            <p class="hero-sub">Dispute collections, check charity care eligibility, negotiate settlements, or scan your bill for errors. Free tools and guided letters.</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px;">
+                <a href="/fight-debt" class="btn-scan-hero" style="font-size: 1.1rem; padding: 16px 36px;">Fight My Debt →</a>
+                <a href="/scan" class="btn-scan-hero" style="font-size: 1.1rem; padding: 16px 36px; background: transparent; border: 2px solid #fff; color: #fff;">Scan My Bill →</a>
+            </div>
+            <p class="grade-microcopy" style="margin-top: 18px;">FDCPA letters, charity care checks, settlement tools, and AI bill audits. No lawyer needed.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Fight debt tools -->
+<section style="padding: 64px 0 48px; background: #fff;">
+    <div class="container">
+        <p class="section-eyebrow">What's going on with your bill?</p>
+        <h2 class="section-heading" style="margin-bottom: 32px;">Pick the tool that fits your situation</h2>
+        <div class="fd-tools-grid">
+            <a href="/collection-notice" style="display: flex; flex-direction: column; gap: 12px; padding: 28px; border: 1px solid var(--c-gray-border); border-radius: 22px; background: #fff; text-decoration: none; color: var(--c-black); transition: border-color 0.15s;">
+                <div style="width: 44px; height: 44px; background: var(--c-green); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                </div>
+                <div style="font-size: 1.08rem; font-weight: 800; letter-spacing: -0.02em;">I got a collection notice</div>
+                <div style="color: #666; font-size: 0.92rem; line-height: 1.5;">Generate a legally correct FDCPA debt validation letter. Forces the collector to prove they own your debt.</div>
+                <span style="margin-top: auto; display: inline-flex; width: fit-content; background: var(--c-black); color: #fff; font-size: 0.84rem; font-weight: 700; border-radius: 999px; padding: 10px 20px;">Start Letter →</span>
+            </a>
+            <a href="/charity-care" style="display: flex; flex-direction: column; gap: 12px; padding: 28px; border: 1px solid var(--c-gray-border); border-radius: 22px; background: #fff; text-decoration: none; color: var(--c-black); transition: border-color 0.15s;">
+                <div style="width: 44px; height: 44px; background: var(--c-green); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                </div>
+                <div style="font-size: 1.08rem; font-weight: 800; letter-spacing: -0.02em;">I can't afford my bill</div>
+                <div style="color: #666; font-size: 0.92rem; line-height: 1.5;">Check if you qualify for hospital financial assistance. Most nonprofit hospitals must forgive bills under certain income levels.</div>
+                <span style="margin-top: auto; display: inline-flex; width: fit-content; background: var(--c-black); color: #fff; font-size: 0.84rem; font-weight: 700; border-radius: 999px; padding: 10px 20px;">Check Eligibility →</span>
+            </a>
+            <a href="/scan" style="display: flex; flex-direction: column; gap: 12px; padding: 28px; border: 1px solid var(--c-gray-border); border-radius: 22px; background: #fff; text-decoration: none; color: var(--c-black); transition: border-color 0.15s;">
+                <div style="width: 44px; height: 44px; background: var(--c-green); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                </div>
+                <div style="font-size: 1.08rem; font-weight: 800; letter-spacing: -0.02em;">I think my bill has errors</div>
+                <div style="color: #666; font-size: 0.92rem; line-height: 1.5;">Upload your bill for a free AI audit. Finds overcharges, duplicate charges, and billing errors instantly.</div>
+                <span style="margin-top: auto; display: inline-flex; width: fit-content; background: var(--c-black); color: #fff; font-size: 0.84rem; font-weight: 700; border-radius: 999px; padding: 10px 20px;">Scan My Bill →</span>
+            </a>
+        </div>
+        <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+            <a href="/statute-of-limitations" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.9rem;">Check statute of limitations →</a>
+            <a href="/settle-debt" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.9rem;">Negotiate a settlement →</a>
+            <a href="/fight-debt" style="color: var(--c-green); font-weight: 700; text-decoration: none; font-size: 0.9rem;">All debt-fighting tools →</a>
         </div>
     </div>
 </section>
@@ -376,28 +426,28 @@
         <div class="how-it-works-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;">
             <div style="text-align: center;">
                 <div style="width: 48px; height: 48px; background: #1A1A1A; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin: 0 auto 16px;">1</div>
-                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">Upload</p>
-                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">Snap a photo or upload your bill. PDF or image — any format.</p>
+                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">Tell Us What Happened</p>
+                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">Got a bill? Upload it. Got a collection notice? Pick your tool. We guide you through it.</p>
             </div>
             <div style="text-align: center;">
                 <div style="width: 48px; height: 48px; background: #00824F; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin: 0 auto 16px;">2</div>
-                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">Free Audit</p>
-                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">AI finds every overcharge and error. See exactly what you're owed — free.</p>
+                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">We Analyze It</p>
+                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">AI scans your bill for errors. We check charity care eligibility and statute of limitations.</p>
             </div>
             <div style="text-align: center;">
                 <div style="width: 48px; height: 48px; background: #00824F; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin: 0 auto 16px;">3</div>
-                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">We Fight It</p>
-                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">Pay a flat fee. We send the dispute and follow up automatically for 45 days.</p>
+                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">You Get Your Letters</p>
+                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">FDCPA validation letters, settlement offers, or dispute letters — generated and ready to send.</p>
             </div>
             <div style="text-align: center;">
                 <div style="width: 48px; height: 48px; background: #00824F; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin: 0 auto 16px;">4</div>
-                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">You Save</p>
-                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">Bill reduced, or you get a full refund. Zero downside risk.</p>
+                <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px;">Debt Reduced or Gone</p>
+                <p style="font-size: 0.85rem; color: #666; line-height: 1.5;">Collectors must validate or stop. Hospitals must honor charity care. You keep more money.</p>
             </div>
         </div>
         <div style="text-align: center; margin-top: 40px;">
-            <a href="/scan" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; background: #1A1A1A; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 999px; text-decoration: none;">Upload My Bill Free →</a>
-            <p style="margin-top: 12px; font-size: 0.8rem; color: #999;">Free audit. $29–149 flat fee to fight it. No savings? Full refund.</p>
+            <a href="/fight-debt" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; background: #1A1A1A; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 999px; text-decoration: none;">Fight My Medical Debt →</a>
+            <p style="margin-top: 12px; font-size: 0.8rem; color: #999;">Free tools. FDCPA letters from $19. No lawyer needed.</p>
         </div>
     </div>
 </section>
@@ -465,18 +515,19 @@
         <div class="footer-grid">
             <div style="max-width: 300px;">
                 <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">BillKarma</div>
-                <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">We fight unfair medical bills.</p>
+                <p style="color: var(--c-gray-text); font-size: 0.9rem; line-height: 1.6;">Free tools to fight unfair medical bills and debt.</p>
             </div>
             <div style="display: flex; gap: 64px; flex-wrap: wrap;">
                 <div class="footer-col">
                     <div class="footer-col-title">Platform</div>
+                    <a href="/fight-debt">Fight Medical Debt</a>
+                    <a href="/collection-notice">FDCPA Letters</a>
+                    <a href="/charity-care">Charity Care Check</a>
+                    <a href="/statute-of-limitations">SOL Calculator</a>
+                    <a href="/scan">Scan Bill</a>
                     <a href="/procedures/">Find a Procedure</a>
                     <a href="/hospitals/">Find a Hospital</a>
-                    <a href="/find/">Find Facilities</a>
-                    <a href="/scan">Scan Bill</a>
-                    <a href="/compare/">Compare</a>
                     <a href="/tools/">Free Tools</a>
-                    <a href="/guides/hospital-billing-grades-explained">Methodology</a>
                 </div>
                 <div class="footer-col">
                     <div class="footer-col-title">Company</div>
