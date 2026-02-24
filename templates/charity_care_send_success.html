@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Application Sent — BillKarma{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-6 py-20 text-center">
+    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+    </div>
+    <h1 class="text-2xl font-extrabold tracking-tight mb-3">Payment received — your letter is on its way.</h1>
+    <p class="text-gray-500 mb-8">Your charity care cover letter is being printed and prepared for USPS Certified Mail to the hospital's billing department. You'll receive a tracking number by email within 1 business day.</p>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 text-left">
+        <h3 class="font-bold text-amber-800 text-sm mb-3">What you still need to do</h3>
+        <ol class="text-sm text-amber-700 space-y-2 list-decimal list-inside">
+            <li>Get the hospital's Financial Assistance Application form (we linked to it on the previous page, or call their billing department).</li>
+            <li>Fill out the hospital's form completely.</li>
+            <li>Gather your supporting documents (tax return, pay stubs, proof of household size).</li>
+            <li>Mail the completed application form + supporting documents to the hospital. Our cover letter arrives separately via certified mail.</li>
+        </ol>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8 text-left">
+        <h3 class="font-bold text-blue-800 text-sm mb-3">What happens after you apply</h3>
+        <ol class="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+            <li>The hospital has 30–45 days to review your application.</li>
+            <li>They must suspend collection activity while your application is under review.</li>
+            <li>If approved, your bill will be reduced or eliminated based on their sliding scale.</li>
+            <li>If denied, you have the right to appeal in writing.</li>
+        </ol>
+    </div>
+
+    <div class="flex flex-col gap-3 items-center">
+        <a href="/charity-care" class="text-sm font-semibold text-green-700 hover:underline">Back to Charity Care</a>
+        <a href="/fight-debt" class="text-sm text-gray-500 hover:underline">Back to Fight Debt</a>
+    </div>
+</div>
+{% endblock %}

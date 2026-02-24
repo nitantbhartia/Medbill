@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Letter Sent — BillKarma{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-6 py-20 text-center">
+    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+    </div>
+    <h1 class="text-2xl font-extrabold tracking-tight mb-3">Payment received — we're on it.</h1>
+    <p class="text-gray-500 mb-8">Your FDCPA letter is being printed and prepared for USPS Certified Mail. You'll receive a tracking number by email within 1 business day.</p>
+
+    <div id="tracking-section" class="hidden bg-gray-50 border border-gray-200 rounded-2xl p-6 mb-8 text-left">
+        <h2 class="font-bold text-sm mb-3">Your tracking information</h2>
+        <p class="text-sm text-gray-600 mb-2">Tracking number: <strong id="tracking-number" class="font-mono"></strong></p>
+        <a id="tracking-link" href="#" target="_blank" rel="noopener" class="text-sm font-semibold text-green-700 hover:underline">Track on USPS.com →</a>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8 text-left">
+        <h3 class="font-bold text-blue-800 text-sm mb-3">What happens next</h3>
+        <ol class="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+            <li>We print your letter and send it via USPS Certified Mail (typically within 1 business day).</li>
+            <li>You'll receive tracking info by email once it's mailed.</li>
+            <li>The collector has 30 days from receipt to respond with debt validation.</li>
+            <li>If they don't respond within 30 days, the debt may not be legally collectible.</li>
+        </ol>
+    </div>
+
+    <div class="flex flex-col gap-3 items-center">
+        <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt</a>
+        <a href="/statute-of-limitations" class="text-sm text-gray-500 hover:underline">Check if this debt is past the statute of limitations</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var params = new URLSearchParams(window.location.search);
+    var sessionId = params.get('session_id');
+    if (!sessionId) return;
+
+    // Poll for letter status after Stripe payment confirmation
+    var attempts = 0;
+    function pollStatus() {
+        attempts++;
+        fetch('/api/collection-notice/status-by-session?session_id=' + encodeURIComponent(sessionId))
+            .then(function(r) { return r.json(); })
+            .then(function(json) {
+                if (json.data && json.data.tracking_number) {
+                    document.getElementById('tracking-number').textContent = json.data.tracking_number;
+                    var link = document.getElementById('tracking-link');
+                    if (json.data.tracking_url) {
+                        link.href = json.data.tracking_url;
+                    }
+                    document.getElementById('tracking-section').classList.remove('hidden');
+                } else if (attempts < 6) {
+                    setTimeout(pollStatus, 3000);
+                }
+            })
+            .catch(function() {});
+    }
+    setTimeout(pollStatus, 2000);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+{% block title %}Generate Your Charity Care Application Packet | BillKarma{% endblock %}
+
+{% block head %}
+<style>
+    @media print {
+        .bk-nav, .bk-footer, .no-print { display: none !important; }
+        body { background: #fff !important; }
+        .letter-paper { box-shadow: none !important; border: none !important; border-top: none !important; padding: 0 !important; margin: 0 !important; font-size: 12pt !important; }
+        @page { size: letter; margin: 1.25in; }
+        main { padding: 0 !important; }
+    }
+    .letter-paper {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 13px;
+        line-height: 1.8;
+        color: #1a1a1a;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-top: 4px solid #00824F;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        border-radius: 4px;
+        padding: 48px 56px;
+        margin: 0 auto 24px;
+    }
+    .letter-paper .lp-sender { margin-bottom: 20px; }
+    .letter-paper .lp-date { margin-bottom: 20px; color: #444; }
+    .letter-paper .lp-recipient { margin-bottom: 20px; }
+    .letter-paper .lp-re { font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+    .letter-paper .lp-body p { margin: 0 0 14px 0; }
+    .letter-paper .lp-body ul, .letter-paper .lp-body ol { margin: 8px 0 14px 20px; }
+    .letter-paper .lp-body li { margin-bottom: 6px; }
+    .letter-paper .lp-signature { margin-top: 24px; }
+    .letter-paper .lp-certified { margin-top: 12px; font-size: 11px; color: #666; font-style: italic; }
+    .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .accordion-body.open { max-height: 800px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-16">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-xs text-gray-400 mb-8 no-print">
+        <a href="/charity-care" class="flex items-center gap-1.5 text-green-700 hover:underline">
+            <span class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center text-xs">✓</span>
+            <span>Eligibility</span>
+        </a>
+        <span class="text-gray-300">›</span>
+        <a href="/charity-care/hospital" class="flex items-center gap-1.5 text-green-700 hover:underline">
+            <span class="w-6 h-6 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center text-xs">✓</span>
+            <span>Hospital</span>
+        </a>
+        <span class="text-gray-300">›</span>
+        <span class="w-6 h-6 rounded-full bg-gray-900 text-white font-bold flex items-center justify-center text-xs">3</span>
+        <span class="text-gray-900 font-semibold">Application Packet</span>
+    </div>
+
+    <!-- Summaries -->
+    <div id="summaries" class="space-y-3 mb-8 no-print">
+        <div id="elig-bar" class="hidden rounded-xl px-4 py-3 text-sm"></div>
+        <div id="hosp-bar" class="hidden bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700"></div>
+    </div>
+
+    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Generate your application packet</h1>
+    <p class="text-gray-500 mb-8">This cover letter explains your situation and formally requests consideration under the hospital's Financial Assistance Program. Include it with your completed hospital application form.</p>
+
+    <!-- ===== SECTION A: Application Letter Form ===== -->
+    <div id="form-section">
+        <form id="letter-form" class="space-y-8">
+            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h2 class="font-bold text-base mb-4">Your Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="user-name">Full Name</label>
+                        <input type="text" id="user-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="user-address">Your Address</label>
+                        <input type="text" id="user-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" for="user-income">Annual Income ($)</label>
+                            <input type="number" id="user-income" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="45000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" for="user-household">Household Size</label>
+                            <select id="user-household" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                                <option value="4" selected>4</option><option value="5">5</option>
+                                <option value="6">6</option><option value="7">7</option><option value="8">8+</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h2 class="font-bold text-base mb-4">Hospital Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="hosp-name">Hospital Name</label>
+                        <input type="text" id="hosp-name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="General Hospital">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="hosp-address">Hospital Address</label>
+                        <input type="text" id="hosp-address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Hospital Blvd, City, ST 12345">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <h2 class="font-bold text-base mb-4">Bill Details</h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" for="acct-num">Account Number</label>
+                            <input type="text" id="acct-num" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" for="bill-amount">Bill Amount ($)</label>
+                            <input type="text" id="bill-amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="dos">Date of Service</label>
+                        <input type="date" id="dos" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div id="form-error" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 font-semibold"></div>
+
+            <button type="submit" id="generate-btn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Generate My Application Packet</button>
+        </form>
+
+        <!-- Document checklist + steps (static, always visible below form) -->
+        <div class="mt-10 no-print">
+            <h2 class="text-lg font-bold mb-4">What you'll need to apply</h2>
+            <div id="steps-list" class="space-y-2 mb-8"></div>
+            <h2 class="text-lg font-bold mb-4">Document checklist</h2>
+            <p class="text-sm text-gray-500 mb-3">Check items off as you gather them. <span id="docs-progress" class="font-semibold text-gray-700"></span></p>
+            <div id="docs-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- ===== SECTION B: Letter Result ===== -->
+    <div id="result-section" class="hidden">
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 no-print">
+            <h2 class="text-lg font-bold text-green-800 mb-1">Your application packet is ready</h2>
+            <p class="text-sm text-green-700">Review the cover letter below, then choose how to send it. Print and include it with your completed hospital application form.</p>
+        </div>
+
+        <div id="letter-preview" class="letter-paper mb-2"></div>
+
+        <div class="flex gap-4 mb-8 no-print">
+            <button onclick="editLetter()" class="text-sm text-gray-500 hover:text-gray-700 underline">Edit</button>
+            <button onclick="downloadLetter()" class="text-sm text-gray-500 hover:text-gray-700 underline ml-2">Download as text</button>
+        </div>
+
+        <!-- Delivery options -->
+        <div class="no-print mb-8">
+            <h3 class="font-bold text-base mb-4">How do you want to send this?</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="border border-gray-200 rounded-2xl p-6 flex flex-col">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🖨️</span>
+                        <h4 class="font-bold text-sm">I'll mail it myself</h4>
+                        <span class="ml-auto text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Free</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4 flex-1">Print, attach your supporting documents, and deliver in person or mail certified to the hospital billing department.</p>
+                    <button onclick="window.print()" class="w-full bg-gray-900 text-white font-bold py-3 rounded-full text-sm hover:bg-gray-800 transition">Print as PDF</button>
+                </div>
+                <div class="border-2 border-green-600 rounded-2xl p-6 flex flex-col bg-green-50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📬</span>
+                        <h4 class="font-bold text-sm">BillKarma sends it</h4>
+                        <span class="ml-auto text-xs font-bold text-white bg-green-600 px-2 py-0.5 rounded-full">$9</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-3 flex-1">We mail your cover letter via USPS Certified Mail directly to the hospital billing department. You get a tracking number by email.</p>
+                    <div id="send-error" class="hidden mb-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
+                    <input type="email" id="send-email" placeholder="Your email (for tracking)" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
+                    <button id="send-btn" onclick="sendCertifiedMail()" class="w-full bg-green-600 text-white font-bold py-3 rounded-full text-sm hover:bg-green-700 transition">Pay $9 &amp; Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hospital FAP links (if we have them) -->
+        <div id="hosp-fap-section" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6 no-print">
+            <h3 class="font-bold text-amber-800 text-sm mb-3">Next: Get the hospital's application form</h3>
+            <p class="text-sm text-amber-700 mb-3">This cover letter accompanies the hospital's own Financial Assistance Application. You still need to fill out their form.</p>
+            <div id="hosp-fap-links" class="space-y-2 text-sm"></div>
+        </div>
+
+        <p id="letter-disclaimer" class="text-xs text-gray-400 mt-4 text-center no-print"></p>
+    </div>
+
+    <div class="mt-8 text-center no-print">
+        <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt</a>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-6 text-center no-print">BillKarma is not a law firm. This is a self-help tool, not legal advice. Consult an attorney for complex situations.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    function esc(s) { var el = document.createElement('span'); el.textContent = String(s); return el.innerHTML; }
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+    var letterText = '';
+    var debtLetterId = null;
+    var hospitalData = null;
+    var checkedDocs = {};
+
+    // ── Load session data ────────────────────────────────────────
+    try {
+        var elData = JSON.parse(sessionStorage.getItem('ck_eligibility') || 'null');
+        if (elData) {
+            var bar = document.getElementById('elig-bar');
+            var label = elData.eligibility === 'likely_full' ? 'Likely full forgiveness' : elData.eligibility.includes('partial') ? 'Likely partial discount' : 'Above typical threshold';
+            bar.innerHTML = '<strong>' + label + '</strong> — ' + esc(elData.fpl_percentage) + '% of FPL. <a href="/charity-care" class="underline text-green-700 ml-1">Change</a>';
+            bar.className = elData.eligibility === 'likely_full' ? 'rounded-xl px-4 py-3 text-sm bg-green-50 border border-green-200 text-green-800'
+                : elData.eligibility.includes('partial') ? 'rounded-xl px-4 py-3 text-sm bg-amber-50 border border-amber-200 text-amber-800'
+                : 'rounded-xl px-4 py-3 text-sm bg-gray-50 border border-gray-200 text-gray-700';
+            bar.classList.remove('hidden');
+            // Pre-fill income/household
+            document.getElementById('user-income').value = elData.income || '';
+            document.getElementById('user-household').value = elData.household_size || 4;
+        }
+    } catch(e) {}
+
+    try {
+        hospitalData = JSON.parse(sessionStorage.getItem('ck_hospital') || 'null');
+        if (hospitalData) {
+            var hospBar = document.getElementById('hosp-bar');
+            hospBar.textContent = 'Hospital: ' + hospitalData.name + (hospitalData.city ? ' — ' + hospitalData.city + ', ' + hospitalData.state : '') + (hospitalData.is_nonprofit ? ' (Nonprofit)' : '');
+            hospBar.classList.remove('hidden');
+            // Pre-fill hospital fields
+            document.getElementById('hosp-name').value = hospitalData.name || '';
+            var addr = hospitalData.address || '';
+            if (!addr && hospitalData.city) addr = hospitalData.city + (hospitalData.state ? ', ' + hospitalData.state : '');
+            document.getElementById('hosp-address').value = addr;
+        }
+    } catch(e) {}
+
+    // ── Steps and checklist (static content) ─────────────────────
+    var STEPS = [
+        {n: 1, title: 'Get the Application Form', detail: 'Call the hospital billing department and ask for a Financial Assistance Application. Under IRS Section 501(r), nonprofit hospitals MUST provide one. You can also find it on the hospital\'s website.'},
+        {n: 2, title: 'Gather Your Documents', detail: 'You\'ll need proof of income (tax return, pay stubs), proof of household size, and the hospital bill. See the document checklist below.'},
+        {n: 3, title: 'Complete and Submit', detail: 'Fill out the application completely. Attach all required documents. Submit by certified mail or in person at the hospital billing office. Keep copies of everything.'},
+        {n: 4, title: 'Wait for a Decision (30–45 days)', detail: 'The hospital must review your application. They may ask for additional documents. Collection activity should be paused during review.'},
+        {n: 5, title: 'If Approved: Bill Reduced or Eliminated', detail: 'At 200% FPL or below, most hospitals write off the entire bill. Above that, you may get a 25–75% discount. Get the approval in writing.'},
+        {n: 6, title: 'If Denied: Appeal', detail: 'You have the right to appeal. Write a letter explaining hardship circumstances. Many denials are reversed on appeal. If the hospital refuses, contact your state attorney general.'}
+    ];
+    var DOCS = [
+        {name: 'Proof of Income', items: ['Most recent federal tax return (Form 1040)', 'Last 2–3 pay stubs', 'Social Security award letter (if applicable)', 'Unemployment benefits statement (if applicable)', 'Self-employment records (if applicable)']},
+        {name: 'Proof of Household Size', items: ['Most recent tax return showing dependents', 'Birth certificates for children (some hospitals require)', 'Marriage certificate (if applicable)']},
+        {name: 'Medical Bill Information', items: ['The hospital bill or statement of charges', 'Account number from the bill', 'Date(s) of service', 'Insurance EOB (if you have insurance)']},
+        {name: 'Other Financial Information', items: ['Bank statements (last 1–3 months, some hospitals require)', 'List of monthly expenses', 'Any other outstanding medical bills']}
+    ];
+
+    var stepsEl = document.getElementById('steps-list');
+    var stepsHTML = '';
+    STEPS.forEach(function(s) {
+        stepsHTML += '<div class="border border-gray-200 rounded-xl overflow-hidden">'
+            + '<button type="button" class="step-btn w-full text-left px-5 py-4 flex items-center gap-4 hover:bg-gray-50">'
+            + '<span class="w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">' + s.n + '</span>'
+            + '<span class="font-semibold text-sm flex-1">' + esc(s.title) + '</span>'
+            + '<svg class="step-chev w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+            + '</button>'
+            + '<div class="step-body accordion-body"><div class="px-5 pb-4 pl-16 text-sm text-gray-600">' + esc(s.detail) + '</div></div></div>';
+    });
+    stepsEl.innerHTML = stepsHTML;
+    stepsEl.querySelectorAll('.step-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var body = btn.parentElement.querySelector('.step-body');
+            var chev = btn.querySelector('.step-chev');
+            body.classList.toggle('open');
+            chev.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+        });
+    });
+
+    var totalDocs = 0;
+    var docsEl = document.getElementById('docs-list');
+    var docsHTML = '';
+    DOCS.forEach(function(cat, ci) {
+        docsHTML += '<div class="border border-gray-200 rounded-xl overflow-hidden">'
+            + '<button type="button" class="doc-btn w-full text-left px-5 py-3 flex items-center justify-between hover:bg-gray-50">'
+            + '<span class="font-semibold text-sm">' + esc(cat.name) + '</span>'
+            + '<svg class="doc-chev w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+            + '</button>'
+            + '<div class="doc-items accordion-body"><div class="px-5 pb-3 space-y-2">';
+        cat.items.forEach(function(item, ii) {
+            var key = ci + '-' + ii;
+            totalDocs++;
+            docsHTML += '<label class="flex items-start gap-3 cursor-pointer py-1">'
+                + '<input type="checkbox" class="doc-check mt-0.5 accent-green-600" data-key="' + key + '">'
+                + '<span class="text-sm text-gray-600">' + esc(item) + '</span></label>';
+        });
+        docsHTML += '</div></div></div>';
+    });
+    docsEl.innerHTML = docsHTML;
+    docsEl.querySelectorAll('.doc-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var items = btn.parentElement.querySelector('.doc-items');
+            var chev = btn.querySelector('.doc-chev');
+            items.classList.toggle('open');
+            chev.style.transform = items.classList.contains('open') ? 'rotate(180deg)' : '';
+        });
+    });
+    docsEl.querySelectorAll('.doc-check').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            checkedDocs[cb.getAttribute('data-key')] = cb.checked;
+            updateProgress();
+        });
+    });
+    updateProgress();
+
+    function updateProgress() {
+        var n = Object.values(checkedDocs).filter(Boolean).length;
+        document.getElementById('docs-progress').textContent = n + ' of ' + totalDocs + ' gathered';
+    }
+
+    // ── Letter generation ─────────────────────────────────────────
+    document.getElementById('letter-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('generate-btn');
+        var errEl = document.getElementById('form-error');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+        errEl.classList.add('hidden');
+
+        var body = {
+            user_name: document.getElementById('user-name').value.trim(),
+            user_address: document.getElementById('user-address').value.trim(),
+            hospital_name: document.getElementById('hosp-name').value.trim(),
+            hospital_address: document.getElementById('hosp-address').value.trim(),
+            account_number: document.getElementById('acct-num').value.trim(),
+            bill_amount: document.getElementById('bill-amount').value.replace(/[,$]/g, ''),
+            income: parseFloat(document.getElementById('user-income').value) || 0,
+            household_size: parseInt(document.getElementById('user-household').value) || 4,
+            date_of_service: document.getElementById('dos').value
+        };
+
+        try {
+            var res = await fetch('/api/charity-care/application', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            var json = await res.json();
+            if (!res.ok) {
+                errEl.textContent = json.detail || 'Error generating letter. Please check your inputs.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            var d = json.data;
+            letterText = d.letter_text;
+            debtLetterId = d.debt_letter_id || null;
+            document.getElementById('letter-preview').innerHTML = formatLetterHTML(letterText);
+            document.getElementById('letter-disclaimer').textContent = d.disclaimer || '';
+            hide('form-section');
+            show('result-section');
+            document.getElementById('result-section').scrollIntoView({behavior: 'smooth'});
+
+            // Show hospital FAP links if available
+            if (hospitalData && (hospitalData.fa_url || hospitalData.fa_app_url)) {
+                var fapLinks = '';
+                if (hospitalData.fa_url) {
+                    fapLinks += '<p><a href="' + esc(hospitalData.fa_url) + '" target="_blank" rel="noopener" class="text-amber-800 font-semibold underline">View ' + esc(hospitalData.name) + '\'s financial assistance policy ↗</a></p>';
+                }
+                if (hospitalData.fa_app_url) {
+                    fapLinks += '<p><a href="' + esc(hospitalData.fa_app_url) + '" target="_blank" rel="noopener" class="text-amber-800 underline">Download their application form ↗</a></p>';
+                }
+                if (hospitalData.fa_income_threshold) {
+                    fapLinks += '<p class="text-xs text-amber-700 mt-1">Income threshold: ' + esc(hospitalData.fa_income_threshold) + '</p>';
+                }
+                document.getElementById('hosp-fap-links').innerHTML = fapLinks;
+                show('hosp-fap-section');
+            }
+        } catch(e) {
+            errEl.textContent = 'Something went wrong. Please try again.';
+            errEl.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Generate My Application Packet';
+        }
+    });
+
+    // ── Letter HTML formatter (same as collection notice) ─────────
+    function formatLetterHTML(text) {
+        var lines = text.split('\n');
+        var reIdx = -1, dearIdx = -1, sincerelyIdx = -1;
+        lines.forEach(function(line, i) {
+            if (line.startsWith('Re:') && reIdx === -1) reIdx = i;
+            if (line.startsWith('Dear') && dearIdx === -1) dearIdx = i;
+            if (line.startsWith('Sincerely') && sincerelyIdx === -1) sincerelyIdx = i;
+        });
+
+        var senderLines = [], i = 0;
+        while (i < lines.length && lines[i].trim() !== '') { senderLines.push(lines[i]); i++; }
+        while (i < lines.length && lines[i].trim() === '') i++;
+        var dateLine = lines[i] || ''; i++;
+        while (i < lines.length && lines[i].trim() === '') i++;
+        var recipientLines = [];
+        while (i < lines.length && lines[i].trim() !== '') { recipientLines.push(lines[i]); i++; }
+
+        var reLineText = reIdx >= 0 ? lines[reIdx] : '';
+        var bodyLines = dearIdx >= 0 && sincerelyIdx >= 0 ? lines.slice(dearIdx, sincerelyIdx) : [];
+        var signatureLines = sincerelyIdx >= 0 ? lines.slice(sincerelyIdx) : [];
+
+        var bodyHTML = '', currentPara = [];
+        bodyLines.forEach(function(line) {
+            if (line.trim() === '') {
+                if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+            } else if (/^\d+\./.test(line.trim())) {
+                if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+                bodyHTML += '<li>' + esc(line.trim()) + '</li>';
+            } else if (line.trim().startsWith('- ')) {
+                if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+                bodyHTML += '<li style="list-style:disc;margin-left:16px;">' + esc(line.trim().slice(2)) + '</li>';
+            } else {
+                currentPara.push(esc(line));
+            }
+        });
+        if (currentPara.length) bodyHTML += '<p>' + currentPara.join('<br>') + '</p>';
+
+        var html = '<div class="lp-sender">' + senderLines.map(esc).join('<br>') + '</div>';
+        html += '<div class="lp-date">' + esc(dateLine) + '</div>';
+        if (recipientLines.length) html += '<div class="lp-recipient">' + recipientLines.map(esc).join('<br>') + '</div>';
+        if (reLineText) html += '<div class="lp-re">' + esc(reLineText) + '</div>';
+        html += '<div class="lp-body">' + bodyHTML + '</div>';
+        if (signatureLines.length) {
+            var sigFiltered = signatureLines.filter(function(l) { return l.trim() !== 'Sent via USPS Certified Mail'; });
+            var certLine = signatureLines.find(function(l) { return l.trim() === 'Sent via USPS Certified Mail'; });
+            html += '<div class="lp-signature">' + sigFiltered.map(esc).join('<br>') + '</div>';
+            if (certLine) html += '<div class="lp-certified">' + esc(certLine) + '</div>';
+        }
+        return html;
+    }
+
+    // ── Actions ───────────────────────────────────────────────────
+    window.editLetter = function() {
+        show('form-section');
+        hide('result-section');
+    };
+
+    window.downloadLetter = function() {
+        var blob = new Blob([letterText], {type: 'text/plain'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'Charity_Care_Cover_Letter.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    window.sendCertifiedMail = async function() {
+        var email = document.getElementById('send-email').value.trim();
+        var errEl = document.getElementById('send-error');
+        var btn = document.getElementById('send-btn');
+        if (!email || !email.includes('@')) {
+            errEl.textContent = 'Please enter a valid email address.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        if (!debtLetterId) {
+            errEl.textContent = 'Letter ID not found. Please regenerate your letter.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        errEl.classList.add('hidden');
+        btn.disabled = true;
+        btn.textContent = 'Opening payment...';
+        try {
+            var res = await fetch('/api/charity-care/checkout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({debt_letter_id: debtLetterId, email: email})
+            });
+            var json = await res.json();
+            if (!res.ok) {
+                errEl.textContent = json.detail || 'Something went wrong. Please try again.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            window.location.href = json.data.checkout_url;
+        } catch(e) {
+            errEl.textContent = 'Network error. Please try again.';
+            errEl.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Pay $9 & Send';
+        }
+    };
+})();
+</script>
+{% endblock %}

@@ -3,21 +3,49 @@
 
 {% block head %}
 <style>
+    .letter-paper {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 13px;
+        line-height: 1.8;
+        color: #1a1a1a;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-top: 4px solid #00824F;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        border-radius: 4px;
+        padding: 48px 56px;
+        max-width: 760px;
+        margin: 0 auto 24px;
+        position: relative;
+    }
+    .letter-paper .lp-sender { margin-bottom: 20px; }
+    .letter-paper .lp-date { margin-bottom: 20px; color: #444; }
+    .letter-paper .lp-recipient { margin-bottom: 20px; }
+    .letter-paper .lp-re { font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+    .letter-paper .lp-salutation { margin-bottom: 16px; }
+    .letter-paper .lp-body p { margin: 0 0 14px 0; }
+    .letter-paper .lp-body ul, .letter-paper .lp-body ol { margin: 8px 0 14px 20px; }
+    .letter-paper .lp-body li { margin-bottom: 6px; }
+    .letter-paper .lp-signature { margin-top: 24px; }
+    .letter-paper .lp-certified { margin-top: 12px; font-size: 11px; color: #666; font-style: italic; }
+
     @media print {
         header, footer, .bk-nav, .bk-footer,
         .no-print, #progress-bar, #rights-section,
         #step-1-panel, #step-2-panel, #step-3-panel,
-        #actions-bar, #what-happens-next, #certified-mail-section,
+        #delivery-options, #what-happens-next, #certified-mail-section,
         #disclaimer-footer, #back-link { display: none !important; }
 
         #step-4-panel { display: block !important; }
-        #letter-preview {
+        .letter-paper {
+            box-shadow: none !important;
             border: none !important;
+            border-top: none !important;
             padding: 0 !important;
             margin: 0 !important;
             font-size: 12pt !important;
-            line-height: 1.6 !important;
         }
+        @page { size: letter; margin: 1.25in; }
         body { background: #fff !important; }
         main { padding: 0 !important; }
     }
@@ -182,20 +210,48 @@
         </div>
     </div>
 
-    <!-- Step 4: Letter Preview & Actions -->
+    <!-- Step 4: Letter Preview & Delivery -->
     <div id="step-4-panel" class="hidden">
         <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 no-print">
             <h2 class="text-lg font-bold text-green-800 mb-1">Your letter is ready</h2>
             <p class="text-sm text-green-700" id="letter-type-confirm"></p>
         </div>
 
-        <div id="letter-preview" class="bg-white border border-gray-300 rounded-xl p-8 font-mono text-sm leading-relaxed whitespace-pre-wrap mb-6"></div>
+        <!-- HTML letterhead preview -->
+        <div id="letter-preview" class="letter-paper mb-2"></div>
+        <div class="flex gap-3 mb-8 no-print">
+            <button onclick="goToStep(3)" class="text-sm text-gray-500 hover:text-gray-700 underline">Edit letter</button>
+            <button onclick="downloadLetter()" class="text-sm text-gray-500 hover:text-gray-700 underline ml-4">Download as text</button>
+        </div>
 
-        <!-- Action buttons -->
-        <div id="actions-bar" class="flex gap-3 mb-8 no-print">
-            <button onclick="printLetter()" class="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Print as PDF</button>
-            <button onclick="downloadLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Download as Text</button>
-            <button onclick="goToStep(3)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Edit</button>
+        <!-- Delivery options -->
+        <div id="delivery-options" class="no-print mb-8">
+            <h3 class="font-bold text-base mb-4">How do you want to send this?</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <!-- Option A: Self-mail -->
+                <div class="border border-gray-200 rounded-2xl p-6 flex flex-col">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">🖨️</span>
+                        <h4 class="font-bold text-sm">I'll mail it myself</h4>
+                        <span class="ml-auto text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Free</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4 flex-1">Print, sign, and take to any USPS location. Request certified mail with return receipt (~$8.20).</p>
+                    <button onclick="printLetter()" class="w-full bg-gray-900 text-white font-bold py-3 rounded-full text-sm hover:bg-gray-800 transition">Print as PDF</button>
+                </div>
+
+                <!-- Option B: BillKarma sends -->
+                <div class="border-2 border-green-600 rounded-2xl p-6 flex flex-col bg-green-50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-lg">📬</span>
+                        <h4 class="font-bold text-sm">BillKarma sends it</h4>
+                        <span class="ml-auto text-xs font-bold text-white bg-green-600 px-2 py-0.5 rounded-full">$19</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-3 flex-1">We print and mail via USPS Certified Mail. You get a tracking number emailed to you. No post office trip required.</p>
+                    <div id="send-error" class="hidden mb-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
+                    <input type="email" id="send-email" placeholder="Your email (for tracking)" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
+                    <button id="send-btn" onclick="sendCertifiedMail()" class="w-full bg-green-600 text-white font-bold py-3 rounded-full text-sm hover:bg-green-700 transition">Pay $19 &amp; Send</button>
+                </div>
+            </div>
         </div>
 
         <!-- What Happens Next -->
@@ -204,14 +260,14 @@
             <div id="timeline-list" class="space-y-3 mb-4"></div>
             <div id="what-happens-list" class="mt-4 pt-4 border-t border-blue-200">
                 <h4 class="font-semibold text-blue-800 text-xs uppercase tracking-wide mb-2">What the law requires of them</h4>
-                <ul id="what-happens-items" class="text-sm text-blue-700 space-y-1"></ul>
+                <ul id="what-happens-items" class="text-sm text-blue-700 space-y-1 list-disc list-inside"></ul>
             </div>
         </div>
 
-        <!-- Certified Mail Guide -->
+        <!-- Certified Mail Guide (collapsed) -->
         <div id="certified-mail-section" class="no-print">
             <button onclick="toggleCertifiedMail()" class="w-full flex items-center justify-between bg-amber-50 border border-amber-200 rounded-2xl px-6 py-4 text-left hover:bg-amber-100 transition">
-                <span class="font-bold text-amber-800 text-sm">How to Send This Letter (Certified Mail Guide)</span>
+                <span class="font-bold text-amber-800 text-sm">Step-by-step: How to send certified mail yourself</span>
                 <svg id="mail-chevron" class="w-5 h-5 text-amber-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
@@ -219,10 +275,8 @@
             <div id="certified-mail-body" class="accordion-body">
                 <div class="bg-amber-50 border border-t-0 border-amber-200 rounded-b-2xl px-6 pb-6 -mt-3 pt-5">
                     <p id="mail-why" class="text-sm text-amber-700 mb-4"></p>
-
                     <h4 class="font-semibold text-amber-800 text-xs uppercase tracking-wide mb-2">Step-by-step instructions</h4>
                     <ol id="mail-steps" class="text-sm text-amber-700 space-y-2 list-decimal list-inside mb-4"></ol>
-
                     <h4 class="font-semibold text-amber-800 text-xs uppercase tracking-wide mb-2">Keep for your records</h4>
                     <ul id="mail-tips" class="text-sm text-amber-700 space-y-1 list-disc list-inside"></ul>
                 </div>
@@ -232,7 +286,7 @@
 
     <!-- Back link -->
     <div id="back-link" class="mt-10 text-center no-print">
-        <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt tools</a>
+        <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt</a>
     </div>
 
     <!-- Disclaimer -->
@@ -250,6 +304,7 @@ function esc(s) {
 
 var selectedLetterType = 'debt_validation';
 var letterText = '';
+var debtLetterId = null;
 var letterTypes = {};
 var certifiedMailGuide = {};
 var currentStep = 1;
@@ -481,9 +536,10 @@ async function generateLetter() {
         var data = json.data;
 
         letterText = data.letter_text;
-        document.getElementById('letter-preview').textContent = letterText;
+        debtLetterId = data.debt_letter_id || null;
+        document.getElementById('letter-preview').innerHTML = formatLetterHTML(letterText);
         document.getElementById('letter-type-confirm').textContent =
-            'Review your ' + data.letter_type_name + ' below, then print or download it.';
+            'Review your ' + data.letter_type_name + ' below, then choose how to send it.';
 
         renderTimeline(data.timeline);
         renderWhatHappens(data.what_happens_next);
@@ -544,6 +600,116 @@ function renderCertifiedMailGuide() {
         tipsHtml += '<li>' + esc(tip) + '</li>';
     });
     document.getElementById('mail-tips').innerHTML = tipsHtml;
+}
+
+// -- Format letter as HTML letterhead --
+
+function formatLetterHTML(text) {
+    var lines = text.split('\n');
+    var reIdx = -1, dearIdx = -1, sincerelyIdx = -1;
+    lines.forEach(function(line, i) {
+        if (line.startsWith('Re:') && reIdx === -1) reIdx = i;
+        if (line.startsWith('Dear') && dearIdx === -1) dearIdx = i;
+        if (line.startsWith('Sincerely') && sincerelyIdx === -1) sincerelyIdx = i;
+    });
+
+    function escLine(s) { return esc(s); }
+
+    // Sender = lines before first blank block
+    var senderLines = [];
+    var i = 0;
+    while (i < lines.length && lines[i].trim() !== '') { senderLines.push(lines[i]); i++; }
+    // Skip blank lines
+    while (i < lines.length && lines[i].trim() === '') i++;
+    // Date = next non-blank line
+    var dateLine = lines[i] || '';
+    i++;
+    // Skip blank lines to recipient
+    while (i < lines.length && lines[i].trim() === '') i++;
+    // Recipient = next block of non-blank lines
+    var recipientLines = [];
+    while (i < lines.length && lines[i].trim() !== '') { recipientLines.push(lines[i]); i++; }
+
+    var reLineText = reIdx >= 0 ? lines[reIdx] : '';
+    var bodyLines = dearIdx >= 0 && sincerelyIdx >= 0 ? lines.slice(dearIdx, sincerelyIdx) : [];
+    var signatureLines = sincerelyIdx >= 0 ? lines.slice(sincerelyIdx) : [];
+
+    // Render body — group into paragraphs, lists
+    var bodyHTML = '';
+    var currentPara = [];
+    bodyLines.forEach(function(line) {
+        if (line.trim() === '') {
+            if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+        } else if (/^\d+\./.test(line.trim())) {
+            if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+            bodyHTML += '<li>' + escLine(line.trim()) + '</li>';
+        } else if (line.trim().startsWith('- ')) {
+            if (currentPara.length) { bodyHTML += '<p>' + currentPara.join('<br>') + '</p>'; currentPara = []; }
+            bodyHTML += '<li style="list-style:disc;margin-left:16px;">' + escLine(line.trim().slice(2)) + '</li>';
+        } else {
+            currentPara.push(escLine(line));
+        }
+    });
+    if (currentPara.length) bodyHTML += '<p>' + currentPara.join('<br>') + '</p>';
+
+    var html = '<div class="lp-sender">' + senderLines.map(escLine).join('<br>') + '</div>';
+    html += '<div class="lp-date">' + escLine(dateLine) + '</div>';
+    if (recipientLines.length) {
+        html += '<div class="lp-recipient">' + recipientLines.map(escLine).join('<br>') + '</div>';
+    }
+    if (reLineText) html += '<div class="lp-re">' + escLine(reLineText) + '</div>';
+    html += '<div class="lp-body">' + bodyHTML + '</div>';
+    if (signatureLines.length) {
+        var sigFiltered = signatureLines.filter(function(l) { return l.trim() !== 'Sent via USPS Certified Mail'; });
+        var certLine = signatureLines.find(function(l) { return l.trim() === 'Sent via USPS Certified Mail'; });
+        html += '<div class="lp-signature">' + sigFiltered.map(escLine).join('<br>') + '</div>';
+        if (certLine) html += '<div class="lp-certified">' + escLine(certLine) + '</div>';
+    }
+    return html;
+}
+
+// -- Send via BillKarma certified mail --
+
+async function sendCertifiedMail() {
+    var email = document.getElementById('send-email').value.trim();
+    var errorEl = document.getElementById('send-error');
+    var btn = document.getElementById('send-btn');
+
+    if (!email || !email.includes('@')) {
+        errorEl.textContent = 'Please enter a valid email address.';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+    if (!debtLetterId) {
+        errorEl.textContent = 'Letter ID not found. Please regenerate your letter.';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+
+    errorEl.classList.add('hidden');
+    btn.disabled = true;
+    btn.textContent = 'Opening payment...';
+
+    try {
+        var res = await fetch('/api/collection-notice/checkout', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({debt_letter_id: debtLetterId, email: email})
+        });
+        var json = await res.json();
+        if (!res.ok) {
+            errorEl.textContent = json.detail || 'Something went wrong. Please try again.';
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        window.location.href = json.data.checkout_url;
+    } catch (e) {
+        errorEl.textContent = 'Network error. Please check your connection and try again.';
+        errorEl.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pay $19 & Send';
+    }
 }
 
 // -- Download and print --
