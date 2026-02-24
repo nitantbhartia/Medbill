@@ -94,6 +94,7 @@ def test_send_letter_rejects_mismatched_paid_session(monkeypatch):
 
 def test_send_letter_allows_paid_matching_session(monkeypatch):
     monkeypatch.setattr(config, "LOB_API_KEY", "")
+    monkeypatch.setattr(config, "DEBT_SEND_MAX_RETRIES", 3)
     letter_id = _insert_letter("cs_paid_ok")
     monkeypatch.setattr(
         api_module.payment_module,
@@ -107,6 +108,76 @@ def test_send_letter_allows_paid_matching_session(monkeypatch):
     )
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
+    assert resp.json()["data"]["pending"] is True
+
+
+def test_send_letter_auto_refunds_after_terminal_send_failure(monkeypatch):
+    monkeypatch.setattr(config, "LOB_API_KEY", "")
+    monkeypatch.setattr(config, "DEBT_SEND_MAX_RETRIES", 1)
+    letter_id = _insert_letter("cs_paid_refund")
+    monkeypatch.setattr(
+        api_module.payment_module,
+        "get_session",
+        lambda _sid: {"payment_status": "paid", "metadata": {"debt_letter_id": str(letter_id)}},
+    )
+    refunded = {"called": False}
+
+    def _refund(_session_id: str):
+        refunded["called"] = True
+        return True
+
+    monkeypatch.setattr(api_module.payment_module, "issue_refund_for_checkout_session", _refund)
+    resp = client.post(
+        "/api/collection-notice/send",
+        json={"debt_letter_id": letter_id, "letter_text": "Sample"},
+        headers={"cf-connecting-ip": "198.51.100.14"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["data"]["refunded"] is True
+    assert refunded["called"] is True
+
+    with get_db() as db:
+        row = db.execute("SELECT status, refunded_at FROM debt_letters WHERE id = ?", (letter_id,)).fetchone()
+    assert row is not None
+    assert row["status"] == "refunded"
+    assert row["refunded_at"] is not None
+
+
+def test_webhook_debt_letter_failure_marks_refunded_when_retry_budget_exhausted(monkeypatch):
+    monkeypatch.setattr(config, "DEBT_SEND_MAX_RETRIES", 1)
+    monkeypatch.setattr(config, "LOB_API_KEY", "lob_live_dummy")
+    monkeypatch.setattr(config, "DEBUG", True)
+    letter_id = _insert_letter("cs_webhook_refund")
+
+    monkeypatch.setattr(
+        api_module.debt_fighter,
+        "send_via_lob",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("lob_down")),
+    )
+    monkeypatch.setattr(api_module.payment_module, "issue_refund_for_checkout_session", lambda _sid: True)
+    monkeypatch.setattr(api_module, "log_audit", lambda **_kwargs: None)
+
+    event = {
+        "type": "checkout.session.completed",
+        "data": {
+            "object": {
+                "id": "cs_webhook_refund",
+                "metadata": {"payment_purpose": "debt_letter", "debt_letter_id": str(letter_id)},
+            }
+        },
+    }
+    resp = client.post("/api/stripe/webhook", json=event)
+    assert resp.status_code == 200
+
+    with get_db() as db:
+        row = db.execute(
+            "SELECT status, send_attempts, refunded_at FROM debt_letters WHERE id = ?",
+            (letter_id,),
+        ).fetchone()
+    assert row is not None
+    assert row["status"] == "refunded"
+    assert int(row["send_attempts"] or 0) >= 1
+    assert row["refunded_at"] is not None
 
 
 def test_debt_generate_rate_limited_by_forwarded_ip(monkeypatch):
@@ -127,3 +198,23 @@ def test_debt_generate_rate_limited_by_forwarded_ip(monkeypatch):
     second = client.post("/api/collection-notice/generate", json=payload, headers=headers)
     assert first.status_code == 200
     assert second.status_code == 429
+
+
+def test_admin_retry_pending_sends_processes_and_refunds(monkeypatch):
+    monkeypatch.setattr(config, "DEBT_SEND_MAX_RETRIES", 1)
+    monkeypatch.setattr(config, "LOB_API_KEY", "")
+    monkeypatch.setattr(config, "ENV", "development")
+    monkeypatch.setattr(config, "ADMIN_API_TOKEN", "")
+    letter_id = _insert_letter("cs_pending_retry")
+    with get_db() as db:
+        db.execute(
+            "UPDATE debt_letters SET status = 'pending_send', send_attempts = 0 WHERE id = ?",
+            (letter_id,),
+        )
+
+    monkeypatch.setattr(api_module.payment_module, "issue_refund_for_checkout_session", lambda _sid: True)
+    resp = client.post("/api/debt/run-pending-sends")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["processed"] >= 1
+    assert data["refunded"] >= 1

@@ -198,3 +198,24 @@ def issue_refund(payment_id: int) -> bool:
         )
 
     return True
+
+
+def issue_refund_for_checkout_session(session_id: str) -> bool:
+    """Issue a refund using a Stripe Checkout session id.
+
+    Safe for retries: if a refund already exists for the payment intent, returns True.
+    """
+    session = get_session(session_id)
+    pi_id = session.get("payment_intent")
+    if not pi_id:
+        raise RuntimeError("Cannot issue refund: payment intent ID not found for session")
+
+    try:
+        existing = _stripe_get(f"refunds?payment_intent={urllib.parse.quote(pi_id)}&limit=1")
+    except RuntimeError:
+        existing = {"data": []}
+    if (existing.get("data") or []):
+        return True
+
+    _stripe_post("refunds", {"payment_intent": pi_id})
+    return True

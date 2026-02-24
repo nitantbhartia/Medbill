@@ -101,6 +101,89 @@ def _request_client_key(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+def _record_debt_send_failure(db, debt_letter_id: int, session_id: str, attempts: int, error_text: str) -> None:
+    db.execute(
+        """
+        UPDATE debt_letters
+        SET status = 'pending_send',
+            stripe_payment_id = COALESCE(?, stripe_payment_id),
+            send_attempts = ?,
+            last_send_error = ?,
+            last_send_attempt_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (session_id or None, attempts, error_text[:500], debt_letter_id),
+    )
+
+
+def _mark_debt_letter_refunded(db, debt_letter_id: int, session_id: str, error_text: str) -> None:
+    db.execute(
+        """
+        UPDATE debt_letters
+        SET status = 'refunded',
+            stripe_payment_id = COALESCE(?, stripe_payment_id),
+            refunded_at = CURRENT_TIMESTAMP,
+            last_send_error = ?,
+            last_send_attempt_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (session_id or None, error_text[:500], debt_letter_id),
+    )
+
+
+def _attempt_debt_letter_send(db, debt_letter_id: int, session_id: str | None) -> dict:
+    row = db.execute(
+        """
+        SELECT id, status, stripe_payment_id, send_attempts, refunded_at
+        FROM debt_letters
+        WHERE id = ?
+        """,
+        (debt_letter_id,),
+    ).fetchone()
+    if not row:
+        raise HTTPException(404, "Letter not found")
+
+    if row["status"] in ("sent", "delivered"):
+        return {"state": "already_sent"}
+    if row["status"] == "refunded" or row["refunded_at"]:
+        return {"state": "already_refunded"}
+
+    effective_session_id = session_id or (row["stripe_payment_id"] or "")
+    attempts = int(row["send_attempts"] or 0) + 1
+
+    try:
+        if not config.LOB_API_KEY:
+            raise RuntimeError("Lob API key not configured")
+
+        lob_result = debt_fighter.send_via_lob(db, debt_letter_id, config.LOB_API_KEY)
+        db.execute(
+            """
+            UPDATE debt_letters
+            SET send_attempts = ?, last_send_error = NULL, last_send_attempt_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (attempts, debt_letter_id),
+        )
+        return {"state": "sent", "lob_result": lob_result}
+    except Exception as exc:
+        error_text = str(exc)
+        _record_debt_send_failure(db, debt_letter_id, effective_session_id, attempts, error_text)
+        if attempts < config.DEBT_SEND_MAX_RETRIES:
+            return {"state": "pending_send", "error": error_text, "attempts": attempts}
+
+        if not effective_session_id:
+            return {"state": "pending_send", "error": error_text, "attempts": attempts}
+
+        try:
+            payment_module.issue_refund_for_checkout_session(effective_session_id)
+            _mark_debt_letter_refunded(db, debt_letter_id, effective_session_id, error_text)
+            return {"state": "refunded", "error": error_text, "attempts": attempts}
+        except Exception as refund_exc:
+            refund_error = f"{error_text} | refund_failed: {refund_exc}"
+            _record_debt_send_failure(db, debt_letter_id, effective_session_id, attempts, refund_error)
+            return {"state": "pending_send", "error": refund_error, "attempts": attempts}
+
+
 ALLOWED_MIME_TYPES = {
     "image/jpeg", "image/png", "image/gif", "image/webp",
     "image/heic", "image/heif", "image/tiff", "image/bmp",
@@ -1297,18 +1380,26 @@ async def stripe_webhook(request: Request):
             if debt_letter_id:
                 try:
                     with get_db() as db:
-                        lob_result = debt_fighter.send_via_lob(db, int(debt_letter_id), config.LOB_API_KEY)
-                    log_audit(action="debt_letter_sent", resource_type="debt_letter",
-                              resource_id=debt_letter_id,
-                              metadata={"lob_id": lob_result.get("lob_id"), "tracking": lob_result.get("tracking_number")})
+                        outcome = _attempt_debt_letter_send(db, int(debt_letter_id), session_id)
+                    if outcome["state"] == "sent":
+                        lob_result = outcome.get("lob_result") or {}
+                        log_audit(
+                            action="debt_letter_sent",
+                            resource_type="debt_letter",
+                            resource_id=debt_letter_id,
+                            metadata={"lob_id": lob_result.get("lob_id"), "tracking": lob_result.get("tracking_number")},
+                        )
+                    elif outcome["state"] == "refunded":
+                        log_audit(
+                            action="debt_letter_refunded_after_send_failure",
+                            resource_type="debt_letter",
+                            resource_id=debt_letter_id,
+                            metadata={"session_id": session_id, "error": outcome.get("error", "")[:300]},
+                        )
                 except Exception as exc:
                     log.error("Lob send failed for debt_letter_id=%s: %s", debt_letter_id, exc)
-                    # Payment succeeded — mark as 'pending_send' so we can retry
                     with get_db() as db:
-                        db.execute(
-                            "UPDATE debt_letters SET status = 'pending_send', stripe_payment_id = ? WHERE id = ?",
-                            (session_id, int(debt_letter_id)),
-                        )
+                        _record_debt_send_failure(db, int(debt_letter_id), session_id, 1, str(exc))
         else:
             # Dispute service payment
             bill_id = payment_module.record_payment_success(session_id)
@@ -1557,6 +1648,47 @@ async def run_followups(request: Request):
     return {"status": "ok", "data": {"followups_sent": sent}}
 
 
+@router.post("/debt/run-pending-sends")
+async def run_pending_debt_sends(request: Request):
+    """Admin endpoint: retry pending debt-letter sends and auto-refund on terminal failures."""
+    _require_admin_access(request)
+
+    processed = 0
+    sent = 0
+    refunded = 0
+    still_pending = 0
+
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT id, stripe_payment_id
+            FROM debt_letters
+            WHERE status = 'pending_send' AND (refunded_at IS NULL OR refunded_at = '')
+            ORDER BY id ASC
+            """
+        ).fetchall()
+        for row in rows:
+            processed += 1
+            outcome = _attempt_debt_letter_send(db, int(row["id"]), row["stripe_payment_id"])
+            state = outcome.get("state")
+            if state == "sent":
+                sent += 1
+            elif state == "refunded":
+                refunded += 1
+            else:
+                still_pending += 1
+
+    return {
+        "status": "ok",
+        "data": {
+            "processed": processed,
+            "sent": sent,
+            "refunded": refunded,
+            "pending": still_pending,
+        },
+    }
+
+
 @router.get("/dispute/fee")
 async def get_dispute_fee(request: Request, bill_id: int):
     """Return the dispute fee for a bill based on its total."""
@@ -1710,14 +1842,25 @@ async def send_fdcpa_letter(request: Request):
     if str(metadata.get("debt_letter_id") or "") not in {"", str(debt_letter_id)}:
         raise HTTPException(403, "Payment does not match this letter")
 
-    if not config.LOB_API_KEY:
+    with get_db() as db:
+        outcome = _attempt_debt_letter_send(db, int(debt_letter_id), stripe_session_id)
+
+    state = outcome.get("state")
+    if state in {"sent", "already_sent"}:
+        return {
+            "status": "ok",
+            "data": {
+                "sent": True,
+                "message": "Letter sent via certified mail.",
+            },
+        }
+    if state == "refunded":
         return {
             "status": "ok",
             "data": {
                 "sent": False,
-                "message": "Certified mail sending is coming soon. For now, download your letter and mail it yourself.",
-                "certified_mail_guide": debt_fighter.CERTIFIED_MAIL_GUIDE,
-                "letter_text": letter_text,
+                "refunded": True,
+                "message": "Send failed. Your payment was refunded automatically.",
             },
         }
 
@@ -1725,8 +1868,10 @@ async def send_fdcpa_letter(request: Request):
         "status": "ok",
         "data": {
             "sent": False,
-            "message": "Lob integration pending. Download and mail the letter yourself via USPS Certified Mail.",
+            "pending": True,
+            "message": "Send failed. We will retry automatically; if retries fail, payment is refunded.",
             "certified_mail_guide": debt_fighter.CERTIFIED_MAIL_GUIDE,
+            "letter_text": letter_text,
         },
     }
 
