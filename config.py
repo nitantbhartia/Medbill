@@ -115,6 +115,7 @@ MAP_TILE_ATTRIBUTION = os.getenv(
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 )
 MAP_MAX_ZOOM = int(os.getenv("MAP_MAX_ZOOM", "18"))
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "")
 
 # Free geocoder backfill
 GEOCODER_FALLBACK_ENABLED = os.getenv("GEOCODER_FALLBACK_ENABLED", "true").lower() == "true"
