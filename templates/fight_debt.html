@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Fight Your Medical Debt — BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="Got a medical bill or collection notice? BillKarma helps you fight it with FDCPA letters, charity care checks, and AI bill audits.">
+<style>
+    .fd-hero {
+        background: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 56px 24px 52px;
+        margin-bottom: 36px;
+    }
+    .fd-hero-inner { max-width: 1100px; margin: 0 auto; }
+    .fd-hero h1 { color: #fff; font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .fd-hero p { color: rgba(255,255,255,0.85); max-width: 68ch; font-weight: 500; }
+
+    .fd-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 72px; }
+
+    .fd-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 48px;
+    }
+    .fd-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 28px;
+        border: 1px solid var(--bk-gray-border);
+        border-radius: 22px;
+        background: #fff;
+        transition: border-color 0.15s;
+    }
+    .fd-card:hover { border-color: var(--bk-green); }
+
+    .fd-card-icon {
+        width: 44px; height: 44px;
+        background: var(--bk-green);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .fd-card-title { font-size: 1.08rem; font-weight: 800; color: var(--bk-black); letter-spacing: -0.02em; }
+    .fd-card-desc { color: var(--bk-secondary); font-size: 0.92rem; line-height: 1.5; }
+    .fd-card-link {
+        margin-top: auto;
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        text-decoration: none;
+        background: var(--bk-black);
+        color: #fff;
+        font-size: 0.84rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 10px 20px;
+        transition: background 0.15s;
+    }
+    .fd-card-link:hover { background: #333; }
+
+    .fd-more {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px 48px;
+    }
+    .fd-more-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--bk-black);
+        margin-bottom: 16px;
+    }
+    .fd-more-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+    .fd-more-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border: 1px solid var(--bk-gray-border);
+        border-radius: 16px;
+        background: #fff;
+        text-decoration: none;
+        color: var(--bk-black);
+        transition: border-color 0.15s;
+    }
+    .fd-more-card:hover { border-color: var(--bk-green); }
+    .fd-more-name { font-weight: 700; font-size: 0.95rem; }
+    .fd-more-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        flex-shrink: 0;
+    }
+    .fd-badge-free { background: #E6F4EA; color: var(--bk-green); }
+    .fd-badge-paid { background: #F3F4F6; color: var(--bk-black); }
+
+    @media (max-width: 768px) {
+        .fd-hero { padding: 36px 18px 34px; border-radius: 0 0 24px 24px; }
+        .fd-hero h1 { font-size: 1.7rem; }
+        .fd-grid { grid-template-columns: 1fr; }
+        .fd-more-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="fd-hero">
+    <div class="fd-hero-inner">
+        <h1>Got a medical bill or collection notice? We'll help you fight it.</h1>
+        <p>Free tools and guided letters to dispute, negotiate, or eliminate your medical debt.</p>
+    </div>
+</section>
+
+<section class="fd-wrap">
+    <div class="fd-grid">
+        <!-- Collection Notice -->
+        <article class="fd-card">
+            <div class="fd-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/>
+                </svg>
+            </div>
+            <h2 class="fd-card-title">I got a collection notice</h2>
+            <p class="fd-card-desc">Generate a legally correct FDCPA debt validation letter. 10 minutes. $19.</p>
+            <a href="/collection-notice" class="fd-card-link">Start Letter &rarr;</a>
+        </article>
+
+        <!-- Charity Care -->
+        <article class="fd-card">
+            <div class="fd-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                </svg>
+            </div>
+            <h2 class="fd-card-title">I can't afford my bill</h2>
+            <p class="fd-card-desc">Check if you qualify for hospital financial assistance. Free to check.</p>
+            <a href="/charity-care" class="fd-card-link">Check Eligibility &rarr;</a>
+        </article>
+
+        <!-- Bill Scanner -->
+        <article class="fd-card">
+            <div class="fd-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+            </div>
+            <h2 class="fd-card-title">I want to check if my bill has errors</h2>
+            <p class="fd-card-desc">Upload your bill for a free AI audit. Finds overcharges and billing errors.</p>
+            <a href="/scan" class="fd-card-link">Scan My Bill &rarr;</a>
+        </article>
+    </div>
+</section>
+
+<section class="fd-more">
+    <h2 class="fd-more-title">Not sure where to start?</h2>
+    <div class="fd-more-grid">
+        <a href="/statute-of-limitations" class="fd-more-card">
+            <span class="fd-more-name">Check your statute of limitations</span>
+            <span class="fd-more-badge fd-badge-free">Free</span>
+        </a>
+        <a href="/settle-debt" class="fd-more-card">
+            <span class="fd-more-name">Negotiate a settlement</span>
+            <span class="fd-more-badge fd-badge-paid">$9</span>
+        </a>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-6 pb-12">
+    <p class="text-xs text-center text-gray-400">BillKarma is not a law firm. This is a self-help document tool, not legal advice. You are acting on your own behalf.</p>
+</div>
+{% endblock %}

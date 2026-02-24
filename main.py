@@ -1197,6 +1197,11 @@ async def guides_sitemap():
     base = config.APP_URL.rstrip("/")
     static_urls = [
         (f"{base}/", "2026-02-01", "1.0"),
+        (f"{base}/fight-debt", "2026-02-24", "0.9"),
+        (f"{base}/collection-notice", "2026-02-24", "0.9"),
+        (f"{base}/statute-of-limitations", "2026-02-24", "0.9"),
+        (f"{base}/charity-care", "2026-02-24", "0.9"),
+        (f"{base}/settle-debt", "2026-02-24", "0.8"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
         (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/calculator", "2026-02-01", "0.7"),
@@ -1388,6 +1393,93 @@ async def dispute_dashboard_page(
         {
             "request": request,
             "summary": summary,
+        },
+    )
+
+
+# --- Debt Fighter pages ---
+
+
+@app.get("/fight-debt", response_class=HTMLResponse)
+async def fight_debt_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/fight-debt"
+    return templates.TemplateResponse(
+        "fight_debt.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Fight Your Medical Debt | BillKarma",
+            "og_description": "Got a medical bill or collection notice? Generate FDCPA letters, check charity care eligibility, and negotiate settlements.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/statute-of-limitations", response_class=HTMLResponse)
+async def sol_page(request: Request):
+    from debt_fighter import SOL_BY_STATE, STATE_NAMES
+    states = [{"code": k, "name": STATE_NAMES[k]} for k in sorted(STATE_NAMES.keys())]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/statute-of-limitations"
+    return templates.TemplateResponse(
+        "statute_of_limitations.html",
+        {
+            "request": request,
+            "states": states,
+            "canonical_url": canonical_url,
+            "og_title": "Medical Debt Statute of Limitations Calculator | BillKarma",
+            "og_description": "Check if your medical debt is past the statute of limitations in your state. Free calculator.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/collection-notice", response_class=HTMLResponse)
+async def collection_notice_page(request: Request):
+    from debt_fighter import STATE_NAMES
+    states = [{"code": k, "name": STATE_NAMES[k]} for k in sorted(STATE_NAMES.keys())]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/collection-notice"
+    return templates.TemplateResponse(
+        "collection_notice.html",
+        {
+            "request": request,
+            "states": states,
+            "canonical_url": canonical_url,
+            "og_title": "Fight Your Collection Notice — FDCPA Letter Generator | BillKarma",
+            "og_description": "Generate a legally correct FDCPA debt validation letter and mail it certified. Takes 10 minutes.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/charity-care", response_class=HTMLResponse)
+async def charity_care_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/charity-care"
+    return templates.TemplateResponse(
+        "charity_care.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Do You Qualify for Hospital Financial Assistance? | BillKarma",
+            "og_description": "Check if you qualify for charity care. Most nonprofit hospitals must forgive bills for patients under 200-400% of the Federal Poverty Level.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/settle-debt", response_class=HTMLResponse)
+async def settle_debt_page(request: Request):
+    from debt_fighter import STATE_NAMES
+    states = [{"code": k, "name": STATE_NAMES[k]} for k in sorted(STATE_NAMES.keys())]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/settle-debt"
+    return templates.TemplateResponse(
+        "settle_debt.html",
+        {
+            "request": request,
+            "states": states,
+            "canonical_url": canonical_url,
+            "og_title": "Negotiate a Medical Debt Settlement | BillKarma",
+            "og_description": "Generate a settlement offer letter for medical debt. Collectors often accept 20-40% of the balance.",
+            "meta_robots": "index, follow",
         },
     )
 

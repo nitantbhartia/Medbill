@@ -50,6 +50,12 @@ DISPUTE_FEE_TIERS = [
 DISPUTE_FOLLOWUP_DAYS = [7, 14, 30, 45]
 DISPUTE_MAX_DAYS = 45
 
+# Lob (for certified mail — debt validation letters)
+LOB_API_KEY = os.getenv("LOB_API_KEY", "")
+FDCPA_LETTER_PRICE_CENTS = 1900  # $19
+CHARITY_CARE_APP_PRICE_CENTS = 900  # $9
+SETTLEMENT_LETTER_PRICE_CENTS = 900  # $9
+
 # Twilio (for fax sending — optional)
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")

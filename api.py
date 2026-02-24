@@ -1287,3 +1287,139 @@ async def get_dispute_fee(bill_id: int):
     fee_cents = payment_module.calculate_fee(bill_total)
 
     return {"status": "ok", "data": {"fee_cents": fee_cents, "fee_dollars": fee_cents / 100}}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# DEBT FIGHTER — SOL calculator, FDCPA letters, charity care, settlement
+# ──────────────────────────────────────────────────────────────────────────────
+
+import debt_fighter
+
+
+@router.post("/sol-check")
+async def sol_check(request: Request):
+    """Check statute of limitations for a medical debt."""
+    body = await request.json()
+    state = (body.get("state") or "").strip()
+    start_date = (body.get("start_date") or "").strip()
+
+    if not state or not start_date:
+        raise HTTPException(400, "state and start_date are required")
+
+    result = debt_fighter.check_sol(state, start_date)
+    if result["status"] == "error":
+        raise HTTPException(400, result["message"])
+
+    return {"status": "ok", "data": result}
+
+
+@router.post("/collection-notice/generate")
+async def generate_fdcpa_letter(request: Request):
+    """Generate an FDCPA debt validation letter."""
+    body = await request.json()
+
+    required = ["user_name", "user_address", "collector_name", "collector_address",
+                "account_number", "amount", "date_of_notice"]
+    missing = [f for f in required if not (body.get(f) or "").strip()]
+    if missing:
+        raise HTTPException(400, f"Missing required fields: {', '.join(missing)}")
+
+    result = debt_fighter.generate_fdcpa_letter(
+        user_name=body["user_name"].strip(),
+        user_address=body["user_address"].strip(),
+        collector_name=body["collector_name"].strip(),
+        collector_address=body["collector_address"].strip(),
+        account_number=body["account_number"].strip(),
+        amount=body["amount"].strip(),
+        date_of_notice=body["date_of_notice"].strip(),
+    )
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO debt_letters (letter_type, user_name, collector_name, account_number, amount, letter_text) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            ("fdcpa_validation", body["user_name"], body["collector_name"],
+             body["account_number"], body["amount"], result["letter_text"]),
+        )
+
+    return {"status": "ok", "data": result}
+
+
+@router.post("/collection-notice/send")
+async def send_fdcpa_letter(request: Request):
+    """Send the FDCPA letter via certified mail (Lob integration placeholder)."""
+    body = await request.json()
+    letter_text = (body.get("letter_text") or "").strip()
+    if not letter_text:
+        raise HTTPException(400, "letter_text is required")
+
+    if not config.LOB_API_KEY:
+        return {
+            "status": "ok",
+            "data": {
+                "sent": False,
+                "message": "Letter mailing is not configured yet. Download the letter and mail it yourself via USPS Certified Mail.",
+                "letter_text": letter_text,
+            },
+        }
+
+    # Lob integration will go here when API key is configured
+    return {
+        "status": "ok",
+        "data": {
+            "sent": False,
+            "message": "Lob integration pending. Download and mail the letter yourself via USPS Certified Mail.",
+        },
+    }
+
+
+@router.post("/charity-care/check")
+async def check_charity_care(request: Request):
+    """Check charity care eligibility based on income and household size."""
+    body = await request.json()
+
+    try:
+        income = float(body.get("income", 0))
+        household_size = int(body.get("household_size", 1))
+    except (ValueError, TypeError):
+        raise HTTPException(400, "income must be a number, household_size must be an integer")
+
+    if income <= 0:
+        raise HTTPException(400, "income must be positive")
+    if household_size < 1 or household_size > 20:
+        raise HTTPException(400, "household_size must be between 1 and 20")
+
+    result = debt_fighter.check_charity_care(income, household_size)
+    return {"status": "ok", "data": result}
+
+
+@router.post("/settlement/generate")
+async def generate_settlement(request: Request):
+    """Generate a settlement offer letter."""
+    body = await request.json()
+
+    required = ["user_name", "user_address", "collector_name", "collector_address",
+                "account_number", "original_amount", "offer_amount"]
+    missing = [f for f in required if not (body.get(f) or "").strip()]
+    if missing:
+        raise HTTPException(400, f"Missing required fields: {', '.join(missing)}")
+
+    result = debt_fighter.generate_settlement_letter(
+        user_name=body["user_name"].strip(),
+        user_address=body["user_address"].strip(),
+        collector_name=body["collector_name"].strip(),
+        collector_address=body["collector_address"].strip(),
+        account_number=body["account_number"].strip(),
+        original_amount=body["original_amount"].strip(),
+        offer_amount=body["offer_amount"].strip(),
+    )
+
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO debt_letters (letter_type, user_name, collector_name, account_number, amount, letter_text) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            ("settlement_offer", body["user_name"], body["collector_name"],
+             body["account_number"], body["original_amount"], result["letter_text"]),
+        )
+
+    return {"status": "ok", "data": result}

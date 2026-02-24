@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Medical Debt Settlement Letter Generator | BillKarma{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Negotiate a Medical Debt Settlement</h1>
+    <p class="text-gray-500 mb-8">Collection agencies buy medical debt for 3-7 cents on the dollar. A lump-sum settlement of 20-40% is commonly accepted.</p>
+
+    <div id="form-section">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
+            <h3 class="font-bold text-amber-800 text-sm mb-2">Before you generate this letter</h3>
+            <ul class="text-sm text-amber-700 space-y-1">
+                <li>&#9888; Making any payment may reset the statute of limitations in your state. <a href="/statute-of-limitations" class="underline font-semibold">Check your SOL first</a>.</li>
+                <li>&#9888; Never send payment until you have the collector's written agreement.</li>
+                <li>&#9888; "Pay for delete" is not guaranteed enforceable. Some collectors agree, others do not.</li>
+            </ul>
+        </div>
+
+        <form id="settle-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <h2 class="text-lg font-bold mb-2">Debt Details</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Original Amount ($)</label>
+                    <input type="text" id="original_amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="11,000">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Your Lump-Sum Offer ($)</label>
+                    <input type="text" id="offer_amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="3,000">
+                </div>
+            </div>
+
+            <h2 class="text-lg font-bold mb-2 mt-6">Your Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Full Name</label>
+                    <input type="text" id="user_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Address</label>
+                    <input type="text" id="user_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St, City, ST 12345">
+                </div>
+            </div>
+
+            <h2 class="text-lg font-bold mb-2 mt-6">Collector Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Collection Agency Name</label>
+                    <input type="text" id="collector_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Collection Agency Address</label>
+                    <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Account Number</label>
+                    <input type="text" id="account_number" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                </div>
+            </div>
+
+            <button type="submit" class="mt-4 w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Generate Settlement Letter</button>
+        </form>
+    </div>
+
+    <!-- Result -->
+    <div id="result-section" class="hidden">
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-bold text-green-800 mb-1">Your settlement letter is ready</h2>
+            <p class="text-sm text-green-700">Review the letter below. Send it to the collection agency via certified mail or email.</p>
+        </div>
+        <div id="letter-preview" class="bg-white border border-gray-300 rounded-xl p-8 font-mono text-sm leading-relaxed whitespace-pre-wrap mb-6"></div>
+        <div class="flex gap-3 mb-6">
+            <button onclick="downloadLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Download Letter</button>
+            <button onclick="showForm()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Edit</button>
+        </div>
+        <div id="warnings-box" class="bg-red-50 border border-red-200 rounded-2xl p-6"></div>
+    </div>
+
+    <div class="mt-10 text-center">
+        <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt tools</a>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-8 text-center">BillKarma is not a law firm. This is a self-help tool, not legal advice. You are acting on your own behalf. Consult an attorney for complex situations.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let letterText = '';
+
+function showForm() {
+    document.getElementById('form-section').classList.remove('hidden');
+    document.getElementById('result-section').classList.add('hidden');
+}
+
+document.getElementById('settle-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        user_name: document.getElementById('user_name').value,
+        user_address: document.getElementById('user_address').value,
+        collector_name: document.getElementById('collector_name').value,
+        collector_address: document.getElementById('collector_address').value,
+        account_number: document.getElementById('account_number').value,
+        original_amount: document.getElementById('original_amount').value.replace(/[,$]/g, ''),
+        offer_amount: document.getElementById('offer_amount').value.replace(/[,$]/g, '')
+    };
+
+    const res = await fetch('/api/settlement/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        const err = await res.json();
+        alert(err.detail || 'Error generating letter');
+        return;
+    }
+
+    const json = await res.json();
+    letterText = json.data.letter_text;
+    document.getElementById('letter-preview').textContent = letterText;
+
+    let warningsHtml = '<h3 class="font-bold text-red-800 text-sm mb-2">Important Warnings</h3><ul class="text-sm text-red-700 space-y-1">';
+    json.data.warnings.forEach(function(w) { warningsHtml += '<li>&#9888; ' + w + '</li>'; });
+    warningsHtml += '</ul>';
+    document.getElementById('warnings-box').innerHTML = warningsHtml;
+
+    document.getElementById('form-section').classList.add('hidden');
+    document.getElementById('result-section').classList.remove('hidden');
+});
+
+function downloadLetter() {
+    const blob = new Blob([letterText], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Settlement_Offer_Letter.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

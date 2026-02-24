@@ -940,6 +940,31 @@ def _run_migrations(db):
         },
     )
 
+    # Debt fighter: generated letters tracking
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS debt_letters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            letter_type TEXT NOT NULL,
+            user_email TEXT,
+            user_name TEXT,
+            collector_name TEXT,
+            account_number TEXT,
+            amount TEXT,
+            state TEXT,
+            letter_text TEXT,
+            lob_id TEXT,
+            tracking_number TEXT,
+            stripe_payment_id TEXT,
+            status TEXT NOT NULL DEFAULT 'generated',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            sent_at TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_debt_letters_email ON debt_letters(user_email)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_debt_letters_type ON debt_letters(letter_type)")
+
 
 SCHEMA = """
 -- Users
