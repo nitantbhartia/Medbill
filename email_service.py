@@ -1,3 +1,4 @@
+from html import escape as _he
 import json
 import logging
 import re
@@ -67,8 +68,8 @@ def send_dispute_to_hospital(
     """Send a dispute letter to the hospital billing department."""
     html = (
         f"<p>This is a formal billing dispute submitted on behalf of patient "
-        f"<strong>{patient_name}</strong> by BillKarma Patient Advocacy.</p>"
-        f"<pre style='font-family:monospace;white-space:pre-wrap;'>{letter_text}</pre>"
+        f"<strong>{_he(patient_name)}</strong> by BillKarma Patient Advocacy.</p>"
+        f"<pre style='font-family:monospace;white-space:pre-wrap;'>{_he(letter_text)}</pre>"
         f"<p style='color:#666;font-size:12px;'>Submitted via BillKarma.app — "
         f"AI-assisted medical bill dispute service.</p>"
     )
@@ -87,8 +88,8 @@ def send_dispute_confirmation(
     html = f"""
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
         <h2 style="color:#00824F;">Your dispute is on its way.</h2>
-        <p>Hi {patient_name},</p>
-        <p>We've filed your formal billing dispute with <strong>{hospital_name or 'the provider'}</strong>.
+        <p>Hi {_he(patient_name)},</p>
+        <p>We've filed your formal billing dispute with <strong>{_he(hospital_name or 'the provider')}</strong>.
         Here's what happens next:</p>
         <ul>
             <li>We'll follow up automatically at day 7, 14, 30, and 45 if there's no response.</li>
@@ -116,7 +117,7 @@ def send_followup_to_hospital(
     """Send a follow-up message to the hospital billing department."""
     body = (
         f"This is follow-up #{followup_number} regarding the formal billing dispute "
-        f"submitted on behalf of patient {patient_name} (Account: {account_number}).\n\n"
+        f"submitted on behalf of patient {patient_name} (Account: {account_number}).\n\n"  # plain-text, not rendered as HTML
         f"We have not received a written response to our dispute letter sent on behalf of "
         f"our client. We respectfully request a written acknowledgment and resolution "
         f"within 7 business days.\n\n"
@@ -126,7 +127,7 @@ def send_followup_to_hospital(
         f"Please respond in writing to disputes@billkarma.app, referencing case #{case_id}.\n\n"
         f"BillKarma Patient Advocacy\ndisputes@billkarma.app"
     )
-    html = f"<pre style='font-family:monospace;white-space:pre-wrap;'>{body}</pre>"
+    html = f"<pre style='font-family:monospace;white-space:pre-wrap;'>{_he(body)}</pre>"
     return send_email(to=to, subject=subject, html_body=html, text_body=body)
 
 
@@ -142,9 +143,9 @@ def send_refund_confirmation(
     html = f"""
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
         <h2 style="color:#00824F;">Your refund is on its way.</h2>
-        <p>Hi {patient_name},</p>
+        <p>Hi {_he(patient_name)},</p>
         <p>We weren't able to resolve your dispute via written channels within our 45-day window,
-        so we've issued a full refund of <strong>{amount}</strong> to your original payment method.</p>
+        so we've issued a full refund of <strong>{_he(amount)}</strong> to your original payment method.</p>
         <p>Refunds typically appear within 5–10 business days.</p>
         <p>We're sorry we couldn't get this resolved for you. If you'd like to escalate further,
         consider filing a complaint with your state Attorney General or the CMS.</p>

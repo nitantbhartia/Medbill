@@ -82,6 +82,13 @@ DEBT_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("DEBT_RATE_LIMIT_WINDOW_SECONDS",
 MAX_TOOL_PAYLOAD_BYTES = int(os.getenv("MAX_TOOL_PAYLOAD_BYTES", "32768"))
 MAX_TOOL_CONTEXT_BYTES = int(os.getenv("MAX_TOOL_CONTEXT_BYTES", "8192"))
 
+# Input length limits for user-supplied text fields
+MAX_NAME_LEN = 200
+MAX_ADDRESS_LEN = 300
+MAX_ACCOUNT_NUMBER_LEN = 60
+MAX_AMOUNT_LEN = 30
+MAX_NOTE_LEN = 2000
+
 # Admin API access for destructive/ops endpoints
 ADMIN_API_TOKEN = os.getenv("ADMIN_API_TOKEN", "")
 
