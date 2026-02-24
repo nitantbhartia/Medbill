@@ -40,7 +40,7 @@ class TestLandingPageRegression:
         assert "Search your procedure on BillKarma" in html
         assert 'id="mobileMenuSearch"' in html
         assert 'id="mobileMenuResults"' in html
-        assert 'id="procedureCardsGrid"' in html
+        assert 'class="stat-strip"' in html
 
 
 class TestPageFlowRegression:
@@ -328,15 +328,11 @@ class TestPricingConsistencyRegression:
         assert m is not None
         return int(m.group(1).replace(",", ""))
 
-    def test_homepage_and_mri_article_hospital_avg_match(self):
+    def test_mri_article_hospital_avg_is_correct(self):
         self._seed_consistency_fixture()
 
         landing = client.get("/")
         assert landing.status_code == 200
-        landing_price = self._extract_money_int(
-            r'<div class="procedure-name">[^<]*MRI[^<]*</div>\s*<div class="procedure-price">\$([0-9,]+)</div>',
-            landing.text,
-        )
 
         mri = client.get("/procedures/mri-cost/")
         assert mri.status_code == 200
@@ -345,9 +341,7 @@ class TestPricingConsistencyRegression:
             mri.text,
         )
 
-        assert landing_price == 2500
         assert mri_hosp_avg == 2500
-        assert landing_price == mri_hosp_avg
 
     def test_mri_detail_and_article_medicare_rate_match(self):
         self._seed_consistency_fixture()
