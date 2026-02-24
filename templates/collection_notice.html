@@ -1,177 +1,568 @@
 {% extends "base.html" %}
-{% block title %}FDCPA Debt Validation Letter Generator | BillKarma{% endblock %}
+{% block title %}FDCPA Collection Letter Generator | BillKarma{% endblock %}
+
+{% block head %}
+<style>
+    @media print {
+        header, footer, .bk-nav, .bk-footer,
+        .no-print, #progress-bar, #rights-section,
+        #step-1-panel, #step-2-panel, #step-3-panel,
+        #actions-bar, #what-happens-next, #certified-mail-section,
+        #disclaimer-footer, #back-link { display: none !important; }
+
+        #step-4-panel { display: block !important; }
+        #letter-preview {
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-size: 12pt !important;
+            line-height: 1.6 !important;
+        }
+        body { background: #fff !important; }
+        main { padding: 0 !important; }
+    }
+
+    .letter-card { transition: border-color 0.15s, box-shadow 0.15s; }
+    .letter-card:hover { border-color: #9CA3AF; }
+    .letter-card.selected {
+        border-color: #00824F !important;
+        box-shadow: 0 0 0 2px rgba(0, 130, 79, 0.2);
+    }
+
+    .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .accordion-body.open { max-height: 600px; }
+
+    .step-dot-active { background: #111; color: #fff; }
+    .step-dot-inactive { background: #E5E7EB; color: #6B7280; }
+    .step-line-active { background: #111; }
+    .step-line-inactive { background: #E5E7EB; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-6 py-16">
     <h1 class="text-3xl font-extrabold tracking-tight mb-2">Fight Your Collection Notice</h1>
-    <p class="text-gray-500 mb-8">Generate a legally correct FDCPA debt validation letter. The collector must prove the debt is yours or stop collecting.</p>
+    <p class="text-gray-500 mb-8">Generate a legally correct FDCPA letter. Federal law gives you powerful rights — use them.</p>
 
-    <!-- Progress bar -->
-    <div class="flex items-center gap-2 mb-8">
-        <div id="step-dot-1" class="w-8 h-8 rounded-full bg-gray-900 text-white text-sm font-bold flex items-center justify-center">1</div>
-        <div id="step-line-1" class="flex-1 h-0.5 bg-gray-200"></div>
-        <div id="step-dot-2" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 text-sm font-bold flex items-center justify-center">2</div>
-        <div id="step-line-2" class="flex-1 h-0.5 bg-gray-200"></div>
-        <div id="step-dot-3" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 text-sm font-bold flex items-center justify-center">3</div>
-    </div>
-
-    <!-- Step 1: Your Info -->
-    <div id="step-1" class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
-        <h2 class="text-lg font-bold mb-4">Step 1: Your Information</h2>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold mb-1">Full Name</label>
-                <input type="text" id="user_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="John Smith">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold mb-1">Street Address</label>
-                <input type="text" id="user_street" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St">
-            </div>
-            <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-sm font-semibold mb-1">City</label>
-                    <input type="text" id="user_city" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+    <!-- FDCPA Rights Accordion -->
+    <div id="rights-section" class="mb-10 no-print">
+        <button onclick="toggleRights()" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 text-left hover:bg-gray-100 transition">
+            <span class="font-bold text-sm">Your Rights Under the FDCPA</span>
+            <svg id="rights-chevron" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+        <div id="rights-body" class="accordion-body">
+            <div class="bg-gray-50 border border-t-0 border-gray-200 rounded-b-2xl px-6 pb-5 -mt-3 pt-5">
+                <div id="rights-list" class="space-y-3">
+                    <p class="text-sm text-gray-400">Loading your rights...</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">State</label>
-                    <select id="user_state" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
-                        {% for s in states %}
-                        <option value="{{ s.code }}">{{ s.code }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">ZIP</label>
-                    <input type="text" id="user_zip" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" maxlength="5">
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">When you send one of these letters via certified mail, the collector is <strong>legally required</strong> to respond within 30 days. If they don't, they cannot legally continue collecting.</p>
                 </div>
             </div>
         </div>
-        <button onclick="goToStep(2)" class="mt-6 w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800">Continue</button>
     </div>
 
-    <!-- Step 2: Collector Info -->
-    <div id="step-2" class="hidden bg-gray-50 rounded-2xl p-8 border border-gray-200">
-        <h2 class="text-lg font-bold mb-4">Step 2: Collection Agency Details</h2>
-        <p class="text-sm text-gray-500 mb-4">This information is on the collection notice you received.</p>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold mb-1">Collection Agency Name</label>
-                <input type="text" id="collector_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="ABC Collections">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold mb-1">Collection Agency Address</label>
-                <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Collection Ave, Suite 100, City, ST 12345">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
+    <!-- Progress Bar -->
+    <div id="progress-bar" class="flex items-center gap-2 mb-8 no-print">
+        <div id="step-dot-1" class="w-8 h-8 rounded-full step-dot-active text-sm font-bold flex items-center justify-center">1</div>
+        <div id="step-line-1" class="flex-1 h-0.5 step-line-inactive"></div>
+        <div id="step-dot-2" class="w-8 h-8 rounded-full step-dot-inactive text-sm font-bold flex items-center justify-center">2</div>
+        <div id="step-line-2" class="flex-1 h-0.5 step-line-inactive"></div>
+        <div id="step-dot-3" class="w-8 h-8 rounded-full step-dot-inactive text-sm font-bold flex items-center justify-center">3</div>
+        <div id="step-line-3" class="flex-1 h-0.5 step-line-inactive"></div>
+        <div id="step-dot-4" class="w-8 h-8 rounded-full step-dot-inactive text-sm font-bold flex items-center justify-center">4</div>
+    </div>
+
+    <!-- Step 1: Letter Type -->
+    <div id="step-1-panel">
+        <h2 class="text-lg font-bold mb-1">What kind of letter do you need?</h2>
+        <p class="text-sm text-gray-500 mb-5">Pick the one that matches your situation. Not sure? Debt Validation is the best starting point.</p>
+
+        <div id="letter-type-cards" class="space-y-3 mb-6">
+            <p class="text-sm text-gray-400">Loading letter types...</p>
+        </div>
+
+        <button onclick="goToStep(2)" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Continue</button>
+    </div>
+
+    <!-- Step 2: Your Information -->
+    <div id="step-2-panel" class="hidden">
+        <h2 class="text-lg font-bold mb-1">Your Information</h2>
+        <p class="text-sm text-gray-500 mb-5">Your return address goes on the letter. This is never stored or shared.</p>
+
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Account Number</label>
-                    <input type="text" id="account_number" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    <label class="block text-sm font-semibold mb-1" for="user_name">Full Name</label>
+                    <input type="text" id="user_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="John Smith">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Amount Claimed ($)</label>
-                    <input type="text" id="amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000.00">
+                    <label class="block text-sm font-semibold mb-1" for="user_street">Street Address</label>
+                    <input type="text" id="user_street" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St">
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold mb-1">Date on Collection Notice</label>
-                <input type="date" id="date_of_notice" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                <div class="grid grid-cols-6 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-semibold mb-1" for="user_city">City</label>
+                        <input type="text" id="user_city" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-semibold mb-1" for="user_state">State</label>
+                        <select id="user_state" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                            <option value="">--</option>
+                            {% for s in states %}
+                            <option value="{{ s.code }}">{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-semibold mb-1" for="user_zip">ZIP</label>
+                        <input type="text" id="user_zip" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" maxlength="5" pattern="[0-9]{5}" inputmode="numeric">
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="mt-6 flex gap-3">
-            <button onclick="goToStep(1)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Back</button>
-            <button onclick="generateLetter()" class="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800">Generate Letter</button>
+            <button onclick="goToStep(1)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Back</button>
+            <button onclick="validateAndGoToStep3()" class="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Continue</button>
         </div>
     </div>
 
-    <!-- Step 3: Review & Send -->
-    <div id="step-3" class="hidden">
-        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
+    <!-- Step 3: Collector Information -->
+    <div id="step-3-panel" class="hidden">
+        <h2 class="text-lg font-bold mb-1">Collection Agency Details</h2>
+        <p class="text-sm text-gray-500 mb-5">Find this on the collection notice you received.</p>
+
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1" for="collector_name">Collection Agency Name</label>
+                    <input type="text" id="collector_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="ABC Collections">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1" for="collector_address">Collection Agency Address</label>
+                    <input type="text" id="collector_address" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Collection Ave, Suite 100, City, ST 12345">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="account_number">Account Number</label>
+                        <input type="text" id="account_number" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" for="amount">Amount Claimed ($)</label>
+                        <input type="text" id="amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000.00" inputmode="decimal">
+                    </div>
+                </div>
+
+                <!-- Date of notice: shown for debt_validation -->
+                <div id="date-of-notice-field">
+                    <label class="block text-sm font-semibold mb-1" for="date_of_notice">Date on Collection Notice</label>
+                    <input type="date" id="date_of_notice" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
+                    <p class="text-xs text-gray-400 mt-1">Optional. Helps establish your 30-day dispute window.</p>
+                </div>
+
+                <!-- Dispute reason: shown for dispute_amount -->
+                <div id="dispute-reason-field" class="hidden">
+                    <label class="block text-sm font-semibold mb-1" for="dispute_reason">Why do you dispute this amount?</label>
+                    <textarea id="dispute_reason" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="Example: I already made two payments totaling $1,200 that are not reflected in this amount."></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Be specific. Mention prior payments, billing errors, or incorrect fees.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="step3-error" class="hidden mt-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p class="text-sm text-red-700 font-semibold"></p>
+        </div>
+
+        <div class="mt-6 flex gap-3">
+            <button onclick="goToStep(2)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Back</button>
+            <button id="generate-btn" onclick="generateLetter()" class="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Generate Letter</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Letter Preview & Actions -->
+    <div id="step-4-panel" class="hidden">
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 no-print">
             <h2 class="text-lg font-bold text-green-800 mb-1">Your letter is ready</h2>
-            <p class="text-sm text-green-700">Review the letter below. Download it or mail it certified.</p>
+            <p class="text-sm text-green-700" id="letter-type-confirm"></p>
         </div>
+
         <div id="letter-preview" class="bg-white border border-gray-300 rounded-xl p-8 font-mono text-sm leading-relaxed whitespace-pre-wrap mb-6"></div>
-        <div class="flex gap-3">
-            <button onclick="downloadLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Download Letter</button>
-            <button onclick="goToStep(2)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100">Edit</button>
+
+        <!-- Action buttons -->
+        <div id="actions-bar" class="flex gap-3 mb-8 no-print">
+            <button onclick="printLetter()" class="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Print as PDF</button>
+            <button onclick="downloadLetter()" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Download as Text</button>
+            <button onclick="goToStep(3)" class="flex-1 border border-gray-300 font-bold py-3.5 rounded-full text-sm hover:bg-gray-100 transition">Edit</button>
         </div>
-        <div class="mt-6 bg-amber-50 border border-amber-200 rounded-2xl p-6">
-            <h3 class="font-bold text-amber-800 text-sm mb-2">Important: Send this via USPS Certified Mail</h3>
-            <p class="text-sm text-amber-700">Certified mail creates a legal record that the collector received your letter. Keep the tracking receipt. The collector has 30 days to respond with validation after receiving it.</p>
+
+        <!-- What Happens Next -->
+        <div id="what-happens-next" class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6 no-print">
+            <h3 class="font-bold text-blue-800 text-sm mb-3">What Happens Next</h3>
+            <div id="timeline-list" class="space-y-3 mb-4"></div>
+            <div id="what-happens-list" class="mt-4 pt-4 border-t border-blue-200">
+                <h4 class="font-semibold text-blue-800 text-xs uppercase tracking-wide mb-2">What the law requires of them</h4>
+                <ul id="what-happens-items" class="text-sm text-blue-700 space-y-1"></ul>
+            </div>
+        </div>
+
+        <!-- Certified Mail Guide -->
+        <div id="certified-mail-section" class="no-print">
+            <button onclick="toggleCertifiedMail()" class="w-full flex items-center justify-between bg-amber-50 border border-amber-200 rounded-2xl px-6 py-4 text-left hover:bg-amber-100 transition">
+                <span class="font-bold text-amber-800 text-sm">How to Send This Letter (Certified Mail Guide)</span>
+                <svg id="mail-chevron" class="w-5 h-5 text-amber-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div id="certified-mail-body" class="accordion-body">
+                <div class="bg-amber-50 border border-t-0 border-amber-200 rounded-b-2xl px-6 pb-6 -mt-3 pt-5">
+                    <p id="mail-why" class="text-sm text-amber-700 mb-4"></p>
+
+                    <h4 class="font-semibold text-amber-800 text-xs uppercase tracking-wide mb-2">Step-by-step instructions</h4>
+                    <ol id="mail-steps" class="text-sm text-amber-700 space-y-2 list-decimal list-inside mb-4"></ol>
+
+                    <h4 class="font-semibold text-amber-800 text-xs uppercase tracking-wide mb-2">Keep for your records</h4>
+                    <ul id="mail-tips" class="text-sm text-amber-700 space-y-1 list-disc list-inside"></ul>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="mt-10 text-center">
+    <!-- Back link -->
+    <div id="back-link" class="mt-10 text-center no-print">
         <a href="/fight-debt" class="text-sm font-semibold text-green-700 hover:underline">Back to Fight Debt tools</a>
     </div>
 
-    <p class="text-xs text-gray-400 mt-8 text-center">BillKarma is not a law firm. This is a self-help tool, not legal advice. You are acting on your own behalf. Consult an attorney for complex situations.</p>
+    <!-- Disclaimer -->
+    <p id="disclaimer-footer" class="text-xs text-gray-400 mt-8 text-center no-print">BillKarma is not a law firm. This is a self-help tool, not legal advice. You are acting on your own behalf. Consult an attorney for complex situations.</p>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-let letterText = '';
+function esc(s) {
+    var el = document.createElement('span');
+    el.textContent = s;
+    return el.innerHTML;
+}
 
-function goToStep(n) {
-    document.getElementById('step-1').classList.add('hidden');
-    document.getElementById('step-2').classList.add('hidden');
-    document.getElementById('step-3').classList.add('hidden');
-    document.getElementById('step-' + n).classList.remove('hidden');
-    for (let i = 1; i <= 3; i++) {
-        const dot = document.getElementById('step-dot-' + i);
-        if (i <= n) {
-            dot.className = 'w-8 h-8 rounded-full bg-gray-900 text-white text-sm font-bold flex items-center justify-center';
-        } else {
-            dot.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-500 text-sm font-bold flex items-center justify-center';
-        }
-        if (i < 3) {
-            document.getElementById('step-line-' + i).className = i < n ? 'flex-1 h-0.5 bg-gray-900' : 'flex-1 h-0.5 bg-gray-200';
-        }
+var selectedLetterType = 'debt_validation';
+var letterText = '';
+var letterTypes = {};
+var certifiedMailGuide = {};
+var currentStep = 1;
+
+// -- Load data on page load --
+
+function loadLetterTypes() {
+    fetch('/api/collection-notice/letter-types')
+        .then(function(res) { return res.json(); })
+        .then(function(json) {
+            if (json.status !== 'ok') return;
+            letterTypes = json.data;
+            renderLetterTypeCards();
+        })
+        .catch(function() {});
+}
+
+function loadRights() {
+    fetch('/api/collection-notice/rights')
+        .then(function(res) { return res.json(); })
+        .then(function(json) {
+            if (json.status !== 'ok') return;
+            renderRights(json.data.rights);
+            certifiedMailGuide = json.data.certified_mail_guide;
+        })
+        .catch(function() {});
+}
+
+loadLetterTypes();
+loadRights();
+
+// -- Render letter type cards --
+
+function renderLetterTypeCards() {
+    var container = document.getElementById('letter-type-cards');
+    var keys = ['debt_validation', 'cease_desist', 'dispute_amount'];
+    var html = '';
+
+    keys.forEach(function(key) {
+        var t = letterTypes[key];
+        if (!t) return;
+        var isSelected = key === selectedLetterType;
+        html += '<button type="button" onclick="selectLetterType(\'' + key + '\')" '
+            + 'class="letter-card w-full text-left border rounded-2xl p-5 '
+            + (isSelected ? 'selected border-green-600 bg-green-50' : 'border-gray-200 bg-white') + '">'
+            + '<div class="flex items-start justify-between">'
+            + '<div>'
+            + '<h3 class="font-bold text-sm">' + esc(t.name) + '</h3>'
+            + '<p class="text-xs text-gray-400 mt-0.5">' + esc(t.legal_basis) + '</p>'
+            + '</div>'
+            + (isSelected ? '<span class="text-green-600 font-bold text-lg leading-none">&#10003;</span>' : '')
+            + '</div>'
+            + '<p class="text-sm text-gray-600 mt-2">' + esc(t.description) + '</p>'
+            + '<p class="text-xs text-gray-500 mt-2"><strong>Best for:</strong> ' + esc(t.best_for) + '</p>'
+            + '</button>';
+    });
+
+    container.innerHTML = html;
+}
+
+function selectLetterType(type) {
+    selectedLetterType = type;
+    renderLetterTypeCards();
+    updateConditionalFields();
+}
+
+function updateConditionalFields() {
+    var dateField = document.getElementById('date-of-notice-field');
+    var disputeField = document.getElementById('dispute-reason-field');
+
+    if (selectedLetterType === 'debt_validation') {
+        dateField.classList.remove('hidden');
+    } else {
+        dateField.classList.add('hidden');
+    }
+
+    if (selectedLetterType === 'dispute_amount') {
+        disputeField.classList.remove('hidden');
+    } else {
+        disputeField.classList.add('hidden');
     }
 }
 
-async function generateLetter() {
-    const userAddress = document.getElementById('user_street').value + ', '
-        + document.getElementById('user_city').value + ', '
-        + document.getElementById('user_state').value + ' '
-        + document.getElementById('user_zip').value;
+// -- Render FDCPA rights --
 
-    const body = {
-        user_name: document.getElementById('user_name').value,
-        user_address: userAddress,
-        collector_name: document.getElementById('collector_name').value,
-        collector_address: document.getElementById('collector_address').value,
-        account_number: document.getElementById('account_number').value,
-        amount: document.getElementById('amount').value.replace(/[,$]/g, ''),
-        date_of_notice: document.getElementById('date_of_notice').value
-    };
-
-    const res = await fetch('/api/collection-notice/generate', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
+function renderRights(rights) {
+    var container = document.getElementById('rights-list');
+    var html = '';
+    rights.forEach(function(r) {
+        html += '<div class="bg-white rounded-xl p-4 border border-gray-100">'
+            + '<h4 class="font-semibold text-sm text-gray-900">' + esc(r.right) + '</h4>'
+            + '<p class="text-sm text-gray-600 mt-1">' + esc(r.detail) + '</p>'
+            + '</div>';
     });
+    container.innerHTML = html;
+}
 
-    if (!res.ok) {
-        const err = await res.json();
-        alert(err.detail || 'Error generating letter');
-        return;
+// -- Accordions --
+
+function toggleRights() {
+    var body = document.getElementById('rights-body');
+    var chevron = document.getElementById('rights-chevron');
+    body.classList.toggle('open');
+    chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+function toggleCertifiedMail() {
+    var body = document.getElementById('certified-mail-body');
+    var chevron = document.getElementById('mail-chevron');
+    body.classList.toggle('open');
+    chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+// -- Progress bar + step navigation --
+
+function goToStep(n) {
+    var panels = ['step-1-panel', 'step-2-panel', 'step-3-panel', 'step-4-panel'];
+    panels.forEach(function(id) { document.getElementById(id).classList.add('hidden'); });
+    document.getElementById(panels[n - 1]).classList.remove('hidden');
+    currentStep = n;
+
+    for (var i = 1; i <= 4; i++) {
+        var dot = document.getElementById('step-dot-' + i);
+        dot.className = 'w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center '
+            + (i <= n ? 'step-dot-active' : 'step-dot-inactive');
+    }
+    for (var j = 1; j <= 3; j++) {
+        var line = document.getElementById('step-line-' + j);
+        line.className = 'flex-1 h-0.5 ' + (j < n ? 'step-line-active' : 'step-line-inactive');
     }
 
-    const json = await res.json();
-    letterText = json.data.letter_text;
-    document.getElementById('letter-preview').textContent = letterText;
+    if (n === 3) {
+        updateConditionalFields();
+    }
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// -- Validation --
+
+function validateAndGoToStep3() {
+    var name = document.getElementById('user_name').value.trim();
+    var street = document.getElementById('user_street').value.trim();
+    var city = document.getElementById('user_city').value.trim();
+    var state = document.getElementById('user_state').value;
+    var zip = document.getElementById('user_zip').value.trim();
+
+    if (!name || !street || !city || !state || !zip) {
+        showStep3Error('Please fill in all fields.');
+        return;
+    }
+    if (!/^\d{5}$/.test(zip)) {
+        showStep3Error('Please enter a valid 5-digit ZIP code.');
+        return;
+    }
+    hideStep3Error();
     goToStep(3);
 }
 
+function showStep3Error(msg) {
+    var box = document.getElementById('step3-error');
+    box.classList.remove('hidden');
+    box.querySelector('p').textContent = msg;
+}
+
+function hideStep3Error() {
+    document.getElementById('step3-error').classList.add('hidden');
+}
+
+// -- Generate letter --
+
+async function generateLetter() {
+    var collectorName = document.getElementById('collector_name').value.trim();
+    var collectorAddress = document.getElementById('collector_address').value.trim();
+    var accountNumber = document.getElementById('account_number').value.trim();
+    var amountVal = document.getElementById('amount').value.trim();
+
+    if (!collectorName || !collectorAddress || !accountNumber || !amountVal) {
+        showStep3Error('Please fill in all required fields.');
+        return;
+    }
+    hideStep3Error();
+
+    var btn = document.getElementById('generate-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    var userAddress = document.getElementById('user_street').value.trim() + ', '
+        + document.getElementById('user_city').value.trim() + ', '
+        + document.getElementById('user_state').value + ' '
+        + document.getElementById('user_zip').value.trim();
+
+    var body = {
+        letter_type: selectedLetterType,
+        user_name: document.getElementById('user_name').value.trim(),
+        user_address: userAddress,
+        collector_name: collectorName,
+        collector_address: collectorAddress,
+        account_number: accountNumber,
+        amount: amountVal.replace(/[,$]/g, '')
+    };
+
+    if (selectedLetterType === 'debt_validation') {
+        var noticeDate = document.getElementById('date_of_notice').value;
+        if (noticeDate) body.date_of_notice = noticeDate;
+    }
+
+    if (selectedLetterType === 'dispute_amount') {
+        var reason = document.getElementById('dispute_reason').value.trim();
+        if (reason) body.dispute_reason = reason;
+    }
+
+    try {
+        var res = await fetch('/api/collection-notice/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            var err = await res.json();
+            showStep3Error(err.detail || 'Something went wrong. Please try again.');
+            btn.disabled = false;
+            btn.textContent = 'Generate Letter';
+            return;
+        }
+
+        var json = await res.json();
+        var data = json.data;
+
+        letterText = data.letter_text;
+        document.getElementById('letter-preview').textContent = letterText;
+        document.getElementById('letter-type-confirm').textContent =
+            'Review your ' + data.letter_type_name + ' below, then print or download it.';
+
+        renderTimeline(data.timeline);
+        renderWhatHappens(data.what_happens_next);
+        renderCertifiedMailGuide();
+
+        goToStep(4);
+    } catch (e) {
+        showStep3Error('Network error. Please check your connection and try again.');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Generate Letter';
+}
+
+// -- Render post-generation sections --
+
+function renderTimeline(timeline) {
+    var container = document.getElementById('timeline-list');
+    var html = '';
+    timeline.forEach(function(item, i) {
+        var isLast = i === timeline.length - 1;
+        html += '<div class="flex items-start gap-3">'
+            + '<div class="flex flex-col items-center">'
+            + '<div class="w-3 h-3 rounded-full bg-blue-400 mt-1 flex-shrink-0"></div>'
+            + (isLast ? '' : '<div class="w-0.5 h-full bg-blue-200 mt-1"></div>')
+            + '</div>'
+            + '<div class="pb-1">'
+            + '<p class="text-xs font-bold text-blue-800">' + esc(item.day) + '</p>'
+            + '<p class="text-sm text-blue-700">' + esc(item.event) + '</p>'
+            + '</div>'
+            + '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function renderWhatHappens(items) {
+    var container = document.getElementById('what-happens-items');
+    var html = '';
+    items.forEach(function(item) {
+        html += '<li>' + esc(item) + '</li>';
+    });
+    container.innerHTML = html;
+}
+
+function renderCertifiedMailGuide() {
+    if (!certifiedMailGuide.why) return;
+
+    document.getElementById('mail-why').textContent = certifiedMailGuide.why;
+
+    var stepsHtml = '';
+    certifiedMailGuide.steps.forEach(function(step) {
+        stepsHtml += '<li>' + esc(step) + '</li>';
+    });
+    document.getElementById('mail-steps').innerHTML = stepsHtml;
+
+    var tipsHtml = '';
+    certifiedMailGuide.tips.forEach(function(tip) {
+        tipsHtml += '<li>' + esc(tip) + '</li>';
+    });
+    document.getElementById('mail-tips').innerHTML = tipsHtml;
+}
+
+// -- Download and print --
+
 function downloadLetter() {
-    const blob = new Blob([letterText], {type: 'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    var typeName = (letterTypes[selectedLetterType] || {}).name || 'FDCPA_Letter';
+    var filename = typeName.replace(/\s+/g, '_') + '.txt';
+
+    var blob = new Blob([letterText], {type: 'text/plain'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
-    a.download = 'FDCPA_Debt_Validation_Letter.txt';
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function printLetter() {
+    window.print();
 }
 </script>
 {% endblock %}
