@@ -48,6 +48,7 @@ router = APIRouter(prefix="/api")
 _rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 _tools_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 _debt_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+_email_report_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 
 
 def _check_rate_limit(ip: str) -> bool:
@@ -83,6 +84,42 @@ def _check_debt_rate_limit(ip: str) -> bool:
     if len(_debt_rate_buckets[ip]) >= config.DEBT_RATE_LIMIT_REQUESTS:
         return False
     _debt_rate_buckets[ip].append(now)
+    return True
+
+
+def _check_named_rate_limit(bucket_map: dict[str, list[float]], key: str, limit: int, window_seconds: int) -> bool:
+    now = time.monotonic()
+    bucket = bucket_map[key]
+    bucket_map[key] = [t for t in bucket if now - t < window_seconds]
+    if len(bucket_map[key]) >= limit:
+        return False
+    bucket_map[key].append(now)
+    return True
+
+
+def _check_email_report_limits(client_key: str, bill_id: int, recipient_email: str) -> bool:
+    if not _check_named_rate_limit(
+        _email_report_rate_buckets,
+        f"ip:{client_key}",
+        config.EMAIL_REPORT_RATE_LIMIT_REQUESTS,
+        config.EMAIL_REPORT_RATE_LIMIT_WINDOW_SECONDS,
+    ):
+        return False
+    # Per-bill daily cap to limit repeated spam from one compromised session.
+    if not _check_named_rate_limit(
+        _email_report_rate_buckets,
+        f"bill:{bill_id}",
+        config.EMAIL_REPORT_BILL_DAILY_LIMIT,
+        86400,
+    ):
+        return False
+    if not _check_named_rate_limit(
+        _email_report_rate_buckets,
+        f"recipient:{recipient_email.lower()}",
+        config.EMAIL_REPORT_RECIPIENT_DAILY_LIMIT,
+        86400,
+    ):
+        return False
     return True
 
 
@@ -705,8 +742,9 @@ async def email_report(request: Request):
     if not bill_id:
         raise HTTPException(400, "bill_id is required")
     require_bill_access(request, int(bill_id))
-
-    require_bill_access(request, int(bill_id))
+    client_key = _request_client_key(request)
+    if not _check_email_report_limits(client_key, int(bill_id), to_email):
+        raise HTTPException(429, "Too many email report requests. Please try again later.")
 
     results = analyzer.get_bill_results(int(bill_id))
     if not results:
@@ -1842,7 +1880,7 @@ async def send_fdcpa_letter(request: Request):
         raise HTTPException(402, "Payment required before sending")
 
     metadata = session.get("metadata") or {}
-    if str(metadata.get("debt_letter_id") or "") not in {"", str(debt_letter_id)}:
+    if str(metadata.get("debt_letter_id") or "") != str(debt_letter_id):
         raise HTTPException(403, "Payment does not match this letter")
 
     with get_db() as db:

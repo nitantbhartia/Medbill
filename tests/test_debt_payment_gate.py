@@ -92,6 +92,21 @@ def test_send_letter_rejects_mismatched_paid_session(monkeypatch):
     assert resp.status_code == 403
 
 
+def test_send_letter_rejects_paid_session_with_missing_metadata(monkeypatch):
+    letter_id = _insert_letter("cs_paid_missing_meta")
+    monkeypatch.setattr(
+        api_module.payment_module,
+        "get_session",
+        lambda _sid: {"payment_status": "paid", "metadata": {}},
+    )
+    resp = client.post(
+        "/api/collection-notice/send",
+        json={"debt_letter_id": letter_id, "letter_text": "Sample"},
+        headers={"cf-connecting-ip": "198.51.100.125"},
+    )
+    assert resp.status_code == 403
+
+
 def test_send_letter_allows_paid_matching_session(monkeypatch):
     monkeypatch.setattr(config, "LOB_API_KEY", "")
     monkeypatch.setattr(config, "DEBT_SEND_MAX_RETRIES", 3)
