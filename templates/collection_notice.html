@@ -123,11 +123,11 @@
         <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-1" for="user_name">Full Name</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user_name">Full Name<span class="bk-tip" data-tip="Your legal name. This appears as the sender name on the letter. Use the same name that appears on the collection notice or any correspondence you've received."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <input type="text" id="user_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="John Smith">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1" for="user_street">Street Address</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user_street">Street Address<span class="bk-tip" data-tip="Your current home street address. Used as the return address on the letter — legally required so the collector can respond in writing."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <input type="text" id="user_street" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="123 Main St">
                 </div>
                 <div class="grid grid-cols-6 gap-3">
@@ -145,7 +145,7 @@
                         </select>
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-sm font-semibold mb-1" for="user_zip">ZIP</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="user_zip">ZIP<span class="bk-tip" data-tip="Your 5-digit zip code. Collectors are required to verify that the address you provide is valid before taking legal action."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="user_zip" required autocomplete="postal-code" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" maxlength="5" pattern="[0-9]{5}" inputmode="numeric">
                     </div>
                 </div>
@@ -166,34 +166,34 @@
         <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-1" for="collector_name">Collection Agency Name</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="collector_name">Collection Agency Name<span class="bk-tip" data-tip="The full legal name of the collection agency, exactly as it appears on the notice you received. Don't use abbreviations — use the exact name printed on the letter."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <input type="text" id="collector_name" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="ABC Collections">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1" for="collector_address">Collection Agency Address</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="collector_address">Collection Agency Address<span class="bk-tip" data-tip="The mailing address from the collection notice. Use the address listed for correspondence or responses — sometimes different from the company's main office. Include suite number if shown."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <input type="text" id="collector_address" required autocomplete="street-address" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="456 Collection Ave, Suite 100, City, ST 12345">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="account_number">Account Number</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="account_number">Account Number<span class="bk-tip" data-tip="The account, reference, or file number from the collection notice. Often labeled 'Account #', 'Reference #', or 'File #'. This is how the collector identifies your specific debt."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="account_number" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" for="amount">Amount Claimed ($)</label>
+                        <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="amount">Amount Claimed ($)<span class="bk-tip" data-tip="The total dollar amount the collector says you owe, as shown on the collection notice. Don't add interest or fees — use the exact number printed on the notice."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input type="text" id="amount" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="5,000.00" inputmode="decimal">
                     </div>
                 </div>
 
                 <!-- Date of notice: shown for debt_validation -->
                 <div id="date-of-notice-field">
-                    <label class="block text-sm font-semibold mb-1" for="date_of_notice">Date on Collection Notice</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="date_of_notice">Date on Collection Notice<span class="bk-tip" data-tip="The date printed at the top of the collection letter you received (not the postmark). Under the FDCPA, you have 30 days from this date to dispute the debt in writing."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <input type="date" id="date_of_notice" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm">
                     <p class="text-xs text-gray-400 mt-1">Optional. Helps establish your 30-day dispute window.</p>
                 </div>
 
                 <!-- Dispute reason: shown for dispute_amount -->
                 <div id="dispute-reason-field" class="hidden">
-                    <label class="block text-sm font-semibold mb-1" for="dispute_reason">Why do you dispute this amount?</label>
+                    <label class="block text-sm font-semibold mb-1 flex items-center gap-1" for="dispute_reason">Why do you dispute this amount?<span class="bk-tip" data-tip="Be specific. Examples: 'I made two payments totaling $1,200 that are not reflected', 'This bill was already resolved by my insurance', 'I was never treated by this provider'. Specific claims are harder to dismiss."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                     <textarea id="dispute_reason" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm" placeholder="Example: I already made two payments totaling $1,200 that are not reflected in this amount."></textarea>
                     <p class="text-xs text-gray-400 mt-1">Be specific. Mention prior payments, billing errors, or incorrect fees.</p>
                 </div>
@@ -248,7 +248,8 @@
                     </div>
                     <p class="text-xs text-gray-600 mb-3 flex-1">We print and mail via USPS Certified Mail. You get a tracking number emailed to you. No post office trip required.</p>
                     <div id="send-error" class="hidden mb-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
-                    <input type="email" id="send-email" placeholder="Your email (for tracking)" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
+                    <div class="flex items-center gap-1 mb-1"><label class="text-xs font-medium text-gray-700">Your email</label><span class="bk-tip" data-tip="We'll email you a USPS tracking number once the letter is mailed, so you have proof of delivery. Keep the tracking number — it's your legal record that the letter was sent."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></div>
+                    <input type="email" id="send-email" placeholder="you@example.com" class="w-full border border-green-300 rounded-xl px-3 py-2.5 text-sm mb-3 focus:ring-2 focus:ring-green-600 bg-white">
                     <button id="send-btn" onclick="sendCertifiedMail()" class="w-full bg-green-600 text-white font-bold py-3 rounded-full text-sm hover:bg-green-700 transition">Pay $19 &amp; Send</button>
                 </div>
             </div>
