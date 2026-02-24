@@ -1114,10 +1114,33 @@ async def stripe_webhook(request: Request):
 
     if event_type == "checkout.session.completed":
         session_id = data.get("id")
-        bill_id = payment_module.record_payment_success(session_id)
-        if bill_id:
-            log_audit(action="payment_completed", resource_type="dispute_payment",
-                      resource_id=session_id, metadata={"bill_id": bill_id})
+        metadata = data.get("metadata", {})
+        payment_purpose = metadata.get("payment_purpose", "")
+
+        if payment_purpose == "debt_letter":
+            # Certified mail payment — trigger Lob send
+            debt_letter_id = metadata.get("debt_letter_id")
+            if debt_letter_id:
+                try:
+                    with get_db() as db:
+                        lob_result = debt_fighter.send_via_lob(db, int(debt_letter_id), config.LOB_API_KEY)
+                    log_audit(action="debt_letter_sent", resource_type="debt_letter",
+                              resource_id=debt_letter_id,
+                              metadata={"lob_id": lob_result.get("lob_id"), "tracking": lob_result.get("tracking_number")})
+                except Exception as exc:
+                    log.error("Lob send failed for debt_letter_id=%s: %s", debt_letter_id, exc)
+                    # Payment succeeded — mark as 'pending_send' so we can retry
+                    with get_db() as db:
+                        db.execute(
+                            "UPDATE debt_letters SET status = 'pending_send', stripe_payment_id = ? WHERE id = ?",
+                            (session_id, int(debt_letter_id)),
+                        )
+        else:
+            # Dispute service payment
+            bill_id = payment_module.record_payment_success(session_id)
+            if bill_id:
+                log_audit(action="payment_completed", resource_type="dispute_payment",
+                          resource_id=session_id, metadata={"bill_id": bill_id})
 
     return {"status": "ok"}
 
@@ -1369,13 +1392,20 @@ async def generate_fdcpa_letter(request: Request):
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 
+    user_email = (body.get("email") or "").strip()
     with get_db() as db:
-        db.execute(
-            "INSERT INTO debt_letters (letter_type, user_name, collector_name, account_number, amount, letter_text) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (letter_type, result["user_name"], result["collector_name"],
+        cursor = db.execute(
+            "INSERT INTO debt_letters "
+            "(letter_type, user_email, user_name, user_address, collector_name, collector_address, account_number, amount, letter_text) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (letter_type, user_email or None, result["user_name"], result["user_address"],
+             result["collector_name"], result["collector_address"],
              result["account_number"], result["amount"], result["letter_text"]),
         )
+        debt_letter_id = cursor.lastrowid
+
+    result["debt_letter_id"] = debt_letter_id
+    result["certified_mail_price_cents"] = config.FDCPA_LETTER_PRICE_CENTS
 
     log_audit(action="generate_fdcpa_letter", resource_type="debt_letter",
               resource_id=result["account_number"],
@@ -1489,18 +1519,200 @@ async def generate_charity_application(request: Request):
     except ValueError as exc:
         raise HTTPException(400, str(exc))
 
+    user_email = (body.get("email") or "").strip()
     with get_db() as db:
-        db.execute(
-            "INSERT INTO debt_letters (letter_type, user_name, account_number, amount, letter_text) "
-            "VALUES (?, ?, ?, ?, ?)",
-            ("charity_care_application", result["user_name"],
+        cursor = db.execute(
+            "INSERT INTO debt_letters "
+            "(letter_type, user_email, user_name, user_address, collector_name, collector_address, account_number, amount, letter_text) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            ("charity_care_application", user_email or None, result["user_name"],
+             str(body["user_address"]).strip(), result["hospital_name"],
+             str(body["hospital_address"]).strip(),
              result["account_number"], result["bill_amount"], result["letter_text"]),
         )
+        debt_letter_id = cursor.lastrowid
+
+    result["debt_letter_id"] = debt_letter_id
+    result["certified_mail_price_cents"] = config.CHARITY_CARE_APP_PRICE_CENTS
 
     log_audit(action="generate_charity_letter", resource_type="debt_letter",
               resource_id=result["account_number"],
               metadata={"letter_type": "charity_care", "hospital": result["hospital_name"]})
     return {"status": "ok", "data": result}
+
+
+@router.post("/collection-notice/checkout")
+async def collection_notice_checkout(request: Request):
+    """Create Stripe checkout session to send an FDCPA letter via certified mail ($19)."""
+    _debt_rate_check(request)
+    body = await request.json()
+    debt_letter_id = body.get("debt_letter_id")
+    email = (body.get("email") or "").strip()
+
+    if not debt_letter_id:
+        raise HTTPException(400, "debt_letter_id is required")
+    if not email or "@" not in email:
+        raise HTTPException(400, "A valid email is required for delivery confirmation")
+    if not config.STRIPE_SECRET_KEY:
+        raise HTTPException(503, "Payment processing is not configured")
+
+    with get_db() as db:
+        row = db.execute("SELECT id, status, letter_type FROM debt_letters WHERE id = ?", (debt_letter_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Letter not found")
+    if row["status"] in ("sent", "delivered"):
+        raise HTTPException(400, "This letter has already been sent")
+
+    app_url = config.APP_URL.rstrip("/")
+    success_url = f"{app_url}/collection-notice/send-success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{app_url}/collection-notice"
+
+    params = {
+        "mode": "payment",
+        "customer_email": email,
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][unit_amount]": str(config.FDCPA_LETTER_PRICE_CENTS),
+        "line_items[0][price_data][product_data][name]": "FDCPA Certified Mail — BillKarma",
+        "line_items[0][price_data][product_data][description]": (
+            "Your letter is printed and mailed via USPS Certified Mail with tracking."
+        ),
+        "line_items[0][quantity]": "1",
+        "metadata[debt_letter_id]": str(debt_letter_id),
+        "metadata[payment_purpose]": "debt_letter",
+        "success_url": success_url,
+        "cancel_url": cancel_url,
+    }
+
+    try:
+        session = payment_module._stripe_post("checkout/sessions", params)
+    except RuntimeError as exc:
+        log.error("Stripe checkout error: %s", exc)
+        raise HTTPException(500, "Payment session could not be created")
+
+    with get_db() as db:
+        db.execute(
+            "UPDATE debt_letters SET user_email = ?, stripe_payment_id = ? WHERE id = ?",
+            (email, session["id"], debt_letter_id),
+        )
+
+    log_audit(action="debt_letter_checkout", resource_type="debt_letter",
+              resource_id=str(debt_letter_id), metadata={"session": session["id"]})
+    return {"status": "ok", "data": {"checkout_url": session["url"], "session_id": session["id"]}}
+
+
+@router.get("/collection-notice/status-by-session")
+async def get_debt_letter_status_by_session(session_id: str):
+    """Look up delivery status for a debt letter by Stripe session ID."""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT id, status, lob_id, tracking_number, sent_at, letter_type FROM debt_letters WHERE stripe_payment_id = ?",
+            (session_id,),
+        ).fetchone()
+    if not row:
+        return {"status": "ok", "data": {"status": "pending"}}
+
+    tracking_url = ""
+    if row["tracking_number"]:
+        tracking_url = f"https://tools.usps.com/go/TrackConfirmAction?tLabels={row['tracking_number']}"
+
+    return {
+        "status": "ok",
+        "data": {
+            "debt_letter_id": row["id"],
+            "status": row["status"],
+            "tracking_number": row["tracking_number"],
+            "tracking_url": tracking_url,
+            "sent_at": row["sent_at"],
+        },
+    }
+
+
+@router.get("/collection-notice/status/{debt_letter_id}")
+async def get_debt_letter_status(debt_letter_id: int):
+    """Return delivery status for a sent debt letter."""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT id, status, lob_id, tracking_number, sent_at, letter_type FROM debt_letters WHERE id = ?",
+            (debt_letter_id,),
+        ).fetchone()
+    if not row:
+        raise HTTPException(404, "Letter not found")
+
+    tracking_url = ""
+    if row["tracking_number"]:
+        tracking_url = f"https://tools.usps.com/go/TrackConfirmAction?tLabels={row['tracking_number']}"
+
+    return {
+        "status": "ok",
+        "data": {
+            "debt_letter_id": row["id"],
+            "status": row["status"],
+            "lob_id": row["lob_id"],
+            "tracking_number": row["tracking_number"],
+            "tracking_url": tracking_url,
+            "sent_at": row["sent_at"],
+            "letter_type": row["letter_type"],
+        },
+    }
+
+
+@router.post("/charity-care/checkout")
+async def charity_care_checkout(request: Request):
+    """Create Stripe checkout session to send a charity care packet via certified mail ($9)."""
+    _debt_rate_check(request)
+    body = await request.json()
+    debt_letter_id = body.get("debt_letter_id")
+    email = (body.get("email") or "").strip()
+
+    if not debt_letter_id:
+        raise HTTPException(400, "debt_letter_id is required")
+    if not email or "@" not in email:
+        raise HTTPException(400, "A valid email is required for delivery confirmation")
+    if not config.STRIPE_SECRET_KEY:
+        raise HTTPException(503, "Payment processing is not configured")
+
+    with get_db() as db:
+        row = db.execute("SELECT id, status FROM debt_letters WHERE id = ?", (debt_letter_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Letter not found")
+    if row["status"] in ("sent", "delivered"):
+        raise HTTPException(400, "This letter has already been sent")
+
+    app_url = config.APP_URL.rstrip("/")
+    success_url = f"{app_url}/charity-care/send-success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{app_url}/charity-care/apply"
+
+    params = {
+        "mode": "payment",
+        "customer_email": email,
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][unit_amount]": str(config.CHARITY_CARE_APP_PRICE_CENTS),
+        "line_items[0][price_data][product_data][name]": "Charity Care Application — BillKarma",
+        "line_items[0][price_data][product_data][description]": (
+            "Your cover letter is printed and mailed via USPS Certified Mail with tracking."
+        ),
+        "line_items[0][quantity]": "1",
+        "metadata[debt_letter_id]": str(debt_letter_id),
+        "metadata[payment_purpose]": "debt_letter",
+        "success_url": success_url,
+        "cancel_url": cancel_url,
+    }
+
+    try:
+        session = payment_module._stripe_post("checkout/sessions", params)
+    except RuntimeError as exc:
+        log.error("Stripe checkout error: %s", exc)
+        raise HTTPException(500, "Payment session could not be created")
+
+    with get_db() as db:
+        db.execute(
+            "UPDATE debt_letters SET user_email = ?, stripe_payment_id = ? WHERE id = ?",
+            (email, session["id"], debt_letter_id),
+        )
+
+    log_audit(action="charity_care_checkout", resource_type="debt_letter",
+              resource_id=str(debt_letter_id), metadata={"session": session["id"]})
+    return {"status": "ok", "data": {"checkout_url": session["url"], "session_id": session["id"]}}
 
 
 @router.post("/settlement/generate")

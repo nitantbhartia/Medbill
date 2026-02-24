@@ -965,6 +965,13 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_debt_letters_email ON debt_letters(user_email)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_debt_letters_type ON debt_letters(letter_type)")
 
+    # Migrate: add address columns if missing (existing installs)
+    for col_def in ["user_address TEXT", "collector_address TEXT"]:
+        try:
+            db.execute(f"ALTER TABLE debt_letters ADD COLUMN {col_def}")
+        except Exception:
+            pass  # Column already exists
+
 
 SCHEMA = """
 -- Users

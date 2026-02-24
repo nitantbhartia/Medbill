@@ -1,6 +1,10 @@
 """Medical debt fighting tools: SOL calculator, FDCPA letters, charity care, settlement offers."""
+import json
 import logging
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import date
 
 log = logging.getLogger(__name__)
@@ -506,7 +510,9 @@ Sent via USPS Certified Mail"""
         "letter_type_name": LETTER_TYPES[letter_type]["name"],
         "letter_text": letter,
         "user_name": user_name,
+        "user_address": user_address,
         "collector_name": collector_name,
+        "collector_address": collector_address,
         "account_number": account_number,
         "amount": amount,
         "disclaimer": LEGAL_DISCLAIMER,
@@ -765,6 +771,119 @@ Sent via USPS Certified Mail"""
         "fpl_percentage": fpl_pct,
         "disclaimer": LEGAL_DISCLAIMER,
     }
+
+
+# ── Lob certified mail ───────────────────────────────────────────────────────
+
+LOB_API = "https://api.lob.com/v1"
+
+
+def _parse_address_for_lob(full_address: str) -> dict:
+    """Best-effort parse of 'Street, City, ST 12345' into Lob address fields."""
+    parts = [p.strip() for p in full_address.split(",")]
+    result = {"address_line1": full_address, "address_city": "", "address_state": "", "address_zip": "", "address_country": "US"}
+    if len(parts) >= 3:
+        result["address_line1"] = parts[0]
+        result["address_city"] = parts[-2].strip() if len(parts) >= 3 else ""
+        # Last part typically "ST 12345"
+        last = parts[-1].strip().split()
+        if len(last) == 2 and len(last[0]) == 2:
+            result["address_state"] = last[0]
+            result["address_zip"] = last[1]
+        elif len(last) >= 1:
+            result["address_state"] = last[0]
+    return result
+
+
+def send_via_lob(db, debt_letter_id: int, api_key: str) -> dict:
+    """Send a debt letter via Lob certified mail.
+
+    Returns dict with lob_id, tracking_number, expected_delivery_date.
+    Raises RuntimeError on failure.
+    """
+    row = db.execute("SELECT * FROM debt_letters WHERE id = ?", (debt_letter_id,)).fetchone()
+    if not row:
+        raise ValueError(f"Letter {debt_letter_id} not found")
+    if row["status"] == "sent":
+        return {"lob_id": row["lob_id"], "tracking_number": row["tracking_number"], "already_sent": True}
+
+    user_name = row["user_name"] or ""
+    user_address = row["user_address"] or ""
+    collector_name = row["collector_name"] or ""
+    collector_address = row["collector_address"] or ""
+
+    # Build simple HTML version of the letter for Lob
+    letter_html = _letter_text_to_lob_html(row["letter_text"] or "")
+
+    from_addr = _parse_address_for_lob(user_address)
+    to_addr = _parse_address_for_lob(collector_address)
+
+    # Build multipart form data for Lob /v1/letters
+    params = {
+        "description": f"FDCPA Letter - {row['letter_type']}",
+        "to[name]": collector_name,
+        "to[address_line1]": to_addr["address_line1"],
+        "to[address_city]": to_addr["address_city"],
+        "to[address_state]": to_addr["address_state"],
+        "to[address_zip]": to_addr["address_zip"],
+        "to[address_country]": "US",
+        "from[name]": user_name,
+        "from[address_line1]": from_addr["address_line1"],
+        "from[address_city]": from_addr["address_city"],
+        "from[address_state]": from_addr["address_state"],
+        "from[address_zip]": from_addr["address_zip"],
+        "from[address_country]": "US",
+        "file": letter_html,
+        "color": "false",
+        "double_sided": "false",
+        "extra_service": "certified",
+    }
+
+    body = urllib.parse.urlencode(params).encode()
+    credentials = urllib.parse.quote(api_key) + ":"
+    import base64
+    auth_header = "Basic " + base64.b64encode(credentials.encode()).decode()
+
+    req = urllib.request.Request(
+        f"{LOB_API}/letters",
+        data=body,
+        headers={
+            "Authorization": auth_header,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        body_text = e.read().decode(errors="replace")
+        log.error("Lob error %s: %s", e.code, body_text)
+        raise RuntimeError(f"Lob error {e.code}: {body_text}") from e
+
+    lob_id = result.get("id", "")
+    tracking_number = result.get("tracking_number", "")
+    expected_delivery = result.get("expected_delivery_date", "")
+
+    db.execute(
+        "UPDATE debt_letters SET lob_id = ?, tracking_number = ?, status = 'sent', sent_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (lob_id, tracking_number, debt_letter_id),
+    )
+
+    return {"lob_id": lob_id, "tracking_number": tracking_number, "expected_delivery_date": expected_delivery}
+
+
+def _letter_text_to_lob_html(text: str) -> str:
+    """Convert plain-text letter to minimal HTML for Lob submission."""
+    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    paragraphs = escaped.replace("\n\n", "</p><p>").replace("\n", "<br>")
+    return (
+        "<!DOCTYPE html><html><head><meta charset='utf-8'>"
+        "<style>body{font-family:Times New Roman,serif;font-size:12pt;line-height:1.6;margin:0;}"
+        "p{margin:0 0 12pt 0;}</style></head>"
+        f"<body><p>{paragraphs}</p></body></html>"
+    )
 
 
 # ── Settlement letter ────────────────────────────────────────────────────────

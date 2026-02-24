@@ -1455,15 +1455,55 @@ async def collection_notice_page(request: Request):
 async def charity_care_page(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/charity-care"
     return templates.TemplateResponse(
-        "charity_care.html",
+        "charity_care_eligibility.html",
         {
             "request": request,
             "canonical_url": canonical_url,
-            "og_title": "Do You Qualify for Hospital Financial Assistance? | BillKarma",
-            "og_description": "Check if you qualify for charity care. Most nonprofit hospitals must forgive bills for patients under 200-400% of the Federal Poverty Level.",
+            "og_title": "Do You Qualify for Hospital Charity Care? | BillKarma",
+            "og_description": "IRS law requires nonprofit hospitals to forgive or reduce bills for patients who can't afford them. Check if you qualify — free.",
             "meta_robots": "index, follow",
         },
     )
+
+
+@app.get("/charity-care/hospital", response_class=HTMLResponse)
+async def charity_care_hospital_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/charity-care/hospital"
+    return templates.TemplateResponse(
+        "charity_care_hospital.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Find Your Hospital's Financial Assistance Program | BillKarma",
+            "og_description": "Search our hospital database to see if your hospital is nonprofit and find their financial assistance application.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/charity-care/apply", response_class=HTMLResponse)
+async def charity_care_apply_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/charity-care/apply"
+    return templates.TemplateResponse(
+        "charity_care_apply.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Generate Your Charity Care Application Packet | BillKarma",
+            "og_description": "Generate a cover letter and document checklist for your hospital financial assistance application.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/charity-care/send-success", response_class=HTMLResponse)
+async def charity_care_send_success_page(request: Request):
+    return templates.TemplateResponse("charity_care_send_success.html", {"request": request})
+
+
+@app.get("/collection-notice/send-success", response_class=HTMLResponse)
+async def collection_notice_send_success_page(request: Request):
+    return templates.TemplateResponse("collection_notice_send_success.html", {"request": request})
 
 
 @app.get("/settle-debt", response_class=HTMLResponse)

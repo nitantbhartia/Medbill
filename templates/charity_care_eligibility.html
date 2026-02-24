@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Do You Qualify for Hospital Charity Care? | BillKarma{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-6 py-16">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-xs text-gray-400 mb-8 no-print">
+        <span class="w-6 h-6 rounded-full bg-gray-900 text-white font-bold flex items-center justify-center text-xs">1</span>
+        <span class="text-gray-900 font-semibold">Eligibility Check</span>
+        <span class="text-gray-300">›</span>
+        <span>Find Your Hospital</span>
+        <span class="text-gray-300">›</span>
+        <span>Get Your Application Packet</span>
+    </div>
+
+    <h1 class="text-3xl font-extrabold tracking-tight mb-3">Do you qualify for hospital charity care?</h1>
+    <p class="text-gray-500 mb-8">IRS law requires nonprofit hospitals to forgive or reduce bills for patients who can't afford them. Millions qualify every year and never apply. This takes 60 seconds.</p>
+
+    <form id="eligibility-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+        <div>
+            <label class="block text-sm font-semibold mb-2" for="household_size">Household Size</label>
+            <select id="household_size" required class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600">
+                <option value="1">1 person</option>
+                <option value="2">2 people</option>
+                <option value="3">3 people</option>
+                <option value="4" selected>4 people</option>
+                <option value="5">5 people</option>
+                <option value="6">6 people</option>
+                <option value="7">7 people</option>
+                <option value="8">8+ people</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-2" for="income">Annual Household Income ($)</label>
+            <input type="number" id="income" required min="0" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600" placeholder="45000">
+            <p class="text-xs text-gray-400 mt-1">Your total household income before taxes. Use your most recent tax return as a guide.</p>
+        </div>
+        <button type="submit" id="check-btn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Check My Eligibility — Free</button>
+    </form>
+
+    <!-- Result -->
+    <div id="result-box" class="hidden mt-8 rounded-2xl p-8 border">
+        <h2 id="result-title" class="text-xl font-bold mb-2"></h2>
+        <p id="result-message" class="mb-5"></p>
+
+        <div class="space-y-1 mb-5 text-sm text-gray-600">
+            <p><strong>Your income:</strong> <span id="result-income"></span></p>
+            <p><strong>2025 Federal Poverty Level for your household:</strong> <span id="result-fpl"></span></p>
+            <p><strong>Your income as % of FPL:</strong> <span id="result-pct"></span></p>
+        </div>
+
+        <!-- FPL visual bar -->
+        <div class="mb-6">
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span>0% FPL</span><span>200%</span><span>400%+</span>
+            </div>
+            <div class="relative h-4 rounded-full overflow-hidden" style="background: linear-gradient(to right, #22c55e 0%, #22c55e 50%, #f59e0b 50%, #f59e0b 75%, #9ca3af 75%, #9ca3af 100%);">
+                <div id="fpl-marker" class="absolute top-0 w-1 h-full bg-gray-900 rounded-full transition-all duration-500" style="left:0%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span class="text-green-700 font-semibold">Full forgiveness</span>
+                <span class="text-amber-600 font-semibold">Partial discount</span>
+                <span class="text-gray-400">Above threshold</span>
+            </div>
+            <p id="fpl-label" class="text-xs font-semibold text-gray-700 mt-2"></p>
+        </div>
+
+        <a id="next-btn" href="/charity-care/hospital" class="block w-full text-center bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">Find Your Hospital →</a>
+        <p class="text-xs text-gray-400 mt-3 text-center">Even if you're above the typical threshold, applying is free and worth it.</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-box" class="hidden mt-8 bg-red-50 border border-red-200 rounded-2xl p-6">
+        <p id="error-msg" class="text-red-800 font-semibold text-sm"></p>
+    </div>
+
+    <!-- How it works -->
+    <div class="mt-10 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+        <h3 class="font-bold text-sm mb-3">How does hospital charity care work?</h3>
+        <ul class="text-sm text-gray-600 space-y-2">
+            <li><strong>IRS Section 501(r)</strong> requires nonprofit hospitals to offer Financial Assistance Programs (FAPs) to keep their tax-exempt status. It's federal law, not optional charity.</li>
+            <li>Eligibility is based on household income relative to the <strong>Federal Poverty Level (FPL)</strong>. Most programs cover patients up to 200–400% of FPL.</li>
+            <li>You can apply <strong>retroactively</strong> — even after a bill has gone to collections.</li>
+            <li>The hospital must suspend collection activity while your application is under review.</li>
+        </ul>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-8 text-center">BillKarma is not a law firm. Eligibility estimates are based on published 2025 federal poverty guidelines. Hospital thresholds vary.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    function esc(s) { var el = document.createElement('span'); el.textContent = String(s); return el.innerHTML; }
+
+    document.getElementById('eligibility-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var income = parseFloat(document.getElementById('income').value);
+        var size = parseInt(document.getElementById('household_size').value);
+        var btn = document.getElementById('check-btn');
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+
+        try {
+            var res = await fetch('/api/charity-care/check', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({income: income, household_size: size})
+            });
+            var json = await res.json();
+
+            if (!res.ok) {
+                document.getElementById('error-msg').textContent = json.detail || 'Error checking eligibility.';
+                document.getElementById('error-box').classList.remove('hidden');
+                document.getElementById('result-box').classList.add('hidden');
+                return;
+            }
+
+            var d = json.data;
+            document.getElementById('error-box').classList.add('hidden');
+
+            var color = d.eligibility === 'likely_full' ? 'green' : d.eligibility.includes('partial') ? 'amber' : 'gray';
+            var title = d.eligibility === 'likely_full'
+                ? 'You likely qualify for full bill forgiveness'
+                : d.eligibility.includes('partial')
+                ? 'You may qualify for a significant discount'
+                : "You're above typical thresholds, but applying is still worth it.";
+
+            var box = document.getElementById('result-box');
+            box.className = 'mt-8 rounded-2xl p-8 border border-' + color + '-200 bg-' + color + '-50';
+            document.getElementById('result-title').className = 'text-xl font-bold mb-2 text-' + color + '-800';
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-message').className = 'mb-5 text-' + color + '-700';
+            document.getElementById('result-message').textContent = d.message;
+            document.getElementById('result-income').textContent = '$' + Number(d.income).toLocaleString();
+            document.getElementById('result-fpl').textContent = '$' + Number(d.fpl).toLocaleString();
+            document.getElementById('result-pct').textContent = d.fpl_percentage + '%';
+
+            var markerPct = Math.min(d.fpl_percentage / 400 * 100, 100);
+            document.getElementById('fpl-marker').style.left = markerPct + '%';
+            document.getElementById('fpl-label').textContent = 'You are at ' + d.fpl_percentage + '% of the Federal Poverty Level';
+
+            box.classList.remove('hidden');
+            box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+
+            // Save to sessionStorage for next page
+            sessionStorage.setItem('ck_eligibility', JSON.stringify({
+                income: d.income,
+                household_size: d.household_size,
+                fpl: d.fpl,
+                fpl_percentage: d.fpl_percentage,
+                eligibility: d.eligibility,
+                message: d.message
+            }));
+        } catch (err) {
+            document.getElementById('error-msg').textContent = 'Something went wrong. Please try again.';
+            document.getElementById('error-box').classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Check My Eligibility — Free';
+        }
+    });
+})();
+</script>
+{% endblock %}
