@@ -1003,6 +1003,24 @@ def _run_migrations(db):
         },
     )
 
+    # Bill Watch — price alert subscriptions
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS bill_watches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            watch_type TEXT NOT NULL,
+            watch_value TEXT NOT NULL,
+            zip_code TEXT,
+            active INTEGER DEFAULT 1,
+            last_notified_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_bill_watches_email ON bill_watches(email)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_bill_watches_active ON bill_watches(active, watch_type)")
+
 
 SCHEMA = """
 -- Users

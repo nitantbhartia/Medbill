@@ -2268,3 +2268,94 @@ async def generate_settlement(request: Request):
               resource_id=result["account_number"],
               metadata={"letter_type": "settlement", "collector": result["collector_name"]})
     return {"status": "ok", "data": result}
+
+
+# --- Bill Health Score API ---
+
+
+@router.get("/score/{bill_id}")
+async def api_bill_score(request: Request, bill_id: int):
+    """Return the Bill Health Score for a bill."""
+    require_bill_access(request, bill_id)
+    from bill_score import compute_bill_score
+    score = compute_bill_score(bill_id)
+    if not score:
+        raise HTTPException(404, "Bill not found")
+    return {"status": "ok", "data": score}
+
+
+# --- Community Savings API ---
+
+
+@router.get("/savings/stats")
+async def api_savings_stats():
+    """Return aggregate community savings stats."""
+    from savings_feed import get_aggregate_stats
+    return {"status": "ok", "data": get_aggregate_stats()}
+
+
+@router.get("/savings/feed")
+async def api_savings_feed(limit: int = 20):
+    """Return recent anonymized savings events."""
+    from savings_feed import get_recent_savings
+    feed = get_recent_savings(min(max(1, limit), 50))
+    return {"status": "ok", "data": feed}
+
+
+# --- Price Shopper API ---
+
+
+@router.get("/shop/{cpt_code}")
+async def api_price_shop(cpt_code: str, zip: str = "", radius: int = 50, sort: str = "price", type: str = "all"):
+    """Find providers near a zip for a procedure, ranked by price."""
+    if not zip or len(zip) < 5:
+        raise HTTPException(400, "zip is required (5 digits)")
+    from price_shopper import shop_for_procedure
+    data = shop_for_procedure(
+        cpt_code=cpt_code.strip(),
+        zip_code=zip.strip(),
+        radius_miles=max(10, min(radius, 200)),
+        facility_type=type,
+        sort_by=sort,
+    )
+    return {"status": "ok", "data": data}
+
+
+# --- Bill Watch API ---
+
+
+@router.post("/watch")
+async def api_create_watch(request: Request):
+    """Create a price watch subscription."""
+    body = await request.json()
+    from bill_watch import add_watch
+    result = add_watch(
+        email=body.get("email", ""),
+        watch_type=body.get("watch_type", ""),
+        watch_value=body.get("watch_value", ""),
+        zip_code=body.get("zip_code", ""),
+    )
+    if not result.get("ok"):
+        raise HTTPException(400, result.get("error", "Failed to create watch"))
+    return {"status": "ok", "message": result["message"]}
+
+
+@router.get("/watches")
+async def api_list_watches(email: str = ""):
+    """List active watches for an email."""
+    if not email:
+        raise HTTPException(400, "email is required")
+    from bill_watch import get_watches_for_email
+    watches = get_watches_for_email(email)
+    return {"status": "ok", "watches": watches}
+
+
+@router.delete("/watch/{watch_id}")
+async def api_remove_watch(watch_id: int, request: Request):
+    """Remove a price watch."""
+    body = await request.json()
+    from bill_watch import remove_watch
+    result = remove_watch(watch_id, body.get("email", ""))
+    if not result.get("ok"):
+        raise HTTPException(404, result.get("error", "Watch not found"))
+    return {"status": "ok", "message": result["message"]}
