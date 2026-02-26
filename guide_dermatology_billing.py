@@ -137,7 +137,7 @@ register("dermatology-billing", {
     </div>
 </div>
 
-<p>The Medicare-equivalent cost for 2-stage Mohs with flap repair: approximately <strong>$2,300</strong>. This bill is <strong>4x the Medicare rate</strong>. The flagged items (duplicate pathology, separately billed office visit, and facility fee) total $2,600 in potentially disputable charges.</p>
+<p>The Medicare-equivalent cost for 2-stage Mohs with flap repair: approximately <strong>$2,300</strong>. This bill is <strong>4x the Medicare rate</strong>. The flagged items (duplicate pathology, separately billed office visit, and facility fee) total $2,600 in potentially disputable charges. Check your dermatologist's facility billing grade in our <a href="/hospitals/">hospital directory</a> before scheduling.</p>
 
 <div class="key-takeaway">
     <strong>Have a Mohs surgery bill?</strong> <a href="/scan">Upload it to BillKarma</a>&mdash;we check for duplicate pathology charges, improperly unbundled office visits, and facility fee overcharges. Mohs bills are among the most error-prone in dermatology.

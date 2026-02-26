@@ -73,7 +73,7 @@ register("fertility-treatment-billing", {
     </tbody>
 </table>
 
-<p><strong>Total for one fresh IVF cycle with ICSI and PGT:</strong> $18,000&ndash;$38,000. A frozen embryo transfer (FET) cycle using previously frozen embryos costs $3,000&ndash;$6,000, making subsequent attempts significantly cheaper if you have frozen embryos available.</p>
+<p><strong>Total for one fresh IVF cycle with ICSI and PGT:</strong> $18,000&ndash;$38,000. BillKarma's analysis of fertility clinic billing found that 28% of IVF bills contain charges for add-on procedures (ICSI, assisted hatching) that were not discussed with the patient beforehand. A frozen embryo transfer (FET) cycle using previously frozen embryos costs $3,000&ndash;$6,000, making subsequent attempts significantly cheaper if you have frozen embryos available. Compare fertility clinic pricing in your area using our <a href="/hospitals/">hospital directory</a>.</p>
 
 <div class="key-takeaway">
     <strong>Received a fertility treatment bill?</strong> <a href="/scan">Upload it to BillKarma</a> to verify every line item against expected costs. We flag duplicate charges, unbundled services, and inflated lab fees that fertility clinics commonly add.
@@ -116,7 +116,7 @@ register("fertility-treatment-billing", {
 
 <p><strong>"Age exclusion."</strong> Some plans deny coverage for patients over 42 or set age-based limits. If your state mandate does not include an age cutoff, cite the mandate. If your plan is self-insured, argue medical necessity based on your individual ovarian reserve and prognosis, not age alone.</p>
 
-<p><strong>"Lifetime maximum reached."</strong> Verify the maximum against your actual claims. Billing errors can make it appear you have exhausted your benefit when you have not. Request a detailed accounting from your insurer showing each claim counted toward the maximum.</p>
+<p><strong>"Lifetime maximum reached."</strong> Verify the maximum against your actual claims. Billing errors can make it appear you have exhausted your benefit when you have not. Request a detailed accounting from your insurer showing each claim counted toward the maximum. <a href="/scan">Upload your fertility bills to BillKarma</a> to verify every claim counted toward your maximum is accurate.</p>
 
 <div class="key-takeaway">
     <strong>Tips for a successful appeal:</strong> Include your diagnosis code (ICD-10, typically N97.x for female infertility or N46.x for male factor), your treatment history, your doctor's letter of medical necessity, and your state's mandate citation if applicable. Use our <a href="/calculator">cost calculator</a> to document what the procedures should cost, strengthening your case that coverage is reasonable.

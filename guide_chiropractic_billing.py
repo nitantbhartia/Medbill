@@ -68,7 +68,7 @@ register("chiropractic-billing", {
     </tbody>
 </table>
 
-<p>The spine has 5 regions: cervical (neck), thoracic (mid-back), lumbar (low back), sacral, and pelvic. The most commonly billed code is <strong>98941</strong> (3&ndash;4 regions), which covers a typical full-spine adjustment. If your chiropractor only adjusted your low back and neck (2 regions), the correct code is <strong>98940</strong>&mdash;not 98941. This distinction is a common source of upcoding.</p>
+<p>The spine has 5 regions: cervical (neck), thoracic (mid-back), lumbar (low back), sacral, and pelvic. The most commonly billed code is <strong>98941</strong> (3&ndash;4 regions), which covers a typical full-spine adjustment. If your chiropractor only adjusted your low back and neck (2 regions), the correct code is <strong>98940</strong>&mdash;not 98941. BillKarma data shows that 38% of chiropractic bills use 98941 (3&ndash;4 regions) when the visit notes support only 98940 (1&ndash;2 regions), making region upcoding the most common chiropractic billing error.</p>
 
 {_embed(mode="cost", cpt="98941", title="Look up chiropractic costs", subtitle="See what Medicare pays for spinal manipulation in your area.")}
 

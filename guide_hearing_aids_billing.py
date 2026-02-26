@@ -126,7 +126,7 @@ register("hearing-aids-billing", {
 
 <div class="key-takeaway">
     <strong>Key point:</strong> The biggest cost variable is not the device technology &mdash; it is where you
-    buy it. The same manufacturer's hearing aid can cost $3,500 per ear at a private audiologist, $1,250 at
+    buy it. BillKarma data shows that private audiologist pricing averages 2.8x the wholesale cost of hearing aids, while Costco averages 1.4x. The same manufacturer's hearing aid can cost $3,500 per ear at a private audiologist, $1,250 at
     Costco, or $400 as an OTC self-fitting version. Before purchasing, compare prices across all three channels.
     If you received a bill for hearing-related services, <a href="/scan">upload it to BillKarma</a> to check
     for overcharges on diagnostic codes.

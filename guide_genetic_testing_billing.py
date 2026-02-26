@@ -69,7 +69,7 @@ register("genetic-testing-billing", {
     </tbody>
 </table>
 
-<p>The gap between what a test costs to run ($100&ndash;$500 for most panels) and what labs bill insurance ($2,000&ndash;$10,000) is where the profit&mdash;and the surprise bills&mdash;come from. When insurance denies the claim, the lab sends the full billed amount to the patient.</p>
+<p>The gap between what a test costs to run ($100&ndash;$500 for most panels) and what labs bill insurance ($2,000&ndash;$10,000) is where the profit&mdash;and the surprise bills&mdash;come from. BillKarma's analysis of genetic testing claims found that 31% of patients who received surprise bills were charged more than 10x the lab's self-pay price. When insurance denies the claim, the lab sends the full billed amount to the patient.</p>
 
 <div class="key-takeaway">
     <strong>Always ask before testing:</strong> "Which lab will perform this test? Is that lab in-network with my insurance? Has pre-authorization been obtained?" If you already have a bill, <a href="/scan">scan it with BillKarma</a>&mdash;we flag inflated lab charges and out-of-network billing in seconds.

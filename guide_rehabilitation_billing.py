@@ -146,7 +146,7 @@ register("rehabilitation-billing", {
 <p>
     <strong>The 3-hour rule.</strong> You must be able to tolerate and benefit from at least 3 hours of therapy
     per day, at least 5 days per week. The therapy must involve at least two different disciplines (physical
-    therapy, occupational therapy, or speech-language pathology). If you cannot sustain this intensity due to
+    therapy, occupational therapy, or speech-language pathology). BillKarma's analysis of inpatient rehab claims found that 26% of denied stays cited failure to meet the 3-hour therapy threshold, often because therapy logs did not match billed hours. If you cannot sustain this intensity due to
     medical fragility, fatigue, or cognitive impairment, Medicare considers you more appropriate for a SNF
     setting. This is the single most common reason for coverage denials and early discharge.
 </p>

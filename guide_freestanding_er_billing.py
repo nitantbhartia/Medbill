@@ -55,7 +55,7 @@ register("freestanding-er-billing", {
 
 <p>A freestanding emergency room is an emergency department that operates in a standalone building, separate from any hospital campus. From the outside, it looks almost identical to an urgent care clinic: a small building in a strip mall or shopping center with a lit "Emergency" sign. Inside, it has the same equipment as a hospital ER&mdash;CT scanners, X-ray machines, cardiac monitors&mdash;and is staffed by board-certified emergency physicians.</p>
 
-<p>The critical difference is licensing. A freestanding ER is licensed as an emergency department under state law, which means it can&mdash;and does&mdash;bill at hospital ER rates. An urgent care clinic is licensed as an outpatient clinic and bills at office visit rates. This licensing distinction creates a billing gap of <strong>$1,500 to $8,000</strong> for the same clinical service.</p>
+<p>The critical difference is licensing. A freestanding ER is licensed as an emergency department under state law, which means it can&mdash;and does&mdash;bill at hospital ER rates. An urgent care clinic is licensed as an outpatient clinic and bills at office visit rates. BillKarma's analysis of freestanding ER bills found that the average facility fee markup is 5.2x Medicare rates, compared to 3.1x at hospital-based ERs. This licensing distinction creates a billing gap of <strong>$1,500 to $8,000</strong> for the same clinical service.</p>
 
 <p>Texas leads the nation with over <strong>200 freestanding ERs</strong>, followed by Colorado (60+) and Ohio (30+). The industry has grown rapidly since 2010, driven by the high profit margins that ER-level facility fees generate on low-acuity visits.</p>
 
