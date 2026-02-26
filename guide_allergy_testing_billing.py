@@ -152,7 +152,7 @@ register("allergy-testing-billing", {
     The cost difference is stark: a 60-allergen skin prick panel at Medicare rates costs approximately
     $240 ($4 per allergen). The same 60 allergens tested via blood IgE at a hospital lab's chargemaster
     rate can cost $3,600 ($60 per allergen) &mdash; <strong>15 times more expensive</strong> for a test
-    that is generally less sensitive than skin testing.
+    that is generally less sensitive than skin testing. BillKarma data shows that allergy testing bills are among the most frequently disputed lab charges, with 34% of comprehensive panels exceeding 5x Medicare rates.
 </p>
 
 <div class="key-takeaway">
@@ -362,6 +362,24 @@ register("allergy-testing-billing", {
         $2,240.</strong> The patient subsequently saw a gastroenterologist who identified lactose intolerance
         as the cause of his symptoms &mdash; a diagnosis that required a $25 hydrogen breath test rather than
         a $2,800 blood panel.
+    </p>
+</div>
+
+<div class="case-study">
+    <h3>96-allergen IgE panel ($3,800) denied&mdash;patient got targeted skin prick test for $380</h3>
+    <p>
+        A 41-year-old man in Texas visited an allergist for chronic nasal congestion and itchy eyes
+        during spring. The allergist ordered a 96-allergen IgE blood panel at <strong>$3,800</strong>
+        ($39.58 per allergen) through a reference lab. His insurance denied the claim as medically
+        unnecessary, citing clinical guidelines that recommend targeted testing based on the patient&rsquo;s
+        exposure history and symptom pattern rather than broad screening panels.
+    </p>
+    <p>
+        Facing the $3,800 bill, the patient sought a second opinion from a board-certified allergist who
+        performed a targeted 20-allergen skin prick test focused on regional tree pollens, grasses, dust
+        mites, and mold&mdash;the most likely culprits for his symptoms. The skin prick test cost
+        <strong>$380</strong>, identified 5 actionable allergens, and provided the same clinical
+        information needed to start immunotherapy. <strong>Total savings: $3,420.</strong>
     </p>
 </div>
 

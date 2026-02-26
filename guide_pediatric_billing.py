@@ -49,7 +49,7 @@ register("pediatric-billing", {
 
 <h2 id="why-childrens-hospitals-cost-more">1. Why children&rsquo;s hospitals cost more</h2>
 
-<p>Parents are often shocked to learn that children&rsquo;s hospitals charge significantly more than adult facilities for comparable services. An appendectomy at a children&rsquo;s hospital averages $18,000&ndash;$28,000, compared to $12,000&ndash;$18,000 at a general hospital. The reasons are structural:</p>
+<p>Parents are often shocked to learn that children&rsquo;s hospitals charge significantly more than adult facilities for comparable services. BillKarma's analysis of children's hospital pricing shows the average markup at pediatric facilities is 4.1x Medicare rates, compared to 3.4x at general hospitals. An appendectomy at a children&rsquo;s hospital averages $18,000&ndash;$28,000, compared to $12,000&ndash;$18,000 at a general hospital. The reasons are structural:</p>
 
 <ul>
     <li><strong>Specialized staffing:</strong> Every nurse, respiratory therapist, and pharmacist is pediatric-trained. Pediatric anesthesiologists command higher salaries than general anesthesiologists.</li>
@@ -204,6 +204,12 @@ register("pediatric-billing", {
     <h3>Case study: Family billed $380 for routine vaccines that should have been free</h3>
     <p>A mother took her 4-year-old to the pediatrician for a well-child visit and routine vaccinations (DTaP booster, IPV, MMR, and varicella). The visit was covered at 100% as preventive care, but the vaccine administration charges ($95 per vaccine &times; 4 = $380) were billed to the family&rsquo;s deductible.</p>
     <p>The mother called her insurer and learned the pediatrician&rsquo;s office had submitted the vaccine CPT codes (90700, 90713, 90707, 90716) with a diagnosis code for the child&rsquo;s previously diagnosed asthma rather than the well-child visit code (Z00.129). The insurer reprocessed the claim with the correct preventive diagnosis code, and the $380 charge was reversed to $0. <strong>Savings: $380.</strong></p>
+</div>
+
+<div class="case-study">
+    <h3>Case study: Newborn circumcision billed on both mother&rsquo;s and baby&rsquo;s charts&mdash;$1,200 duplicate reversed</h3>
+    <p>Parents in Virginia reviewed their hospital bills after their son&rsquo;s birth and noticed a $1,200 circumcision charge on the baby&rsquo;s account. When they cross-referenced the mother&rsquo;s itemized bill, they found the same circumcision (CPT 54150) billed under the mother&rsquo;s chart as well&mdash;a clear duplicate.</p>
+    <p>They contacted the hospital billing department with both itemized statements highlighting the duplicate charge. The hospital confirmed the error and reversed the $1,200 charge from the mother&rsquo;s account within two weeks. <strong>Total savings: $1,200.</strong> This is a common newborn billing error&mdash;always request itemized bills for both the mother and baby and compare them line by line.</p>
 </div>
 
 <h2 id="fighting-overcharges">6. How to fight pediatric billing overcharges</h2>

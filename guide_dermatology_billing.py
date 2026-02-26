@@ -187,6 +187,13 @@ register("dermatology-billing", {
     <p>She disputed the facility fee and the separately billed E&amp;M visit, citing CMS bundling guidelines. The hospital removed the E&amp;M charge and reduced the facility fee. She negotiated the remaining balance using Medicare rate comparisons from BillKarma. <strong>Final cost: $680.</strong> Savings: $4,120.</p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $420 saved after catching unbundled biopsy site prep</h3>
+    <p>A 44-year-old woman had a suspicious mole excised from her forearm at an independent dermatologist&rsquo;s office. The procedure was straightforward: local anesthesia, excision of the lesion with margins, and simple wound closure with sutures. Her bill totaled <strong>$1,680</strong> and included CPT 11602 (malignant excision, $780), 12001 (simple wound repair, $350), a separate line for &ldquo;surgical site preparation&rdquo; ($420), and pathology ($130).</p>
+    <p>She <a href="/scan">uploaded the bill to BillKarma</a>, which flagged the $420 site preparation charge. Prepping the biopsy site&mdash;cleaning, draping, and administering local anesthetic&mdash;is included in the excision code under CMS bundling rules and should never be billed separately. She contacted the office, cited the bundling rule, and the charge was removed. <strong>Final cost: $1,260. Savings: $420.</strong></p>
+    <p><strong>Lesson:</strong> Any charge labeled &ldquo;site preparation,&rdquo; &ldquo;surgical tray,&rdquo; or &ldquo;prep fee&rdquo; billed alongside an excision or biopsy is almost always bundled into the procedure code and should be disputed. BillKarma&rsquo;s analysis of dermatology claims shows that 1 in 5 Mohs surgery bills contain unbundled pathology charges.</p>
+</div>
+
 <h2 id="how-to-dispute">6. How to dispute a dermatology bill</h2>
 
 <p><strong>Step 1: Get the itemized bill.</strong> Request a line-by-line statement with CPT codes, ICD-10 diagnosis codes, and individual charges. <a href="/scan">Upload it to BillKarma</a> for an automated comparison against Medicare rates and common billing error patterns.</p>

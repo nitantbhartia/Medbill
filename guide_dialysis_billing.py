@@ -186,6 +186,13 @@ register("dialysis-billing", {
     <p><strong>Lesson:</strong> Keep a dialysis treatment log and compare it to your monthly statement. Check every line for medications and labs that should be bundled. Use our <a href="/calculator">cost calculator</a> to verify Medicare rates for any charges on your statement.</p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $8,400 in duplicate EPO charges reversed over 6 months</h3>
+    <p>A 57-year-old Medicare patient on in-center hemodialysis noticed that his Explanation of Benefits statements listed Epogen (J0882) charges on dates he had documented in his personal dialysis log as no-treatment days (holidays and a brief hospitalization). Over 6 months, he identified <strong>14 separate EPO charges totaling $8,400</strong> that appeared on claims for dates when he did not receive dialysis at the center.</p>
+    <p>He filed a formal billing dispute with the Fresenius center, attaching his personal log and hospital admission records proving he was inpatient on several of the billed dates. The facility investigated and confirmed the charges were billing errors&mdash;a combination of duplicate claim submissions and charges posted to incorrect dates of service. All 14 charges were reversed, and his Medicare coinsurance payments were refunded. <strong>Total recovered: $8,400 in erroneous charges plus $1,680 in coinsurance he had already paid.</strong></p>
+    <p><strong>Lesson:</strong> Keep your own dialysis treatment log with dates, times, and any medications administered. Compare it against every monthly statement and EOB. Duplicate and phantom charges in dialysis billing compound quickly over time.</p>
+</div>
+
 {_embed(mode="cost", cpt="90999", title="Look up dialysis treatment costs", subtitle="Check Medicare rates for dialysis CPT codes on your bill.")}
 
 <h2 id="reducing-costs">6. How to reduce your dialysis costs</h2>

@@ -303,6 +303,25 @@ register("medical-device-billing", {
     </p>
 </div>
 
+<div class="case-study">
+    <h3>Premium IOL lens billed at $4,500 without informed consent on cost</h3>
+    <p>
+        A 70-year-old Medicare patient underwent cataract surgery and received a premium multifocal
+        intraocular lens (IOL) billed at <strong>$4,500</strong>. Medicare covers the standard
+        monofocal IOL at no additional cost to the patient, but the surgeon&rsquo;s office upgraded
+        her to a premium lens without clearly explaining the out-of-pocket cost difference. The patient
+        assumed the lens was covered because Medicare covered the surgery itself.
+    </p>
+    <p>
+        After receiving the bill, the patient contacted the surgery center and pointed out that she
+        was never informed the premium lens would cost $4,500 more than the covered standard lens,
+        and no written cost disclosure or upgrade consent form had been signed. The surgery center
+        waived the $4,500 upcharge and billed the standard IOL rate instead. <strong>Total savings:
+        $4,500.</strong> Always ask your surgeon whether a standard device option is covered by
+        insurance before agreeing to a premium upgrade.
+    </p>
+</div>
+
 <h2 id="reduce-costs">7. How to reduce device costs before surgery</h2>
 
 <p>

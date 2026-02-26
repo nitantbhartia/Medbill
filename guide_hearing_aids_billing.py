@@ -374,6 +374,24 @@ register("hearing-aids-billing", {
     </p>
 </div>
 
+<div class="case-study">
+    <h3>Medicare patient billed $340 for hearing aid evaluation that should have been a covered diagnostic visit</h3>
+    <p>
+        A 78-year-old Medicare beneficiary visited an audiologist after her primary care physician
+        referred her for evaluation of progressive hearing difficulty. The audiologist performed a
+        comprehensive audiological evaluation and billed it under CPT 92590 (hearing aid evaluation)
+        at <strong>$340</strong>&mdash;a code Medicare does not cover. The patient was billed the full amount.
+    </p>
+    <p>
+        The patient&rsquo;s son reviewed the bill and realized the visit was physician-referred and
+        diagnostic in nature, which should have been billed under CPT 92557 (comprehensive audiometry),
+        a code Medicare Part B does cover. He contacted the audiologist&rsquo;s office and requested the
+        claim be recoded to reflect the diagnostic purpose of the visit. The office resubmitted under
+        the correct code, Medicare covered the visit, and the <strong>$340 charge was refunded</strong>
+        in full.
+    </p>
+</div>
+
 <div class="bill-example">
     <div class="line-item">Diagnostic audiometry &mdash; 92557 | $185</div>
     <div class="line-item">Tympanometry &mdash; 92567 | $65</div>

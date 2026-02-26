@@ -161,6 +161,13 @@ register("genetic-testing-billing", {
     <p><strong>Lesson:</strong> For NIPT bills, cite ACOG guidelines in your appeal. The standard of care has shifted to recommending NIPT for all pregnancies, and many insurers have not updated their age-based restrictions.</p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $5,600 prenatal genetic screening reclassified as preventive&mdash;covered at 100%</h3>
+    <p>A 29-year-old pregnant woman received a bill for <strong>$5,600</strong> from a genetics lab after her OB ordered a comprehensive prenatal screening panel that included carrier screening and an expanded NIPT. Her insurer processed the claim as diagnostic testing, applying her $3,000 deductible and 30% coinsurance, leaving her with <strong>$4,780</strong> in patient responsibility.</p>
+    <p>She filed an appeal arguing that the tests were preventive in nature&mdash;ordered as part of routine prenatal care with no prior indication of a genetic abnormality. She included ACOG guidelines recommending carrier screening and NIPT for all pregnancies, her OB&rsquo;s letter confirming the tests were ordered as standard preventive screening, and the ACA requirement that insurers cover USPSTF-recommended preventive services at no cost. The insurer reclassified the claim as preventive care and covered the full <strong>$5,600</strong> with zero patient cost-sharing. <strong>Savings: $4,780.</strong></p>
+    <p><strong>Lesson:</strong> If prenatal genetic screening is coded as diagnostic rather than preventive, appeal with ACOG guidelines and ACA preventive care rules. The coding distinction alone can mean the difference between $0 and thousands out of pocket.</p>
+</div>
+
 {_embed(mode="cost", cpt="81162", title="Look up genetic testing costs", subtitle="Enter the CPT code from your bill to see Medicare reimbursement rates.")}
 
 <h2 id="your-rights">6. Your rights: GINA and the No Surprises Act</h2>

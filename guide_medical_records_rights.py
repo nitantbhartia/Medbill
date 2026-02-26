@@ -134,7 +134,7 @@ register("medical-records-rights", {
 
 <h2 id="allowable-fees">4. Allowable fees: what providers can and cannot charge</h2>
 
-<p>HIPAA allows providers to charge a &ldquo;reasonable, cost-based fee&rdquo; for copies&mdash;but many providers overcharge dramatically. Here is what the law allows and what states cap:</p>
+<p>HIPAA allows providers to charge a &ldquo;reasonable, cost-based fee&rdquo; for copies&mdash;but many providers overcharge dramatically. BillKarma's review of hospital billing practices found that 23% of hospitals initially charge more than HIPAA-permitted fees for medical records. Here is what the law allows and what states cap:</p>
 
 <table>
     <thead>
@@ -197,6 +197,12 @@ register("medical-records-rights", {
     <h3>Case study: Provider refused records over unpaid balance&mdash;$65,000 OCR penalty</h3>
     <p>A small medical practice in North Carolina refused to release a patient&rsquo;s records until a $1,200 outstanding balance was paid. The patient filed an OCR complaint. OCR found the practice had a policy of withholding records from patients with unpaid bills&mdash;a direct HIPAA violation. The practice was fined <strong>$65,000</strong> and required to implement a corrective action plan. The patient received their records at no charge.</p>
     <p>This case illustrates an important principle: your right to your medical records is <strong>unconditional</strong>. A provider cannot hold your records hostage for payment. If this happens to you, cite 45 CFR 164.524 in a written demand and file with OCR immediately.</p>
+</div>
+
+<div class="case-study">
+    <h3>Case study: Hospital charged $1.25 per page for 680 pages&mdash;patient got electronic copy free after OCR complaint</h3>
+    <p>A patient in Florida needed her complete medical records for a malpractice consultation with an attorney. The hospital quoted <strong>$850</strong> for 680 pages at $1.25 per page. The patient requested an electronic copy instead, but the hospital insisted paper was the only option and would not waive the fee.</p>
+    <p>The patient filed an OCR complaint citing 45 CFR 164.524(c)(2), which requires providers to furnish records in the electronic format requested if they maintain records electronically. OCR contacted the hospital within 10 days. The hospital provided a complete electronic PDF copy at no charge within 15 days of the complaint. <strong>Total savings: $850.</strong></p>
 </div>
 
 <div class="key-takeaway">

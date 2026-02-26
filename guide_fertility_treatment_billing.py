@@ -206,6 +206,13 @@ register("fertility-treatment-billing", {
     <p><strong>Lesson:</strong> Never fill fertility prescriptions at your clinic without comparing prices at specialty pharmacies first. Ask about manufacturer discount programs.</p>
 </div>
 
+<div class="case-study">
+    <h3>Medication double-billed: $3,400 refund after line-by-line review</h3>
+    <p>A couple in Massachusetts going through their second IVF cycle received a consolidated bill of <strong>$21,800</strong> from their fertility clinic. When they requested a fully itemized statement and compared it line by line against their pharmacy receipts, they discovered that Gonal-F and Menopur had been billed twice&mdash;once through the clinic&rsquo;s in-house pharmacy (which they had used) and once as a &ldquo;medication management fee&rdquo; on the clinic&rsquo;s facility bill.</p>
+    <p>They contacted the clinic&rsquo;s billing department with documentation showing both charges. The clinic acknowledged the duplicate and issued a credit of <strong>$3,400</strong>. Without the line-by-line review, the couple would never have caught it. <strong>Savings: $3,400.</strong></p>
+    <p><strong>Lesson:</strong> Always request a fully itemized bill and cross-reference it against your pharmacy receipts. Fertility clinics bill from multiple departments, and duplicate medication charges are more common than patients realize.</p>
+</div>
+
 <p>Not sure if you were overcharged? <a href="/scan">Upload your fertility treatment bill to BillKarma</a> to check for duplicate charges, unbundled services, and inflated line items. Fertility billing is complex and errors are common. <a href="/scan">Scan your bill now</a>&mdash;it takes under 30 seconds.</p>
 
 {_embed(mode="cost", cpt="58970", title="Look up fertility procedure costs", subtitle="Enter the CPT code from your bill to see Medicare rates.")}

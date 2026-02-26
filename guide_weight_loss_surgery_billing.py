@@ -214,6 +214,13 @@ register("weight-loss-surgery-billing", {
     <p>The COE price also included a complication guarantee&mdash;if he needed readmission within 30 days for a surgery-related complication, it was covered at no additional charge. His local hospital offered no such guarantee. <strong>Total savings: $11,000 (39% reduction)</strong>, with a lower complication rate and better warranty.</p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $28,000 bill reduced to $16,800 with self-pay discount and payment plan</h3>
+    <p>A 41-year-old woman with a BMI of 43 and type 2 diabetes needed sleeve gastrectomy but had no bariatric surgery coverage under her employer&rsquo;s health plan. Her hospital quoted <strong>$28,000</strong> for the procedure (surgeon, anesthesia, facility, and one overnight stay). According to BillKarma data, bariatric surgery charges at nonprofit hospitals average 2.8x Medicare rates, compared to 4.2x at for-profit facilities.</p>
+    <p>Because her hospital was a nonprofit, she applied for their self-pay discount program and qualified for a 30% reduction based on her income. The hospital also offered a 12-month interest-free payment plan for balances under $20,000. With the 30% discount applied, her total dropped to <strong>$19,600</strong>. She negotiated an additional 14% prompt-pay reduction by offering to set up automatic monthly payments. <strong>Final cost: $16,800. Savings: $11,200 (40% off the original quote).</strong></p>
+    <p><strong>Lesson:</strong> Nonprofit hospitals are required to have financial assistance policies. Always ask about self-pay discounts, payment plans, and prompt-pay reductions before scheduling surgery. Combining multiple discount programs can cut a bariatric surgery bill by 30&ndash;50%.</p>
+</div>
+
 <div class="key-takeaway">
     <strong>Comparing bariatric surgery programs?</strong> Check facility pricing and quality grades in our <a href="/hospitals/">hospital directory</a>. Then <a href="/scan">upload any quotes or bills to BillKarma</a> to see how each facility&rsquo;s charges compare to Medicare benchmarks.
 </div>

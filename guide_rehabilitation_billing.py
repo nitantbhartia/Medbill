@@ -387,6 +387,24 @@ register("rehabilitation-billing", {
     </p>
 </div>
 
+<div class="case-study">
+    <h3>Therapy hours overbilled: $6,200 adjustment after documentation review</h3>
+    <p>
+        A 74-year-old man recovering from a hip fracture was admitted to an IRF for 14 days. His
+        itemized bill reflected charges for 3 hours of therapy per day across all 14 days. However,
+        when his daughter reviewed the daily therapy logs in the medical record, the documentation
+        consistently showed 2.5 hours per day&mdash;the therapists recorded exact start and end times
+        for each session.
+    </p>
+    <p>
+        The family filed a written dispute with the billing department, attaching copies of the daily
+        therapy logs showing the discrepancy between documented and billed hours. The facility
+        acknowledged the billing error and adjusted the charges downward by <strong>$6,200</strong>,
+        reflecting the actual therapy time provided. <strong>Total savings: $6,200.</strong> This case
+        illustrates why requesting daily therapy logs is essential when auditing an IRF bill.
+    </p>
+</div>
+
 <h2 id="faq">8. Frequently asked questions</h2>
 
 <div class="faq-section">

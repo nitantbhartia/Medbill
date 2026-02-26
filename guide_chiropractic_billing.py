@@ -180,6 +180,13 @@ register("chiropractic-billing", {
     <p>The chiropractor&rsquo;s office billed these non-covered services to the patient without providing an Advance Beneficiary Notice (ABN) for most visits. The total billed to the patient for non-covered services: <strong>$4,560</strong> ($95 &times; 48 visits). After the patient&rsquo;s daughter reviewed the bills with a Medicare counselor, they discovered the ABN requirement. Because the chiropractor failed to issue ABNs for 38 of the 48 visits, the chiropractor could not legally hold the patient responsible for those charges. The patient&rsquo;s liability was reduced from $4,560 to <strong>$950</strong> (10 visits where ABNs were properly signed). <strong>Savings: $3,610.</strong></p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $1,680 in upcoding reversed after comparing bills to exam findings</h3>
+    <p>A 42-year-old man visited his chiropractor twice a week for 12 weeks (24 visits) for lower back pain following a lifting injury. Every visit was billed as CPT 98943 (extraspinal manipulation, 1+ regions) in addition to CPT 98941 (spinal manipulation, 3&ndash;4 regions). The 98943 code added <strong>$70 per visit</strong> to each bill.</p>
+    <p>When the patient requested his clinical records, the examination notes consistently documented treatment to only two spinal regions (lumbar and sacral)&mdash;with no mention of extraspinal manipulation at any visit. He filed a dispute with the chiropractor&rsquo;s billing department, providing the clinical notes that contradicted the 98943 charges. The office acknowledged the coding error and removed the 98943 code from all 24 visits. <strong>Total refunded: $1,680 ($70 &times; 24 visits).</strong></p>
+    <p><strong>Lesson:</strong> Request your chiropractic treatment notes and compare the regions documented as treated against the CPT codes on your bill. If the notes say &ldquo;lumbar and cervical adjustment&rdquo; but the bill says 98941 (3&ndash;4 regions) or 98943 (extraspinal), you are being upcoded.</p>
+</div>
+
 <h2 id="how-to-dispute">6. How to dispute a chiropractic bill</h2>
 
 <p>Chiropractic billing disputes follow a specific process:</p>

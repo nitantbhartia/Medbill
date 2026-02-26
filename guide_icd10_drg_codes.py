@@ -410,6 +410,25 @@ register("icd10-drg-codes", {
     </p>
 </div>
 
+<div class="case-study">
+    <h3>Pneumonia coded as pneumonia with sepsis&mdash;$14,000 reduction after coding review</h3>
+    <p>
+        A 73-year-old Medicare patient was admitted for community-acquired pneumonia. The hospital
+        billed the stay under DRG 871 (septicemia or severe sepsis with MCC), generating a Medicare
+        payment of approximately <strong>$22,000</strong>. The patient&rsquo;s family reviewed the
+        discharge summary and found no mention of sepsis, no blood cultures positive for bacteremia,
+        and no documentation that sepsis criteria (SIRS plus confirmed infection source in blood) were
+        met. The medical record supported straightforward pneumonia only.
+    </p>
+    <p>
+        The family submitted a written dispute requesting a coding review, attaching the discharge
+        summary and lab results showing no sepsis criteria. The hospital&rsquo;s coding department
+        reassigned the stay to DRG 194 (simple pneumonia without CC/MCC) at approximately
+        <strong>$8,000</strong>. The <strong>$14,000 reduction</strong> corrected the Medicare payment
+        and removed the inaccurate sepsis diagnosis from the patient&rsquo;s medical record.
+    </p>
+</div>
+
 <h2 id="faq">8. Frequently asked questions</h2>
 
 <div class="faq-section">

@@ -193,6 +193,13 @@ register("hospice-billing", {
     <p>The family contacted Medicare and discovered the overbilling. Medicare recouped <strong>$4,578</strong> (21 days &times; $218/day) from the hospice agency and confirmed the patient was eligible for a new benefit period. The patient re-elected hospice with a different agency. <strong>Family savings: $4,578 in improperly billed days, plus restored benefit eligibility.</strong></p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $4,800 overcharge for continuous home care days that were actually routine care</h3>
+    <p>The family of an 82-year-old hospice patient with end-stage COPD received a statement from the hospice agency showing 8 days billed to Medicare as Continuous Home Care ($63/hour, minimum 8 hours per day) during a single month. Continuous Home Care requires 8&ndash;24 hours of predominantly nursing care during a documented medical crisis. The family knew from their own daily logs that the patient had received only the standard 1&ndash;2 hour nursing visits on those days&mdash;no crisis, no extended nursing presence.</p>
+    <p>They contacted Medicare&rsquo;s hotline (1-800-MEDICARE) and reported the discrepancy. A Medicare auditor reviewed the clinical documentation and confirmed that the 8 days did not meet Continuous Home Care criteria&mdash;the nursing notes documented only routine visits with no crisis-level care. Medicare reclassified the 8 days from Continuous Home Care to Routine Home Care and recouped the difference from the hospice agency: <strong>$4,800</strong> ($600/day overbilled &times; 8 days). The family owed nothing additional. <strong>Overcharge reversed: $4,800.</strong></p>
+    <p><strong>Lesson:</strong> Keep a daily log of every hospice visit&mdash;who came, how long they stayed, and what care was provided. If your loved one&rsquo;s hospice bills show Continuous Home Care or General Inpatient Care days, verify that the level of care actually matched what was delivered.</p>
+</div>
+
 <h2 id="faq">Frequently asked questions</h2>
 
 <div class="faq-section">

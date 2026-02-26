@@ -172,6 +172,13 @@ register("freestanding-er-billing", {
     <p>The father <a href="/scan">uploaded the bill to BillKarma</a>, which flagged the facility fee as 8x the Medicare rate and identified the supply charges as inflated. He filed a dispute citing Medicare rate comparisons and requested downgrading to urgent care&ndash;equivalent coding. After two rounds of negotiation, the facility accepted <strong>$350</strong> as payment in full. <strong>Savings: $5,250.</strong></p>
 </div>
 
+<div class="case-study">
+    <h3>Case study: $12,500 chest pain visit at a freestanding ER&mdash;then transferred to a hospital anyway</h3>
+    <p>A 58-year-old man experiencing mild chest tightness drove to the nearest open facility at 10 PM, which turned out to be a freestanding ER in suburban Houston. After an EKG, basic blood work, and a chest X-ray, the physician determined he needed a cardiac catheterization and transferred him by ambulance to a hospital ER 12 miles away. Total time at the freestanding ER: 75 minutes.</p>
+    <p>The freestanding ER billed <strong>$12,500</strong> for a Level 5 ER visit, EKG, troponin labs, and a chest X-ray. The hospital ER then billed an additional <strong>$3,700</strong> for the receiving evaluation before admitting him for the catheterization. His combined ER charges totaled <strong>$16,200</strong>&mdash;with the freestanding ER accounting for 77% of that amount despite providing no definitive treatment. After filing a dispute and citing Medicare rate comparisons, he got the freestanding ER bill reduced to <strong>$3,800</strong>. <strong>Savings: $8,700.</strong></p>
+    <p>Had he driven directly to the hospital ER, he would have avoided the freestanding ER charges entirely.</p>
+</div>
+
 {_embed(mode="markup", title="Compare your freestanding ER charges", subtitle="Enter the CPT code from your bill to see Medicare rates vs. what you were charged.", height="420")}
 
 <h2 id="alternatives">6. Alternatives: urgent care vs. freestanding ER</h2>
