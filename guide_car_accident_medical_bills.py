@@ -68,7 +68,7 @@ register("car-accident-medical-bills", {
 <p><strong>The typical payment order:</strong> PIP or MedPay pays first (no-fault coverage). If bills exceed those limits, your health insurance or the at-fault driver&rsquo;s liability insurance covers the remainder. If the other driver is uninsured, your uninsured motorist coverage kicks in.</p>
 
 <div class="key-takeaway">
-    <strong>Do not skip filing with your health insurance.</strong> Many accident victims avoid using health insurance, thinking the at-fault driver&rsquo;s insurer will pay everything. But liability claims take months to settle, and hospitals don&rsquo;t wait. Using your health insurance gets you in-network rates immediately and prevents collections while the liability claim is pending.
+    <strong>Do not skip filing with your health insurance.</strong> Many accident victims avoid using health insurance, thinking the at-fault driver&rsquo;s insurer will pay everything. But liability claims take months to settle, and hospitals don&rsquo;t wait. Using your health insurance gets you in-network rates immediately and prevents collections while the liability claim is pending. For a primer on deductibles, coinsurance, and how claims flow, see <a href="/guides/how-health-insurance-works">our guide to how health insurance works</a>.
 </div>
 
 <h2 id="no-fault-states">2. No-fault states and PIP coverage</h2>
@@ -109,6 +109,7 @@ register("car-accident-medical-bills", {
     </ul>
     <p><strong>But then subrogation hit:</strong> Sarah&rsquo;s health insurer filed a subrogation claim for the $41,000 they paid, reducing her settlement by that amount. After attorney fees (33% = $31,350) and subrogation ($41,000), Sarah kept <strong>$22,650</strong> from the $95,000 settlement.</p>
     <p><strong>What saved her money:</strong> Sarah&rsquo;s attorney negotiated the subrogation claim down to $28,000 (a 32% reduction) and the hospital reduced a $4,500 outstanding balance to $2,200. <strong>Final net to Sarah: $33,450.</strong></p>
+    <p>Before accepting any hospital bill at face value, <a href="/scan">upload it to BillKarma</a> to check for duplicate charges, upcoding, and inflated fees that inflate your lien or settlement deductions.</p>
 </div>
 
 {_embed(mode="cost", cpt="99284", title="Check your ER visit costs", subtitle="See what Medicare pays for your ER visit level.")}
@@ -125,7 +126,7 @@ register("car-accident-medical-bills", {
     <li>If you cannot agree, you may need to file a lawsuit before the statute of limitations expires (typically 2&ndash;4 years, varying by state).</li>
 </ol>
 
-<p><strong>The timing problem:</strong> Liability claims take <strong>3&ndash;18 months</strong> to settle. Your medical bills arrive in weeks. Hospitals and providers will not wait for your liability settlement&mdash;they will send bills to collections or place liens on your anticipated settlement. This is why using PIP, MedPay, or health insurance in the meantime is critical.</p>
+<p><strong>The timing problem:</strong> Liability claims take <strong>3&ndash;18 months</strong> to settle. Your medical bills arrive in weeks. Hospitals and providers will not wait for your liability settlement&mdash;they will send bills to collections or place liens on your anticipated settlement. This is why using PIP, MedPay, or health insurance in the meantime is critical. Compare ER and hospital charges in your area using our <a href="/hospitals/">hospital directory</a> to know whether the facility&rsquo;s pricing is fair.</p>
 
 <h2 id="subrogation">4. Health insurance subrogation explained</h2>
 
@@ -154,8 +155,8 @@ register("car-accident-medical-bills", {
 <ul>
     <li>Most states allow hospital liens, though rules vary on filing procedures and limits.</li>
     <li>Some states cap lien amounts at a percentage of the settlement (often 33&ndash;50%).</li>
-    <li>Liens can be negotiated. Hospitals frequently accept 50&ndash;75% of the lien amount to avoid a lengthy legal fight.</li>
-    <li>If you have health insurance, using it instead of being billed at chargemaster rates can dramatically reduce the lien amount (in-network rates are 40&ndash;70% lower).</li>
+    <li>Liens can be negotiated. Hospitals frequently accept 50&ndash;75% of the lien amount to avoid a lengthy legal fight. See <a href="/guides/how-to-negotiate-medical-bills">our guide to negotiating medical bills</a> for proven strategies.</li>
+    <li>If you have health insurance, using it instead of being billed at chargemaster rates can dramatically reduce the lien amount (in-network rates are 40&ndash;70% lower). Check your hospital&rsquo;s pricing patterns in our <a href="/hospitals/">hospital pricing directory</a>.</li>
 </ul>
 
 <div class="key-takeaway">
@@ -164,7 +165,7 @@ register("car-accident-medical-bills", {
 
 <h2 id="negotiate">6. Negotiating your medical bills after an accident</h2>
 
-<p><strong>Always use health insurance when possible.</strong> In-network rates are dramatically lower than chargemaster prices. A hospital might bill $45,000 for a surgery, but the health insurance allowed amount might be $18,000. Using health insurance means a smaller subrogation claim later.</p>
+<p><strong>Always use health insurance when possible.</strong> In-network rates are dramatically lower than chargemaster prices. A hospital might bill $45,000 for a surgery, but the health insurance allowed amount might be $18,000. Using health insurance means a smaller subrogation claim later. Use our <a href="/calculator">cost calculator</a> to look up what Medicare pays for each procedure on your bill&mdash;this gives you a fair-market benchmark for negotiating liens.</p>
 
 <p><strong>Audit every bill.</strong> Accident-related medical bills are prone to the same errors as any medical bill: duplicate charges, upcoding, unbundled lab tests, and inflated supply charges. <a href="/scan">Upload your bills to BillKarma</a> to catch errors before they become part of a lien or settlement calculation.</p>
 
@@ -180,7 +181,7 @@ register("car-accident-medical-bills", {
     <li><strong>File a police report at the scene.</strong> This documents the accident and establishes fault, which is critical for any liability claim.</li>
     <li><strong>Seek medical attention within 72 hours.</strong> Delayed treatment weakens your injury claim. In Florida, PIP requires treatment within 14 days.</li>
     <li><strong>Use your PIP/MedPay first.</strong> These pay regardless of fault with no subrogation in most states.</li>
-    <li><strong>File with your health insurance.</strong> This gets you negotiated rates and prevents collections during the months-long liability claim process.</li>
+    <li><strong>File with your health insurance.</strong> This gets you negotiated rates and prevents collections during the months-long liability claim process. If you received out-of-network emergency care, the <a href="/guides/no-surprises-act">No Surprises Act</a> may protect you from balance billing.</li>
     <li><strong>Do not give a recorded statement to the other driver&rsquo;s insurer</strong> without consulting an attorney. Anything you say can be used to deny or reduce your claim.</li>
     <li><strong>Do not sign medical record releases</strong> from the other driver&rsquo;s insurance company. They may use your full medical history to argue that your injuries were pre-existing.</li>
     <li><strong>Consult a personal injury attorney for claims over $10,000.</strong> Attorney fees (typically 33%) are usually more than offset by higher settlements and reduced liens.</li>
@@ -188,7 +189,7 @@ register("car-accident-medical-bills", {
 </ol>
 
 <div class="key-takeaway">
-    <strong>The biggest mistake after a car accident:</strong> Not using health insurance because you assume the other driver&rsquo;s insurance will cover everything. Liability claims take months. Hospitals send bills to collections in weeks. Use every coverage source available to you&mdash;PIP, MedPay, and health insurance&mdash;while the liability claim is pending.
+    <strong>The biggest mistake after a car accident:</strong> Not using health insurance because you assume the other driver&rsquo;s insurance will cover everything. Liability claims take months. Hospitals send bills to collections in weeks. Use every coverage source available to you&mdash;PIP, MedPay, and health insurance&mdash;while the liability claim is pending. <a href="/scan">Scan every bill with BillKarma</a> to ensure you are only paying for accurate, legitimate charges.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

@@ -64,7 +64,7 @@ register("medical-debt-after-death", {
 <p>If the estate does not have enough assets to cover all debts, the remaining medical bills are simply <strong>written off</strong>. Creditors cannot pursue family members for the shortfall. This is what lawyers call an &ldquo;insolvent estate.&rdquo;</p>
 
 <div class="key-takeaway">
-    <strong>The critical principle:</strong> Medical debt does not pass to children, siblings, or other relatives simply because of a family relationship. The estate owes the debt, not the family. The only exceptions are specific legal situations outlined below.
+    <strong>The critical principle:</strong> Medical debt does not pass to children, siblings, or other relatives simply because of a family relationship. The estate owes the debt, not the family. The only exceptions are specific legal situations outlined below. Before the estate pays any medical bill, <a href="/scan">upload it to BillKarma</a> to check for errors&mdash;billing mistakes are common, and the estate should only pay what is actually owed.
 </div>
 
 <h2 id="community-property">2. Community property states: when spouses may owe</h2>
@@ -95,15 +95,16 @@ register("medical-debt-after-death", {
     <p><strong>Situation:</strong> Robert, age 72, died after a three-month hospital stay in California. His medical bills totaled <strong>$47,000</strong> after Medicare payments. His wife Patricia had not signed any hospital financial agreements.</p>
     <p><strong>The outcome:</strong> Because California is a community property state, Patricia was liable for medical debt incurred during their marriage. However, she hired a patient advocate who reviewed the itemized bills and found <strong>$9,200 in billing errors</strong>&mdash;duplicate charges for daily room rates and unbundled lab tests. The corrected balance was $37,800.</p>
     <p><strong>Resolution:</strong> Patricia applied for the hospital&rsquo;s financial assistance program (the hospital was nonprofit). Based on her income of $34,000/year, she qualified for a 70% reduction. <strong>Final amount owed: $11,340, paid over 24 months at $472.50/month with zero interest. Total savings: $35,660.</strong></p>
+    <p>Check whether a hospital is nonprofit and review its billing track record in our <a href="/hospitals/">hospital pricing directory</a>. For more on financial assistance programs, see <a href="/guides/hospital-charity-care-financial-assistance">our guide to charity care</a>.</p>
 </div>
 
 <h2 id="exceptions">3. Other exceptions: when family IS responsible</h2>
 
 <p>Beyond community property, there are specific situations where family members can be held liable:</p>
 
-<p><strong>Co-signed financial agreements:</strong> If you signed a hospital admission form that includes a &ldquo;responsible party&rdquo; or &ldquo;guarantor&rdquo; clause, you may have agreed to pay the bill. Read hospital paperwork carefully&mdash;these clauses are often buried in routine intake forms. This is the most common way family members become liable.</p>
+<p><strong>Co-signed financial agreements:</strong> If you signed a hospital admission form that includes a &ldquo;responsible party&rdquo; or &ldquo;guarantor&rdquo; clause, you may have agreed to pay the bill. Read hospital paperwork carefully&mdash;these clauses are often buried in routine intake forms. This is the most common way family members become liable. Even if you did co-sign, use our <a href="/calculator">cost calculator</a> to verify the charges match Medicare rates&mdash;you should only be responsible for accurate amounts.</p>
 
-<p><strong>Filial responsibility laws:</strong> About 30 states have filial responsibility statutes that can require adult children to pay for a parent&rsquo;s necessities, including medical care. These laws are rarely enforced, but they exist and have been used in cases involving nursing home debt. Pennsylvania is the most aggressive state in enforcing filial responsibility.</p>
+<p><strong>Filial responsibility laws:</strong> About 30 states have filial responsibility statutes that can require adult children to pay for a parent&rsquo;s necessities, including medical care. These laws are rarely enforced, but they exist and have been used in cases involving nursing home debt. Pennsylvania is the most aggressive state in enforcing filial responsibility. If you are facing a filial responsibility claim, <a href="/guides/how-to-negotiate-medical-bills">our guide to negotiating medical bills</a> can help you reduce the amount owed.</p>
 
 <p><strong>Minors&rsquo; medical debt:</strong> Parents are responsible for the medical debt of their minor children. If a child incurs medical debt and later dies, the parents remain liable for those bills.</p>
 
@@ -139,7 +140,7 @@ register("medical-debt-after-death", {
 
 <p><strong>Know your rights.</strong> The FDCPA allows collectors to contact a spouse, parent (of a minor), guardian, executor, or estate administrator. But they cannot demand payment from someone who is not legally obligated to pay. They also cannot misrepresent that you owe the debt if you do not.</p>
 
-<p><strong>Do not admit to owing the debt.</strong> Saying &ldquo;I&rsquo;ll try to pay&rdquo; or making any payment&mdash;even a small one&mdash;could be interpreted as accepting the obligation. If you are not legally responsible, say: &ldquo;I am not personally responsible for this debt. Please direct all claims to the estate.&rdquo;</p>
+<p><strong>Do not admit to owing the debt.</strong> Saying &ldquo;I&rsquo;ll try to pay&rdquo; or making any payment&mdash;even a small one&mdash;could be interpreted as accepting the obligation. If you are not legally responsible, say: &ldquo;I am not personally responsible for this debt. Please direct all claims to the estate.&rdquo; For more on your rights, see <a href="/guides/medical-debt-and-debt-collectors">our guide to dealing with medical debt collectors</a>.</p>
 
 <p><strong>Request validation in writing.</strong> Under the FDCPA, you can request written proof that the debt is valid and that the collector has the right to collect. Send this request within 30 days of first contact.</p>
 
@@ -153,12 +154,12 @@ register("medical-debt-after-death", {
     <li><strong>Do not sign hospital &ldquo;responsible party&rdquo; forms for a relative.</strong> When accompanying a family member to the hospital, read every document before signing. Cross out or refuse to sign guarantor clauses. The hospital must still treat the patient under EMTALA for emergencies.</li>
     <li><strong>Keep assets out of probate.</strong> Life insurance proceeds, jointly held accounts with survivorship rights, payable-on-death accounts, and assets in properly structured trusts pass directly to beneficiaries and are generally not available to creditors of the estate.</li>
     <li><strong>Verify all bills before the estate pays.</strong> Request itemized statements with procedure codes for every medical bill submitted to the estate. Billing errors are common, and the estate should only pay verified, accurate charges. <a href="/scan">Upload bills to BillKarma</a> for an audit.</li>
-    <li><strong>Check if the hospital is nonprofit.</strong> If the deceased was treated at a nonprofit hospital, the estate may qualify for charity care retroactively. Apply for financial assistance even after death&mdash;many hospitals will reduce or forgive the balance.</li>
+    <li><strong>Check if the hospital is nonprofit.</strong> Look up the facility in our <a href="/hospitals/">hospital directory</a> to check its nonprofit status and billing grade. If it is nonprofit, the estate may qualify for charity care retroactively. Apply for financial assistance even after death&mdash;many hospitals will reduce or forgive the balance.</li>
     <li><strong>Consult an elder law attorney for Medicaid planning.</strong> If a family member may need long-term care in the future, asset protection planning done well in advance can shield the family home and savings from Medicaid estate recovery.</li>
 </ol>
 
 <div class="key-takeaway">
-    <strong>Bottom line:</strong> In most situations, family members do not inherit medical debt. The estate pays what it can, and any remaining debt is written off. Do not let collectors pressure you into paying a debt that is not yours. Know the exceptions&mdash;community property states, co-signed agreements, and Medicaid recovery&mdash;and consult an attorney if any of those apply to your situation.
+    <strong>Bottom line:</strong> In most situations, family members do not inherit medical debt. The estate pays what it can, and any remaining debt is written off. Do not let collectors pressure you into paying a debt that is not yours. Know the exceptions&mdash;community property states, co-signed agreements, and Medicaid recovery&mdash;and consult an attorney if any of those apply to your situation. If you are handling an estate&rsquo;s medical bills, <a href="/scan">scan every bill for errors</a> before authorizing payment.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

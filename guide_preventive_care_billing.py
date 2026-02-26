@@ -60,7 +60,7 @@ register("preventive-care-billing", {
 <p><strong>Key requirements:</strong> The service must be performed by an <strong>in-network provider</strong>, and it must be a <strong>screening</strong> (no symptoms), not a diagnostic workup. Plans must cover these services with zero copay, zero deductible, and zero coinsurance.</p>
 
 <div class="key-takeaway">
-    <strong>Important:</strong> Grandfathered plans (those that existed before March 23, 2010, and have not made significant changes) are exempt from the preventive care mandate. Check with your insurer if you are unsure whether your plan is grandfathered.
+    <strong>Important:</strong> Grandfathered plans (those that existed before March 23, 2010, and have not made significant changes) are exempt from the preventive care mandate. Check with your insurer if you are unsure whether your plan is grandfathered. If you&rsquo;ve been billed for a service you believe should be free, <a href="/scan">upload your bill to BillKarma</a>&mdash;we&rsquo;ll identify whether the codes match preventive care requirements.
 </div>
 
 <h2 id="free-services">2. Complete list of no-cost preventive services</h2>
@@ -91,7 +91,7 @@ register("preventive-care-billing", {
     </tbody>
 </table>
 
-<p>This is not exhaustive&mdash;USPSTF maintains over 80 recommendations with A or B grades. The full list is available at the USPSTF website.</p>
+<p>This is not exhaustive&mdash;USPSTF maintains over 80 recommendations with A or B grades. The full list is available at the USPSTF website. Use our <a href="/calculator">cost calculator</a> to look up what Medicare pays for each of these screening codes in your area&mdash;this gives you a baseline to compare against if you are billed.</p>
 
 <h2 id="preventive-vs-diagnostic">3. When preventive turns diagnostic (and bills you)</h2>
 
@@ -116,6 +116,7 @@ register("preventive-care-billing", {
     <p><strong>Situation:</strong> Jennifer scheduled her annual wellness exam, which should be covered at 100%. During the visit, she mentioned occasional lower back pain. Her doctor spent 5 minutes discussing it and suggested stretches.</p>
     <p><strong>The bill:</strong> The office billed both a preventive visit (99395, $0 to Jennifer) and a separate office visit (99213, $185 physician fee + $155 facility fee = <strong>$340</strong>) for addressing the back pain complaint. Jennifer&rsquo;s deductible had not been met, so she owed the full $340.</p>
     <p><strong>What she did:</strong> Jennifer called the billing department and asked them to rebill the visit under the preventive code only, since the back pain discussion was brief and no separate workup was ordered. The office refused. She then filed an appeal with her insurance company, citing that the back pain was discussed incidentally and did not constitute a separate evaluation. <strong>The insurer agreed and reprocessed the claim as preventive only. Jennifer&rsquo;s bill: $0. Savings: $340.</strong></p>
+    <p><a href="/scan">Scan your bill with BillKarma</a> to quickly check whether your preventive visit was coded correctly or split into a diagnostic charge.</p>
 </div>
 
 {_embed(mode="cost", cpt="99395", title="Look up preventive visit costs", subtitle="See what Medicare pays for wellness exam codes.")}
@@ -126,22 +127,22 @@ register("preventive-care-billing", {
 
 <p><strong>Lab work coded as diagnostic:</strong> Blood work ordered during your annual wellness exam should be coded as screening (preventive). But if the lab or provider codes it as diagnostic&mdash;for example, a lipid panel coded under a diagnostic ICD-10 code instead of a screening code&mdash;it hits your deductible. Always check the diagnosis code (ICD-10) on your lab results, not just the procedure code.</p>
 
-<p><strong>Out-of-network providers at in-network facilities:</strong> Your in-network doctor&rsquo;s office may use an out-of-network lab. The preventive care mandate only requires zero cost-sharing with in-network providers. If an out-of-network lab processes your &ldquo;free&rdquo; screening blood work, you may receive a bill.</p>
+<p><strong>Out-of-network providers at in-network facilities:</strong> Your in-network doctor&rsquo;s office may use an out-of-network lab. The preventive care mandate only requires zero cost-sharing with in-network providers. If an out-of-network lab processes your &ldquo;free&rdquo; screening blood work, you may receive a bill. Check your facility&rsquo;s affiliated providers in our <a href="/hospitals/">hospital and provider directory</a> before your visit.</p>
 
 <p><strong>Colonoscopy polyp removal reclassification:</strong> Historically, insurers reclassified a screening colonoscopy as diagnostic if polyps were found and removed, triggering cost-sharing that could exceed <strong>$1,500</strong>. The ACA was updated to prohibit this, but some plans have been slow to update their claims processing. If you are billed for polyp removal during a screening colonoscopy, appeal immediately.</p>
 
 <div class="key-takeaway">
-    <strong>The ICD-10 code matters as much as the CPT code.</strong> A cholesterol test (CPT 80061) coded with an ICD-10 screening diagnosis (Z13.220) is free. The same test coded with a diagnostic diagnosis (E78.5, hyperlipidemia) is subject to cost-sharing. Ask your provider to use screening diagnosis codes for preventive services.
+    <strong>The ICD-10 code matters as much as the CPT code.</strong> A cholesterol test (CPT 80061) coded with an ICD-10 screening diagnosis (Z13.220) is free. The same test coded with a diagnostic diagnosis (E78.5, hyperlipidemia) is subject to cost-sharing. Ask your provider to use screening diagnosis codes for preventive services. Learn more about how procedure codes work in <a href="/guides/cpt-codes-explained">our CPT codes guide</a>.
 </div>
 
 <h2 id="fight-back">5. How to fight a wrongly-billed preventive visit</h2>
 
 <ol>
-    <li><strong>Get the EOB and itemized bill.</strong> Check the CPT codes and ICD-10 diagnosis codes. Identify whether the service was coded as preventive or diagnostic.</li>
+    <li><strong>Get the EOB and itemized bill.</strong> Check the CPT codes and ICD-10 diagnosis codes. Identify whether the service was coded as preventive or diagnostic. For a step-by-step walkthrough, see <a href="/guides/how-to-read-your-eob">our guide to reading your EOB</a>.</li>
     <li><strong>Call the provider&rsquo;s billing department.</strong> Ask them to review and resubmit the claim with the correct preventive CPT and ICD-10 codes. Many billing errors are resolved at this step.</li>
     <li><strong>File a formal appeal with your insurer.</strong> If the provider won&rsquo;t change the codes, appeal directly with your insurance company. Cite the specific ACA preventive care requirement and the USPSTF recommendation grade (A or B) for the service.</li>
     <li><strong>Include supporting documentation.</strong> Attach the USPSTF recommendation, the relevant CPT code, and a letter explaining that the service was a routine screening without diagnostic intent.</li>
-    <li><strong>File a complaint if needed.</strong> If the insurer denies your appeal, file a complaint with your state insurance commissioner and the U.S. Department of Health and Human Services. ACA preventive care coverage is a federal requirement, and regulators take violations seriously.</li>
+    <li><strong>File a complaint if needed.</strong> If the insurer denies your appeal, file a complaint with your state insurance commissioner and the U.S. Department of Health and Human Services. ACA preventive care coverage is a federal requirement, and regulators take violations seriously. For a full walkthrough of the appeals process, see <a href="/guides/how-to-appeal-a-medical-bill-denial">our guide to appealing insurance denials</a>.</li>
 </ol>
 
 <h2 id="protect-yourself">6. Protecting yourself before your visit</h2>
@@ -154,10 +155,10 @@ register("preventive-care-billing", {
 
 <p><strong>Verify lab orders are coded as screening.</strong> Before blood work is drawn, ask the provider to confirm the orders use screening ICD-10 codes. This takes 30 seconds and can save you hundreds of dollars.</p>
 
-<p><strong>Confirm in-network status for all providers.</strong> Verify that the lab, imaging center, and any specialists involved in your preventive care are in-network. The zero cost-sharing guarantee only applies to in-network providers.</p>
+<p><strong>Confirm in-network status for all providers.</strong> Verify that the lab, imaging center, and any specialists involved in your preventive care are in-network. The zero cost-sharing guarantee only applies to in-network providers. Look up your hospital&rsquo;s billing grade and affiliated labs in our <a href="/hospitals/">hospital pricing directory</a>.</p>
 
 <div class="key-takeaway">
-    <strong>One sentence can save you hundreds:</strong> Before your annual wellness exam, tell the scheduling staff: &ldquo;This is a preventive wellness visit only. Please bill it under the preventive care code.&rdquo; This sets the expectation and creates a record that the visit was intended as preventive.
+    <strong>One sentence can save you hundreds:</strong> Before your annual wellness exam, tell the scheduling staff: &ldquo;This is a preventive wellness visit only. Please bill it under the preventive care code.&rdquo; This sets the expectation and creates a record that the visit was intended as preventive. After your visit, <a href="/scan">upload your bill to BillKarma</a> to confirm the codes are correct before you pay.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

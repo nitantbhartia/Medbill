@@ -65,7 +65,7 @@ register("how-health-insurance-works", {
 </table>
 
 <div class="key-takeaway">
-    <strong>The relationship:</strong> You pay your premium every month. When you get care, you pay the full allowed amount until you hit your deductible. Then you pay coinsurance (your percentage) until you hit your out-of-pocket maximum. After the out-of-pocket max, insurance pays 100%. Preventive care is always free, regardless of deductible status.
+    <strong>The relationship:</strong> You pay your premium every month. When you get care, you pay the full allowed amount until you hit your deductible. Then you pay coinsurance (your percentage) until you hit your out-of-pocket maximum. After the out-of-pocket max, insurance pays 100%. Preventive care is always free, regardless of deductible status. Learn exactly which services qualify in <a href="/guides/preventive-care-billing">our guide to preventive care billing</a>.
 </div>
 
 <h2 id="how-costs-flow">2. How costs flow: a visual example</h2>
@@ -104,7 +104,7 @@ register("how-health-insurance-works", {
     </div>
 </div>
 
-<p><strong>What happened:</strong> The hospital charged $12,000, but the insurance-negotiated rate was only $8,400 (the &ldquo;allowed amount&rdquo;). The patient paid the remaining $1,000 deductible, then 20% coinsurance on the rest ($1,480). Total patient cost: <strong>$2,480</strong>. If this patient has more care this year, they only need to pay $3,020 more before hitting the $6,000 out-of-pocket max (they&rsquo;ve already paid $500 + $1,000 + $1,480 = $2,980).</p>
+<p><strong>What happened:</strong> The hospital charged $12,000, but the insurance-negotiated rate was only $8,400 (the &ldquo;allowed amount&rdquo;). The patient paid the remaining $1,000 deductible, then 20% coinsurance on the rest ($1,480). Total patient cost: <strong>$2,480</strong>. If this patient has more care this year, they only need to pay $3,020 more before hitting the $6,000 out-of-pocket max (they&rsquo;ve already paid $500 + $1,000 + $1,480 = $2,980). Use our <a href="/calculator">cost calculator</a> to look up the Medicare allowable rate for any procedure&mdash;it&rsquo;s a useful benchmark for what you should expect to pay.</p>
 
 <div class="case-study">
     <h3>Case study: Understanding your plan saves $4,200</h3>
@@ -125,7 +125,7 @@ register("how-health-insurance-works", {
     <li><strong>Provider submits a claim.</strong> The billing department sends a claim to your insurance company with CPT codes (procedures) and ICD-10 codes (diagnoses). This usually happens within 1&ndash;5 business days.</li>
     <li><strong>Insurance processes the claim (adjudication).</strong> The insurer checks your coverage, applies the allowed amount, calculates your deductible and coinsurance, and determines what they pay vs. what you owe. This takes 15&ndash;45 days.</li>
     <li><strong>You receive an EOB.</strong> Your insurance sends an Explanation of Benefits showing how the claim was processed. This is <strong>not a bill</strong>&mdash;it&rsquo;s a statement from your insurer.</li>
-    <li><strong>Provider sends your bill.</strong> After receiving insurance payment, the provider bills you for your remaining balance (deductible, coinsurance, copay, or any denied amounts).</li>
+    <li><strong>Provider sends your bill.</strong> After receiving insurance payment, the provider bills you for your remaining balance (deductible, coinsurance, copay, or any denied amounts). Compare this to your EOB carefully&mdash;see <a href="/guides/understanding-your-eob">our guide to reading your EOB</a> for help.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -148,7 +148,7 @@ register("how-health-insurance-works", {
     </tbody>
 </table>
 
-<p><strong>The cost difference is real.</strong> An in-network MRI might cost you $400 (after negotiated rates and insurance). The same MRI out-of-network on a PPO plan might cost $1,200 (higher coinsurance plus balance billing). On an HMO, the out-of-network MRI may not be covered at all, leaving you with the full $3,000+ charge.</p>
+<p><strong>The cost difference is real.</strong> An in-network MRI might cost you $400 (after negotiated rates and insurance). The same MRI out-of-network on a PPO plan might cost $1,200 (higher coinsurance plus balance billing). On an HMO, the out-of-network MRI may not be covered at all, leaving you with the full $3,000+ charge. Check how hospitals in your area price common procedures in our <a href="/hospitals/">hospital pricing directory</a>.</p>
 
 <h2 id="choosing-plan">5. How to choose the right plan</h2>
 
@@ -158,12 +158,12 @@ register("how-health-insurance-works", {
 
 <p><strong>If you have ongoing medical needs:</strong> Choose a plan with a lower deductible and lower coinsurance, even if premiums are higher. If you know you&rsquo;ll hit your deductible every year, the lower deductible plan almost always saves money overall.</p>
 
-<p><strong>If you see specialists frequently:</strong> Choose a PPO or EPO so you can see specialists without referrals. The premium is higher, but avoiding the referral process and having broader provider choices saves time and can prevent delays in care.</p>
+<p><strong>If you see specialists frequently:</strong> Choose a PPO or EPO so you can see specialists without referrals. The premium is higher, but avoiding the referral process and having broader provider choices saves time and can prevent delays in care. Before selecting a plan, look up the hospitals and providers you use most in our <a href="/hospitals/">hospital directory</a> to see how their pricing compares.</p>
 
 <p><strong>The math check:</strong> Add up your expected annual costs: (monthly premium &times; 12) + expected deductible + expected coinsurance. Compare this total across plans. The cheapest premium is not always the cheapest plan.</p>
 
 <div class="key-takeaway">
-    <strong>The #1 mistake:</strong> Choosing the lowest-premium plan without calculating total costs. A plan with a $150/month premium and $6,000 deductible costs $1,800/year in premiums alone. If you need a $5,000 procedure, you pay $6,800 total. A $300/month plan with a $1,500 deductible costs $3,600 in premiums plus $1,500 deductible = $5,100 total. The &ldquo;expensive&rdquo; plan saves you $1,700.
+    <strong>The #1 mistake:</strong> Choosing the lowest-premium plan without calculating total costs. A plan with a $150/month premium and $6,000 deductible costs $1,800/year in premiums alone. If you need a $5,000 procedure, you pay $6,800 total. A $300/month plan with a $1,500 deductible costs $3,600 in premiums plus $1,500 deductible = $5,100 total. The &ldquo;expensive&rdquo; plan saves you $1,700. For a deeper dive on deductibles and out-of-pocket costs, see <a href="/guides/out-of-pocket-maximum-explained">our guide to out-of-pocket maximums</a>.
 </div>
 
 <h2 id="open-enrollment">6. Open enrollment and special enrollment</h2>
@@ -180,7 +180,7 @@ register("how-health-insurance-works", {
     <li>Changes in household income affecting marketplace subsidy eligibility</li>
 </ul>
 
-<p>SEPs typically give you <strong>60 days</strong> from the qualifying event to enroll. Missing this window means waiting until the next open enrollment.</p>
+<p>SEPs typically give you <strong>60 days</strong> from the qualifying event to enroll. Missing this window means waiting until the next open enrollment. If you&rsquo;re between plans and receive a medical bill, <a href="/scan">scan it with BillKarma</a> to make sure you&rsquo;re not being overcharged while uninsured.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

@@ -86,7 +86,7 @@ register("skilled-nursing-facility-billing", {
 <p>A <strong>benefit period</strong> begins the day you are admitted as an inpatient to a hospital and ends when you have been out of a hospital or SNF for 60 consecutive days. If you are readmitted after 60 days, a new benefit period begins and the 100-day clock resets. This matters because patients who cycle between hospital and SNF within the same benefit period continue using their existing 100 days rather than starting over.</p>
 
 <div class="key-takeaway">
-    <strong>Key point:</strong> The three-day hospital stay requirement means observation status does not count. If your hospital stay was classified as observation rather than inpatient, Medicare will deny your SNF coverage entirely. See our <a href="/guides/observation-status">observation status guide</a> for how to check and appeal your status.
+    <strong>Key point:</strong> The three-day hospital stay requirement means observation status does not count. If your hospital stay was classified as observation rather than inpatient, Medicare will deny your SNF coverage entirely. See our <a href="/guides/observation-status">observation status guide</a> for how to check and appeal your status. If you already have a SNF bill in hand, <a href="/scan">upload it to BillKarma</a> — we will flag coverage issues, coinsurance miscalculations, and line-item errors in minutes.
 </div>
 
 <h2 id="qualifying">2. How to qualify for Medicare SNF coverage</h2>
@@ -144,9 +144,9 @@ register("skilled-nursing-facility-billing", {
     </tbody>
 </table>
 
-<p>For a typical Medicare patient who stays the full 100 days: the first 20 days cost nothing, and days 21 through 100 cost $204.50 per day &times; 80 days = <strong>$16,360 in total coinsurance</strong>. If you have a Medigap policy (Medicare Supplement Insurance), many plans cover some or all of the day 21&ndash;100 coinsurance. Medigap Plan C, Plan F, and Plan G all cover the full SNF coinsurance. Check your Medigap plan benefits before assuming you will owe the full amount.</p>
+<p>For a typical Medicare patient who stays the full 100 days: the first 20 days cost nothing, and days 21 through 100 cost $204.50 per day &times; 80 days = <strong>$16,360 in total coinsurance</strong>. If you have a Medigap policy (Medicare Supplement Insurance), many plans cover some or all of the day 21&ndash;100 coinsurance. Medigap Plan C, Plan F, and Plan G all cover the full SNF coinsurance. Check your Medigap plan benefits before assuming you will owe the full amount. You can <a href="/calculator">look up Medicare rates</a> for specific SNF services to verify the charges on your statement.</p>
 
-<p>Private-pay rates vary significantly by state. The national median for a semi-private room is approximately $290 per day ($8,700 per month), while a private room averages $330 per day ($9,900 per month). In high-cost areas like the Northeast and West Coast, rates can exceed $400 per day.</p>
+<p>Private-pay rates vary significantly by state. The national median for a semi-private room is approximately $290 per day ($8,700 per month), while a private room averages $330 per day ($9,900 per month). In high-cost areas like the Northeast and West Coast, rates can exceed $400 per day. You can <a href="/hospitals/">check your facility's billing grade</a> in our hospital directory to see how their charges compare to regional averages.</p>
 
 <h2 id="common-denials">4. Common reasons for SNF coverage denials</h2>
 
@@ -160,7 +160,7 @@ register("skilled-nursing-facility-billing", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Important:</strong> If your SNF coverage is denied while you are still in the facility, the SNF must give you an Advance Beneficiary Notice (ABN) before charging you privately. Do not sign the ABN without understanding that it means you are agreeing to pay out of pocket. You have the right to appeal the denial before accepting private-pay responsibility.
+    <strong>Important:</strong> If your SNF coverage is denied while you are still in the facility, the SNF must give you an Advance Beneficiary Notice (ABN) before charging you privately. Do not sign the ABN without understanding that it means you are agreeing to pay out of pocket. You have the right to appeal the denial before accepting private-pay responsibility. For step-by-step appeal instructions, see our <a href="/guides/how-to-appeal-a-medical-bill-denial">appeal guide</a>.
 </div>
 
 <h2 id="appeals">5. How to appeal a Medicare SNF denial</h2>
@@ -180,6 +180,7 @@ register("skilled-nursing-facility-billing", {
 <div class="case-study">
     <h3>Case study: 82-year-old denied at day 22 — appeal recovers $14,500</h3>
     <p>An 82-year-old patient in Pennsylvania was admitted to a SNF after hip replacement surgery. Medicare covered days 1 through 22, then denied continued coverage, stating the patient no longer required skilled rehabilitation. The denial came from a Medicare Advantage plan via prior authorization review. The patient's physical therapist documented that the patient could not walk independently, could not transfer from bed to wheelchair without assistance, and was at high risk for falls. The family filed a Level 1 appeal with a letter from the orthopedic surgeon and the PT's functional assessment. The appeal was denied. At Level 2 reconsideration, they submitted video documentation of the patient's mobility limitations and updated progress notes showing incremental but measurable improvement in walking distance (from 10 feet to 45 feet over 14 days). The QIC overturned the denial and authorized coverage through day 85. <strong>Total coinsurance saved: $12,800. Total private-pay charges avoided: $14,500.</strong></p>
+    <p>If you are facing a similar situation, <a href="/scan">scan your SNF bill with BillKarma</a> to identify line-item errors or overcharges before starting the appeal process.</p>
 </div>
 
 <h2 id="medicaid">6. Medicaid as a last resort for long-term care</h2>
@@ -194,15 +195,15 @@ register("skilled-nursing-facility-billing", {
     <li><strong>Spousal protections:</strong> If one spouse needs nursing home care, the community spouse (the one still living at home) can keep a portion of the couple's assets — the Community Spouse Resource Allowance, which ranges from approximately $30,000 to $154,000 depending on the state.</li>
 </ul>
 
-<p>Medicaid has a <strong>five-year lookback period</strong> for asset transfers. If you gave away assets within five years of applying for Medicaid, those transfers can trigger a penalty period during which Medicaid will not pay for your care. This is why families should consult an elder law attorney well before a nursing home admission is imminent.</p>
+<p>Medicaid has a <strong>five-year lookback period</strong> for asset transfers. If you gave away assets within five years of applying for Medicaid, those transfers can trigger a penalty period during which Medicaid will not pay for your care. This is why families should consult an elder law attorney well before a nursing home admission is imminent. Many nonprofit SNFs also offer <a href="/guides/hospital-financial-assistance-guide">financial assistance programs</a> separate from Medicaid — check your facility's charity care policy before assuming you must pay the full private rate.</p>
 
-<p><strong>The application process</strong> typically takes 45 to 90 days. During the gap between Medicare coverage ending and Medicaid approval, the SNF may require private pay. Many facilities will accept a "Medicaid pending" status, meaning they will bill Medicaid retroactively once the application is approved. However, not all facilities accept Medicaid patients, and Medicaid beds may be limited.</p>
+<p><strong>The application process</strong> typically takes 45 to 90 days. During the gap between Medicare coverage ending and Medicaid approval, the SNF may require private pay. Many facilities will accept a "Medicaid pending" status, meaning they will bill Medicaid retroactively once the application is approved. However, not all facilities accept Medicaid patients, and Medicaid beds may be limited. Before choosing a SNF, check whether the facility accepts Medicaid and review its billing practices in our <a href="/hospitals/">hospital directory</a>.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
 
 <div class="case-study">
     <h3>Observation status blocks SNF coverage — family pays $9,600 out of pocket</h3>
-    <p>A 76-year-old woman in Ohio was hospitalized for three nights after a fall that fractured her wrist and aggravated a chronic back condition. She was discharged to a SNF for rehabilitation. After 8 days, the SNF informed the family that Medicare had denied coverage because the hospital stay was classified as observation status — not inpatient admission. Despite spending three nights in the hospital, the observation classification meant she had zero qualifying inpatient days. The family was billed $320 per day for the 8 days already spent in the SNF ($2,560) plus the remaining 22 days of rehabilitation at the same rate ($7,040). <strong>Total private-pay cost: $9,600</strong> for care that would have been fully covered under Medicare if the hospital had classified the stay as inpatient.</p>
+    <p>A 76-year-old woman in Ohio was hospitalized for three nights after a fall that fractured her wrist and aggravated a chronic back condition. She was discharged to a SNF for rehabilitation. After 8 days, the SNF informed the family that Medicare had denied coverage because the hospital stay was classified as observation status — not inpatient admission. Despite spending three nights in the hospital, the observation classification meant she had zero qualifying inpatient days. The family was billed $320 per day for the 8 days already spent in the SNF ($2,560) plus the remaining 22 days of rehabilitation at the same rate ($7,040). <strong>Total private-pay cost: $9,600</strong> for care that would have been fully covered under Medicare if the hospital had classified the stay as inpatient. <a href="/scan">Upload your SNF or hospital bill to BillKarma</a> to catch observation status issues and other coverage problems early.</p>
 </div>
 
 <div class="case-study">
@@ -235,7 +236,7 @@ register("skilled-nursing-facility-billing", {
 
     <div class="faq-item">
         <h3>Does Medicaid cover skilled nursing facility costs?</h3>
-        <p>Yes, for those who qualify financially. Medicaid is the largest payer of long-term nursing home care in the US. Eligibility requires meeting strict income and asset limits (typically under $2,000 in assets for an individual). Medicaid covers the full daily rate with no coinsurance but has a five-year lookback period for asset transfers.</p>
+        <p>Yes, for those who qualify financially. Medicaid is the largest payer of long-term nursing home care in the US. Eligibility requires meeting strict income and asset limits (typically under $2,000 in assets for an individual). Medicaid covers the full daily rate with no coinsurance but has a five-year lookback period for asset transfers. If you do not qualify for Medicaid, you may still be able to <a href="/guides/how-to-negotiate-a-medical-bill">negotiate the private-pay rate</a> directly with the facility.</p>
     </div>
 </div>
 

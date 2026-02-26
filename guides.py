@@ -139,3 +139,21 @@ import guide_surprise_assistant_surgeon_bills
 import guide_medical_billing_rights_overview
 import guide_hospital_financial_assistance
 import guide_medical_bill_audit_checklist
+# Freestanding ER, Fertility, Genetic Testing, Dialysis, Dermatology guides
+import guide_freestanding_er_billing
+import guide_fertility_treatment_billing
+import guide_genetic_testing_billing
+import guide_dialysis_billing
+import guide_dermatology_billing
+# Rehab, Device, ICD-10/DRG, Hearing Aid, Allergy Testing guides
+import guide_rehabilitation_billing
+import guide_medical_device_billing
+import guide_icd10_drg_codes
+import guide_hearing_aids_billing
+import guide_allergy_testing_billing
+# Bariatric, Medical Records, Pediatric, Hospice, Chiropractic guides
+import guide_weight_loss_surgery_billing
+import guide_medical_records_rights
+import guide_pediatric_billing
+import guide_hospice_billing
+import guide_chiropractic_billing

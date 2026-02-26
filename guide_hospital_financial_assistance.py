@@ -31,7 +31,7 @@ register("hospital-financial-assistance-guide", {
         },
     ],
     "body": f"""
-<p class="lead">Approximately 60% of hospitals in the United States are nonprofit institutions, and <strong>every one of them is legally required to offer financial assistance to patients who cannot afford their bills</strong>. Under IRS Section 501(r), these hospitals must have a written financial assistance policy, publicize it, and screen patients for eligibility before sending them to collections. Yet billions of dollars in available assistance go unclaimed each year because patients do not know to apply. This guide walks you through the entire process, step by step.</p>
+<p class="lead">Approximately 60% of hospitals in the United States are nonprofit institutions, and <strong>every one of them is legally required to offer financial assistance to patients who cannot afford their bills</strong>. Under IRS Section 501(r), these hospitals must have a written financial assistance policy, publicize it, and screen patients for eligibility before sending them to collections. Yet billions of dollars in available assistance go unclaimed each year because patients do not know to apply. This guide walks you through the entire process, step by step. Before you apply, <a href="/scan">upload your bill to BillKarma</a> to check for billing errors — reducing the bill first makes financial assistance go further.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -99,7 +99,7 @@ register("hospital-financial-assistance-guide", {
     </tbody>
 </table>
 
-<p>The thresholds above are common, but every hospital is different. Some of the most generous programs extend free care to 300% FPL and discounted care to 600% FPL (notably in Illinois, where state law requires this). Always check your specific hospital's FAP — it is available on their website and by request from the billing department.</p>
+<p>The thresholds above are common, but every hospital is different. Some of the most generous programs extend free care to 300% FPL and discounted care to 600% FPL (notably in Illinois, where state law requires this). Always check your specific hospital's FAP — it is available on their website and by request from the billing department. You can also use the <a href="/calculator">BillKarma cost calculator</a> to see what Medicare pays for the services on your bill — this gives you a baseline for evaluating whether the hospital's charges are reasonable even after a discount.</p>
 
 <h2 id="fpl-table">3. 2024 Federal Poverty Level reference table</h2>
 
@@ -205,7 +205,7 @@ register("hospital-financial-assistance-guide", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Missing a document?</strong> Submit the application with everything you have and note which documents are pending. A partial application submitted on time is better than a complete application submitted late. You can provide additional documents during the review process.
+    <strong>Missing a document?</strong> Submit the application with everything you have and note which documents are pending. A partial application submitted on time is better than a complete application submitted late. You can provide additional documents during the review process. While your application is in progress, <a href="/scan">scan your bill with BillKarma</a> to identify any billing errors worth disputing separately — correcting overcharges on top of financial assistance can dramatically reduce what you owe.
 </div>
 
 <h2 id="denied">6. What to do if your application is denied</h2>
@@ -216,7 +216,7 @@ register("hospital-financial-assistance-guide", {
     <li><strong>Request the denial reason in writing.</strong> The hospital must tell you why you were denied. Common reasons: income above the threshold, incomplete application, missing documents, or the bill is from a for-profit entity within the hospital system that is not covered by the FAP.</li>
     <li><strong>Address the specific reason.</strong> If documents were missing, gather and submit them. If your income was slightly above the threshold, write a letter explaining extraordinary expenses — medical costs, rent increases, childcare — that reduce your effective ability to pay.</li>
     <li><strong>File a formal appeal.</strong> Most hospitals have a written appeal process. Include any new documentation and a clear explanation of why you believe you qualify.</li>
-    <li><strong>Ask about alternative programs.</strong> Even if you do not qualify for the formal financial assistance program, ask about hardship discounts, prompt-pay discounts, or extended payment plans with no interest. Many hospitals offer these outside the FAP.</li>
+    <li><strong>Ask about alternative programs.</strong> Even if you do not qualify for the formal financial assistance program, ask about hardship discounts, prompt-pay discounts, or extended payment plans with no interest. Many hospitals offer these outside the FAP. See our <a href="/guides/how-to-negotiate-a-medical-bill">negotiation guide</a> for strategies to reduce your bill even without formal financial assistance.</li>
     <li><strong>Contact your state attorney general.</strong> If you believe the hospital failed to follow its own financial assistance policy or failed to screen you before taking collection action, file a complaint with your state attorney general's consumer protection division.</li>
     <li><strong>Report 501(r) violations to the IRS.</strong> If a nonprofit hospital denied your application without following its own written policy, or took extraordinary collection actions without giving you a reasonable opportunity to apply, you can file IRS Form 13909 to report a potential 501(r) violation.</li>
 </ol>
@@ -226,6 +226,7 @@ register("hospital-financial-assistance-guide", {
 <div class="case-study">
     <h3>Family of four earning $58,000 gets $34,000 hospital bill reduced to $0</h3>
     <p>A family of four in Illinois with a household income of $58,000 (186% FPL) received a $34,000 bill after an emergency appendectomy at a nonprofit hospital. The family had insurance, but their high-deductible plan left them with $8,200 in patient responsibility (deductible plus coinsurance). They contacted the hospital's patient financial services department and requested a financial assistance application. Because their income fell below the hospital's 200% FPL threshold for free care, and Illinois state law requires nonprofit hospitals to provide free care to patients under 200% FPL, the hospital approved the application and wrote off the entire $8,200 patient responsibility. The family also learned that the hospital's published AGB rate for the procedure was $12,400 — less than half the $34,000 gross charge. <strong>Result: $8,200 patient responsibility eliminated entirely.</strong></p>
+    <p>If you are in a similar situation, <a href="/scan">upload your bill to BillKarma</a> to check for errors before applying for assistance, and review our <a href="/guides/medical-billing-rights-overview">medical billing rights overview</a> to know your full protections.</p>
 </div>
 
 <div class="case-study">
@@ -238,7 +239,7 @@ register("hospital-financial-assistance-guide", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>Who qualifies for hospital financial assistance?</h3>
-        <p>Eligibility varies by hospital. Most nonprofit hospitals offer free care to patients below 200% of the Federal Poverty Level and discounted care up to 300% or 400% FPL. For a family of four in 2024, 200% FPL is $62,400 and 400% FPL is $124,800. Some hospitals extend assistance higher. Check your hospital's specific financial assistance policy on their website or by calling the billing department.</p>
+        <p>Eligibility varies by hospital. Most nonprofit hospitals offer free care to patients below 200% of the Federal Poverty Level and discounted care up to 300% or 400% FPL. For a family of four in 2024, 200% FPL is $62,400 and 400% FPL is $124,800. Some hospitals extend assistance higher. Check your hospital's specific financial assistance policy on their website or by calling the billing department. If your bill seems inflated, <a href="/guides/medical-bill-audit-checklist">audit it first</a> using our 12-point checklist before applying for assistance.</p>
     </div>
 
     <div class="faq-item">
