@@ -2,211 +2,416 @@
 
 {% block title %}Scan Your Bill - BillKarma{% endblock %}
 
+{% block head %}
+<style>
+    .scan-hero {
+        background-color: #00824F;
+        color: #fff;
+        padding: 56px 0 72px;
+        border-radius: 0 0 40px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    .scan-hero-blob {
+        position: absolute;
+        border-radius: 50%;
+        background: #00663D;
+        pointer-events: none;
+    }
+    .scan-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 500;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        margin-bottom: 14px;
+    }
+    .scan-hero-sub {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.8);
+        max-width: 480px;
+        line-height: 1.6;
+    }
+    .scan-stat-strip {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 20px 0;
+        border-bottom: 1px solid #E5E5E5;
+        background: #F5F5F5;
+    }
+    .scan-stat-item {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 0 36px;
+        flex: 1;
+        justify-content: center;
+    }
+    .scan-stat-num {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #1A1A1A;
+        white-space: nowrap;
+    }
+    .scan-stat-label {
+        font-size: 0.84rem;
+        color: #666;
+        line-height: 1.3;
+    }
+    .scan-stat-divider {
+        width: 1px;
+        height: 28px;
+        background: #D4D4D4;
+        flex-shrink: 0;
+    }
+    .scan-form-card {
+        background: #fff;
+        border: 1px solid #E5E5E5;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .scan-checks-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .scan-check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        border: 1px solid #E5E5E5;
+        border-radius: 14px;
+        background: #FAFAFA;
+    }
+    .scan-check-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #E6F4EA;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+        .scan-hero { padding: 40px 0 56px; }
+        .scan-hero h1 { font-size: 1.85rem; }
+        .scan-hero-sub { font-size: 0.95rem; }
+        .scan-hero-blob { display: none; }
+        .scan-stat-strip { flex-direction: column; gap: 12px; padding: 16px 0; }
+        .scan-stat-item { padding: 0; justify-content: flex-start; }
+        .scan-stat-divider { display: none; }
+        .scan-form-card { padding: 20px; border-radius: 16px; }
+        .scan-checks-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="max-w-xl mx-auto px-5 py-10 sm:py-16">
-    <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">Scan your bill</h1>
-    <p class="text-sm text-gray-500 mb-3">Upload a photo or image. We'll extract every charge automatically.</p>
-    {% if outcome_stats and outcome_stats.show_stat %}
-    <p class="text-xs text-green-700 bg-green-50 border border-green-200 rounded-md px-3 py-2 mb-6">
-        BillKarma users recover a median of <strong>${{ "%.0f"|format(outcome_stats.median_recovered) }}</strong> per dispute &mdash; based on {{ outcome_stats.total_disputes }} verified outcomes.
-    </p>
-    {% else %}
-    <div class="mb-8"></div>
-    {% endif %}
-
-    <div id="scan-form-shell">
-    <form id="scan-form" class="space-y-6" enctype="multipart/form-data">
-        <!-- Upload area -->
-        <div>
-            <div id="upload-area"
-                 role="button"
-                 tabindex="0"
-                 aria-label="Select bill files to upload"
-                 class="relative border border-dashed border-gray-300 rounded-lg p-10 text-center cursor-pointer hover:border-accent-500 hover:bg-accent-50/30 transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2">
-                <input type="file"
-                       id="file-input"
-                       name="images"
-                       accept="image/*,.pdf"
-                       multiple
-                       class="hidden"/>
-                <div id="upload-placeholder">
-                    <div class="text-gray-400 mb-3">
-                        <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-                        </svg>
-                    </div>
-                    <p class="text-sm font-medium text-gray-700">Choose files or take a photo</p>
-                    <p class="text-xs text-gray-400 mt-1">JPG, PNG, HEIC, or PDF. Multiple pages OK.</p>
-                </div>
-            </div>
-
-            <div id="preview-area" class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 hidden"></div>
-
-            <button type="button" id="add-more-btn"
-                    class="mt-2 hidden text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors">
-                + Add more pages
-            </button>
-        </div>
-
-        <!-- Optional EOB upload -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                Upload EOB <span class="text-gray-400 font-normal text-xs">(optional)</span>
-                <span class="bk-tip" data-tip="Your Explanation of Benefits (EOB) is the summary your insurance sends after processing a claim. It shows what was billed, what insurance paid, and your share. Not the same as your bill — find it in your insurer's portal or mail."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
-            </label>
-            <p class="text-xs text-gray-400 mb-2">Adding your Explanation of Benefits improves insurance mismatch detection.</p>
-            <input type="file"
-                   id="eob-input"
-                   name="eob_images"
-                   accept="image/*,.pdf"
-                   multiple
-                   class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
-        </div>
-
-        <!-- Portal screenshots -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                Insurance portal screenshots <span class="text-gray-400 font-normal text-xs">(optional)</span>
-                <span class="bk-tip" data-tip="Screenshots from your insurance company's online portal — e.g. claim status pages, payment history, or messages from your insurer. These aren't OCR'd but are attached to your dispute as supporting evidence."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
-            </label>
-            <p class="text-xs text-gray-400 mb-2">Screenshots from your insurance portal showing balances, messages, or claim details strengthen your dispute.</p>
-            <input type="file"
-                   id="portal-input"
-                   name="portal_images"
-                   accept="image/*,.pdf"
-                   multiple
-                   class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
-        </div>
-
-        <!-- Evidence strength chips -->
-        <div id="evidence-chips" class="hidden flex gap-2 flex-wrap items-center">
-            <span class="text-xs text-gray-500 font-medium">Evidence:</span>
-            <span id="chip-bill" class="hidden text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Bill</span>
-            <span id="chip-eob" class="hidden text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">EOB</span>
-            <span id="chip-portal" class="hidden text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">Portal</span>
-        </div>
-        <p id="evidence-strength" class="hidden text-xs font-medium mt-1"></p>
-
-        <div id="capture-quality" class="hidden text-xs rounded-md border px-3 py-2"></div>
-
-        <!-- Zip code -->
-        <div>
-            <label for="zip-code" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                Zip code <span class="text-red-400">*</span>
-                <span class="bk-tip" data-tip="Use the zip code where the medical service was provided, not your home zip. Medicare reimbursement rates vary by location, and this is the benchmark we compare against."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
-            </label>
-            <p class="text-xs text-gray-400 mb-1.5">Medicare rates vary by location.</p>
-            <input type="text"
-                   id="zip-code"
-                   name="zip_code"
-                   inputmode="numeric"
-                   pattern="[0-9]{5}"
-                   maxlength="5"
-                   placeholder="10001"
-                   required
-                   class="w-36 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 transition-colors"/>
-        </div>
-
-        <!-- Email -->
-        <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                Email <span class="text-gray-400 font-normal text-xs">(optional)</span>
-                <span class="bk-tip" data-tip="We'll email you a copy of your analysis report. We don't send marketing emails or share your address. If you start an autopilot dispute later, we'll also send you case updates here."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
-            </label>
-            <p class="text-xs text-gray-400 mb-1.5">We'll send you a copy of the report.</p>
-            <input type="email"
-                   id="email"
-                   name="email"
-                   placeholder="you@example.com"
-                   class="w-full sm:w-72 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 transition-colors"/>
-        </div>
-
-        <!-- Submit -->
-        <div class="pt-2">
-            <button type="submit" id="submit-btn" disabled
-                    class="px-5 py-2.5 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
-                <span id="submit-text">Analyze my bill</span>
-                <svg id="submit-spinner" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Error -->
-        <div id="error-display" class="hidden">
-            <div class="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-4 py-3">
-                <span id="error-text">Something went wrong.</span>
-            </div>
-        </div>
-    </form>
+<!-- Hero -->
+<section class="scan-hero">
+    <div class="scan-hero-blob" style="width:400px;height:400px;bottom:-120px;right:-40px;opacity:0.45;"></div>
+    <div class="scan-hero-blob" style="width:200px;height:200px;top:-60px;right:200px;opacity:0.35;"></div>
+    <div class="max-w-3xl mx-auto px-5">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:16px;">Free AI bill audit</p>
+        <h1>Find the overcharges<br>hiding in your bill.</h1>
+        <p class="scan-hero-sub">Upload a photo of your medical bill. We compare every line item against Medicare rates, flag billing errors, and calculate your potential savings.</p>
+        {% if outcome_stats and outcome_stats.show_stat %}
+        <p style="margin-top:18px;font-size:0.88rem;color:rgba(255,255,255,0.75);">BillKarma users recover a median of <strong style="color:#fff;">${{ "%.0f"|format(outcome_stats.median_recovered) }}</strong> per dispute &mdash; based on {{ outcome_stats.total_disputes }} verified outcomes.</p>
+        {% endif %}
     </div>
+</section>
 
-    <section id="processing-view" class="hidden rounded-2xl border border-accent-200 bg-gradient-to-b from-accent-50 to-white p-6 sm:p-8">
-        <div class="flex items-start justify-between gap-4 mb-6">
-            <div>
-                <p class="text-xs font-semibold text-accent-700 uppercase tracking-wide">Analyzing your bill</p>
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mt-1">Building your savings report</h2>
-                <p class="text-sm text-gray-600 mt-2">This usually takes under a minute. We compare your bill against Medicare rates, coding rules, and your uploaded evidence.</p>
-                <p id="processing-current-step" class="text-xs text-accent-700 mt-2">Preparing upload...</p>
-                <p id="processing-eta" class="text-xs text-gray-500 mt-1">Estimated time remaining: under 1 minute</p>
+<!-- Stat strip -->
+<div class="scan-stat-strip">
+    <div class="max-w-3xl mx-auto px-5 flex items-center justify-center w-full" style="gap:0;">
+        <div class="scan-stat-item">
+            <span class="scan-stat-num">1 in 4</span>
+            <span class="scan-stat-label">medical bills contain errors</span>
+        </div>
+        <div class="scan-stat-divider"></div>
+        <div class="scan-stat-item">
+            <span class="scan-stat-num">3.4&times;</span>
+            <span class="scan-stat-label">avg hospital markup over Medicare</span>
+        </div>
+        <div class="scan-stat-divider"></div>
+        <div class="scan-stat-item">
+            <span class="scan-stat-num">&lt; 60s</span>
+            <span class="scan-stat-label">to get your full report</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main content: form + what we check -->
+<section class="max-w-3xl mx-auto px-5 py-10 sm:py-14">
+    <div class="grid sm:grid-cols-5 gap-8 items-start">
+
+        <!-- Form card (3 cols) -->
+        <div class="sm:col-span-3">
+            <div id="scan-form-shell">
+            <div class="scan-form-card">
+                <h2 class="text-lg font-bold tracking-tight text-gray-900 mb-1">Upload your bill</h2>
+                <p class="text-sm text-gray-500 mb-5">Photo, screenshot, or PDF. We extract every charge automatically.</p>
+
+                <form id="scan-form" class="space-y-5" enctype="multipart/form-data">
+                    <!-- Upload area -->
+                    <div>
+                        <div id="upload-area"
+                             role="button"
+                             tabindex="0"
+                             aria-label="Select bill files to upload"
+                             class="relative border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center cursor-pointer hover:border-accent-500 hover:bg-accent-50/30 transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2">
+                            <input type="file"
+                                   id="file-input"
+                                   name="images"
+                                   accept="image/*,.pdf"
+                                   multiple
+                                   class="hidden"/>
+                            <div id="upload-placeholder">
+                                <div class="mx-auto mb-3 w-12 h-12 rounded-full bg-accent-50 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-accent-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-semibold text-gray-800">Choose files or take a photo</p>
+                                <p class="text-xs text-gray-400 mt-1">JPG, PNG, HEIC, or PDF. Multiple pages OK.</p>
+                            </div>
+                        </div>
+
+                        <div id="preview-area" class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 hidden"></div>
+
+                        <button type="button" id="add-more-btn"
+                                class="mt-2 hidden text-xs font-medium text-accent-700 hover:text-accent-800 transition-colors">
+                            + Add more pages
+                        </button>
+                    </div>
+
+                    <!-- Optional EOB upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            Upload EOB <span class="text-gray-400 font-normal text-xs">(optional)</span>
+                            <span class="bk-tip" data-tip="Your Explanation of Benefits (EOB) is the summary your insurance sends after processing a claim. It shows what was billed, what insurance paid, and your share. Not the same as your bill — find it in your insurer's portal or mail."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
+                        </label>
+                        <p class="text-xs text-gray-400 mb-2">Adding your EOB improves insurance mismatch detection.</p>
+                        <input type="file"
+                               id="eob-input"
+                               name="eob_images"
+                               accept="image/*,.pdf"
+                               multiple
+                               class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
+                    </div>
+
+                    <!-- Portal screenshots -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            Insurance portal screenshots <span class="text-gray-400 font-normal text-xs">(optional)</span>
+                            <span class="bk-tip" data-tip="Screenshots from your insurance company's online portal — e.g. claim status pages, payment history, or messages from your insurer. These aren't OCR'd but are attached to your dispute as supporting evidence."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
+                        </label>
+                        <p class="text-xs text-gray-400 mb-2">Portal screenshots showing balances or claim details strengthen your dispute.</p>
+                        <input type="file"
+                               id="portal-input"
+                               name="portal_images"
+                               accept="image/*,.pdf"
+                               multiple
+                               class="block w-full text-xs text-gray-600 file:mr-3 file:px-3 file:py-2 file:rounded file:border file:border-gray-200 file:bg-white file:text-gray-700 hover:file:bg-gray-50"/>
+                    </div>
+
+                    <!-- Evidence strength chips -->
+                    <div id="evidence-chips" class="hidden flex gap-2 flex-wrap items-center">
+                        <span class="text-xs text-gray-500 font-medium">Evidence:</span>
+                        <span id="chip-bill" class="hidden text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Bill</span>
+                        <span id="chip-eob" class="hidden text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">EOB</span>
+                        <span id="chip-portal" class="hidden text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">Portal</span>
+                    </div>
+                    <p id="evidence-strength" class="hidden text-xs font-medium mt-1"></p>
+
+                    <div id="capture-quality" class="hidden text-xs rounded-md border px-3 py-2"></div>
+
+                    <!-- Zip code + Email row -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-shrink-0">
+                            <label for="zip-code" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                                Zip code <span class="text-red-400">*</span>
+                                <span class="bk-tip" data-tip="Use the zip code where the medical service was provided, not your home zip. Medicare reimbursement rates vary by location, and this is the benchmark we compare against."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
+                            </label>
+                            <input type="text"
+                                   id="zip-code"
+                                   name="zip_code"
+                                   inputmode="numeric"
+                                   pattern="[0-9]{5}"
+                                   maxlength="5"
+                                   placeholder="10001"
+                                   required
+                                   class="w-36 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 transition-colors"/>
+                        </div>
+                        <div class="flex-1">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                                Email <span class="text-gray-400 font-normal text-xs">(optional)</span>
+                                <span class="bk-tip" data-tip="We'll email you a copy of your analysis report. We don't send marketing emails or share your address. If you start an autopilot dispute later, we'll also send you case updates here."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
+                            </label>
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   placeholder="you@example.com"
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-accent-500 focus:border-accent-500 transition-colors"/>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="pt-1">
+                        <button type="submit" id="submit-btn" disabled
+                                class="w-full px-5 py-3 bg-accent-700 text-white text-sm font-bold rounded-full hover:bg-accent-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+                            <span id="submit-text">Analyze my bill</span>
+                            <svg id="submit-spinner" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                            </svg>
+                        </button>
+                        <p class="text-center text-xs text-gray-400 mt-2.5">Free &middot; No signup required &middot; Takes under 60 seconds</p>
+                    </div>
+
+                    <!-- Error -->
+                    <div id="error-display" class="hidden">
+                        <div class="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-4 py-3">
+                            <span id="error-text">Something went wrong.</span>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="hidden sm:flex items-center gap-2 rounded-full bg-white border border-accent-200 px-3 py-1.5 text-xs text-accent-800 font-medium">
-                <span class="inline-block w-2 h-2 rounded-full bg-accent-600 animate-pulse"></span>
-                Live processing
+            </div>
+
+            <!-- Processing view -->
+            <section id="processing-view" class="hidden rounded-2xl border border-accent-200 bg-gradient-to-b from-accent-50 to-white p-6 sm:p-8">
+                <div class="flex items-start justify-between gap-4 mb-6">
+                    <div>
+                        <p class="text-xs font-semibold text-accent-700 uppercase tracking-wide">Analyzing your bill</p>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mt-1">Building your savings report</h2>
+                        <p class="text-sm text-gray-600 mt-2">This usually takes under a minute. We compare your bill against Medicare rates, coding rules, and your uploaded evidence.</p>
+                        <p id="processing-current-step" class="text-xs text-accent-700 mt-2">Preparing upload...</p>
+                        <p id="processing-eta" class="text-xs text-gray-500 mt-1">Estimated time remaining: under 1 minute</p>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-white border border-accent-200 px-3 py-1.5 text-xs text-accent-800 font-medium">
+                        <span class="inline-block w-2 h-2 rounded-full bg-accent-600 animate-pulse"></span>
+                        Live processing
+                    </div>
+                </div>
+
+                <div class="h-2 rounded-full bg-white border border-accent-100 overflow-hidden mb-7">
+                    <div id="processing-progress-fill" class="h-full w-0 bg-accent-500/90 transition-all duration-700 ease-out"></div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div class="space-y-3" id="processing-steps">
+                        <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-upload" data-status="pending">
+                            <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                            <span class="step-label text-gray-400">Uploading files...</span>
+                        </div>
+                        <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-extract" data-status="pending">
+                            <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                            <span class="step-label text-gray-400">Extracting line items...</span>
+                        </div>
+                        <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm hidden" id="step-eob" data-status="pending">
+                            <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                            <span class="step-label text-gray-400">Matching EOB to bill...</span>
+                        </div>
+                        <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-analyze" data-status="pending">
+                            <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                            <span class="step-label text-gray-400">Detecting billing errors...</span>
+                        </div>
+                        <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-savings" data-status="pending">
+                            <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
+                            <span class="step-label text-gray-400">Calculating savings...</span>
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-4">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">What we're checking</p>
+                        <div class="mt-3 space-y-2.5">
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                                Overcharges vs Medicare benchmarks
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                                Duplicate or unbundled line items
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                                Insurance/EOB mismatches
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                                Likely dispute leverage and savings
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- What we check sidebar (2 cols) -->
+        <div class="sm:col-span-2">
+            <div class="sticky" style="top:80px;">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">What we check</p>
+                <div class="space-y-3">
+                    <div class="scan-check-item">
+                        <div class="scan-check-icon">
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Medicare rate comparison</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Every CPT code checked against federal benchmarks</p>
+                        </div>
+                    </div>
+                    <div class="scan-check-item">
+                        <div class="scan-check-icon">
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Duplicate charges</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Same service billed twice or more</p>
+                        </div>
+                    </div>
+                    <div class="scan-check-item">
+                        <div class="scan-check-icon">
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Unbundling errors</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Services that should be billed together</p>
+                        </div>
+                    </div>
+                    <div class="scan-check-item">
+                        <div class="scan-check-icon">
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Upcoding detection</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Codes billed at a higher level than warranted</p>
+                        </div>
+                    </div>
+                    <div class="scan-check-item">
+                        <div class="scan-check-icon">
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Savings calculation</p>
+                            <p class="text-xs text-gray-500 mt-0.5">How much you could recover with a dispute</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 rounded-2xl bg-accent-50 border border-accent-100">
+                    <p class="text-sm font-semibold text-gray-800 mb-1">Already have results?</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">Use our <a href="/calculator" class="text-accent-500 font-semibold hover:underline">cost calculator</a> to look up Medicare rates for any procedure, or browse <a href="/hospitals/" class="text-accent-500 font-semibold hover:underline">hospital pricing</a> in your area.</p>
+                </div>
             </div>
         </div>
 
-        <div class="h-2 rounded-full bg-white border border-accent-100 overflow-hidden mb-7">
-            <div id="processing-progress-fill" class="h-full w-0 bg-accent-500/90 transition-all duration-700 ease-out"></div>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-6">
-            <div class="space-y-3" id="processing-steps">
-                <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-upload" data-status="pending">
-                    <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
-                    <span class="step-label text-gray-400">Uploading files...</span>
-                </div>
-                <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-extract" data-status="pending">
-                    <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
-                    <span class="step-label text-gray-400">Extracting line items...</span>
-                </div>
-                <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm hidden" id="step-eob" data-status="pending">
-                    <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
-                    <span class="step-label text-gray-400">Matching EOB to bill...</span>
-                </div>
-                <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-analyze" data-status="pending">
-                    <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
-                    <span class="step-label text-gray-400">Detecting billing errors...</span>
-                </div>
-                <div class="step flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm" id="step-savings" data-status="pending">
-                    <span class="step-icon flex-shrink-0 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center"></span>
-                    <span class="step-label text-gray-400">Calculating savings...</span>
-                </div>
-            </div>
-            <div class="rounded-xl border border-gray-200 bg-white p-4">
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">What we're checking</p>
-                <div class="mt-3 space-y-2.5">
-                    <div class="flex items-center gap-2 text-sm text-gray-700">
-                        <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
-                        Overcharges vs Medicare benchmarks
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-700">
-                        <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
-                        Duplicate or unbundled line items
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-700">
-                        <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
-                        Insurance/EOB mismatches
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-700">
-                        <span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
-                        Likely dispute leverage and savings
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 </section>
 {% endblock %}
 
