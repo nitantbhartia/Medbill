@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Community Savings Feed | BillKarma{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <!-- Hero Stats -->
+    <div class="text-center mb-12">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Community Savings</h1>
+        <p class="text-gray-600 mb-8">Real billing errors found by BillKarma users</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-accent-50 rounded-xl p-4">
+                <p class="text-2xl font-bold text-accent-500">{{ "{:,}".format(stats.bills_analyzed|int) }}</p>
+                <p class="text-xs text-gray-600 mt-1">Bills Analyzed</p>
+            </div>
+            <div class="bg-accent-50 rounded-xl p-4">
+                <p class="text-2xl font-bold text-accent-500">${{ "{:,.0f}".format(stats.total_savings_found|float) }}</p>
+                <p class="text-xs text-gray-600 mt-1">Total Savings Found</p>
+            </div>
+            <div class="bg-accent-50 rounded-xl p-4">
+                <p class="text-2xl font-bold text-accent-500">{{ "{:,}".format(stats.total_issues_found|int) }}</p>
+                <p class="text-xs text-gray-600 mt-1">Issues Detected</p>
+            </div>
+            <div class="bg-accent-50 rounded-xl p-4">
+                <p class="text-2xl font-bold text-accent-500">${{ "{:,.0f}".format(stats.total_realized_savings|float) }}</p>
+                <p class="text-xs text-gray-600 mt-1">Actually Recovered</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Finding Types -->
+    {% if stats.top_finding_types %}
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
+        <h2 class="font-semibold text-gray-900 mb-4">Most Common Issues Found</h2>
+        <div class="space-y-3">
+            {% for ft in stats.top_finding_types %}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-accent-400"></span>
+                    <span class="text-sm text-gray-700 capitalize">{{ ft.type }}</span>
+                    <span class="text-xs text-gray-400">({{ ft.count }} found)</span>
+                </div>
+                <span class="text-sm font-semibold text-gray-900">${{ "{:,.0f}".format(ft.total_savings) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Live Feed -->
+    <h2 class="font-semibold text-gray-900 mb-4">Recent Savings Found</h2>
+    <div class="space-y-3">
+        {% for item in feed %}
+        <div class="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between hover:border-accent-200 transition">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-block w-2 h-2 rounded-full
+                        {% if item.severity == 'high' %}bg-red-500{% elif item.severity == 'medium' %}bg-yellow-500{% else %}bg-blue-400{% endif %}"></span>
+                    <span class="text-sm font-medium text-gray-900 capitalize">{{ item.finding_label }}</span>
+                </div>
+                <p class="text-xs text-gray-500">
+                    {{ item.provider_hint }} &middot; ZIP {{ item.zip_prefix }}
+                    {% if item.created_at %} &middot; {{ item.created_at[:10] }}{% endif %}
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-lg font-bold text-red-600">${{ "{:,.0f}".format(item.savings) }}</p>
+                <p class="text-xs text-gray-400">potential savings</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not feed %}
+        <div class="text-center py-12 text-gray-400">
+            <p>No savings data yet. Be the first to scan a bill!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-12">
+        <a href="/scan" class="inline-block px-8 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition">
+            Scan Your Bill &mdash; Free
+        </a>
+        <p class="text-xs text-gray-400 mt-3">Join thousands saving money on medical bills</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{% if data.procedure %}{{ data.procedure.name }} Cost Near {{ data.zip_center.city }}, {{ data.zip_center.state }}{% else %}Pre-Care Price Shopper{% endif %} | BillKarma{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Search Form -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Shop Before You Go</h1>
+        <p class="text-gray-600 mb-6">Find the best price for your procedure before scheduling</p>
+
+        <form method="GET" action="/shop" class="max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
+            <input type="text" name="cpt" value="{{ request.query_params.get('cpt', '') }}"
+                placeholder="CPT code or procedure name" required
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-400">
+            <input type="text" name="zip" value="{{ request.query_params.get('zip', '') }}"
+                placeholder="ZIP code" required maxlength="5" pattern="\d{5}"
+                class="w-32 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-400">
+            <button type="submit"
+                class="px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition whitespace-nowrap">
+                Find Prices
+            </button>
+        </form>
+
+        <div class="flex justify-center gap-4 mt-4">
+            <label class="text-sm text-gray-500">
+                <input type="radio" name="sort_select" value="price" {% if not request.query_params.get('sort') or request.query_params.get('sort') == 'price' %}checked{% endif %}
+                    onchange="updateSort(this.value)"> Price
+            </label>
+            <label class="text-sm text-gray-500">
+                <input type="radio" name="sort_select" value="distance" {% if request.query_params.get('sort') == 'distance' %}checked{% endif %}
+                    onchange="updateSort(this.value)"> Distance
+            </label>
+            <label class="text-sm text-gray-500">
+                <input type="radio" name="sort_select" value="grade" {% if request.query_params.get('sort') == 'grade' %}checked{% endif %}
+                    onchange="updateSort(this.value)"> Grade
+            </label>
+        </div>
+    </div>
+
+    {% if data.procedure %}
+    <!-- Procedure Header -->
+    <div class="bg-accent-50 rounded-xl p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">{{ data.procedure.name }}</h2>
+                <p class="text-sm text-gray-600">CPT {{ data.procedure.cpt_code }} &middot; within {{ data.radius_miles }} miles of {{ data.zip_center.city }}, {{ data.zip_center.state }}</p>
+            </div>
+            {% if data.procedure.medicare_rate %}
+            <div class="text-right">
+                <p class="text-sm text-gray-500">Medicare Reference</p>
+                <p class="text-xl font-bold text-accent-500">${{ "{:,.0f}".format(data.procedure.medicare_rate) }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Savings Opportunity Banner -->
+    {% if data.savings_opportunity %}
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center justify-between">
+        <div>
+            <p class="font-semibold text-green-800">Save up to ${{ "{:,.0f}".format(data.savings_opportunity.max_savings) }}</p>
+            <p class="text-sm text-green-700">by choosing {{ data.savings_opportunity.cheapest_provider }} (${{ "{:,.0f}".format(data.savings_opportunity.cheapest) }}) instead of the most expensive option (${{ "{:,.0f}".format(data.savings_opportunity.most_expensive) }})</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Results -->
+    <div class="space-y-3">
+        {% for p in data.providers %}
+        <a href="{{ p.url }}" class="block bg-white border border-gray-200 rounded-xl p-5 hover:border-accent-300 hover:shadow-sm transition">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="font-semibold text-gray-900 truncate">{{ p.name }}</h3>
+                        {% if p.billing_grade %}
+                        <span class="inline-block px-2 py-0.5 rounded text-xs font-bold text-white
+                            {% if p.billing_grade == 'A' %}bg-grade-a{% elif p.billing_grade == 'B' %}bg-grade-b{% elif p.billing_grade == 'C' %}bg-grade-c{% elif p.billing_grade == 'D' %}bg-grade-d{% else %}bg-grade-f{% endif %}">
+                            {{ p.billing_grade }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-sm text-gray-500">
+                        {{ p.facility_type_label }} &middot; {{ p.city }}, {{ p.state }} &middot; {{ p.distance_miles }} mi
+                    </p>
+                    {% if p.phone %}
+                    <p class="text-xs text-gray-400 mt-1">{{ p.phone }}</p>
+                    {% endif %}
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-xl font-bold text-gray-900">${{ "{:,.0f}".format(p.gross_charge) }}</p>
+                    {% if p.cash_price %}
+                    <p class="text-sm text-green-600 font-medium">Cash: ${{ "{:,.0f}".format(p.cash_price) }}</p>
+                    {% endif %}
+                    {% if p.markup_vs_medicare %}
+                    <p class="text-xs text-gray-400">{{ p.markup_vs_medicare }}x Medicare</p>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+
+        {% if not data.providers %}
+        <div class="text-center py-12 text-gray-400">
+            <p class="mb-2">No providers found with pricing data for this procedure near this ZIP code.</p>
+            <p class="text-sm">Try expanding your search radius or a different procedure.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-8">
+        {{ data.total_found }} provider(s) found. Prices from hospital transparency files and may not reflect your final cost.
+    </p>
+    {% endif %}
+
+    {% if not data.procedure %}
+    <!-- Empty state when no search yet -->
+    <div class="text-center py-16">
+        <p class="text-5xl mb-4">&#128269;</p>
+        <p class="text-gray-500 mb-2">Enter a CPT code and ZIP code above to find prices</p>
+        <p class="text-sm text-gray-400">Common codes: 70551 (Brain MRI), 45378 (Colonoscopy), 27447 (Knee Replacement), 99284 (ER Visit L4)</p>
+    </div>
+    {% endif %}
+
+    <!-- Already had the procedure? -->
+    <div class="text-center mt-12 bg-gray-50 rounded-xl p-8">
+        <p class="font-semibold text-gray-900 mb-2">Already had this procedure?</p>
+        <p class="text-sm text-gray-600 mb-4">Compare your actual bill against these prices to see if you overpaid.</p>
+        <a href="/scan" class="inline-block px-6 py-3 bg-accent-500 text-white font-semibold rounded-xl hover:bg-accent-600 transition">
+            Scan Your Bill &mdash; Free
+        </a>
+    </div>
+</div>
+
+<script>
+function updateSort(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('sort', value);
+    window.location = url.toString();
+}
+</script>
+{% endblock %}

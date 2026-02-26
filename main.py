@@ -1245,6 +1245,9 @@ async def sitemap_index():
         (f"{base}/guides/", "2026-02-01", "0.8"),
         (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/fight-debt", "2026-02-24", "0.9"),
+        (f"{base}/savings", "2026-02-25", "0.8"),
+        (f"{base}/shop", "2026-02-25", "0.8"),
+        (f"{base}/watch", "2026-02-25", "0.7"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
@@ -1606,6 +1609,138 @@ async def settle_debt_page(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Negotiate a Medical Debt Settlement | BillKarma",
             "og_description": "Generate a settlement offer letter for medical debt. Collectors often accept 20-40% of the balance.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Bill Health Score ---
+
+
+@app.get("/score/{bill_id}", response_class=HTMLResponse)
+async def bill_score_page(request: Request, bill_id: int):
+    """Show the Bill Health Score for a scanned bill."""
+    require_bill_access(request, bill_id)
+    from bill_score import compute_bill_score
+    score = compute_bill_score(bill_id)
+    if not score:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+    share_url = f"{config.APP_URL.rstrip('/')}/score/share/{score['share_token']}"
+    return templates.TemplateResponse(
+        "bill_score.html",
+        {
+            "request": request,
+            "score": score,
+            "share_url": share_url,
+            "is_public": False,
+            "og_title": f"Bill Health Score: {score['score']}/100 — Grade {score['grade']} | BillKarma",
+            "og_description": f"This medical bill scored {score['score']}/100 with {score['finding_count']} issue(s) and ${score['potential_savings']:,.0f} in potential savings.",
+            "meta_robots": "noindex",
+        },
+    )
+
+
+@app.get("/score/share/{share_token}", response_class=HTMLResponse)
+async def bill_score_public(request: Request, share_token: str):
+    """Public shareable Bill Health Score page."""
+    from bill_score import get_score_by_token
+    score = get_score_by_token(share_token)
+    if not score:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Score not found"})
+    share_url = f"{config.APP_URL.rstrip('/')}/score/share/{share_token}"
+    return templates.TemplateResponse(
+        "bill_score.html",
+        {
+            "request": request,
+            "score": score,
+            "share_url": share_url,
+            "is_public": True,
+            "canonical_url": share_url,
+            "og_title": f"Bill Health Score: {score['score']}/100 — Grade {score['grade']} | BillKarma",
+            "og_description": f"This medical bill scored {score['score']}/100 with ${score['potential_savings']:,.0f} in potential overcharges found.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Community Savings Feed ---
+
+
+@app.get("/savings", response_class=HTMLResponse)
+async def savings_feed_page(request: Request):
+    """Community savings feed showing anonymized recent savings."""
+    from savings_feed import get_recent_savings, get_aggregate_stats
+    feed = get_recent_savings(30)
+    stats = get_aggregate_stats()
+    canonical_url = f"{config.APP_URL.rstrip('/')}/savings"
+    return templates.TemplateResponse(
+        "savings_feed.html",
+        {
+            "request": request,
+            "feed": feed,
+            "stats": stats,
+            "canonical_url": canonical_url,
+            "og_title": "Community Savings Feed | BillKarma",
+            "og_description": f"BillKarma users have found ${stats.get('total_savings_found', 0):,.0f} in billing errors. See real-time savings.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Pre-Care Price Shopper ---
+
+
+@app.get("/shop", response_class=HTMLResponse)
+async def price_shopper_page(
+    request: Request,
+    cpt: str = "",
+    zip: str = "",
+    sort: str = "price",
+    radius: int = 50,
+    type: str = "all",
+):
+    """Pre-care price shopper — find cheapest providers for a procedure."""
+    from price_shopper import shop_for_procedure
+    data = {"procedure": None, "providers": [], "savings_opportunity": None}
+    if cpt and zip:
+        data = shop_for_procedure(
+            cpt_code=cpt.strip(),
+            zip_code=zip.strip(),
+            radius_miles=max(10, min(radius, 200)),
+            facility_type=type,
+            sort_by=sort,
+        )
+    proc_name = (data.get("procedure") or {}).get("name") or "Medical Procedure"
+    zip_city = (data.get("zip_center") or {}).get("city") or ""
+    zip_state = (data.get("zip_center") or {}).get("state") or ""
+    canonical_url = f"{config.APP_URL.rstrip('/')}/shop"
+    return templates.TemplateResponse(
+        "price_shopper.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": canonical_url,
+            "og_title": f"Find Best Price for {proc_name} | BillKarma" if cpt else "Pre-Care Price Shopper | BillKarma",
+            "og_description": f"Compare prices for {proc_name} near {zip_city}, {zip_state}. Find the cheapest provider." if cpt else "Compare procedure prices across hospitals, surgery centers, and imaging centers before scheduling.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Bill Watch / Price Alerts ---
+
+
+@app.get("/watch", response_class=HTMLResponse)
+async def bill_watch_page(request: Request):
+    """Price watch subscription page."""
+    canonical_url = f"{config.APP_URL.rstrip('/')}/watch"
+    return templates.TemplateResponse(
+        "bill_watch.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Price Watch — Get Hospital Pricing Alerts | BillKarma",
+            "og_description": "Set alerts for hospitals, procedures, or ZIP codes. Get notified when pricing data changes.",
             "meta_robots": "index, follow",
         },
     )
