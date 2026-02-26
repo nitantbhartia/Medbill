@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 {% block title %}{% if data.procedure %}{{ data.procedure.name }} Cost Near {{ data.zip_center.city }}, {{ data.zip_center.state }}{% else %}Pre-Care Price Shopper{% endif %} | BillKarma{% endblock %}
+{% block head %}
+<style>
+    .ps-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; text-align:center; }
+    .ps-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; }
+    .ps-hero p { color:rgba(255,255,255,0.8); font-weight:500; font-size:1.05rem; }
+    @media(max-width:640px){ .ps-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .ps-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-12">
+<section class="ps-hero">
+    <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">Pre-care pricing</p>
+    <h1>Shop Before You Go</h1>
+    <p>Compare real hospital prices for your procedure before scheduling</p>
+</section>
+
+<div class="max-w-4xl mx-auto px-4 py-10">
     <!-- Search Form -->
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Shop Before You Go</h1>
-        <p class="text-gray-600 mb-6">Find the best price for your procedure before scheduling</p>
 
         <form method="GET" action="/shop" class="max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
             <input type="text" name="cpt" value="{{ request.query_params.get('cpt', '') }}"

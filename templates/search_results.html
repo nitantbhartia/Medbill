@@ -5,10 +5,13 @@
 {% block head %}
 <meta name="description" content="{{ og_description if og_description else 'Search procedures and facilities on BillKarma.' }}">
 <style>
-  .search-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 48px; }
-  .search-head { margin-bottom: 22px; }
-  .search-head h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; }
-  .search-head p { color: #6b7280; margin-top: 8px; }
+  .sr-hero { background:#00824F; border-radius:0 0 40px 40px; padding:48px 24px 44px; }
+  .sr-hero-inner { max-width:1100px; margin:0 auto; }
+  .sr-hero h1 { color:#fff; font-size:2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:6px; }
+  .sr-hero p { color:rgba(255,255,255,0.75); font-weight:500; }
+  @media(max-width:640px){ .sr-hero{padding:36px 18px 32px;border-radius:0 0 24px 24px;} .sr-hero h1{font-size:1.6rem;} }
+
+  .search-wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
   .search-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   .result-col { border: 1px solid #e5e7eb; border-radius: 16px; background: #fff; }
   .result-col h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
@@ -23,11 +26,17 @@
 {% endblock %}
 
 {% block content %}
+<section class="sr-hero">
+    <div class="sr-hero-inner">
+        <h1>{% if query %}Results for &ldquo;{{ query }}&rdquo;{% else %}Search{% endif %}</h1>
+        <p>{% if query %}Procedures, hospitals, and facilities{% else %}Enter a procedure, hospital, surgery center, or imaging center{% endif %}</p>
+    </div>
+</section>
+
 <div class="search-wrap">
-  <div class="search-head">
-    <h1>Search results</h1>
+  <div>
     {% if query %}
-    <p>Results for "{{ query }}"</p>
+    <p style="color:#6b7280;margin-bottom:18px;">Showing matches across procedures and facilities</p>
     {% else %}
     <p>Enter a procedure, hospital, surgery center, or imaging center.</p>
     {% endif %}

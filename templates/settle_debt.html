@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Medical Debt Settlement Letter Generator | BillKarma{% endblock %}
 
+{% block head %}
+<style>
+    .settle-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .settle-hero-inner { max-width:672px; margin:0 auto; }
+    .settle-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .settle-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    .settle-hero .settle-stat { display:inline-flex; align-items:baseline; gap:8px; margin-top:18px; padding:8px 16px; background:rgba(255,255,255,0.15); border-radius:999px; font-size:0.88rem; color:rgba(255,255,255,0.9); }
+    .settle-hero .settle-stat strong { color:#fff; font-size:1.1rem; }
+    @media(max-width:640px){ .settle-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .settle-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto px-6 py-16">
-    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Negotiate a Medical Debt Settlement</h1>
-    <p class="text-gray-500 mb-8">Collection agencies buy medical debt for 3-7 cents on the dollar. A lump-sum settlement of 20-40% is commonly accepted.</p>
+<section class="settle-hero">
+    <div class="settle-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Free tool</p>
+        <h1>Negotiate your<br>medical debt</h1>
+        <p>Collection agencies buy medical debt for 3&ndash;7 cents on the dollar. Generate a settlement letter offering 20&ndash;40% and keep the rest in your pocket.</p>
+        <div class="settle-stat"><strong>20&ndash;40%</strong> lump-sum settlements commonly accepted</div>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-6 py-10">
 
     <div id="form-section">
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">

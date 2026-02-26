@@ -4,15 +4,20 @@
 
 {% block content %}
 <section class="max-w-md mx-auto px-5 py-20 text-center">
+    <div class="mx-auto mb-5 w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+        </svg>
+    </div>
     <h1 class="text-xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-    <p class="text-sm text-gray-500 mb-6">
+    <p class="text-sm text-gray-500 mb-8">
         {{ message | default("An unexpected error occurred. Please try again.") }}
     </p>
     <div class="flex items-center justify-center gap-3">
-        <a href="/scan" class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
+        <a href="/scan" class="px-5 py-2.5 bg-accent-700 text-white text-sm font-bold rounded-full hover:bg-accent-800 transition-colors">
             Try again
         </a>
-        <a href="/" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+        <a href="/" class="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">
             Go home
         </a>
     </div>

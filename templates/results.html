@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Results - BillKarma{% endblock %}
+{% block head %}
+<style>
+    .results-bar { background:#00824F; padding:20px 24px; border-radius:0 0 24px 24px; }
+    .results-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .results-bar .rb-crumb { font-size:0.75rem; color:rgba(255,255,255,0.5); }
+    .results-bar .rb-crumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
+    .results-bar .rb-crumb a:hover { color:rgba(255,255,255,0.8); }
+    .results-bar .rb-crumb .rb-active { color:#fff; font-weight:600; }
+    .results-bar .rb-title { color:#fff; font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
+    @media(max-width:640px){ .results-bar{padding:16px 16px;} .results-bar-inner{flex-direction:column;align-items:flex-start;gap:4px;} }
+</style>
+{% endblock %}
+
 {% block content %}
 {% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
 {% set total_gross = data.total_gross_potential_savings if data.total_gross_potential_savings is defined else total_savings %}
@@ -9,12 +22,18 @@
 {% set has_patient_data = data.has_patient_data if data.has_patient_data is defined else false %}
 {% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
 
-<section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
-    <!-- Breadcrumb -->
-    <div class="text-xs text-gray-400 mb-6 flex items-center gap-1.5">
-        <span>Upload</span><span>&rsaquo;</span><span>Confirm</span><span>&rsaquo;</span>
-        <span class="text-gray-700 font-medium">Results</span>
+<div class="results-bar">
+    <div class="results-bar-inner">
+        <div class="rb-crumb">
+            <a href="/scan">Upload</a> <span>&rsaquo;</span> <a href="/confirm/{{ data.bill.id }}">Confirm</a> <span>&rsaquo;</span> <span class="rb-active">Results</span>
+        </div>
+        <div class="rb-title">
+            {% if issue_count > 0 %}{{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} &middot; ${{ "%.0f" | format(total_savings) }} potential savings{% else %}Bill Analysis{% endif %}
+        </div>
     </div>
+</div>
+
+<section class="max-w-2xl mx-auto px-5 py-8 sm:py-10">
 
     {% if issue_count > 0 %}
     <!-- Case Summary Cards -->
