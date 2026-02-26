@@ -127,3 +127,15 @@ import guide_pay_for_delete_medical_debt
 import guide_medical_debt_settlement
 # Medical Debt Forgiveness
 import guide_medical_debt_forgiveness
+# New guides
+import guide_dental_billing
+import guide_medical_debt_after_death
+import guide_preventive_care_billing
+import guide_how_health_insurance_works
+import guide_car_accident_medical_bills
+# Skilled Nursing, Rights, Financial Assistance, Audit guides
+import guide_skilled_nursing_billing
+import guide_surprise_assistant_surgeon_bills
+import guide_medical_billing_rights_overview
+import guide_hospital_financial_assistance
+import guide_medical_bill_audit_checklist

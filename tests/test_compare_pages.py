@@ -96,7 +96,7 @@ def test_compare_index_renders():
 def test_compare_query_deeplink_redirects():
     _seed()
     resp = client.get(f"/compare/?facility-a={_FID_A}&facility-b={_FID_B}", follow_redirects=False)
-    assert resp.status_code in (302, 307)
+    assert resp.status_code in (301, 302, 307)
     assert resp.headers["location"] == f"/compare/{_FID_A}/vs/{_FID_B}/"
 
 
@@ -278,3 +278,32 @@ def test_compare_map_fallback_without_coordinates():
     data = get_comparison_data(_FID_A, _FID_B)
     assert data is not None
     assert data["map_data"]["available"] is False
+
+
+# ---- Float facility ID cleanup tests ----
+
+
+def test_compare_detail_redirects_float_ids():
+    """Float-suffixed facility IDs in URLs get 301-redirected to clean versions."""
+    _seed()
+    resp = client.get(f"/compare/{_FID_A}.0/vs/{_FID_B}.0/", follow_redirects=False)
+    assert resp.status_code == 301
+    assert resp.headers["location"] == f"/compare/{_FID_A}/vs/{_FID_B}/"
+
+
+def test_compare_query_cleans_float_hospital_param():
+    """The ?hospital= param gets cleaned of .0 suffix before redirect."""
+    _seed()
+    resp = client.get(f"/compare/?hospital={_FID_A}.0", follow_redirects=False)
+    assert resp.status_code == 301
+    assert f"{_FID_A}.0" not in resp.headers["location"]
+    assert _FID_A in resp.headers["location"]
+
+
+def test_normalize_facility_id_strips_float():
+    from hospital_seo import normalize_facility_id
+    assert normalize_facility_id("1659325629.0") == "1659325629"
+    assert normalize_facility_id("010001.0") == "010001"
+    assert normalize_facility_id("010001") == "010001"
+    assert normalize_facility_id(None) is None
+    assert normalize_facility_id("") is None

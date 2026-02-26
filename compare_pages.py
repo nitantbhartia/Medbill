@@ -12,6 +12,7 @@ from hospital_seo import (
     _display_name,
     _grade_index,
     _ownership_display_label,
+    normalize_facility_id,
     state_display_name,
 )
 
@@ -66,6 +67,7 @@ def search_hospitals_for_compare(query: str, limit: int = 10) -> list[dict]:
     result = []
     for row in rows:
         d = dict(row)
+        d["facility_id"] = normalize_facility_id(d.get("facility_id")) or d.get("facility_id")
         d["name"] = _display_name(d.get("name"), d.get("facility_id"))
         d["city"] = _display_city(d.get("city"))
         d["state"] = state_display_name(d.get("state"))

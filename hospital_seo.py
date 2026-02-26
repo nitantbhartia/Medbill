@@ -91,7 +91,13 @@ def city_slug_from_name(city: str) -> str:
 def normalize_facility_id(value: str | None) -> str | None:
     if not value:
         return None
-    return str(value).strip().zfill(6)
+    s = str(value).strip()
+    # Strip ".0" suffix from float-parsed CSV values (e.g. "1659325629.0" → "1659325629")
+    if s.endswith(".0"):
+        prefix = s[:-2]
+        if prefix.isdigit():
+            s = prefix
+    return s.zfill(6)
 
 
 def _to_bool_int(value: str | int | None) -> int | None:

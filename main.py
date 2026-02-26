@@ -64,6 +64,17 @@ async def security_headers(request: Request, call_next):
 templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
 
+
+def _clean_fid(value):
+    """Strip trailing .0 from facility IDs rendered in URLs."""
+    s = str(value or "")
+    if s.endswith(".0") and s[:-2].isdigit():
+        return s[:-2]
+    return s
+
+
+templates.env.filters["clean_fid"] = _clean_fid
+
 HOME_PROCEDURE_CARD_SPECS = [
     {"cpt_code": "70551", "name": "MRI of Brain (w/o contrast)", "category": "Imaging", "secondary_type": "imaging_center"},
     {"cpt_code": "45378", "name": "Colonoscopy (Diagnostic)", "category": "Surgery", "secondary_type": "asc"},
@@ -1191,11 +1202,15 @@ async def compare_index(
     facility_b: str = Query("", alias="facility-b"),
     hospital: str = "",
 ):
+    # Normalize float-parsed facility IDs (e.g. "1659325629.0" → "1659325629")
+    facility_a = _clean_fid(facility_a)
+    facility_b = _clean_fid(facility_b)
+    hospital = _clean_fid(hospital)
     # Deep-link support from ASC/imaging pages.
     if facility_a and facility_b:
-        return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=302)
+        return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=301)
     if hospital:
-        return RedirectResponse(url=f"/compare/?facility-a={hospital}", status_code=302)
+        return RedirectResponse(url=f"/compare/?facility-a={hospital}", status_code=301)
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
     return templates.TemplateResponse(
         "compare_index.html",
@@ -1211,6 +1226,10 @@ async def compare_index(
 
 @app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
 async def compare_detail(request: Request, fid_a: str, fid_b: str):
+    # Redirect .0-suffixed IDs to clean URLs
+    clean_a, clean_b = _clean_fid(fid_a), _clean_fid(fid_b)
+    if clean_a != fid_a or clean_b != fid_b:
+        return RedirectResponse(url=f"/compare/{clean_a}/vs/{clean_b}/", status_code=301)
     data = get_comparison_data(fid_a, fid_b)
     if not data:
         return templates.TemplateResponse(

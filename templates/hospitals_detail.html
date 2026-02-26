@@ -170,7 +170,7 @@
         <div class="rounded-lg border border-gray-200 p-5">
             <h2 class="text-lg font-semibold text-gray-900 mb-2">Planning a procedure?</h2>
             <p class="text-sm text-gray-600">See what it should cost before you schedule.</p>
-            <a href="/compare?hospital={{ data.hospital.facility_id }}" class="inline-block mt-3 bg-accent-700 text-white text-base font-semibold px-6 py-3 rounded-lg">Compare Procedure Costs &rarr;</a>
+            <a href="/compare?hospital={{ data.hospital.facility_id|clean_fid }}" class="inline-block mt-3 bg-accent-700 text-white text-base font-semibold px-6 py-3 rounded-lg">Compare Procedure Costs &rarr;</a>
         </div>
     </div>
 
@@ -178,7 +178,7 @@
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h2 class="text-lg font-semibold text-gray-900 mb-2">Need professional billing help?</h2>
         <p class="text-sm text-gray-600">Connect with an independent patient-advocacy service.</p>
-        <a href="{{ affiliate_url }}?utm_source=billkarma&utm_medium=hospital_page&utm_campaign={{ data.hospital.facility_id }}"
+        <a href="{{ affiliate_url }}?utm_source=billkarma&utm_medium=hospital_page&utm_campaign={{ data.hospital.facility_id|clean_fid }}"
            target="_blank" rel="noopener"
            class="inline-block mt-3 text-sm font-semibold text-accent-700 hover:text-accent-800 underline">Get dispute support</a>
     </div>
@@ -450,7 +450,7 @@
     <div class="mb-8 rounded-lg border border-gray-200 p-5">
         <h2 class="text-lg font-semibold text-gray-900 mb-2">Hospital representative?</h2>
         <p class="text-sm text-gray-600">Claim this profile to add official billing-assistance links and correction notes.</p>
-        <a href="{{ claim_hospital_url }}?facility_id={{ data.hospital.facility_id }}"
+        <a href="{{ claim_hospital_url }}?facility_id={{ data.hospital.facility_id|clean_fid }}"
            class="inline-block mt-3 text-sm font-semibold text-accent-700 hover:text-accent-800 underline">Claim this hospital profile</a>
     </div>
     {% endif %}
