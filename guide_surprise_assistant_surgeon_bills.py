@@ -107,7 +107,7 @@ register("surprise-assistant-surgeon-bills", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Before any scheduled surgery:</strong> Ask your surgeon whether an assistant surgeon will be used, who it will be, and whether they are in your insurance network. If the assistant is out-of-network, ask the surgeon to use an in-network assistant or put in writing that you do not consent to out-of-network assistant surgeon services.
+    <strong>Before any scheduled surgery:</strong> Ask your surgeon whether an assistant surgeon will be used, who it will be, and whether they are in your insurance network. If the assistant is out-of-network, ask the surgeon to use an in-network assistant or put in writing that you do not consent to out-of-network assistant surgeon services. You can <a href="/hospitals/">look up your hospital's billing grade</a> in our directory to see how frequently it uses out-of-network providers.
 </div>
 
 <h2 id="modifiers">3. Understanding modifier 80, 82, and AS billing</h2>
@@ -132,7 +132,7 @@ register("surprise-assistant-surgeon-bills", {
     <li><strong>The consent exception:</strong> The NSA protections can be waived if you signed a written consent form specifically agreeing to out-of-network care from the assistant surgeon at least 72 hours before a scheduled (non-emergency) procedure. The consent must identify the specific provider and include a good-faith estimate of charges. Generic surgical consent forms that broadly authorize "additional physicians" do not meet this standard.</li>
 </ul>
 
-<p><strong>If you did not sign a specific out-of-network consent for the assistant surgeon, the NSA applies.</strong> Contact your insurer and request the claim be reprocessed at in-network rates. If the provider refuses to comply, file a complaint at cms.gov/nosurprises or call 1-800-985-3059.</p>
+<p><strong>If you did not sign a specific out-of-network consent for the assistant surgeon, the NSA applies.</strong> Contact your insurer and request the claim be reprocessed at in-network rates. If the provider refuses to comply, file a complaint at cms.gov/nosurprises or call 1-800-985-3059. For more on how these protections work, see our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>.</p>
 
 <h2 id="medical-necessity">5. When an assistant surgeon is not medically necessary</h2>
 
@@ -177,7 +177,7 @@ register("surprise-assistant-surgeon-bills", {
     <li><strong>Request the operative report.</strong> Ask the hospital for the full operative report, which documents who was in the operating room and what each person did. This is your primary evidence for evaluating whether the assistant surgeon's role was medically necessary and whether the billing is accurate.</li>
     <li><strong>Check No Surprises Act applicability.</strong> Was the assistant out-of-network at an in-network facility? Was the surgery an emergency? Did you sign a specific consent form for out-of-network assistant surgeon services? If the NSA applies, contact your insurer and ask for reprocessing at in-network rates.</li>
     <li><strong>Verify medical necessity.</strong> Look up the CPT code's assistant surgeon indicator. If Medicare does not cover an assistant for your procedure, inform the billing department and your insurer that the charge lacks medical necessity support.</li>
-    <li><strong>Compare the charge to Medicare rates.</strong> The assistant surgeon's charge should roughly correspond to 16% of the primary surgeon's Medicare rate for the procedure. If the billed amount is dramatically higher, use the Medicare rate as a negotiation benchmark.</li>
+    <li><strong>Compare the charge to Medicare rates.</strong> The assistant surgeon's charge should roughly correspond to 16% of the primary surgeon's Medicare rate for the procedure. If the billed amount is dramatically higher, use the Medicare rate as a negotiation benchmark. Use the <a href="/calculator">BillKarma cost calculator</a> to look up the Medicare rate for your procedure code.</li>
     <li><strong>Send a written dispute.</strong> Address it to the assistant surgeon's billing department. Include the operative report, the Medicare assistant surgeon indicator, the No Surprises Act citation if applicable, and a clear statement of what you believe you owe (in-network cost-sharing only, or nothing if the assistant was not medically necessary).</li>
     <li><strong>Escalate if necessary.</strong> File a complaint with your state insurance commissioner, with CMS at cms.gov/nosurprises, or with your state attorney general's consumer protection office. For insurance denials, file a formal appeal with your insurer.</li>
 </ol>
@@ -188,11 +188,13 @@ register("surprise-assistant-surgeon-bills", {
     <h3>$4,000 assistant surgeon bill for a knee replacement the patient never consented to</h3>
     <p>A 58-year-old patient in Texas had a scheduled total knee replacement (CPT 27447) at an in-network hospital with an in-network orthopedic surgeon. The surgery went smoothly and the patient was discharged after two days. Three weeks later, a separate bill arrived from a physician the patient had never met: $4,000 for assistant surgeon services (27447-80). The assistant surgeon was out-of-network. The patient had signed only a standard hospital consent form — no specific written consent for out-of-network assistant surgeon services.</p>
     <p>The patient contacted their insurer and cited the No Surprises Act, noting the surgery was at an in-network facility and they had not signed a provider-specific out-of-network consent. The insurer reprocessed the claim at in-network rates. The assistant surgeon's allowed amount was recalculated at $520 (approximately 16% of the primary surgeon's in-network rate of $3,250). The patient's 20% coinsurance on the in-network amount: <strong>$104</strong>. The original $4,000 bill was reduced to $104 — a savings of <strong>$3,896</strong>.</p>
+    <p>Facing a similar situation? <a href="/scan">Upload your surgical bill to BillKarma</a> to automatically flag out-of-network assistant surgeon charges and compare them to Medicare benchmarks.</p>
 </div>
 
 <div class="case-study">
     <h3>Assistant surgeon billed for a laparoscopic procedure Medicare says does not require one</h3>
     <p>A 45-year-old patient in Georgia received a $2,200 bill from an assistant surgeon after a laparoscopic cholecystectomy (gallbladder removal, CPT 47562). The patient's insurance paid $380 and left $1,820 as patient responsibility. When the patient checked the Medicare Physician Fee Schedule, CPT 47562 had an assistant surgeon indicator of 0 — meaning Medicare does not pay for assistant surgeon services for this procedure because an assistant is not typically medically necessary. The patient filed a written dispute with the assistant surgeon's billing office, citing the Medicare indicator and requesting the operative report. The operative report showed the assistant's documented role was limited to holding a retractor. The billing office reduced the charge to $0 after failing to provide documentation supporting medical necessity. <strong>Total saved: $2,200.</strong></p>
+    <p><a href="/scan">Scan your bill with BillKarma</a> to check whether your procedure code supports assistant surgeon billing under Medicare guidelines.</p>
 </div>
 
 <h2 id="faq">8. Frequently asked questions</h2>
@@ -215,12 +217,12 @@ register("surprise-assistant-surgeon-bills", {
 
     <div class="faq-item">
         <h3>How do I dispute an assistant surgeon bill I never agreed to?</h3>
-        <p>Request the operative report, check the No Surprises Act applicability, verify the procedure's assistant surgeon indicator in the Medicare Fee Schedule, and compare the charge to Medicare rates. Then file a written dispute with the assistant surgeon's billing office and contact your insurer to request reprocessing. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has letter templates you can use.</p>
+        <p>Request the operative report, check the No Surprises Act applicability, verify the procedure's assistant surgeon indicator in the Medicare Fee Schedule, and compare the charge to Medicare rates. Then file a written dispute with the assistant surgeon's billing office and contact your insurer to request reprocessing. You can also <a href="/hospitals/">check whether your hospital has a pattern of surprise billing</a> in our directory. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has letter templates you can use.</p>
     </div>
 
     <div class="faq-item">
         <h3>Can a surgeon use an assistant surgeon if Medicare says one is not needed?</h3>
-        <p>Medicare classifies each procedure code with an assistant surgeon indicator. If the indicator is 0, Medicare will not pay for assistant surgeon services for that procedure. Commercial insurers may have different policies, but the Medicare indicator is strong evidence that an assistant was not medically necessary. Use this as a basis for disputing the charge.</p>
+        <p>Medicare classifies each procedure code with an assistant surgeon indicator. If the indicator is 0, Medicare will not pay for assistant surgeon services for that procedure. Commercial insurers may have different policies, but the Medicare indicator is strong evidence that an assistant was not medically necessary. Use this as a basis for disputing the charge. For a broader overview of surgical billing practices, see our <a href="/guides/surgery-costs-billing">surgery costs guide</a>.</p>
     </div>
 </div>
 

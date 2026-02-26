@@ -102,7 +102,7 @@ register("medical-billing-rights-overview", {
 </table>
 
 <div class="key-takeaway">
-    <strong>Your most powerful federal rights:</strong> You cannot be surprise-billed in an emergency. You are entitled to an itemized bill. Nonprofit hospitals must offer financial assistance before sending you to collections. Debt collectors must validate debts and follow strict rules. These rights apply everywhere in the United States.
+    <strong>Your most powerful federal rights:</strong> You cannot be surprise-billed in an emergency. You are entitled to an itemized bill. Nonprofit hospitals must offer financial assistance before sending you to collections. Debt collectors must validate debts and follow strict rules. These rights apply everywhere in the United States. If you have a bill you suspect violates any of these protections, <a href="/scan">upload it to BillKarma</a> — we will flag surprise charges, coding errors, and overcharges automatically.
 </div>
 
 <h2 id="no-surprises-act">2. The No Surprises Act: surprise bill protections</h2>
@@ -184,7 +184,7 @@ register("medical-billing-rights-overview", {
     </tbody>
 </table>
 
-<p>Your state may have additional protections not listed here. Contact your state attorney general's consumer protection division or your state insurance department to find out what specific protections apply where you live.</p>
+<p>Your state may have additional protections not listed here. Contact your state attorney general's consumer protection division or your state insurance department to find out what specific protections apply where you live. You can also <a href="/hospitals/">check your hospital's billing grade</a> in our directory to see whether it has a track record of compliance with financial assistance and billing transparency rules.</p>
 
 <h2 id="timely-billing">5. Time limits on medical billing by state</h2>
 
@@ -200,6 +200,7 @@ register("medical-billing-rights-overview", {
 <div class="case-study">
     <h3>Case study: $8,400 ER bill arrives 14 months late in California</h3>
     <p>A patient in California received an $8,400 emergency room bill 14 months after the date of service. The patient had been insured at the time of the visit, but the hospital had failed to bill the insurance company within the insurer's timely filing window (typically 90 to 180 days). Under California law (Health and Safety Code Section 127425), hospitals cannot bill insured patients more than 365 days after service. The patient sent a written response citing the law and noting the bill arrived outside the 365-day window. The hospital withdrew the bill entirely. <strong>Result: $8,400 bill eliminated.</strong></p>
+    <p>Have an old or suspicious bill? <a href="/scan">Scan it with BillKarma</a> to check for timing issues, coding errors, and overcharges before you pay.</p>
 </div>
 
 <h2 id="transparency">6. Price transparency requirements</h2>
@@ -212,7 +213,7 @@ register("medical-billing-rights-overview", {
     <li><strong>Insurer price transparency:</strong> The Transparency in Coverage Rule requires health insurers to publish machine-readable files of negotiated rates with in-network providers and allowed amounts for out-of-network providers.</li>
 </ul>
 
-<p>In practice, you can use these tools to compare hospital prices before a scheduled procedure and to verify after the fact whether the charges on your bill match the hospital's published rates. If a hospital charges you more than their published rate for your insurance plan, that discrepancy is worth disputing.</p>
+<p>In practice, you can use these tools to compare hospital prices before a scheduled procedure and to verify after the fact whether the charges on your bill match the hospital's published rates. If a hospital charges you more than their published rate for your insurance plan, that discrepancy is worth disputing. Use the <a href="/calculator">BillKarma cost calculator</a> to look up Medicare rates for any procedure code and compare them against what you were charged.</p>
 
 <div class="key-takeaway">
     <strong>Use price transparency to your advantage:</strong> Before any scheduled procedure, check the hospital's published prices. After receiving a bill, compare the charges to published rates. Any discrepancy between the published rate and your bill is a basis for dispute. <a href="/scan">Upload your bill to BillKarma</a> to automatically compare your charges against Medicare benchmarks.
@@ -221,11 +222,11 @@ register("medical-billing-rights-overview", {
 <h2 id="action-steps">7. How to exercise your billing rights</h2>
 
 <ol>
-    <li><strong>Always request an itemized bill with CPT codes.</strong> A summary statement is not enough. You need individual line items to identify errors, duplicates, and overcharges.</li>
+    <li><strong>Always request an itemized bill with CPT codes.</strong> A summary statement is not enough. You need individual line items to identify errors, duplicates, and overcharges. Our <a href="/guides/medical-bill-audit-checklist">12-point audit checklist</a> walks you through exactly what to look for on each line.</li>
     <li><strong>Compare every bill to your Explanation of Benefits.</strong> Your insurer's EOB shows what was billed, what they paid, and what you owe. If the provider's bill does not match the EOB, one of them is wrong.</li>
     <li><strong>Check for No Surprises Act protections.</strong> If you see out-of-network charges from an ER visit or from a provider you did not choose at an in-network facility, cite the NSA and request reprocessing.</li>
     <li><strong>Request debt validation before paying a collector.</strong> If a medical bill goes to collections, send a written validation request within 30 days. Do not pay until the debt is validated with documentation.</li>
-    <li><strong>Apply for financial assistance at nonprofit hospitals.</strong> Under 501(r), nonprofit hospitals must have a written financial assistance policy and screen patients before pursuing collections. Apply even if you have insurance — many policies cover the patient-responsibility portion.</li>
+    <li><strong>Apply for financial assistance at nonprofit hospitals.</strong> Under 501(r), nonprofit hospitals must have a written financial assistance policy and screen patients before pursuing collections. Apply even if you have insurance — many policies cover the patient-responsibility portion. See our <a href="/guides/hospital-financial-assistance-guide">financial assistance guide</a> for a step-by-step walkthrough.</li>
     <li><strong>Know your state's deadlines.</strong> Check timely billing laws and the statute of limitations for medical debt in your state. An old bill may be uncollectible.</li>
     <li><strong>File complaints when rights are violated.</strong> Report No Surprises Act violations to CMS at cms.gov/nosurprises. Report FDCPA violations to the CFPB at consumerfinance.gov. Report state law violations to your state attorney general.</li>
 </ol>
@@ -245,7 +246,7 @@ register("medical-billing-rights-overview", {
 
     <div class="faq-item">
         <h3>Can a hospital sue me for unpaid medical bills?</h3>
-        <p>Yes, but they must file within your state's statute of limitations. Nonprofit hospitals that sue without first screening for financial assistance may be violating IRS 501(r) requirements. Always respond to a lawsuit within the deadline — ignoring it results in a default judgment. See our <a href="/guides/medical-debt-lawsuit-defense">lawsuit defense guide</a> for what to do if you are sued.</p>
+        <p>Yes, but they must file within your state's statute of limitations. Nonprofit hospitals that sue without first screening for financial assistance may be violating IRS 501(r) requirements. Always respond to a lawsuit within the deadline — ignoring it results in a default judgment. Check whether your hospital is nonprofit in our <a href="/hospitals/">hospital directory</a>, and see our <a href="/guides/medical-debt-lawsuit-defense">lawsuit defense guide</a> for what to do if you are sued.</p>
     </div>
 
     <div class="faq-item">

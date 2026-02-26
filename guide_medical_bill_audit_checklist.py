@@ -56,7 +56,7 @@ register("medical-bill-audit-checklist", {
     <li><strong>Your personal records.</strong> Notes you took during your visit or stay, discharge paperwork, prescriptions, and any recollection of what medications you received, which doctors saw you, and what tests were performed. These are your reality check against what the bill claims happened.</li>
 </ol>
 
-<p>With these three documents in hand, work through the checklist below. Each check takes 2 to 5 minutes. The entire audit should take 30 to 60 minutes for a typical bill.</p>
+<p>With these three documents in hand, work through the checklist below. Each check takes 2 to 5 minutes. The entire audit should take 30 to 60 minutes for a typical bill. Or, if you want to skip the manual work, <a href="/scan">upload your bill to BillKarma</a> and our analyzer will run all 12 checks automatically.</p>
 
 <h2 id="checklist">2. The 12-point audit checklist</h2>
 
@@ -179,7 +179,7 @@ register("medical-bill-audit-checklist", {
 <p>Check that the number of units on each line item matches what you actually received. Medications are particularly prone to unit errors — billed for four doses when you received two, or billed at a higher dosage than administered. <strong>Example:</strong> A patient received 2 units of IV ondansetron (anti-nausea) but was billed for 4 units. At $85 per unit, that is a $170 overcharge.</p>
 
 <h3>Check 10: Check facility fees</h3>
-<p>Hospital-owned physician practices can charge a facility fee on top of the professional fee — sometimes called a "site-of-service" charge. This is legal but can double your cost compared to a freestanding office. Verify whether the facility fee is legitimate and whether your insurance covered it. <strong>Example:</strong> A routine office visit at a hospital-owned clinic billed as 99214 ($128 professional fee) plus a separate facility fee of $340 — total $468. The same visit at a freestanding office: $128 total.</p>
+<p>Hospital-owned physician practices can charge a facility fee on top of the professional fee — sometimes called a "site-of-service" charge. This is legal but can double your cost compared to a freestanding office. Verify whether the facility fee is legitimate and whether your insurance covered it. You can <a href="/hospitals/">look up your hospital's billing grade</a> in our directory to see how its facility fees compare to regional averages. <strong>Example:</strong> A routine office visit at a hospital-owned clinic billed as 99214 ($128 professional fee) plus a separate facility fee of $340 — total $468. The same visit at a freestanding office: $128 total.</p>
 
 <h3>Check 11: Look for upcoding</h3>
 <p>Upcoding means billing for a higher-cost service level than was actually performed. The most common example is ER visit levels: a straightforward visit billed at Level 5 instead of Level 3. Compare the billed visit level to the complexity of your actual experience. <strong>Example:</strong> A patient visited the ER for a minor laceration requiring three stitches. The bill showed CPT 99285 (Level 5, billed at $4,800). The patient requested a coding review, and it was downgraded to 99283 (Level 3, billed at $1,200) — a $3,600 reduction.</p>
@@ -249,7 +249,7 @@ register("medical-bill-audit-checklist", {
     </div>
 </div>
 
-<p>The five flagged items total <strong>$3,578</strong> in potentially incorrect charges: a duplicate CBC ($284), an extra room-and-board day ($1,940), three extra medication units ($255), and a cardiology consultation that may not have occurred ($620). Each of these would be caught by the corresponding checklist item.</p>
+<p>The five flagged items total <strong>$3,578</strong> in potentially incorrect charges: a duplicate CBC ($284), an extra room-and-board day ($1,940), three extra medication units ($255), and a cardiology consultation that may not have occurred ($620). Each of these would be caught by the corresponding checklist item. <a href="/scan">Scan your own bill with BillKarma</a> to get a similar flagged report with Medicare rate comparisons for every line item.</p>
 
 <h2 id="after-audit">4. What to do after your audit</h2>
 
@@ -257,8 +257,8 @@ register("medical-bill-audit-checklist", {
     <li><strong>Document every flagged item.</strong> For each potential error, note the date, CPT code, charge amount, and which checklist item it failed. Be specific — "CBC billed twice on 02/10, $284 each" is better than "duplicate charge found."</li>
     <li><strong>Call the billing department.</strong> Reference each flagged item by date and CPT code. For simple errors (duplicates, wrong patient info, math errors), a phone call often resolves it on the spot.</li>
     <li><strong>Follow up in writing for anything not resolved in 10 days.</strong> Send a written dispute listing each item. Include your account number, the specific charges in question, and supporting documentation (your EOB, discharge papers, personal notes).</li>
-    <li><strong>Request a formal billing review.</strong> Ask the hospital to conduct a formal coding review for any items involving upcoding, unbundling, or medical necessity questions. This triggers an internal audit process.</li>
-    <li><strong>Do not pay disputed amounts.</strong> Ask for the disputed charges to be placed on hold during the review. Pay the undisputed portion if you can, but do not pay charges you are actively disputing.</li>
+    <li><strong>Request a formal billing review.</strong> Ask the hospital to conduct a formal coding review for any items involving upcoding, unbundling, or medical necessity questions. This triggers an internal audit process. If the hospital is nonprofit, they are also required to screen you for <a href="/guides/hospital-financial-assistance-guide">financial assistance</a> before pursuing collections.</li>
+    <li><strong>Do not pay disputed amounts.</strong> Ask for the disputed charges to be placed on hold during the review. Pay the undisputed portion if you can, but do not pay charges you are actively disputing. For letter templates and escalation steps, see our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a>.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -276,7 +276,7 @@ register("medical-bill-audit-checklist", {
         <li><strong>Check #7 (bill vs. EOB):</strong> The bill showed $22,000 total, but the EOB showed the insurance-negotiated rate was $14,800. The billing department had not applied the $7,200 insurance adjustment. After correction, the patient's 20% coinsurance was $2,960 instead of $4,400.</li>
         <li><strong>Check #11 (upcoding):</strong> The facility charged a Level 5 anesthesia complexity code. The anesthesia record showed standard general anesthesia with no complications — consistent with a lower level.</li>
     </ul>
-    <p>The patient called the billing department with all four items documented. The duplicate surgery charge and medication overcharge were removed immediately. The insurance adjustment was applied. The anesthesia coding was sent for internal review and subsequently downgraded. <strong>Total savings: $4,200 in patient responsibility.</strong></p>
+    <p>The patient called the billing department with all four items documented. The duplicate surgery charge and medication overcharge were removed immediately. The insurance adjustment was applied. The anesthesia coding was sent for internal review and subsequently downgraded. <strong>Total savings: $4,200 in patient responsibility.</strong> Before your next procedure, <a href="/hospitals/">check the facility's billing grade</a> in our hospital directory to know what to expect.</p>
 </div>
 
 <h2 id="faq">6. Frequently asked questions</h2>
@@ -304,7 +304,7 @@ register("medical-bill-audit-checklist", {
 
     <div class="faq-item">
         <h3>How long do I have to dispute a medical bill?</h3>
-        <p>Dispute as soon as possible. Most hospitals have internal review timeframes of 30 to 90 days. Insurance appeals are typically allowed within 180 days of the EOB. Medicare appeals must be filed within 120 days of the Medicare Summary Notice. Early disputes are resolved more easily and prevent accounts from going to collections.</p>
+        <p>Dispute as soon as possible. Most hospitals have internal review timeframes of 30 to 90 days. Insurance appeals are typically allowed within 180 days of the EOB. Medicare appeals must be filed within 120 days of the Medicare Summary Notice. Early disputes are resolved more easily and prevent accounts from going to collections. Know your full <a href="/guides/medical-billing-rights-overview">medical billing rights</a> to strengthen your dispute.</p>
     </div>
 </div>
 

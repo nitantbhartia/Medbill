@@ -64,10 +64,10 @@ register("understanding-dental-billing", {
     </tbody>
 </table>
 
-<p><strong>When the systems overlap:</strong> Dental work performed in a hospital setting (e.g., oral surgery under general anesthesia) may generate both CDT and CPT codes. The dental procedure is billed under CDT to dental insurance, while the hospital facility fee and anesthesia are billed under CPT to medical insurance. This dual-billing scenario is a common source of confusion and duplicate charges.</p>
+<p><strong>When the systems overlap:</strong> Dental work performed in a hospital setting (e.g., oral surgery under general anesthesia) may generate both CDT and CPT codes. The dental procedure is billed under CDT to dental insurance, while the hospital facility fee and anesthesia are billed under CPT to medical insurance. This dual-billing scenario is a common source of confusion and duplicate charges. If you had dental work at a hospital, check the facility&rsquo;s billing track record in our <a href="/hospitals/">hospital pricing directory</a> and learn how to spot errors in <a href="/guides/how-to-read-your-medical-bill">our guide to reading your medical bill</a>.</p>
 
 <div class="key-takeaway">
-    <strong>Always request an itemized dental bill with CDT codes.</strong> Many dental offices only send a summary. The itemized version shows exactly what each code is and what was charged, making it possible to verify you were billed correctly.
+    <strong>Always request an itemized dental bill with CDT codes.</strong> Many dental offices only send a summary. The itemized version shows exactly what each code is and what was charged, making it possible to verify you were billed correctly. <a href="/scan">Upload your dental bill to BillKarma</a> and we&rsquo;ll flag charges that don&rsquo;t match fair market rates.
 </div>
 
 <h2 id="common-procedures">2. Common dental procedures and what they cost</h2>
@@ -92,7 +92,7 @@ register("understanding-dental-billing", {
     </tbody>
 </table>
 
-<p>These prices are for the procedure only. Additional charges for imaging, anesthesia, and follow-up visits can add 20&ndash;40% to the total cost.</p>
+<p>These prices are for the procedure only. Additional charges for imaging, anesthesia, and follow-up visits can add 20&ndash;40% to the total cost. Use our <a href="/calculator">cost calculator</a> to look up Medicare allowable rates for dental-related medical procedures in your area.</p>
 
 <h2 id="insurance-tiers">3. How dental insurance coverage tiers work</h2>
 
@@ -152,6 +152,7 @@ register("understanding-dental-billing", {
     <p><strong>Situation:</strong> Maria went in for a routine cleaning expecting to pay nothing (preventive tier, 100% covered). The dentist diagnosed periodontal disease and performed scaling on all four quadrants plus antimicrobial treatment&mdash;without clearly explaining the added cost upfront.</p>
     <p><strong>The problem:</strong> The cleaning ($145) was covered at 100%, but scaling (D4341) falls under the basic tier at 80% coverage. The antimicrobial delivery (D4381) was only covered at 50%. Maria&rsquo;s out-of-pocket: <strong>$224 for scaling + $150 for antimicrobial = $374</strong>&mdash;when she expected to pay $0.</p>
     <p><strong>What she did:</strong> Maria got a second opinion from another dentist, who found that only two quadrants (not four) showed clinical signs of periodontal disease. She disputed the bill with the original office, and they agreed to remove two quadrants of scaling and all four antimicrobial treatments. <strong>Revised bill: $865. Savings: $860.</strong></p>
+    <p><strong>Lesson:</strong> Always <a href="/scan">scan your dental bill</a> before paying&mdash;flagging questionable charges early gives you leverage to dispute.</p>
 </div>
 
 {_embed(mode="markup", title="Check your dental charges", subtitle="See how your dental bill compares to fair market rates.", height="420")}
@@ -164,15 +165,15 @@ register("understanding-dental-billing", {
 
 <p><strong>Unnecessary quadrant billing:</strong> Scaling is billed per quadrant (4 quadrants = 4 charges). If your gum disease is localized to one area, you should not be billed for all four quadrants. Request the periodontal charting that shows pocket depths for each quadrant.</p>
 
-<p><strong>Surprise out-of-network charges:</strong> Always verify your dentist is in-network before your visit. Out-of-network dentists can balance bill you for the difference between their fee and the insurance-allowed amount, which can double your costs.</p>
+<p><strong>Surprise out-of-network charges:</strong> Always verify your dentist is in-network before your visit. Out-of-network dentists can balance bill you for the difference between their fee and the insurance-allowed amount, which can double your costs. For more on this topic, see <a href="/guides/balance-billing">our guide to balance billing</a>.</p>
 
 <p><strong>Steps to dispute a dental bill:</strong></p>
 <ol>
     <li>Request the itemized bill with CDT codes and the clinical notes supporting each procedure.</li>
-    <li>Compare charges against the average costs in the table above and your insurance fee schedule.</li>
+    <li>Compare charges against the average costs in the table above and your insurance fee schedule. Check how your provider&rsquo;s pricing compares in our <a href="/hospitals/">hospital and provider directory</a>.</li>
     <li>If you suspect unnecessary treatment, get a second opinion from another dentist.</li>
     <li>File a written dispute with the dental office, citing specific CDT codes you are challenging.</li>
-    <li>If the office won&rsquo;t budge, file a complaint with your state dental board.</li>
+    <li>If the office won&rsquo;t budge, file a complaint with your state dental board. For detailed dispute strategies, see <a href="/guides/how-to-dispute-a-medical-bill">our guide to disputing medical bills</a>.</li>
 </ol>
 
 <h2 id="save-money">6. 5 ways to save on dental care</h2>
@@ -188,7 +189,7 @@ register("understanding-dental-billing", {
 <p><strong>Negotiate cash-pay rates.</strong> If you are paying out of pocket, ask for a cash-pay discount. Most dental offices offer 10&ndash;20% off their standard fees for patients who pay at the time of service, because they avoid the cost of insurance processing.</p>
 
 <div class="key-takeaway">
-    <strong>Before any major dental work:</strong> Get an itemized treatment plan with CDT codes, request a pre-treatment estimate from your insurance, and get a second opinion if the total exceeds $1,000. These three steps catch most overcharges before they happen.
+    <strong>Before any major dental work:</strong> Get an itemized treatment plan with CDT codes, request a pre-treatment estimate from your insurance, and get a second opinion if the total exceeds $1,000. These three steps catch most overcharges before they happen. After the procedure, <a href="/scan">upload your final bill to BillKarma</a> to verify every charge.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>
