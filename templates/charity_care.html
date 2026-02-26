@@ -3,8 +3,15 @@
 
 {% block head %}
 <style>
+    .cc-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .cc-hero-inner { max-width:672px; margin:0 auto; }
+    .cc-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .cc-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    .cc-hero .cc-stat { display:inline-flex; align-items:baseline; gap:8px; margin-top:18px; padding:8px 16px; background:rgba(255,255,255,0.15); border-radius:999px; font-size:0.88rem; color:rgba(255,255,255,0.9); }
+    .cc-hero .cc-stat strong { color:#fff; font-size:1.1rem; }
+    @media(max-width:640px){ .cc-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .cc-hero h1{font-size:1.8rem;} }
     @media print {
-        .bk-nav, .bk-footer, .no-print { display: none !important; }
+        .bk-nav, .bk-footer, .no-print, .cc-hero { display: none !important; }
         body { background: #fff !important; }
         #letter-preview { border: none !important; padding: 0 !important; font-size: 12pt !important; }
         main { padding: 0 !important; }
@@ -13,9 +20,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-6 py-16">
-    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Do You Qualify for Hospital Financial Assistance?</h1>
-    <p class="text-gray-500 mb-10">Most nonprofit hospitals are required to forgive or reduce bills for patients who can't afford them. Millions qualify every year and never apply. Let's find out if you're one of them.</p>
+<section class="cc-hero">
+    <div class="cc-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Free tool</p>
+        <h1>Do you qualify for<br>financial assistance?</h1>
+        <p>Most nonprofit hospitals are legally required to forgive or reduce bills for patients who can't afford them. Millions qualify every year and never apply.</p>
+        <div class="cc-stat"><strong>76%</strong> of U.S. hospitals are nonprofit with charity care programs</div>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-6 py-10">
 
     <!-- ========== SECTION 1: Hospital Search ========== -->
     <section id="section-hospital" class="mb-10 no-print">

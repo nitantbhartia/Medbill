@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Community Savings Feed | BillKarma{% endblock %}
+{% block head %}
+<style>
+    .sf-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; text-align:center; }
+    .sf-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; }
+    .sf-hero p { color:rgba(255,255,255,0.8); font-weight:500; font-size:1.05rem; }
+    @media(max-width:640px){ .sf-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .sf-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-12">
-    <!-- Hero Stats -->
-    <div class="text-center mb-12">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Community Savings</h1>
-        <p class="text-gray-600 mb-8">Real billing errors found by BillKarma users</p>
+<section class="sf-hero">
+    <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">Live data</p>
+    <h1>Community Savings</h1>
+    <p>Real billing errors found by BillKarma users</p>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <!-- Stats Grid -->
+    <div class="text-center mb-10">
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-accent-50 rounded-xl p-4">

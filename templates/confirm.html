@@ -2,14 +2,31 @@
 
 {% block title %}Confirm Items - BillKarma{% endblock %}
 
+{% block head %}
+<style>
+    .confirm-bar { background:#00824F; padding:20px 24px; border-radius:0 0 24px 24px; }
+    .confirm-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .confirm-bar .cb-crumb { font-size:0.75rem; color:rgba(255,255,255,0.5); }
+    .confirm-bar .cb-crumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
+    .confirm-bar .cb-crumb a:hover { color:rgba(255,255,255,0.8); }
+    .confirm-bar .cb-crumb .cb-active { color:#fff; font-weight:600; }
+    .confirm-bar .cb-title { color:#fff; font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
+    @media(max-width:640px){ .confirm-bar{padding:16px 16px;} .confirm-bar-inner{flex-direction:column;align-items:flex-start;gap:4px;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
-    <div class="mb-8">
-        <div class="text-xs text-gray-400 mb-3 flex items-center gap-1.5">
-            <a href="/scan" class="hover:text-accent-700 transition-colors">Scan</a>
-            <span>&rsaquo;</span>
-            <span class="text-gray-700 font-medium">Confirm</span>
+<div class="confirm-bar">
+    <div class="confirm-bar-inner">
+        <div class="cb-crumb">
+            <a href="/scan">Upload</a> <span>&rsaquo;</span> <span class="cb-active">Confirm</span> <span>&rsaquo;</span> <span>Results</span>
         </div>
+        <div class="cb-title">{{ data.line_items | length }} line items extracted</div>
+    </div>
+</div>
+
+<section class="max-w-2xl mx-auto px-5 py-8 sm:py-10">
+    <div class="mb-8">
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">Confirm extracted items</h1>
         <p class="text-sm text-gray-500">
             We found <strong class="text-gray-700">{{ data.line_items | length }}</strong> line items.

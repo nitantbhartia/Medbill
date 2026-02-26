@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Medical Debt Statute of Limitations Calculator | BillKarma{% endblock %}
 
+{% block head %}
+<style>
+    .sol-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .sol-hero-inner { max-width:672px; margin:0 auto; }
+    .sol-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .sol-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    .sol-hero .sol-stat { display:inline-flex; align-items:baseline; gap:8px; margin-top:18px; padding:8px 16px; background:rgba(255,255,255,0.15); border-radius:999px; font-size:0.88rem; color:rgba(255,255,255,0.9); }
+    .sol-hero .sol-stat strong { color:#fff; font-size:1.1rem; }
+    @media(max-width:640px){ .sol-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .sol-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto px-6 py-16">
-    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Medical Debt Statute of Limitations</h1>
-    <p class="text-gray-500 mb-10">Find out if your medical debt is still legally collectible in your state.</p>
+<section class="sol-hero">
+    <div class="sol-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Free tool</p>
+        <h1>Is your medical debt<br>still collectible?</h1>
+        <p>The statute of limitations on medical debt ranges from 3 to 10 years depending on your state. After it expires, collectors generally cannot sue you.</p>
+        <div class="sol-stat"><strong>3&ndash;10 years</strong> SOL range across all 50 states</div>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-6 py-10">
 
     <form id="sol-form" class="space-y-6 bg-gray-50 rounded-2xl p-8 border border-gray-200">
         <div>

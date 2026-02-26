@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Price Watch — Get Alerts on Hospital Pricing | BillKarma{% endblock %}
+{% block head %}
+<style>
+    .bw-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; text-align:center; }
+    .bw-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; }
+    .bw-hero p { color:rgba(255,255,255,0.8); font-weight:500; font-size:1.05rem; }
+    @media(max-width:640px){ .bw-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .bw-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-12">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Price Watch</h1>
-        <p class="text-gray-600">Get notified when we find new pricing data for your hospital or procedure</p>
-    </div>
+<section class="bw-hero">
+    <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">Price alerts</p>
+    <h1>Price Watch</h1>
+    <p>Get notified when we find new pricing data for your hospital or procedure</p>
+</section>
+
+<div class="max-w-2xl mx-auto px-4 py-10">
 
     <!-- Create Watch Form -->
     <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
