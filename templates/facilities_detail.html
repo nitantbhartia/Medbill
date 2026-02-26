@@ -78,7 +78,7 @@
             · {{ "%.1fx"|format(data.nearest_hospital_comparison.hospital.avg_markup_vs_medicare or 0) }} Medicare
         </p>
         <a class="inline-block mt-3 text-sm font-semibold text-accent-700 underline"
-           href="/compare/?facility-a={{ data.facility_id }}&facility-b={{ data.nearest_hospital_comparison.hospital.facility_id }}">
+           href="/compare/?facility-a={{ data.facility_id|clean_fid }}&facility-b={{ data.nearest_hospital_comparison.hospital.facility_id|clean_fid }}">
             See full comparison →
         </a>
     </div>
