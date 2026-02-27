@@ -157,3 +157,14 @@ import guide_medical_records_rights
 import guide_pediatric_billing
 import guide_hospice_billing
 import guide_chiropractic_billing
+# New guides batch: trending 2026 topics
+import guide_facility_fees_explained
+import guide_good_faith_estimate
+import guide_medical_debt_wage_garnishment
+import guide_bill_after_insurance
+import guide_medical_billing_errors_statistics
+import guide_how_to_get_itemized_bill
+import guide_hospital_price_transparency_2026
+import guide_medical_debt_credit_report_2026
+import guide_aca_subsidy_cliff_2026
+import guide_insurance_denial_appeal_win
