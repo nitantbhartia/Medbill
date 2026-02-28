@@ -179,3 +179,14 @@ import guide_surprise_bills_after_surgery
 import guide_duplicate_charges
 import guide_medical_bill_time_limit
 import guide_patient_rights_emergency_room
+# Batch 4: state-specific guides
+import guide_colorado_medical_billing
+import guide_virginia_medical_billing
+import guide_new_jersey_medical_billing
+import guide_arizona_medical_billing
+import guide_massachusetts_medical_billing
+import guide_maryland_medical_billing
+import guide_minnesota_medical_billing
+import guide_indiana_medical_billing
+import guide_washington_medical_billing
+import guide_connecticut_medical_billing
