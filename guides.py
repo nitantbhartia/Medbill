@@ -168,3 +168,14 @@ import guide_hospital_price_transparency_2026
 import guide_medical_debt_credit_report_2026
 import guide_aca_subsidy_cliff_2026
 import guide_insurance_denial_appeal_win
+import guide_out_of_network_bills
+import guide_medical_debt_buying_house
+import guide_coordination_of_benefits
+import guide_nicu_bills
+# Batch 3: actionable guides
+import guide_dispute_phone_scripts
+import guide_hospital_chargemaster
+import guide_surprise_bills_after_surgery
+import guide_duplicate_charges
+import guide_medical_bill_time_limit
+import guide_patient_rights_emergency_room
