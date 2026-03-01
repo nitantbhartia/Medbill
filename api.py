@@ -2431,3 +2431,76 @@ async def advisor_stream(request: Request):
     )
 
     return StreamingResponse(generate(), media_type="text/plain")
+
+
+_autopilot_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+
+
+@router.post("/autopilot/strategy")
+async def autopilot_strategy_api(request: Request):
+    """Generate an AI-driven dispute strategy for a bill."""
+    body = await _parse_json_object(request)
+    bill_id = body.get("bill_id")
+    if not bill_id:
+        raise HTTPException(400, "bill_id is required")
+
+    require_bill_access(request, int(bill_id))
+
+    client_key = _request_client_key(request)
+    if not _check_named_rate_limit(_autopilot_rate_buckets, f"ip:{client_key}", 10, 600):
+        raise HTTPException(429, "Too many strategy requests. Please wait a few minutes.")
+
+    from autopilot import generate_strategy
+
+    strategy = generate_strategy(int(bill_id))
+    if strategy.get("error"):
+        raise HTTPException(404, strategy["error"])
+
+    log_audit(
+        action="autopilot_strategy",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=int(bill_id),
+    )
+
+    return strategy
+
+
+@router.post("/autopilot/activate")
+async def autopilot_activate_api(request: Request):
+    """Activate autopilot for a dispute case (after payment)."""
+    body = await _parse_json_object(request)
+    bill_id = body.get("bill_id")
+    patient_name = (body.get("patient_name") or "").strip()
+    patient_email = (body.get("patient_email") or "").strip()
+
+    if not bill_id:
+        raise HTTPException(400, "bill_id is required")
+    if not patient_email:
+        raise HTTPException(400, "patient_email is required")
+
+    require_bill_access(request, int(bill_id))
+
+    client_key = _request_client_key(request)
+    if not _check_named_rate_limit(_autopilot_rate_buckets, f"activate:{client_key}", 5, 3600):
+        raise HTTPException(429, "Too many activation requests.")
+
+    # Activate using existing dispute service
+    result = dispute_service.activate_dispute(
+        bill_id=int(bill_id),
+        patient_name=patient_name,
+        patient_email=patient_email,
+        session_id=get_or_create_session_id(request),
+    )
+
+    if result.get("error"):
+        raise HTTPException(400, result["error"])
+
+    log_audit(
+        action="autopilot_activate",
+        resource_type="dispute_case",
+        resource_id=str(result.get("case_id", "")),
+        bill_id=int(bill_id),
+    )
+
+    return {"status": "ok", "case_id": result.get("case_id")}

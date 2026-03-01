@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Autopilot Dashboard &mdash; Case #{{ data.case_id }} | BillKarma{% endblock %}
+{% block head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+    .ap-hero { background:#00824F; border-radius:0 0 40px 40px; padding:36px 24px 32px; }
+    .ap-hero-inner { max-width:672px; margin:0 auto; }
+    .ap-hero h1 { color:#fff; font-size:1.8rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; }
+    .ap-hero p { color:rgba(255,255,255,0.75); font-weight:500; font-size:0.85rem; }
+    @media(max-width:640px){ .ap-hero{padding:28px 18px 24px;border-radius:0 0 24px 24px;} .ap-hero h1{font-size:1.5rem;} }
+
+    .phase-bar { display:flex; gap:2px; margin-bottom:8px; }
+    .phase-segment { flex:1; height:8px; border-radius:4px; background:#E5E7EB; transition:background 0.3s; }
+    .phase-segment.active { background:#00824F; }
+    .phase-segment.complete { background:#22C55E; }
+
+    .timeline-line { position:relative; padding-left:28px; }
+    .timeline-line::before { content:''; position:absolute; left:9px; top:0; bottom:0; width:2px; background:#E5E7EB; }
+    .tl-item { position:relative; padding-bottom:20px; }
+    .tl-item:last-child { padding-bottom:0; }
+    .tl-dot { position:absolute; left:-28px; top:2px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .tl-dot.milestone { background:#00824F; }
+    .tl-dot.action { background:#3B82F6; }
+    .tl-dot.note { background:#F59E0B; }
+    .tl-dot svg { width:10px; height:10px; }
+
+    .pulse-dot { width:10px; height:10px; border-radius:50%; background:#22C55E; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 70%{box-shadow:0 0 0 8px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ap-hero">
+    <div class="ap-hero-inner">
+        <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">
+            <a href="/results/{{ data.bill_id }}" style="color:rgba(255,255,255,0.55);text-decoration:none;">&larr; Back to results</a>
+            <span style="margin:0 6px;">&middot;</span>
+            Case #{{ data.case_id }}
+        </p>
+        <h1>Autopilot Dashboard</h1>
+        <p>Your AI agent is handling your dispute with {{ data.provider_name }}.</p>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-5 py-8">
+
+    <!-- Status Banner -->
+    {% if data.status == 'resolved' %}
+    <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 text-center">
+        <p class="text-sm font-semibold text-green-700 mb-1">Dispute Resolved</p>
+        {% if data.actual_savings %}
+        <p class="text-3xl font-extrabold text-green-800">${{ "{:,.0f}".format(data.actual_savings) }} saved</p>
+        {% endif %}
+        <p class="text-xs text-green-600 mt-1">{{ data.outcome or "Successfully resolved" }}</p>
+    </div>
+    {% elif data.status == 'refunded' %}
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8 text-center">
+        <p class="text-sm font-semibold text-blue-700 mb-1">Refund Issued</p>
+        <p class="text-lg font-bold text-blue-800">Your full payment has been refunded</p>
+        <p class="text-xs text-blue-600 mt-1">We weren&rsquo;t able to resolve within 45 days. Your guarantee activated.</p>
+    </div>
+    {% elif data.status == 'refund_pending' %}
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8 text-center">
+        <p class="text-sm font-semibold text-amber-700 mb-1">Refund Processing</p>
+        <p class="text-sm text-amber-700">Your guaranteed refund is being processed. Allow 5&ndash;10 business days.</p>
+    </div>
+    {% else %}
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="pulse-dot"></div>
+            <div>
+                <p class="font-semibold text-gray-900">{{ data.current_phase }}</p>
+                <p class="text-xs text-gray-500">Day {{ data.days_elapsed }} of 45 &middot; {{ data.progress_pct }}% complete</p>
+            </div>
+        </div>
+        <!-- Phase progress bar -->
+        <div class="phase-bar">
+            {% for i in range(data.phases_total) %}
+            <div class="phase-segment {% if i < data.phase_number %}complete{% elif i == data.phase_number %}active{% endif %}"></div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-between text-xs text-gray-400 mt-1">
+            <span>Dispute</span>
+            <span>Follow-up</span>
+            <span>Escalation</span>
+            <span>Final</span>
+            <span>Guarantee</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Key Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div class="border border-gray-200 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-green-700 tabular-nums">${{ "{:,.0f}".format(data.total_savings) }}</p>
+            <p class="text-xs text-gray-500 mt-1">Potential savings</p>
+        </div>
+        <div class="border border-gray-200 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-gray-900">{{ data.finding_count }}</p>
+            <p class="text-xs text-gray-500 mt-1">Issues disputed</p>
+        </div>
+        <div class="border border-gray-200 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-blue-700">{{ data.followups_sent }}/{{ data.followups_total }}</p>
+            <p class="text-xs text-gray-500 mt-1">Follow-ups sent</p>
+        </div>
+        <div class="border border-gray-200 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-gray-900">{{ data.days_elapsed }}</p>
+            <p class="text-xs text-gray-500 mt-1">Days active</p>
+        </div>
+    </div>
+
+    <!-- Next Action -->
+    {% if data.next_action and data.next_action.action != 'none' %}
+    <div class="bg-accent-50 border border-accent-200 rounded-xl p-5 mb-8">
+        <p class="text-xs font-bold text-accent-600 uppercase tracking-wide mb-1">Next automated action</p>
+        <p class="text-sm text-gray-900 font-medium">{{ data.next_action.description }}</p>
+        {% if data.next_action.scheduled_for %}
+        <p class="text-xs text-gray-500 mt-1">Scheduled: {{ data.next_action.scheduled_for }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- AI Advisor link -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 mb-8 flex items-center gap-4">
+        <div class="w-10 h-10 rounded-full bg-accent-500 flex items-center justify-center flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p class="font-semibold text-gray-900 text-sm">Have questions about your dispute?</p>
+            <p class="text-xs text-gray-500">Talk to AI Advisor &mdash; it knows your full case.</p>
+        </div>
+        <a href="/advisor/{{ data.bill_id }}" class="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-full hover:bg-gray-800 transition">Ask AI</a>
+    </div>
+
+    <!-- Timeline -->
+    <div class="mb-8">
+        <h2 class="font-bold text-gray-900 mb-4">Activity Timeline</h2>
+        <div class="timeline-line">
+            {% for event in data.timeline %}
+            <div class="tl-item">
+                <div class="tl-dot {{ event.type }}">
+                    {% if event.type == 'milestone' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    {% elif event.type == 'action' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    {% else %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><circle cx="12" cy="12" r="3"></circle></svg>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <p class="text-sm font-semibold text-gray-900">{{ event.event }}</p>
+                        {% if event.date %}
+                        <span class="text-xs text-gray-400">{{ event.date }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-gray-600">{{ event.detail }}</p>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if data.status not in ('resolved', 'refunded') %}
+            <!-- Upcoming events -->
+            <div class="tl-item opacity-40">
+                <div class="tl-dot" style="background:#D1D5DB;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><circle cx="12" cy="12" r="3"></circle></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">{{ data.next_action.description }}</p>
+                    <p class="text-xs text-gray-400">Upcoming</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Guarantee -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
+        <h3 class="font-bold text-gray-900 mb-2">Your guarantee</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> We dispute every identified issue on your behalf</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Automated follow-ups at day 7, 14, 30, and 45</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> AI-driven strategy adjusts based on hospital responses</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Full refund if unresolved in 45 days</li>
+            {% if data.is_nonprofit %}
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> 501(r) financial assistance application filed (nonprofit hospital)</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <p class="text-xs text-gray-400 text-center">
+        Dashboard updates automatically. Not legal advice. Questions? Talk to <a href="/advisor/{{ data.bill_id }}" class="text-accent-500 hover:underline">AI Advisor</a>.
+    </p>
+</div>
+{% endblock %}
