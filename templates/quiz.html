@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}What Should I Do About My Medical Bill? — Free Quiz | BillKarma{% endblock %}
+{% block head %}
+<meta name="description" content="Answer 4 quick questions and get a personalized action plan for your medical bill. Free quiz from BillKarma.">
+<style>
+    .qz-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .qz-hero-inner { max-width:672px; margin:0 auto; }
+    .qz-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .qz-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    @media(max-width:640px){ .qz-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .qz-hero h1{font-size:1.8rem;} }
+    .qz-option {
+        display:block; width:100%; text-align:left; padding:16px 20px;
+        background:#fff; border:2px solid #E5E5E5; border-radius:14px;
+        font-size:0.95rem; font-weight:600; color:#1A1A1A; cursor:pointer;
+        transition: border-color 0.15s, background 0.15s;
+    }
+    .qz-option:hover { border-color:#00824F; background:#F0FDF4; }
+    .qz-option.selected { border-color:#00824F; background:#DCFCE7; }
+    .qz-progress { height:4px; background:#E5E5E5; border-radius:999px; overflow:hidden; }
+    .qz-progress-bar { height:100%; background:#00824F; border-radius:999px; transition: width 0.3s ease; }
+    .impact-high { background:#DCFCE7; color:#166534; }
+    .impact-medium { background:#FEF3C7; color:#92400E; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="qz-hero">
+    <div class="qz-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">30-second quiz</p>
+        <h1>What should I do<br>about my bill?</h1>
+        <p>Answer 4 quick questions and get a personalized action plan with the exact next steps for your situation.</p>
+    </div>
+</section>
+
+<div class="max-w-xl mx-auto px-6 py-10">
+
+    <!-- Progress -->
+    <div class="qz-progress mb-8">
+        <div class="qz-progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <!-- Questions -->
+    <div id="quizContainer">
+        {% for q in questions %}
+        <div class="qz-step hidden" data-step="{{ loop.index0 }}">
+            <p class="text-xs text-gray-400 font-semibold mb-2">Question {{ loop.index }} of {{ questions|length }}</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-5">{{ q.text }}</h2>
+            <div class="space-y-3">
+                {% for opt in q.options %}
+                <button type="button" class="qz-option" data-question="{{ q.id }}" data-value="{{ opt.value }}">
+                    {{ opt.label }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Results (hidden initially) -->
+    <div id="quizResult" class="hidden"></div>
+
+    <p class="text-xs text-gray-400 mt-10 text-center">
+        BillKarma is not a law firm. This quiz provides general guidance, not legal or financial advice.
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var answers = {};
+    var currentStep = 0;
+    var totalSteps = {{ questions|length }};
+    var steps = document.querySelectorAll('.qz-step');
+    var progressBar = document.getElementById('progressBar');
+
+    function showStep(n) {
+        steps.forEach(function(s) { s.classList.add('hidden'); });
+        if (n < totalSteps) {
+            steps[n].classList.remove('hidden');
+            progressBar.style.width = ((n / totalSteps) * 100) + '%';
+        }
+    }
+
+    showStep(0);
+
+    document.querySelectorAll('.qz-option').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var q = this.dataset.question;
+            var v = this.dataset.value;
+            answers[q] = v;
+
+            // Highlight selected
+            this.parentNode.querySelectorAll('.qz-option').forEach(function(b) { b.classList.remove('selected'); });
+            this.classList.add('selected');
+
+            // Advance after brief delay
+            setTimeout(function() {
+                currentStep++;
+                if (currentStep < totalSteps) {
+                    showStep(currentStep);
+                } else {
+                    progressBar.style.width = '100%';
+                    submitQuiz();
+                }
+            }, 250);
+        });
+    });
+
+    function esc(s) { var t = document.createElement('span'); t.textContent = s; return t.innerHTML; }
+
+    async function submitQuiz() {
+        document.getElementById('quizContainer').classList.add('hidden');
+        var resultBox = document.getElementById('quizResult');
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="text-center py-8"><p class="text-gray-500 font-medium">Building your action plan...</p></div>';
+
+        try {
+            var res = await fetch('/api/quiz', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(answers)
+            });
+            var data = await res.json();
+            renderResult(data, resultBox);
+        } catch (err) {
+            resultBox.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-red-800">Something went wrong. Please refresh and try again.</div>';
+        }
+    }
+
+    function renderResult(data, box) {
+        var html = '';
+
+        // Headline
+        html += '<div class="bg-accent-50 rounded-2xl p-8 mb-6 text-center">';
+        html += '<h2 class="text-2xl font-extrabold text-gray-900 tracking-tight mb-2">' + data.headline + '</h2>';
+        if (data.urgency) {
+            html += '<p class="text-sm font-semibold text-red-600 mt-2">' + data.urgency + '</p>';
+        }
+        html += '</div>';
+
+        // Actions
+        if (data.actions && data.actions.length) {
+            html += '<h3 class="font-bold text-gray-900 text-lg mb-4">Your action plan</h3>';
+            html += '<div class="space-y-3 mb-8">';
+            data.actions.forEach(function(a, i) {
+                var ic = a.impact === 'high' ? 'impact-high' : 'impact-medium';
+                html += '<div class="bg-white border border-gray-200 rounded-xl p-5">';
+                html += '<div class="flex items-start justify-between gap-4">';
+                html += '<div class="flex-1">';
+                html += '<div class="flex items-center gap-2 mb-1">';
+                html += '<span class="w-6 h-6 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center shrink-0">' + (i+1) + '</span>';
+                html += '<span class="font-semibold text-gray-900">' + a.title + '</span>';
+                html += '<span class="text-xs font-bold px-2 py-0.5 rounded-full ' + ic + '">' + a.impact + '</span>';
+                html += '</div>';
+                html += '<p class="text-sm text-gray-600 ml-8">' + a.description + '</p>';
+                if (a.price) {
+                    html += '<p class="text-xs text-gray-400 ml-8 mt-1">' + esc(a.price) + '</p>';
+                }
+                html += '</div>';
+                html += '<a href="' + a.url + '" class="shrink-0 px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-full hover:bg-gray-800 transition whitespace-nowrap">' + a.button + '</a>';
+                html += '</div></div>';
+            });
+            html += '</div>';
+        }
+
+        // Know your rights
+        html += '<div class="bg-gray-50 rounded-xl p-5 mb-6">';
+        html += '<p class="font-semibold text-gray-900 mb-1">Know your rights</p>';
+        html += '<p class="text-sm text-gray-600">Your state has specific protections for medical billing, debt collection, and charity care.</p>';
+        html += '<a href="/rights/" class="inline-block mt-2 text-sm font-semibold text-accent-500 hover:underline">Check your state rights &rarr;</a>';
+        html += '</div>';
+
+        // Retake
+        html += '<div class="text-center mt-6">';
+        html += '<button onclick="location.reload()" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition">Retake quiz</button>';
+        html += '</div>';
+
+        box.innerHTML = html;
+        box.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+})();
+</script>
+{% endblock %}

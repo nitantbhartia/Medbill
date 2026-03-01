@@ -1269,6 +1269,8 @@ async def sitemap_index():
         (f"{base}/watch", "2026-02-25", "0.7"),
         (f"{base}/estimate", "2026-03-01", "0.9"),
         (f"{base}/rights/", "2026-03-01", "0.8"),
+        (f"{base}/quiz", "2026-03-01", "0.9"),
+        (f"{base}/glossary/", "2026-03-01", "0.8"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
@@ -1860,6 +1862,51 @@ async def rights_state_page(request: Request, state_slug: str):
             "canonical_url": canonical_url,
             "og_title": f"{state['name']} Medical Billing Rights & Protections | BillKarma",
             "og_description": f"Medical billing rights in {state['name']}: {state['sol_years']}-year statute of limitations, balance billing protections, charity care rules, and more.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Quick Triage Quiz ---
+
+
+@app.get("/quiz", response_class=HTMLResponse)
+async def quiz_page(request: Request):
+    """Quick triage quiz — 4 questions to personalized action plan."""
+    from quiz import QUESTIONS
+
+    canonical_url = f"{config.APP_URL.rstrip('/')}/quiz"
+    return templates.TemplateResponse(
+        "quiz.html",
+        {
+            "request": request,
+            "questions": QUESTIONS,
+            "canonical_url": canonical_url,
+            "og_title": "What Should I Do About My Medical Bill? — Free Quiz | BillKarma",
+            "og_description": "Answer 4 quick questions and get a personalized action plan for your medical bill situation.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Medical Billing Glossary ---
+
+
+@app.get("/glossary/", response_class=HTMLResponse)
+async def glossary_page(request: Request):
+    """Medical billing glossary with 50+ terms."""
+    from glossary import get_all_terms, get_terms_by_category
+
+    canonical_url = f"{config.APP_URL.rstrip('/')}/glossary/"
+    return templates.TemplateResponse(
+        "glossary.html",
+        {
+            "request": request,
+            "all_terms": get_all_terms(),
+            "categories": get_terms_by_category(),
+            "canonical_url": canonical_url,
+            "og_title": "Medical Billing Glossary — 50+ Terms Explained | BillKarma",
+            "og_description": "Plain-English definitions for every term on your medical bill, insurance statement, and collection notice.",
             "meta_robots": "index, follow",
         },
     )
