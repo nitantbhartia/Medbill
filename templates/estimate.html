@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}How Much Could I Save? — Free Savings Estimator | BillKarma{% endblock %}
+{% block head %}
+<meta name="description" content="Enter your medical bill amount and hospital name to instantly see how much you could save. Free estimate based on Medicare rates and hospital billing data.">
+<style>
+    .est-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .est-hero-inner { max-width:672px; margin:0 auto; }
+    .est-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .est-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    .est-hero .est-stat { display:inline-flex; align-items:baseline; gap:8px; margin-top:18px; padding:8px 16px; background:rgba(255,255,255,0.15); border-radius:999px; font-size:0.88rem; color:rgba(255,255,255,0.9); }
+    .est-hero .est-stat strong { color:#fff; font-size:1.1rem; }
+    @media(max-width:640px){ .est-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .est-hero h1{font-size:1.8rem;} }
+    .impact-high { background:#DCFCE7; color:#166534; }
+    .impact-medium { background:#FEF3C7; color:#92400E; }
+    .impact-low { background:#DBEAFE; color:#1E40AF; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="est-hero">
+    <div class="est-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Free tool</p>
+        <h1>How much could<br>you save?</h1>
+        <p>Enter your bill amount and hospital name. We&rsquo;ll estimate your potential savings using Medicare benchmarks and hospital billing data.</p>
+        <div class="est-stat"><strong>$1,200</strong> average savings found per bill</div>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-6 py-10">
+
+    <form id="est-form" class="space-y-5 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+        <div>
+            <label class="block text-sm font-semibold mb-2" for="bill_amount">Bill amount ($)</label>
+            <input type="number" id="bill_amount" required min="1" step="0.01" placeholder="e.g. 4500"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 focus:border-green-600">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-2" for="hospital_name">Hospital name (optional)</label>
+            <input type="text" id="hospital_name" placeholder="e.g. Memorial Regional Hospital"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 focus:border-green-600">
+            <p class="text-xs text-gray-400 mt-1">We&rsquo;ll look up their billing grade and average markup.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-2" for="insurance_status">Insurance status</label>
+                <select id="insurance_status" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 focus:border-green-600">
+                    <option value="insured">Insured (in-network)</option>
+                    <option value="out_of_network">Insured (out-of-network)</option>
+                    <option value="uninsured">Uninsured / Self-pay</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-2" for="household_size">Household size</label>
+                <input type="number" id="household_size" min="1" max="12" placeholder="e.g. 3"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 focus:border-green-600">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-2" for="income">Annual household income (optional)</label>
+            <input type="number" id="income" min="0" placeholder="e.g. 52000"
+                class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 focus:border-green-600">
+            <p class="text-xs text-gray-400 mt-1">Used to check charity care eligibility. We never store this.</p>
+        </div>
+        <button type="submit" id="est-btn" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-full text-sm hover:bg-gray-800 transition">
+            Estimate My Savings &mdash; Free
+        </button>
+    </form>
+
+    <div id="est-result" class="hidden mt-8"></div>
+
+    <!-- Trust signals -->
+    <div class="mt-12 grid grid-cols-3 gap-6 text-center">
+        <div>
+            <p class="text-2xl font-bold text-gray-900">3.4&times;</p>
+            <p class="text-xs text-gray-500 mt-1">Average hospital markup over Medicare</p>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-gray-900">80%</p>
+            <p class="text-xs text-gray-500 mt-1">of bills contain at least one error</p>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-gray-900">$1,200+</p>
+            <p class="text-xs text-gray-500 mt-1">average savings found per bill</p>
+        </div>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-10 text-center">
+        Estimates are based on hospital billing data and Medicare benchmarks. Actual savings depend on specific charges, insurance, and dispute outcome.
+        BillKarma is not a law firm. Not legal or financial advice.
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function esc(s) { const t = document.createElement('span'); t.textContent = s; return t.innerHTML; }
+function fmt(n) { return n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}); }
+
+document.getElementById('est-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('est-btn');
+    btn.disabled = true;
+    btn.textContent = 'Estimating...';
+
+    const payload = {
+        bill_amount: parseFloat(document.getElementById('bill_amount').value) || 0,
+        hospital_name: document.getElementById('hospital_name').value,
+        insurance_status: document.getElementById('insurance_status').value,
+        income: parseFloat(document.getElementById('income').value) || 0,
+        household_size: parseInt(document.getElementById('household_size').value) || 0,
+    };
+
+    try {
+        const res = await fetch('/api/estimate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error');
+        renderResult(data, payload.bill_amount);
+    } catch (err) {
+        const box = document.getElementById('est-result');
+        box.classList.remove('hidden');
+        box.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-800 font-semibold">' + esc(err.message) + '</div>';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Estimate My Savings \u2014 Free';
+    }
+});
+
+function renderResult(data, billAmount) {
+    const box = document.getElementById('est-result');
+    box.classList.remove('hidden');
+
+    let html = '';
+
+    // Savings headline
+    const lo = data.estimated_savings_low;
+    const hi = data.estimated_savings_high;
+    if (lo > 0) {
+        html += '<div class="bg-green-50 border border-green-200 rounded-2xl p-8 mb-6 text-center">';
+        html += '<p class="text-sm font-semibold text-green-700 mb-1">Estimated potential savings</p>';
+        html += '<p class="text-4xl font-extrabold text-green-800 tracking-tight">$' + fmt(lo) + ' &ndash; $' + fmt(hi) + '</p>';
+        html += '<p class="text-sm text-green-600 mt-2">on a $' + fmt(billAmount) + ' bill</p>';
+        html += '</div>';
+    } else {
+        html += '<div class="bg-blue-50 border border-blue-200 rounded-2xl p-8 mb-6 text-center">';
+        html += '<p class="text-lg font-bold text-blue-800">Your bill may already be fairly priced</p>';
+        html += '<p class="text-sm text-blue-600 mt-1">But a full scan can catch coding errors and duplicates that estimates miss.</p>';
+        html += '</div>';
+    }
+
+    // Hospital card
+    if (data.hospital) {
+        const h = data.hospital;
+        const gradeColors = {A:'bg-grade-a',B:'bg-grade-b',C:'bg-grade-c',D:'bg-grade-d',F:'bg-grade-f'};
+        const gc = gradeColors[h.billing_grade] || 'bg-gray-400';
+        html += '<div class="bg-white border border-gray-200 rounded-xl p-5 mb-6">';
+        html += '<div class="flex items-center justify-between">';
+        html += '<div>';
+        html += '<p class="font-semibold text-gray-900">' + esc(h.name) + '</p>';
+        html += '<p class="text-sm text-gray-500">' + esc(h.city || '') + (h.state ? ', ' + esc(h.state) : '') + '</p>';
+        html += '</div>';
+        html += '<div class="text-right">';
+        html += '<span class="inline-block px-3 py-1 rounded-lg text-white text-sm font-bold ' + gc + '">' + esc(h.billing_grade) + '</span>';
+        if (h.avg_markup) {
+            html += '<p class="text-xs text-gray-500 mt-1">' + h.avg_markup + '&times; Medicare avg</p>';
+        }
+        html += '</div></div>';
+        if (h.is_nonprofit) {
+            html += '<p class="text-xs text-green-600 mt-3 font-medium">Nonprofit &mdash; required to offer financial assistance under IRS 501(r)</p>';
+        }
+        html += '</div>';
+    }
+
+    // Charity care
+    if (data.charity_care && data.charity_care.eligible) {
+        const cc = data.charity_care;
+        html += '<div class="bg-purple-50 border border-purple-200 rounded-xl p-5 mb-6">';
+        html += '<p class="font-semibold text-purple-900 mb-1">You may qualify for charity care</p>';
+        html += '<p class="text-sm text-purple-700">At ' + cc.fpl_percent + '% of Federal Poverty Level, estimated discount: <strong>' + esc(cc.estimated_discount) + '</strong></p>';
+        if (!cc.is_nonprofit) {
+            html += '<p class="text-xs text-purple-500 mt-2">Note: This hospital may be for-profit. Federal charity care rules may not apply, but many still offer financial assistance programs.</p>';
+        }
+        html += '</div>';
+    }
+
+    // Action plan
+    if (data.actions && data.actions.length) {
+        html += '<div class="mb-6">';
+        html += '<h3 class="font-bold text-gray-900 text-lg mb-4">Your action plan</h3>';
+        html += '<div class="space-y-3">';
+        data.actions.forEach(function(a, i) {
+            const impactClass = a.impact === 'high' ? 'impact-high' : a.impact === 'medium' ? 'impact-medium' : 'impact-low';
+            html += '<div class="bg-white border border-gray-200 rounded-xl p-5">';
+            html += '<div class="flex items-start justify-between gap-4">';
+            html += '<div class="flex-1">';
+            html += '<div class="flex items-center gap-2 mb-1">';
+            html += '<span class="text-sm font-bold text-gray-500">' + (i + 1) + '.</span>';
+            html += '<span class="font-semibold text-gray-900">' + esc(a.title) + '</span>';
+            html += '<span class="text-xs font-bold px-2 py-0.5 rounded-full ' + impactClass + '">' + esc(a.impact) + '</span>';
+            html += '</div>';
+            html += '<p class="text-sm text-gray-600">' + esc(a.description) + '</p>';
+            html += '</div>';
+            html += '<a href="' + esc(a.url) + '" class="shrink-0 px-4 py-2 bg-gray-900 text-white text-sm font-bold rounded-full hover:bg-gray-800 transition whitespace-nowrap">' + esc(a.button) + '</a>';
+            html += '</div></div>';
+        });
+        html += '</div></div>';
+    }
+
+    // Bottom CTA
+    html += '<div class="text-center bg-gray-50 rounded-xl p-8">';
+    html += '<p class="font-semibold text-gray-900 mb-2">Want the full picture?</p>';
+    html += '<p class="text-sm text-gray-600 mb-4">This estimate is based on hospital averages. A full bill scan checks every line item against Medicare rates and catches specific errors.</p>';
+    html += '<a href="/scan" class="inline-block px-8 py-3 bg-accent-500 text-white font-bold rounded-full hover:bg-accent-600 transition">Scan My Bill &mdash; Free</a>';
+    html += '<p class="text-xs text-gray-400 mt-3">Free audit. $29&ndash;149 if you want us to fight it. No savings? Full refund.</p>';
+    html += '</div>';
+
+    box.innerHTML = html;
+    box.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+</script>
+{% endblock %}
