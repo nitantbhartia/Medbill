@@ -8,7 +8,7 @@ import time
 from datetime import datetime
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 import config
 import email_service
@@ -2389,3 +2389,45 @@ async def api_quiz(request: Request):
     body = await request.json()
     from quiz import get_recommendation
     return get_recommendation(body)
+
+
+_advisor_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
+
+
+@router.post("/advisor/stream")
+async def advisor_stream(request: Request):
+    """Stream AI advisor responses for a specific bill."""
+    body = await _parse_json_object(request)
+    bill_id = body.get("bill_id")
+    message = (body.get("message") or "").strip()
+    history = body.get("history") or []
+
+    if not bill_id:
+        raise HTTPException(400, "bill_id is required")
+    if not message:
+        raise HTTPException(400, "message is required")
+    if len(message) > 2000:
+        raise HTTPException(400, "Message too long (max 2000 characters)")
+
+    require_bill_access(request, int(bill_id))
+
+    # Rate limit: 20 messages per 10 minutes per IP
+    client_key = _request_client_key(request)
+    if not _check_named_rate_limit(_advisor_rate_buckets, f"ip:{client_key}", 20, 600):
+        raise HTTPException(429, "Too many advisor requests. Please wait a few minutes.")
+
+    from advisor import stream_advisor_response
+
+    def generate():
+        for chunk in stream_advisor_response(int(bill_id), message, history):
+            yield chunk
+
+    log_audit(
+        action="advisor_chat",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        bill_id=int(bill_id),
+        metadata={"message_length": len(message)},
+    )
+
+    return StreamingResponse(generate(), media_type="text/plain")

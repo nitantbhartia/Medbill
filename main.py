@@ -1923,6 +1923,34 @@ async def glossary_page(request: Request):
     )
 
 
+# --- AI Bill Advisor ---
+
+
+@app.get("/advisor/{bill_id}", response_class=HTMLResponse)
+async def advisor_page(request: Request, bill_id: int):
+    """AI-powered chat advisor with full bill context."""
+    require_bill_access(request, bill_id)
+    results = get_bill_results(bill_id)
+    if not results:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+
+    bill = results["bill"]
+    findings = results.get("findings") or []
+    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+
+    return templates.TemplateResponse(
+        "advisor.html",
+        {
+            "request": request,
+            "bill_id": bill_id,
+            "provider_name": bill.get("provider_name", ""),
+            "total_savings": total_savings,
+            "finding_count": len(findings),
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
 # --- Embeddable Savings Calculator Widget ---
 
 
