@@ -54,7 +54,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
-    response.headers.setdefault("X-Frame-Options", "DENY")
+    if not request.url.path.startswith("/embed/"):
+        response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
     if not config.DEBUG:
@@ -1271,6 +1272,11 @@ async def sitemap_index():
         (f"{base}/rights/", "2026-03-01", "0.8"),
         (f"{base}/quiz", "2026-03-01", "0.9"),
         (f"{base}/glossary/", "2026-03-01", "0.8"),
+        (f"{base}/cost/mri/", "2026-03-01", "0.8"),
+        (f"{base}/cost/colonoscopy/", "2026-03-01", "0.8"),
+        (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
+        (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
+        (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
@@ -1325,10 +1331,15 @@ async def guides_sitemap():
         f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>2026-03-01</lastmod><priority>0.7</priority></url>"
         for s in _get_all_states_sitemap()
     )
+    from cost_pages import get_all_cost_slugs
+    cost_entries = "".join(
+        f"<url><loc>{base}/cost/{slug}/</loc><lastmod>2026-03-01</lastmod><priority>0.8</priority></url>"
+        for slug in get_all_cost_slugs()
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}</urlset>"
+        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1907,6 +1918,90 @@ async def glossary_page(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Glossary — 50+ Terms Explained | BillKarma",
             "og_description": "Plain-English definitions for every term on your medical bill, insurance statement, and collection notice.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Embeddable Savings Calculator Widget ---
+
+
+@app.get("/embed/estimate", response_class=HTMLResponse)
+async def embed_estimate(request: Request):
+    """Lightweight embeddable savings calculator for iframes."""
+    response = templates.TemplateResponse(
+        "embed_estimate.html",
+        {
+            "request": request,
+            "app_url": config.APP_URL.rstrip("/"),
+            "api_base": config.APP_URL.rstrip("/"),
+        },
+    )
+    response.headers["X-Frame-Options"] = "ALLOWALL"
+    response.headers["Content-Security-Policy"] = "frame-ancestors *"
+    return response
+
+
+# --- How Much Does X Cost? Landing Pages ---
+
+
+@app.get("/cost/{slug}/", response_class=HTMLResponse)
+async def cost_page(request: Request, slug: str):
+    """Consumer-friendly procedure cost landing page."""
+    from cost_pages import get_cost_page_data
+
+    data = get_cost_page_data(slug)
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Cost page not found"})
+    canonical_url = f"{config.APP_URL.rstrip('/')}/cost/{slug}/"
+    return templates.TemplateResponse(
+        "cost_page.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": canonical_url,
+            "og_title": f"{data['title']} (2026 Prices) | BillKarma",
+            "og_description": data["seo"]["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Hospital vs Hospital SEO Comparison Pages ---
+
+
+@app.get("/compare/{slug_a}-vs-{slug_b}/", response_class=HTMLResponse)
+async def compare_seo_page(request: Request, slug_a: str, slug_b: str):
+    """Auto-generated hospital comparison page using human-readable slugs."""
+    from compare_seo import resolve_comparison_slugs
+
+    result = resolve_comparison_slugs(slug_a, slug_b)
+    if not result:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "message": "One or both hospitals not found."},
+        )
+    fid_a, fid_b = result
+    data = get_comparison_data(fid_a, fid_b)
+    if not data:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "message": "Comparison data not available."},
+        )
+    name_a = data["a"]["name"]
+    name_b = data["b"]["name"]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{slug_a}-vs-{slug_b}/"
+    return templates.TemplateResponse(
+        "compare_detail.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": canonical_url,
+            "og_title": f"{name_a} vs {name_b} | BillKarma",
+            "og_description": (
+                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
+                "See which hospital charges less relative to Medicare."
+            ),
             "meta_robots": "index, follow",
         },
     )
