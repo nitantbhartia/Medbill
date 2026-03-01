@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}AI Bill Advisor | BillKarma{% endblock %}
+{% block head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+    .adv-hero { background:#00824F; border-radius:0 0 40px 40px; padding:36px 24px 32px; }
+    .adv-hero-inner { max-width:672px; margin:0 auto; }
+    .adv-hero h1 { color:#fff; font-size:1.8rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; }
+    .adv-hero p { color:rgba(255,255,255,0.75); font-weight:500; font-size:0.85rem; }
+    @media(max-width:640px){ .adv-hero{padding:28px 18px 24px;border-radius:0 0 24px 24px;} .adv-hero h1{font-size:1.5rem;} }
+
+    .chat-container { max-width:672px; margin:0 auto; display:flex; flex-direction:column; min-height:60vh; }
+    .chat-messages { flex:1; overflow-y:auto; padding:24px 0; }
+    .chat-msg { margin-bottom:16px; display:flex; gap:10px; align-items:flex-start; }
+    .chat-msg.user { flex-direction:row-reverse; }
+    .chat-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px; }
+    .chat-avatar.ai { background:#E6F4EA; color:#00824F; }
+    .chat-avatar.human { background:#F3F4F6; color:#6B7280; }
+    .chat-bubble { max-width:85%; padding:12px 16px; border-radius:16px; font-size:0.88rem; line-height:1.6; }
+    .chat-bubble.ai { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:16px 16px 16px 4px; color:#1F2937; }
+    .chat-bubble.user { background:#00824F; color:#fff; border-radius:16px 16px 4px 16px; }
+    .chat-bubble p { margin:0 0 8px; }
+    .chat-bubble p:last-child { margin-bottom:0; }
+    .chat-bubble ul, .chat-bubble ol { margin:6px 0; padding-left:20px; }
+    .chat-bubble li { margin-bottom:4px; }
+    .chat-bubble strong { font-weight:600; }
+    .chat-bubble code { background:rgba(0,0,0,0.06); padding:1px 5px; border-radius:4px; font-size:0.82em; }
+    .chat-bubble a { color:#00824F; text-decoration:underline; }
+    .chat-bubble.user a { color:#C8E6D0; }
+
+    .chat-input-bar { position:sticky; bottom:0; background:#fff; border-top:1px solid #E5E7EB; padding:16px 0 24px; }
+    .chat-input-wrap { display:flex; gap:8px; align-items:flex-end; }
+    .chat-input-wrap textarea { flex:1; resize:none; border:1px solid #D1D5DB; border-radius:12px; padding:10px 14px; font-size:0.88rem; line-height:1.5; max-height:120px; overflow-y:auto; font-family:inherit; }
+    .chat-input-wrap textarea:focus { outline:none; border-color:#00824F; box-shadow:0 0 0 2px rgba(0,130,79,0.15); }
+    .chat-send-btn { width:40px; height:40px; border-radius:50%; background:#00824F; color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s; }
+    .chat-send-btn:hover { background:#00663D; }
+    .chat-send-btn:disabled { background:#D1D5DB; cursor:not-allowed; }
+
+    .typing-indicator { display:inline-flex; gap:4px; padding:4px 0; }
+    .typing-indicator span { width:6px; height:6px; border-radius:50%; background:#9CA3AF; animation:typing 1.2s infinite; }
+    .typing-indicator span:nth-child(2) { animation-delay:0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typing { 0%,60%,100%{opacity:0.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-4px)} }
+
+    .suggestion-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+    .suggestion-chip { padding:6px 14px; border:1px solid #D1D5DB; border-radius:999px; font-size:0.78rem; color:#374151; cursor:pointer; background:#fff; transition:all 0.15s; white-space:nowrap; }
+    .suggestion-chip:hover { border-color:#00824F; color:#00824F; background:#E6F4EA; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="adv-hero">
+    <div class="adv-hero-inner">
+        <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">
+            <a href="/results/{{ bill_id }}" style="color:rgba(255,255,255,0.55);text-decoration:none;">&larr; Back to results</a>
+        </p>
+        <h1>AI Bill Advisor</h1>
+        <p>Ask anything about your bill. I have your full analysis loaded.</p>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-5 py-0">
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+
+            <!-- Welcome message -->
+            <div class="chat-msg">
+                <div class="chat-avatar ai">AI</div>
+                <div class="chat-bubble ai">
+                    <p>Hi! I&rsquo;m your BillKarma AI Advisor. I&rsquo;ve loaded your full bill analysis{% if provider_name %} from <strong>{{ provider_name }}</strong>{% endif %}{% if total_savings > 0 %} &mdash; I found <strong>${{ "{:,.0f}".format(total_savings) }}</strong> in potential savings across <strong>{{ finding_count }}</strong> issue{{ "s" if finding_count != 1 else "" }}{% endif %}.</p>
+                    <p>I can help you:</p>
+                    <ul>
+                        <li>Understand any charge on your bill</li>
+                        <li>Explain what each finding means and why it matters</li>
+                        <li>Generate dispute letters, phone scripts, or appeal templates</li>
+                        <li>Check your rights and financial assistance options</li>
+                        <li>Plan your next steps</li>
+                    </ul>
+                    <p>What would you like to know?</p>
+                </div>
+            </div>
+
+            <!-- Suggestion chips -->
+            <div class="suggestion-chips" id="suggestions">
+                {% if finding_count > 0 %}
+                <button class="suggestion-chip" data-msg="Explain the biggest issue on my bill in plain English">Explain the biggest issue</button>
+                <button class="suggestion-chip" data-msg="What are my chances of winning a dispute?">What are my chances?</button>
+                <button class="suggestion-chip" data-msg="Write me a dispute letter I can send to the hospital">Write a dispute letter</button>
+                {% endif %}
+                <button class="suggestion-chip" data-msg="What should I say if I call the billing department?">What to say on the phone</button>
+                <button class="suggestion-chip" data-msg="Do I qualify for financial assistance or charity care?">Do I qualify for help?</button>
+                <button class="suggestion-chip" data-msg="Break down every charge on my bill and tell me which ones are fair">Break down my charges</button>
+                {% if finding_count > 0 %}
+                <button class="suggestion-chip" data-msg="What are my next steps to fight this bill? Give me a prioritized action plan.">Give me an action plan</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="chat-input-bar">
+            <div class="chat-input-wrap">
+                <textarea id="chat-input" rows="1" placeholder="Ask about your bill..." maxlength="2000"></textarea>
+                <button class="chat-send-btn" id="chat-send" aria-label="Send message">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 text-center">AI-generated. Not legal, medical, or financial advice. Always verify important information.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    var billId = '{{ bill_id }}';
+    var messagesEl = document.getElementById('chat-messages');
+    var inputEl = document.getElementById('chat-input');
+    var sendBtn = document.getElementById('chat-send');
+    var suggestionsEl = document.getElementById('suggestions');
+    var history = [];
+    var isStreaming = false;
+
+    function esc(s) { var t = document.createElement('span'); t.textContent = s; return t.innerHTML; }
+
+    function formatMarkdown(text) {
+        /* Minimal markdown: bold, links, lists, code, paragraphs */
+        var html = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/`(.*?)`/g, '<code>$1</code>')
+            .replace(/\[(.*?)\]\((\/[^\)]+)\)/g, '<a href="$2">$1</a>');
+
+        /* Split into paragraphs */
+        var lines = html.split('\n');
+        var out = '';
+        var inList = false;
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line) {
+                if (inList) { out += '</ul>'; inList = false; }
+                continue;
+            }
+            if (line.match(/^[-*]\s/)) {
+                if (!inList) { out += '<ul>'; inList = true; }
+                out += '<li>' + line.replace(/^[-*]\s/, '') + '</li>';
+            } else if (line.match(/^\d+\.\s/)) {
+                if (!inList) { out += '<ol>'; inList = true; }
+                out += '<li>' + line.replace(/^\d+\.\s/, '') + '</li>';
+            } else {
+                if (inList) { out += inList === true ? '</ul>' : '</ol>'; inList = false; }
+                out += '<p>' + line + '</p>';
+            }
+        }
+        if (inList) out += '</ul>';
+        return out;
+    }
+
+    function addMessage(role, content, stream) {
+        var msg = document.createElement('div');
+        msg.className = 'chat-msg' + (role === 'user' ? ' user' : '');
+
+        var avatar = document.createElement('div');
+        avatar.className = 'chat-avatar ' + (role === 'user' ? 'human' : 'ai');
+        avatar.textContent = role === 'user' ? 'You' : 'AI';
+
+        var bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + (role === 'user' ? 'user' : 'ai');
+
+        if (role === 'user') {
+            bubble.textContent = content;
+        } else if (stream) {
+            bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        } else {
+            bubble.innerHTML = formatMarkdown(content);
+        }
+
+        msg.appendChild(avatar);
+        msg.appendChild(bubble);
+        messagesEl.appendChild(msg);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return bubble;
+    }
+
+    function hideSuggestions() {
+        if (suggestionsEl) suggestionsEl.style.display = 'none';
+    }
+
+    async function sendMessage(text) {
+        text = (text || '').trim();
+        if (!text || isStreaming) return;
+
+        hideSuggestions();
+        isStreaming = true;
+        sendBtn.disabled = true;
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+
+        addMessage('user', text);
+        history.push({role: 'user', content: text});
+
+        var bubble = addMessage('model', '', true);
+        var fullText = '';
+
+        try {
+            var res = await fetch('/api/advisor/stream', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    bill_id: parseInt(billId),
+                    message: text,
+                    history: history.slice(-20)
+                })
+            });
+
+            if (!res.ok) {
+                var err = await res.json().catch(function() { return {detail: 'Error'}; });
+                throw new Error(err.detail || 'Failed to get response');
+            }
+
+            var reader = res.body.getReader();
+            var decoder = new TextDecoder();
+
+            while (true) {
+                var result = await reader.read();
+                if (result.done) break;
+                var chunk = decoder.decode(result.value, {stream: true});
+                fullText += chunk;
+                bubble.innerHTML = formatMarkdown(fullText);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            if (!fullText.trim()) {
+                fullText = "I wasn't able to generate a response. Please try again.";
+                bubble.innerHTML = formatMarkdown(fullText);
+            }
+
+            history.push({role: 'model', content: fullText});
+
+        } catch (err) {
+            fullText = 'Sorry, something went wrong: ' + (err.message || 'Unknown error') + '. Please try again.';
+            bubble.innerHTML = '<p>' + esc(fullText) + '</p>';
+        } finally {
+            isStreaming = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        }
+    }
+
+    /* Event listeners */
+    sendBtn.addEventListener('click', function() { sendMessage(inputEl.value); });
+
+    inputEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(inputEl.value);
+        }
+    });
+
+    /* Auto-resize textarea */
+    inputEl.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    /* Suggestion chips */
+    document.querySelectorAll('.suggestion-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            sendMessage(chip.getAttribute('data-msg'));
+        });
+    });
+
+    inputEl.focus();
+})();
+</script>
+{% endblock %}

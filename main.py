@@ -1923,6 +1923,81 @@ async def glossary_page(request: Request):
     )
 
 
+# --- Autopilot Agent ---
+
+
+@app.get("/autopilot/strategy/{bill_id}", response_class=HTMLResponse)
+async def autopilot_strategy_page(request: Request, bill_id: int):
+    """Show AI-generated dispute strategy before activation."""
+    require_bill_access(request, bill_id)
+    from autopilot import generate_strategy
+
+    strategy = generate_strategy(bill_id)
+    if strategy.get("error"):
+        return templates.TemplateResponse("error.html", {"request": request, "message": strategy["error"]})
+
+    bill_total = float(strategy.get("total_charged") or 0)
+    fee_cents = payment_module.calculate_fee(bill_total)
+
+    return templates.TemplateResponse(
+        "autopilot_strategy.html",
+        {
+            "request": request,
+            "strategy": strategy,
+            "fee_dollars": fee_cents // 100,
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
+@app.get("/autopilot/dashboard/{case_id}", response_class=HTMLResponse)
+async def autopilot_dashboard_page(request: Request, case_id: int):
+    """Real-time autopilot dispute dashboard."""
+    require_case_access(request, case_id)
+    from autopilot import get_autopilot_status
+
+    data = get_autopilot_status(case_id)
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Case not found"})
+
+    return templates.TemplateResponse(
+        "autopilot.html",
+        {
+            "request": request,
+            "data": data,
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
+# --- AI Bill Advisor ---
+
+
+@app.get("/advisor/{bill_id}", response_class=HTMLResponse)
+async def advisor_page(request: Request, bill_id: int):
+    """AI-powered chat advisor with full bill context."""
+    require_bill_access(request, bill_id)
+    results = get_bill_results(bill_id)
+    if not results:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+
+    bill = results["bill"]
+    findings = results.get("findings") or []
+    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+
+    return templates.TemplateResponse(
+        "advisor.html",
+        {
+            "request": request,
+            "bill_id": bill_id,
+            "provider_name": bill.get("provider_name", ""),
+            "total_savings": total_savings,
+            "finding_count": len(findings),
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
 # --- Embeddable Savings Calculator Widget ---
 
 
