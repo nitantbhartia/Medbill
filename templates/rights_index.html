@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Medical Billing Rights by State | BillKarma{% endblock %}
+{% block head %}
+<meta name="description" content="Know your medical billing rights. State-by-state guide to statute of limitations, balance billing protections, charity care laws, and debt collection rules.">
+<style>
+    .ri-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .ri-hero-inner { max-width:720px; margin:0 auto; }
+    .ri-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
+    .ri-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
+    @media(max-width:640px){ .ri-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .ri-hero h1{font-size:1.8rem;} }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ri-hero">
+    <div class="ri-hero-inner">
+        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Patient rights</p>
+        <h1>Medical billing rights<br>by state</h1>
+        <p>Every state has different rules for medical debt collection, balance billing, and charity care. Know yours before you pay.</p>
+    </div>
+</section>
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+
+    <!-- Quick stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div class="text-center p-4 bg-accent-50 rounded-xl">
+            <p class="text-2xl font-bold text-accent-500">3&ndash;10 yrs</p>
+            <p class="text-xs text-gray-600 mt-1">SOL range across states</p>
+        </div>
+        <div class="text-center p-4 bg-accent-50 rounded-xl">
+            <p class="text-2xl font-bold text-accent-500">18+</p>
+            <p class="text-xs text-gray-600 mt-1">States with balance billing laws</p>
+        </div>
+        <div class="text-center p-4 bg-accent-50 rounded-xl">
+            <p class="text-2xl font-bold text-accent-500">10+</p>
+            <p class="text-xs text-gray-600 mt-1">States with strong charity care laws</p>
+        </div>
+        <div class="text-center p-4 bg-accent-50 rounded-xl">
+            <p class="text-2xl font-bold text-accent-500">50</p>
+            <p class="text-xs text-gray-600 mt-1">States covered</p>
+        </div>
+    </div>
+
+    <!-- State Grid -->
+    <h2 class="text-lg font-bold text-gray-900 mb-4">Select your state</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-10">
+        {% for state in states %}
+        <a href="/rights/{{ state.slug }}/" class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-accent-300 hover:shadow-sm transition">
+            <div>
+                <span class="font-semibold text-gray-900">{{ state.name }}</span>
+                <span class="text-xs text-gray-400 ml-1">({{ state.code }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ state.sol_years }}yr SOL</span>
+                {% if state.has_balance_billing_law %}
+                <span class="w-2 h-2 rounded-full bg-green-400" title="Has balance billing law"></span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Legend -->
+    <div class="flex items-center gap-6 text-xs text-gray-500 mb-10">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-400"></span> Has state balance billing protections</span>
+        <span><strong>SOL</strong> = Statute of limitations on medical debt</span>
+    </div>
+
+    <!-- Federal Rights -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
+        <h3 class="font-bold text-gray-900 mb-3">Federal protections that apply in every state</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> No Surprises Act protects against surprise out-of-network bills for emergency services</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> Medical debt under $500 cannot appear on credit reports</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> Medical debt cannot appear on credit reports for at least 12 months</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> Paid medical debt is removed from credit reports</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> FDCPA: You can demand debt validation within 30 days of first collector contact</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> Nonprofit hospitals must offer financial assistance under IRS 501(r)</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold shrink-0">&check;</span> Good Faith Estimate required for uninsured/self-pay patients before scheduled services</li>
+        </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center bg-accent-50 rounded-xl p-8">
+        <p class="font-semibold text-gray-900 mb-2">Know your rights. Then use them.</p>
+        <p class="text-sm text-gray-600 mb-4">Upload your bill and we&rsquo;ll flag every overcharge, coding error, and billing violation.</p>
+        <div class="flex justify-center gap-3 flex-wrap">
+            <a href="/scan" class="inline-block px-6 py-3 bg-accent-500 text-white font-bold rounded-full hover:bg-accent-600 transition">Scan My Bill &mdash; Free</a>
+            <a href="/fight-debt" class="inline-block px-6 py-3 border border-gray-300 text-gray-900 font-bold rounded-full hover:bg-white transition">Fight My Debt</a>
+        </div>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-10 text-center">
+        This is an informational resource, not legal advice. Laws change frequently. Consult an attorney for your specific situation. Last updated March 2026.
+    </p>
+</div>
+{% endblock %}

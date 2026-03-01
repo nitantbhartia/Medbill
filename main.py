@@ -1267,6 +1267,8 @@ async def sitemap_index():
         (f"{base}/savings", "2026-02-25", "0.8"),
         (f"{base}/shop", "2026-02-25", "0.8"),
         (f"{base}/watch", "2026-02-25", "0.7"),
+        (f"{base}/estimate", "2026-03-01", "0.9"),
+        (f"{base}/rights/", "2026-03-01", "0.8"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
@@ -1301,6 +1303,8 @@ async def guides_sitemap():
         (f"{base}/guides/", "2026-02-01", "0.8"),
         (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/calculator", "2026-02-01", "0.7"),
+        (f"{base}/estimate", "2026-03-01", "0.9"),
+        (f"{base}/rights/", "2026-03-01", "0.8"),
     ]
     static_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
@@ -1314,10 +1318,15 @@ async def guides_sitemap():
         f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
         for tool in list_tools()
     )
+    from state_rights import get_all_states as _get_all_states_sitemap
+    rights_entries = "".join(
+        f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>2026-03-01</lastmod><priority>0.7</priority></url>"
+        for s in _get_all_states_sitemap()
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{tool_entries}</urlset>"
+        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1760,6 +1769,97 @@ async def bill_watch_page(request: Request):
             "canonical_url": canonical_url,
             "og_title": "Price Watch — Get Hospital Pricing Alerts | BillKarma",
             "og_description": "Set alerts for hospitals, procedures, or ZIP codes. Get notified when pricing data changes.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- Savings Estimator ---
+
+
+@app.get("/estimate", response_class=HTMLResponse)
+async def estimate_page(request: Request):
+    """Savings estimator — instant overcharge estimate."""
+    canonical_url = f"{config.APP_URL.rstrip('/')}/estimate"
+    return templates.TemplateResponse(
+        "estimate.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "How Much Could I Save on My Medical Bill? | BillKarma",
+            "og_description": "Enter your bill amount and hospital name for a free savings estimate based on Medicare benchmarks and hospital billing data.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+# --- My Bills Dashboard ---
+
+
+@app.get("/my-bills", response_class=HTMLResponse)
+async def my_bills_page(request: Request):
+    """Dashboard showing all bills the user has scanned."""
+    from access_control import get_session_id
+    from my_bills import get_session_bills, get_session_summary
+
+    sid = get_session_id(request)
+    bills = get_session_bills(sid) if sid else []
+    summary = get_session_summary(bills)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/my-bills"
+    return templates.TemplateResponse(
+        "my_bills.html",
+        {
+            "request": request,
+            "bills": bills,
+            "summary": summary,
+            "canonical_url": canonical_url,
+            "og_title": "My Bills | BillKarma",
+            "og_description": "Track all your scanned medical bills and savings in one place.",
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
+# --- State Medical Billing Rights ---
+
+
+@app.get("/rights/", response_class=HTMLResponse)
+async def rights_index_page(request: Request):
+    """State-by-state medical billing rights index."""
+    from state_rights import get_all_states
+
+    states = get_all_states()
+    canonical_url = f"{config.APP_URL.rstrip('/')}/rights/"
+    return templates.TemplateResponse(
+        "rights_index.html",
+        {
+            "request": request,
+            "states": states,
+            "canonical_url": canonical_url,
+            "og_title": "Medical Billing Rights by State | BillKarma",
+            "og_description": "Know your medical billing rights. State-by-state guide to statute of limitations, balance billing, charity care, and debt collection laws.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/rights/{state_slug}/", response_class=HTMLResponse)
+async def rights_state_page(request: Request, state_slug: str):
+    """Individual state medical billing rights page."""
+    from state_rights import get_state_rights
+
+    state = get_state_rights(state_slug)
+    if not state:
+        return HTMLResponse(status_code=404, content="State not found")
+    canonical_url = f"{config.APP_URL.rstrip('/')}/rights/{state_slug}/"
+    return templates.TemplateResponse(
+        "rights_state.html",
+        {
+            "request": request,
+            "state": state,
+            "canonical_url": canonical_url,
+            "og_title": f"{state['name']} Medical Billing Rights & Protections | BillKarma",
+            "og_description": f"Medical billing rights in {state['name']}: {state['sol_years']}-year statute of limitations, balance billing protections, charity care rules, and more.",
             "meta_robots": "index, follow",
         },
     )

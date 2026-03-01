@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}{{ state.name }} Medical Billing Rights &amp; Protections | BillKarma{% endblock %}
+{% block head %}
+<meta name="description" content="Medical billing rights in {{ state.name }}: {{ state.sol_years }}-year statute of limitations, balance billing protections, charity care rules, and debt collection laws.">
+<style>
+    .rs-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .rs-hero-inner { max-width:672px; margin:0 auto; }
+    .rs-hero h1 { color:#fff; font-size:2.2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; line-height:1.1; }
+    .rs-hero p { color:rgba(255,255,255,0.8); font-weight:500; }
+    @media(max-width:640px){ .rs-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .rs-hero h1{font-size:1.7rem;} }
+</style>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "What is the statute of limitations on medical debt in {{ state.name }}?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The statute of limitations on medical debt in {{ state.name }} is {{ state.sol_years }} years. After this period, creditors generally cannot sue to collect the debt, though they may still contact you."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Does {{ state.name }} have balance billing protections?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{% if state.balance_billing %}{{ state.balance_billing }}{% else %}{{ state.name }} relies primarily on federal No Surprises Act protections for balance billing.{% endif %}"
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I get charity care in {{ state.name }}?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{% if state.charity_care %}{{ state.charity_care }}{% else %}Federal IRS 501(r) rules require all nonprofit hospitals in {{ state.name }} to offer financial assistance. Contact the hospital's billing department to request an application.{% endif %}"
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="rs-hero">
+    <div class="rs-hero-inner">
+        <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">
+            <a href="/rights/" style="color:rgba(255,255,255,0.55);text-decoration:none;">All states</a> &rsaquo; {{ state.code }}
+        </p>
+        <h1>{{ state.name }} medical<br>billing rights</h1>
+        <p>Your protections under federal and {{ state.name }} law when dealing with medical bills and debt collectors.</p>
+    </div>
+</section>
+
+<div class="max-w-2xl mx-auto px-6 py-10">
+
+    <!-- Key Stats -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="text-center p-4 bg-accent-50 rounded-xl">
+            <p class="text-2xl font-bold text-accent-500">{{ state.sol_years }} yrs</p>
+            <p class="text-xs text-gray-600 mt-1">Statute of Limitations</p>
+        </div>
+        <div class="text-center p-4 rounded-xl {% if state.balance_billing %}bg-green-50{% else %}bg-gray-50{% endif %}">
+            <p class="text-2xl font-bold {% if state.balance_billing %}text-green-600{% else %}text-gray-400{% endif %}">
+                {% if state.balance_billing %}Yes{% else %}Federal{% endif %}
+            </p>
+            <p class="text-xs text-gray-600 mt-1">Balance Billing Law</p>
+        </div>
+        <div class="text-center p-4 rounded-xl {% if state.charity_care %}bg-green-50{% else %}bg-gray-50{% endif %}">
+            <p class="text-2xl font-bold {% if state.charity_care %}text-green-600{% else %}text-gray-400{% endif %}">
+                {% if state.charity_care %}Yes{% else %}Federal{% endif %}
+            </p>
+            <p class="text-xs text-gray-600 mt-1">State Charity Care Law</p>
+        </div>
+    </div>
+
+    <!-- Statute of Limitations -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="font-bold text-gray-900 mb-3">Statute of Limitations: {{ state.sol_years }} Years</h2>
+        <p class="text-sm text-gray-700 mb-3">
+            In {{ state.name }}, creditors have <strong>{{ state.sol_years }} years</strong> to file a lawsuit to collect medical debt.
+            The clock typically starts from the date of your last payment or the original date of service, whichever is later.
+        </p>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <p class="text-xs text-yellow-800">
+                <strong>Warning:</strong> Making even a small payment may restart the statute of limitations in some states.
+                Do not pay or acknowledge the debt without checking first.
+            </p>
+        </div>
+        <a href="/statute-of-limitations" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your specific debt &rarr;</a>
+    </div>
+
+    <!-- Balance Billing -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="font-bold text-gray-900 mb-3">Balance Billing Protections</h2>
+        {% if state.balance_billing %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+            <p class="text-sm text-green-800">{{ state.name }} has state-level balance billing protections.</p>
+        </div>
+        <p class="text-sm text-gray-700">{{ state.balance_billing }}</p>
+        {% else %}
+        <p class="text-sm text-gray-700 mb-2">
+            {{ state.name }} relies primarily on the <strong>federal No Surprises Act</strong> for balance billing protections.
+        </p>
+        <p class="text-sm text-gray-600">
+            Under federal law, you are protected from surprise out-of-network bills for emergency services
+            and for services at in-network facilities where the provider is out-of-network.
+        </p>
+        {% endif %}
+        <a href="/tools/surprise-bill-checker/" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check if your bill is protected &rarr;</a>
+    </div>
+
+    <!-- Charity Care -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="font-bold text-gray-900 mb-3">Charity Care &amp; Financial Assistance</h2>
+        {% if state.charity_care %}
+        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+            <p class="text-sm text-green-800">{{ state.name }} has state-level charity care requirements.</p>
+        </div>
+        <p class="text-sm text-gray-700">{{ state.charity_care }}</p>
+        {% else %}
+        <p class="text-sm text-gray-700">
+            While {{ state.name }} does not have state-specific charity care legislation beyond federal rules,
+            all <strong>nonprofit hospitals</strong> must offer financial assistance under IRS Section 501(r).
+            This typically covers patients with income below 200&ndash;400% of the Federal Poverty Level.
+        </p>
+        {% endif %}
+        <a href="/charity-care" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your eligibility &rarr;</a>
+    </div>
+
+    <!-- Collection Protections -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="font-bold text-gray-900 mb-3">Debt Collection Protections</h2>
+        {% if state.collection_protections %}
+        <p class="text-sm text-gray-700 mb-3">{{ state.collection_protections }}</p>
+        {% else %}
+        <p class="text-sm text-gray-700 mb-3">
+            {{ state.name }} relies primarily on the federal Fair Debt Collection Practices Act (FDCPA) and
+            Consumer Financial Protection Bureau (CFPB) rules for medical debt collection protections.
+        </p>
+        {% endif %}
+        <p class="text-sm text-gray-700">Under federal law:</p>
+        <ul class="mt-2 space-y-1.5 text-sm text-gray-600">
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> You can demand debt validation within 30 days of first contact</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Collectors must stop collection activity until they validate the debt</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Medical debt under $500 cannot appear on your credit report</li>
+            <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Medical debt cannot appear on credit reports for at least 12 months</li>
+        </ul>
+        <a href="/collection-notice" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Generate a debt validation letter &rarr;</a>
+    </div>
+
+    <!-- Federal Rights -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-6">
+        <h2 class="font-bold text-gray-900 mb-3">Federal rights that apply in {{ state.name }}</h2>
+        <ul class="space-y-2">
+            {% for right in state.federal_rights %}
+            <li class="flex gap-2 text-sm text-gray-700">
+                <span class="text-accent-500 font-bold shrink-0">&check;</span>
+                {{ right }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Action CTAs -->
+    <div class="bg-accent-50 rounded-xl p-8 text-center mb-6">
+        <p class="font-bold text-gray-900 text-lg mb-2">Know your rights. Now use them.</p>
+        <p class="text-sm text-gray-600 mb-4">Upload your bill and we&rsquo;ll flag every overcharge and billing error automatically.</p>
+        <div class="flex justify-center gap-3 flex-wrap">
+            <a href="/scan" class="inline-block px-6 py-3 bg-accent-500 text-white font-bold rounded-full hover:bg-accent-600 transition">Scan My Bill &mdash; Free</a>
+            <a href="/estimate" class="inline-block px-6 py-3 border border-gray-300 bg-white text-gray-900 font-bold rounded-full hover:bg-gray-50 transition">Estimate Savings</a>
+            <a href="/fight-debt" class="inline-block px-6 py-3 border border-gray-300 bg-white text-gray-900 font-bold rounded-full hover:bg-gray-50 transition">Fight My Debt</a>
+        </div>
+    </div>
+
+    <!-- FAQs (rendered for users) -->
+    <div class="space-y-4 mb-8">
+        <h2 class="font-bold text-gray-900">Frequently asked questions</h2>
+
+        <details class="bg-white border border-gray-200 rounded-xl p-5 group">
+            <summary class="font-semibold text-gray-900 cursor-pointer">What is the statute of limitations on medical debt in {{ state.name }}?</summary>
+            <p class="text-sm text-gray-600 mt-3">
+                The statute of limitations on medical debt in {{ state.name }} is {{ state.sol_years }} years.
+                After this period expires, creditors generally cannot file a lawsuit to collect the debt.
+                However, collectors may still contact you &mdash; they just cannot threaten legal action.
+                Making a partial payment may restart the clock in some cases.
+            </p>
+        </details>
+
+        <details class="bg-white border border-gray-200 rounded-xl p-5 group">
+            <summary class="font-semibold text-gray-900 cursor-pointer">Does {{ state.name }} have balance billing protections?</summary>
+            <p class="text-sm text-gray-600 mt-3">
+                {% if state.balance_billing %}{{ state.balance_billing }}{% else %}{{ state.name }} relies primarily on the federal No Surprises Act for balance billing protections. Under federal law, you are protected from surprise out-of-network bills for emergency services and at in-network facilities.{% endif %}
+            </p>
+        </details>
+
+        <details class="bg-white border border-gray-200 rounded-xl p-5 group">
+            <summary class="font-semibold text-gray-900 cursor-pointer">Can I get charity care at hospitals in {{ state.name }}?</summary>
+            <p class="text-sm text-gray-600 mt-3">
+                {% if state.charity_care %}{{ state.charity_care }}{% else %}All nonprofit hospitals in {{ state.name }} are required to offer financial assistance under federal IRS 501(r) rules. Contact the hospital&rsquo;s billing department or financial counselor to request an application. You can apply retroactively, even after a bill goes to collections.{% endif %}
+            </p>
+        </details>
+    </div>
+
+    <!-- Other states -->
+    <div class="text-center">
+        <a href="/rights/" class="text-sm font-semibold text-accent-500 hover:underline">&larr; View all states</a>
+    </div>
+
+    <p class="text-xs text-gray-400 mt-10 text-center">
+        This is an informational resource, not legal advice. Laws change frequently. Consult an attorney for complex situations. Last updated March 2026.
+    </p>
+</div>
+{% endblock %}

@@ -2359,3 +2359,25 @@ async def api_remove_watch(watch_id: int, request: Request):
     if not result.get("ok"):
         raise HTTPException(404, result.get("error", "Watch not found"))
     return {"status": "ok", "message": result["message"]}
+
+
+@router.post("/estimate")
+async def api_estimate_savings(request: Request):
+    """Savings estimator — instant overcharge estimate from bill amount + hospital."""
+    body = await request.json()
+    bill_amount = float(body.get("bill_amount") or 0)
+    if bill_amount <= 0:
+        raise HTTPException(400, "bill_amount must be a positive number")
+    if bill_amount > 5_000_000:
+        raise HTTPException(400, "bill_amount exceeds maximum")
+
+    from savings_estimator import estimate_savings
+    result = estimate_savings(
+        bill_amount=bill_amount,
+        hospital_name=str(body.get("hospital_name") or ""),
+        zip_code=str(body.get("zip_code") or ""),
+        insurance_status=str(body.get("insurance_status") or "insured"),
+        income=float(body.get("income") or 0),
+        household_size=int(body.get("household_size") or 0),
+    )
+    return result
