@@ -2381,3 +2381,11 @@ async def api_estimate_savings(request: Request):
         household_size=int(body.get("household_size") or 0),
     )
     return result
+
+
+@router.post("/quiz")
+async def api_quiz(request: Request):
+    """Quick triage quiz — returns personalized recommendation."""
+    body = await request.json()
+    from quiz import get_recommendation
+    return get_recommendation(body)
