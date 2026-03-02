@@ -201,3 +201,14 @@ import guide_how_to_get_medical_bills_reduced
 import guide_hospital_liens_explained
 import guide_air_ambulance_bills
 import guide_medical_billing_coding_mistakes
+# Batch 6: trending 2026 topics
+import guide_medicaid_cuts_2026
+import guide_site_neutral_payment_2026
+import guide_glp1_denied_2026
+import guide_medicare_costs_2026
+import guide_biosimilar_drugs_savings
+import guide_short_term_health_insurance
+import guide_healthcare_costs_rising_2026
+import guide_medicaid_to_marketplace_2026
+import guide_copay_accumulator_programs
+import guide_tariffs_drug_prices_2026
