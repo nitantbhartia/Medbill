@@ -12,6 +12,9 @@
 {% if guide.published %}
 <meta property="article:published_time" content="{{ guide.published }}">
 {% endif %}
+{% if guide.reviewed_on %}
+<meta property="article:modified_time" content="{{ guide.reviewed_on }}">
+{% endif %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -19,6 +22,8 @@
     "headline": "{{ guide.title }}",
     "description": "{{ meta_description }}",
     "datePublished": "{{ guide.published }}",
+    "dateModified": "{{ guide.reviewed_on or guide.published }}",
+    "mainEntityOfPage": "{{ canonical_url }}",
     "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
     "publisher": {"@type": "Organization", "name": "BillKarma"}
 }
@@ -189,7 +194,10 @@
             <span class="meta-category">{{ guide.category }}</span>
             {% endif %}
             {% if guide.published %}
-            <span class="meta-date">{{ guide.published }}</span>
+            <span class="meta-date">Published {{ guide.published }}</span>
+            {% endif %}
+            {% if guide.reviewed_on %}
+            <span class="meta-date">Reviewed {{ guide.reviewed_on }}</span>
             {% endif %}
         </div>
         <h1>{{ guide.title }}</h1>

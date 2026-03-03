@@ -1527,9 +1527,20 @@ def recompute_benchmarks() -> int:
 def recompute_billing_metrics() -> int:
     with get_db() as db:
         facilities = db.execute("SELECT facility_id, state FROM hospitals").fetchall()
+        transparency = {
+            row["facility_id"]: {
+                "parse_status": row["parse_status"],
+                "parse_notes": row["parse_notes"],
+            }
+            for row in db.execute(
+                "SELECT facility_id, parse_status, parse_notes FROM transparency_files"
+            ).fetchall()
+        }
         upserted = 0
+        min_points = 5
 
         for f in facilities:
+            tf = transparency.get(f["facility_id"])
             rows = db.execute(
                 """
                 SELECT gross_charge, cash_price, markup_vs_medicare
@@ -1541,15 +1552,22 @@ def recompute_billing_metrics() -> int:
                 (f["facility_id"],),
             ).fetchall()
 
-            min_points = 10
             if len(rows) < min_points:
+                if not tf:
+                    ungraded_reason = "missing_transparency_file"
+                elif tf["parse_status"] == "not_found":
+                    ungraded_reason = "transparency_file_not_found"
+                elif tf["parse_status"] in ("failed", "unsupported_format", "empty_or_unreadable", "no_standard_codes"):
+                    ungraded_reason = "transparency_parse_failed"
+                else:
+                    ungraded_reason = "insufficient_comparable_rows"
                 db.execute(
                     """
                     INSERT INTO billing_metrics (
                         facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
                         max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
-                        billing_grade, computed_at
-                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', CURRENT_TIMESTAMP)
+                        billing_grade, ungraded_reason, grade_confidence, computed_at
+                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', ?, NULL, CURRENT_TIMESTAMP)
                     ON CONFLICT(facility_id) DO UPDATE SET
                         avg_markup_vs_medicare=NULL,
                         median_markup_vs_medicare=NULL,
@@ -1557,9 +1575,11 @@ def recompute_billing_metrics() -> int:
                         procedures_compared=excluded.procedures_compared,
                         cash_discount_avg_pct=NULL,
                         billing_grade='N/A',
+                        ungraded_reason=excluded.ungraded_reason,
+                        grade_confidence=NULL,
                         computed_at=CURRENT_TIMESTAMP
                     """,
-                    (f["facility_id"], len(rows)),
+                    (f["facility_id"], len(rows), ungraded_reason),
                 )
                 upserted += 1
                 continue
@@ -1572,8 +1592,8 @@ def recompute_billing_metrics() -> int:
                     INSERT INTO billing_metrics (
                         facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
                         max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
-                        billing_grade, computed_at
-                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', CURRENT_TIMESTAMP)
+                        billing_grade, ungraded_reason, grade_confidence, computed_at
+                    ) VALUES (?, NULL, NULL, NULL, ?, NULL, 'N/A', ?, NULL, CURRENT_TIMESTAMP)
                     ON CONFLICT(facility_id) DO UPDATE SET
                         avg_markup_vs_medicare=NULL,
                         median_markup_vs_medicare=NULL,
@@ -1581,15 +1601,18 @@ def recompute_billing_metrics() -> int:
                         procedures_compared=excluded.procedures_compared,
                         cash_discount_avg_pct=NULL,
                         billing_grade='N/A',
+                        ungraded_reason=excluded.ungraded_reason,
+                        grade_confidence=NULL,
                         computed_at=CURRENT_TIMESTAMP
                     """,
-                    (f["facility_id"], len(markups)),
+                    (f["facility_id"], len(markups), "insufficient_rows_after_outlier_filter"),
                 )
                 upserted += 1
                 continue
             avg_markup = sum(markups) / len(markups)
             med_markup = sorted(markups)[len(markups) // 2]
             max_markup = max(markups)
+            grade_confidence = "high" if len(markups) >= 10 else "medium"
 
             cash_discounts = []
             for r in rows:
@@ -1606,8 +1629,8 @@ def recompute_billing_metrics() -> int:
                 INSERT INTO billing_metrics (
                     facility_id, avg_markup_vs_medicare, median_markup_vs_medicare,
                     max_markup_vs_medicare, procedures_compared, cash_discount_avg_pct,
-                    billing_grade, computed_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                    billing_grade, ungraded_reason, grade_confidence, computed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, CURRENT_TIMESTAMP)
                 ON CONFLICT(facility_id) DO UPDATE SET
                     avg_markup_vs_medicare=excluded.avg_markup_vs_medicare,
                     median_markup_vs_medicare=excluded.median_markup_vs_medicare,
@@ -1615,6 +1638,8 @@ def recompute_billing_metrics() -> int:
                     procedures_compared=excluded.procedures_compared,
                     cash_discount_avg_pct=excluded.cash_discount_avg_pct,
                     billing_grade=excluded.billing_grade,
+                    ungraded_reason=NULL,
+                    grade_confidence=excluded.grade_confidence,
                     computed_at=CURRENT_TIMESTAMP
                 """,
                 (
@@ -1625,6 +1650,7 @@ def recompute_billing_metrics() -> int:
                     len(markups),
                     round(cash_discount_avg, 2) if cash_discount_avg is not None else None,
                     grade,
+                    grade_confidence,
                 ),
             )
             upserted += 1
@@ -2105,7 +2131,7 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
 
 
 def _build_page_title(name: str) -> str:
-    suffix = " Billing Grade & Prices | BillKarma"
+    suffix = " Billing Grade, Prices & Charity Care | BillKarma"
     max_name = 60 - len(suffix)
     return _truncate_name(name, max_name) + suffix
 

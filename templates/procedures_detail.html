@@ -4,6 +4,9 @@
 
 {% block head %}
 <meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.procedure_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
 <style>
     .proc-detail-hero {
         background-color: var(--bk-green);
@@ -38,6 +41,10 @@
             {% if data.header.medicare_rate %}&nbsp;&middot;&nbsp;Medicare rate: <strong>${{ "{:,.0f}".format(data.header.medicare_rate) }}</strong>{% endif %}
             {% if data.header.national_avg_charge %}&nbsp;&middot;&nbsp;National avg charge: <strong>${{ "{:,.0f}".format(data.header.national_avg_charge) }}</strong>{% endif %}
             &nbsp;&middot;&nbsp;BillKarma data from <strong>{{ "{:,}".format(data.header.provider_count or data.header.hospital_count) }}</strong> providers
+        </p>
+        <p class="stats" style="font-size:0.8rem;color:rgba(255,255,255,0.72);margin-top:8px;">
+            Reviewed {{ data.seo.reviewed_on }}
+            {% if data.header.latest_data_year %}&nbsp;&middot;&nbsp;Pricing data year: <strong>{{ data.header.latest_data_year }}</strong>{% endif %}
         </p>
     </div>
 </div>
@@ -358,12 +365,12 @@
         {% endif %}
 
         <div class="rounded-lg border border-gray-200 p-5 bg-white">
-            <h3 class="font-bold text-gray-800 text-sm mb-3">Check Your Hospital</h3>
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Need This Scheduled Soon?</h3>
             <p class="text-xs text-gray-500 mb-3">
-                See billing grades for hospitals in your state.
+                Compare hospitals and surgery centers before you book this procedure.
             </p>
             <a href="/hospitals/" class="text-sm text-accent-700 hover:text-accent-800 underline font-medium">
-                Browse Hospital Directory →
+                Browse graded facilities →
             </a>
         </div>
 

@@ -4,11 +4,15 @@ Each guide is a dict with title, meta_description, published date, and
 body (HTML string). Calculators are embedded inline via iframes.
 """
 
+from __future__ import annotations
+
 GUIDES = {}
 
 
 def register(slug: str, guide: dict):
-    GUIDES[slug] = {**guide, "slug": slug}
+    published = guide.get("published")
+    reviewed_on = guide.get("reviewed_on") or published
+    GUIDES[slug] = {**guide, "slug": slug, "reviewed_on": reviewed_on}
 
 
 def get_guide(slug: str) -> dict | None:

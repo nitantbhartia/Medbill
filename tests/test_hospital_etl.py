@@ -94,7 +94,7 @@ def test_metrics_compute_grade_and_benchmarks():
         }
     )
 
-    # >=10 rows to get non-N/A grade
+    # >=5 rows to get non-N/A grade
     for cpt in ["99285", "99284", "99283", "99282", "99281", "99291", "99292", "93000", "80053", "74177"]:
         upsert_hospital_price(
             "10001",
@@ -120,6 +120,56 @@ def test_metrics_compute_grade_and_benchmarks():
     assert row is not None
     assert row["billing_grade"] in ("A", "B", "C", "D", "F", "N/A")
     assert row["avg_markup_vs_medicare"] is not None
+
+
+def test_recompute_billing_metrics_grades_with_five_rows_and_sets_medium_confidence():
+    _db._connection = None
+    _db.init_db()
+
+    with get_db() as conn:
+        for cpt in ["99285", "99284", "99283", "93000", "80053"]:
+            conn.execute(
+                "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+                (cpt, "0000000", 500.0, 500.0, 2026),
+            )
+
+    upsert_hospital_row(
+        {
+            "facility_id": "10002",
+            "name": "Five Row Hospital",
+            "city": "Miami",
+            "state": "FL",
+            "slug": "five-row-hospital-miami",
+        }
+    )
+
+    for cpt in ["99285", "99284", "99283", "93000", "80053"]:
+        upsert_hospital_price(
+            "10002",
+            {
+                "cpt_code": cpt,
+                "description": "Comparable service",
+                "gross_charge": 2000.0,
+                "cash_price": 1200.0,
+                "avg_negotiated_rate": 1000.0,
+                "min_negotiated_rate": 900.0,
+                "max_negotiated_rate": 1100.0,
+            },
+            data_year=2026,
+        )
+
+    recompute_billing_metrics()
+
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT billing_grade, procedures_compared, ungraded_reason, grade_confidence FROM billing_metrics WHERE facility_id = ?",
+            ("010002",),
+        ).fetchone()
+    assert row is not None
+    assert row["billing_grade"] in ("A", "B", "C", "D", "F")
+    assert row["procedures_compared"] == 5
+    assert row["ungraded_reason"] is None
+    assert row["grade_confidence"] == "medium"
 
 
 def test_refresh_top300_transparency_downloads_remote_file(monkeypatch):
@@ -171,6 +221,16 @@ def test_refresh_top300_transparency_downloads_remote_file(monkeypatch):
     assert tf["file_format"] == "csv"
     assert tf["procedures_extracted"] >= 1
     assert pc["n"] >= 1
+
+
+def test_refresh_facility_transparency_respects_empty_explicit_selection():
+    summary = refresh_facility_transparency(selected=[], files_dir="", data_year=2026)
+    assert summary == {
+        "selected": 0,
+        "parsed": 0,
+        "failed": 0,
+        "missing": 0,
+    }
 
 
 def test_refresh_top300_transparency_marks_download_failure(monkeypatch):

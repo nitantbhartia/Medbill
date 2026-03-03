@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import date
+import json
 import math
 import re
 
+from config import APP_URL
 from db import get_db
 
 _PROCEDURE_RADIUS_MILES = 75.0
@@ -426,6 +429,7 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             SELECT
                 hp.facility_id,
                 hp.gross_charge,
+                hp.data_year,
                 {resolved_rate_expr} AS medicare_rate,
                 {resolved_markup_expr} AS markup_vs_medicare,
                 COALESCE(fm.billing_grade, m.billing_grade) AS billing_grade,
@@ -551,6 +555,7 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
     procedure_type = _classify_cpt(cpt_code)
     medicare_rate = header.get("avg_medicare_rate")
     avg_charge = header.get("avg_charge")
+    latest_data_year = max((int(r["data_year"]) for r in filtered_detail if r.get("data_year") is not None), default=None)
 
     by_grade_map: dict[str, list[dict]] = {}
     for r in filtered_detail:
@@ -647,6 +652,17 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
         "zone_d_end": _pos(medicare_rate * 8.0) if medicare_rate else None,
     }
 
+    faq = _build_procedure_faq(name, cpt_code, procedure_type, medicare_rate, avg_charge)
+    seo = _build_procedure_seo(
+        name,
+        cpt_code,
+        medicare_rate,
+        avg_charge,
+        header["provider_count"],
+        latest_data_year,
+        faq,
+    )
+
     return {
         "cpt_code": cpt_code,
         "name": name,
@@ -660,15 +676,16 @@ def get_procedure_profile(cpt_code: str) -> dict | None:
             "hospital_count": header["provider_count"],
             "avg_markup": header.get("avg_markup"),
             "excluded_outliers": header.get("excluded_outliers", 0),
+            "latest_data_year": latest_data_year,
         },
         "by_grade": by_grade,
         "range_bar": range_bar,
         "cheapest_hospitals": [r for r in cheapest_list if r.get("facility_type") == "hospital"][:10],
         "cheapest_providers": cheapest_list,
         "ranges_by_type": ranges_by_type,
-        "faq": _build_procedure_faq(name, cpt_code, procedure_type, medicare_rate, avg_charge),
+        "faq": faq,
         "related": related,
-        "seo": _build_procedure_seo(name, cpt_code, medicare_rate, avg_charge, header["provider_count"]),
+        "seo": seo,
     }
 
 
@@ -1125,17 +1142,60 @@ def _build_procedure_seo(
     medicare_rate: float | None,
     avg_charge: float | None,
     hospital_count: int,
+    latest_data_year: int | None,
+    faq: list[dict],
 ) -> dict:
     rate_str = f"${medicare_rate:,.0f}" if medicare_rate else "N/A"
     avg_str = f"${avg_charge:,.0f}" if avg_charge else "N/A"
-    title = f"{name}: Cost, Grade & Prices | BillKarma"
+    reviewed_on = date.today().isoformat()
+    title = f"{name} Cost & Fair Price | BillKarma"
     if len(title) > 60:
         short = name[:28].rsplit(" ", 1)[0] if len(name) > 28 else name
-        title = f"{short}: Cost & Fair Prices | BillKarma"
+        title = f"{short} Fair Price | BillKarma"
     desc = (
-        f"CPT {cpt_code} · Medicare rate {rate_str} · National avg {avg_str}. "
-        f"Compare {hospital_count:,} hospitals by billing grade and see if your bill is fair."
+        f"CPT {cpt_code}. Medicare rate {rate_str}. National average charge {avg_str}. "
+        f"Compare {hospital_count:,} local providers, fair prices, and billing grades before you schedule."
     )
     if len(desc) > 155:
         desc = desc[:152].rsplit(" ", 1)[0] + "..."
-    return {"page_title": title, "meta_description": desc}
+    base = APP_URL.rstrip("/") or "https://www.billkarma.com"
+    breadcrumb_schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "BillKarma", "item": f"{base}/"},
+            {"@type": "ListItem", "position": 2, "name": "Procedures", "item": f"{base}/procedures/"},
+            {"@type": "ListItem", "position": 3, "name": name, "item": f"{base}/procedures/{cpt_code}/"},
+        ],
+    }
+    procedure_schema = {
+        "@context": "https://schema.org",
+        "@type": "MedicalProcedure",
+        "name": name,
+        "code": {"@type": "MedicalCode", "code": cpt_code, "codingSystem": "CPT"},
+        "description": desc,
+        "mainEntityOfPage": f"{base}/procedures/{cpt_code}/",
+    }
+    if latest_data_year:
+        procedure_schema["dateModified"] = f"{latest_data_year}-01-01"
+    faq_schema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": item["q"],
+                "acceptedAnswer": {"@type": "Answer", "text": item["a"]},
+            }
+            for item in faq
+        ],
+    }
+    return {
+        "page_title": title,
+        "meta_description": desc,
+        "reviewed_on": reviewed_on,
+        "data_year": latest_data_year,
+        "breadcrumb_schema_json": json.dumps(breadcrumb_schema, ensure_ascii=False),
+        "procedure_schema_json": json.dumps(procedure_schema, ensure_ascii=False),
+        "faq_schema_json": json.dumps(faq_schema, ensure_ascii=False),
+    }

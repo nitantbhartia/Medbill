@@ -948,6 +948,34 @@ def select_top_hospitals_by_beds(limit: int = 300) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def select_hospitals_for_transparency(limit: int | None = None) -> list[dict]:
+    """Select hospitals for transparency refresh, prioritizing missing/unparsed files first."""
+    limit_sql = "LIMIT ?" if limit else ""
+    params: tuple[object, ...] = (limit,) if limit else ()
+    with get_db() as db:
+        rows = db.execute(
+            f"""
+            SELECT h.facility_id, h.slug, h.name, h.state, h.city
+            FROM hospitals h
+            LEFT JOIN transparency_files tf ON tf.facility_id = h.facility_id
+            ORDER BY
+                CASE COALESCE(tf.parse_status, 'NO_FILE')
+                    WHEN 'NO_FILE' THEN 0
+                    WHEN 'not_found' THEN 1
+                    WHEN 'failed' THEN 2
+                    WHEN 'partial' THEN 3
+                    WHEN 'parsed' THEN 4
+                    ELSE 5
+                END,
+                COALESCE(h.bed_count, 0) DESC,
+                h.name
+            {limit_sql}
+            """,
+            params,
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def select_facilities_for_transparency(
     facility_types: tuple[str, ...] = ("hospital", "asc", "imaging_center"),
     limit: int | None = None,
@@ -1122,6 +1150,14 @@ def refresh_top300_transparency(files_dir: str = "", data_year: int | None = Non
     return refresh_facility_transparency(selected=selected, files_dir=files_dir, data_year=data_year)
 
 
+def refresh_hospital_transparency(files_dir: str = "", data_year: int | None = None, limit: int | None = None) -> dict:
+    selected = [
+        {"facility_id": r["facility_id"], "facility_type": "hospital", "slug": r.get("slug")}
+        for r in select_hospitals_for_transparency(limit=limit)
+    ]
+    return refresh_facility_transparency(selected=selected, files_dir=files_dir, data_year=data_year)
+
+
 def refresh_facility_transparency(
     selected: list[dict] | None = None,
     files_dir: str = "",
@@ -1129,7 +1165,8 @@ def refresh_facility_transparency(
     facility_types: tuple[str, ...] = ("hospital", "asc", "imaging_center"),
     limit: int | None = None,
 ) -> dict:
-    selected = selected or select_facilities_for_transparency(facility_types=facility_types, limit=limit)
+    if selected is None:
+        selected = select_facilities_for_transparency(facility_types=facility_types, limit=limit)
     parsed = 0
     failed = 0
     missing = 0

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import date
+import json
 import math
 
-from config import ENABLE_FREE_MAPS
+from config import APP_URL, ENABLE_FREE_MAPS
 from db import get_db
 from hospital_seo import (
     FRIENDLY_CPT_DESCRIPTIONS,
@@ -192,6 +194,99 @@ def get_comparison_data(fid_a: str, fid_b: str) -> dict | None:
         "verdict": verdict,
         "distance_miles": distance_miles,
         "map_data": map_data,
+        "seo": build_comparison_seo(h_a, h_b, common, distance_miles),
+    }
+
+
+def _truncate_name(name: str, max_len: int) -> str:
+    txt = (name or "").strip()
+    if len(txt) <= max_len:
+        return txt
+    return txt[: max_len - 3].rsplit(" ", 1)[0] + "..."
+
+
+def build_comparison_seo(h_a: dict, h_b: dict, common: list[dict], distance_miles: float | None) -> dict:
+    name_a = h_a.get("name", "Hospital A")
+    name_b = h_b.get("name", "Hospital B")
+    city = h_a.get("city") if h_a.get("city") == h_b.get("city") else None
+    state = h_a.get("state") if h_a.get("state") == h_b.get("state") else None
+    locality = f" in {city}, {state}" if city and state else ""
+    title = f"{name_a} vs {name_b}: Which Costs Less{locality}? | BillKarma"
+    if len(title) > 65:
+        title = (
+            f"{_truncate_name(name_a, 18)} vs {_truncate_name(name_b, 18)}: Cost Compare | BillKarma"
+        )
+
+    top_proc = common[0] if common else None
+    proc_clause = ""
+    if top_proc:
+        proc_name = top_proc.get("name") or f"CPT {top_proc.get('cpt_code')}"
+        proc_clause = (
+            f" For {proc_name}, the price gap is about ${top_proc.get('savings', 0):,.0f}."
+        )
+    distance_clause = f" The hospitals are {distance_miles} miles apart." if distance_miles is not None else ""
+    desc = (
+        f"Compare billing grades, procedure prices, and financial assistance for {name_a} and {name_b}{locality}."
+        f"{proc_clause}{distance_clause}"
+    )
+    if len(desc) > 155:
+        desc = desc[:152].rsplit(" ", 1)[0] + "..."
+
+    base = APP_URL.rstrip("/")
+    compare_url = f"{base}/compare/{h_a.get('slug')}-vs-{h_b.get('slug')}/"
+    breadcrumb_schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "BillKarma", "item": f"{base}/"},
+            {"@type": "ListItem", "position": 2, "name": "Compare", "item": f"{base}/compare/"},
+            {"@type": "ListItem", "position": 3, "name": f"{name_a} vs {name_b}", "item": compare_url},
+        ],
+    }
+    web_page_schema = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": title,
+        "description": desc,
+        "url": compare_url,
+        "dateModified": date.today().isoformat(),
+    }
+    faq_schema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": f"Which hospital has the better billing grade: {name_a} or {name_b}?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": (
+                        f"{name_a} is graded {h_a.get('billing_grade') or 'N/A'} and "
+                        f"{name_b} is graded {h_b.get('billing_grade') or 'N/A'}."
+                    ),
+                },
+            },
+            {
+                "@type": "Question",
+                "name": f"Does this comparison include procedure prices?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": (
+                        f"Yes. BillKarma compares shared procedure prices from machine-readable hospital files"
+                        f" and benchmarks them against Medicare where data is available."
+                    ),
+                },
+            },
+        ],
+    }
+    return {
+        "page_title": title,
+        "meta_description": desc,
+        "reviewed_on": date.today().isoformat(),
+        "top_procedure": top_proc,
+        "breadcrumb_schema_json": json.dumps(breadcrumb_schema, ensure_ascii=False),
+        "webpage_schema_json": json.dumps(web_page_schema, ensure_ascii=False),
+        "faq_schema_json": json.dumps(faq_schema, ensure_ascii=False),
     }
 
 
