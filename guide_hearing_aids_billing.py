@@ -442,12 +442,12 @@ register("hearing-aids-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="#" target="_blank" rel="noopener">FDA: Over-the-Counter Hearing Aids &mdash; Final Rule (August 2022, Effective October 2022)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Coverage of Hearing Services and Hearing Aids &mdash; Benefit Policy Manual</a></li>
-    <li><a href="#" target="_blank" rel="noopener">NASEM: Hearing Health Care for Adults &mdash; Priorities for Improving Access and Affordability</a></li>
-    <li><a href="#" target="_blank" rel="noopener">JAMA Otolaryngology: Self-Fitting OTC Hearing Aids vs. Audiologist-Fitted Devices &mdash; Randomized Clinical Trial</a></li>
-    <li><a href="#" target="_blank" rel="noopener">VA: Audiology and Hearing Aid Services &mdash; Eligibility and Benefits</a></li>
-    <li><a href="#" target="_blank" rel="noopener">ASHA: State Insurance Mandates for Hearing Aid Coverage &mdash; 2025 Update</a></li>
+    <li><a href="https://www.fda.gov/medical-devices/consumer-products/hearing-aids" target="_blank" rel="noopener">FDA: Over-the-Counter Hearing Aids &mdash; Final Rule (August 2022, Effective October 2022)</a></li>
+    <li><a href="https://www.cms.gov/medicare/payment/fee-schedules/physician/audiology-services" target="_blank" rel="noopener">CMS: Medicare Coverage of Hearing Services and Hearing Aids &mdash; Benefit Policy Manual</a></li>
+    <li><a href="https://www.nap.edu/catalog/23446/hearing-health-care-for-adults-priorities-for-improving-access-and" target="_blank" rel="noopener">NASEM: Hearing Health Care for Adults &mdash; Priorities for Improving Access and Affordability</a></li>
+    <li>JAMA Otolaryngology: Self-Fitting OTC Hearing Aids vs. Audiologist-Fitted Devices &mdash; Randomized Clinical Trial</li>
+    <li><a href="https://www.rehab.va.gov/audiology/" target="_blank" rel="noopener">VA: Audiology and Hearing Aid Services &mdash; Eligibility and Benefits</a></li>
+    <li><a href="https://www.asha.org/advocacy/state/state-insurance-mandates-for-hearing-aids/" target="_blank" rel="noopener">ASHA: State Insurance Mandates for Hearing Aid Coverage &mdash; 2025 Update</a></li>
 </ul>
 """,
 })

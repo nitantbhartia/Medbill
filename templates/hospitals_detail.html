@@ -3,6 +3,7 @@
 {% block title %}{{ data.seo.page_title }}{% endblock %}
 
 {% block head %}
+{% block meta_description %}{% endblock %}
 <meta name="description" content="{{ data.seo.meta_description }}">
 <script type="application/ld+json">{{ data.seo.hospital_schema_json | safe }}</script>
 <script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>

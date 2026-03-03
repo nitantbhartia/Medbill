@@ -31,6 +31,20 @@ def get_guides_for_sitemap() -> list[tuple[str, str]]:
     ]
 
 
+def get_related_guides(current_slug: str, limit: int = 4) -> list[dict]:
+    """Return guides in the same category, excluding the current guide."""
+    current = GUIDES.get(current_slug)
+    if not current:
+        return []
+    category = current.get("category", "")
+    related = [
+        g for slug, g in GUIDES.items()
+        if slug != current_slug and g.get("category") == category
+    ]
+    related.sort(key=lambda g: g.get("published", ""), reverse=True)
+    return related[:limit]
+
+
 def _embed(mode="cost", cpt="", title="", subtitle="", height="380"):
     """Return an iframe snippet for embedding a calculator in article body."""
     params = f"mode={mode}"

@@ -214,11 +214,11 @@ register("how-health-insurance-works", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="#" target="_blank" rel="noopener">HealthCare.gov: How Health Insurance Works</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Kaiser Family Foundation: Employer Health Benefits Survey (2025)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Marketplace Open Enrollment Period</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Kaiser Family Foundation: Health Insurance Literacy Survey (2024)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">U.S. Department of Labor: Understanding Your Health Plan</a></li>
+    <li><a href="https://www.healthcare.gov/choose-a-plan/" target="_blank" rel="noopener">HealthCare.gov: How Health Insurance Works</a></li>
+    <li><a href="https://www.kff.org/health-costs/2025-employer-health-benefits-survey/" target="_blank" rel="noopener">Kaiser Family Foundation: Employer Health Benefits Survey (2025)</a></li>
+    <li><a href="https://www.cms.gov/data-research/statistics-trends-reports/marketplace-products/2025-marketplace-open-enrollment-period-public-use-files" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Marketplace Open Enrollment Period</a></li>
+    <li><a href="https://www.kff.org/affordable-care-act/kff-survey-of-consumer-experiences-with-health-insurance/" target="_blank" rel="noopener">Kaiser Family Foundation: Health Insurance Literacy Survey (2024)</a></li>
+    <li><a href="https://www.dol.gov/general/topic/health-plans" target="_blank" rel="noopener">U.S. Department of Labor: Understanding Your Health Plan</a></li>
 </ul>
 """,
 })
