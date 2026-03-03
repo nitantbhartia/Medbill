@@ -1192,7 +1192,7 @@ async def unified_find_page(request: Request, q: str = "", zip: str = "", type: 
             "title": "Find Facilities | BillKarma",
             "og_title": "Find Hospitals, Surgery Centers, and Imaging Centers | BillKarma",
             "og_description": "Find and compare graded facilities near you across hospitals, surgery centers, and imaging centers.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow",
         },
     )
 
@@ -1228,7 +1228,7 @@ async def compare_index(
 
 @app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
 async def compare_detail(request: Request, fid_a: str, fid_b: str):
-    # Redirect .0-suffixed IDs to clean URLs
+    """Redirect ID-based compare URLs to canonical slug-based URLs."""
     clean_a, clean_b = _clean_fid(fid_a), _clean_fid(fid_b)
     if clean_a != fid_a or clean_b != fid_b:
         return RedirectResponse(url=f"/compare/{clean_a}/vs/{clean_b}/", status_code=301)
@@ -1238,6 +1238,11 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
             "error.html",
             {"request": request, "message": "One or both hospitals not found."},
         )
+    slug_a = data["a"].get("slug")
+    slug_b = data["b"].get("slug")
+    if slug_a and slug_b:
+        return RedirectResponse(url=f"/compare/{slug_a}-vs-{slug_b}/", status_code=301)
+    # Fallback: render directly if slugs are missing
     name_a = data["a"]["name"]
     name_b = data["b"]["name"]
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
@@ -1256,7 +1261,7 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
                 f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
                 "See which hospital charges less relative to Medicare."
             ),
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow",
         },
     )
 
@@ -1268,6 +1273,7 @@ async def sitemap_index():
         f"{base}/sitemap-core.xml",
         f"{base}/sitemap-guides.xml",
         f"{base}/sitemap-hospitals.xml",
+        f"{base}/sitemap-compare.xml",
     ]
     entries = "".join(f"<sitemap><loc>{url}</loc></sitemap>" for url in sitemaps)
     xml = (
@@ -1303,15 +1309,10 @@ async def core_sitemap():
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
         for loc, lastmod, priority in core_urls
     )
-    hospital_paths = get_hospital_sitemap_paths()
-    hospital_entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
-        for path in hospital_paths
-    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{core_entries}{hospital_entries}</urlset>"
+        f"{core_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1354,6 +1355,24 @@ async def hospital_sitemap_v2():
     urlset = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{urlset}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-compare.xml")
+async def compare_sitemap():
+    from compare_seo import get_comparison_sitemap_paths
+
+    base = config.APP_URL.rstrip("/")
+    paths = get_comparison_sitemap_paths()
+    urlset = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-03-01</lastmod><priority>0.6</priority></url>"
+        for path in paths
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'

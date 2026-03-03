@@ -28,7 +28,7 @@
     "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ canonical_url.split('/compare/')[0] }}/"},
         {"@type": "ListItem", "position": 2, "name": "Compare Hospitals", "item": "{{ canonical_url.split('/compare/')[0] }}/compare/"},
-        {"@type": "ListItem", "position": 3, "name": "{{ data.a.name }} vs {{ data.b.name }}"}
+        {"@type": "ListItem", "position": 3, "name": {{ (data.a.name ~ " vs " ~ data.b.name) | tojson }}}
     ]
 }
 </script>

@@ -30,7 +30,7 @@
     "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ canonical_url.split('/procedures/')[0] }}/"},
         {"@type": "ListItem", "position": 2, "name": "Procedures", "item": "{{ canonical_url.split('/procedures/')[0] }}/procedures/"},
-        {"@type": "ListItem", "position": 3, "name": "{{ data.name }}"}
+        {"@type": "ListItem", "position": 3, "name": {{ data.name | tojson }}}
     ]
 }
 </script>
@@ -41,7 +41,7 @@
     "@type": "FAQPage",
     "mainEntity": [
         {% for item in data.faq %}
-        {"@type": "Question", "name": "{{ item.q }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ item.a }}"}}{% if not loop.last %},{% endif %}
+        {"@type": "Question", "name": {{ item.q | tojson }}, "acceptedAnswer": {"@type": "Answer", "text": {{ item.a | tojson }}}}{% if not loop.last %},{% endif %}
         {% endfor %}
     ]
 }

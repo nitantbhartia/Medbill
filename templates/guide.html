@@ -17,10 +17,10 @@
 {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "{{ guide.title }}",
-    "description": "{{ meta_description }}",
+    "headline": {{ guide.title | tojson }},
+    "description": {{ meta_description | tojson }},
     "datePublished": "{{ guide.published }}",
-    "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
+    "author": {"@type": "Organization", "name": {{ (guide.author or "BillKarma") | tojson }}},
     "publisher": {"@type": "Organization", "name": "BillKarma"}
 }
 </script>
@@ -33,10 +33,10 @@
         {% for faq in guide.faqs %}
         {
             "@type": "Question",
-            "name": "{{ faq.q }}",
+            "name": {{ faq.q | tojson }},
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "{{ faq.a }}"
+                "text": {{ faq.a | tojson }}
             }
         }{% if not loop.last %},{% endif %}
         {% endfor %}
