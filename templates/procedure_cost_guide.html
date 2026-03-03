@@ -3,6 +3,7 @@
 {% block title %}{{ data.content_heading }} | BillKarma{% endblock %}
 
 {% block head %}
+{% block meta_description %}{% endblock %}
 <meta name="description" content="{{ data.seo.meta_description }}">
 {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
 <meta property="og:title" content="{{ data.content_heading }} | BillKarma">

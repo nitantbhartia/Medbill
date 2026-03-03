@@ -3,6 +3,7 @@
 {% block title %}{{ data.seo.page_title }}{% endblock %}
 
 {% block head %}
+{% block meta_description %}{% endblock %}
 <meta name="description" content="{{ data.seo.meta_description }}">
 <style>
     .proc-detail-hero {
@@ -22,6 +23,30 @@
         .proc-detail-hero h1 { font-size: 1.4rem; }
     }
 </style>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ canonical_url.split('/procedures/')[0] }}/"},
+        {"@type": "ListItem", "position": 2, "name": "Procedures", "item": "{{ canonical_url.split('/procedures/')[0] }}/procedures/"},
+        {"@type": "ListItem", "position": 3, "name": "{{ data.name }}"}
+    ]
+}
+</script>
+{% if data.faq %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in data.faq %}
+        {"@type": "Question", "name": "{{ item.q }}", "acceptedAnswer": {"@type": "Answer", "text": "{{ item.a }}"}}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -339,7 +364,7 @@
     {% endif %}
 
     {# SECTION 7: Internal Links #}
-    <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {% if data.related %}
         <div class="rounded-lg border border-gray-200 p-5 bg-white">
             <h3 class="font-bold text-gray-800 text-sm mb-3">Related Procedures</h3>
@@ -375,6 +400,15 @@
             <a href="/scan" class="text-sm font-bold bg-accent-700 text-white px-4 py-2 rounded-lg inline-block">
                 Scan My Bill Free →
             </a>
+        </div>
+
+        <div class="rounded-lg border border-gray-200 p-5 bg-white">
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Billing Guides</h3>
+            <ul class="space-y-2">
+                <li><a href="/guides/how-to-read-your-medical-bill" class="text-sm text-accent-700 hover:text-accent-800 underline">How to Read Your Bill</a></li>
+                <li><a href="/guides/common-hospital-billing-errors" class="text-sm text-accent-700 hover:text-accent-800 underline">Common Billing Errors</a></li>
+                <li><a href="/guides/how-to-negotiate-medical-bills" class="text-sm text-accent-700 hover:text-accent-800 underline">Negotiate Your Bill</a></li>
+            </ul>
         </div>
     </div>
 

@@ -193,12 +193,12 @@ register("preventive-care-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="#" target="_blank" rel="noopener">U.S. Preventive Services Task Force: A and B Recommendations (2026)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Preventive Care Benefits Under the ACA</a></li>
-    <li><a href="#" target="_blank" rel="noopener">HealthCare.gov: Preventive Health Services for Adults</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Advisory Committee on Immunization Practices: Recommended Immunization Schedule (2026)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Kaiser Family Foundation: Preventive Services Tracker</a></li>
-    <li><a href="#" target="_blank" rel="noopener">U.S. Department of Health and Human Services: ACA Section 2713 Implementation FAQ</a></li>
+    <li><a href="https://www.uspreventiveservicestaskforce.org/uspstf/recommendation-topics/uspstf-a-and-b-recommendations" target="_blank" rel="noopener">U.S. Preventive Services Task Force: A and B Recommendations (2026)</a></li>
+    <li><a href="https://www.cms.gov/cciio/resources/fact-sheets-and-faqs/preventive-care-background" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Preventive Care Benefits Under the ACA</a></li>
+    <li><a href="https://www.healthcare.gov/preventive-care-adults/" target="_blank" rel="noopener">HealthCare.gov: Preventive Health Services for Adults</a></li>
+    <li><a href="https://www.cdc.gov/vaccines/hcp/imz-schedules/index.html" target="_blank" rel="noopener">Advisory Committee on Immunization Practices: Recommended Immunization Schedule (2026)</a></li>
+    <li><a href="https://www.kff.org/health-reform/report/preventive-services-tracker/" target="_blank" rel="noopener">Kaiser Family Foundation: Preventive Services Tracker</a></li>
+    <li><a href="https://www.hhs.gov/healthcare/about-the-aca/preventive-care/index.html" target="_blank" rel="noopener">U.S. Department of Health and Human Services: ACA Section 2713 Implementation FAQ</a></li>
 </ul>
 """,
 })

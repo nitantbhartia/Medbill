@@ -625,7 +625,7 @@ async def calculator_embed(
 @app.get("/guides/{slug}", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    from guides import get_guide
+    from guides import get_guide, get_related_guides
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"})
@@ -635,6 +635,7 @@ async def guide_page(request: Request, slug: str):
         {
             "request": request,
             "guide": guide,
+            "related_guides": get_related_guides(slug),
             "canonical_url": canonical_url,
             "og_title": guide["title"] + " | BillKarma",
             "og_description": guide["meta_description"],
@@ -1155,7 +1156,7 @@ async def unified_search_page(request: Request, q: str = ""):
     token = (q or "").strip()
     procedures = _search_procedures(token, limit=25) if len(token) >= 2 else []
     facilities = _search_facilities(token, limit=25) if len(token) >= 2 else []
-    canonical_url = f"{config.APP_URL.rstrip('/')}/search?q={token}" if token else f"{config.APP_URL.rstrip('/')}/search"
+    canonical_url = f"{config.APP_URL.rstrip('/')}/search"
     return templates.TemplateResponse(
         "search_results.html",
         {
@@ -1167,7 +1168,7 @@ async def unified_search_page(request: Request, q: str = ""):
             "title": "Search Results | BillKarma",
             "og_title": "Search Medical Procedure and Facility Prices | BillKarma",
             "og_description": "Search procedures, hospitals, surgery centers, and imaging centers with pricing context from Medicare benchmarks.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow",
         },
     )
 
@@ -1251,6 +1252,10 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
                 f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
                 "See which hospital charges less relative to Medicare."
             ),
+            "meta_description": (
+                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
+                "See which hospital charges less relative to Medicare."
+            ),
             "meta_robots": "index, follow",
         },
     )
@@ -1259,7 +1264,23 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 @app.get("/sitemap.xml")
 async def sitemap_index():
     base = config.APP_URL.rstrip("/")
-    hospital_paths = get_hospital_sitemap_paths()
+    sitemaps = [
+        f"{base}/sitemap-core.xml",
+        f"{base}/sitemap-guides.xml",
+        f"{base}/sitemap-hospitals.xml",
+    ]
+    entries = "".join(f"<sitemap><loc>{url}</loc></sitemap>" for url in sitemaps)
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{entries}</sitemapindex>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-core.xml")
+async def core_sitemap():
+    base = config.APP_URL.rstrip("/")
     core_urls = [
         (f"{base}/", "2026-02-01", "1.0"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
@@ -1277,13 +1298,12 @@ async def sitemap_index():
         (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
         (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
-        (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
-        (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
         for loc, lastmod, priority in core_urls
     )
+    hospital_paths = get_hospital_sitemap_paths()
     hospital_entries = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
@@ -1301,23 +1321,6 @@ async def guides_sitemap():
     from guides import get_guides_for_sitemap
 
     base = config.APP_URL.rstrip("/")
-    static_urls = [
-        (f"{base}/", "2026-02-01", "1.0"),
-        (f"{base}/fight-debt", "2026-02-24", "0.9"),
-        (f"{base}/collection-notice", "2026-02-24", "0.9"),
-        (f"{base}/statute-of-limitations", "2026-02-24", "0.9"),
-        (f"{base}/charity-care", "2026-02-24", "0.9"),
-        (f"{base}/settle-debt", "2026-02-24", "0.8"),
-        (f"{base}/guides/", "2026-02-01", "0.8"),
-        (f"{base}/tools/", "2026-02-01", "0.8"),
-        (f"{base}/calculator", "2026-02-01", "0.7"),
-        (f"{base}/estimate", "2026-03-01", "0.9"),
-        (f"{base}/rights/", "2026-03-01", "0.8"),
-    ]
-    static_entries = "".join(
-        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
-        for loc, lastmod, priority in static_urls
-    )
     guide_entries = "".join(
         f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
@@ -1339,7 +1342,7 @@ async def guides_sitemap():
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
+        f"{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1347,16 +1350,6 @@ async def guides_sitemap():
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
-    core_entries = "".join(
-        [
-            f"<url><loc>{base}/</loc><lastmod>2026-02-01</lastmod><priority>1.0</priority></url>",
-            f"<url><loc>{base}/tools/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>",
-        ]
-    )
-    tool_entries = "".join(
-        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
-        for tool in list_tools()
-    )
     hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
@@ -1365,7 +1358,7 @@ async def hospital_sitemap_v2():
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{core_entries}{tool_entries}{urlset}</urlset>"
+        f"{urlset}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -2074,6 +2067,10 @@ async def compare_seo_page(request: Request, slug_a: str, slug_b: str):
             "canonical_url": canonical_url,
             "og_title": f"{name_a} vs {name_b} | BillKarma",
             "og_description": (
+                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
+                "See which hospital charges less relative to Medicare."
+            ),
+            "meta_description": (
                 f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
                 "See which hospital charges less relative to Medicare."
             ),

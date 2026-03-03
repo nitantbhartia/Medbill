@@ -243,12 +243,12 @@ register("skilled-nursing-facility-billing", {
 <h2 id="sources">9. Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Skilled Nursing Facility Coverage &mdash; Benefit Period Rules and Coinsurance Rates (2026)</a></li>
-    <li><a href="#" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Advantage Prior Authorization Denials for Skilled Nursing Facility Care</a></li>
-    <li><a href="#" target="_blank" rel="noopener">MedPAC: March 2025 Report to Congress &mdash; Skilled Nursing Facility Services, Chapter 8</a></li>
-    <li><a href="#" target="_blank" rel="noopener">KFF: Medicaid&rsquo;s Role in Nursing Home Care &mdash; Coverage, Spending, and Eligibility</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Jimmo v. Sebelius Settlement: CMS Clarification on Skilled Care Coverage Standards</a></li>
-    <li><a href="#" target="_blank" rel="noopener">Genworth Financial: Cost of Care Survey &mdash; 2025 Median Nursing Home Costs by State</a></li>
+    <li><a href="https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles" target="_blank" rel="noopener">CMS: Medicare Skilled Nursing Facility Coverage &mdash; Benefit Period Rules and Coinsurance Rates (2026)</a></li>
+    <li><a href="https://oig.hhs.gov/reports/all/2022/some-medicare-advantage-organization-denials-of-prior-authorization-requests-raise-concerns-about-beneficiary-access-to-medically-necessary-care/" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Advantage Prior Authorization Denials for Skilled Nursing Facility Care</a></li>
+    <li><a href="https://www.medpac.gov/document/chapter-6-skilled-nursing-facility-services-march-2025-report/" target="_blank" rel="noopener">MedPAC: March 2025 Report to Congress &mdash; Skilled Nursing Facility Services, Chapter 8</a></li>
+    <li><a href="https://www.kff.org/medicaid/medicaids-role-in-nursing-home-care/" target="_blank" rel="noopener">KFF: Medicaid&rsquo;s Role in Nursing Home Care &mdash; Coverage, Spending, and Eligibility</a></li>
+    <li><a href="https://www.cms.gov/medicare/settlements/jimmo" target="_blank" rel="noopener">Jimmo v. Sebelius Settlement: CMS Clarification on Skilled Care Coverage Standards</a></li>
+    <li><a href="https://www.carescout.com/cost-of-care" target="_blank" rel="noopener">Genworth Financial: Cost of Care Survey &mdash; 2025 Median Nursing Home Costs by State</a></li>
 </ul>
 """,
 })
