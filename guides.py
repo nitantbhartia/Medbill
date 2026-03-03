@@ -212,3 +212,14 @@ import guide_healthcare_costs_rising_2026
 import guide_medicaid_to_marketplace_2026
 import guide_copay_accumulator_programs
 import guide_tariffs_drug_prices_2026
+# Batch 7: high-conversion articles
+import guide_medical_bill_vs_eob
+import guide_spouse_medical_debt
+import guide_medical_bill_while_traveling
+import guide_negotiate_before_procedure
+import guide_prior_auth_denied_2026
+import guide_medical_bill_after_job_loss
+import guide_self_pay_patient_rights
+import guide_medical_credit_cards
+import guide_er_vs_urgent_care_costs
+import guide_second_opinion_insurance
