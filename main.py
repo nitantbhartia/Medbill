@@ -54,7 +54,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
-    if not request.url.path.startswith("/embed/"):
+    frame_allowed = request.url.path.startswith("/embed/") or request.url.path == "/calculator/embed"
+    if not frame_allowed:
         response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
