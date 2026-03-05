@@ -112,7 +112,7 @@ def create_case(org_id: int, user_id: int, patient_label: str, **kwargs) -> dict
                 (kwargs.get("notes") or "").strip() or None,
                 (kwargs.get("tags") or "").strip() or None,
                 1 if kwargs.get("patient_consent") else 0,
-                kwargs.get("assigned_to") or user_id,
+                kwargs.get("assigned_to") if kwargs.get("assigned_to") is not None else user_id,
             ),
         )
         case_id = cursor.lastrowid
@@ -153,8 +153,9 @@ def list_cases(org_id: int, status: str = None, assigned_to: int = None,
         conditions.append("c.assigned_to = ?")
         params.append(assigned_to)
     if search:
-        conditions.append("(c.patient_label LIKE ? OR c.hospital_name LIKE ? OR c.tags LIKE ?)")
-        term = f"%{search}%"
+        conditions.append("(c.patient_label LIKE ? ESCAPE '\\' OR c.hospital_name LIKE ? ESCAPE '\\' OR c.tags LIKE ? ESCAPE '\\')")
+        escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        term = f"%{escaped}%"
         params.extend([term, term, term])
 
     where = " AND ".join(conditions)
@@ -184,7 +185,7 @@ def update_case(case_id: int, org_id: int, **kwargs) -> dict:
     allowed = {
         "patient_label", "hospital_name", "insurance_carrier", "date_of_service",
         "bill_amount", "notes", "tags", "assigned_to", "status", "outcome",
-        "outcome_amount", "patient_consent",
+        "outcome_amount", "patient_consent", "appeal_deadline", "follow_up_date",
     }
     updates = {k: v for k, v in kwargs.items() if k in allowed and v is not None}
     if not updates:
@@ -194,6 +195,16 @@ def update_case(case_id: int, org_id: int, **kwargs) -> dict:
         raise HTTPException(400, f"Invalid status: {updates['status']}")
     if "outcome" in updates and updates["outcome"] not in VALID_OUTCOMES:
         raise HTTPException(400, f"Invalid outcome: {updates['outcome']}")
+
+    # Validate assigned_to is an active org member
+    if "assigned_to" in updates:
+        with get_db() as db:
+            member = db.execute(
+                "SELECT id FROM org_members WHERE org_id = ? AND user_id = ? AND status = 'active'",
+                (org_id, updates["assigned_to"]),
+            ).fetchone()
+            if not member:
+                raise HTTPException(400, "Assignee is not an active member of this organization")
 
     set_parts = [f"{k} = ?" for k in updates]
     set_parts.append("updated_at = CURRENT_TIMESTAMP")
@@ -695,8 +706,11 @@ def generate_letter(case_id: int, org_id: int, user_id: int, letter_type: str,
             content = result["letter"]
 
     elif letter_type == "charity_care":
-        income = float(fields.get("income", 0))
-        household_size = int(fields.get("household_size", 1))
+        try:
+            income = float(fields.get("income", 0))
+            household_size = int(fields.get("household_size", 1))
+        except (ValueError, TypeError):
+            raise HTTPException(400, "Income must be a number and household_size must be an integer")
         bill_amount = str(case.get("bill_amount") or fields.get("bill_amount", "0"))
         result = generate_charity_care_letter(
             user_name=patient_name,
@@ -1098,6 +1112,32 @@ def bulk_assign(org_id: int, case_ids: list[int], assigned_to: int, user_id: int
     return {"updated": updated, "total": len(case_ids), "assigned_to": assigned_to}
 
 
+def bulk_export_csv(org_id: int, case_ids: list[int] = None, status: str = None) -> str:
+    """Export case data as CSV string."""
+    import csv
+    import io
+
+    cases = bulk_export(org_id, case_ids=case_ids, status=status)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "ID", "Patient", "Status", "Hospital", "Insurance", "Date of Service",
+        "Bill Amount", "Outcome", "Outcome Amount", "Tags",
+        "Appeal Deadline", "Follow-up Date", "Assigned To", "Created", "Updated",
+    ])
+    for c in cases:
+        writer.writerow([
+            c["id"], c["patient_label"], c["status"], c.get("hospital_name", ""),
+            c.get("insurance_carrier", ""), c.get("date_of_service", ""),
+            c.get("bill_amount", ""), c.get("outcome", ""), c.get("outcome_amount", ""),
+            c.get("tags", ""), c.get("appeal_deadline", ""), c.get("follow_up_date", ""),
+            c.get("assigned_to_name", ""), c.get("created_at", ""), c.get("updated_at", ""),
+        ])
+
+    return output.getvalue()
+
+
 def bulk_export(org_id: int, case_ids: list[int] = None, status: str = None) -> list[dict]:
     """Export case data as JSON. If no case_ids, export all (with optional status filter)."""
     conditions = ["c.org_id = ?"]
@@ -1155,3 +1195,163 @@ def bulk_export(org_id: int, case_ids: list[int] = None, status: str = None) -> 
             result.append(case_dict)
 
     return result
+
+
+# ── Dashboard Analytics ──────────────────────────────────────────────────────
+
+def get_dashboard_stats(org_id: int) -> dict:
+    """Get aggregate analytics for the org dashboard."""
+    with get_db() as db:
+        # Status distribution
+        status_rows = db.execute(
+            "SELECT status, COUNT(*) as count FROM advocacy_cases WHERE org_id = ? GROUP BY status",
+            (org_id,),
+        ).fetchall()
+        by_status = {r["status"]: r["count"] for r in status_rows}
+        total_cases = sum(by_status.values())
+
+        # Financial summary
+        fin = db.execute(
+            """
+            SELECT COALESCE(SUM(bill_amount), 0) as total_billed,
+                   COALESCE(SUM(CASE WHEN outcome IN ('resolved_reduced', 'resolved_forgiven') THEN outcome_amount ELSE 0 END), 0) as total_saved,
+                   COUNT(CASE WHEN outcome IS NOT NULL THEN 1 END) as resolved_count
+            FROM advocacy_cases WHERE org_id = ?
+            """,
+            (org_id,),
+        ).fetchone()
+
+        # Upcoming deadlines (next 14 days)
+        upcoming_deadlines = db.execute(
+            """
+            SELECT id, patient_label, appeal_deadline, follow_up_date, status
+            FROM advocacy_cases
+            WHERE org_id = ? AND (
+                (appeal_deadline IS NOT NULL AND appeal_deadline <= date('now', '+14 days') AND appeal_deadline >= date('now'))
+                OR (follow_up_date IS NOT NULL AND follow_up_date <= date('now', '+14 days') AND follow_up_date >= date('now'))
+            )
+            ORDER BY COALESCE(appeal_deadline, follow_up_date)
+            LIMIT 20
+            """,
+            (org_id,),
+        ).fetchall()
+
+        # Overdue deadlines
+        overdue = db.execute(
+            """
+            SELECT id, patient_label, appeal_deadline, follow_up_date, status
+            FROM advocacy_cases
+            WHERE org_id = ? AND status NOT IN ('resolved', 'closed') AND (
+                (appeal_deadline IS NOT NULL AND appeal_deadline < date('now'))
+                OR (follow_up_date IS NOT NULL AND follow_up_date < date('now'))
+            )
+            ORDER BY COALESCE(appeal_deadline, follow_up_date)
+            LIMIT 20
+            """,
+            (org_id,),
+        ).fetchall()
+
+        # Case aging: average days open for non-resolved cases
+        aging = db.execute(
+            """
+            SELECT AVG(julianday('now') - julianday(created_at)) as avg_days_open
+            FROM advocacy_cases
+            WHERE org_id = ? AND status NOT IN ('resolved', 'closed')
+            """,
+            (org_id,),
+        ).fetchone()
+
+    return {
+        "total_cases": total_cases,
+        "by_status": by_status,
+        "total_billed": fin["total_billed"],
+        "total_saved": fin["total_saved"],
+        "resolved_count": fin["resolved_count"],
+        "avg_days_open": round(aging["avg_days_open"] or 0, 1),
+        "upcoming_deadlines": [dict(r) for r in upcoming_deadlines],
+        "overdue_deadlines": [dict(r) for r in overdue],
+    }
+
+
+# ── Case Templates ────────────────────────────────────────────────────────────
+
+BUILTIN_TEMPLATES = [
+    {
+        "name": "Hospital Billing Dispute",
+        "template_type": "hospital_dispute",
+        "default_fields": {
+            "tags": "billing dispute",
+            "notes": "Patient received bill with suspected errors. Upload itemized bill and EOB for analysis.",
+        },
+    },
+    {
+        "name": "Insurance Denial Appeal",
+        "template_type": "insurance_appeal",
+        "default_fields": {
+            "tags": "denied claim, appeal",
+            "notes": "Insurance denied coverage. Upload denial letter and original bill for appeal letter generation.",
+        },
+    },
+    {
+        "name": "Charity Care Application",
+        "template_type": "charity_care",
+        "default_fields": {
+            "tags": "charity care, financial hardship",
+            "notes": "Patient qualifies for financial assistance. Upload bill and prepare charity care request.",
+        },
+    },
+    {
+        "name": "Debt Collection Defense",
+        "template_type": "debt_validation",
+        "default_fields": {
+            "tags": "collections, debt validation",
+            "notes": "Bill sent to collections. Generate FDCPA debt validation letter to protect patient rights.",
+        },
+    },
+]
+
+
+def get_templates(org_id: int) -> list[dict]:
+    """Get built-in + org custom templates."""
+    with get_db() as db:
+        custom = db.execute(
+            "SELECT * FROM case_templates WHERE org_id = ? ORDER BY name",
+            (org_id,),
+        ).fetchall()
+
+    result = [{"id": None, "org_id": None, "builtin": True, **t} for t in BUILTIN_TEMPLATES]
+    for row in custom:
+        r = dict(row)
+        r["default_fields"] = json.loads(r["default_fields"])
+        r["builtin"] = False
+        result.append(r)
+    return result
+
+
+def create_template(org_id: int, user_id: int, name: str, template_type: str,
+                    default_fields: dict) -> dict:
+    """Create a custom case template."""
+    name = (name or "").strip()
+    if not name:
+        raise HTTPException(400, "Template name is required")
+    template_type = (template_type or "").strip()
+    if not template_type:
+        raise HTTPException(400, "Template type is required")
+
+    with get_db() as db:
+        cursor = db.execute(
+            "INSERT INTO case_templates (org_id, name, template_type, default_fields, created_by) VALUES (?, ?, ?, ?, ?)",
+            (org_id, name, template_type, json.dumps(default_fields or {}), user_id),
+        )
+    return {"id": cursor.lastrowid, "name": name, "template_type": template_type, "default_fields": default_fields}
+
+
+def delete_template(template_id: int, org_id: int) -> None:
+    """Delete a custom case template."""
+    with get_db() as db:
+        result = db.execute(
+            "DELETE FROM case_templates WHERE id = ? AND org_id = ?",
+            (template_id, org_id),
+        )
+        if result.rowcount == 0:
+            raise HTTPException(404, "Template not found")

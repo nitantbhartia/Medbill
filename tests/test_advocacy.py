@@ -720,3 +720,169 @@ class TestBulkOperations:
             "status": "sent",
         })
         assert resp.status_code == 400
+
+
+class TestDashboard:
+    def test_dashboard_empty(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/dashboard")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["total_cases"] == 0
+        assert data["total_billed"] == 0
+        assert data["total_saved"] == 0
+
+    def test_dashboard_with_cases(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        # Create cases with different statuses and amounts
+        client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+            "patient_label": "A", "bill_amount": 5000, "patient_consent": True,
+        })
+        client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+            "patient_label": "B", "bill_amount": 8000, "patient_consent": True,
+        })
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/dashboard")
+        data = resp.json()["data"]
+        assert data["total_cases"] == 2
+        assert data["total_billed"] == 13000
+        assert data["by_status"]["new"] == 2
+
+    def test_dashboard_page(self):
+        resp = client.get("/advocacy/dashboard")
+        assert resp.status_code == 200
+
+    def test_dashboard_overdue_deadlines(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_resp = client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+            "patient_label": "Urgent", "patient_consent": True,
+        })
+        case_id = case_resp.json()["data"]["id"]
+        # Set an overdue appeal deadline
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}", json={
+            "appeal_deadline": "2025-01-01",
+        })
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/dashboard")
+        data = resp.json()["data"]
+        assert len(data["overdue_deadlines"]) == 1
+        assert data["overdue_deadlines"][0]["patient_label"] == "Urgent"
+
+
+class TestDeadlineTracking:
+    def test_set_appeal_deadline(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}", json={
+            "appeal_deadline": "2026-06-01",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["appeal_deadline"] == "2026-06-01"
+
+    def test_set_follow_up_date(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}", json={
+            "follow_up_date": "2026-04-15",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["follow_up_date"] == "2026-04-15"
+
+    def test_deadline_persists_in_get(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}", json={
+            "appeal_deadline": "2026-06-01",
+            "follow_up_date": "2026-04-15",
+        })
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}")
+        data = resp.json()["data"]
+        assert data["appeal_deadline"] == "2026-06-01"
+        assert data["follow_up_date"] == "2026-04-15"
+
+
+class TestCSVExport:
+    def test_csv_export(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        create_case(org_id)
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/export-csv", json={})
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "text/csv; charset=utf-8"
+        content = resp.text
+        assert "Patient" in content
+        assert "Jane Doe" in content
+
+    def test_csv_export_selected(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        c1 = create_case(org_id).json()["data"]["id"]
+        client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+            "patient_label": "Other Patient", "patient_consent": True,
+        })
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/export-csv", json={
+            "case_ids": [c1],
+        })
+        assert resp.status_code == 200
+        assert "Jane Doe" in resp.text
+        assert "Other Patient" not in resp.text
+
+
+class TestCaseTemplates:
+    def test_list_builtin_templates(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/templates")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert len(data) >= 4  # 4 builtins
+        names = [t["name"] for t in data]
+        assert "Hospital Billing Dispute" in names
+        assert "Insurance Denial Appeal" in names
+
+    def test_create_custom_template(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/templates", json={
+            "name": "Workers Comp",
+            "template_type": "workers_comp",
+            "default_fields": {"tags": "workers comp", "notes": "Work injury case."},
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["name"] == "Workers Comp"
+
+        # Verify it shows in list
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/templates")
+        names = [t["name"] for t in resp.json()["data"]]
+        assert "Workers Comp" in names
+
+    def test_delete_custom_template(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/templates", json={
+            "name": "Temp", "template_type": "temp", "default_fields": {},
+        })
+        tid = resp.json()["data"]["id"]
+        resp = client.delete(f"/api/advocacy/orgs/{org_id}/templates/{tid}")
+        assert resp.status_code == 200
+
+    def test_create_template_empty_name(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/templates", json={
+            "name": "", "template_type": "test", "default_fields": {},
+        })
+        assert resp.status_code == 400
+
+    def test_builtin_templates_have_default_fields(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/templates")
+        for t in resp.json()["data"]:
+            if t.get("builtin"):
+                assert "tags" in t["default_fields"]
+                assert "notes" in t["default_fields"]

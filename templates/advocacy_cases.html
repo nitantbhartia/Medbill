@@ -45,7 +45,8 @@
             <option value="closed">Closed</option>
         </select>
         <button onclick="bulkUpdateStatus()" class="px-3 py-1 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700">Apply</button>
-        <button onclick="bulkExport()" class="px-3 py-1 text-xs border border-blue-300 text-blue-700 rounded-full hover:bg-blue-100">Export Selected</button>
+        <button onclick="bulkExport()" class="px-3 py-1 text-xs border border-blue-300 text-blue-700 rounded-full hover:bg-blue-100">Export JSON</button>
+        <button onclick="bulkExportCSV()" class="px-3 py-1 text-xs border border-blue-300 text-blue-700 rounded-full hover:bg-blue-100">Export CSV</button>
         <button onclick="clearSelection()" class="ml-auto text-xs text-blue-600 hover:text-blue-800">Clear</button>
     </div>
 
@@ -226,6 +227,22 @@ async function bulkExport() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `cases_export_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function bulkExportCSV() {
+    if (!selectedCases.size) return;
+    const resp = await fetch(`${API}/orgs/${currentOrg.id}/cases/bulk/export-csv`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({case_ids: [...selectedCases]}),
+    });
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cases_export_${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
 }

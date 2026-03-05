@@ -1,0 +1,188 @@
+{% extends "advocacy_base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block nav_dashboard %}bg-gray-100 text-gray-900{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <a href="/advocacy/cases/new" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800">+ New Case</a>
+    </div>
+
+    <div id="loading" class="text-center text-gray-400 py-12">Loading dashboard...</div>
+
+    <div id="dashboard" class="hidden space-y-6">
+        <!-- Summary cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Cases</div>
+                <div id="stat-total" class="text-2xl font-bold mt-1">0</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Billed</div>
+                <div id="stat-billed" class="text-2xl font-bold mt-1">$0</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Saved</div>
+                <div id="stat-saved" class="text-2xl font-bold text-green-700 mt-1">$0</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">Avg Days Open</div>
+                <div id="stat-aging" class="text-2xl font-bold mt-1">0</div>
+            </div>
+        </div>
+
+        <!-- Status breakdown -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="font-semibold mb-4">Cases by Status</h2>
+            <div id="status-bars" class="space-y-2"></div>
+            <div id="status-empty" class="text-sm text-gray-400 text-center py-4 hidden">No cases yet.</div>
+        </div>
+
+        <!-- Two-column: overdue + upcoming -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Overdue deadlines -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span> Overdue
+                </h2>
+                <div id="overdue-list" class="space-y-2"></div>
+                <div id="overdue-empty" class="text-sm text-gray-400 text-center py-4 hidden">No overdue items.</div>
+            </div>
+
+            <!-- Upcoming deadlines -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full"></span> Upcoming (14 days)
+                </h2>
+                <div id="upcoming-list" class="space-y-2"></div>
+                <div id="upcoming-empty" class="text-sm text-gray-400 text-center py-4 hidden">No upcoming deadlines.</div>
+            </div>
+        </div>
+
+        <!-- Quick export -->
+        <div class="flex items-center gap-3">
+            <button onclick="exportCSV()" class="px-4 py-2 text-sm border border-gray-200 rounded-full hover:bg-gray-50">Export All Cases (CSV)</button>
+            <button onclick="exportJSON()" class="px-4 py-2 text-sm border border-gray-200 rounded-full hover:bg-gray-50">Export All Cases (JSON)</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const STATUS_LABELS = {
+    'new': 'New', 'docs_uploaded': 'Docs Uploaded', 'analyzed': 'Analyzed',
+    'letter_generated': 'Letter Ready', 'sent': 'Sent', 'awaiting_response': 'Awaiting Response',
+    'resolved': 'Resolved', 'closed': 'Closed',
+};
+const STATUS_COLORS = {
+    'new': 'bg-gray-200', 'docs_uploaded': 'bg-blue-400', 'analyzed': 'bg-purple-400',
+    'letter_generated': 'bg-green-400', 'sent': 'bg-yellow-400', 'awaiting_response': 'bg-orange-400',
+    'resolved': 'bg-emerald-500', 'closed': 'bg-gray-400',
+};
+const STATUS_ORDER = ['new','docs_uploaded','analyzed','letter_generated','sent','awaiting_response','resolved','closed'];
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+async function loadDashboard() {
+    if (!currentOrg) return;
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/dashboard`);
+        const d = resp.data;
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+
+        document.getElementById('stat-total').textContent = d.total_cases;
+        document.getElementById('stat-billed').textContent = '$' + Number(d.total_billed).toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('stat-saved').textContent = '$' + Number(d.total_saved).toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('stat-aging').textContent = d.avg_days_open;
+
+        // Status bars
+        const barsEl = document.getElementById('status-bars');
+        const emptyEl = document.getElementById('status-empty');
+        if (d.total_cases === 0) {
+            emptyEl.classList.remove('hidden');
+            barsEl.innerHTML = '';
+        } else {
+            emptyEl.classList.add('hidden');
+            barsEl.innerHTML = STATUS_ORDER.filter(s => d.by_status[s]).map(s => {
+                const count = d.by_status[s];
+                const pct = Math.round(count / d.total_cases * 100);
+                return `
+                    <div class="flex items-center gap-3">
+                        <a href="/advocacy/cases?status=${s}" class="text-sm w-32 truncate hover:text-blue-600">${STATUS_LABELS[s] || s}</a>
+                        <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+                            <div class="${STATUS_COLORS[s] || 'bg-gray-300'} h-5 rounded-full transition-all" style="width: ${Math.max(pct, 2)}%"></div>
+                        </div>
+                        <span class="text-sm font-medium w-12 text-right">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Deadline lists
+        renderDeadlines('overdue-list', 'overdue-empty', d.overdue_deadlines, true);
+        renderDeadlines('upcoming-list', 'upcoming-empty', d.upcoming_deadlines, false);
+    } catch (e) {
+        document.getElementById('loading').textContent = 'Failed to load dashboard.';
+    }
+}
+
+function renderDeadlines(listId, emptyId, items, isOverdue) {
+    const list = document.getElementById(listId);
+    const empty = document.getElementById(emptyId);
+    if (!items.length) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    list.innerHTML = items.map(item => {
+        const deadline = item.appeal_deadline || item.follow_up_date;
+        const type = item.appeal_deadline ? 'Appeal deadline' : 'Follow-up';
+        return `
+            <a href="/advocacy/cases/${item.id}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : 'bg-yellow-50'}">
+                <div>
+                    <div class="text-sm font-medium">${esc(item.patient_label)}</div>
+                    <div class="text-xs text-gray-500">${type}: ${deadline}</div>
+                </div>
+                <span class="text-xs ${isOverdue ? 'text-red-600 font-medium' : 'text-yellow-700'}">${isOverdue ? 'Overdue' : deadline}</span>
+            </a>
+        `;
+    }).join('');
+}
+
+async function exportCSV() {
+    if (!currentOrg) return;
+    const resp = await fetch(`${API}/orgs/${currentOrg.id}/cases/bulk/export-csv`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({}),
+    });
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cases_export_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function exportJSON() {
+    if (!currentOrg) return;
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/bulk/export`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+    });
+    const blob = new Blob([JSON.stringify(resp.data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cases_export_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function onWorkspaceReady() {
+    if (!currentOrg) { window.location.href = '/advocacy/setup'; return; }
+    loadDashboard();
+}
+</script>
+{% endblock %}

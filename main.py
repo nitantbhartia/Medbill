@@ -515,6 +515,11 @@ async def advocacy_setup_page(request: Request):
     return templates.TemplateResponse("advocacy_setup.html", {"request": request})
 
 
+@app.get("/advocacy/dashboard", response_class=HTMLResponse)
+async def advocacy_dashboard_page(request: Request):
+    return templates.TemplateResponse("advocacy_dashboard.html", {"request": request})
+
+
 @app.get("/advocacy/cases", response_class=HTMLResponse)
 async def advocacy_cases_page(request: Request):
     return templates.TemplateResponse("advocacy_cases.html", {"request": request})
