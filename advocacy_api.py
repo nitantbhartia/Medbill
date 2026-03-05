@@ -153,13 +153,19 @@ async def create_case(request: Request, org_id: int):
 async def list_cases(request: Request, org_id: int):
     org_management.require_org_member(request, org_id)
     params = request.query_params
+    try:
+        assigned_to = int(params["assigned_to"]) if params.get("assigned_to") else None
+        limit = min(int(params.get("limit", 100)), 500)
+        offset = int(params.get("offset", 0))
+    except (ValueError, TypeError):
+        raise HTTPException(400, "Invalid query parameter value")
     result = advocacy.list_cases(
         org_id=org_id,
         status=params.get("status"),
-        assigned_to=int(params["assigned_to"]) if params.get("assigned_to") else None,
+        assigned_to=assigned_to,
         search=params.get("search"),
-        limit=min(int(params.get("limit", 100)), 500),
-        offset=int(params.get("offset", 0)),
+        limit=limit,
+        offset=offset,
     )
     return JSONResponse({"status": "ok", "data": result})
 
@@ -232,10 +238,11 @@ async def list_documents(request: Request, org_id: int, case_id: int):
 async def download_document(request: Request, org_id: int, case_id: int, doc_id: int):
     org_management.require_org_member(request, org_id)
     doc = advocacy.get_document_file(doc_id, case_id, org_id)
+    safe_name = doc["filename"].replace('"', '_').replace('\n', '_').replace('\r', '_')
     return Response(
         content=doc["file_data"],
         media_type=doc["mime_type"],
-        headers={"Content-Disposition": f'attachment; filename="{doc["filename"]}"'},
+        headers={"Content-Disposition": f'attachment; filename="{safe_name}"'},
     )
 
 
@@ -412,8 +419,11 @@ async def list_notes(request: Request, org_id: int, case_id: int):
 @router.get("/orgs/{org_id}/cases/{case_id}/activity")
 async def get_activity(request: Request, org_id: int, case_id: int):
     org_management.require_org_member(request, org_id)
-    limit = int(request.query_params.get("limit", 100))
-    activity = advocacy.get_activity(case_id, org_id, limit=min(limit, 500))
+    try:
+        limit = min(int(request.query_params.get("limit", 100)), 500)
+    except (ValueError, TypeError):
+        limit = 100
+    activity = advocacy.get_activity(case_id, org_id, limit=limit)
     return JSONResponse({"status": "ok", "data": activity})
 
 
@@ -508,3 +518,58 @@ async def bulk_export(request: Request, org_id: int):
         status=payload.get("status"),
     )
     return JSONResponse({"status": "ok", "data": result})
+
+
+@router.post("/orgs/{org_id}/cases/bulk/export-csv")
+async def bulk_export_csv(request: Request, org_id: int):
+    org_management.require_org_member(request, org_id)
+    payload = await request.json()
+    csv_data = advocacy.bulk_export_csv(
+        org_id=org_id,
+        case_ids=payload.get("case_ids"),
+        status=payload.get("status"),
+    )
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="cases_export.csv"'},
+    )
+
+
+# ── Dashboard endpoint ─────────────────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/dashboard")
+async def get_dashboard(request: Request, org_id: int):
+    org_management.require_org_member(request, org_id)
+    stats = advocacy.get_dashboard_stats(org_id)
+    return JSONResponse({"status": "ok", "data": stats})
+
+
+# ── Template endpoints ──────────────────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/templates")
+async def list_templates(request: Request, org_id: int):
+    org_management.require_org_member(request, org_id)
+    templates = advocacy.get_templates(org_id)
+    return JSONResponse({"status": "ok", "data": templates})
+
+
+@router.post("/orgs/{org_id}/templates")
+async def create_template(request: Request, org_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.create_template(
+        org_id=org_id,
+        user_id=member["id"],
+        name=payload.get("name", ""),
+        template_type=payload.get("template_type", ""),
+        default_fields=payload.get("default_fields", {}),
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+@router.delete("/orgs/{org_id}/templates/{template_id}")
+async def delete_template(request: Request, org_id: int, template_id: int):
+    require_org_writer(request, org_id)
+    advocacy.delete_template(template_id, org_id)
+    return JSONResponse({"status": "ok"})

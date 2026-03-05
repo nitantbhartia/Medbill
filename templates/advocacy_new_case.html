@@ -7,6 +7,17 @@
     <h1 class="text-2xl font-bold tracking-tight mb-6">New Case</h1>
 
     <form id="case-form" onsubmit="return handleCreate(event)" class="space-y-6">
+        <!-- Template picker -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="font-semibold text-lg mb-3">Start from template</h2>
+            <div id="template-grid" class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="clearTemplate()" class="template-btn p-3 border-2 border-gray-900 rounded-lg text-left">
+                    <div class="font-medium text-sm">Blank Case</div>
+                    <div class="text-xs text-gray-500 mt-0.5">Start from scratch</div>
+                </button>
+            </div>
+        </div>
+
         <!-- Step 1: Basic info -->
         <div id="step-info" class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
             <h2 class="font-semibold text-lg">Patient & billing info</h2>
@@ -103,8 +114,53 @@ async function handleCreate(e) {
     return false;
 }
 
+async function loadTemplates() {
+    if (!currentOrg) return;
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/templates`);
+        const grid = document.getElementById('template-grid');
+        resp.data.forEach(t => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'template-btn p-3 border border-gray-200 rounded-lg text-left hover:border-gray-400';
+            btn.innerHTML = `<div class="font-medium text-sm">${esc(t.name)}</div><div class="text-xs text-gray-500 mt-0.5">${esc(t.template_type)}</div>`;
+            btn.onclick = () => applyTemplate(t);
+            grid.appendChild(btn);
+        });
+    } catch (e) { /* templates are optional */ }
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function applyTemplate(t) {
+    document.querySelectorAll('.template-btn').forEach(b => {
+        b.classList.remove('border-gray-900', 'border-2');
+        b.classList.add('border-gray-200', 'border');
+    });
+    event.currentTarget.classList.remove('border-gray-200', 'border');
+    event.currentTarget.classList.add('border-gray-900', 'border-2');
+
+    const f = t.default_fields || {};
+    if (f.tags) document.getElementById('tags').value = f.tags;
+    if (f.notes) document.getElementById('notes').value = f.notes;
+    if (f.hospital_name) document.getElementById('hospital-name').value = f.hospital_name;
+    if (f.insurance_carrier) document.getElementById('insurance').value = f.insurance_carrier;
+}
+
+function clearTemplate() {
+    document.querySelectorAll('.template-btn').forEach(b => {
+        b.classList.remove('border-gray-900', 'border-2');
+        b.classList.add('border-gray-200', 'border');
+    });
+    event.currentTarget.classList.remove('border-gray-200', 'border');
+    event.currentTarget.classList.add('border-gray-900', 'border-2');
+    document.getElementById('tags').value = '';
+    document.getElementById('notes').value = '';
+}
+
 function onWorkspaceReady() {
     if (!currentOrg) window.location.href = '/advocacy/setup';
+    loadTemplates();
 }
 </script>
 {% endblock %}

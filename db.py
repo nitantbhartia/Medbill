@@ -1223,6 +1223,31 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_letter_versions_letter ON letter_versions(letter_id)")
 
+    # Deadline tracking columns on advocacy_cases
+    ensure_columns(
+        "advocacy_cases",
+        {
+            "appeal_deadline": "DATE",
+            "follow_up_date": "DATE",
+        },
+    )
+
+    # Case templates table
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id INTEGER NOT NULL REFERENCES organizations(id),
+            name TEXT NOT NULL,
+            template_type TEXT NOT NULL,
+            default_fields TEXT NOT NULL,
+            created_by INTEGER NOT NULL REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_templates_org ON case_templates(org_id)")
+
 
 SCHEMA = """
 -- Users

@@ -65,6 +65,19 @@
                     <div><span class="text-gray-500">Assigned to:</span> <span id="info-assigned"></span></div>
                     <div><span class="text-gray-500">Created:</span> <span id="info-created"></span></div>
                 </div>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500">Appeal deadline:</span>
+                        <input type="date" id="appeal-deadline" onchange="updateDeadline('appeal_deadline', this.value)"
+                            class="text-sm border border-gray-200 rounded px-2 py-0.5">
+                        <span id="deadline-urgency" class="text-xs font-medium hidden"></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500">Follow-up date:</span>
+                        <input type="date" id="follow-up-date" onchange="updateDeadline('follow_up_date', this.value)"
+                            class="text-sm border border-gray-200 rounded px-2 py-0.5">
+                    </div>
+                </div>
                 <div id="info-notes" class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600 hidden"></div>
             </div>
         </div>
@@ -265,6 +278,30 @@ function renderCase() {
         document.getElementById('info-notes').textContent = c.notes;
         document.getElementById('info-notes').classList.remove('hidden');
     }
+    if (c.appeal_deadline) {
+        document.getElementById('appeal-deadline').value = c.appeal_deadline;
+        const daysLeft = Math.ceil((new Date(c.appeal_deadline) - new Date()) / 86400000);
+        const badge = document.getElementById('deadline-urgency');
+        if (daysLeft < 0) {
+            badge.textContent = 'OVERDUE'; badge.className = 'text-xs font-medium px-2 py-0.5 bg-red-100 text-red-700 rounded-full';
+        } else if (daysLeft <= 7) {
+            badge.textContent = daysLeft + 'd left'; badge.className = 'text-xs font-medium px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full';
+        } else if (daysLeft <= 30) {
+            badge.textContent = daysLeft + 'd left'; badge.className = 'text-xs font-medium px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full';
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+    if (c.follow_up_date) document.getElementById('follow-up-date').value = c.follow_up_date;
+}
+
+async function updateDeadline(field, value) {
+    if (!currentOrg) return;
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({[field]: value || null}),
+    });
+    loadCase();
 }
 
 async function updateStatus(status) {
