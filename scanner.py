@@ -195,6 +195,45 @@ def _run_vision_extraction(image_bytes: bytes, mime_type: str, prompt: str) -> d
     return _add_confidence_flags(extracted)
 
 
+def _normalize_mime_type(mime_type: str | None) -> str:
+    """Normalize MIME values from multipart headers (strip params, lowercase)."""
+    raw = (mime_type or "").strip().lower()
+    if ";" in raw:
+        raw = raw.split(";", 1)[0].strip()
+    return raw or "image/jpeg"
+
+
+def _prepare_media_for_ocr(image_bytes: bytes, mime_type: str | None) -> tuple[bytes, str]:
+    """
+    Normalize uploads before OCR.
+
+    - Reject PDF with a clear message when no PDF rasterizer is configured.
+    - Validate image payloads up front to avoid opaque downstream OCR failures.
+    """
+    normalized_mime = _normalize_mime_type(mime_type)
+
+    if normalized_mime == "application/pdf":
+        # PDF OCR would require a rasterization dependency not currently wired.
+        raise ValueError(
+            "PDF OCR is not available in this environment yet. Upload bill pages as JPG/PNG images."
+        )
+
+    if not normalized_mime.startswith("image/"):
+        raise ValueError(f"Unsupported OCR media type '{normalized_mime}'. Upload image files only.")
+
+    if Image is not None:
+        try:
+            # Validate bytes are decodable image content.
+            img = Image.open(BytesIO(image_bytes))
+            img.verify()
+        except Exception as exc:
+            raise ValueError(
+                f"Could not decode uploaded image ({normalized_mime}). Try a JPG or PNG screenshot."
+            ) from exc
+
+    return image_bytes, normalized_mime
+
+
 def _serialize_image(image_obj) -> bytes:
     buf = BytesIO()
     image_obj.save(buf, format="PNG")
@@ -333,6 +372,7 @@ def _extract_with_ensemble(image_bytes: bytes, mime_type: str) -> dict:
     """
     variants = _preprocess_variants(image_bytes, mime_type)
     candidates = []
+    errors = []
     for label, variant_bytes, variant_mime in variants:
         try:
             extracted = _run_vision_extraction(variant_bytes, variant_mime, EXTRACTION_PROMPT)
@@ -342,9 +382,11 @@ def _extract_with_ensemble(image_bytes: bytes, mime_type: str) -> dict:
             candidates.append((score, extracted, meta))
         except Exception as exc:
             log.warning("Variant extraction failed for %s: %s", label, exc)
+            errors.append(f"{label}: {exc}")
 
     if not candidates:
-        raise RuntimeError("No OCR extraction candidates succeeded")
+        detail = " | ".join(errors[:3]) if errors else "unknown OCR failure"
+        raise RuntimeError(f"No OCR extraction candidates succeeded. {detail}")
 
     candidates.sort(key=lambda tup: tup[0], reverse=True)
     best_score, best_extract, best_meta = candidates[0]
@@ -366,6 +408,7 @@ def process_bill_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dic
     Send a single bill image to Gemini Flash Vision.
     Returns extracted data with confidence flags.
     """
+    image_bytes, mime_type = _prepare_media_for_ocr(image_bytes, mime_type)
     if config.OCR_ENSEMBLE_ENABLED:
         return _extract_with_ensemble(image_bytes, mime_type)
     return _run_vision_extraction(image_bytes, mime_type, EXTRACTION_PROMPT)
@@ -432,6 +475,7 @@ def process_multi_page_bill(images: list[tuple[bytes, str]]) -> dict:
 
     contents = []
     for i, (img_bytes, mime_type) in enumerate(images):
+        img_bytes, mime_type = _prepare_media_for_ocr(img_bytes, mime_type)
         contents.append(f"Page {i + 1} of {len(images)}:")
         contents.append(types.Part.from_bytes(data=img_bytes, mime_type=mime_type))
 
