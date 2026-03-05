@@ -1030,6 +1030,149 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_bill_watches_email ON bill_watches(email)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_bill_watches_active ON bill_watches(active, watch_type)")
 
+    # ── Advocacy Workspace tables ────────────────────────────────────────────
+    ensure_columns("users", {"name": "TEXT", "password_hash": "TEXT"})
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS auth_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT NOT NULL UNIQUE,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP DEFAULT (datetime('now', '+45 days'))
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_auth_sessions_token ON auth_sessions(token)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS organizations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            contact_email TEXT NOT NULL,
+            org_type TEXT NOT NULL DEFAULT 'nonprofit',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS org_members (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id INTEGER NOT NULL REFERENCES organizations(id),
+            user_id INTEGER REFERENCES users(id),
+            invite_email TEXT,
+            role TEXT NOT NULL DEFAULT 'advocate',
+            invited_by INTEGER REFERENCES users(id),
+            status TEXT NOT NULL DEFAULT 'active',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(org_id, user_id)
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_org_members_org ON org_members(org_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_org_members_user ON org_members(user_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_org_members_invite ON org_members(invite_email)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS advocacy_cases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id INTEGER NOT NULL REFERENCES organizations(id),
+            bill_id INTEGER REFERENCES bills(id),
+            patient_label TEXT NOT NULL,
+            title TEXT,
+            assigned_to INTEGER REFERENCES users(id),
+            created_by INTEGER NOT NULL REFERENCES users(id),
+            status TEXT NOT NULL DEFAULT 'new',
+            hospital_name TEXT,
+            insurance_carrier TEXT,
+            date_of_service DATE,
+            bill_amount REAL,
+            notes TEXT,
+            tags TEXT,
+            patient_consent INTEGER DEFAULT 0,
+            outcome TEXT,
+            outcome_amount REAL,
+            reviewed INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_advocacy_cases_org ON advocacy_cases(org_id)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_advocacy_cases_status ON advocacy_cases(status)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_advocacy_cases_assigned ON advocacy_cases(assigned_to)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            doc_type TEXT NOT NULL DEFAULT 'other',
+            filename TEXT NOT NULL,
+            file_data BLOB NOT NULL,
+            mime_type TEXT,
+            file_size_bytes INTEGER,
+            extraction_status TEXT DEFAULT 'pending',
+            extracted_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_docs_case ON case_documents(case_id)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_overrides (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            field_name TEXT NOT NULL,
+            field_value TEXT NOT NULL,
+            set_by INTEGER NOT NULL REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(case_id, field_name)
+        )
+        """
+    )
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_letters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            letter_type TEXT NOT NULL,
+            input_fields TEXT,
+            content TEXT NOT NULL,
+            generated_by INTEGER NOT NULL REFERENCES users(id),
+            marked_sent INTEGER DEFAULT 0,
+            sent_date DATE,
+            reviewed INTEGER DEFAULT 0,
+            reviewed_by INTEGER REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_letters_case ON case_letters(case_id)")
+
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            author_id INTEGER NOT NULL REFERENCES users(id),
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_notes_case ON case_notes(case_id)")
+
 
 SCHEMA = """
 -- Users
