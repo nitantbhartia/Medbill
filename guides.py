@@ -4,11 +4,15 @@ Each guide is a dict with title, meta_description, published date, and
 body (HTML string). Calculators are embedded inline via iframes.
 """
 
+from __future__ import annotations
+
 GUIDES = {}
 
 
 def register(slug: str, guide: dict):
-    GUIDES[slug] = {**guide, "slug": slug}
+    published = guide.get("published")
+    reviewed_on = guide.get("reviewed_on") or published
+    GUIDES[slug] = {**guide, "slug": slug, "reviewed_on": reviewed_on}
 
 
 def get_guide(slug: str) -> dict | None:
@@ -29,20 +33,6 @@ def get_guides_for_sitemap() -> list[tuple[str, str]]:
         (slug, g.get("published", "2026-01-01"))
         for slug, g in sorted(GUIDES.items(), key=lambda x: x[1].get("published", ""), reverse=True)
     ]
-
-
-def get_related_guides(current_slug: str, limit: int = 4) -> list[dict]:
-    """Return guides in the same category, excluding the current guide."""
-    current = GUIDES.get(current_slug)
-    if not current:
-        return []
-    category = current.get("category", "")
-    related = [
-        g for slug, g in GUIDES.items()
-        if slug != current_slug and g.get("category") == category
-    ]
-    related.sort(key=lambda g: g.get("published", ""), reverse=True)
-    return related[:limit]
 
 
 def _embed(mode="cost", cpt="", title="", subtitle="", height="380"):
@@ -215,47 +205,3 @@ import guide_how_to_get_medical_bills_reduced
 import guide_hospital_liens_explained
 import guide_air_ambulance_bills
 import guide_medical_billing_coding_mistakes
-# Batch 6: trending 2026 topics
-import guide_medicaid_cuts_2026
-import guide_site_neutral_payment_2026
-import guide_glp1_denied_2026
-import guide_medicare_costs_2026
-import guide_biosimilar_drugs_savings
-import guide_short_term_health_insurance
-import guide_healthcare_costs_rising_2026
-import guide_medicaid_to_marketplace_2026
-import guide_copay_accumulator_programs
-import guide_tariffs_drug_prices_2026
-# Batch 7: high-conversion articles
-import guide_medical_bill_vs_eob
-import guide_spouse_medical_debt
-import guide_medical_bill_while_traveling
-import guide_negotiate_before_procedure
-import guide_prior_auth_denied_2026
-import guide_medical_bill_after_job_loss
-import guide_self_pay_patient_rights
-import guide_medical_credit_cards
-import guide_er_vs_urgent_care_costs
-import guide_second_opinion_insurance
-# Batch 8: trending state and policy topics
-import guide_states_ban_medical_debt_credit
-import guide_medicare_part_d_cap_2026
-import guide_california_new_healthcare_laws_2026
-import guide_illinois_facility_fee_transparency
-import guide_healthcare_costs_by_state
-import guide_ground_ambulance_billing
-import guide_aca_premium_increases_2026
-import guide_hospital_refund_overpayment
-import guide_ai_healthcare_patient_rights
-import guide_florida_healthcare_crisis_2026
-# Batch 9: high-ranking keyword guides
-import guide_dental_costs_saving
-import guide_mental_health_therapy_costs
-import guide_understanding_deductibles
-import guide_prescription_drug_costs_2026
-import guide_medical_debt_over_50
-import guide_telehealth_costs_comparison
-import guide_price_transparency_how_to_use
-import guide_outpatient_surgery_savings
-import guide_choosing_health_insurance_plan
-import guide_medical_bills_during_divorce

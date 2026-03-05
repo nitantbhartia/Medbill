@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-debt-after-death", {
     "title": "Medical Debt After Death: Who Pays and How to Protect Your Family",
-    "meta_description": "When someone dies with medical debt, the estate may owe but family members usually do not. Learn who is responsible, community property rules, and how to protect yourself.",
+    "meta_description": "When someone dies with medical debt, the estate may owe but family members usually do not. Learn who is responsible, community property rules, and how to.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Medical Debt",
@@ -194,12 +194,12 @@ register("medical-debt-after-death", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.consumerfinance.gov/ask-cfpb/does-a-persons-debt-go-away-when-they-die-en-1463/" target="_blank" rel="noopener">Consumer Financial Protection Bureau: What Happens to Debt When Someone Dies</a></li>
-    <li><a href="https://consumer.ftc.gov/articles/debts-and-deceased-relatives" target="_blank" rel="noopener">Federal Trade Commission: Debts and Deceased Relatives FAQ</a></li>
-    <li><a href="https://www.medicaid.gov/medicaid/eligibility-policy/estate-recovery" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Medicaid Estate Recovery Overview</a></li>
-    <li><a href="https://library.nclc.org/book/surviving-debt" target="_blank" rel="noopener">National Consumer Law Center: Surviving Debt (Medical Debt Chapter)</a></li>
-    <li>American Bar Association: Community Property and Debt After Death</li>
-    <li>National Academy of Elder Law Attorneys: Medicaid Planning and Estate Recovery</li>
+    <li><a href="#" target="_blank" rel="noopener">Consumer Financial Protection Bureau: What Happens to Debt When Someone Dies</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Federal Trade Commission: Debts and Deceased Relatives FAQ</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Centers for Medicare &amp; Medicaid Services: Medicaid Estate Recovery Overview</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Consumer Law Center: Surviving Debt (Medical Debt Chapter)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American Bar Association: Community Property and Debt After Death</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Academy of Elder Law Attorneys: Medicaid Planning and Estate Recovery</a></li>
 </ul>
 """,
 })

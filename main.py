@@ -27,7 +27,7 @@ from hospital_seo import (
     slugify,
     state_display_name,
 )
-from compare_pages import get_comparison_data, search_hospitals_for_compare
+from compare_pages import build_comparison_seo, get_comparison_data, search_hospitals_for_compare
 from dispute_workflow import build_phone_script, get_outcome_stats
 from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_state_index, get_landing_stats
 from procedure_pages import (
@@ -54,8 +54,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
-    frame_allowed = request.url.path.startswith("/embed/") or request.url.path == "/calculator/embed"
-    if not frame_allowed:
+    if not request.url.path.startswith("/embed/"):
         response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
@@ -626,7 +625,7 @@ async def calculator_embed(
 @app.get("/guides/{slug}", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    from guides import get_guide, get_related_guides
+    from guides import get_guide
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"})
@@ -636,7 +635,6 @@ async def guide_page(request: Request, slug: str):
         {
             "request": request,
             "guide": guide,
-            "related_guides": get_related_guides(slug),
             "canonical_url": canonical_url,
             "og_title": guide["title"] + " | BillKarma",
             "og_description": guide["meta_description"],
@@ -1157,7 +1155,7 @@ async def unified_search_page(request: Request, q: str = ""):
     token = (q or "").strip()
     procedures = _search_procedures(token, limit=25) if len(token) >= 2 else []
     facilities = _search_facilities(token, limit=25) if len(token) >= 2 else []
-    canonical_url = f"{config.APP_URL.rstrip('/')}/search"
+    canonical_url = f"{config.APP_URL.rstrip('/')}/search?q={token}" if token else f"{config.APP_URL.rstrip('/')}/search"
     return templates.TemplateResponse(
         "search_results.html",
         {
@@ -1169,7 +1167,7 @@ async def unified_search_page(request: Request, q: str = ""):
             "title": "Search Results | BillKarma",
             "og_title": "Search Medical Procedure and Facility Prices | BillKarma",
             "og_description": "Search procedures, hospitals, surgery centers, and imaging centers with pricing context from Medicare benchmarks.",
-            "meta_robots": "noindex, follow",
+            "meta_robots": "index, follow",
         },
     )
 
@@ -1193,7 +1191,7 @@ async def unified_find_page(request: Request, q: str = "", zip: str = "", type: 
             "title": "Find Facilities | BillKarma",
             "og_title": "Find Hospitals, Surgery Centers, and Imaging Centers | BillKarma",
             "og_description": "Find and compare graded facilities near you across hospitals, surgery centers, and imaging centers.",
-            "meta_robots": "noindex, follow",
+            "meta_robots": "index, follow",
         },
     )
 
@@ -1229,7 +1227,7 @@ async def compare_index(
 
 @app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
 async def compare_detail(request: Request, fid_a: str, fid_b: str):
-    """Redirect ID-based compare URLs to canonical slug-based URLs."""
+    # Redirect .0-suffixed IDs to clean URLs
     clean_a, clean_b = _clean_fid(fid_a), _clean_fid(fid_b)
     if clean_a != fid_a or clean_b != fid_b:
         return RedirectResponse(url=f"/compare/{clean_a}/vs/{clean_b}/", status_code=301)
@@ -1239,30 +1237,26 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
             "error.html",
             {"request": request, "message": "One or both hospitals not found."},
         )
-    slug_a = data["a"].get("slug")
-    slug_b = data["b"].get("slug")
-    if slug_a and slug_b:
-        return RedirectResponse(url=f"/compare/{slug_a}-vs-{slug_b}/", status_code=301)
-    # Fallback: render directly if slugs are missing
-    name_a = data["a"]["name"]
-    name_b = data["b"]["name"]
-    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
+    if data["a"].get("slug") and data["b"].get("slug"):
+        canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{data['a']['slug']}-vs-{data['b']['slug']}/"
+    else:
+        canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
+    seo = data.get("seo") or build_comparison_seo(
+        data["a"],
+        data["b"],
+        data.get("common_procedures", []),
+        data.get("distance_miles"),
+    )
     return templates.TemplateResponse(
         "compare_detail.html",
         {
             "request": request,
             "data": data,
             "canonical_url": canonical_url,
-            "og_title": f"{name_a} vs {name_b} | BillKarma",
-            "og_description": (
-                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
-                "See which hospital charges less relative to Medicare."
-            ),
-            "meta_description": (
-                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
-                "See which hospital charges less relative to Medicare."
-            ),
-            "meta_robots": "noindex, follow",
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
+            "meta_robots": "index, follow",
         },
     )
 
@@ -1270,24 +1264,10 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 @app.get("/sitemap.xml")
 async def sitemap_index():
     base = config.APP_URL.rstrip("/")
-    sitemaps = [
-        f"{base}/sitemap-core.xml",
-        f"{base}/sitemap-guides.xml",
-        f"{base}/sitemap-hospitals.xml",
-        f"{base}/sitemap-compare.xml",
-    ]
-    entries = "".join(f"<sitemap><loc>{url}</loc></sitemap>" for url in sitemaps)
-    xml = (
-        '<?xml version="1.0" encoding="UTF-8"?>'
-        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{entries}</sitemapindex>"
-    )
-    return Response(content=xml, media_type="application/xml")
+    hospital_paths = get_hospital_sitemap_paths()
+    from compare_seo import get_comparison_sitemap_paths
 
-
-@app.get("/sitemap-core.xml")
-async def core_sitemap():
-    base = config.APP_URL.rstrip("/")
+    comparison_paths = get_comparison_sitemap_paths()
     core_urls = [
         (f"{base}/", "2026-02-01", "1.0"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
@@ -1305,15 +1285,25 @@ async def core_sitemap():
         (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
         (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
+        (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
+        (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
         for loc, lastmod, priority in core_urls
     )
+    hospital_entries = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
+        for path in hospital_paths
+    )
+    comparison_entries = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-03-03</lastmod><priority>0.6</priority></url>"
+        for path in comparison_paths
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{core_entries}</urlset>"
+        f"{core_entries}{hospital_entries}{comparison_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1323,6 +1313,23 @@ async def guides_sitemap():
     from guides import get_guides_for_sitemap
 
     base = config.APP_URL.rstrip("/")
+    static_urls = [
+        (f"{base}/", "2026-02-01", "1.0"),
+        (f"{base}/fight-debt", "2026-02-24", "0.9"),
+        (f"{base}/collection-notice", "2026-02-24", "0.9"),
+        (f"{base}/statute-of-limitations", "2026-02-24", "0.9"),
+        (f"{base}/charity-care", "2026-02-24", "0.9"),
+        (f"{base}/settle-debt", "2026-02-24", "0.8"),
+        (f"{base}/guides/", "2026-02-01", "0.8"),
+        (f"{base}/tools/", "2026-02-01", "0.8"),
+        (f"{base}/calculator", "2026-02-01", "0.7"),
+        (f"{base}/estimate", "2026-03-01", "0.9"),
+        (f"{base}/rights/", "2026-03-01", "0.8"),
+    ]
+    static_entries = "".join(
+        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
+        for loc, lastmod, priority in static_urls
+    )
     guide_entries = "".join(
         f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
@@ -1344,7 +1351,7 @@ async def guides_sitemap():
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
+        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1352,33 +1359,31 @@ async def guides_sitemap():
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
+    from compare_seo import get_comparison_sitemap_paths
+
+    core_entries = "".join(
+        [
+            f"<url><loc>{base}/</loc><lastmod>2026-02-01</lastmod><priority>1.0</priority></url>",
+            f"<url><loc>{base}/tools/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>",
+        ]
+    )
+    tool_entries = "".join(
+        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
+        for tool in list_tools()
+    )
     hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
     )
-    xml = (
-        '<?xml version="1.0" encoding="UTF-8"?>'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{urlset}</urlset>"
-    )
-    return Response(content=xml, media_type="application/xml")
-
-
-@app.get("/sitemap-compare.xml")
-async def compare_sitemap():
-    from compare_seo import get_comparison_sitemap_paths
-
-    base = config.APP_URL.rstrip("/")
-    paths = get_comparison_sitemap_paths()
-    urlset = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-01</lastmod><priority>0.6</priority></url>"
-        for path in paths
+    comparison_entries = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-03-03</lastmod><priority>0.6</priority></url>"
+        for path in get_comparison_sitemap_paths()
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{urlset}</urlset>"
+        f"{core_entries}{tool_entries}{urlset}{comparison_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -2048,8 +2053,9 @@ async def cost_page(request: Request, slug: str):
             "request": request,
             "data": data,
             "canonical_url": canonical_url,
-            "og_title": f"{data['title']} (2026 Prices) | BillKarma",
+            "og_title": data["seo"]["page_title"],
             "og_description": data["seo"]["meta_description"],
+            "meta_description": data["seo"]["meta_description"],
             "meta_robots": "index, follow",
         },
     )
@@ -2076,24 +2082,22 @@ async def compare_seo_page(request: Request, slug_a: str, slug_b: str):
             "error.html",
             {"request": request, "message": "Comparison data not available."},
         )
-    name_a = data["a"]["name"]
-    name_b = data["b"]["name"]
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{slug_a}-vs-{slug_b}/"
+    seo = data.get("seo") or build_comparison_seo(
+        data["a"],
+        data["b"],
+        data.get("common_procedures", []),
+        data.get("distance_miles"),
+    )
     return templates.TemplateResponse(
         "compare_detail.html",
         {
             "request": request,
             "data": data,
             "canonical_url": canonical_url,
-            "og_title": f"{name_a} vs {name_b} | BillKarma",
-            "og_description": (
-                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
-                "See which hospital charges less relative to Medicare."
-            ),
-            "meta_description": (
-                f"Compare billing grades and procedure prices: {name_a} vs {name_b}. "
-                "See which hospital charges less relative to Medicare."
-            ),
+            "og_title": seo["page_title"],
+            "og_description": seo["meta_description"],
+            "meta_description": seo["meta_description"],
             "meta_robots": "index, follow",
         },
     )

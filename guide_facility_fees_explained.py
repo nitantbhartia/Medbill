@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-facility-fees-explained", {
-    "title": "Hospital Facility Fees Explained: Why You\u2019re Billed Twice for One Visit",
-    "meta_description": "Facility fees add $350\u2013$1,500 to routine doctor visits at hospital-owned offices. Learn what facility fees are, when they\u2019re legal, and how to avoid or dispute them.",
+    "title": "Hospital Facility Fees Explained: Why You’re Billed Twice",
+    "meta_description": "Facility fees add $350–$1,500 to routine doctor visits at hospital-owned offices. Learn what facility fees are, when they’re legal, and how to avoid or.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
     "category": "Billing Basics",

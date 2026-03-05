@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("why-lab-test-bills-are-so-high", {
     "title": "Why Lab Test Bills Are So High — And How to Get a Fair Price",
-    "meta_description": "A basic blood panel costs $14 at Medicare rates but hospitals bill $300–$500. Learn how lab test pricing works, which codes to check, and how to cut your bill.",
+    "meta_description": "A basic blood panel costs $14 at Medicare rates but hospitals bill $300–$500. Learn how lab test pricing works, which codes to check, and how to cut your.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",

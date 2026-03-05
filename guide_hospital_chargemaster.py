@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-chargemaster-explained", {
-    "title": "Hospital Chargemaster Explained: The Secret Price List Behind Your Bill",
-    "meta_description": "Every hospital has a chargemaster with 10,000&ndash;50,000 items at wildly inflated prices. Learn how it works, who pays full price, and how to use it to negotiate your bill.",
+    "title": "Hospital Chargemaster Explained",
+    "meta_description": "Every hospital has a chargemaster with 10,000&ndash;50,000 items at wildly inflated prices. Learn how it works, who pays full price, and how to use it to.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

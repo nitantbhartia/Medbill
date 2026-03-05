@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("florida-hospital-billing-rights", {
-    "title": "Florida Hospital Billing Rights: Wage Garnishment Exemptions, Charity Care, and How to Dispute (2026)",
-    "meta_description": "Florida has one of the strongest wage garnishment exemptions for medical debt. Learn your rights, charity care options, and how to dispute Florida hospital bills under state and federal law.",
+    "title": "Florida Hospital Billing Rights: Wage Garnishment Exemptions",
+    "meta_description": "Florida has one of the strongest wage garnishment exemptions for medical debt. Learn your rights, charity care options, and how to dispute Florida hospital.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

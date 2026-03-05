@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("sleep-study-billing", {
-    "title": "Sleep Study Billing: Polysomnography Costs, CPAP Coverage, and Common Billing Errors",
-    "meta_description": "In-lab sleep studies cost $900 Medicare rate but hospitals charge $3,000–$8,000. Learn CPT codes, CPAP rental traps, split-night billing errors, and how to dispute surprise sleep study bills.",
+    "title": "Sleep Study Billing: Polysomnography Costs",
+    "meta_description": "In-lab sleep studies cost $900 Medicare rate but hospitals charge $3,000–$8,000. Learn CPT codes, CPAP rental traps, split-night billing errors, and how to.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Billing Basics",

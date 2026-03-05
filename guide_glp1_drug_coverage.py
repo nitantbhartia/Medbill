@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("glp1-drug-coverage", {
-    "title": "GLP-1 Drug Coverage: Why Insurance Denies Ozempic and Wegovy (and How to Appeal)",
-    "meta_description": "BillKarma data shows 68% of Wegovy prior auth requests are denied initially. Learn why insurers cover Ozempic for diabetes but deny the same drug for obesity — and how to appeal.",
+    "title": "GLP-1 Drug Coverage: Why Insurance Denies Ozempic",
+    "meta_description": "BillKarma data shows 68% of Wegovy prior auth requests are denied initially. Learn why insurers cover Ozempic for diabetes but deny the same drug for obesity.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

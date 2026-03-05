@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("car-accident-medical-bills", {
-    "title": "Medical Bills After a Car Accident: Who Pays and How to Protect Yourself",
-    "meta_description": "After a car accident, medical bills can come from PIP, MedPay, at-fault insurance, or your health plan. Learn who pays, how subrogation works, and how to negotiate.",
+    "title": "Medical Bills After a Car Accident: Who Pays",
+    "meta_description": "After a car accident, medical bills can come from PIP, MedPay, at-fault insurance, or your health plan. Learn who pays, how subrogation works, and how to.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Patient Rights",
@@ -224,12 +224,12 @@ register("car-accident-medical-bills", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.iii.org/article/background-on-no-fault-auto-insurance" target="_blank" rel="noopener">Insurance Information Institute: Auto Insurance Basics and No-Fault Laws</a></li>
-    <li><a href="https://content.naic.org/article/what-you-should-know-about-auto-insurance-coverage" target="_blank" rel="noopener">National Association of Insurance Commissioners: PIP Coverage by State</a></li>
-    <li><a href="https://www.americanbar.org/groups/public_education/resources/law_issues_for_consumers/personalinjury/" target="_blank" rel="noopener">American Bar Association: Understanding Subrogation in Personal Injury Cases</a></li>
-    <li>National Conference of State Legislatures: Auto Insurance Statute of Limitations by State</li>
-    <li><a href="https://insurance-research.org/auto-injury-claims-trends/countrywide-patterns-auto-injury-claims" target="_blank" rel="noopener">Insurance Research Council: Auto Injury Insurance Claims Study (2025)</a></li>
-    <li><a href="https://www.cdc.gov/transportation-safety/about/index.html" target="_blank" rel="noopener">Centers for Disease Control and Prevention: Motor Vehicle Crash Injuries and Costs</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Insurance Information Institute: Auto Insurance Basics and No-Fault Laws</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Association of Insurance Commissioners: PIP Coverage by State</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American Bar Association: Understanding Subrogation in Personal Injury Cases</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Conference of State Legislatures: Auto Insurance Statute of Limitations by State</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Insurance Research Council: Auto Injury Insurance Claims Study (2025)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Centers for Disease Control and Prevention: Motor Vehicle Crash Injuries and Costs</a></li>
 </ul>
 """,
 })

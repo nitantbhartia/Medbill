@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("mental-health-billing-and-parity-rights", {
-    "title": "Mental Health Billing: Your Rights Under Parity Laws and How to Fight Denials",
+    "title": "Mental Health Billing: Your Rights Under Parity Laws",
     "meta_description": "Insurers must cover mental health the same as physical health under federal parity law. Learn your rights, how to spot violations, and how to appeal a denial.",
     "published": "2026-02-19",
     "author": "BillKarma Team",

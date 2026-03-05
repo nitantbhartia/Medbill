@@ -548,6 +548,7 @@ def test_procedure_detail_seo_title():
     assert profile is not None
     title = profile["seo"]["page_title"]
     assert "BillKarma" in title
+    assert "Fair Price" in title or "Cost" in title
     assert len(title) <= 60
 
 
@@ -558,6 +559,16 @@ def test_procedure_detail_seo_description():
     desc = profile["seo"]["meta_description"]
     assert "27447" in desc
     assert len(desc) <= 155
+
+
+def test_procedure_detail_seo_includes_structured_data_payloads():
+    _seed()
+    profile = get_procedure_profile("27447")
+    assert profile is not None
+    seo = profile["seo"]
+    assert '"@type": "MedicalProcedure"' in seo["procedure_schema_json"]
+    assert '"@type": "BreadcrumbList"' in seo["breadcrumb_schema_json"]
+    assert '"@type": "FAQPage"' in seo["faq_schema_json"]
 
 
 def test_procedure_profile_trims_extreme_outliers_in_header_stats():

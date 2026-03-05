@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("allergy-testing-billing", {
-    "title": "Allergy Testing Costs: What Insurance Covers and How to Avoid Surprise Bills",
-    "meta_description": "A blood allergy panel can cost $4,200 when a $380 skin prick test was clinically appropriate. Learn allergy test CPT codes, insurance rules, and how to dispute overcharges.",
+    "title": "Allergy Testing Costs: What Insurance Covers",
+    "meta_description": "A blood allergy panel can cost $4,200 when a $380 skin prick test was clinically appropriate. Learn allergy test CPT codes, insurance rules, and how to.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",
@@ -424,12 +424,12 @@ register("allergy-testing-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li>AAAAI: Allergy Diagnostic Testing Practice Parameter &mdash; 2024 Update</li>
-    <li><a href="https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files" target="_blank" rel="noopener">CMS: Medicare Clinical Laboratory Fee Schedule &mdash; CPT 86003 Rates by Locality (2026)</a></li>
-    <li><a href="https://www.cms.gov/medicare/physician-fee-schedule/search" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; CPT 95004, 95024 Rates (2026)</a></li>
-    <li>JACI: Food Allergy Testing &mdash; Choosing Wisely Recommendations</li>
-    <li><a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">No Surprises Act &mdash; Protections Against Surprise Out-of-Network Laboratory Bills</a></li>
-    <li><a href="https://www.gao.gov/products/gao-19-67" target="_blank" rel="noopener">GAO: Clinical Laboratory Pricing Variation and Consumer Impact</a></li>
+    <li><a href="#" target="_blank" rel="noopener">AAAAI: Allergy Diagnostic Testing Practice Parameter &mdash; 2024 Update</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Clinical Laboratory Fee Schedule &mdash; CPT 86003 Rates by Locality (2026)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; CPT 95004, 95024 Rates (2026)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">JACI: Food Allergy Testing &mdash; Choosing Wisely Recommendations</a></li>
+    <li><a href="#" target="_blank" rel="noopener">No Surprises Act &mdash; Protections Against Surprise Out-of-Network Laboratory Bills</a></li>
+    <li><a href="#" target="_blank" rel="noopener">GAO: Clinical Laboratory Pricing Variation and Consumer Impact</a></li>
 </ul>
 """,
 })

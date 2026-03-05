@@ -5,8 +5,8 @@ from guides import register, _embed
 _pe_embed = _embed(mode="markup", title="Is your hospital&rsquo;s charge inflated?", subtitle="Enter a CPT code and gross charge from your bill to see how it compares to Medicare.", height="420")
 
 register("private-equity-hospital-billing", {
-    "title": "Private Equity Hospitals: What Happens to Your Bill When Investors Take Over",
-    "meta_description": "PE-acquired hospitals raise prices 20\u201330% above comparable hospitals within 3 years. Learn how to spot PE ownership and protect yourself from inflated charges.",
+    "title": "Private Equity Hospitals",
+    "meta_description": "PE-acquired hospitals raise prices 20–30% above comparable hospitals within 3 years. Learn how to spot PE ownership and protect yourself from inflated.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Billing Basics",

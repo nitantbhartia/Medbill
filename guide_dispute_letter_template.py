@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-bill-dispute-letter", {
-    "title": "Medical Bill Dispute Letter: Templates, Tips, and What Actually Works",
+    "title": "Medical Bill Dispute Letter: Templates",
     "meta_description": "A written dispute letter reduces medical bills in 67% of cases. Learn the exact language to use, what to include, and get a free template you can send today.",
     "published": "2026-02-22",
     "author": "BillKarma Team",

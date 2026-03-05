@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("patient-rights-emergency-room", {
-    "title": "Your Rights in the Emergency Room: What Hospitals Can and Can't Do",
-    "meta_description": "Federal law protects your right to ER care regardless of insurance. Learn what EMTALA and the No Surprises Act guarantee, what hospitals can't do, and how to fight back.",
+    "title": "Your Rights in the Emergency Room: What Hospitals Can",
+    "meta_description": "Federal law protects your right to ER care regardless of insurance. Learn what EMTALA and the No Surprises Act guarantee, what hospitals can't do, and how to.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Patient Rights",

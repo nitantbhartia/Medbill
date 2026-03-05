@@ -1,8 +1,10 @@
 {% extends "base.html" %}
-{% block title %}{{ data.a.name }} vs {{ data.b.name }} | Hospital Comparison | BillKarma{% endblock %}
-{% block meta_description %}{% endblock %}
+{% block title %}{{ data.seo.page_title }}{% endblock %}
 {% block head %}
-<meta name="description" content="{{ meta_description if meta_description else 'Compare hospital billing grades, procedure prices, and financial assistance. See which hospital charges less.' }}">
+<meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.webpage_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
 <style>
     .compare-detail-hero {
         background-color: var(--bk-green);
@@ -21,17 +23,6 @@
         .compare-detail-hero h1 { font-size: 1.4rem; }
     }
 </style>
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ canonical_url.split('/compare/')[0] }}/"},
-        {"@type": "ListItem", "position": 2, "name": "Compare Hospitals", "item": "{{ canonical_url.split('/compare/')[0] }}/compare/"},
-        {"@type": "ListItem", "position": 3, "name": {{ (data.a.name ~ " vs " ~ data.b.name) | tojson }}}
-    ]
-}
-</script>
 {% endblock %}
 
 {% block content %}
@@ -46,6 +37,10 @@
             {{ data.a.city }}, {{ data.a.state }} &middot;
             {{ data.b.city }}, {{ data.b.state }}
             {% if data.distance_miles %}&middot; {{ data.distance_miles }} mi apart{% endif %}
+        </p>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.72);margin-top:8px;">
+            Reviewed {{ data.seo.reviewed_on }}
+            {% if data.seo.top_procedure %}&middot; Biggest shared price gap: {{ data.seo.top_procedure.name }}{% endif %}
         </p>
     </div>
 </div>
@@ -339,6 +334,27 @@
       </button>
     </div>
     <p id="copyMsg" class="hidden text-xs text-green-600 mt-2">Link copied!</p>
+  </section>
+
+  <section class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mb-10">
+    <h2 class="text-base font-bold text-gray-800 mb-3">Next Best Pages</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+      <a href="/hospitals/{{ data.a.state_slug }}/{{ data.a.city_slug }}/{{ data.a.slug }}/" class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+        {{ data.a.name }} billing grade
+      </a>
+      <a href="/hospitals/{{ data.b.state_slug }}/{{ data.b.city_slug }}/{{ data.b.slug }}/" class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+        {{ data.b.name }} financial assistance
+      </a>
+      {% if data.seo.top_procedure %}
+      <a href="/procedures/{{ data.seo.top_procedure.cpt_code }}/" class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+        {{ data.seo.top_procedure.name }} fair price
+      </a>
+      {% else %}
+      <a href="/procedures/" class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 font-medium text-gray-700">
+        Procedure fair price guides
+      </a>
+      {% endif %}
+    </div>
   </section>
 
   <!-- Bottom CTAs -->

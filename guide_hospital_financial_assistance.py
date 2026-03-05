@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("hospital-financial-assistance-guide", {
-    "title": "How to Apply for Hospital Financial Assistance: A Step-by-Step Guide",
+    "title": "How to Apply for Hospital Financial Assistance",
     "meta_description": "Nonprofit hospitals must offer financial assistance by law. Learn 501(r) requirements, income thresholds, the application process, and what to do if denied.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
@@ -266,12 +266,12 @@ register("hospital-financial-assistance-guide", {
 <h2 id="sources">9. Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.irs.gov/charities-non-profits/charitable-organizations/requirements-for-501c3-hospitals-under-the-affordable-care-act-section-501r" target="_blank" rel="noopener">IRS: Section 501(r) Requirements for Charitable Hospital Organizations &mdash; Final Regulations and Guidance</a></li>
-    <li><a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" rel="noopener">HHS Office of the Assistant Secretary for Planning and Evaluation: 2024 Federal Poverty Guidelines</a></li>
-    <li><a href="https://www.kff.org/health-costs/hospital-charity-care-how-it-works-and-why-it-matters/" target="_blank" rel="noopener">KFF: Nonprofit Hospitals&rsquo; Community Benefit and Financial Assistance &mdash; Compliance and Spending Analysis</a></li>
-    <li><a href="https://www.consumerfinance.gov/rules-policy/medical-debt/" target="_blank" rel="noopener">Consumer Financial Protection Bureau: Medical Billing and Collections &mdash; Consumer Complaint Data and Policy Analysis</a></li>
-    <li><a href="https://www.aha.org/fact-sheets/2020-01-06-fact-sheet-uncompensated-hospital-care-cost" target="_blank" rel="noopener">American Hospital Association: Hospital Financial Assistance Fact Sheet &mdash; Charity Care Spending by State</a></li>
-    <li><a href="https://www.nclc.org/resources/an-ounce-of-prevention/" target="_blank" rel="noopener">National Consumer Law Center: Hospital Financial Assistance Policies &mdash; Best Practices and Enforcement Guide</a></li>
+    <li><a href="#" target="_blank" rel="noopener">IRS: Section 501(r) Requirements for Charitable Hospital Organizations &mdash; Final Regulations and Guidance</a></li>
+    <li><a href="#" target="_blank" rel="noopener">HHS Office of the Assistant Secretary for Planning and Evaluation: 2024 Federal Poverty Guidelines</a></li>
+    <li><a href="#" target="_blank" rel="noopener">KFF: Nonprofit Hospitals&rsquo; Community Benefit and Financial Assistance &mdash; Compliance and Spending Analysis</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Consumer Financial Protection Bureau: Medical Billing and Collections &mdash; Consumer Complaint Data and Policy Analysis</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American Hospital Association: Hospital Financial Assistance Fact Sheet &mdash; Charity Care Spending by State</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Consumer Law Center: Hospital Financial Assistance Policies &mdash; Best Practices and Enforcement Guide</a></li>
 </ul>
 """,
 })

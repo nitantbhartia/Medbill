@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-mergers-higher-prices", {
-    "title": "Hospital Mergers Are Making Your Bills Higher: What the Research Shows",
-    "meta_description": "RAND research shows hospital consolidation raises prices 20–40%. Learn how mergers affect what you pay, how to spot a monopoly market, and what you can do about it.",
+    "title": "Hospital Mergers Are Making Your Bills Higher",
+    "meta_description": "RAND research shows hospital consolidation raises prices 20–40%. Learn how mergers affect what you pay, how to spot a monopoly market, and what you can do.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Billing Basics",

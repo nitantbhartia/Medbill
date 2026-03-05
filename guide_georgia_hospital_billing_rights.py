@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("georgia-hospital-billing-rights", {
-    "title": "Georgia Hospital Billing Rights: Charity Care, Surprise Bills, and Medical Debt Laws (2026)",
-    "meta_description": "Georgia has not expanded Medicaid and lacks a state charity care mandate — but federal 501(r) rules and the No Surprises Act still protect you. Learn your Georgia hospital billing rights.",
+    "title": "Georgia Hospital Billing Rights: Charity Care",
+    "meta_description": "Georgia has not expanded Medicaid and lacks a state charity care mandate — but federal 501(r) rules and the No Surprises Act still protect you.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

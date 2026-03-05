@@ -59,6 +59,13 @@ def _run_migrations(db):
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
     ensure_columns(
+        "billing_metrics",
+        {
+            "ungraded_reason": "TEXT",
+            "grade_confidence": "TEXT",
+        },
+    )
+    ensure_columns(
         "hospitals",
         {
             "facility_type": "TEXT",
@@ -388,6 +395,8 @@ def _run_migrations(db):
             procedures_compared INTEGER,
             cash_discount_avg_pct REAL,
             billing_grade TEXT,
+            ungraded_reason TEXT,
+            grade_confidence TEXT,
             state_rank INTEGER,
             national_percentile INTEGER,
             computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -1485,6 +1494,8 @@ CREATE TABLE IF NOT EXISTS billing_metrics (
     procedures_compared INTEGER,
     cash_discount_avg_pct REAL,
     billing_grade TEXT,
+    ungraded_reason TEXT,
+    grade_confidence TEXT,
     state_rank INTEGER,
     national_percentile INTEGER,
     computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

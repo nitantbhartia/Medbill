@@ -3,8 +3,10 @@
 {% block title %}{{ data.seo.page_title }}{% endblock %}
 
 {% block head %}
-{% block meta_description %}{% endblock %}
 <meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.procedure_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
 <style>
     .proc-detail-hero {
         background-color: var(--bk-green);
@@ -23,30 +25,6 @@
         .proc-detail-hero h1 { font-size: 1.4rem; }
     }
 </style>
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ canonical_url.split('/procedures/')[0] }}/"},
-        {"@type": "ListItem", "position": 2, "name": "Procedures", "item": "{{ canonical_url.split('/procedures/')[0] }}/procedures/"},
-        {"@type": "ListItem", "position": 3, "name": {{ data.name | tojson }}}
-    ]
-}
-</script>
-{% if data.faq %}
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-        {% for item in data.faq %}
-        {"@type": "Question", "name": {{ item.q | tojson }}, "acceptedAnswer": {"@type": "Answer", "text": {{ item.a | tojson }}}}{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ]
-}
-</script>
-{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -63,6 +41,10 @@
             {% if data.header.medicare_rate %}&nbsp;&middot;&nbsp;Medicare rate: <strong>${{ "{:,.0f}".format(data.header.medicare_rate) }}</strong>{% endif %}
             {% if data.header.national_avg_charge %}&nbsp;&middot;&nbsp;National avg charge: <strong>${{ "{:,.0f}".format(data.header.national_avg_charge) }}</strong>{% endif %}
             &nbsp;&middot;&nbsp;BillKarma data from <strong>{{ "{:,}".format(data.header.provider_count or data.header.hospital_count) }}</strong> providers
+        </p>
+        <p class="stats" style="font-size:0.8rem;color:rgba(255,255,255,0.72);margin-top:8px;">
+            Reviewed {{ data.seo.reviewed_on }}
+            {% if data.header.latest_data_year %}&nbsp;&middot;&nbsp;Pricing data year: <strong>{{ data.header.latest_data_year }}</strong>{% endif %}
         </p>
     </div>
 </div>
@@ -364,7 +346,7 @@
     {% endif %}
 
     {# SECTION 7: Internal Links #}
-    <div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         {% if data.related %}
         <div class="rounded-lg border border-gray-200 p-5 bg-white">
             <h3 class="font-bold text-gray-800 text-sm mb-3">Related Procedures</h3>
@@ -383,12 +365,12 @@
         {% endif %}
 
         <div class="rounded-lg border border-gray-200 p-5 bg-white">
-            <h3 class="font-bold text-gray-800 text-sm mb-3">Check Your Hospital</h3>
+            <h3 class="font-bold text-gray-800 text-sm mb-3">Need This Scheduled Soon?</h3>
             <p class="text-xs text-gray-500 mb-3">
-                See billing grades for hospitals in your state.
+                Compare hospitals and surgery centers before you book this procedure.
             </p>
             <a href="/hospitals/" class="text-sm text-accent-700 hover:text-accent-800 underline font-medium">
-                Browse Hospital Directory →
+                Browse graded facilities →
             </a>
         </div>
 
@@ -400,15 +382,6 @@
             <a href="/scan" class="text-sm font-bold bg-accent-700 text-white px-4 py-2 rounded-lg inline-block">
                 Scan My Bill Free →
             </a>
-        </div>
-
-        <div class="rounded-lg border border-gray-200 p-5 bg-white">
-            <h3 class="font-bold text-gray-800 text-sm mb-3">Billing Guides</h3>
-            <ul class="space-y-2">
-                <li><a href="/guides/how-to-read-your-medical-bill" class="text-sm text-accent-700 hover:text-accent-800 underline">How to Read Your Bill</a></li>
-                <li><a href="/guides/common-hospital-billing-errors" class="text-sm text-accent-700 hover:text-accent-800 underline">Common Billing Errors</a></li>
-                <li><a href="/guides/how-to-negotiate-medical-bills" class="text-sm text-accent-700 hover:text-accent-800 underline">Negotiate Your Bill</a></li>
-            </ul>
         </div>
     </div>
 

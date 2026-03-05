@@ -6,7 +6,7 @@ register(
     "hsa-fsa-pay-medical-bills",
     {
         "title": "How to Use Your HSA or FSA to Pay Medical Bills",
-        "meta_description": "HSA contribution limits hit $4,300 in 2026. Learn which medical expenses qualify, how to use HSA and FSA funds strategically, and why your HSA beats a savings account for medical bills.",
+        "meta_description": "HSA contribution limits hit $4,300 in 2026. Learn which medical expenses qualify, how to use HSA and FSA funds strategically, and why your HSA beats a.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
         "category": "Health Insurance",

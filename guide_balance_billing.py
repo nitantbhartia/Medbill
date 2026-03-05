@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("balance-billing", {
     "title": "Balance Billing: What It Is, When It's Illegal, and What to Do",
-    "meta_description": "Balance billing happens when out-of-network providers charge you the gap between their fee and your insurer's payment. Learn when it's illegal under the No Surprises Act and how to fight back.",
+    "meta_description": "Balance billing happens when out-of-network providers charge you the gap between their fee and your insurer's payment.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Patient Rights",

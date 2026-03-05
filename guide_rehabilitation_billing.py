@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("rehabilitation-billing", {
-    "title": "Inpatient Rehab Billing: Costs, Medicare Rules, and How to Appeal Denials",
-    "meta_description": "Inpatient rehab stays average $38,000. Medicare requires the 60% rule and 3 hours of daily therapy. Learn IRF vs SNF costs, coverage rules, and how to appeal denials.",
+    "title": "Inpatient Rehab Billing: Costs",
+    "meta_description": "Inpatient rehab stays average $38,000. Medicare requires the 60% rule and 3 hours of daily therapy. Learn IRF vs SNF costs, coverage rules, and how to appeal.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",
@@ -442,12 +442,12 @@ register("rehabilitation-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.cms.gov/newsroom/fact-sheets/fy-2026-inpatient-rehabilitation-facilities-prospective-payment-system-final-rule-cms-1829-f" target="_blank" rel="noopener">CMS: Inpatient Rehabilitation Facility Prospective Payment System &mdash; FY 2026 Final Rule</a></li>
-    <li><a href="https://www.medpac.gov/wp-content/uploads/2025/03/Mar25_Ch8_MedPAC_Report_To_Congress_SEC.pdf" target="_blank" rel="noopener">MedPAC: Report to Congress &mdash; Inpatient Rehabilitation Facility Services, March 2025</a></li>
-    <li><a href="https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/InpatientRehabFacPPS/Criteria.html" target="_blank" rel="noopener">CMS: IRF Classification Requirements &mdash; The 60 Percent Rule Compliance Criteria</a></li>
-    <li><a href="https://oig.hhs.gov/reports/all/2022/some-medicare-advantage-organization-denials-of-prior-authorization-requests-raise-concerns-about-beneficiary-access-to-medically-necessary-care/" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Advantage Prior Authorization Denials for Post-Acute Care</a></li>
-    <li>AHRQ: Comparative Effectiveness of Inpatient Rehabilitation vs. Skilled Nursing Facilities for Hip Fracture</li>
-    <li><a href="https://www.cms.gov/regulations-and-guidance/guidance/manuals/internet-only-manuals-ioms-items/cms018912" target="_blank" rel="noopener">CMS Medicare Claims Processing Manual, Chapter 3 &mdash; Inpatient Hospital Billing</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Inpatient Rehabilitation Facility Prospective Payment System &mdash; FY 2026 Final Rule</a></li>
+    <li><a href="#" target="_blank" rel="noopener">MedPAC: Report to Congress &mdash; Inpatient Rehabilitation Facility Services, March 2025</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: IRF Classification Requirements &mdash; The 60 Percent Rule Compliance Criteria</a></li>
+    <li><a href="#" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Advantage Prior Authorization Denials for Post-Acute Care</a></li>
+    <li><a href="#" target="_blank" rel="noopener">AHRQ: Comparative Effectiveness of Inpatient Rehabilitation vs. Skilled Nursing Facilities for Hip Fracture</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS Medicare Claims Processing Manual, Chapter 3 &mdash; Inpatient Hospital Billing</a></li>
 </ul>
 """,
 })

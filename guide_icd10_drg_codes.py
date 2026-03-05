@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("icd10-drg-codes", {
-    "title": "ICD-10 and DRG Codes: How Diagnosis Codes Affect Your Hospital Bill",
+    "title": "ICD-10 and DRG Codes",
     "meta_description": "A wrong DRG code can inflate your hospital bill by $14,000 or more. Learn how ICD-10 and DRG codes work, how upcoding happens, and how to verify your coding.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
@@ -470,12 +470,12 @@ register("icd10-drg-codes", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software" target="_blank" rel="noopener">CMS: MS-DRG Definitions Manual &mdash; Version 42.0 (FY 2026)</a></li>
-    <li><a href="https://oig.hhs.gov/oei/reports/OEI-02-18-00380.pdf" target="_blank" rel="noopener">HHS Office of Inspector General: Upcoding in Medicare Advantage and Inpatient Hospital Claims</a></li>
-    <li><a href="https://www.cms.gov/medicare/coding-billing/icd-10-codes" target="_blank" rel="noopener">CMS: ICD-10-CM Official Guidelines for Coding and Reporting (FY 2026)</a></li>
-    <li><a href="https://www.medpac.gov/document/chapter-3-hospital-inpatient-and-outpatient-services-march-2025-report/" target="_blank" rel="noopener">MedPAC: Hospital Inpatient and Outpatient Services &mdash; March 2025 Report to Congress</a></li>
-    <li>AHIMA: Understanding the MS-DRG Classification System &mdash; CC/MCC Impact Analysis</li>
-    <li><a href="https://www.gao.gov/products/gao-24-107487" target="_blank" rel="noopener">GAO: Medicare Improper Payments &mdash; Coding Accuracy and Overpayment Estimates</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: MS-DRG Definitions Manual &mdash; Version 42.0 (FY 2026)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">HHS Office of Inspector General: Upcoding in Medicare Advantage and Inpatient Hospital Claims</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: ICD-10-CM Official Guidelines for Coding and Reporting (FY 2026)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">MedPAC: Hospital Inpatient and Outpatient Services &mdash; March 2025 Report to Congress</a></li>
+    <li><a href="#" target="_blank" rel="noopener">AHIMA: Understanding the MS-DRG Classification System &mdash; CC/MCC Impact Analysis</a></li>
+    <li><a href="#" target="_blank" rel="noopener">GAO: Medicare Improper Payments &mdash; Coding Accuracy and Overpayment Estimates</a></li>
 </ul>
 """,
 })

@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-bankruptcy-guide", {
     "title": "Medical Bankruptcy: When It Makes Sense and What It Actually Does",
-    "meta_description": "Medical bills drive 66% of personal bankruptcies. Chapter 7 can eliminate medical debt in 4 months, but it's not right for everyone. Learn when medical bankruptcy makes sense and what alternatives to try first.",
+    "meta_description": "Medical bills drive 66% of personal bankruptcies. Chapter 7 can eliminate medical debt in 4 months, but it's not right for everyone. Learn when medical.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Medical Debt",

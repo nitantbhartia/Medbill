@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{{ data.title }} (2026 Prices) | BillKarma{% endblock %}
+{% block title %}{{ data.seo.page_title }}{% endblock %}
 {% block head %}
-{% block meta_description %}{% endblock %}
 <meta name="description" content="{{ data.seo.meta_description }}">
+<script type="application/ld+json">{{ data.seo.webpage_schema_json | safe }}</script>
+<script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
 <style>
     .cp-hero { background:#00824F; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
     .cp-hero-inner { max-width:672px; margin:0 auto; }
@@ -44,6 +45,11 @@
         </p>
         <h1>{{ data.title }}</h1>
         <p>{{ data.subtitle }}</p>
+        <p style="margin-top:10px;font-size:0.82rem;color:rgba(255,255,255,0.72);font-weight:600;">
+            Reviewed {{ data.seo.reviewed_on }}
+            {% if data.seo.data_year %}&middot; Pricing data year {{ data.seo.data_year }}{% endif %}
+            {% if data.provider_count %}&middot; {{ "{:,}".format(data.provider_count) }} providers analyzed{% endif %}
+        </p>
     </div>
 </section>
 

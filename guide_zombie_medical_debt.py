@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("zombie-medical-debt", {
-    "title": "Zombie Medical Debt: When Old Medical Bills Come Back to Haunt You",
-    "meta_description": "Old medical debt resurfacing? Zombie debt collectors buy expired bills for pennies. Learn how to identify zombie debt, check the SOL, and protect yourself legally.",
+    "title": "Zombie Medical Debt",
+    "meta_description": "Old medical debt resurfacing? Zombie debt collectors buy expired bills for pennies. Learn how to identify zombie debt, check the SOL, and protect yourself.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Patient Rights",

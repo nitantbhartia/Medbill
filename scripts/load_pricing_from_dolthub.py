@@ -7,6 +7,7 @@ It maps hospitals by normalized name/city/state and ingests target CPT/HCPCS row
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -92,31 +93,44 @@ def load_dolthub_hospitals() -> list[dict]:
     return rows
 
 
-def match_hospitals(limit: int) -> tuple[dict[str, dict], list[dict]]:
+def _local_hospitals(limit: int | None = None) -> list[dict]:
     with sqlite3.connect(config.DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
-        ours = conn.execute(
-            """
+        sql = """
             SELECT facility_id, name, city, state
             FROM hospitals
             ORDER BY COALESCE(bed_count, 0) DESC, name
-            LIMIT ?
-            """,
-            (limit,),
-        ).fetchall()
-    ours = [dict(r) for r in ours]
+        """
+        params: tuple[object, ...] = ()
+        if limit is not None:
+            sql += " LIMIT ?"
+            params = (limit,)
+        ours = conn.execute(sql, params).fetchall()
+    return [dict(r) for r in ours]
+
+
+def match_hospitals(limit: int | None) -> tuple[dict[str, dict], list[dict]]:
+    ours = _local_hospitals(limit)
     dolt = load_dolthub_hospitals()
 
     by_exact: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
     by_name_state: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    by_state: dict[str, list[dict]] = defaultdict(list)
+    by_city_state: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in dolt:
         key_exact = (norm_name(row.get("name")), norm_city(row.get("city")), (row.get("state") or "").upper())
         key_name_state = (norm_name(row.get("name")), (row.get("state") or "").upper())
+        key_city_state = (norm_city(row.get("city")), (row.get("state") or "").upper())
         by_exact[key_exact].append(row)
         by_name_state[key_name_state].append(row)
+        by_city_state[key_city_state].append(row)
+        by_state[(row.get("state") or "").upper()].append(row)
 
     facility_matches: dict[str, dict] = {}
     for h in ours:
+        state = (h.get("state") or "").upper()
+        city = norm_city(h.get("city"))
+        local_name = norm_name(h.get("name"))
         key_exact = (norm_name(h.get("name")), norm_city(h.get("city")), (h.get("state") or "").upper())
         cands = by_exact.get(key_exact, [])
         if len(cands) == 1:
@@ -135,8 +149,99 @@ def match_hospitals(limit: int) -> tuple[dict[str, dict], list[dict]]:
                 "method": "name_state_single_candidate",
                 "confidence": 0.7,
             }
+            continue
+
+        # Conservative fuzzy pass: compare only within same state, prefer same city.
+        fuzzy_pool = by_city_state.get((city, state), []) or by_state.get(state, [])
+        scored: list[tuple[float, dict]] = []
+        local_tokens = set(local_name.split())
+        for cand in fuzzy_pool:
+            cand_name = norm_name(cand.get("name"))
+            if not cand_name:
+                continue
+            ratio = difflib.SequenceMatcher(None, local_name, cand_name).ratio()
+            cand_tokens = set(cand_name.split())
+            token_overlap = (
+                len(local_tokens & cand_tokens) / max(1, len(local_tokens | cand_tokens))
+                if (local_tokens or cand_tokens)
+                else 0.0
+            )
+            contains_bonus = 0.08 if (local_name in cand_name or cand_name in local_name) else 0.0
+            city_bonus = 0.04 if norm_city(cand.get("city")) == city and city else 0.0
+            score = (ratio * 0.65) + (token_overlap * 0.35) + contains_bonus + city_bonus
+            scored.append((score, cand))
+
+        scored.sort(key=lambda item: item[0], reverse=True)
+        if scored:
+            best_score, best = scored[0]
+            second_score = scored[1][0] if len(scored) > 1 else 0.0
+            if best_score >= 0.86 and (best_score - second_score) >= 0.05:
+                facility_matches[h["facility_id"]] = {
+                    "npi": best["npi_number"],
+                    "method": "fuzzy_name_state_city",
+                    "confidence": round(best_score, 3),
+                }
 
     return facility_matches, dolt
+
+
+def ingest_transparency_index_for_matches(facility_matches: dict[str, dict], dolt_hospitals: list[dict]) -> dict[str, int]:
+    by_npi = {str(row.get("npi_number")): row for row in dolt_hospitals if row.get("npi_number")}
+    matched = 0
+    with sqlite3.connect(config.DB_PATH) as conn:
+        for facility_id, match in facility_matches.items():
+            npi = str(match.get("npi"))
+            src = by_npi.get(npi)
+            if not src:
+                continue
+            file_url = src.get("url")
+            if not file_url:
+                continue
+            conn.execute(
+                """
+                INSERT INTO transparency_files (
+                    facility_id, file_url, file_format, parse_status, parse_notes,
+                    last_downloaded
+                ) VALUES (?, ?, NULL, 'pending', ?, CURRENT_DATE)
+                ON CONFLICT(facility_id) DO UPDATE SET
+                    file_url=excluded.file_url,
+                    parse_status=CASE
+                        WHEN transparency_files.parse_status IN ('parsed','partial') THEN transparency_files.parse_status
+                        ELSE 'pending'
+                    END,
+                    parse_notes=?,
+                    last_downloaded=CURRENT_DATE
+                """,
+                (
+                    facility_id,
+                    file_url,
+                    f"Discovered via DoltHub index (publish_date={src.get('publish_date')})",
+                    f"Discovered via DoltHub index (publish_date={src.get('publish_date')})",
+                ),
+            )
+            conn.execute(
+                """
+                INSERT INTO data_source_crosswalk (
+                    source_name, source_entity_id, facility_id,
+                    match_method, match_confidence, last_verified_at
+                ) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(source_name, source_entity_id) DO UPDATE SET
+                    facility_id=excluded.facility_id,
+                    match_method=excluded.match_method,
+                    match_confidence=excluded.match_confidence,
+                    last_verified_at=CURRENT_TIMESTAMP
+                """,
+                (
+                    "dolthub_hospital_price_transparency",
+                    npi,
+                    facility_id,
+                    match.get("method"),
+                    match.get("confidence"),
+                ),
+            )
+            matched += 1
+        conn.commit()
+    return {"indexed_facilities": matched}
 
 
 def _chunks(values: list[str], size: int) -> list[list[str]]:
@@ -272,21 +377,41 @@ def load_prices_for_matches(facility_matches: dict[str, dict], year: int) -> dic
 def main() -> None:
     parser = argparse.ArgumentParser(description="Load pricing from DoltHub fallback source")
     parser.add_argument("--limit", type=int, default=300, help="Top hospitals to match by bed-count ordering")
+    parser.add_argument("--all-hospitals", action="store_true", help="Match all hospitals instead of top-N")
     parser.add_argument("--year", type=int, default=2026, help="Data year for hospital_prices rows")
+    parser.add_argument("--index-only", action="store_true", help="Only ingest transparency URLs/crosswalks")
     args = parser.parse_args()
 
     db.init_db()
-    facility_matches, _ = match_hospitals(limit=args.limit)
+    limit = None if args.all_hospitals else args.limit
+    facility_matches, dolt_hospitals = match_hospitals(limit=limit)
+    indexed = ingest_transparency_index_for_matches(facility_matches, dolt_hospitals)
+    if args.index_only:
+        log_refresh(
+            "dolthub_transparency_index",
+            indexed["indexed_facilities"],
+            "success" if indexed["indexed_facilities"] else "partial",
+            f"matched_facilities={len(facility_matches)}",
+        )
+        print(
+            {
+                "matched_facilities": len(facility_matches),
+                "indexed_facilities": indexed["indexed_facilities"],
+            }
+        )
+        return
+
     loaded = load_prices_for_matches(facility_matches, year=args.year)
     log_refresh(
         "dolthub_pricing",
         loaded["rows"],
         "success" if loaded["rows"] else "partial",
-        f"matched_facilities={len(facility_matches)} loaded_facilities={loaded['facilities']}",
+        f"matched_facilities={len(facility_matches)} indexed_facilities={indexed['indexed_facilities']} loaded_facilities={loaded['facilities']}",
     )
     print(
         {
             "matched_facilities": len(facility_matches),
+            "indexed_facilities": indexed["indexed_facilities"],
             "loaded_facilities": loaded["facilities"],
             "rows_loaded": loaded["rows"],
         }

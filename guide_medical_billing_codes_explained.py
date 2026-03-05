@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-billing-codes-explained", {
-    "title": "Medical Billing Codes Explained: CPT, ICD-10, HCPCS, and DRG in Plain English",
+    "title": "Medical Billing Codes Explained: CPT",
     "meta_description": "Confused by medical billing codes? Plain-English guide to CPT, ICD-10, HCPCS, and DRG codes on your hospital bill. Learn to spot upcoding and billing errors.",
     "published": "2026-03-01",
     "author": "BillKarma Team",

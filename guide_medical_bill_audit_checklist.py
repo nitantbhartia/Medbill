@@ -311,12 +311,12 @@ register("medical-bill-audit-checklist", {
 <h2 id="sources">7. Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://oig.hhs.gov/reports-and-publications/top-challenges/2011/issue03.asp" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Fee-for-Service Improper Payment Rate &mdash; Annual Audit Results</a></li>
-    <li><a href="https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits" target="_blank" rel="noopener">CMS: National Correct Coding Initiative (NCCI) Edits &mdash; Unbundling Prevention and Code Pair Reference</a></li>
-    <li><a href="https://www.cms.gov/medicare/payment/fee-schedules/physician" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; 2026 CPT Code Rates and Relative Value Units</a></li>
-    <li>Medical Billing Advocates of America: Patient Bill Audit Outcomes and Savings Data</li>
-    <li><a href="https://www.aarp.org/money/personal-finance/spot-fix-medical-billing-errors/" target="_blank" rel="noopener">AARP: How to Read and Dispute a Medical Bill &mdash; Consumer Guide</a></li>
-    <li><a href="https://www.kff.org/health-costs/americans-challenges-with-health-care-costs/" target="_blank" rel="noopener">KFF: Americans&rsquo; Challenges with Health Care Costs &mdash; Billing Error Prevalence and Impact</a></li>
+    <li><a href="#" target="_blank" rel="noopener">HHS Office of Inspector General: Medicare Fee-for-Service Improper Payment Rate &mdash; Annual Audit Results</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: National Correct Coding Initiative (NCCI) Edits &mdash; Unbundling Prevention and Code Pair Reference</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; 2026 CPT Code Rates and Relative Value Units</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Medical Billing Advocates of America: Patient Bill Audit Outcomes and Savings Data</a></li>
+    <li><a href="#" target="_blank" rel="noopener">AARP: How to Read and Dispute a Medical Bill &mdash; Consumer Guide</a></li>
+    <li><a href="#" target="_blank" rel="noopener">KFF: Americans&rsquo; Challenges with Health Care Costs &mdash; Billing Error Prevalence and Impact</a></li>
 </ul>
 """,
 })

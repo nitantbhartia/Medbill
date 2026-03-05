@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("telehealth-billing", {
-    "title": "Telehealth Billing: Common Errors, CPT Codes, and How to Dispute Overcharges",
-    "meta_description": "Telehealth billing errors are surging. Learn which CPT codes apply, when you're being overcharged for a video visit, and how to dispute telehealth bills in 2026.",
+    "title": "Telehealth Billing: Common Errors",
+    "meta_description": "Telehealth billing errors are surging. Learn which CPT codes apply, when you're being overcharged for a video visit, and how to dispute telehealth bills in.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("stop-medical-debt-collector-calls", {
     "title": "How to Stop Medical Debt Collector Calls and Harassment",
-    "meta_description": "Medical debt collectors calling nonstop? Learn exactly how to stop the calls legally — cease-and-desist letters, FDCPA protections, and complaint filing steps.",
+    "meta_description": "Medical debt collectors calling nonstop? Learn exactly how to stop the calls legally — cease-and-desist letters, FDCPA protections, and complaint filing.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

@@ -107,6 +107,8 @@ def test_compare_detail_renders():
     assert "Test General Hospital" in resp.text
     assert "Test Specialty Center" in resp.text
     assert 'data-free-map="compare"' in resp.text
+    assert '"@type": "WebPage"' in resp.text
+    assert "Reviewed" in resp.text
 
 
 def test_compare_detail_shows_verdict():
@@ -149,6 +151,13 @@ def test_compare_detail_shows_share_url():
     resp = client.get(f"/compare/{_FID_A}/vs/{_FID_B}/")
     assert resp.status_code == 200
     assert "shareUrl" in resp.text or "/compare/" in resp.text
+
+
+def test_compare_seo_route_renders_human_readable_page():
+    _seed()
+    resp = client.get("/compare/test-general-hospital-springfield-vs-test-specialty-center-springfield/")
+    assert resp.status_code == 200
+    assert "Which Costs Less" in resp.text or "Test General Hospital" in resp.text
 
 
 # ---- API tests ----

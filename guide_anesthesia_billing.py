@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("anesthesia-billing", {
-    "title": "Anesthesia Bills Explained: Why You Got a Separate Bill From the Anesthesiologist",
-    "meta_description": "Anesthesia bills use a confusing 'units' system and often arrive as a surprise separate charge. Learn how anesthesia pricing works, what to check on your bill, and how the No Surprises Act protects you.",
+    "title": "Anesthesia Bills Explained",
+    "meta_description": "Anesthesia bills use a confusing 'units' system and often arrive as a surprise separate charge. Learn how anesthesia pricing works, what to check on your.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",

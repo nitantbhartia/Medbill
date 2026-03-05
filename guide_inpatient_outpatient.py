@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("inpatient-vs-outpatient-billing", {
-    "title": "Inpatient vs. Outpatient Billing: Why the Same Procedure Can Cost 4x More",
-    "meta_description": "Inpatient vs. outpatient billing changes your cost dramatically — the same knee surgery can cost $4,800 or $18,000. Learn how to check your status and dispute wrong assignments.",
+    "title": "Inpatient vs. Outpatient Billing",
+    "meta_description": "Inpatient vs. outpatient billing changes your cost dramatically — the same knee surgery can cost $4,800 or $18,000. Learn how to check your status and.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Billing Basics",

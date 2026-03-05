@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("uninsured-hospital-bill", {
     "title": "Uninsured and Got a Hospital Bill? How to Cut It by 50-80%",
-    "meta_description": "Uninsured patients are billed 2-4x more than insured patients for the same care. Learn how to get the self-pay discount, charity care, and negotiate your bill down.",
+    "meta_description": "Uninsured patients are billed 2-4x more than insured patients for the same care. Learn how to get the self-pay discount, charity care, and negotiate your.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Negotiation",

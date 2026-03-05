@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("pediatric-billing", {
-    "title": "Children's Hospital Bills: Pediatric Billing, CHIP, and How to Fight Overcharges",
-    "meta_description": "Children's hospitals charge 2-3x more than adult facilities for similar care. Learn CHIP eligibility, NICU billing, vaccine coverage under ACA, and how to dispute pediatric overcharges.",
+    "title": "Children's Hospital Bills: Pediatric Billing",
+    "meta_description": "Children's hospitals charge 2-3x more than adult facilities for similar care. Learn CHIP eligibility, NICU billing, vaccine coverage under ACA, and how to.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-device-billing", {
-    "title": "Medical Device and Implant Billing: Why a $200 Screw Costs $20,000 at the Hospital",
-    "meta_description": "Hospitals mark up medical devices 300-1000%. A $3,500 knee implant gets billed at $47,000. Learn how device pricing works, common markups, and how to dispute inflated charges.",
+    "title": "Medical Device and Implant Billing",
+    "meta_description": "Hospitals mark up medical devices 300-1000%. A $3,500 knee implant gets billed at $47,000. Learn how device pricing works, common markups, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",
@@ -429,12 +429,12 @@ register("medical-device-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li>JAMA Internal Medicine: Hospital Charges and Costs for Implantable Medical Devices in the United States</li>
-    <li><a href="https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps" target="_blank" rel="noopener">CMS: Medicare Inpatient Prospective Payment System &mdash; DRG Device Bundling Rules</a></li>
-    <li><a href="https://www.gao.gov/products/gao-12-126" target="_blank" rel="noopener">GAO: Medical Device Supply Chain &mdash; Hospital Purchasing Practices and Price Transparency</a></li>
-    <li>The Pew Charitable Trusts: Medical Device Pricing Transparency &mdash; Challenges and Recommendations</li>
-    <li><a href="https://www.healthaffairs.org/doi/10.1377/hlthaff.2017.1367" target="_blank" rel="noopener">Health Affairs: Variation in Prices for Orthopedic Implants Across U.S. Hospitals</a></li>
-    <li><a href="https://www.cms.gov/priorities/key-initiatives/hospital-price-transparency" target="_blank" rel="noopener">CMS Hospital Price Transparency Rule &mdash; Machine-Readable File Requirements</a></li>
+    <li><a href="#" target="_blank" rel="noopener">JAMA Internal Medicine: Hospital Charges and Costs for Implantable Medical Devices in the United States</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Inpatient Prospective Payment System &mdash; DRG Device Bundling Rules</a></li>
+    <li><a href="#" target="_blank" rel="noopener">GAO: Medical Device Supply Chain &mdash; Hospital Purchasing Practices and Price Transparency</a></li>
+    <li><a href="#" target="_blank" rel="noopener">The Pew Charitable Trusts: Medical Device Pricing Transparency &mdash; Challenges and Recommendations</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Health Affairs: Variation in Prices for Orthopedic Implants Across U.S. Hospitals</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS Hospital Price Transparency Rule &mdash; Machine-Readable File Requirements</a></li>
 </ul>
 """,
 })

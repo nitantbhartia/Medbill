@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-records-rights", {
-    "title": "How to Get Your Medical Records: HIPAA Rights, Costs, and Timelines",
-    "meta_description": "HIPAA gives you the right to your medical records within 30 days. Learn allowable fees, how to request electronic copies, and how to file an OCR complaint if denied.",
+    "title": "How to Get Your Medical Records: HIPAA Rights",
+    "meta_description": "HIPAA gives you the right to your medical records within 30 days. Learn allowable fees, how to request electronic copies, and how to file an OCR complaint if.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Patient Rights",

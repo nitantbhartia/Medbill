@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-financial-assistance-charity-care", {
-    "title": "Hospital Financial Assistance and Charity Care: How to Get Your Bill Reduced or Eliminated",
-    "meta_description": "60% of US hospitals must offer financial assistance by law. Learn who qualifies, how to apply, and how patients save $5,000-$50,000+ on bills via charity care.",
+    "title": "Hospital Financial Assistance and Charity Care",
+    "meta_description": "Most U.S. hospitals must offer financial assistance by law. Learn who qualifies, how to apply, and how patients can reduce bills through charity care.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Taking Action",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-debt-forgiveness-programs", {
-    "title": "Medical Debt Forgiveness Programs in 2026: Who Qualifies and How to Apply",
-    "meta_description": "Medical debt forgiveness is real — from hospital charity care to nonprofit buyback programs. Learn who qualifies, 7 forgiveness options, and step-by-step application guides.",
+    "title": "Medical Debt Forgiveness Programs in 2026: Who Qualifies",
+    "meta_description": "Medical debt forgiveness is real — from hospital charity care to nonprofit buyback programs. Learn who qualifies, 7 forgiveness options, and step-by-step.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

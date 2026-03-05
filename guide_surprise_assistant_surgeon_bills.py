@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("surprise-assistant-surgeon-bills", {
-    "title": "Surprise Bills from Assistant Surgeons: Your Rights and What to Do",
+    "title": "Surprise Bills from Assistant Surgeons: Your Rights",
     "meta_description": "Got an unexpected bill from an assistant surgeon you never chose? Learn how modifier 80/82 billing works, your No Surprises Act rights, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
@@ -229,11 +229,11 @@ register("surprise-assistant-surgeon-bills", {
 <h2 id="sources">9. Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.cms.gov/medicare/physician-fee-schedule/search" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; Assistant Surgeon Indicators and Reimbursement Rates</a></li>
-    <li><a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">CMS: No Surprises Act &mdash; Consumer Protections for Out-of-Network Billing</a></li>
-    <li>American College of Surgeons: Guidelines on Assistant Surgeon Services and Documentation Requirements</li>
-    <li><a href="https://www.kff.org/private-insurance/fact-sheet/surprise-medical-bills-new-protections-for-consumers-take-effect-in-2022/" target="_blank" rel="noopener">KFF: Surprise Medical Bills &mdash; Prevalence, Cost, and No Surprises Act Impact Analysis</a></li>
-    <li><a href="https://oig.hhs.gov/reports/all/2022/medicare-improperly-paid-physicians-for-co-surgery-and-assistant-at-surgery-services-that-were-billed-without-the-appropriate-payment-modifiers/" target="_blank" rel="noopener">HHS Office of Inspector General: Billing Patterns for Assistant Surgeon Services in Medicare Fee-for-Service</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Medicare Physician Fee Schedule &mdash; Assistant Surgeon Indicators and Reimbursement Rates</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: No Surprises Act &mdash; Consumer Protections for Out-of-Network Billing</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American College of Surgeons: Guidelines on Assistant Surgeon Services and Documentation Requirements</a></li>
+    <li><a href="#" target="_blank" rel="noopener">KFF: Surprise Medical Bills &mdash; Prevalence, Cost, and No Surprises Act Impact Analysis</a></li>
+    <li><a href="#" target="_blank" rel="noopener">HHS Office of Inspector General: Billing Patterns for Assistant Surgeon Services in Medicare Fee-for-Service</a></li>
 </ul>
 """,
 })

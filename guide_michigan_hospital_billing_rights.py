@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("michigan-hospital-billing-rights", {
-    "title": "Michigan Hospital Billing Rights: Patients' Rights Act, Charity Care, and Medical Debt Protections (2026)",
-    "meta_description": "Michigan's Patients' Right to Independent Review Act and Medicaid expansion give patients strong protections. Learn Michigan's charity care rules, garnishment limits, and how to dispute hospital bills.",
+    "title": "Michigan Hospital Billing Rights: Patients' Rights Act",
+    "meta_description": "Michigan's Patients' Right to Independent Review Act and Medicaid expansion give patients strong protections. Learn Michigan's charity care rules.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

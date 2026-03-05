@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("cardiac-billing", {
-    "title": "Cardiac Procedure Billing: Stents, Pacemakers, and Bypass Surgery Costs Explained",
-    "meta_description": "BillKarma finds cardiac bills have the highest error rate of any procedure category. A stent billed at $78,000 may cost Medicare $2,800. Learn what to look for and how to dispute overcharges.",
+    "title": "Cardiac Procedure Billing: Stents",
+    "meta_description": "BillKarma finds cardiac bills have the highest error rate of any procedure category. A stent billed at $78,000 may cost Medicare $2,800. Learn what to look.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("new-york-medical-billing-laws", {
-    "title": "New York Medical Billing Laws: Financial Hardship Protections, 400% FPL Charity Care, and Dispute Rights (2026)",
-    "meta_description": "New York offers some of the strongest hospital billing protections in the nation — charity care up to 400% FPL, strict balance billing bans, and 180-day collections delays. Here's how to use them.",
+    "title": "New York Medical Billing Laws: Financial Hardship Protections",
+    "meta_description": "New York offers some of the strongest hospital billing protections in the nation — charity care up to 400% FPL, strict balance billing bans, and 180-day.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

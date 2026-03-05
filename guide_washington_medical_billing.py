@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("washington-state-medical-billing-laws", {
-    "title": "Washington State Medical Billing Laws: Balance Billing Protection Act, Charity Care, and Patient Rights (2026)",
-    "meta_description": "Washington has among the strongest surprise billing and charity care protections in the US. Learn your rights under the BBPA, WA Charity Care Act, and how to dispute hospital bills.",
+    "title": "Washington State Medical Billing Laws",
+    "meta_description": "Washington has among the strongest surprise billing and charity care protections in the US. Learn your rights under the BBPA, WA Charity Care Act, and how to.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

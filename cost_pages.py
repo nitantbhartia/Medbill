@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from datetime import date
+import json
+
+from config import APP_URL
 from db import get_db
 from procedure_pages import get_procedure_profile
 
@@ -177,6 +181,34 @@ def get_cost_page_data(slug: str) -> dict | None:
     # State averages from raw data
     state_averages = _get_state_averages(spec["cpt"])
 
+    reviewed_on = date.today().isoformat()
+    page_title = f"{spec['title'].rstrip('?')}: Fair Price & Local Options | BillKarma"
+    if len(page_title) > 65:
+        page_title = f"{spec['title'].rstrip('?')} | BillKarma"
+    meta_description = (
+        f"{spec['title'].rstrip('?')} in 2026. National average: ${int(national_median or 0):,}. Compare hospital vs. imaging center prices and find cheaper options near you."
+        if national_median
+        else f"{spec['title'].rstrip('?')} in 2026. Compare prices by facility type, check Medicare rates, and find savings tips."
+    )
+    base = APP_URL.rstrip("/")
+    page_url = f"{base}/cost/{slug}/"
+    breadcrumb_schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "BillKarma", "item": f"{base}/"},
+            {"@type": "ListItem", "position": 2, "name": "Cost Guides", "item": f"{base}/procedures/"},
+            {"@type": "ListItem", "position": 3, "name": spec["title"].rstrip("?"), "item": page_url},
+        ],
+    }
+    webpage_schema = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": page_title,
+        "description": meta_description,
+        "url": page_url,
+        "dateModified": reviewed_on,
+    }
     return {
         "slug": slug,
         "cpt_code": spec["cpt"],
@@ -194,9 +226,12 @@ def get_cost_page_data(slug: str) -> dict | None:
         "provider_count": header.get("provider_count", 0),
         "name": profile.get("name", ""),
         "seo": {
-            "meta_description": f"{spec['title'].rstrip('?')} in 2026. National average: ${int(national_median or 0):,}. Compare hospital vs. imaging center prices and find cheaper options near you."
-            if national_median
-            else f"{spec['title'].rstrip('?')} in 2026. Compare prices by facility type, check Medicare rates, and find savings tips.",
+            "page_title": page_title,
+            "meta_description": meta_description,
+            "reviewed_on": reviewed_on,
+            "data_year": profile.get("header", {}).get("latest_data_year"),
+            "breadcrumb_schema_json": json.dumps(breadcrumb_schema, ensure_ascii=False),
+            "webpage_schema_json": json.dumps(webpage_schema, ensure_ascii=False),
         },
     }
 

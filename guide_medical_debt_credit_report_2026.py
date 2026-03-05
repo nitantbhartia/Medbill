@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-debt-credit-report-2026", {
-    "title": "Medical Debt and Your Credit Report in 2026: What\u2019s Changed, What\u2019s Protected, and What to Do",
+    "title": "Medical Debt and Your Credit Report in 2026: What’s Changed",
     "meta_description": "Medical debt credit report rules changed in 2025-2026. Learn what\u2019s reported, state protections, and 4 ways to remove medical debt from your credit report.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("cancer-treatment-billing-guide", {
-    "title": "Cancer Treatment Billing: How to Manage Bills During and After Treatment",
-    "meta_description": "Cancer patients face an average $150,000 in treatment costs. Learn how chemotherapy, radiation, and immunotherapy are billed, what assistance is available, and how to avoid $10,000+ billing errors.",
+    "title": "Cancer Treatment Billing: How to Manage Bills During",
+    "meta_description": "Cancer patients face an average $150,000 in treatment costs. Learn how chemotherapy, radiation, and immunotherapy are billed, what assistance is available.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Cancer Care",

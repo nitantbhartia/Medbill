@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("settle-medical-debt-collections", {
-    "title": "How to Settle Medical Debt in Collections for 20-40 Cents on the Dollar",
-    "meta_description": "Collectors buy medical debt for pennies. Learn how to negotiate settlements at 20-40% of the balance — step-by-step scripts, letter templates, and what to avoid.",
+    "title": "How to Settle Medical Debt in Collections for 20-40 Cents on",
+    "meta_description": "Collectors buy medical debt for pennies. Learn how to negotiate settlements at 20-40% of the balance — step-by-step scripts, letter templates, and what to.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

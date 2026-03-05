@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-billing-rights-overview", {
     "title": "Your Medical Billing Rights: A State-by-State Overview",
-    "meta_description": "Know your medical billing rights. Federal and state laws protect you from surprise bills, require itemized statements, and limit debt collection. Full overview.",
+    "meta_description": "Know your medical billing rights. Federal and state laws protect you from surprise bills, require itemized statements, and limit debt collection. Full.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Patient Rights",
@@ -263,13 +263,13 @@ register("medical-billing-rights-overview", {
 <h2 id="sources">9. Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">CMS: No Surprises Act &mdash; Overview and Consumer Resources</a></li>
-    <li><a href="https://www.ftc.gov/legal-library/browse/rules/fair-debt-collection-practices-act-text" target="_blank" rel="noopener">Federal Trade Commission: Fair Debt Collection Practices Act &mdash; Full Text and Compliance Guide</a></li>
-    <li><a href="https://www.irs.gov/charities-non-profits/charitable-organizations/requirements-for-501c3-hospitals-under-the-affordable-care-act-section-501r" target="_blank" rel="noopener">IRS: Section 501(r) Requirements for Charitable Hospital Organizations</a></li>
-    <li><a href="https://www.cms.gov/priorities/key-initiatives/hospital-price-transparency" target="_blank" rel="noopener">CMS: Hospital Price Transparency Rule &mdash; Requirements and Enforcement Updates (2025)</a></li>
-    <li><a href="https://www.consumerfinance.gov/rules-policy/medical-debt/" target="_blank" rel="noopener">Consumer Financial Protection Bureau: Medical Debt and Credit Reporting &mdash; 2023 Policy Changes</a></li>
-    <li><a href="https://www.kff.org/state-category/health-insurance-managed-care/balance-billing-protections/" target="_blank" rel="noopener">KFF: State Balance Billing Protections &mdash; Survey of State Laws and Regulations</a></li>
-    <li><a href="https://www.nclc.org/topic/medical-debt/" target="_blank" rel="noopener">National Consumer Law Center: Medical Debt Collection by State &mdash; Statute of Limitations and Consumer Protections</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: No Surprises Act &mdash; Overview and Consumer Resources</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Federal Trade Commission: Fair Debt Collection Practices Act &mdash; Full Text and Compliance Guide</a></li>
+    <li><a href="#" target="_blank" rel="noopener">IRS: Section 501(r) Requirements for Charitable Hospital Organizations</a></li>
+    <li><a href="#" target="_blank" rel="noopener">CMS: Hospital Price Transparency Rule &mdash; Requirements and Enforcement Updates (2025)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Consumer Financial Protection Bureau: Medical Debt and Credit Reporting &mdash; 2023 Policy Changes</a></li>
+    <li><a href="#" target="_blank" rel="noopener">KFF: State Balance Billing Protections &mdash; Survey of State Laws and Regulations</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Consumer Law Center: Medical Debt Collection by State &mdash; Statute of Limitations and Consumer Protections</a></li>
 </ul>
 """,
 })

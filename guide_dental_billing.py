@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("understanding-dental-billing", {
     "title": "Understanding Dental Billing: Codes, Insurance, and How to Save",
-    "meta_description": "Dental bills use CDT codes, not CPT codes. Learn how dental billing works, what common procedures cost, insurance coverage tiers, and how to fight overcharges.",
+    "meta_description": "Dental bills use CDT codes, not CPT codes. Learn how dental billing works, what common procedures cost, insurance coverage tiers, and how to fight.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",
@@ -224,11 +224,11 @@ register("understanding-dental-billing", {
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.ada.org/publications/cdt" target="_blank" rel="noopener">American Dental Association: CDT Code Reference Guide (2026)</a></li>
-    <li>National Association of Dental Plans: Dental Benefits Report (2025)</li>
-    <li><a href="https://www.bls.gov/cpi/factsheets/medical-care.htm" target="_blank" rel="noopener">U.S. Bureau of Labor Statistics: Dental Services Consumer Price Index</a></li>
-    <li><a href="https://meps.ahrq.gov/data_files/publications/st555/stat555.shtml" target="_blank" rel="noopener">Agency for Healthcare Research and Quality: Dental Care Utilization and Expenditures</a></li>
-    <li><a href="https://www.adea.org/godental/Apply/resources-and-faqs/where-to-apply" target="_blank" rel="noopener">American Dental Education Association: Dental School Clinic Directory</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American Dental Association: CDT Code Reference Guide (2026)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">National Association of Dental Plans: Dental Benefits Report (2025)</a></li>
+    <li><a href="#" target="_blank" rel="noopener">U.S. Bureau of Labor Statistics: Dental Services Consumer Price Index</a></li>
+    <li><a href="#" target="_blank" rel="noopener">Agency for Healthcare Research and Quality: Dental Care Utilization and Expenditures</a></li>
+    <li><a href="#" target="_blank" rel="noopener">American Dental Education Association: Dental School Clinic Directory</a></li>
 </ul>
 """,
 })

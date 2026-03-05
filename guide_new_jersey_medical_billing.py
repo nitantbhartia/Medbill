@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("new-jersey-medical-billing-laws", {
-    "title": "New Jersey Medical Billing Laws: Surprise Bill Protections, Charity Care, and How to Fight Your Bill (2026)",
-    "meta_description": "New Jersey has nation-leading charity care laws covering all hospitals, strong surprise billing protections, and a formal arbitration process. Learn how to cut your NJ medical bill.",
+    "title": "New Jersey Medical Billing Laws: Surprise Bill Protections",
+    "meta_description": "New Jersey has nation-leading charity care laws covering all hospitals, strong surprise billing protections, and a formal arbitration process.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

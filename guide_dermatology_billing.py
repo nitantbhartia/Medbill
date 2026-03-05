@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("dermatology-billing", {
-    "title": "Dermatology Billing: Mohs Surgery, Biopsies, and Common Overcharges",
-    "meta_description": "Dermatology bills are full of upcoded biopsies, unbundled Mohs surgery fees, and cosmetic-vs-medical disputes. Learn CPT codes, fair prices, and how to fight overcharges.",
+    "title": "Dermatology Billing: Mohs Surgery",
+    "meta_description": "Dermatology bills are full of upcoded biopsies, unbundled Mohs surgery fees, and cosmetic-vs-medical disputes.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",

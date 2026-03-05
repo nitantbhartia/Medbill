@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("surprise-medical-bills-after-surgery", {
-    "title": "Surprise Medical Bills After Surgery: Why They Happen and How to Fight Them",
-    "meta_description": "Got an unexpected bill after surgery from the anesthesiologist, assistant surgeon, or lab? Learn why post-surgery surprise bills happen and exactly how to fight each type.",
+    "title": "Surprise Medical Bills After Surgery: Why They Happen",
+    "meta_description": "Got an unexpected bill after surgery from the anesthesiologist, assistant surgeon, or lab? Learn why post-surgery surprise bills happen and exactly how to.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

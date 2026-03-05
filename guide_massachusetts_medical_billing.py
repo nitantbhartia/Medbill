@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("massachusetts-medical-billing-laws", {
-    "title": "Massachusetts Medical Billing Laws: Health Safety Net, MassHealth, and Patient Protections (2026)",
-    "meta_description": "Massachusetts has near-universal coverage and unique billing protections including the Health Safety Net, Chapter 93A treble damages, and MassHealth retroactive coverage.",
+    "title": "Massachusetts Medical Billing Laws: Health Safety Net",
+    "meta_description": "Massachusetts has near-universal coverage and unique billing protections including the Health Safety Net, Chapter 93A treble damages, and MassHealth.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",
