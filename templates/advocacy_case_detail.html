@@ -35,6 +35,7 @@
             <button onclick="showSection('analysis')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="analysis">Analysis</button>
             <button onclick="showSection('letters')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="letters">Letters</button>
             <button onclick="showSection('notes')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="notes">Notes</button>
+            <button onclick="showSection('comms')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="comms">Communications</button>
             <button onclick="showSection('activity')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="activity">Activity</button>
             <button onclick="showSection('sharing')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap" data-tab="sharing">Share</button>
         </div>
@@ -158,9 +159,53 @@
                             <div class="font-medium text-sm">Debt Validation</div>
                             <div class="text-xs text-gray-500 mt-1">Require collector to prove debt is valid (FDCPA)</div>
                         </button>
+                        <button onclick="generateLetter('cease_desist')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Cease & Desist</div>
+                            <div class="text-xs text-gray-500 mt-1">Stop all collector contact (FDCPA &sect; 1692c)</div>
+                        </button>
+                        <button onclick="generateLetter('dispute_amount')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Dispute Amount</div>
+                            <div class="text-xs text-gray-500 mt-1">Challenge the dollar amount claimed by collector</div>
+                        </button>
+                        <button onclick="generateLetter('settlement')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Settlement Offer</div>
+                            <div class="text-xs text-gray-500 mt-1">Pay-for-delete offer with credit bureau removal</div>
+                        </button>
                     </div>
                 </div>
                 <div id="letters-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Communications section -->
+        <div id="sec-comms" class="section hidden">
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold">Communications</h2>
+                    <button onclick="showLogResponseForm()" class="px-3 py-1.5 text-xs border border-gray-200 rounded-full hover:bg-gray-50">+ Log Response</button>
+                </div>
+                <div id="log-response-form" class="hidden mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Channel</label>
+                            <select id="resp-channel" class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg">
+                                <option value="email">Email</option>
+                                <option value="phone">Phone</option>
+                                <option value="mail">Mail</option>
+                                <option value="fax">Fax</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Subject</label>
+                            <input type="text" id="resp-subject" placeholder="e.g. Hospital responded" class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg">
+                        </div>
+                    </div>
+                    <textarea id="resp-notes" rows="2" placeholder="Notes about the response..."
+                        class="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg"></textarea>
+                    <button onclick="logResponse()" class="px-4 py-1.5 bg-gray-900 text-white text-xs rounded-full hover:bg-gray-800">Save</button>
+                </div>
+                <div id="comms-list" class="space-y-2"></div>
+                <div id="comms-empty" class="text-center text-gray-400 text-sm py-4 hidden">No communications recorded.</div>
             </div>
         </div>
 
@@ -228,6 +273,7 @@ const ACTION_LABELS = {
     letter_edited: 'Letter edited', letter_reviewed: 'Letter reviewed', letter_sent: 'Letter sent',
     note_added: 'Note added', share_link_created: 'Share link created', share_link_revoked: 'Share link revoked',
     status_changed: 'Status changed', case_assigned: 'Case reassigned',
+    letter_emailed: 'Letter emailed', response_received: 'Response received',
 };
 
 function showSection(name) {
@@ -240,6 +286,7 @@ function showSection(name) {
         btn.classList.toggle('border-transparent', !active);
         btn.classList.toggle('text-gray-500', !active);
     });
+    if (name === 'comms') loadComms();
     if (name === 'activity') loadActivity();
     if (name === 'sharing') loadShareLinks();
 }
@@ -442,7 +489,7 @@ async function loadLetters() {
     const list = document.getElementById('letters-list');
     if (!resp.data.length) { list.innerHTML = ''; return; }
 
-    const TYPE_LABELS = {hospital_dispute: 'Hospital Dispute', insurance_appeal: 'Insurance Appeal', charity_care: 'Charity Care', debt_validation: 'Debt Validation'};
+    const TYPE_LABELS = {hospital_dispute: 'Hospital Dispute', insurance_appeal: 'Insurance Appeal', charity_care: 'Charity Care', debt_validation: 'Debt Validation', cease_desist: 'Cease & Desist', dispute_amount: 'Dispute Amount', settlement: 'Settlement Offer'};
     list.innerHTML = resp.data.map(l => `
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-3">
@@ -457,6 +504,7 @@ async function loadLetters() {
                     <button onclick="showVersions(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">History</button>
                     ${!l.reviewed ? `<button onclick="reviewLetter(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">Mark Reviewed</button>` : ''}
                     ${!l.marked_sent ? `<button onclick="markSent(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">Mark Sent</button>` : ''}
+                    ${!l.marked_sent ? `<button onclick="showEmailDialog(${l.id})" class="px-3 py-1 text-xs bg-green-700 text-white rounded-full hover:bg-green-800">Send Email</button>` : ''}
                 </div>
             </div>
             <textarea id="letter-${l.id}" rows="12" class="w-full text-sm font-mono p-3 border border-gray-200 rounded-lg" data-updated="${l.updated_at}">${esc(l.content)}</textarea>
@@ -521,6 +569,67 @@ async function restoreVersion(letterId, versionId) {
     if (!confirm('Restore this version? Current content will be saved as a version.')) return;
     await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters/${letterId}/versions/${versionId}/restore`, {method: 'POST'});
     loadLetters();
+}
+
+// Email sending
+async function showEmailDialog(letterId) {
+    const email = prompt('Enter recipient email (hospital billing department):');
+    if (!email) return;
+    try {
+        await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters/${letterId}/email`, {
+            method: 'POST',
+            body: JSON.stringify({recipient_email: email}),
+        });
+        alert('Email sent successfully!');
+        loadLetters();
+        loadCase();
+    } catch (e) {
+        alert('Failed to send: ' + e.message);
+    }
+}
+
+// Communications
+async function loadComms() {
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/communications`);
+    const list = document.getElementById('comms-list');
+    const empty = document.getElementById('comms-empty');
+    if (!resp.data.length) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    list.innerHTML = resp.data.map(c => `
+        <div class="flex items-start gap-3 p-3 rounded-lg ${c.direction === 'outbound' ? 'bg-blue-50' : 'bg-green-50'}">
+            <div class="w-2 h-2 mt-1.5 rounded-full ${c.direction === 'outbound' ? 'bg-blue-500' : 'bg-green-500'} flex-shrink-0"></div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium">${c.direction === 'outbound' ? 'Sent' : 'Received'}</span>
+                    <span class="text-xs px-1.5 py-0.5 bg-white rounded border border-gray-200">${esc(c.channel)}</span>
+                    ${c.status === 'failed' ? '<span class="text-xs px-1.5 py-0.5 bg-red-100 text-red-700 rounded">Failed</span>' : ''}
+                </div>
+                ${c.subject ? `<div class="text-sm text-gray-700 mt-0.5">${esc(c.subject)}</div>` : ''}
+                ${c.recipient_email ? `<div class="text-xs text-gray-500">To: ${esc(c.recipient_email)}</div>` : ''}
+                ${c.error_message && c.direction === 'inbound' ? `<div class="text-xs text-gray-500 mt-0.5">${esc(c.error_message)}</div>` : ''}
+                <div class="text-xs text-gray-400 mt-0.5">${esc(c.sent_by_name || '')} &mdash; ${new Date(c.created_at + 'Z').toLocaleString()}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showLogResponseForm() {
+    document.getElementById('log-response-form').classList.toggle('hidden');
+}
+
+async function logResponse() {
+    const channel = document.getElementById('resp-channel').value;
+    const subject = document.getElementById('resp-subject').value;
+    const notes = document.getElementById('resp-notes').value;
+    if (!subject.trim()) { alert('Subject is required'); return; }
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/communications`, {
+        method: 'POST',
+        body: JSON.stringify({channel, subject, notes}),
+    });
+    document.getElementById('resp-subject').value = '';
+    document.getElementById('resp-notes').value = '';
+    document.getElementById('log-response-form').classList.add('hidden');
+    loadComms();
 }
 
 // Notes

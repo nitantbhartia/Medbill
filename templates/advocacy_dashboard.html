@@ -60,6 +60,38 @@
             </div>
         </div>
 
+        <!-- Two-column: aging + letter stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Case aging -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4">Case Aging (Open Cases)</h2>
+                <div id="aging-breakdown" class="space-y-2"></div>
+                <div id="aging-empty" class="text-sm text-gray-400 text-center py-4 hidden">No open cases.</div>
+            </div>
+
+            <!-- Letter effectiveness -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4">Letter Effectiveness</h2>
+                <div id="letter-stats" class="space-y-2"></div>
+                <div id="letter-stats-empty" class="text-sm text-gray-400 text-center py-4 hidden">No letters generated yet.</div>
+            </div>
+        </div>
+
+        <!-- Communications summary -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="font-semibold mb-4">Communications</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div id="stat-emails-sent" class="text-2xl font-bold text-blue-700">0</div>
+                    <div class="text-xs text-gray-500 mt-1">Emails Sent</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div id="stat-responses" class="text-2xl font-bold text-green-700">0</div>
+                    <div class="text-xs text-gray-500 mt-1">Responses Received</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Quick export -->
         <div class="flex items-center gap-3">
             <button onclick="exportCSV()" class="px-4 py-2 text-sm border border-gray-200 rounded-full hover:bg-gray-50">Export All Cases (CSV)</button>
@@ -180,9 +212,70 @@ async function exportJSON() {
     URL.revokeObjectURL(url);
 }
 
+const LETTER_TYPE_LABELS = {
+    hospital_dispute: 'Hospital Dispute', insurance_appeal: 'Insurance Appeal',
+    charity_care: 'Charity Care', debt_validation: 'Debt Validation',
+    cease_desist: 'Cease & Desist', dispute_amount: 'Dispute Amount', settlement: 'Settlement',
+};
+
+const AGING_LABELS = {under_7_days: '< 7 days', '7_to_30_days': '7-30 days', '30_to_60_days': '30-60 days', over_60_days: '> 60 days'};
+const AGING_COLORS = {under_7_days: 'bg-green-400', '7_to_30_days': 'bg-yellow-400', '30_to_60_days': 'bg-orange-400', over_60_days: 'bg-red-400'};
+
+async function loadFunnel() {
+    if (!currentOrg) return;
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/dashboard/funnel`);
+        const d = resp.data;
+
+        // Aging breakdown
+        const agingEl = document.getElementById('aging-breakdown');
+        const agingEmpty = document.getElementById('aging-empty');
+        const totalOpen = Object.values(d.aging).reduce((a, b) => a + b, 0);
+        if (totalOpen === 0) { agingEl.innerHTML = ''; agingEmpty.classList.remove('hidden'); }
+        else {
+            agingEmpty.classList.add('hidden');
+            agingEl.innerHTML = Object.entries(d.aging).map(([k, v]) => {
+                const pct = Math.round(v / totalOpen * 100);
+                return `
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm w-24">${AGING_LABELS[k] || k}</span>
+                        <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+                            <div class="${AGING_COLORS[k] || 'bg-gray-300'} h-5 rounded-full" style="width: ${Math.max(pct, 2)}%"></div>
+                        </div>
+                        <span class="text-sm font-medium w-8 text-right">${v}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Letter stats
+        const letterEl = document.getElementById('letter-stats');
+        const letterEmpty = document.getElementById('letter-stats-empty');
+        if (!d.letter_stats.length) { letterEl.innerHTML = ''; letterEmpty.classList.remove('hidden'); }
+        else {
+            letterEmpty.classList.add('hidden');
+            letterEl.innerHTML = d.letter_stats.map(s => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span class="text-sm font-medium">${LETTER_TYPE_LABELS[s.letter_type] || s.letter_type}</span>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span>${s.total} generated</span>
+                        <span class="text-blue-600">${s.sent} sent</span>
+                        <span class="text-green-600">${s.resolved_positive} resolved</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Communications
+        document.getElementById('stat-emails-sent').textContent = d.communications.emails_sent;
+        document.getElementById('stat-responses').textContent = d.communications.responses_received;
+    } catch (e) { /* funnel is supplementary */ }
+}
+
 function onWorkspaceReady() {
     if (!currentOrg) { window.location.href = '/advocacy/setup'; return; }
     loadDashboard();
+    loadFunnel();
 }
 </script>
 {% endblock %}

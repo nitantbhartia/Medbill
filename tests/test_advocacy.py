@@ -886,3 +886,145 @@ class TestCaseTemplates:
             if t.get("builtin"):
                 assert "tags" in t["default_fields"]
                 assert "notes" in t["default_fields"]
+
+
+class TestNewLetterTypes:
+    def test_generate_cease_desist(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "cease_desist",
+            "fields": {"collector_name": "ABC Collections", "collector_address": "123 Main St"},
+        })
+        assert resp.status_code == 200
+        assert "cease" in resp.json()["data"]["content"].lower() or "contact" in resp.json()["data"]["content"].lower()
+
+    def test_generate_dispute_amount(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "dispute_amount",
+            "fields": {"collector_name": "XYZ Debt", "dispute_reason": "Amount is incorrect"},
+        })
+        assert resp.status_code == 200
+        content = resp.json()["data"]["content"]
+        assert len(content) > 100
+
+    def test_generate_settlement(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "settlement",
+            "fields": {"collector_name": "ABC Collections", "offer_amount": "3000"},
+        })
+        assert resp.status_code == 200
+        content = resp.json()["data"]["content"]
+        assert "settlement" in content.lower()
+
+    def test_invalid_letter_type(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "not_a_type",
+        })
+        assert resp.status_code == 400
+
+
+class TestEmailSending:
+    def test_send_letter_email_no_resend_key(self):
+        """Without RESEND_API_KEY, email is skipped (not failed)."""
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        # Generate a letter first
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "hospital_dispute", "fields": {},
+        })
+        letters = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters").json()["data"]
+        letter_id = letters[0]["id"]
+
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/email", json={
+            "recipient_email": "billing@hospital.com",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["status"] == "skipped"  # no API key
+
+    def test_send_letter_email_invalid_email(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "hospital_dispute", "fields": {},
+        })
+        letters = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters").json()["data"]
+        letter_id = letters[0]["id"]
+
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/email", json={
+            "recipient_email": "not-an-email",
+        })
+        assert resp.status_code == 400
+
+
+class TestCommunicationLog:
+    def test_log_inbound_communication(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/communications", json={
+            "channel": "phone",
+            "subject": "Hospital called back",
+            "notes": "They agreed to review the bill",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["id"]
+
+    def test_list_communications(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        # Log a response
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/communications", json={
+            "channel": "email", "subject": "Hospital response", "notes": "",
+        })
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/communications")
+        assert resp.status_code == 200
+        assert len(resp.json()["data"]) == 1
+        assert resp.json()["data"][0]["direction"] == "inbound"
+
+    def test_empty_communications(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/communications")
+        assert resp.status_code == 200
+        assert len(resp.json()["data"]) == 0
+
+
+class TestDashboardFunnel:
+    def test_funnel_empty(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/dashboard/funnel")
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert "funnel" in data
+        assert "aging" in data
+        assert "letter_stats" in data
+        assert "communications" in data
+
+    def test_funnel_with_data(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        # Generate a letter
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "hospital_dispute", "fields": {},
+        })
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/dashboard/funnel")
+        data = resp.json()["data"]
+        assert data["aging"]["under_7_days"] >= 1
+        assert len(data["letter_stats"]) >= 1

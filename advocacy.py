@@ -16,7 +16,8 @@ import scanner
 from compliance import scrub_extracted_data
 from db import get_db
 from dispute_workflow import build_dispute_letter, build_appeal_letter
-from debt_fighter import generate_fdcpa_letter, generate_charity_care_letter, LEGAL_DISCLAIMER
+from debt_fighter import generate_fdcpa_letter, generate_charity_care_letter, generate_settlement_letter, LEGAL_DISCLAIMER
+import email_service
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +35,10 @@ VALID_STATUSES = {
 
 VALID_DOC_TYPES = {"hospital_bill", "eob", "denial_letter", "itemized_bill", "other"}
 
-LETTER_TYPES = {"insurance_appeal", "hospital_dispute", "charity_care", "debt_validation"}
+LETTER_TYPES = {
+    "insurance_appeal", "hospital_dispute", "charity_care",
+    "debt_validation", "cease_desist", "dispute_amount", "settlement",
+}
 
 VALID_OUTCOMES = {"resolved_reduced", "resolved_forgiven", "resolved_denied", "unknown"}
 
@@ -630,13 +634,27 @@ def _build_recommendations(analysis: dict, extracted: dict, case: dict) -> list[
             "based_on": ["Charges significantly exceed Medicare benchmark rates."],
         })
 
-    # Debt validation if this looks like a collections case
+    # Debt-related letters if this looks like a collections case
     if case.get("tags") and "collections" in (case.get("tags") or "").lower():
         recommendations.append({
             "action": "Generate debt validation letter",
             "letter_type": "debt_validation",
             "priority": 1,
             "reason": "Case tagged as collections. Debt validation letter protects patient rights under FDCPA.",
+            "based_on": ["Case metadata indicates collection activity."],
+        })
+        recommendations.append({
+            "action": "Generate cease & desist letter",
+            "letter_type": "cease_desist",
+            "priority": 3,
+            "reason": "Stop collector contact if patient is being harassed (FDCPA § 1692c).",
+            "based_on": ["Case metadata indicates collection activity."],
+        })
+        recommendations.append({
+            "action": "Generate settlement offer",
+            "letter_type": "settlement",
+            "priority": 4,
+            "reason": "Negotiate a pay-for-delete settlement to reduce debt and remove from credit reports.",
             "based_on": ["Case metadata indicates collection activity."],
         })
 
@@ -725,15 +743,28 @@ def generate_letter(case_id: int, org_id: int, user_id: int, letter_type: str,
         )
         content = result.get("letter_text")
 
-    elif letter_type == "debt_validation":
+    elif letter_type in ("debt_validation", "cease_desist", "dispute_amount"):
         result = generate_fdcpa_letter(
-            letter_type="debt_validation",
+            letter_type=letter_type,
             user_name=patient_name,
             user_address=fields.get("patient_address", "[Patient Address]"),
             collector_name=fields.get("collector_name", "[Collector Name]"),
             collector_address=fields.get("collector_address", "[Collector Address]"),
             account_number=account_number,
             amount=str(case.get("bill_amount") or fields.get("amount", "0")),
+            dispute_reason=fields.get("dispute_reason", ""),
+        )
+        content = result.get("letter_text")
+
+    elif letter_type == "settlement":
+        result = generate_settlement_letter(
+            user_name=patient_name,
+            user_address=fields.get("patient_address", "[Patient Address]"),
+            collector_name=fields.get("collector_name", "[Collector Name]"),
+            collector_address=fields.get("collector_address", "[Collector Address]"),
+            account_number=account_number,
+            original_amount=str(case.get("bill_amount") or fields.get("original_amount", "0")),
+            offer_amount=str(fields.get("offer_amount", "0")),
         )
         content = result.get("letter_text")
 
@@ -1355,3 +1386,150 @@ def delete_template(template_id: int, org_id: int) -> None:
         )
         if result.rowcount == 0:
             raise HTTPException(404, "Template not found")
+
+
+# ── Email Sending ────────────────────────────────────────────────────────────
+
+def send_letter_email(case_id: int, org_id: int, letter_id: int, user_id: int,
+                      recipient_email: str) -> dict:
+    """Send a letter via email and log the communication."""
+    recipient_email = (recipient_email or "").strip()
+    if not recipient_email or "@" not in recipient_email:
+        raise HTTPException(400, "Valid recipient email is required")
+
+    case = get_case(case_id, org_id)
+    letters = get_case_letters(case_id, org_id)
+    letter = next((l for l in letters if l["id"] == letter_id), None)
+    if not letter:
+        raise HTTPException(404, "Letter not found")
+
+    patient_name = case.get("patient_label", "Patient")
+    hospital_name = case.get("hospital_name", "Provider")
+    subject = f"Formal Billing Dispute — {patient_name} — {hospital_name}"
+
+    try:
+        sent = email_service.send_dispute_to_hospital(
+            to=recipient_email,
+            subject=subject,
+            letter_text=letter["content"],
+            patient_name=patient_name,
+        )
+    except RuntimeError as e:
+        _log_communication(case_id, letter_id, recipient_email, subject, "failed", str(e), user_id)
+        raise HTTPException(502, f"Email delivery failed: {e}")
+
+    status = "sent" if sent else "skipped"
+    _log_communication(case_id, letter_id, recipient_email, subject, status, None, user_id)
+
+    if sent:
+        mark_letter_sent(letter_id, case_id, org_id)
+        log_activity(case_id, user_id, "letter_emailed", f"Letter emailed to {recipient_email}")
+
+    return {"status": status, "recipient": recipient_email, "letter_id": letter_id}
+
+
+def _log_communication(case_id: int, letter_id: int, recipient_email: str,
+                       subject: str, status: str, error: str, user_id: int) -> None:
+    with get_db() as db:
+        db.execute(
+            """INSERT INTO case_communications
+               (case_id, letter_id, direction, channel, recipient_email, subject, status, error_message, sent_by)
+               VALUES (?, ?, 'outbound', 'email', ?, ?, ?, ?, ?)""",
+            (case_id, letter_id, recipient_email, subject, status, error, user_id),
+        )
+
+
+def log_inbound_communication(case_id: int, org_id: int, user_id: int,
+                              channel: str, subject: str, notes: str) -> dict:
+    """Log an inbound communication (response received from hospital/insurance)."""
+    _ = get_case(case_id, org_id)
+    with get_db() as db:
+        cursor = db.execute(
+            """INSERT INTO case_communications
+               (case_id, direction, channel, subject, status, error_message, sent_by)
+               VALUES (?, 'inbound', ?, ?, 'received', ?, ?)""",
+            (case_id, channel, subject, notes, user_id),
+        )
+        log_activity(case_id, user_id, "response_received", f"{channel}: {subject}", db=db)
+    return {"id": cursor.lastrowid}
+
+
+def get_communications(case_id: int, org_id: int) -> list[dict]:
+    """Get all communications for a case."""
+    _ = get_case(case_id, org_id)
+    with get_db() as db:
+        rows = db.execute(
+            """SELECT c.*, u.name as sent_by_name
+               FROM case_communications c
+               LEFT JOIN users u ON c.sent_by = u.id
+               WHERE c.case_id = ?
+               ORDER BY c.created_at DESC""",
+            (case_id,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ── Enhanced Dashboard Stats ─────────────────────────────────────────────────
+
+def get_dashboard_funnel(org_id: int) -> dict:
+    """Get case funnel metrics and per-letter-type stats."""
+    with get_db() as db:
+        # Funnel: count of cases that reached each status
+        funnel_rows = db.execute(
+            """SELECT status, COUNT(*) as count
+               FROM advocacy_cases WHERE org_id = ?
+               GROUP BY status""",
+            (org_id,),
+        ).fetchall()
+        funnel = {r["status"]: r["count"] for r in funnel_rows}
+
+        # Letter type success rates
+        letter_stats = db.execute(
+            """SELECT l.letter_type,
+                      COUNT(*) as total,
+                      SUM(CASE WHEN l.marked_sent = 1 THEN 1 ELSE 0 END) as sent,
+                      SUM(CASE WHEN c.outcome IN ('resolved_reduced', 'resolved_forgiven') THEN 1 ELSE 0 END) as resolved_positive
+               FROM case_letters l
+               JOIN advocacy_cases c ON l.case_id = c.id
+               WHERE c.org_id = ?
+               GROUP BY l.letter_type""",
+            (org_id,),
+        ).fetchall()
+
+        # Aging breakdown
+        aging = db.execute(
+            """SELECT
+                 SUM(CASE WHEN julianday('now') - julianday(created_at) <= 7 THEN 1 ELSE 0 END) as week_1,
+                 SUM(CASE WHEN julianday('now') - julianday(created_at) > 7 AND julianday('now') - julianday(created_at) <= 30 THEN 1 ELSE 0 END) as week_2_4,
+                 SUM(CASE WHEN julianday('now') - julianday(created_at) > 30 AND julianday('now') - julianday(created_at) <= 60 THEN 1 ELSE 0 END) as month_2,
+                 SUM(CASE WHEN julianday('now') - julianday(created_at) > 60 THEN 1 ELSE 0 END) as over_60
+               FROM advocacy_cases
+               WHERE org_id = ? AND status NOT IN ('resolved', 'closed')""",
+            (org_id,),
+        ).fetchone()
+
+        # Communications summary
+        comms = db.execute(
+            """SELECT
+                 SUM(CASE WHEN direction = 'outbound' THEN 1 ELSE 0 END) as emails_sent,
+                 SUM(CASE WHEN direction = 'inbound' THEN 1 ELSE 0 END) as responses_received
+               FROM case_communications cc
+               JOIN advocacy_cases c ON cc.case_id = c.id
+               WHERE c.org_id = ?""",
+            (org_id,),
+        ).fetchone()
+
+    return {
+        "funnel": funnel,
+        "letter_stats": [dict(r) for r in letter_stats],
+        "aging": {
+            "under_7_days": aging["week_1"] or 0,
+            "7_to_30_days": aging["week_2_4"] or 0,
+            "30_to_60_days": aging["month_2"] or 0,
+            "over_60_days": aging["over_60"] or 0,
+        },
+        "communications": {
+            "emails_sent": (comms["emails_sent"] or 0) if comms else 0,
+            "responses_received": (comms["responses_received"] or 0) if comms else 0,
+        },
+    }

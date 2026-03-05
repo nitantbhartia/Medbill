@@ -1248,6 +1248,26 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_case_templates_org ON case_templates(org_id)")
 
+    # Communication log (sent emails, responses, delivery tracking)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_communications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            letter_id INTEGER REFERENCES case_letters(id),
+            direction TEXT NOT NULL DEFAULT 'outbound',
+            channel TEXT NOT NULL DEFAULT 'email',
+            recipient_email TEXT,
+            subject TEXT,
+            status TEXT NOT NULL DEFAULT 'sent',
+            error_message TEXT,
+            sent_by INTEGER REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_comms_case ON case_communications(case_id)")
+
 
 SCHEMA = """
 -- Users

@@ -573,3 +573,52 @@ async def delete_template(request: Request, org_id: int, template_id: int):
     require_org_writer(request, org_id)
     advocacy.delete_template(template_id, org_id)
     return JSONResponse({"status": "ok"})
+
+
+# ── Email Sending endpoint ──────────────────────────────────────────────────
+
+@router.post("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/email")
+async def send_letter_email(request: Request, org_id: int, case_id: int, letter_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.send_letter_email(
+        case_id=case_id,
+        org_id=org_id,
+        letter_id=letter_id,
+        user_id=member["id"],
+        recipient_email=payload.get("recipient_email", ""),
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+# ── Communication Log endpoints ─────────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/cases/{case_id}/communications")
+async def list_communications(request: Request, org_id: int, case_id: int):
+    org_management.require_org_member(request, org_id)
+    comms = advocacy.get_communications(case_id, org_id)
+    return JSONResponse({"status": "ok", "data": comms})
+
+
+@router.post("/orgs/{org_id}/cases/{case_id}/communications")
+async def log_communication(request: Request, org_id: int, case_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.log_inbound_communication(
+        case_id=case_id,
+        org_id=org_id,
+        user_id=member["id"],
+        channel=payload.get("channel", "email"),
+        subject=payload.get("subject", ""),
+        notes=payload.get("notes", ""),
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+# ── Dashboard Funnel endpoint ───────────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/dashboard/funnel")
+async def get_dashboard_funnel(request: Request, org_id: int):
+    org_management.require_org_member(request, org_id)
+    result = advocacy.get_dashboard_funnel(org_id)
+    return JSONResponse({"status": "ok", "data": result})
