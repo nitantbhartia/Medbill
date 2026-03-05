@@ -535,6 +535,11 @@ async def advocacy_team_page(request: Request):
     return templates.TemplateResponse("advocacy_team.html", {"request": request})
 
 
+@app.get("/advocacy/shared/{token}", response_class=HTMLResponse)
+async def advocacy_shared_case_page(request: Request, token: str):
+    return templates.TemplateResponse("advocacy_shared_case.html", {"request": request, "share_token": token})
+
+
 @app.get("/scan", response_class=HTMLResponse)
 async def scan_page(request: Request):
     return templates.TemplateResponse("scan.html", {"request": request, "outcome_stats": get_outcome_stats()})

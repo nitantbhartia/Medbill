@@ -13,6 +13,7 @@ import config
 import advocacy
 import auth
 import org_management
+from org_management import require_org_writer
 
 log = logging.getLogger(__name__)
 
@@ -130,7 +131,7 @@ async def remove_member(request: Request, org_id: int, member_id: int):
 
 @router.post("/orgs/{org_id}/cases")
 async def create_case(request: Request, org_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     case = advocacy.create_case(
         org_id=org_id,
@@ -172,7 +173,7 @@ async def get_case(request: Request, org_id: int, case_id: int):
 
 @router.patch("/orgs/{org_id}/cases/{case_id}")
 async def update_case(request: Request, org_id: int, case_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     case = advocacy.update_case(case_id, org_id, **payload)
     return JSONResponse({"status": "ok", "data": case})
@@ -188,7 +189,7 @@ async def upload_document(
     file: UploadFile = File(...),
     doc_type: str = Form("other"),
 ):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
 
     mime = file.content_type or ""
     if mime not in ALLOWED_MIME_TYPES:
@@ -240,7 +241,7 @@ async def download_document(request: Request, org_id: int, case_id: int, doc_id:
 
 @router.delete("/orgs/{org_id}/cases/{case_id}/documents/{doc_id}")
 async def delete_document(request: Request, org_id: int, case_id: int, doc_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     advocacy.delete_document(doc_id, case_id, org_id)
     return JSONResponse({"status": "ok"})
 
@@ -249,7 +250,7 @@ async def delete_document(request: Request, org_id: int, case_id: int, doc_id: i
 
 @router.post("/orgs/{org_id}/cases/{case_id}/overrides")
 async def set_override(request: Request, org_id: int, case_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     result = advocacy.set_override(
         case_id=case_id,
@@ -290,7 +291,7 @@ async def get_analysis(request: Request, org_id: int, case_id: int):
 
 @router.post("/orgs/{org_id}/cases/{case_id}/letters")
 async def generate_letter(request: Request, org_id: int, case_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     result = advocacy.generate_letter(
         case_id=case_id,
@@ -311,7 +312,7 @@ async def list_letters(request: Request, org_id: int, case_id: int):
 
 @router.patch("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}")
 async def update_letter(request: Request, org_id: int, case_id: int, letter_id: int):
-    org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     result = advocacy.update_letter(
         letter_id=letter_id,
@@ -319,20 +320,21 @@ async def update_letter(request: Request, org_id: int, case_id: int, letter_id: 
         org_id=org_id,
         content=payload.get("content", ""),
         expected_updated_at=payload.get("expected_updated_at"),
+        user_id=member["id"],
     )
     return JSONResponse({"status": "ok", "data": result})
 
 
 @router.post("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/review")
 async def review_letter(request: Request, org_id: int, case_id: int, letter_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     result = advocacy.mark_letter_reviewed(letter_id, case_id, org_id, member["id"])
     return JSONResponse({"status": "ok", "data": result})
 
 
 @router.post("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/sent")
 async def mark_sent(request: Request, org_id: int, case_id: int, letter_id: int):
-    org_management.require_org_member(request, org_id)
+    require_org_writer(request, org_id)
     payload = await request.json()
     result = advocacy.mark_letter_sent(
         letter_id, case_id, org_id,
@@ -392,7 +394,7 @@ def _render_letter_pdf(content: str, letter_type: str) -> bytes:
 
 @router.post("/orgs/{org_id}/cases/{case_id}/notes")
 async def add_note(request: Request, org_id: int, case_id: int):
-    member = org_management.require_org_member(request, org_id)
+    member = require_org_writer(request, org_id)
     payload = await request.json()
     result = advocacy.add_note(case_id, org_id, member["id"], payload.get("content", ""))
     return JSONResponse({"status": "ok", "data": result})
@@ -403,3 +405,106 @@ async def list_notes(request: Request, org_id: int, case_id: int):
     org_management.require_org_member(request, org_id)
     notes = advocacy.get_case_notes(case_id, org_id)
     return JSONResponse({"status": "ok", "data": notes})
+
+
+# ── Activity Timeline endpoints ─────────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/cases/{case_id}/activity")
+async def get_activity(request: Request, org_id: int, case_id: int):
+    org_management.require_org_member(request, org_id)
+    limit = int(request.query_params.get("limit", 100))
+    activity = advocacy.get_activity(case_id, org_id, limit=min(limit, 500))
+    return JSONResponse({"status": "ok", "data": activity})
+
+
+# ── Share Link endpoints ────────────────────────────────────────────────────
+
+@router.post("/orgs/{org_id}/cases/{case_id}/share")
+async def create_share_link(request: Request, org_id: int, case_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.create_share_link(
+        case_id=case_id,
+        org_id=org_id,
+        user_id=member["id"],
+        label=payload.get("label"),
+        expires_days=payload.get("expires_days"),
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+@router.get("/orgs/{org_id}/cases/{case_id}/share")
+async def list_share_links(request: Request, org_id: int, case_id: int):
+    org_management.require_org_member(request, org_id)
+    links = advocacy.list_share_links(case_id, org_id)
+    return JSONResponse({"status": "ok", "data": links})
+
+
+@router.delete("/orgs/{org_id}/cases/{case_id}/share/{link_id}")
+async def revoke_share_link(request: Request, org_id: int, case_id: int, link_id: int):
+    require_org_writer(request, org_id)
+    advocacy.revoke_share_link(link_id, case_id, org_id)
+    return JSONResponse({"status": "ok"})
+
+
+@router.get("/shared/{token}")
+async def get_shared_case(token: str):
+    """Public endpoint — no auth required. Returns read-only case view."""
+    case = advocacy.get_shared_case(token)
+    return JSONResponse({"status": "ok", "data": case})
+
+
+# ── Letter Version History endpoints ────────────────────────────────────────
+
+@router.get("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions")
+async def get_letter_versions(request: Request, org_id: int, case_id: int, letter_id: int):
+    org_management.require_org_member(request, org_id)
+    versions = advocacy.get_letter_versions(letter_id, case_id, org_id)
+    return JSONResponse({"status": "ok", "data": versions})
+
+
+@router.post("/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions/{version_id}/restore")
+async def restore_letter_version(request: Request, org_id: int, case_id: int, letter_id: int, version_id: int):
+    member = require_org_writer(request, org_id)
+    result = advocacy.restore_letter_version(version_id, letter_id, case_id, org_id, member["id"])
+    return JSONResponse({"status": "ok", "data": result})
+
+
+# ── Bulk Operations endpoints ───────────────────────────────────────────────
+
+@router.post("/orgs/{org_id}/cases/bulk/status")
+async def bulk_update_status(request: Request, org_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.bulk_update_status(
+        org_id=org_id,
+        case_ids=payload.get("case_ids", []),
+        status=payload.get("status", ""),
+        user_id=member["id"],
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+@router.post("/orgs/{org_id}/cases/bulk/assign")
+async def bulk_assign(request: Request, org_id: int):
+    member = require_org_writer(request, org_id)
+    payload = await request.json()
+    result = advocacy.bulk_assign(
+        org_id=org_id,
+        case_ids=payload.get("case_ids", []),
+        assigned_to=payload.get("assigned_to", 0),
+        user_id=member["id"],
+    )
+    return JSONResponse({"status": "ok", "data": result})
+
+
+@router.post("/orgs/{org_id}/cases/bulk/export")
+async def bulk_export(request: Request, org_id: int):
+    org_management.require_org_member(request, org_id)
+    payload = await request.json()
+    result = advocacy.bulk_export(
+        org_id=org_id,
+        case_ids=payload.get("case_ids"),
+        status=payload.get("status"),
+    )
+    return JSONResponse({"status": "ok", "data": result})

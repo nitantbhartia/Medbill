@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Case — BillKarma</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { background: #F9FAFB; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }</style>
+</head>
+<body class="text-gray-900">
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <div class="flex items-center gap-2 mb-6">
+            <div class="w-5 h-5 bg-green-600 rounded-full"></div>
+            <span class="font-bold text-sm">BillKarma</span>
+            <span class="ml-2 px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded-full">Shared View</span>
+        </div>
+
+        <div id="loading" class="text-center text-gray-400 py-12">Loading case...</div>
+        <div id="error" class="hidden text-center text-red-500 py-12"></div>
+
+        <div id="case-content" class="hidden space-y-6">
+            <div>
+                <h1 id="case-title" class="text-2xl font-bold tracking-tight"></h1>
+                <div class="flex items-center gap-2 mt-2">
+                    <span id="case-status" class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100"></span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4">Case Info</h2>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div><span class="text-gray-500">Patient:</span> <span id="info-patient"></span></div>
+                    <div><span class="text-gray-500">Hospital:</span> <span id="info-hospital"></span></div>
+                    <div><span class="text-gray-500">Insurance:</span> <span id="info-insurance"></span></div>
+                    <div><span class="text-gray-500">Date of Service:</span> <span id="info-dos"></span></div>
+                    <div><span class="text-gray-500">Bill Amount:</span> <span id="info-amount"></span></div>
+                    <div><span class="text-gray-500">Status:</span> <span id="info-status"></span></div>
+                </div>
+            </div>
+
+            <div id="outcome-section" class="bg-white rounded-xl border border-gray-200 p-6 hidden">
+                <h2 class="font-semibold mb-4">Outcome</h2>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div><span class="text-gray-500">Result:</span> <span id="info-outcome"></span></div>
+                    <div><span class="text-gray-500">Amount:</span> <span id="info-outcome-amount"></span></div>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-400 text-center">
+                This is a read-only shared view. For full access, contact the case advocate.
+            </p>
+        </div>
+    </div>
+
+    <script>
+    const token = '{{ share_token }}';
+    function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    async function loadSharedCase() {
+        try {
+            const resp = await fetch(`/api/advocacy/shared/${token}`);
+            const data = await resp.json();
+            if (resp.status >= 400) {
+                document.getElementById('loading').classList.add('hidden');
+                const err = document.getElementById('error');
+                err.textContent = data.detail || 'This share link is no longer available.';
+                err.classList.remove('hidden');
+                return;
+            }
+            const c = data.data;
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('case-content').classList.remove('hidden');
+            document.getElementById('case-title').textContent = c.title || c.patient_label;
+            document.getElementById('case-status').textContent = c.status;
+            document.getElementById('info-patient').textContent = c.patient_label;
+            document.getElementById('info-hospital').textContent = c.hospital_name || '—';
+            document.getElementById('info-insurance').textContent = c.insurance_carrier || '—';
+            document.getElementById('info-dos').textContent = c.date_of_service || '—';
+            document.getElementById('info-amount').textContent = c.bill_amount ? '$' + Number(c.bill_amount).toLocaleString() : '—';
+            document.getElementById('info-status').textContent = c.status;
+            if (c.outcome) {
+                document.getElementById('outcome-section').classList.remove('hidden');
+                document.getElementById('info-outcome').textContent = c.outcome;
+                document.getElementById('info-outcome-amount').textContent = c.outcome_amount ? '$' + Number(c.outcome_amount).toLocaleString() : '—';
+            }
+        } catch (e) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').textContent = 'Failed to load case.';
+            document.getElementById('error').classList.remove('hidden');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', loadSharedCase);
+    </script>
+</body>
+</html>

@@ -6,7 +6,8 @@ in a case management layer for advocacy organizations.
 
 import json
 import logging
-from datetime import date
+import secrets
+from datetime import date, datetime
 
 from fastapi import HTTPException
 
@@ -36,6 +37,46 @@ VALID_DOC_TYPES = {"hospital_bill", "eob", "denial_letter", "itemized_bill", "ot
 LETTER_TYPES = {"insurance_appeal", "hospital_dispute", "charity_care", "debt_validation"}
 
 VALID_OUTCOMES = {"resolved_reduced", "resolved_forgiven", "resolved_denied", "unknown"}
+
+VALID_ROLES = {"admin", "advocate", "viewer"}
+
+
+# ── Activity Timeline ────────────────────────────────────────────────────────
+
+def log_activity(case_id: int, user_id: int | None, action: str,
+                 detail: str = None, metadata: dict = None, db=None) -> None:
+    """Log a case activity event. Accepts an optional db connection for transactional logging."""
+    meta_json = json.dumps(metadata) if metadata else None
+
+    def _insert(conn):
+        conn.execute(
+            "INSERT INTO case_activity (case_id, user_id, action, detail, metadata) VALUES (?, ?, ?, ?, ?)",
+            (case_id, user_id, action, detail, meta_json),
+        )
+
+    if db:
+        _insert(db)
+    else:
+        with get_db() as conn:
+            _insert(conn)
+
+
+def get_activity(case_id: int, org_id: int, limit: int = 100) -> list[dict]:
+    """Get activity timeline for a case."""
+    _ = get_case(case_id, org_id)  # verify access
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT a.*, u.name as user_name
+            FROM case_activity a
+            LEFT JOIN users u ON a.user_id = u.id
+            WHERE a.case_id = ?
+            ORDER BY a.created_at DESC
+            LIMIT ?
+            """,
+            (case_id, limit),
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 # ── Case CRUD ────────────────────────────────────────────────────────────────
@@ -75,6 +116,7 @@ def create_case(org_id: int, user_id: int, patient_label: str, **kwargs) -> dict
             ),
         )
         case_id = cursor.lastrowid
+        log_activity(case_id, user_id, "case_created", f"Case created for {patient_label}", db=db)
 
     return get_case(case_id, org_id)
 
@@ -165,6 +207,9 @@ def update_case(case_id: int, org_id: int, **kwargs) -> dict:
         if result.rowcount == 0:
             raise HTTPException(404, "Case not found")
 
+        fields_str = ", ".join(updates.keys())
+        log_activity(case_id, None, "case_updated", f"Updated: {fields_str}", metadata=updates, db=db)
+
     return get_case(case_id, org_id)
 
 
@@ -222,6 +267,7 @@ def upload_document(case_id: int, org_id: int, filename: str, file_data: bytes,
 
         # Auto-advance to docs_uploaded
         _auto_advance_status(db, case_id, "docs_uploaded")
+        log_activity(case_id, None, "document_uploaded", f"Uploaded {filename} ({doc_type})", db=db)
 
     # Run extraction
     extraction = _extract_document(doc_id, file_data, mime_type)
@@ -299,6 +345,7 @@ def delete_document(doc_id: int, case_id: int, org_id: int) -> None:
         )
         if result.rowcount == 0:
             raise HTTPException(404, "Document not found")
+        log_activity(case_id, None, "document_deleted", f"Deleted document {doc_id}", db=db)
 
 
 # ── Overrides ────────────────────────────────────────────────────────────────
@@ -468,6 +515,11 @@ def run_analysis(case_id: int, org_id: int) -> dict:
                 (analysis["total_findings"], analysis["total_potential_savings"], bill_id),
             )
             _auto_advance_status(db, case_id, "analyzed")
+
+    log_activity(
+        case_id, None, "analysis_run",
+        f"Found {analysis['total_findings']} issues, ${analysis['total_potential_savings']:,.2f} potential savings",
+    )
 
     # Build recommendations
     recommendations = _build_recommendations(analysis, merged, case)
@@ -695,6 +747,7 @@ def generate_letter(case_id: int, org_id: int, user_id: int, letter_type: str,
         )
         letter_id = cursor.lastrowid
         _auto_advance_status(db, case_id, "letter_generated")
+        log_activity(case_id, user_id, "letter_generated", f"Generated {letter_type} letter", db=db)
 
     return {
         "id": letter_id,
@@ -706,12 +759,12 @@ def generate_letter(case_id: int, org_id: int, user_id: int, letter_type: str,
 
 
 def update_letter(letter_id: int, case_id: int, org_id: int, content: str,
-                  expected_updated_at: str = None) -> dict:
-    """Update letter content with optimistic locking."""
+                  expected_updated_at: str = None, user_id: int = None) -> dict:
+    """Update letter content with optimistic locking and version history."""
     with get_db() as db:
         row = db.execute(
             """
-            SELECT l.id, l.updated_at FROM case_letters l
+            SELECT l.id, l.updated_at, l.content FROM case_letters l
             JOIN advocacy_cases c ON l.case_id = c.id
             WHERE l.id = ? AND l.case_id = ? AND c.org_id = ?
             """,
@@ -727,10 +780,18 @@ def update_letter(letter_id: int, case_id: int, org_id: int, content: str,
                 "Letter was edited by someone else. Reload to see changes.",
             )
 
+        # Save previous version before overwriting
+        editor_id = user_id or 0
+        db.execute(
+            "INSERT INTO letter_versions (letter_id, content, edited_by) VALUES (?, ?, ?)",
+            (letter_id, row["content"], editor_id),
+        )
+
         db.execute(
             "UPDATE case_letters SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (content, letter_id),
         )
+        log_activity(case_id, user_id, "letter_edited", f"Edited letter {letter_id}", db=db)
 
     return {"id": letter_id, "status": "updated"}
 
@@ -748,6 +809,7 @@ def mark_letter_reviewed(letter_id: int, case_id: int, org_id: int, user_id: int
         )
         if result.rowcount == 0:
             raise HTTPException(404, "Letter not found")
+        log_activity(case_id, user_id, "letter_reviewed", f"Reviewed letter {letter_id}", db=db)
 
     return {"id": letter_id, "reviewed": True}
 
@@ -768,6 +830,7 @@ def mark_letter_sent(letter_id: int, case_id: int, org_id: int, sent_date: str =
         )
         if result.rowcount == 0:
             raise HTTPException(404, "Letter not found")
+        log_activity(case_id, None, "letter_sent", f"Letter {letter_id} marked sent on {sent_date}", db=db)
 
     return {"id": letter_id, "marked_sent": True, "sent_date": sent_date}
 
@@ -821,6 +884,7 @@ def add_note(case_id: int, org_id: int, user_id: int, content: str) -> dict:
             "UPDATE advocacy_cases SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (case_id,),
         )
+        log_activity(case_id, user_id, "note_added", "Added a note", db=db)
         return {"id": cursor.lastrowid, "content": content}
 
 
@@ -838,3 +902,256 @@ def get_case_notes(case_id: int, org_id: int) -> list[dict]:
             (case_id, org_id),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+# ── Share Links ─────────────────────────────────────────────────────────────
+
+def create_share_link(case_id: int, org_id: int, user_id: int,
+                      label: str = None, expires_days: int = None) -> dict:
+    """Create a read-only share link for a case."""
+    _ = get_case(case_id, org_id)  # verify access
+    token = secrets.token_urlsafe(32)
+    expires_at = None
+    if expires_days and expires_days > 0:
+        from datetime import timedelta
+        expires_at = (datetime.utcnow().replace(microsecond=0) + timedelta(days=expires_days)).isoformat()
+
+    with get_db() as db:
+        cursor = db.execute(
+            """
+            INSERT INTO case_share_links (case_id, token, created_by, label, expires_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (case_id, token, user_id, (label or "").strip() or None, expires_at),
+        )
+        link_id = cursor.lastrowid
+        log_activity(case_id, user_id, "share_link_created", label or "Share link created", db=db)
+
+    return {"id": link_id, "token": token, "label": label, "expires_at": expires_at}
+
+
+def list_share_links(case_id: int, org_id: int) -> list[dict]:
+    """List all share links for a case."""
+    _ = get_case(case_id, org_id)
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT s.id, s.token, s.label, s.active, s.expires_at, s.created_at,
+                   u.name as created_by_name
+            FROM case_share_links s
+            JOIN users u ON s.created_by = u.id
+            WHERE s.case_id = ?
+            ORDER BY s.created_at DESC
+            """,
+            (case_id,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def revoke_share_link(link_id: int, case_id: int, org_id: int) -> None:
+    """Deactivate a share link."""
+    _ = get_case(case_id, org_id)
+    with get_db() as db:
+        result = db.execute(
+            "UPDATE case_share_links SET active = 0 WHERE id = ? AND case_id = ?",
+            (link_id, case_id),
+        )
+        if result.rowcount == 0:
+            raise HTTPException(404, "Share link not found")
+        log_activity(case_id, None, "share_link_revoked", f"Revoked share link {link_id}", db=db)
+
+
+def get_shared_case(token: str) -> dict:
+    """Get case data via a share token. Returns case + read-only context."""
+    with get_db() as db:
+        link = db.execute(
+            """
+            SELECT s.case_id, s.active, s.expires_at, c.org_id
+            FROM case_share_links s
+            JOIN advocacy_cases c ON s.case_id = c.id
+            WHERE s.token = ?
+            """,
+            (token,),
+        ).fetchone()
+
+    if not link:
+        raise HTTPException(404, "Share link not found or expired")
+    if not link["active"]:
+        raise HTTPException(410, "Share link has been revoked")
+    if link["expires_at"]:
+        try:
+            exp = datetime.fromisoformat(link["expires_at"])
+            if datetime.utcnow() > exp:
+                raise HTTPException(410, "Share link has expired")
+        except ValueError:
+            pass
+
+    case = get_case(link["case_id"], link["org_id"])
+    # Strip sensitive fields for shared view
+    for key in ("created_by", "assigned_to", "created_by_name", "assigned_to_name"):
+        case.pop(key, None)
+    return case
+
+
+# ── Letter Version History ──────────────────────────────────────────────────
+
+def get_letter_versions(letter_id: int, case_id: int, org_id: int) -> list[dict]:
+    """Get version history for a letter."""
+    with get_db() as db:
+        # Verify access
+        letter = db.execute(
+            """
+            SELECT l.id FROM case_letters l
+            JOIN advocacy_cases c ON l.case_id = c.id
+            WHERE l.id = ? AND l.case_id = ? AND c.org_id = ?
+            """,
+            (letter_id, case_id, org_id),
+        ).fetchone()
+        if not letter:
+            raise HTTPException(404, "Letter not found")
+
+        rows = db.execute(
+            """
+            SELECT v.id, v.content, v.created_at, u.name as edited_by_name
+            FROM letter_versions v
+            LEFT JOIN users u ON v.edited_by = u.id
+            WHERE v.letter_id = ?
+            ORDER BY v.created_at DESC
+            """,
+            (letter_id,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def restore_letter_version(version_id: int, letter_id: int, case_id: int,
+                           org_id: int, user_id: int) -> dict:
+    """Restore a letter to a previous version."""
+    with get_db() as db:
+        version = db.execute(
+            """
+            SELECT v.content FROM letter_versions v
+            JOIN case_letters l ON v.letter_id = l.id
+            JOIN advocacy_cases c ON l.case_id = c.id
+            WHERE v.id = ? AND v.letter_id = ? AND l.case_id = ? AND c.org_id = ?
+            """,
+            (version_id, letter_id, case_id, org_id),
+        ).fetchone()
+        if not version:
+            raise HTTPException(404, "Version not found")
+
+    # Use update_letter which handles version saving and activity logging
+    return update_letter(letter_id, case_id, org_id, version["content"], user_id=user_id)
+
+
+# ── Bulk Operations ─────────────────────────────────────────────────────────
+
+def bulk_update_status(org_id: int, case_ids: list[int], status: str, user_id: int = None) -> dict:
+    """Update status for multiple cases at once."""
+    if not case_ids:
+        raise HTTPException(400, "No case IDs provided")
+    if status not in VALID_STATUSES:
+        raise HTTPException(400, f"Invalid status: {status}")
+    if len(case_ids) > 100:
+        raise HTTPException(400, "Maximum 100 cases per bulk operation")
+
+    updated = 0
+    with get_db() as db:
+        for cid in case_ids:
+            result = db.execute(
+                "UPDATE advocacy_cases SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+                (status, cid, org_id),
+            )
+            if result.rowcount > 0:
+                updated += 1
+                log_activity(cid, user_id, "status_changed", f"Status changed to {status} (bulk)", db=db)
+
+    return {"updated": updated, "total": len(case_ids), "status": status}
+
+
+def bulk_assign(org_id: int, case_ids: list[int], assigned_to: int, user_id: int = None) -> dict:
+    """Assign multiple cases to a user."""
+    if not case_ids:
+        raise HTTPException(400, "No case IDs provided")
+    if len(case_ids) > 100:
+        raise HTTPException(400, "Maximum 100 cases per bulk operation")
+
+    # Verify assignee is an org member
+    with get_db() as db:
+        member = db.execute(
+            "SELECT id FROM org_members WHERE org_id = ? AND user_id = ? AND status = 'active'",
+            (org_id, assigned_to),
+        ).fetchone()
+        if not member:
+            raise HTTPException(400, "Assignee is not an active member of this organization")
+
+    updated = 0
+    with get_db() as db:
+        for cid in case_ids:
+            result = db.execute(
+                "UPDATE advocacy_cases SET assigned_to = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND org_id = ?",
+                (assigned_to, cid, org_id),
+            )
+            if result.rowcount > 0:
+                updated += 1
+                log_activity(cid, user_id, "case_assigned", f"Assigned to user {assigned_to} (bulk)", db=db)
+
+    return {"updated": updated, "total": len(case_ids), "assigned_to": assigned_to}
+
+
+def bulk_export(org_id: int, case_ids: list[int] = None, status: str = None) -> list[dict]:
+    """Export case data as JSON. If no case_ids, export all (with optional status filter)."""
+    conditions = ["c.org_id = ?"]
+    params: list = [org_id]
+
+    if case_ids:
+        placeholders = ",".join("?" * len(case_ids))
+        conditions.append(f"c.id IN ({placeholders})")
+        params.extend(case_ids)
+    if status:
+        conditions.append("c.status = ?")
+        params.append(status)
+
+    where = " AND ".join(conditions)
+
+    with get_db() as db:
+        cases = db.execute(
+            f"""
+            SELECT c.*, u.name as created_by_name, a.name as assigned_to_name
+            FROM advocacy_cases c
+            LEFT JOIN users u ON c.created_by = u.id
+            LEFT JOIN users a ON c.assigned_to = a.id
+            WHERE {where}
+            ORDER BY c.created_at DESC
+            """,
+            params,
+        ).fetchall()
+
+        result = []
+        for case in cases:
+            case_dict = dict(case)
+            cid = case_dict["id"]
+
+            # Get notes
+            notes = db.execute(
+                "SELECT n.content, u.name as author_name, n.created_at FROM case_notes n JOIN users u ON n.author_id = u.id WHERE n.case_id = ? ORDER BY n.created_at",
+                (cid,),
+            ).fetchall()
+            case_dict["notes_list"] = [dict(n) for n in notes]
+
+            # Get letters (without full content for brevity)
+            letters = db.execute(
+                "SELECT letter_type, marked_sent, sent_date, reviewed, created_at FROM case_letters WHERE case_id = ? ORDER BY created_at",
+                (cid,),
+            ).fetchall()
+            case_dict["letters"] = [dict(l) for l in letters]
+
+            # Get overrides
+            overrides = db.execute(
+                "SELECT field_name, field_value FROM case_overrides WHERE case_id = ?",
+                (cid,),
+            ).fetchall()
+            case_dict["overrides"] = {r["field_name"]: r["field_value"] for r in overrides}
+
+            result.append(case_dict)
+
+    return result

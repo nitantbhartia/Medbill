@@ -6,9 +6,11 @@
 <div class="max-w-6xl">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold tracking-tight">Cases</h1>
-        <a href="/advocacy/cases/new" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
-            + New Case
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="/advocacy/cases/new" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
+                + New Case
+            </a>
+        </div>
     </div>
 
     <!-- Filters -->
@@ -28,11 +30,31 @@
         </select>
     </div>
 
+    <!-- Bulk actions bar -->
+    <div id="bulk-bar" class="hidden flex items-center gap-3 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <span id="selected-count" class="text-sm font-medium text-blue-700">0 selected</span>
+        <select id="bulk-status" class="px-2 py-1 text-sm border border-blue-200 rounded-lg bg-white">
+            <option value="">Change status...</option>
+            <option value="new">New</option>
+            <option value="docs_uploaded">Docs Uploaded</option>
+            <option value="analyzed">Analyzed</option>
+            <option value="letter_generated">Letter Ready</option>
+            <option value="sent">Sent</option>
+            <option value="awaiting_response">Awaiting Response</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+        </select>
+        <button onclick="bulkUpdateStatus()" class="px-3 py-1 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700">Apply</button>
+        <button onclick="bulkExport()" class="px-3 py-1 text-xs border border-blue-300 text-blue-700 rounded-full hover:bg-blue-100">Export Selected</button>
+        <button onclick="clearSelection()" class="ml-auto text-xs text-blue-600 hover:text-blue-800">Clear</button>
+    </div>
+
     <!-- Table -->
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <table class="w-full">
             <thead>
                 <tr class="border-b border-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-4 py-3 w-8"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)" class="rounded"></th>
                     <th class="px-4 py-3">Patient</th>
                     <th class="px-4 py-3">Status</th>
                     <th class="px-4 py-3">Amount</th>
@@ -79,14 +101,35 @@ const STATUS_LABELS = {
     'closed': 'Closed',
 };
 
+let selectedCases = new Set();
+
 let debounceTimer;
 function debounceLoad() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(loadCases, 300);
 }
 
+// Filter persistence via URL params
+function syncFiltersToURL() {
+    const params = new URLSearchParams();
+    const search = document.getElementById('search-input').value.trim();
+    const status = document.getElementById('status-filter').value;
+    if (search) params.set('search', search);
+    if (status) params.set('status', status);
+    const qs = params.toString();
+    const url = window.location.pathname + (qs ? '?' + qs : '');
+    history.replaceState(null, '', url);
+}
+
+function restoreFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('search')) document.getElementById('search-input').value = params.get('search');
+    if (params.get('status')) document.getElementById('status-filter').value = params.get('status');
+}
+
 async function loadCases() {
     if (!currentOrg) return;
+    syncFiltersToURL();
     const params = new URLSearchParams();
     const search = document.getElementById('search-input').value.trim();
     const status = document.getElementById('status-filter').value;
@@ -107,23 +150,84 @@ async function loadCases() {
         empty.classList.add('hidden');
 
         tbody.innerHTML = resp.data.cases.map(c => `
-            <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">
-                <td class="px-4 py-3">
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3" onclick="event.stopPropagation()">
+                    <input type="checkbox" value="${c.id}" onchange="toggleCase(${c.id}, this.checked)" ${selectedCases.has(c.id) ? 'checked' : ''} class="rounded">
+                </td>
+                <td class="px-4 py-3 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">
                     <div class="font-medium text-sm">${esc(c.patient_label)}</div>
                     ${c.tags ? `<div class="text-xs text-gray-400 mt-0.5">${esc(c.tags)}</div>` : ''}
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-4 py-3 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">
                     <span class="px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[c.status] || 'bg-gray-100'}">${STATUS_LABELS[c.status] || c.status}</span>
                 </td>
-                <td class="px-4 py-3 text-sm">${c.bill_amount ? '$' + Number(c.bill_amount).toLocaleString() : '—'}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">${esc(c.hospital_name || '—')}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">${esc(c.assigned_to_name || '—')}</td>
-                <td class="px-4 py-3 text-xs text-gray-400">${timeAgo(c.updated_at)}</td>
+                <td class="px-4 py-3 text-sm cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">${c.bill_amount ? '$' + Number(c.bill_amount).toLocaleString() : '—'}</td>
+                <td class="px-4 py-3 text-sm text-gray-600 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">${esc(c.hospital_name || '—')}</td>
+                <td class="px-4 py-3 text-sm text-gray-600 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">${esc(c.assigned_to_name || '—')}</td>
+                <td class="px-4 py-3 text-xs text-gray-400 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">${timeAgo(c.updated_at)}</td>
             </tr>
         `).join('');
     } catch (e) {
         console.error('Load failed:', e);
     }
+}
+
+function toggleCase(id, checked) {
+    if (checked) selectedCases.add(id); else selectedCases.delete(id);
+    updateBulkBar();
+}
+
+function toggleSelectAll(checked) {
+    document.querySelectorAll('#cases-tbody input[type=checkbox]').forEach(cb => {
+        cb.checked = checked;
+        const id = parseInt(cb.value);
+        if (checked) selectedCases.add(id); else selectedCases.delete(id);
+    });
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    if (selectedCases.size > 0) {
+        bar.classList.remove('hidden');
+        document.getElementById('selected-count').textContent = selectedCases.size + ' selected';
+    } else {
+        bar.classList.add('hidden');
+    }
+}
+
+function clearSelection() {
+    selectedCases.clear();
+    document.querySelectorAll('#cases-tbody input[type=checkbox]').forEach(cb => cb.checked = false);
+    document.getElementById('select-all').checked = false;
+    updateBulkBar();
+}
+
+async function bulkUpdateStatus() {
+    const status = document.getElementById('bulk-status').value;
+    if (!status) return;
+    if (!selectedCases.size) return;
+    await apiFetch(`/orgs/${currentOrg.id}/cases/bulk/status`, {
+        method: 'POST',
+        body: JSON.stringify({case_ids: [...selectedCases], status}),
+    });
+    clearSelection();
+    loadCases();
+}
+
+async function bulkExport() {
+    if (!selectedCases.size) return;
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/bulk/export`, {
+        method: 'POST',
+        body: JSON.stringify({case_ids: [...selectedCases]}),
+    });
+    const blob = new Blob([JSON.stringify(resp.data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cases_export_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -143,6 +247,7 @@ function onWorkspaceReady() {
         window.location.href = '/advocacy/setup';
         return;
     }
+    restoreFiltersFromURL();
     loadCases();
 }
 </script>
