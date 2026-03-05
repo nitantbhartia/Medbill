@@ -1,0 +1,149 @@
+{% extends "advocacy_base.html" %}
+{% block title %}Cases{% endblock %}
+{% block nav_cases %}bg-gray-100 text-gray-900{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold tracking-tight">Cases</h1>
+        <a href="/advocacy/cases/new" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
+            + New Case
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex items-center gap-3 mb-4">
+        <input type="text" id="search-input" placeholder="Search cases..." oninput="debounceLoad()"
+            class="px-3 py-2 text-sm border border-gray-200 rounded-lg w-64 focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none">
+        <select id="status-filter" onchange="loadCases()" class="px-3 py-2 text-sm border border-gray-200 rounded-lg">
+            <option value="">All statuses</option>
+            <option value="new">New</option>
+            <option value="docs_uploaded">Docs Uploaded</option>
+            <option value="analyzed">Analyzed</option>
+            <option value="letter_generated">Letter Generated</option>
+            <option value="sent">Sent</option>
+            <option value="awaiting_response">Awaiting Response</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-4 py-3">Patient</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Amount</th>
+                    <th class="px-4 py-3">Hospital</th>
+                    <th class="px-4 py-3">Assigned</th>
+                    <th class="px-4 py-3">Updated</th>
+                </tr>
+            </thead>
+            <tbody id="cases-tbody" class="divide-y divide-gray-50">
+            </tbody>
+        </table>
+        <div id="empty-state" class="hidden p-12 text-center">
+            <p class="text-gray-500 mb-4">No cases yet. Create your first case to get started.</p>
+            <a href="/advocacy/cases/new" class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800">
+                + New Case
+            </a>
+        </div>
+        <div id="loading" class="p-8 text-center text-gray-400 text-sm">Loading...</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const STATUS_COLORS = {
+    'new': 'bg-gray-100 text-gray-700',
+    'docs_uploaded': 'bg-blue-50 text-blue-700',
+    'analyzed': 'bg-purple-50 text-purple-700',
+    'letter_generated': 'bg-green-50 text-green-700',
+    'sent': 'bg-yellow-50 text-yellow-700',
+    'awaiting_response': 'bg-orange-50 text-orange-700',
+    'resolved': 'bg-emerald-50 text-emerald-700',
+    'closed': 'bg-gray-50 text-gray-500',
+};
+
+const STATUS_LABELS = {
+    'new': 'New',
+    'docs_uploaded': 'Docs Uploaded',
+    'analyzed': 'Analyzed',
+    'letter_generated': 'Letter Ready',
+    'sent': 'Sent',
+    'awaiting_response': 'Awaiting Response',
+    'resolved': 'Resolved',
+    'closed': 'Closed',
+};
+
+let debounceTimer;
+function debounceLoad() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadCases, 300);
+}
+
+async function loadCases() {
+    if (!currentOrg) return;
+    const params = new URLSearchParams();
+    const search = document.getElementById('search-input').value.trim();
+    const status = document.getElementById('status-filter').value;
+    if (search) params.set('search', search);
+    if (status) params.set('status', status);
+
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/cases?${params}`);
+        const tbody = document.getElementById('cases-tbody');
+        const empty = document.getElementById('empty-state');
+        document.getElementById('loading').classList.add('hidden');
+
+        if (!resp.data.cases.length) {
+            tbody.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        tbody.innerHTML = resp.data.cases.map(c => `
+            <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='/advocacy/cases/${c.id}'">
+                <td class="px-4 py-3">
+                    <div class="font-medium text-sm">${esc(c.patient_label)}</div>
+                    ${c.tags ? `<div class="text-xs text-gray-400 mt-0.5">${esc(c.tags)}</div>` : ''}
+                </td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[c.status] || 'bg-gray-100'}">${STATUS_LABELS[c.status] || c.status}</span>
+                </td>
+                <td class="px-4 py-3 text-sm">${c.bill_amount ? '$' + Number(c.bill_amount).toLocaleString() : '—'}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">${esc(c.hospital_name || '—')}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">${esc(c.assigned_to_name || '—')}</td>
+                <td class="px-4 py-3 text-xs text-gray-400">${timeAgo(c.updated_at)}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error('Load failed:', e);
+    }
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function timeAgo(ts) {
+    if (!ts) return '';
+    const d = new Date(ts + (ts.includes('Z') ? '' : 'Z'));
+    const diff = (Date.now() - d.getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+}
+
+function onWorkspaceReady() {
+    if (!currentOrg) {
+        window.location.href = '/advocacy/setup';
+        return;
+    }
+    loadCases();
+}
+</script>
+{% endblock %}

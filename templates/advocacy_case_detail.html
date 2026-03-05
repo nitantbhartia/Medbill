@@ -1,0 +1,453 @@
+{% extends "advocacy_base.html" %}
+{% block title %}Case Detail{% endblock %}
+{% block nav_cases %}bg-gray-100 text-gray-900{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl" id="case-page">
+    <div id="loading-case" class="text-center text-gray-400 py-12">Loading case...</div>
+
+    <div id="case-content" class="hidden">
+        <!-- Header -->
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <a href="/advocacy/cases" class="text-sm text-gray-500 hover:text-gray-700 mb-1 inline-block">&larr; All cases</a>
+                <h1 id="case-title" class="text-2xl font-bold tracking-tight"></h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <select id="status-select" onchange="updateStatus(this.value)"
+                    class="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg">
+                    <option value="new">New</option>
+                    <option value="docs_uploaded">Docs Uploaded</option>
+                    <option value="analyzed">Analyzed</option>
+                    <option value="letter_generated">Letter Ready</option>
+                    <option value="sent">Sent</option>
+                    <option value="awaiting_response">Awaiting Response</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="flex border-b border-gray-200 mb-6 gap-1">
+            <button onclick="showSection('overview')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px" data-tab="overview">Overview</button>
+            <button onclick="showSection('documents')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px" data-tab="documents">Documents</button>
+            <button onclick="showSection('analysis')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px" data-tab="analysis">Analysis</button>
+            <button onclick="showSection('letters')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px" data-tab="letters">Letters</button>
+            <button onclick="showSection('notes')" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 -mb-px" data-tab="notes">Notes</button>
+        </div>
+
+        <!-- Overview section -->
+        <div id="sec-overview" class="section">
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                    <div class="text-xs text-gray-500 mb-1">Bill Amount</div>
+                    <div id="stat-amount" class="text-xl font-bold">—</div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                    <div class="text-xs text-gray-500 mb-1">Potential Savings</div>
+                    <div id="stat-savings" class="text-xl font-bold text-green-700">—</div>
+                </div>
+                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                    <div class="text-xs text-gray-500 mb-1">Findings</div>
+                    <div id="stat-findings" class="text-xl font-bold">—</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4">Case Info</h2>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div><span class="text-gray-500">Patient:</span> <span id="info-patient"></span></div>
+                    <div><span class="text-gray-500">Hospital:</span> <span id="info-hospital"></span></div>
+                    <div><span class="text-gray-500">Insurance:</span> <span id="info-insurance"></span></div>
+                    <div><span class="text-gray-500">Date of Service:</span> <span id="info-dos"></span></div>
+                    <div><span class="text-gray-500">Assigned to:</span> <span id="info-assigned"></span></div>
+                    <div><span class="text-gray-500">Created:</span> <span id="info-created"></span></div>
+                </div>
+                <div id="info-notes" class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600 hidden"></div>
+            </div>
+        </div>
+
+        <!-- Documents section -->
+        <div id="sec-documents" class="section hidden">
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold">Documents</h2>
+                </div>
+                <form id="upload-form" class="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <input type="file" id="file-input" accept="image/*,.pdf" class="text-sm">
+                        <select id="doc-type" class="px-2 py-1.5 text-sm border border-gray-200 rounded-lg">
+                            <option value="hospital_bill">Hospital Bill</option>
+                            <option value="eob">EOB</option>
+                            <option value="denial_letter">Denial Letter</option>
+                            <option value="itemized_bill">Itemized Bill</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button type="submit" class="px-4 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800">Upload</button>
+                    </div>
+                    <div id="upload-status" class="text-sm text-gray-500 mt-2 hidden"></div>
+                </form>
+                <div id="docs-list" class="space-y-2"></div>
+                <div id="docs-empty" class="text-center text-gray-400 text-sm py-4 hidden">No documents uploaded yet.</div>
+            </div>
+        </div>
+
+        <!-- Analysis section -->
+        <div id="sec-analysis" class="section hidden">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-semibold text-lg">Analysis</h2>
+                    <button onclick="runAnalysis()" class="px-4 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800">
+                        Run Analysis
+                    </button>
+                </div>
+                <div id="analysis-loading" class="hidden text-center py-8 text-gray-400">Running analysis...</div>
+                <div id="analysis-empty" class="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
+                    Upload documents and click "Run Analysis" to see results.
+                </div>
+                <div id="analysis-results" class="hidden space-y-4">
+                    <!-- Recommendations -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="font-semibold mb-3">Recommended Actions</h3>
+                        <div id="recommendations-list" class="space-y-3"></div>
+                    </div>
+                    <!-- Findings -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="font-semibold mb-3">Findings</h3>
+                        <div id="findings-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Letters section -->
+        <div id="sec-letters" class="section hidden">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-semibold text-lg">Letters</h2>
+                </div>
+                <!-- Generate letter -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-3">Generate New Letter</h3>
+                    <div class="grid grid-cols-2 gap-3" id="letter-type-cards">
+                        <button onclick="generateLetter('hospital_dispute')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Hospital Dispute</div>
+                            <div class="text-xs text-gray-500 mt-1">Challenge billing errors, duplicate charges, markup</div>
+                        </button>
+                        <button onclick="generateLetter('insurance_appeal')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Insurance Appeal</div>
+                            <div class="text-xs text-gray-500 mt-1">Appeal denied or underpaid claims</div>
+                        </button>
+                        <button onclick="generateLetter('charity_care')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Charity Care Request</div>
+                            <div class="text-xs text-gray-500 mt-1">Request hospital financial assistance</div>
+                        </button>
+                        <button onclick="generateLetter('debt_validation')" class="p-4 border border-gray-200 rounded-lg text-left hover:border-gray-400 transition-colors">
+                            <div class="font-medium text-sm">Debt Validation</div>
+                            <div class="text-xs text-gray-500 mt-1">Require collector to prove debt is valid (FDCPA)</div>
+                        </button>
+                    </div>
+                </div>
+                <!-- Generated letters list -->
+                <div id="letters-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Notes section -->
+        <div id="sec-notes" class="section hidden">
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="font-semibold mb-4">Notes</h2>
+                <form id="note-form" onsubmit="return addNote(event)" class="mb-4">
+                    <textarea id="note-input" rows="2" placeholder="Add a note..."
+                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none mb-2"></textarea>
+                    <button type="submit" class="px-4 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800">Add Note</button>
+                </form>
+                <div id="notes-list" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const caseId = {{ case_id }};
+let caseData = null;
+
+const SEV_COLORS = {high: 'bg-red-50 text-red-700', medium: 'bg-yellow-50 text-yellow-700', low: 'bg-blue-50 text-blue-700', informational: 'bg-gray-50 text-gray-600'};
+const DOC_TYPE_LABELS = {hospital_bill: 'Hospital Bill', eob: 'EOB', denial_letter: 'Denial Letter', itemized_bill: 'Itemized Bill', other: 'Other'};
+
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+    document.getElementById('sec-' + name).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === name;
+        btn.classList.toggle('border-gray-900', active);
+        btn.classList.toggle('text-gray-900', active);
+        btn.classList.toggle('border-transparent', !active);
+        btn.classList.toggle('text-gray-500', !active);
+    });
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+async function loadCase() {
+    if (!currentOrg) return;
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}`);
+        caseData = resp.data;
+        renderCase();
+        document.getElementById('loading-case').classList.add('hidden');
+        document.getElementById('case-content').classList.remove('hidden');
+        loadDocs();
+        loadAnalysis();
+        loadLetters();
+        loadNotes();
+    } catch (e) {
+        document.getElementById('loading-case').textContent = 'Case not found.';
+    }
+}
+
+function renderCase() {
+    const c = caseData;
+    document.getElementById('case-title').textContent = c.title || c.patient_label;
+    document.getElementById('status-select').value = c.status;
+    document.getElementById('stat-amount').textContent = c.bill_amount ? '$' + Number(c.bill_amount).toLocaleString() : '—';
+    document.getElementById('info-patient').textContent = c.patient_label;
+    document.getElementById('info-hospital').textContent = c.hospital_name || '—';
+    document.getElementById('info-insurance').textContent = c.insurance_carrier || '—';
+    document.getElementById('info-dos').textContent = c.date_of_service || '—';
+    document.getElementById('info-assigned').textContent = c.assigned_to_name || '—';
+    document.getElementById('info-created').textContent = c.created_at ? new Date(c.created_at + 'Z').toLocaleDateString() : '—';
+    if (c.notes) {
+        document.getElementById('info-notes').textContent = c.notes;
+        document.getElementById('info-notes').classList.remove('hidden');
+    }
+}
+
+async function updateStatus(status) {
+    if (!currentOrg) return;
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({status}),
+    });
+}
+
+// Documents
+async function loadDocs() {
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/documents`);
+    const list = document.getElementById('docs-list');
+    const empty = document.getElementById('docs-empty');
+    if (!resp.data.length) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    list.innerHTML = resp.data.map(d => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 text-xs font-medium bg-gray-200 rounded">${DOC_TYPE_LABELS[d.doc_type] || d.doc_type}</span>
+                <span class="text-sm font-medium">${esc(d.filename)}</span>
+                <span class="text-xs text-gray-400">${d.file_size_bytes ? (d.file_size_bytes/1024).toFixed(0) + ' KB' : ''}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs ${d.extraction_status === 'extracted' ? 'text-green-600' : d.extraction_status === 'failed' ? 'text-red-500' : 'text-gray-400'}">${d.extraction_status}</span>
+                <button onclick="deleteDoc(${d.id})" class="text-xs text-red-500 hover:text-red-700">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('upload-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput.files.length) return;
+    const status = document.getElementById('upload-status');
+    status.textContent = 'Uploading and extracting...';
+    status.classList.remove('hidden');
+
+    const form = new FormData();
+    form.append('file', fileInput.files[0]);
+    form.append('doc_type', document.getElementById('doc-type').value);
+
+    try {
+        const resp = await fetch(`${API}/orgs/${currentOrg.id}/cases/${caseId}/documents`, {
+            method: 'POST', credentials: 'same-origin', body: form,
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            status.textContent = data.data.extraction?.status === 'extracted' ? 'Uploaded and extracted.' : 'Uploaded. Extraction failed — enter fields manually.';
+            fileInput.value = '';
+            loadDocs();
+            loadCase();
+        } else {
+            status.textContent = 'Error: ' + (data.detail || 'Upload failed');
+        }
+    } catch (err) {
+        status.textContent = 'Connection error.';
+    }
+};
+
+async function deleteDoc(docId) {
+    if (!confirm('Delete this document?')) return;
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/documents/${docId}`, {method: 'DELETE'});
+    loadDocs();
+}
+
+// Analysis
+async function loadAnalysis() {
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/analysis`);
+    if (!resp.data) return;
+    renderAnalysis(resp.data);
+}
+
+async function runAnalysis() {
+    document.getElementById('analysis-loading').classList.remove('hidden');
+    document.getElementById('analysis-empty').classList.add('hidden');
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/analyze`, {method: 'POST'});
+        renderAnalysis(resp.data);
+        loadCase();
+    } catch (e) {
+        alert(e.message);
+    }
+    document.getElementById('analysis-loading').classList.add('hidden');
+}
+
+function renderAnalysis(data) {
+    document.getElementById('analysis-empty').classList.add('hidden');
+    document.getElementById('analysis-results').classList.remove('hidden');
+
+    const analysis = data.analysis || data.results || {};
+    const findings = analysis.findings || [];
+    const recs = data.recommendations || [];
+
+    document.getElementById('stat-savings').textContent = analysis.total_potential_savings ? '$' + Number(analysis.total_potential_savings).toLocaleString() : '—';
+    document.getElementById('stat-findings').textContent = findings.length || '0';
+
+    document.getElementById('recommendations-list').innerHTML = recs.length ? recs.map(r => `
+        <div class="p-3 border border-gray-200 rounded-lg">
+            <div class="flex items-center justify-between">
+                <span class="font-medium text-sm">${esc(r.action)}</span>
+                ${r.letter_type ? `<button onclick="generateLetter('${r.letter_type}')" class="px-3 py-1 text-xs bg-gray-900 text-white rounded-full hover:bg-gray-800">Generate</button>` : ''}
+            </div>
+            <div class="text-xs text-gray-500 mt-1">${esc(r.reason)}</div>
+            ${r.based_on ? `<div class="text-xs text-gray-400 mt-1">Based on: ${r.based_on.map(b => esc(b)).join('; ')}</div>` : ''}
+        </div>
+    `).join('') : '<p class="text-sm text-gray-400">No specific actions recommended.</p>';
+
+    document.getElementById('findings-list').innerHTML = findings.length ? findings.map(f => `
+        <div class="flex items-start gap-3 p-3 rounded-lg ${SEV_COLORS[f.severity] || 'bg-gray-50'}">
+            <span class="px-2 py-0.5 text-xs font-medium rounded capitalize">${f.severity}</span>
+            <div class="flex-1">
+                <div class="text-sm font-medium">${esc(f.message)}</div>
+                ${f.potential_savings ? `<div class="text-xs mt-0.5">Potential savings: $${Number(f.potential_savings).toLocaleString()}</div>` : ''}
+            </div>
+        </div>
+    `).join('') : '<p class="text-sm text-gray-400">No findings.</p>';
+}
+
+// Letters
+async function generateLetter(type) {
+    try {
+        const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters`, {
+            method: 'POST',
+            body: JSON.stringify({letter_type: type, fields: {}}),
+        });
+        loadLetters();
+        showSection('letters');
+    } catch (e) {
+        alert(e.message);
+    }
+}
+
+async function loadLetters() {
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters`);
+    const list = document.getElementById('letters-list');
+    if (!resp.data.length) { list.innerHTML = ''; return; }
+
+    const TYPE_LABELS = {hospital_dispute: 'Hospital Dispute', insurance_appeal: 'Insurance Appeal', charity_care: 'Charity Care', debt_validation: 'Debt Validation'};
+    list.innerHTML = resp.data.map(l => `
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="font-medium text-sm">${TYPE_LABELS[l.letter_type] || l.letter_type}</span>
+                    ${l.reviewed ? '<span class="px-2 py-0.5 text-xs bg-green-50 text-green-700 rounded-full">Reviewed</span>' : ''}
+                    ${l.marked_sent ? '<span class="px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded-full">Sent</span>' : ''}
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="${API}/orgs/${currentOrg.id}/cases/${caseId}/letters/${l.id}/pdf" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">PDF</a>
+                    <button onclick="copyLetter(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">Copy</button>
+                    ${!l.reviewed ? `<button onclick="reviewLetter(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">Mark Reviewed</button>` : ''}
+                    ${!l.marked_sent ? `<button onclick="markSent(${l.id})" class="px-3 py-1 text-xs border border-gray-200 rounded-full hover:bg-gray-50">Mark Sent</button>` : ''}
+                </div>
+            </div>
+            <textarea id="letter-${l.id}" rows="12" class="w-full text-sm font-mono p-3 border border-gray-200 rounded-lg" data-updated="${l.updated_at}">${esc(l.content)}</textarea>
+            <div class="flex items-center justify-between mt-2">
+                <button onclick="saveLetter(${l.id})" class="px-4 py-1.5 text-xs bg-gray-900 text-white rounded-full hover:bg-gray-800">Save changes</button>
+                <span class="text-xs text-gray-400">Generated by ${esc(l.generated_by_name)} on ${new Date(l.created_at + 'Z').toLocaleDateString()}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 italic">${esc(l.disclaimer || '')}</p>
+        </div>
+    `).join('');
+}
+
+async function saveLetter(id) {
+    const ta = document.getElementById('letter-' + id);
+    try {
+        await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({content: ta.value, expected_updated_at: ta.dataset.updated}),
+        });
+        loadLetters();
+    } catch (e) { alert(e.message); }
+}
+
+async function reviewLetter(id) {
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters/${id}/review`, {method: 'POST'});
+    loadLetters();
+}
+
+async function markSent(id) {
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/letters/${id}/sent`, {method: 'POST', body: '{}'});
+    loadLetters();
+}
+
+function copyLetter(id) {
+    const ta = document.getElementById('letter-' + id);
+    navigator.clipboard.writeText(ta.value);
+}
+
+// Notes
+async function loadNotes() {
+    const resp = await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/notes`);
+    const list = document.getElementById('notes-list');
+    if (!resp.data.length) { list.innerHTML = '<p class="text-sm text-gray-400">No notes yet.</p>'; return; }
+    list.innerHTML = resp.data.map(n => `
+        <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-medium text-gray-700">${esc(n.author_name)}</span>
+                <span class="text-xs text-gray-400">${new Date(n.created_at + 'Z').toLocaleString()}</span>
+            </div>
+            <p class="text-sm">${esc(n.content)}</p>
+        </div>
+    `).join('');
+}
+
+async function addNote(e) {
+    e.preventDefault();
+    const input = document.getElementById('note-input');
+    if (!input.value.trim()) return;
+    await apiFetch(`/orgs/${currentOrg.id}/cases/${caseId}/notes`, {
+        method: 'POST',
+        body: JSON.stringify({content: input.value}),
+    });
+    input.value = '';
+    loadNotes();
+    return false;
+}
+
+function onWorkspaceReady() {
+    if (!currentOrg) { window.location.href = '/advocacy/setup'; return; }
+    showSection('overview');
+    loadCase();
+}
+</script>
+{% endblock %}

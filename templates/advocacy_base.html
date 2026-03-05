@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Advocacy Workspace{% endblock %} — BillKarma</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: { 50:'#E6F4EA', 100:'#C8E6D0', 200:'#8BCFA0', 300:'#4EB873', 400:'#00A05E', 500:'#00824F', 600:'#00663D', 700:'#1A1A1A', 800:'#333333', 900:'#111111' },
+                    },
+                    fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/app.css"/>
+    <style>
+        body { background: #F9FAFB; -webkit-font-smoothing: antialiased; }
+        .sidebar { width: 240px; min-height: 100vh; }
+        .main-content { flex: 1; min-width: 0; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-sans text-gray-900">
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="sidebar bg-white border-r border-gray-200 p-4 flex flex-col gap-1 sticky top-0 h-screen">
+            <a href="/" class="flex items-center gap-2.5 px-3 py-2 mb-4">
+                <div class="w-5 h-5 bg-accent-500 rounded-full flex-shrink-0"></div>
+                <span class="font-bold text-sm tracking-tight">BillKarma</span>
+            </a>
+
+            <div id="org-switcher" class="px-3 py-2 mb-2">
+                <select id="org-select" class="w-full text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5" onchange="switchOrg(this.value)">
+                    <option value="">Personal</option>
+                </select>
+            </div>
+
+            <nav id="workspace-nav" class="flex flex-col gap-0.5 hidden">
+                <a href="/advocacy/cases" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors {% block nav_cases %}{% endblock %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Cases
+                </a>
+                <a href="/advocacy/cases/new" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors {% block nav_new_case %}{% endblock %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    New Case
+                </a>
+                <a href="/advocacy/team" id="team-nav" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors {% block nav_team %}{% endblock %} hidden">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path></svg>
+                    Team
+                </a>
+            </nav>
+
+            <div class="mt-auto pt-4 border-t border-gray-100">
+                <div id="user-info" class="px-3 py-2 text-xs text-gray-500 hidden">
+                    <div id="user-name" class="font-medium text-gray-700"></div>
+                    <div id="user-email" class="truncate"></div>
+                </div>
+                <button id="logout-btn" onclick="doLogout()" class="w-full px-3 py-2 text-sm text-gray-500 hover:text-gray-700 text-left hidden">Sign out</button>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content p-6 lg:p-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+    const API = '/api/advocacy';
+    let currentUser = null;
+    let currentOrg = null;
+    let userOrgs = [];
+
+    async function apiFetch(path, opts = {}) {
+        const resp = await fetch(API + path, {
+            headers: {'Content-Type': 'application/json', ...opts.headers},
+            credentials: 'same-origin',
+            ...opts,
+        });
+        if (resp.status === 401) {
+            window.location.href = '/advocacy/login';
+            return null;
+        }
+        const data = await resp.json();
+        if (resp.status >= 400) {
+            throw new Error(data.detail || 'Request failed');
+        }
+        return data;
+    }
+
+    async function initWorkspace() {
+        try {
+            const resp = await apiFetch('/auth/me');
+            if (!resp || !resp.data.user) {
+                window.location.href = '/advocacy/login';
+                return;
+            }
+            currentUser = resp.data.user;
+            userOrgs = resp.data.orgs || [];
+
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-email').textContent = currentUser.email;
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+
+            const select = document.getElementById('org-select');
+            userOrgs.forEach(org => {
+                const opt = document.createElement('option');
+                opt.value = org.id;
+                opt.textContent = org.name;
+                select.appendChild(opt);
+            });
+
+            // Restore org selection
+            const saved = localStorage.getItem('bk_org_id');
+            if (saved && userOrgs.some(o => o.id == saved)) {
+                select.value = saved;
+                currentOrg = userOrgs.find(o => o.id == saved);
+            } else if (userOrgs.length > 0) {
+                select.value = userOrgs[0].id;
+                currentOrg = userOrgs[0];
+            }
+
+            if (currentOrg) {
+                document.getElementById('workspace-nav').classList.remove('hidden');
+                if (currentOrg.role === 'admin') {
+                    document.getElementById('team-nav').classList.remove('hidden');
+                }
+            }
+
+            if (typeof onWorkspaceReady === 'function') onWorkspaceReady();
+        } catch (e) {
+            console.error('Init failed:', e);
+            window.location.href = '/advocacy/login';
+        }
+    }
+
+    function switchOrg(orgId) {
+        if (orgId) {
+            localStorage.setItem('bk_org_id', orgId);
+            currentOrg = userOrgs.find(o => o.id == orgId);
+        } else {
+            localStorage.removeItem('bk_org_id');
+            currentOrg = null;
+        }
+        window.location.reload();
+    }
+
+    async function doLogout() {
+        await apiFetch('/auth/logout', {method: 'POST'});
+        window.location.href = '/advocacy/login';
+    }
+
+    document.addEventListener('DOMContentLoaded', initWorkspace);
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

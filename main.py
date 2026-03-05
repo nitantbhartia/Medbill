@@ -12,6 +12,7 @@ import dispute_service
 import esign as esign_module
 import payment as payment_module
 from api import router as api_router
+from advocacy_api import router as advocacy_router
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -47,6 +48,7 @@ logging.basicConfig(
 
 app = FastAPI(title=config.APP_NAME)
 app.include_router(api_router)
+app.include_router(advocacy_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -499,6 +501,38 @@ async def landing(request: Request):
             "meta_robots": "index, follow",
         },
     )
+
+
+# ── Advocacy Workspace pages ─────────────────────────────────────────────────
+
+@app.get("/advocacy/login", response_class=HTMLResponse)
+async def advocacy_login_page(request: Request):
+    return templates.TemplateResponse("advocacy_login.html", {"request": request})
+
+
+@app.get("/advocacy/setup", response_class=HTMLResponse)
+async def advocacy_setup_page(request: Request):
+    return templates.TemplateResponse("advocacy_setup.html", {"request": request})
+
+
+@app.get("/advocacy/cases", response_class=HTMLResponse)
+async def advocacy_cases_page(request: Request):
+    return templates.TemplateResponse("advocacy_cases.html", {"request": request})
+
+
+@app.get("/advocacy/cases/new", response_class=HTMLResponse)
+async def advocacy_new_case_page(request: Request):
+    return templates.TemplateResponse("advocacy_new_case.html", {"request": request})
+
+
+@app.get("/advocacy/cases/{case_id}", response_class=HTMLResponse)
+async def advocacy_case_detail_page(request: Request, case_id: int):
+    return templates.TemplateResponse("advocacy_case_detail.html", {"request": request, "case_id": case_id})
+
+
+@app.get("/advocacy/team", response_class=HTMLResponse)
+async def advocacy_team_page(request: Request):
+    return templates.TemplateResponse("advocacy_team.html", {"request": request})
 
 
 @app.get("/scan", response_class=HTMLResponse)

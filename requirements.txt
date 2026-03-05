@@ -6,3 +6,5 @@ google-genai==1.14.0
 stripe==11.4.1
 python-dotenv==1.0.1
 pillow==11.1.0
+bcrypt==4.2.1
+weasyprint==63.1
