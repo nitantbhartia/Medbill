@@ -162,6 +162,38 @@
     .article-body .faq-item h3 { margin-top: 0; font-size: 1.08rem; margin-bottom: 8px; }
     .article-body .faq-item p { margin-bottom: 0; font-size: 1rem; }
 
+    .article-body .guide-cta-inline {
+        background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+        border-radius: 20px;
+        padding: 26px 24px;
+        margin: 28px 0;
+        color: #fff;
+        text-align: left;
+    }
+    .article-body .guide-cta-inline h3 {
+        color: #fff;
+        margin: 0 0 8px;
+        font-size: 1.3rem;
+        line-height: 1.25;
+    }
+    .article-body .guide-cta-inline p {
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 14px;
+    }
+    .article-body .guide-cta-inline a {
+        display: inline-block;
+        background: #fff;
+        color: #065f46;
+        border-radius: 999px;
+        padding: 12px 22px;
+        text-decoration: none;
+        font-weight: 800;
+    }
+    .article-body .guide-cta-inline a:hover {
+        background: #f3f4f6;
+        color: #065f46;
+    }
+
     /* CTA at bottom */
     .article-cta {
         background: var(--bk-green); border-radius: 24px; padding: 36px;
@@ -209,10 +241,12 @@
         {{ guide.body | safe }}
     </div>
 
+    {% if not guide.hide_default_cta %}
     <div class="article-cta">
         <h3>Think your bill has errors?</h3>
         <p>Upload your medical bill and we'll compare every line against federal pricing data in 30 seconds.</p>
         <a href="/scan">Check My Bill Free &rarr;</a>
     </div>
+    {% endif %}
 </article>
 {% endblock %}
