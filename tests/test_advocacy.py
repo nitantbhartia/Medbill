@@ -468,3 +468,255 @@ class TestPages:
     def test_setup_page(self):
         resp = client.get("/advocacy/setup")
         assert resp.status_code == 200
+
+    def test_shared_case_page(self):
+        resp = client.get("/advocacy/shared/some-token-here")
+        assert resp.status_code == 200
+
+
+# ── V2 Feature Tests ────────────────────────────────────────────────────────
+
+class TestActivityTimeline:
+    def _setup_case(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        return org_id, case_id
+
+    def test_activity_logged_on_case_create(self):
+        org_id, case_id = self._setup_case()
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/activity")
+        assert resp.status_code == 200
+        activities = resp.json()["data"]
+        assert any(a["action"] == "case_created" for a in activities)
+
+    def test_activity_logged_on_note(self):
+        org_id, case_id = self._setup_case()
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/notes", json={"content": "test note"})
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/activity")
+        activities = resp.json()["data"]
+        assert any(a["action"] == "note_added" for a in activities)
+
+    def test_activity_logged_on_status_change(self):
+        org_id, case_id = self._setup_case()
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}", json={"status": "sent"})
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/activity")
+        activities = resp.json()["data"]
+        assert any(a["action"] == "case_updated" for a in activities)
+
+
+class TestShareLinks:
+    def _setup_case(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        return org_id, case_id
+
+    def test_create_share_link(self):
+        org_id, case_id = self._setup_case()
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share", json={
+            "label": "For patient",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["token"]
+
+    def test_list_share_links(self):
+        org_id, case_id = self._setup_case()
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share", json={"label": "Link 1"})
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share", json={"label": "Link 2"})
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share")
+        assert len(resp.json()["data"]) == 2
+
+    def test_access_shared_case(self):
+        org_id, case_id = self._setup_case()
+        link = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share", json={}).json()["data"]
+        # Access shared case (no auth needed)
+        client.cookies.clear()
+        resp = client.get(f"/api/advocacy/shared/{link['token']}")
+        assert resp.status_code == 200
+        case = resp.json()["data"]
+        assert case["patient_label"] == "Jane Doe"
+        # Sensitive fields should be stripped
+        assert "created_by" not in case
+        assert "assigned_to" not in case
+
+    def test_revoke_share_link(self):
+        org_id, case_id = self._setup_case()
+        link = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share", json={}).json()["data"]
+        # Revoke
+        resp = client.delete(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/share/{link['id']}")
+        assert resp.status_code == 200
+        # Access should fail
+        client.cookies.clear()
+        resp = client.get(f"/api/advocacy/shared/{link['token']}")
+        assert resp.status_code == 410
+
+    def test_invalid_share_token(self):
+        resp = client.get("/api/advocacy/shared/nonexistent-token")
+        assert resp.status_code == 404
+
+
+class TestViewerRole:
+    def _setup_with_viewer(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        # Create viewer
+        register_user(email="viewer@test.org", name="Viewer User")
+        login_user()  # log back as admin
+        client.post(f"/api/advocacy/orgs/{org_id}/members", json={
+            "email": "viewer@test.org", "role": "viewer",
+        })
+        return org_id, case_id
+
+    def test_viewer_can_read_cases(self):
+        org_id, case_id = self._setup_with_viewer()
+        login_user(email="viewer@test.org")
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases")
+        assert resp.status_code == 200
+
+    def test_viewer_cannot_create_case(self):
+        org_id, _ = self._setup_with_viewer()
+        login_user(email="viewer@test.org")
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+            "patient_label": "New Patient",
+        })
+        assert resp.status_code == 403
+
+    def test_viewer_cannot_add_note(self):
+        org_id, case_id = self._setup_with_viewer()
+        login_user(email="viewer@test.org")
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/notes", json={
+            "content": "This should fail",
+        })
+        assert resp.status_code == 403
+
+    def test_viewer_can_read_notes(self):
+        org_id, case_id = self._setup_with_viewer()
+        # Admin adds a note
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/notes", json={"content": "Admin note"})
+        # Viewer reads notes
+        login_user(email="viewer@test.org")
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/notes")
+        assert resp.status_code == 200
+        assert len(resp.json()["data"]) == 1
+
+
+class TestLetterVersionHistory:
+    def _setup_with_letter(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_id = create_case(org_id).json()["data"]["id"]
+        from analyzer import save_bill_and_findings, analyze_bill
+        analysis = analyze_bill(SAMPLE_BILL, "33021")
+        bill_id = save_bill_and_findings(None, SAMPLE_BILL, analysis, "33021")
+        with _db.get_db() as db:
+            db.execute("UPDATE advocacy_cases SET bill_id = ? WHERE id = ?", (bill_id, case_id))
+        letter = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters", json={
+            "letter_type": "hospital_dispute", "fields": {},
+        }).json()["data"]
+        return org_id, case_id, letter["id"]
+
+    def test_version_created_on_edit(self):
+        org_id, case_id, letter_id = self._setup_with_letter()
+        # Edit the letter
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}", json={
+            "content": "Updated content v1",
+        })
+        # Check versions
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions")
+        assert resp.status_code == 200
+        versions = resp.json()["data"]
+        assert len(versions) == 1  # One previous version saved
+
+    def test_multiple_versions(self):
+        org_id, case_id, letter_id = self._setup_with_letter()
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}", json={"content": "v1"})
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}", json={"content": "v2"})
+        resp = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions")
+        assert len(resp.json()["data"]) == 2
+
+    def test_restore_version(self):
+        org_id, case_id, letter_id = self._setup_with_letter()
+        # Get original content
+        original = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters").json()["data"][0]["content"]
+        # Edit
+        client.patch(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}", json={"content": "New content"})
+        # Get version ID
+        versions = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions").json()["data"]
+        version_id = versions[0]["id"]
+        # Restore
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters/{letter_id}/versions/{version_id}/restore")
+        assert resp.status_code == 200
+        # Verify content restored
+        letters = client.get(f"/api/advocacy/orgs/{org_id}/cases/{case_id}/letters").json()["data"]
+        assert letters[0]["content"] == original
+
+
+class TestBulkOperations:
+    def _setup_cases(self, count=3):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        case_ids = []
+        for i in range(count):
+            resp = client.post(f"/api/advocacy/orgs/{org_id}/cases", json={
+                "patient_label": f"Patient {i}",
+                "hospital_name": "Memorial Hospital",
+                "patient_consent": True,
+            })
+            case_ids.append(resp.json()["data"]["id"])
+        return org_id, case_ids
+
+    def test_bulk_status_update(self):
+        org_id, case_ids = self._setup_cases()
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/status", json={
+            "case_ids": case_ids,
+            "status": "sent",
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["updated"] == 3
+
+        # Verify all cases updated
+        for cid in case_ids:
+            case = client.get(f"/api/advocacy/orgs/{org_id}/cases/{cid}").json()["data"]
+            assert case["status"] == "sent"
+
+    def test_bulk_status_invalid(self):
+        org_id, case_ids = self._setup_cases(1)
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/status", json={
+            "case_ids": case_ids,
+            "status": "invalid_status",
+        })
+        assert resp.status_code == 400
+
+    def test_bulk_assign(self):
+        org_id, case_ids = self._setup_cases()
+        # Get user ID (the creator)
+        me = client.get("/api/advocacy/auth/me").json()["data"]["user"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/assign", json={
+            "case_ids": case_ids,
+            "assigned_to": me["id"],
+        })
+        assert resp.status_code == 200
+        assert resp.json()["data"]["updated"] == 3
+
+    def test_bulk_export(self):
+        org_id, case_ids = self._setup_cases()
+        # Add a note to one case
+        client.post(f"/api/advocacy/orgs/{org_id}/cases/{case_ids[0]}/notes", json={"content": "Test note"})
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/export", json={
+            "case_ids": case_ids,
+        })
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert len(data) == 3
+        assert data[0].get("notes_list") is not None
+
+    def test_bulk_empty_case_ids(self):
+        register_user()
+        org_id = create_org().json()["data"]["id"]
+        resp = client.post(f"/api/advocacy/orgs/{org_id}/cases/bulk/status", json={
+            "case_ids": [],
+            "status": "sent",
+        })
+        assert resp.status_code == 400

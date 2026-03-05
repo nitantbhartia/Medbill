@@ -85,6 +85,14 @@ def require_org_member(request: Request, org_id: int) -> dict:
     return {**user, "org_role": row["role"]}
 
 
+def require_org_writer(request: Request, org_id: int) -> dict:
+    """Return user info if they have write access (admin or advocate). Viewers are rejected."""
+    member = require_org_member(request, org_id)
+    if member["org_role"] == "viewer":
+        raise HTTPException(403, "Viewer role does not have write access")
+    return member
+
+
 def require_org_admin(request: Request, org_id: int) -> dict:
     """Return user info if they're an admin of the org, or raise 403."""
     member = require_org_member(request, org_id)
@@ -99,7 +107,7 @@ def invite_member(request: Request, org_id: int, email: str, role: str = "advoca
     email = (email or "").strip().lower()
     if not email:
         raise HTTPException(400, "Email required")
-    if role not in ("admin", "advocate"):
+    if role not in ("admin", "advocate", "viewer"):
         role = "advocate"
 
     with get_db() as db:

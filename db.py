@@ -1173,6 +1173,56 @@ def _run_migrations(db):
     )
     db.execute("CREATE INDEX IF NOT EXISTS idx_case_notes_case ON case_notes(case_id)")
 
+    # ── Advocacy v2 tables ───────────────────────────────────────────────
+
+    # Activity timeline (auto-logged case events)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_activity (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            user_id INTEGER REFERENCES users(id),
+            action TEXT NOT NULL,
+            detail TEXT,
+            metadata TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_case_activity_case ON case_activity(case_id)")
+
+    # Share links (token-based read-only case access)
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS case_share_links (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            case_id INTEGER NOT NULL REFERENCES advocacy_cases(id),
+            token TEXT NOT NULL UNIQUE,
+            created_by INTEGER NOT NULL REFERENCES users(id),
+            label TEXT,
+            active INTEGER DEFAULT 1,
+            expires_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_share_links_token ON case_share_links(token)")
+    db.execute("CREATE INDEX IF NOT EXISTS idx_share_links_case ON case_share_links(case_id)")
+
+    # Letter version history
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS letter_versions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            letter_id INTEGER NOT NULL REFERENCES case_letters(id),
+            content TEXT NOT NULL,
+            edited_by INTEGER NOT NULL REFERENCES users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS idx_letter_versions_letter ON letter_versions(letter_id)")
+
 
 SCHEMA = """
 -- Users
