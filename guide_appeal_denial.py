@@ -8,6 +8,7 @@ register("how-to-appeal-insurance-denial", {
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Insurance Basics",
+    "hide_default_cta": True,
     "faqs": [
         {
             "q": "How long do I have to appeal an insurance denial?",
@@ -36,6 +37,12 @@ register("how-to-appeal-insurance-denial", {
     ],
     "body": f"""
 <p class="lead">Insurance companies deny about 17% of in-network claims, according to KFF. But here&rsquo;s what they don&rsquo;t advertise: <strong>40&ndash;50% of first-level appeals succeed</strong>, and external reviews overturn denials another 40% of the time. Most patients never appeal&mdash;which is exactly what insurers count on. An appealed MRI denial alone can save you <strong>$2,000&ndash;$4,000</strong>. This guide walks you through every step of the appeals process, with templates, timelines, and real results.</p>
+
+<div class="guide-cta-inline">
+    <h3>Got a denial notice like this?</h3>
+    <p>Upload your bill or EOB and generate an appeal letter draft in minutes.</p>
+    <a href="/scan">Scan My Bill &rarr;</a>
+</div>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -234,7 +241,11 @@ register("how-to-appeal-insurance-denial", {
     <li>Keep the tone professional and factual, not emotional or confrontational</li>
 </ul>
 
-<p>Want help identifying the right CPT codes and rates for your appeal? <a href="/scan">Upload your bill or EOB to BillKarma</a> to get a detailed breakdown.</p>
+<div class="guide-cta-inline">
+    <h3>Don&rsquo;t want to write this letter yourself?</h3>
+    <p>Generate your appeal letter automatically with BillKarma, then review and edit before sending.</p>
+    <a href="/scan">Generate My Appeal Letter &rarr;</a>
+</div>
 
 <h2 id="external-review">6. External review &mdash; your ace in the hole</h2>
 
@@ -350,5 +361,11 @@ register("how-to-appeal-insurance-denial", {
     <li><a href="https://www.dol.gov/sites/dolgov/files/EBSA/about-ebsa/our-activities/resource-center/publications/your-rights-after-a-claim-is-denied.pdf" target="_blank" rel="noopener">U.S. Department of Labor: Your Rights After a Health Insurance Claim Is Denied</a></li>
     <li><a href="https://www.commonwealthfund.org/publications/issue-briefs/2023/feb/health-insurance-claim-denials" target="_blank" rel="noopener">Commonwealth Fund: Understanding Health Insurance Claim Denials</a></li>
 </ul>
+
+<div class="guide-cta-inline">
+    <h3>Ready to dispute your denial?</h3>
+    <p>Upload your documents, check for coding issues, and generate your appeal letter now.</p>
+    <a href="/scan">Generate Your Letter &rarr;</a>
+</div>
 """,
 })

@@ -332,6 +332,9 @@ async def scan_bill(
                 img = await f.read()
                 image_list.append((img, f.content_type or "image/jpeg"))
             extracted = scanner.process_multi_page_bill(image_list)
+    except ValueError as e:
+        log.warning("Scan extraction rejected: %s", e)
+        raise HTTPException(400, f"Failed to extract bill data: {e}")
     except Exception as e:
         log.error("Scan extraction failed: %s", e, exc_info=True)
         raise HTTPException(500, f"Failed to extract bill data: {e}")

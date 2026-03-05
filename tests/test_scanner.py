@@ -2,7 +2,9 @@
 Gemini API calls are mocked since we can't make real API calls in tests."""
 
 import sys
+from io import BytesIO
 from unittest.mock import MagicMock
+from PIL import Image
 
 # Mock the google.genai module so scanner can be imported without the real SDK
 _mock_genai = MagicMock()
@@ -10,7 +12,13 @@ sys.modules.setdefault("google", MagicMock())
 sys.modules.setdefault("google.genai", _mock_genai)
 sys.modules.setdefault("google.genai.types", MagicMock())
 
-from scanner import _add_confidence_flags, _quality_score, _merge_candidate  # noqa: E402
+from scanner import (  # noqa: E402
+    _add_confidence_flags,
+    _quality_score,
+    _merge_candidate,
+    _prepare_media_for_ocr,
+    _extract_with_ensemble,
+)
 
 
 class TestAddConfidenceFlags:
@@ -151,3 +159,48 @@ class TestOcrQualityScoring:
         assert merged["line_items"][0]["description"] == "ER visit"
         assert merged["line_items"][0]["charged_amount"] == 800.0
         assert merged["line_items"][0]["quantity"] == 1
+
+
+class TestOcrInputValidation:
+    def _png_bytes(self) -> bytes:
+        img = Image.new("RGB", (4, 4), color=(255, 255, 255))
+        buf = BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    def test_prepare_media_accepts_valid_image(self):
+        data, mime = _prepare_media_for_ocr(self._png_bytes(), "image/png")
+        assert isinstance(data, (bytes, bytearray))
+        assert mime == "image/png"
+
+    def test_prepare_media_rejects_pdf(self):
+        try:
+            _prepare_media_for_ocr(b"%PDF-1.4", "application/pdf")
+            assert False, "Expected ValueError"
+        except ValueError as exc:
+            assert "PDF OCR is not available" in str(exc)
+
+    def test_prepare_media_rejects_invalid_image_bytes(self):
+        try:
+            _prepare_media_for_ocr(b"not-an-image", "image/png")
+            assert False, "Expected ValueError"
+        except ValueError as exc:
+            assert "Could not decode uploaded image" in str(exc)
+
+    def test_extract_with_ensemble_surfaces_variant_errors(self, monkeypatch):
+        def _variants(_bytes, _mime):
+            return [("original", b"abc", "image/png"), ("thresholded", b"def", "image/png")]
+
+        def _fail(*_args, **_kwargs):
+            raise RuntimeError("upstream OCR failed")
+
+        monkeypatch.setattr("scanner._preprocess_variants", _variants)
+        monkeypatch.setattr("scanner._run_vision_extraction", _fail)
+
+        try:
+            _extract_with_ensemble(b"abc", "image/png")
+            assert False, "Expected RuntimeError"
+        except RuntimeError as exc:
+            msg = str(exc)
+            assert "No OCR extraction candidates succeeded." in msg
+            assert "original: upstream OCR failed" in msg
