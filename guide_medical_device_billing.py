@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-device-billing", {
-    "title": "Medical Device and Implant Billing: Why a $200 Screw Costs $20,000 at the Hospital",
-    "meta_description": "Hospitals mark up medical devices 300-1000%. A $3,500 knee implant gets billed at $47,000. Learn how device pricing works, common markups, and how to dispute inflated charges.",
+    "title": "Medical Device and Implant Billing",
+    "meta_description": "Hospitals mark up medical devices 300-1000%. A $3,500 knee implant gets billed at $47,000. Learn how device pricing works, common markups, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("orthopedic-surgery-billing-costs", {
-    "title": "Orthopedic Surgery Billing: What Knee and Hip Replacements Actually Cost",
-    "meta_description": "Knee replacements average $35,000. Hip replacements average $32,000. But BillKarma finds the same procedure varies by $40,000 between hospitals in the same city. Here's what drives the cost and how to pay less.",
+    "title": "Orthopedic Surgery Billing: What Knee",
+    "meta_description": "Knee replacements average $35,000. Hip replacements average $32,000. But BillKarma finds the same procedure varies by $40,000 between hospitals in the same.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Surgery",

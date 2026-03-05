@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("for-profit-vs-nonprofit-hospital-billing", {
-    "title": "For-Profit vs. Nonprofit Hospitals: How Ownership Affects What You Pay",
-    "meta_description": "For-profit hospitals average higher markups than nonprofits — but nonprofit doesn't mean fair billing. Learn how ownership type affects your bill and what each owes you.",
+    "title": "For-Profit vs. Nonprofit Hospitals",
+    "meta_description": "For-profit hospitals average higher markups than nonprofits — but nonprofit doesn't mean fair billing. Learn how ownership type affects your bill and what.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Billing Basics",

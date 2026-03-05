@@ -2,8 +2,8 @@
 from guides import register, _embed
 
 register("medical-bill-hardship-letter", {
-    "title": "Medical Bill Hardship Letter Template: How to Write One That Actually Works",
-    "meta_description": "Free medical bill hardship letter template with step-by-step instructions. Learn what to include to get bills reduced 50-100% through hospital financial assistance.",
+    "title": "Medical Bill Hardship Letter Template",
+    "meta_description": "Free medical bill hardship letter template with step-by-step instructions. Learn what to include to get bills reduced 50-100% through hospital financial.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
     "category": "Debt Relief",

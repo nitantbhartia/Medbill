@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("allergy-testing-billing", {
-    "title": "Allergy Testing Costs: What Insurance Covers and How to Avoid Surprise Bills",
-    "meta_description": "A blood allergy panel can cost $4,200 when a $380 skin prick test was clinically appropriate. Learn allergy test CPT codes, insurance rules, and how to dispute overcharges.",
+    "title": "Allergy Testing Costs: What Insurance Covers",
+    "meta_description": "A blood allergy panel can cost $4,200 when a $380 skin prick test was clinically appropriate. Learn allergy test CPT codes, insurance rules, and how to.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",

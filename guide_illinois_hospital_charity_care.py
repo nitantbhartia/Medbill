@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("illinois-hospital-charity-care", {
-    "title": "Illinois Hospital Charity Care: Free and Reduced-Cost Care Up to 600% FPL and Patient Billing Rights (2026)",
-    "meta_description": "Illinois requires hospitals to provide charity care on a sliding scale up to 600% FPL — one of the broadest in the US. Learn the income limits, how to apply, and Illinois medical billing rights.",
+    "title": "Illinois Hospital Charity Care: Free",
+    "meta_description": "Illinois requires hospitals to provide charity care on a sliding scale up to 600% FPL — one of the broadest in the US.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

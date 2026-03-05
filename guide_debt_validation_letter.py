@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("debt-validation-letter-medical-debt", {
-    "title": "How to Write a Debt Validation Letter for Medical Debt (2026 Template)",
-    "meta_description": "Send a debt validation letter within 30 days to force collectors to prove your medical debt is valid. Free template, step-by-step instructions, and certified mail tips.",
+    "title": "How to Write a Debt Validation Letter for Medical Debt (2026",
+    "meta_description": "Send a debt validation letter within 30 days to force collectors to prove your medical debt is valid. Free template, step-by-step instructions, and certified.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

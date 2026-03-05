@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("home-health-billing", {
-    "title": "Home Health Billing: What Medicare Covers, What Agencies Charge, and How to Dispute Errors",
-    "meta_description": "Medicare covers skilled home health care — but billing errors cost patients thousands. Learn PDGM episode billing, HCPCS codes, visit log rights, and how to dispute home health charges.",
+    "title": "Home Health Billing: What Medicare Covers",
+    "meta_description": "Medicare covers skilled home health care — but billing errors cost patients thousands. Learn PDGM episode billing, HCPCS codes, visit log rights, and how to.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Billing Basics",

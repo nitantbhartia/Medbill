@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("how-long-to-pay-medical-bill", {
-    "title": "How Long Do You Have to Pay a Medical Bill? Deadlines, Grace Periods & Consequences",
-    "meta_description": "Medical bill due dates are not as final as they look. Learn the real timeline from billing to collections, grace periods, and how to use time strategically to negotiate or settle.",
+    "title": "How Long Do You Have to Pay a Medical Bill? Deadlines, Grace",
+    "meta_description": "Medical bill due dates are not as final as they look. Learn the real timeline from billing to collections, grace periods, and how to use time strategically.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

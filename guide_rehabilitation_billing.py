@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("rehabilitation-billing", {
-    "title": "Inpatient Rehab Billing: Costs, Medicare Rules, and How to Appeal Denials",
-    "meta_description": "Inpatient rehab stays average $38,000. Medicare requires the 60% rule and 3 hours of daily therapy. Learn IRF vs SNF costs, coverage rules, and how to appeal denials.",
+    "title": "Inpatient Rehab Billing: Costs",
+    "meta_description": "Inpatient rehab stays average $38,000. Medicare requires the 60% rule and 3 hours of daily therapy. Learn IRF vs SNF costs, coverage rules, and how to appeal.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-billing-advocate", {
-    "title": "Medical Billing Advocate: When to Hire One, What They Cost, and What They Do",
-    "meta_description": "A medical billing advocate reviews your bills, disputes errors, and negotiates with hospitals on your behalf. Learn when to hire one, what they charge, and when to DIY instead.",
+    "title": "Medical Billing Advocate: When to Hire One",
+    "meta_description": "A medical billing advocate reviews your bills, disputes errors, and negotiates with hospitals on your behalf. Learn when to hire one, what they charge, and.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Taking Action",

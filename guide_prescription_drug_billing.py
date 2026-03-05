@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("prescription-drug-billing-errors", {
-    "title": "Prescription Drug Billing Errors: How Pharmacies Overcharge and What to Do",
-    "meta_description": "Pharmacy billing errors cost Americans billions annually. A generic drug that costs $4 can be billed at $80. Learn the most common prescription billing mistakes, how drug pricing works, and how to pay less.",
+    "title": "Prescription Drug Billing Errors: How Pharmacies Overcharge",
+    "meta_description": "Pharmacy billing errors cost Americans billions annually. A generic drug that costs $4 can be billed at $80. Learn the most common prescription billing.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Prescription Drugs",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("pennsylvania-hospital-charity-care", {
-    "title": "Pennsylvania Hospital Charity Care: Act 169, Income-Based Free Care, and Your Billing Rights (2026)",
-    "meta_description": "Pennsylvania's Act 169 requires hospitals to provide free care for low-income patients and bans wage garnishment for medical debt. Learn the income thresholds and how to apply.",
+    "title": "Pennsylvania Hospital Charity Care: Act 169",
+    "meta_description": "Pennsylvania's Act 169 requires hospitals to provide free care for low-income patients and bans wage garnishment for medical debt.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

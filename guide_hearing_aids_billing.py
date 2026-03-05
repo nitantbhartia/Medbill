@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hearing-aids-billing", {
-    "title": "Hearing Aid Costs and Insurance: Coverage, Savings, and OTC Options",
-    "meta_description": "Hearing aids cost $1,000-$6,000 per ear. OTC options start at $200. Learn insurance coverage rules, Medicare limits, state mandates, and how to save thousands.",
+    "title": "Hearing Aid Costs and Insurance: Coverage",
+    "meta_description": "Hearing aids cost $1,000-$6,000 per ear. OTC options start at $200. Learn insurance coverage rules, Medicare limits, state mandates, and how to save.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",

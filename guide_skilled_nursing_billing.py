@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("skilled-nursing-facility-billing", {
-    "title": "Skilled Nursing Facility Billing: Costs, Medicare Coverage, and Appeals",
+    "title": "Skilled Nursing Facility Billing: Costs",
     "meta_description": "Medicare covers up to 100 days in a skilled nursing facility, but coinsurance starts at day 21. Learn SNF costs, coverage rules, and how to appeal denials.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

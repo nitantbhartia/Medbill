@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("prior-authorization", {
-    "title": "Prior Authorization: Why Insurance Delays Your Care (And How to Fight Back)",
-    "meta_description": "Insurance plans improperly denied 13% of valid prior auth requests, yet 75% of appeals succeed. Learn what triggers PA requirements, why requests get denied, and how to appeal.",
+    "title": "Prior Authorization",
+    "meta_description": "Insurance plans improperly denied 13% of valid prior auth requests, yet 75% of appeals succeed. Learn what triggers PA requirements, why requests get denied.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

@@ -6,7 +6,7 @@ register(
     "how-medicare-billing-works",
     {
         "title": "How Medicare Billing Works: Part A, Part B, and What You Owe",
-        "meta_description": "Medicare covers 67 million Americans but billing rules confuse most patients. Learn how Part A and Part B billing work, what you'll owe, and how to catch billing errors before you pay.",
+        "meta_description": "Medicare covers 67 million Americans but billing rules confuse most patients. Learn how Part A and Part B billing work, what you'll owe, and how to catch.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
         "category": "Medicare",

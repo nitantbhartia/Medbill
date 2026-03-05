@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("colorado-medical-billing-laws", {
-    "title": "Colorado Medical Billing Laws: Facility Fee Bans, Patient Rights, and How to Fight Your Bill (2026)",
-    "meta_description": "Colorado bans facility fees at off-campus clinics and requires charity care up to 350% FPL. Learn your rights under HB 22-1285, surprise billing protections, and how to dispute hospital charges.",
+    "title": "Colorado Medical Billing Laws: Facility Fee Bans",
+    "meta_description": "Colorado bans facility fees at off-campus clinics and requires charity care up to 350% FPL. Learn your rights under HB 22-1285, surprise billing protections.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

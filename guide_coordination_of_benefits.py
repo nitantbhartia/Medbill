@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("coordination-of-benefits-dual-insurance", {
-    "title": "Coordination of Benefits: How Dual Insurance Works (And How Billing Mistakes Cost You Thousands)",
+    "title": "Coordination of Benefits",
     "meta_description": "Coordination of benefits errors cause thousands in surprise bills. Learn how primary vs secondary insurance works, common COB mistakes, and how to fix them.",
     "published": "2026-02-28",
     "author": "BillKarma Team",

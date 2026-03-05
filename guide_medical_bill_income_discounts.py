@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("income-based-medical-bill-discounts", {
-    "title": "Income-Based Medical Bill Discounts: Do You Qualify for Free or Reduced Care?",
+    "title": "Income-Based Medical Bill Discounts: Do You Qualify",
     "meta_description": "Earn under $62,400? You may qualify for 25-100% off hospital bills through income-based discounts. Learn the FPL thresholds, how to apply, and what to expect.",
     "published": "2026-02-24",
     "author": "BillKarma Team",

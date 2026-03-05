@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-billing-errors-statistics-2026", {
-    "title": "Medical Billing Errors: 2026 Statistics, Types, and What They Cost You",
-    "meta_description": "26-49% of Medicare claims contain errors and 80% of bills have mistakes. See 2026 statistics on billing error types, costs, dispute success rates, and how to protect yourself.",
+    "title": "Medical Billing Errors: 2026 Statistics",
+    "meta_description": "See 2026 medical billing error statistics, common error types, dispute success rates, and the costs mistakes can add to patient bills.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
     "category": "Billing Basics",

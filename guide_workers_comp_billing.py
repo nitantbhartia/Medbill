@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("workers-compensation-medical-billing", {
-    "title": "Workers\u2019 Compensation Medical Billing: What You Should (and Shouldn\u2019t) Pay",
-    "meta_description": "Workers' compensation should cover 100% of your medical bills from a work injury. But billing disputes, denied claims, and provider confusion are common. Here's how workers comp billing works and what to do when it doesn't.",
+    "title": "Workers’ Compensation Medical Billing",
+    "meta_description": "Workers' compensation should cover 100% of your medical bills from a work injury. But billing disputes, denied claims, and provider confusion are common.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Workers' Comp",

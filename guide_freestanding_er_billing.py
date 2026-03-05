@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("freestanding-er-billing", {
     "title": "Freestanding ER vs Hospital ER: Why Your Bill Could Be 3x Higher",
-    "meta_description": "Freestanding ERs charge hospital-level facility fees for minor visits. Learn why they cost 3x more, which states regulate them, and how to dispute inflated bills.",
+    "meta_description": "Freestanding ERs charge hospital-level facility fees for minor visits. Learn why they cost 3x more, which states regulate them, and how to dispute inflated.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

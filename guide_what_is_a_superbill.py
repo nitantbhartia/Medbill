@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("what-is-a-superbill", {
-    "title": "What Is a Superbill? How to Get Out-of-Network Insurance Reimbursement",
-    "meta_description": "A superbill lets you get reimbursed by insurance for out-of-network care. Learn what a superbill is, how to request one, and how to submit it for maximum reimbursement.",
+    "title": "What Is a Superbill? How to Get Out-of-Network Insurance",
+    "meta_description": "A superbill lets you get reimbursed by insurance for out-of-network care. Learn what a superbill is, how to request one, and how to submit it for maximum.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
     "category": "Insurance",

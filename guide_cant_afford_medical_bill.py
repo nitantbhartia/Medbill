@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("cant-afford-medical-bill", {
-    "title": "Can't Afford Your Medical Bill? 7 Options Before It Goes to Collections",
-    "meta_description": "Can't pay your medical bill? You have 7 real options — from charity care to payment plans to negotiation. Act before collections and save 50-100% on what you owe.",
+    "title": "Can't Afford Your Medical Bill? 7 Options Before It Goes to",
+    "meta_description": "Can't pay your medical bill? You have 7 real options — from charity care to payment plans to negotiation. Act before collections and save 50-100% on what you.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Negotiation",

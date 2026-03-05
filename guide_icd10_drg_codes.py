@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("icd10-drg-codes", {
-    "title": "ICD-10 and DRG Codes: How Diagnosis Codes Affect Your Hospital Bill",
+    "title": "ICD-10 and DRG Codes",
     "meta_description": "A wrong DRG code can inflate your hospital bill by $14,000 or more. Learn how ICD-10 and DRG codes work, how upcoding happens, and how to verify your coding.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

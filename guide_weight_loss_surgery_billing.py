@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("weight-loss-surgery-billing", {
-    "title": "Bariatric Surgery Costs: Insurance Requirements, Appeals, and How to Save",
+    "title": "Bariatric Surgery Costs: Insurance Requirements",
     "meta_description": "Bariatric surgery costs $15,000-$35,000. Learn insurance BMI requirements, the 6-month diet rule, how to appeal denials, and Centers of Excellence discounts.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

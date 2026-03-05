@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("arizona-medical-billing-laws", {
-    "title": "Arizona Medical Billing Laws: Patient Rights, Financial Assistance, and How to Fight Your Bill (2026)",
-    "meta_description": "Arizona patients have surprise billing protections under ARS 20-3102, AHCCCS Medicaid coverage, and charity care options. Learn your rights and how to dispute hospital bills.",
+    "title": "Arizona Medical Billing Laws: Patient Rights",
+    "meta_description": "Arizona patients have surprise billing protections under ARS 20-3102, AHCCCS Medicaid coverage, and charity care options.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

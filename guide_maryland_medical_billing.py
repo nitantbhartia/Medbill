@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("maryland-medical-billing-laws", {
-    "title": "Maryland Medical Billing Laws: The All-Payer System, Patient Protections, and How to Fight Your Bill (2026)",
-    "meta_description": "Maryland is the only state where a government commission sets all hospital rates. Learn how the HSCRC all-payer system, charity care, and debt protections can cut your bill.",
+    "title": "Maryland Medical Billing Laws: The All-Payer System",
+    "meta_description": "Maryland is the only state where a government commission sets all hospital rates. Learn how the HSCRC all-payer system, charity care, and debt protections.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

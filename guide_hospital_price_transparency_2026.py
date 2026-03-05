@@ -6,7 +6,7 @@ _calc_embed = _embed(mode="cost", title="Look up Medicare rates for any procedur
 _markup_embed = _embed(mode="markup", title="Calculate your hospital&rsquo;s markup", subtitle="Enter a CPT code and the amount you were charged to see the markup over Medicare.", height="420")
 
 register("hospital-price-transparency-rules-2026", {
-    "title": "Hospital Price Transparency in 2026: How to Use It to Lower Your Bill",
+    "title": "Hospital Price Transparency in 2026",
     "meta_description": "Hospitals must publish all prices online or face $2M+ fines. Learn how to find, read, and use hospital price data to negotiate your medical bill down.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

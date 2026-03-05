@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("hospital-payment-plans", {
     "title": "Hospital Payment Plans: How to Negotiate 0% Interest Installments",
-    "meta_description": "Hospital payment plans are almost always 0% interest — far better than credit cards. Learn how to negotiate terms, what to watch for, and how to protect yourself.",
+    "meta_description": "Hospital payment plans are almost always 0% interest — far better than credit cards. Learn how to negotiate terms, what to watch for, and how to protect.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Negotiation",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("preventive-care-billing", {
-    "title": "Preventive Care Billing: What's Free Under Insurance and What Gets Billed",
-    "meta_description": "The ACA requires insurers to cover preventive care at no cost. Learn which services are free, when preventive turns diagnostic, and how to fight wrongly-billed preventive visits.",
+    "title": "Preventive Care Billing: What's Free Under Insurance",
+    "meta_description": "The ACA requires insurers to cover preventive care at no cost. Learn which services are free, when preventive turns diagnostic, and how to fight.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Insurance",

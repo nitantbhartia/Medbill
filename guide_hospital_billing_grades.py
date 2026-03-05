@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-billing-grades-explained", {
-    "title": "Hospital Billing Grades Explained: What A Through F Means for Your Bill",
-    "meta_description": "BillKarma grades every hospital A–F based on how much they charge vs. Medicare. Learn what each grade means, how it's calculated, and how to use it before your next visit.",
+    "title": "Hospital Billing Grades Explained: What A Through F Means",
+    "meta_description": "BillKarma grades every hospital A–F based on how much they charge vs. Medicare. Learn what each grade means, how it's calculated, and how to use it before.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Billing Basics",

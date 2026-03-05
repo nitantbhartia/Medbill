@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("surprise-assistant-surgeon-bills", {
-    "title": "Surprise Bills from Assistant Surgeons: Your Rights and What to Do",
+    "title": "Surprise Bills from Assistant Surgeons: Your Rights",
     "meta_description": "Got an unexpected bill from an assistant surgeon you never chose? Learn how modifier 80/82 billing works, your No Surprises Act rights, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

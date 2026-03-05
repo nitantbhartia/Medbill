@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-cash-pay-self-pay-discount", {
-    "title": "Paying Cash at a Hospital: When Skipping Insurance Actually Saves You Money",
-    "meta_description": "Cash prices at hospitals average 52% below gross charges. With high-deductible plans, you may save more paying cash than running through insurance. Here's how to know.",
+    "title": "Paying Cash at a Hospital",
+    "meta_description": "Cash prices at hospitals average 52% below gross charges. With high-deductible plans, you may save more paying cash than running through insurance. Here's.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Negotiation",

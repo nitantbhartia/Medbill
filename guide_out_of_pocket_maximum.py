@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("out-of-pocket-maximum", {
-    "title": "Out-of-Pocket Maximum: What It Is, What Counts, and Common Billing Traps",
-    "meta_description": "The 2026 ACA out-of-pocket maximum is $9,450 for individuals. Learn what counts toward it, what doesn't, and how hospitals sometimes ignore it — costing you thousands.",
+    "title": "Out-of-Pocket Maximum: What It Is",
+    "meta_description": "The 2026 ACA out-of-pocket maximum is $9,450 for individuals. Learn what counts toward it, what doesn't, and how hospitals sometimes ignore it — costing you.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

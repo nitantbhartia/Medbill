@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("maternity-hospital-bill", {
-    "title": "Maternity Hospital Bill: What Every Charge Means and How to Dispute It",
-    "meta_description": "The average vaginal delivery costs $14,768 — and maternity bills are among the most error-prone. Learn what every charge means and how to dispute common overcharges.",
+    "title": "Maternity Hospital Bill: What Every Charge Means",
+    "meta_description": "The average vaginal delivery costs $14,768 — and maternity bills are among the most error-prone. Learn what every charge means and how to dispute common.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("hospital-liens-explained", {
     "title": "Hospital Liens Explained: What They Are and How to Fight Them",
-    "meta_description": "A hospital lien lets hospitals claim part of your injury settlement. Learn how hospital liens work, your rights, and proven strategies to reduce or remove them.",
+    "meta_description": "A hospital lien lets hospitals claim part of your injury settlement. Learn how hospital liens work, your rights, and proven strategies to reduce or remove.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
     "category": "Legal Rights",

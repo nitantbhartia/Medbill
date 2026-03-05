@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-debt-buying-house", {
-    "title": "Medical Debt and Buying a House: What Mortgage Lenders See in 2026",
-    "meta_description": "Medical debt rules changed for homebuyers. Learn how medical collections affect mortgage approval, FICO scores lenders use, and strategies to buy a house with medical debt in 2026.",
+    "title": "Medical Debt and Buying a House",
+    "meta_description": "Medical debt rules changed for homebuyers. Learn how medical collections affect mortgage approval, FICO scores lenders use, and strategies to buy a house.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Medical Debt",

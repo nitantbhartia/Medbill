@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("pay-for-delete-medical-debt", {
     "title": "Pay-for-Delete Letters for Medical Debt: Do They Work in 2026?",
-    "meta_description": "A pay-for-delete letter asks collectors to remove medical debt from your credit report in exchange for payment. Learn how they work, success rates, and free templates.",
+    "meta_description": "A pay-for-delete letter asks collectors to remove medical debt from your credit report in exchange for payment.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

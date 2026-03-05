@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("hospital-financial-assistance-guide", {
-    "title": "How to Apply for Hospital Financial Assistance: A Step-by-Step Guide",
+    "title": "How to Apply for Hospital Financial Assistance",
     "meta_description": "Nonprofit hospitals must offer financial assistance by law. Learn 501(r) requirements, income thresholds, the application process, and what to do if denied.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

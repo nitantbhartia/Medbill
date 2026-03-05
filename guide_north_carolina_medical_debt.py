@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("north-carolina-medical-debt-laws", {
-    "title": "North Carolina Medical Debt Laws: No Wage Garnishment, Charity Care Rights, and Dispute Guide (2026)",
-    "meta_description": "North Carolina prohibits wage garnishment for medical debt by private collectors — one of only a handful of states with this protection. Learn your NC billing rights, charity care options, and how to dispute.",
+    "title": "North Carolina Medical Debt Laws: No Wage Garnishment",
+    "meta_description": "North Carolina prohibits wage garnishment for medical debt by private collectors — one of only a handful of states with this protection.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

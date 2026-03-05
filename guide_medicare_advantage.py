@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medicare-advantage-billing", {
-    "title": "Medicare Advantage Billing: What's Different and What Can Go Wrong",
-    "meta_description": "54% of Medicare beneficiaries are enrolled in Medicare Advantage plans. Learn how MA billing differs from traditional Medicare, common billing traps, and how to appeal denials.",
+    "title": "Medicare Advantage Billing: What's Different",
+    "meta_description": "Learn how Medicare Advantage billing differs from Original Medicare, common billing traps, and how to appeal denials when claims are not paid correctly.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

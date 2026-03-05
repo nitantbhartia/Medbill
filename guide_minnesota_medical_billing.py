@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("minnesota-medical-billing-laws", {
-    "title": "Minnesota Medical Billing Laws: Surprise Billing, MinnesotaCare, and Patient Rights (2026)",
-    "meta_description": "Minnesota surprise billing law (62Q.556), MinnesotaCare, charity care rules, and medical debt protections. Learn how to dispute hospital bills and protect your rights in MN.",
+    "title": "Minnesota Medical Billing Laws: Surprise Billing",
+    "meta_description": "Minnesota surprise billing law (62Q.556), MinnesotaCare, charity care rules, and medical debt protections. Learn how to dispute hospital bills and protect.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

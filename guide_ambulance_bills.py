@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("how-to-fight-an-ambulance-bill", {
-    "title": "How to Fight an Ambulance Bill: Why They Cost So Much and What You Can Do",
-    "meta_description": "Ambulance bills average $1,200–$2,500 for ground transport. Learn why they're so expensive, when balance billing is illegal, and how to dispute or reduce yours.",
+    "title": "How to Fight an Ambulance Bill: Why They Cost So Much",
+    "meta_description": "Ambulance bills average $1,200–$2,500 for ground transport. Learn why they're so expensive, when balance billing is illegal, and how to dispute or reduce.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Taking Action",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("connecticut-medical-billing-laws", {
-    "title": "Connecticut Medical Billing Laws: Facility Fee Bans, Surprise Billing, and Patient Rights (2026)",
-    "meta_description": "Connecticut bans facility fees at hospital-owned offices and has strong surprise billing protections. Learn how CT laws protect patients and how to dispute overcharges.",
+    "title": "Connecticut Medical Billing Laws: Facility Fee Bans",
+    "meta_description": "Connecticut bans facility fees at hospital-owned offices and has strong surprise billing protections. Learn how CT laws protect patients and how to dispute.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

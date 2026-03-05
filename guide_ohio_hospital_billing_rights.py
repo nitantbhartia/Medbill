@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("ohio-hospital-billing-rights", {
-    "title": "Ohio Hospital Billing Rights: Charity Care, Wage Garnishment Rules, and How to Dispute Your Bill (2026)",
-    "meta_description": "Ohio nonprofit hospitals must provide charity care under IRS rules, and your wages are partially protected from medical debt garnishment. Learn Ohio's hospital billing laws for 2026.",
+    "title": "Ohio Hospital Billing Rights: Charity Care",
+    "meta_description": "Ohio nonprofit hospitals must provide charity care under IRS rules, and your wages are partially protected from medical debt garnishment.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

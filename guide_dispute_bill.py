@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-dispute-a-medical-bill", {
-    "title": "How to Dispute a Medical Bill: A Step-by-Step Guide With Templates",
+    "title": "How to Dispute a Medical Bill",
     "meta_description": "Learn exactly how to dispute a medical bill with sample letters, phone scripts, and step-by-step instructions. Know your rights and save hundreds.",
     "published": "2026-02-18",
     "author": "BillKarma Team",

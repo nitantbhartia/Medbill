@@ -6,7 +6,7 @@ register(
     "medical-debt-credit-score",
     {
         "title": "Medical Debt and Your Credit Score: What Changed in 2025",
-        "meta_description": "New CFPB rules removed medical debt under $500 from credit reports in 2025. Learn how medical debt affects your credit, how to dispute inaccurate collections, and what to do before debt collectors call.",
+        "meta_description": "New CFPB rules removed medical debt under $500 from credit reports in 2025. Learn how medical debt affects your credit, how to dispute inaccurate.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
         "category": "Medical Debt",

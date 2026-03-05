@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("air-ambulance-bills", {
     "title": "Air Ambulance Bills: Why They Cost $50,000+ and How to Fight Back",
-    "meta_description": "Air ambulance bills average $36,400 and can exceed $100,000. Learn how the No Surprises Act protects you, plus 5 strategies to reduce or eliminate air ambulance debt.",
+    "meta_description": "Air ambulance bills average $36,400 and can exceed $100,000. Learn how the No Surprises Act protects you, plus 5 strategies to reduce or eliminate air.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
     "category": "Cost Guides",

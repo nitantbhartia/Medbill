@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("duplicate-charges-hospital-bills", {
-    "title": "Double Billing and Duplicate Charges on Hospital Bills: How to Spot and Dispute Them",
-    "meta_description": "Duplicate charges appear on up to 30% of hospital bills. Learn the 8 types of double billing, how to spot them on your itemized bill, and how to get your money back.",
+    "title": "Double Billing and Duplicate Charges on Hospital Bills",
+    "meta_description": "Duplicate charges appear on up to 30% of hospital bills. Learn the 8 types of double billing, how to spot them on your itemized bill, and how to get your.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

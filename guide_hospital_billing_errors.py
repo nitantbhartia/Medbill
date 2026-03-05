@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("common-hospital-billing-errors", {
-    "title": "The 7 Most Common Hospital Billing Errors \u2014 And How to Catch Each One",
-    "meta_description": "Billing errors appear in roughly 1 in 4 hospital bills. Learn the 7 most common error types\u2014upcoding, duplicates, unbundling, and more\u2014and how to catch and dispute each one.",
+    "title": "The 7 Most Common Hospital Billing Errors — And How to Catch",
+    "meta_description": "Billing errors appear in roughly 1 in 4 hospital bills. Learn the 7 most common error types—upcoding, duplicates, unbundling, and more—and how to catch and.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Taking Action",

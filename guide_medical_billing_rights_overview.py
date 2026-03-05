@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-billing-rights-overview", {
     "title": "Your Medical Billing Rights: A State-by-State Overview",
-    "meta_description": "Know your medical billing rights. Federal and state laws protect you from surprise bills, require itemized statements, and limit debt collection. Full overview.",
+    "meta_description": "Know your medical billing rights. Federal and state laws protect you from surprise bills, require itemized statements, and limit debt collection. Full.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Patient Rights",

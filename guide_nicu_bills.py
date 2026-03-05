@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("nicu-bills-explained", {
-    "title": "NICU Bills Explained: Understanding and Fighting Newborn ICU Charges",
-    "meta_description": "NICU stays average $3,000/day and total $50,000 to $500,000+. Learn how to read your NICU bill, spot the 5 most common billing errors, and access financial assistance.",
+    "title": "NICU Bills Explained: Understanding",
+    "meta_description": "NICU stays average $3,000/day and total $50,000 to $500,000+. Learn how to read your NICU bill, spot the 5 most common billing errors, and access financial.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("genetic-testing-billing", {
-    "title": "Genetic Testing Bills: Insurance Coverage, Surprise Costs, and Your Rights",
-    "meta_description": "Genetic tests cost $250-$10,000 and surprise bills are common. Learn about BRCA, prenatal, and pharmacogenomic testing costs, insurance pre-auth rules, and how to dispute.",
+    "title": "Genetic Testing Bills: Insurance Coverage",
+    "meta_description": "Genetic tests cost $250-$10,000 and surprise bills are common. Learn about BRCA, prenatal, and pharmacogenomic testing costs, insurance pre-auth rules, and.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",

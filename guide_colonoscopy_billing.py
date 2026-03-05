@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("colonoscopy-billing", {
-    "title": "Colonoscopy Billing: Why Your \u2018Free\u2019 Screening Turned Into a $900 Bill",
-    "meta_description": "A preventive colonoscopy is free under ACA \u2014 until a polyp is removed. Learn how the reclassification loophole works, what the 2023 federal rule changed, and how to dispute the bill.",
+    "title": "Colonoscopy Billing",
+    "meta_description": "A preventive colonoscopy is free under ACA — until a polyp is removed. Learn how the reclassification loophole works, what the 2023 federal rule changed, and.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Patient Rights",

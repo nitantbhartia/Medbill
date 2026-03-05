@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-appeal-insurance-denial", {
-    "title": "How to Appeal a Health Insurance Claim Denial: A Step-by-Step Guide",
+    "title": "How to Appeal a Health Insurance Claim Denial",
     "meta_description": "Insurance denials get overturned 40-50% of the time on first appeal. Learn exactly how to appeal a denied claim with templates, timelines, and real examples.",
     "published": "2026-02-20",
     "author": "BillKarma Team",

@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("how-health-insurance-works", {
-    "title": "How Health Insurance Works: A Complete Guide to Premiums, Deductibles, and Claims",
-    "meta_description": "Understand how health insurance actually works: premiums, deductibles, copays, coinsurance, out-of-pocket maximums, how claims flow, and network types explained simply.",
+    "title": "How Health Insurance Works: A Complete Guide to Premiums",
+    "meta_description": "Understand how health insurance actually works: premiums, deductibles, copays, coinsurance, out-of-pocket maximums, how claims flow, and network types.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Insurance",
