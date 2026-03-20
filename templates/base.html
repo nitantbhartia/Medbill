@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}BillKarma{% endblock %}</title>
+    <meta name="description" content="{{ og_description if og_description else 'Compare hospital prices, check billing grades, and fight unfair medical bills. Free bill scan, dispute tools, and charity care help.' }}">
     <meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">
     <meta name="theme-color" content="#00824F">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"BillKarma","url":"https://www.billkarma.com","description":"Compare hospital prices, check billing grades, and fight unfair medical bills.","sameAs":[]}</script>
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta property="og:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
@@ -15,8 +17,9 @@
     <meta name="twitter:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta name="twitter:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta name="twitter:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <script>
         tailwind.config = {
             theme: {
@@ -45,7 +48,8 @@
         }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     <link rel="preload" href="/static/css/app.css" as="style">
     <link rel="stylesheet" href="/static/css/app.css"/>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}

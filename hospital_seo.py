@@ -2131,7 +2131,7 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
 
 
 def _build_page_title(name: str) -> str:
-    suffix = " Billing Grade, Prices & Charity Care | BillKarma"
+    suffix = " Billing: Prices, Grade & Payment Help | BillKarma"
     max_name = 60 - len(suffix)
     return _truncate_name(name, max_name) + suffix
 
@@ -2146,17 +2146,16 @@ def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
 
     markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
     loc = f" in {city}, {state_code}" if city and state_code else ""
-    proc_txt = f"See {proc_count} procedure prices, " if proc_count else "See procedure prices, "
+    proc_txt = f"{proc_count} procedure prices" if proc_count else "procedure prices"
 
     desc = (
-        f"{name}{loc} has a BillKarma billing grade of {grade} "
-        f"with an average markup of {markup_txt} Medicare. "
-        f"{proc_txt}compare nearby hospitals, and scan your bill free."
+        f"Struggling with a bill from {name}{loc}? "
+        f"Billing grade: {grade} (markup {markup_txt} Medicare). "
+        f"See {proc_txt}, dispute tips, charity care options, and free bill scan."
     )
-    if len(desc) <= 155:
+    if len(desc) <= 160:
         return desc
-    # Truncate at last word boundary before 152 chars, append ellipsis
-    cut = desc[:152]
+    cut = desc[:157]
     last_space = cut.rfind(" ")
     return (cut[:last_space] if last_space > 100 else cut) + "..."
 

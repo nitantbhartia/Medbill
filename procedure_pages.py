@@ -1148,13 +1148,13 @@ def _build_procedure_seo(
     rate_str = f"${medicare_rate:,.0f}" if medicare_rate else "N/A"
     avg_str = f"${avg_charge:,.0f}" if avg_charge else "N/A"
     reviewed_on = date.today().isoformat()
-    title = f"{name} Cost & Fair Price | BillKarma"
+    title = f"CPT {cpt_code} ({name}) Cost: Fair Price Guide | BillKarma"
     if len(title) > 60:
-        short = name[:28].rsplit(" ", 1)[0] if len(name) > 28 else name
-        title = f"{short} Fair Price | BillKarma"
+        short = name[:22].rsplit(" ", 1)[0] if len(name) > 22 else name
+        title = f"CPT {cpt_code} {short} Cost | BillKarma"
     desc = (
-        f"CPT {cpt_code}. Medicare rate {rate_str}. National average charge {avg_str}. "
-        f"Compare {hospital_count:,} local providers, fair prices, and billing grades before you schedule."
+        f"How much does {name} (CPT {cpt_code}) cost? Medicare rate: {rate_str}. "
+        f"Average hospital charge: {avg_str}. Compare {hospital_count:,} providers near you."
     )
     if len(desc) > 155:
         desc = desc[:152].rsplit(" ", 1)[0] + "..."
