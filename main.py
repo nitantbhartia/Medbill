@@ -667,13 +667,14 @@ async def calculator_embed(
 
 
 @app.get("/guides/{slug}", response_class=HTMLResponse)
+@app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
     from guides import get_guide
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
-    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}"
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}/"
     return templates.TemplateResponse(
         "guide.html",
         {
@@ -889,6 +890,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
 async def surgery_centers_index(request: Request):
     states = get_facility_state_index("asc")
     stats = get_landing_stats("asc")
+    canonical_url = f"{config.APP_URL.rstrip('/')}/surgery-centers/"
     return templates.TemplateResponse(
         "facilities_index.html",
         {
@@ -898,6 +900,7 @@ async def surgery_centers_index(request: Request):
             "label": "Surgery Centers",
             "base_path": "/surgery-centers/",
             "stats": stats,
+            "canonical_url": canonical_url,
         },
     )
 
@@ -905,6 +908,7 @@ async def surgery_centers_index(request: Request):
 @app.get("/surgery-centers/{state_slug}/", response_class=HTMLResponse)
 async def surgery_centers_state(request: Request, state_slug: str):
     facilities = get_facilities_in_scope("asc", state_slug=state_slug)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/surgery-centers/{state_slug}/"
     return templates.TemplateResponse(
         "facilities_state.html",
         {
@@ -913,6 +917,7 @@ async def surgery_centers_state(request: Request, state_slug: str):
             "state_slug": state_slug,
             "label": "Surgery Centers",
             "base_path": "/surgery-centers/",
+            "canonical_url": canonical_url,
         },
     )
 
@@ -920,6 +925,7 @@ async def surgery_centers_state(request: Request, state_slug: str):
 @app.get("/surgery-centers/{state_slug}/{city_slug}/", response_class=HTMLResponse)
 async def surgery_centers_city(request: Request, state_slug: str, city_slug: str):
     facilities = get_facilities_in_scope("asc", state_slug=state_slug, city_slug=city_slug)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/surgery-centers/{state_slug}/{city_slug}/"
     return templates.TemplateResponse(
         "facilities_city.html",
         {
@@ -929,6 +935,7 @@ async def surgery_centers_city(request: Request, state_slug: str, city_slug: str
             "city_slug": city_slug,
             "label": "Surgery Centers",
             "base_path": "/surgery-centers/",
+            "canonical_url": canonical_url,
         },
     )
 
@@ -958,6 +965,7 @@ async def surgery_centers_detail(request: Request, state_slug: str, city_slug: s
 async def imaging_index(request: Request):
     states = get_facility_state_index("imaging_center")
     stats = get_landing_stats("imaging_center")
+    canonical_url = f"{config.APP_URL.rstrip('/')}/imaging/"
     return templates.TemplateResponse(
         "facilities_index.html",
         {
@@ -967,6 +975,7 @@ async def imaging_index(request: Request):
             "label": "Imaging Centers",
             "base_path": "/imaging/",
             "stats": stats,
+            "canonical_url": canonical_url,
         },
     )
 
@@ -974,6 +983,7 @@ async def imaging_index(request: Request):
 @app.get("/imaging/{state_slug}/", response_class=HTMLResponse)
 async def imaging_state(request: Request, state_slug: str):
     facilities = get_facilities_in_scope("imaging_center", state_slug=state_slug)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/imaging/{state_slug}/"
     return templates.TemplateResponse(
         "facilities_state.html",
         {
@@ -982,6 +992,7 @@ async def imaging_state(request: Request, state_slug: str):
             "state_slug": state_slug,
             "label": "Imaging Centers",
             "base_path": "/imaging/",
+            "canonical_url": canonical_url,
         },
     )
 
@@ -989,6 +1000,7 @@ async def imaging_state(request: Request, state_slug: str):
 @app.get("/imaging/{state_slug}/{city_slug}/", response_class=HTMLResponse)
 async def imaging_city(request: Request, state_slug: str, city_slug: str):
     facilities = get_facilities_in_scope("imaging_center", state_slug=state_slug, city_slug=city_slug)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/imaging/{state_slug}/{city_slug}/"
     return templates.TemplateResponse(
         "facilities_city.html",
         {
@@ -998,6 +1010,7 @@ async def imaging_city(request: Request, state_slug: str, city_slug: str):
             "city_slug": city_slug,
             "label": "Imaging Centers",
             "base_path": "/imaging/",
+            "canonical_url": canonical_url,
         },
     )
 
@@ -1446,6 +1459,8 @@ async def robots_txt():
         "User-agent: *\n"
         "Allow: /\n\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-hospitals.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 
