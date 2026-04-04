@@ -228,3 +228,5 @@ import guide_how_to_get_medical_bills_reduced
 import guide_hospital_liens_explained
 import guide_air_ambulance_bills
 import guide_medical_billing_coding_mistakes
+# Batch 6: SEO guide expansion
+import guide_csection_costs
