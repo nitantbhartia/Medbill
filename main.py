@@ -782,10 +782,13 @@ async def hospital_state_page(
     ownership: str = "",
     page: int = 1,
 ):
+    if page == 1 and (str(request.query_params) != ""):
+        return RedirectResponse(url=f"/hospitals/{state_slug}/", status_code=301)
     hospitals, total = get_state_hospitals(state_slug, sort=sort, ownership=ownership, page=page)
     state_name = hospitals[0]["state"] if hospitals else state_display_name(state_slug)
     cities = get_cities_for_state(state_slug)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/"
+    has_params = page > 1 or sort != "grade" or ownership
     return templates.TemplateResponse(
         "hospitals_state.html",
         {
@@ -802,7 +805,7 @@ async def hospital_state_page(
             "canonical_url": canonical_url,
             "og_title": f"{state_name} Hospital Billing Report Cards | BillKarma",
             "og_description": f"Compare billing grades and markup ratios for hospitals in {state_name}.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow" if has_params else "index, follow",
         },
     )
 
@@ -817,10 +820,13 @@ async def hospital_city_page(
 ):
     from hospital_seo import get_city_hospitals
 
+    if page == 1 and (str(request.query_params) != ""):
+        return RedirectResponse(url=f"/hospitals/{state_slug}/{city_slug}/", status_code=301)
     hospitals, total = get_city_hospitals(state_slug, city_slug, sort=sort, page=page)
     city_name = hospitals[0]["city"] if hospitals else city_slug.replace("-", " ").title()
     state_name = hospitals[0]["state"] if hospitals else state_display_name(state_slug)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/"
+    has_params = page > 1 or sort != "grade"
     return templates.TemplateResponse(
         "hospitals_city.html",
         {
@@ -837,7 +843,7 @@ async def hospital_city_page(
             "canonical_url": canonical_url,
             "og_title": f"{city_name}, {state_name} Hospital Billing Comparison | BillKarma",
             "og_description": f"Compare billing grades and markup ratios across hospitals in {city_name}, {state_name}.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow" if has_params else "index, follow",
         },
     )
 
