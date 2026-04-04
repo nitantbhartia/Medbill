@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-debt-statute-of-limitations", {
-    "title": "Medical Debt Statute of Limitations by State (2026 Guide)",
-    "meta_description": "Look up your state's exact statute of limitations for medical debt. Free 50-state table with deadlines, exceptions, and what resets the clock.",
+    "title": "Medical Debt Statute of Limitations by State (2026)",
+    "meta_description": "Can they still sue you? Look up your state's exact deadline. Most are 3-6 years. Free 50-state table with timeframes, exceptions, and what resets the clock.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Taking Action",

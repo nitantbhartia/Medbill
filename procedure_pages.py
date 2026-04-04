@@ -1158,7 +1158,7 @@ def _build_procedure_seo(
     )
     if len(desc) > 155:
         desc = desc[:152].rsplit(" ", 1)[0] + "..."
-    base = APP_URL.rstrip("/") or "https://www.billkarma.com"
+    base = APP_URL.rstrip("/") or "https://billkarma.app"
     breadcrumb_schema = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",

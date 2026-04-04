@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("california-medical-billing-laws", {
-    "title": "California Medical Billing Laws: Your Rights as a Patient (2026)",
-    "meta_description": "California has some of the strongest patient billing protections in the US. Know your rights before paying that hospital bill.",
+    "title": "California Medical Billing Laws: Patient Rights You Need to Know (2026)",
+    "meta_description": "California has some of the strongest patient billing protections in the US. Know your rights before paying that hospital bill — surprise billing, charity care, and more.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

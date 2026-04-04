@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("nicu-bills-explained", {
-    "title": "NICU Bills Explained: Why They're So High and What You Can Do",
-    "meta_description": "NICU stays can cost $3,000-$10,000/day. Understand line items, spot errors, and get financial help for your baby's care.",
+    "title": "NICU Bills Explained: Why They're So High and How to Lower Them",
+    "meta_description": "NICU stays average $3,000-$10,000+ per day. Understand every line item, spot common billing errors, and find financial assistance for your baby's care.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Billing Basics",

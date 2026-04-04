@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-debt-forgiveness-programs", {
     "title": "Medical Debt Forgiveness Programs: 7 Real Options for 2026",
-    "meta_description": "Charity care, RIP Medical Debt, state programs, and more. Find medical debt forgiveness you actually qualify for.",
+    "meta_description": "Charity care, RIP Medical Debt, state-specific programs, hospital financial assistance, and more. Find debt forgiveness you actually qualify for.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Taking Action",

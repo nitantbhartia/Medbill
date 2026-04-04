@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("understanding-explanation-of-benefits", {
-    "title": "Understanding Your Explanation of Benefits (EOB)",
-    "meta_description": "Your Explanation of Benefits is the key to catching billing errors. Learn how to read every section of an EOB, spot discrepancies, and save money on medical.",
+    "title": "How to Read Your EOB: Explanation of Benefits Decoded (2026)",
+    "meta_description": "Confused by your Explanation of Benefits? Learn what every field means, how to spot errors, and what to do when your EOB doesn't match your bill.",
     "published": "2026-02-18",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

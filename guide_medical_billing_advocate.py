@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-billing-advocate", {
-    "title": "Medical Billing Advocate: When to Hire One",
-    "meta_description": "A medical billing advocate reviews your bills, disputes errors, and negotiates with hospitals on your behalf. Learn when to hire one, what they charge, and.",
+    "title": "Medical Billing Advocates: What They Cost and When You Need One",
+    "meta_description": "Medical billing advocates typically charge $50-200/hr or 25-35% of savings. Learn when it's worth hiring one and how to find a good one.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Taking Action",
