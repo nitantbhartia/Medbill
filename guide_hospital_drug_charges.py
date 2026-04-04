@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-drug-charges", {
-    "title": "How Hospitals Price Drugs (And Why You Paid $40 for a Tylenol)",
-    "meta_description": "Hospitals charge $30-$150 for drugs that cost pennies. Learn how hospital drug pricing works, which charges are most inflated, and how to dispute medication.",
+    "title": "Hospital Drug Markups Exposed: What $30 Tylenol Really Costs (2026)",
+    "meta_description": "Hospitals charge up to 1,000% markup on common drugs. See real chargemaster prices and learn how to dispute inflated charges.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",

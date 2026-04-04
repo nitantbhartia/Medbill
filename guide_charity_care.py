@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("hospital-financial-assistance-charity-care", {
-    "title": "Hospital Financial Assistance and Charity Care",
-    "meta_description": "Most U.S. hospitals must offer financial assistance by law. Learn who qualifies, how to apply, and how patients can reduce bills through charity care.",
+    "title": "Hospital Financial Assistance & Charity Care: Who Qualifies + How to Apply",
+    "meta_description": "Most nonprofit hospitals must offer free or reduced-cost care. Check if you qualify and use our step-by-step application guide.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Taking Action",

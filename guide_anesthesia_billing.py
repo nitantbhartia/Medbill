@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("anesthesia-billing", {
-    "title": "Anesthesia Bills Explained",
-    "meta_description": "Anesthesia bills use a confusing 'units' system and often arrive as a surprise separate charge. Learn how anesthesia pricing works, what to check on your.",
+    "title": "Why Anesthesia Bills Are So High — And How to Fight Back (2026)",
+    "meta_description": "Anesthesia often costs more than the surgery itself. Learn what's normal, how to spot errors, and how to dispute overcharges.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",
