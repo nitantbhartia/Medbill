@@ -7,6 +7,8 @@
     <meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">
     <meta name="theme-color" content="#00824F">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="BillKarma">
+    <meta property="og:locale" content="en_US">
     <meta property="og:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta property="og:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta property="og:url" content="{{ canonical_url if canonical_url else request.url }}">
@@ -57,6 +59,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="preload" href="/static/css/app.css" as="style">
     <link rel="stylesheet" href="/static/css/app.css"/>
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks."}
+</script>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
     <style>
         :root {
@@ -274,12 +279,12 @@
             <div>
                 <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">About</div>
                 <a href="/guides/hospital-billing-grades-explained" style="display:block;padding:3px 0;">Our Methodology</a>
-                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
+                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a></span>
                 <span style="display:block;padding:3px 0;font-size:0.72rem;color:#9CA3AF;">Not medical, legal, or financial advice.</span>
             </div>
         </div>
         <div style="width:100%;max-width:1200px;margin:0 auto;padding:12px 40px 0;border-top:1px solid rgba(0,0,0,0.06);font-size:0.72rem;">
-            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
+            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
         </div>
     </footer>
 

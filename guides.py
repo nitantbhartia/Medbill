@@ -23,6 +23,29 @@ def list_guides() -> list[dict]:
     return sorted(GUIDES.values(), key=lambda g: g.get("published", ""), reverse=True)
 
 
+def get_related_guides(slug: str, limit: int = 3) -> list[dict]:
+    """Return up to `limit` other guides related to the given slug, preferring same category."""
+    current = GUIDES.get(slug)
+    if not current:
+        return []
+
+    category = current.get("category", "")
+    same = [
+        {"slug": s, "title": g["title"], "category": g.get("category", "")}
+        for s, g in GUIDES.items()
+        if s != slug and g.get("category") == category
+    ]
+    if len(same) >= limit:
+        return same[:limit]
+
+    other = [
+        {"slug": s, "title": g["title"], "category": g.get("category", "")}
+        for s, g in GUIDES.items()
+        if s != slug and g.get("category") != category
+    ]
+    return (same + other)[:limit]
+
+
 def get_guide_slugs() -> list[str]:
     return list(GUIDES.keys())
 
