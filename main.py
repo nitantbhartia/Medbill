@@ -1240,6 +1240,7 @@ async def unified_find_page(request: Request, q: str = "", zip: str = "", type: 
     )
 
 
+@app.get("/compare", response_class=HTMLResponse)
 @app.get("/compare/", response_class=HTMLResponse)
 async def compare_index(
     request: Request,
@@ -1256,6 +1257,8 @@ async def compare_index(
         return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=301)
     if hospital:
         facility_a = hospital
+    # Parameter URLs are just the empty form — don't let Google index them
+    has_params = facility_a or facility_b
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
     return templates.TemplateResponse(
         "compare_index.html",
@@ -1264,7 +1267,7 @@ async def compare_index(
             "canonical_url": canonical_url,
             "og_title": "Hospital Comparison Tool | BillKarma",
             "og_description": "Compare any two hospitals side-by-side: billing grade, markup vs Medicare, CMS stars, and procedure prices.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow" if has_params else "index, follow",
         },
     )
 
