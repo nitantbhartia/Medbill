@@ -1255,7 +1255,7 @@ async def compare_index(
     if facility_a and facility_b:
         return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=301)
     if hospital:
-        return RedirectResponse(url=f"/compare/?facility-a={hospital}", status_code=301)
+        facility_a = hospital
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
     return templates.TemplateResponse(
         "compare_index.html",
