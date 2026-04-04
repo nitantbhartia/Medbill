@@ -132,6 +132,9 @@ MAP_TILE_ATTRIBUTION = os.getenv(
 MAP_MAX_ZOOM = int(os.getenv("MAP_MAX_ZOOM", "18"))
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "")
 
+# Google Analytics
+GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "G-QHRP0ZQD8K")
+
 # Free geocoder backfill
 GEOCODER_FALLBACK_ENABLED = os.getenv("GEOCODER_FALLBACK_ENABLED", "true").lower() == "true"
 GEOCODER_REQUEST_DELAY_MS = int(os.getenv("GEOCODER_REQUEST_DELAY_MS", "1000"))

@@ -15,6 +15,15 @@
     <meta name="twitter:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta name="twitter:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta name="twitter:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
+    {% if config.GA_MEASUREMENT_ID %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.GA_MEASUREMENT_ID }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
+    </script>
+    {% endif %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script>
