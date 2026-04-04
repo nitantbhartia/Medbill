@@ -30,7 +30,7 @@ from hospital_seo import (
 )
 from compare_pages import build_comparison_seo, get_comparison_data, search_hospitals_for_compare
 from dispute_workflow import build_phone_script, get_outcome_stats
-from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_state_index, get_landing_stats
+from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_sitemap_paths, get_facility_state_index, get_landing_stats
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
     get_providers_near_zip_for_cpt,
@@ -670,7 +670,7 @@ async def calculator_embed(
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    from guides import get_guide
+    from guides import get_guide, get_related_guides
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
@@ -685,6 +685,7 @@ async def guide_page(request: Request, slug: str):
             "og_description": guide["meta_description"],
             "meta_description": guide["meta_description"],
             "meta_robots": "index, follow",
+            "related_guides": get_related_guides(slug),
         },
     )
 
@@ -1353,6 +1354,7 @@ async def sitemap_index():
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
+        (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
@@ -1414,10 +1416,14 @@ async def guides_sitemap():
         f"<url><loc>{base}/cost/{slug}/</loc><lastmod>2026-03-01</lastmod><priority>0.8</priority></url>"
         for slug in get_all_cost_slugs()
     )
+    procedure_entries = "".join(
+        f"<url><loc>{base}/procedures/{p['cpt_code']}/</loc><lastmod>2026-03-01</lastmod><priority>0.6</priority></url>"
+        for p in get_top_cpt_codes()
+    )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}</urlset>"
+        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}{procedure_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1459,6 +1465,22 @@ async def hospital_sitemap_legacy():
     return RedirectResponse(url="/sitemap-hospitals.xml", status_code=301)
 
 
+@app.get("/sitemap-facilities.xml")
+async def facilities_sitemap():
+    base = config.APP_URL.rstrip("/")
+    facility_paths = get_facility_sitemap_paths()
+    entries = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>2026-03-01</lastmod><priority>0.5</priority></url>"
+        for path in facility_paths
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
 @app.get("/robots.txt")
 async def robots_txt():
     body = (
@@ -1467,6 +1489,7 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-hospitals.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 

@@ -241,6 +241,20 @@
         {{ guide.body | safe }}
     </div>
 
+    {% if related_guides %}
+    <div class="mt-10 pt-8 border-t border-gray-200">
+        <h2 style="font-size:1.15rem;font-weight:800;margin-bottom:16px;">Related Guides</h2>
+        <div style="display:grid;gap:12px;">
+            {% for rg in related_guides %}
+            <a href="/guides/{{ rg.slug }}/" style="display:block;padding:16px;border-radius:14px;border:1px solid #E5E7EB;text-decoration:none;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.background='#E6F4EA'" onmouseout="this.style.borderColor='#E5E7EB';this.style.background='transparent'">
+                <div style="font-weight:600;color:#1A1A1A;">{{ rg.title }}</div>
+                <div style="font-size:0.82rem;color:#6B7280;margin-top:4px;">{{ rg.category }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% if not guide.hide_default_cta %}
     <div class="article-cta">
         <h3>Think your bill has errors?</h3>
