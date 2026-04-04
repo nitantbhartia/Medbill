@@ -242,3 +242,5 @@ import guide_medical_debt_divorce
 # Batch 7: procedure cost guides
 import guide_hip_replacement_costs
 import guide_spinal_fusion_costs
+import guide_blood_test_costs
+import guide_epidural_costs
