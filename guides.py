@@ -239,3 +239,6 @@ import guide_medicare_vs_medicaid
 import guide_knee_replacement_costs
 import guide_surgery_center_vs_hospital
 import guide_medical_debt_divorce
+# Batch 7: procedure cost guides
+import guide_hip_replacement_costs
+import guide_spinal_fusion_costs
