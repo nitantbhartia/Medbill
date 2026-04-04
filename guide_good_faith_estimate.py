@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("good-faith-estimate-rights", {
     "title": "Good Faith Estimate: Your Right to Know Costs Before Treatment",
-    "meta_description": "You have the right to a Good Faith Estimate before treatment. Learn how to request one and dispute bills that exceed it by $400 or more.",
+    "meta_description": "Under the No Surprises Act, providers must give you a cost estimate in advance. Learn your GFE rights, how to request one, and what to do if the final bill is higher.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
     "category": "Patient Rights",

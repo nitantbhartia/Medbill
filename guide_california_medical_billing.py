@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("california-medical-billing-laws", {
-    "title": "California Medical Billing Laws: Patient Rights",
-    "meta_description": "California has some of the strongest medical billing protections in the US. Learn your rights under AB 1020, charity care eligibility up to 350% FPL, and how.",
+    "title": "California Medical Billing Laws: Patient Rights You Need to Know (2026)",
+    "meta_description": "California has some of the strongest patient billing protections in the US. Know your rights before paying that hospital bill — surprise billing, charity care, and more.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "State Guides",

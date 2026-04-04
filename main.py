@@ -555,7 +555,7 @@ async def confirm_page(request: Request, bill_id: int):
     require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
     log_audit(action="view_confirm", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
     return templates.TemplateResponse("confirm.html", {"request": request, "data": results})
 
@@ -565,7 +565,7 @@ async def results_page(request: Request, bill_id: int):
     require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
     log_audit(action="view_results_page", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
 
     from negotiation import generate_phone_script
@@ -672,7 +672,7 @@ async def guide_page(request: Request, slug: str):
     from guides import get_guide
     guide = get_guide(slug)
     if not guide:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}"
     return templates.TemplateResponse(
         "guide.html",
@@ -727,7 +727,7 @@ async def tools_index(request: Request):
 async def tool_detail(request: Request, slug: str):
     tool = get_tool(slug)
     if not tool:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Tool not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Tool not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/tools/{slug}/"
     return templates.TemplateResponse(
         "tool_page.html",
@@ -863,7 +863,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
 
     profile = get_hospital_profile(state_slug, city_slug, canonical_slug or hospital_slug)
     if not profile:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{canonical_slug or hospital_slug}/"
 
     seo = profile["seo"]
@@ -937,7 +937,7 @@ async def surgery_centers_city(request: Request, state_slug: str, city_slug: str
 async def surgery_centers_detail(request: Request, state_slug: str, city_slug: str, slug: str):
     data = get_facility_profile("asc", state_slug, city_slug, slug)
     if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"}, status_code=404)
     return templates.TemplateResponse(
         "facilities_detail.html",
         {
@@ -1006,7 +1006,7 @@ async def imaging_city(request: Request, state_slug: str, city_slug: str):
 async def imaging_detail(request: Request, state_slug: str, city_slug: str, slug: str):
     data = get_facility_profile("imaging_center", state_slug, city_slug, slug)
     if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Facility not found"}, status_code=404)
     return templates.TemplateResponse(
         "facilities_detail.html",
         {
@@ -1049,7 +1049,7 @@ async def procedure_index_page(request: Request):
 async def procedure_content_page(request: Request, slug: str):
     data = get_content_page_data(f"{slug}-cost")
     if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"}, status_code=404)
     return templates.TemplateResponse(
         "procedure_cost_guide.html",
         {
@@ -1068,7 +1068,7 @@ async def procedure_content_page(request: Request, slug: str):
 async def procedure_detail_page(request: Request, cpt_code: str):
     profile = get_procedure_profile(cpt_code)
     if not profile:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{cpt_code}/"
     seo = profile["seo"]
     return templates.TemplateResponse(
@@ -1521,7 +1521,7 @@ async def dispute_activate_page(request: Request, bill_id: int):
     require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
 
     bill = results.get("bill") or {}
     findings = results.get("findings") or []
@@ -1727,7 +1727,7 @@ async def bill_score_page(request: Request, bill_id: int):
     from bill_score import compute_bill_score
     score = compute_bill_score(bill_id)
     if not score:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
     share_url = f"{config.APP_URL.rstrip('/')}/score/share/{score['share_token']}"
     return templates.TemplateResponse(
         "bill_score.html",
@@ -1749,7 +1749,7 @@ async def bill_score_public(request: Request, share_token: str):
     from bill_score import get_score_by_token
     score = get_score_by_token(share_token)
     if not score:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Score not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Score not found"}, status_code=404)
     share_url = f"{config.APP_URL.rstrip('/')}/score/share/{share_token}"
     return templates.TemplateResponse(
         "bill_score.html",
@@ -1996,7 +1996,7 @@ async def autopilot_strategy_page(request: Request, bill_id: int):
 
     strategy = generate_strategy(bill_id)
     if strategy.get("error"):
-        return templates.TemplateResponse("error.html", {"request": request, "message": strategy["error"]})
+        return templates.TemplateResponse("error.html", {"request": request, "message": strategy["error"]}, status_code=404)
 
     bill_total = float(strategy.get("total_charged") or 0)
     fee_cents = payment_module.calculate_fee(bill_total)
@@ -2020,7 +2020,7 @@ async def autopilot_dashboard_page(request: Request, case_id: int):
 
     data = get_autopilot_status(case_id)
     if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Case not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Case not found"}, status_code=404)
 
     return templates.TemplateResponse(
         "autopilot.html",
@@ -2041,7 +2041,7 @@ async def advisor_page(request: Request, bill_id: int):
     require_bill_access(request, bill_id)
     results = get_bill_results(bill_id)
     if not results:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
 
     bill = results["bill"]
     findings = results.get("findings") or []
@@ -2089,7 +2089,7 @@ async def cost_page(request: Request, slug: str):
 
     data = get_cost_page_data(slug)
     if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Cost page not found"})
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Cost page not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/cost/{slug}/"
     return templates.TemplateResponse(
         "cost_page.html",

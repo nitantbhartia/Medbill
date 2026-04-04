@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-billing-errors-statistics-2026", {
-    "title": "Medical Billing Errors: 2026 Statistics",
-    "meta_description": "See 2026 medical billing error statistics, common error types, dispute success rates, and the costs mistakes can add to patient bills.",
+    "title": "Medical Billing Errors: How Common Are They in 2026?",
+    "meta_description": "Up to 80% of medical bills contain errors. See the latest statistics, most common error types, and how to audit your own hospital bill.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
     "category": "Billing Basics",

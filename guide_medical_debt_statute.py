@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-debt-statute-of-limitations", {
-    "title": "Medical Debt Statute of Limitations: State-by-State Rules",
-    "meta_description": "Medical debt has a statute of limitations — after it expires, collectors can't sue you. Learn your state's SOL, what resets the clock, and how to handle old.",
+    "title": "Medical Debt Statute of Limitations by State (2026)",
+    "meta_description": "Can they still sue you? Look up your state's exact deadline. Most are 3-6 years. Free 50-state table with timeframes, exceptions, and what resets the clock.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Taking Action",

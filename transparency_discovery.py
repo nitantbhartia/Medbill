@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from db import get_db
 
 
-USER_AGENT = "Mozilla/5.0 (compatible; BillKarmaBot/1.0; +https://billkarma.com)"
+USER_AGENT = "Mozilla/5.0 (compatible; BillKarmaBot/1.0; +https://billkarma.app)"
 SEARCH_BASES = (
     "https://html.duckduckgo.com/html/",
     "https://lite.duckduckgo.com/lite/",
