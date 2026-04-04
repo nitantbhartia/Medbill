@@ -235,3 +235,7 @@ import guide_how_to_apply_for_medicaid
 import guide_medical_billing_scams
 import guide_appendectomy_costs
 import guide_veterans_medical_bills
+import guide_medicare_vs_medicaid
+import guide_knee_replacement_costs
+import guide_surgery_center_vs_hospital
+import guide_medical_debt_divorce
