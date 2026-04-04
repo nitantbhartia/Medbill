@@ -244,3 +244,9 @@ import guide_hip_replacement_costs
 import guide_spinal_fusion_costs
 import guide_blood_test_costs
 import guide_epidural_costs
+import guide_tonsillectomy_costs
+import guide_cataract_surgery_costs
+import guide_acl_surgery_costs
+import guide_gallbladder_surgery_costs
+import guide_xray_costs
+import guide_how_to_choose_health_insurance
