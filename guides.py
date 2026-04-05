@@ -383,3 +383,7 @@ import guide_nevada_medical_billing
 import guide_oregon_medical_billing
 import guide_tennessee_hospital_charity_care
 import guide_nursing_home_billing
+# Batch 9: state guides + dental/vision/HR guides
+import guide_south_carolina_medical_billing
+import guide_dental_implant_cost
+import guide_root_canal_cost
