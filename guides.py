@@ -411,3 +411,8 @@ import guide_pet_scan_cost
 import guide_medicare_part_d_explained
 import guide_short_term_health_insurance
 import guide_addiction_treatment_billing
+# Batch 11: dental insurance, comparison guides, Medicare Advantage
+import guide_dental_insurance_explained
+import guide_dental_discount_plan_vs_insurance
+import guide_best_worst_states_medical_debt
+import guide_medicare_advantage
