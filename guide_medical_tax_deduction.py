@@ -7,7 +7,7 @@ register("medical-expenses-tax-deduction", {
     "meta_description": "You can deduct medical expenses exceeding 7.5% of your AGI. See what qualifies, how to calculate your deduction, and common mistakes that trigger audits.",
     "published": "2026-04-04",
     "author": "BillKarma Team",
-    "category": "Saving Money",
+    "category": "Billing Basics",
     "faqs": [
         {
             "q": "What is the threshold for deducting medical expenses on taxes?",

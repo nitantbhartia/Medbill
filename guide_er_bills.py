@@ -7,7 +7,7 @@ register("why-emergency-room-bills-are-so-high", {
     "meta_description": "The average ER visit costs $2,200 before insurance. Learn why ER bills are so expensive, what each charge actually covers, and 6 proven ways to reduce your.",
     "published": "2026-02-18",
     "author": "BillKarma Team",
-    "category": "ER Bills",
+    "category": "Billing Basics",
     "faqs": [
         {
             "q": "What is the average cost of an emergency room visit?",

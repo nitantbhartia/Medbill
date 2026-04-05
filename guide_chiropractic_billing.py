@@ -7,7 +7,7 @@ register("chiropractic-billing", {
     "meta_description": "Chiropractic visits cost $30-$200 each but insurers cap visits at 20-30 per year. Learn CPT codes 98940-98943, Medicare's limited coverage, maintenance care.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does a chiropractic visit cost without insurance?",

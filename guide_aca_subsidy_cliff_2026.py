@@ -7,7 +7,7 @@ register("aca-subsidy-cliff-2026", {
     "meta_description": "Enhanced ACA subsidies expired in 2026, raising premiums for 22 million Americans. Learn your coverage options, how to appeal bills, and financial help.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
-    "category": "Health Insurance",
+    "category": "Insurance Basics",
     "faqs": [
         {
             "q": "Why did my ACA marketplace premium double in 2026?",

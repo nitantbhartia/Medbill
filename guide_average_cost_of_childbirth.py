@@ -7,7 +7,7 @@ register("average-cost-of-childbirth-2026", {
     "meta_description": "The average cost of childbirth in the U.S. is $18,865 for vaginal delivery and $26,280 for C-section in 2026. See costs by state, what insurance covers, and.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Cost Guides",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does it cost to have a baby in 2026?",

@@ -7,7 +7,7 @@ register("dialysis-billing", {
     "meta_description": "Dialysis costs $90,000+/year. Learn how Medicare ESRD coverage works, the 3-month waiting period, common billing errors, and how to dispute them.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does dialysis cost per year?",

@@ -7,7 +7,7 @@ register("how-to-check-doctor-in-network", {
     "meta_description": "Don't get surprise out-of-network bills. Learn 5 ways to verify your doctor is in-network before your appointment and what to do if you're billed anyway.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Insurance",
+    "category": "Insurance Basics",
     "faqs": [
         {
             "q": "How do I know if my doctor is in-network?",

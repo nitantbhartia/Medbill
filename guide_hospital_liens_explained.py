@@ -7,7 +7,7 @@ register("hospital-liens-explained", {
     "meta_description": "A hospital lien lets hospitals claim part of your injury settlement. Learn how liens work, your rights, and strategies to reduce or eliminate them.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Legal Rights",
+    "category": "Patient Rights",
     "faqs": [
         {
             "q": "What is a hospital lien?",

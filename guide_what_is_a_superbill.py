@@ -7,7 +7,7 @@ register("what-is-a-superbill", {
     "meta_description": "A superbill gets you reimbursed by insurance for out-of-network care. Learn what a superbill includes, how to request one, and how to submit it correctly.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Insurance",
+    "category": "Insurance Basics",
     "faqs": [
         {
             "q": "What is a superbill in medical billing?",

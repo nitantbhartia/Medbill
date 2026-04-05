@@ -93,6 +93,11 @@
         background: rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 100px;
     }
     .meta-date { font-size: 0.88rem; color: rgba(255,255,255,0.8); font-weight: 600; }
+    .meta-reviewed {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 0.82rem; color: rgba(255,255,255,0.75); font-weight: 500;
+    }
+    .meta-reviewed svg { flex-shrink: 0; }
 
     .article-hero h1 {
         font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
@@ -170,6 +175,15 @@
         color: #065F46;
     }
     .article-body .key-takeaway strong { font-weight: 800; }
+
+    .eeat-bar {
+        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 14px;
+        padding: 16px 20px; margin-bottom: 32px;
+        display: flex; align-items: flex-start; gap: 14px;
+        font-size: 0.88rem; line-height: 1.5; color: #4B5563;
+    }
+    .eeat-bar-icon { flex-shrink: 0; margin-top: 2px; }
+    .eeat-bar strong { color: #1A1A1A; display: block; margin-bottom: 2px; }
 
     .article-body .faq-section { margin-top: 48px; }
     .article-body .faq-item {
@@ -252,12 +266,24 @@
             {% if reading_time %}
             <span class="meta-date">{{ reading_time }} min read</span>
             {% endif %}
+            <span class="meta-reviewed">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="rgba(255,255,255,0.7)"/><path d="M4 7l2 2 4-4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Reviewed by BillKarma Team
+            </span>
         </div>
         <h1>{{ guide.title }}</h1>
     </div>
 </div>
 
 <article class="article-container">
+    <div class="eeat-bar">
+        <svg class="eeat-bar-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.5" stroke="#059669"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+            <strong>Fact-checked &amp; reviewed by the BillKarma Team</strong>
+            BillKarma researchers verify every guide against federal Medicare data, state law, and hospital chargemaster records. We update guides when laws change.
+            {% if guide.reviewed_on %}<span style="margin-left:6px;color:#6B7280;">Last reviewed {{ guide.reviewed_on }}.</span>{% endif %}
+        </div>
+    </div>
     <div class="article-body">
         {{ guide.body | safe }}
     </div>

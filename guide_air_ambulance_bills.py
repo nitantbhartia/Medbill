@@ -7,7 +7,7 @@ register("air-ambulance-bills", {
     "meta_description": "Air ambulance bills average $36,400 and can exceed $100,000. Learn how the No Surprises Act protects you, plus 5 strategies to reduce or eliminate air.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Cost Guides",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does an air ambulance ride cost?",
