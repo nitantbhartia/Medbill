@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("why-emergency-room-bills-are-so-high", {
-    "title": "Why Emergency Room Bills Are So High (And How to Lower Yours)",
+    "title": "Why Emergency Room Bills Are So High (And How to Lower Them)",
     "meta_description": "The average ER visit costs $2,200 before insurance. Learn why ER bills are so expensive, what each charge actually covers, and 6 proven ways to reduce your.",
     "published": "2026-02-18",
     "author": "BillKarma Team",

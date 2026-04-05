@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("home-health-billing", {
     "title": "Home Health Billing: What Medicare Covers",
-    "meta_description": "Medicare covers skilled home health care — but billing errors cost patients thousands. Learn PDGM episode billing, HCPCS codes, visit log rights, and how to.",
+    "meta_description": "Medicare covers skilled home health care but billing errors cost thousands. Learn PDGM episode billing, HCPCS codes, visit log rights, and how to dispute.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
     "category": "Billing Basics",

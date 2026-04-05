@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("nicu-bills-explained", {
-    "title": "NICU Bills Explained: Why They're So High and How to Lower Them",
+    "title": "NICU Bills Explained: Why They're High & How to Lower Them",
     "meta_description": "NICU stays average $3,000-$10,000+ per day. Understand every line item, spot common billing errors, and find financial assistance for your baby's care.",
     "published": "2026-02-28",
     "author": "BillKarma Team",

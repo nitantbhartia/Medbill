@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("what-are-cpt-codes", {
-    "title": "What Are CPT Codes? How to Use Them to Audit Your Medical Bill",
+    "title": "What Are CPT Codes? How to Audit Your Medical Bill (2026)",
     "meta_description": "CPT codes are the five-digit numbers on every medical bill. Learn what they mean, how hospitals misuse them, and how to audit your own bill using CPT codes.",
     "published": "2026-02-19",
     "author": "BillKarma Team",

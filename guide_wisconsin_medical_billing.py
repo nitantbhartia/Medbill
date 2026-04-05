@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("wisconsin-medical-billing", {
     "title": "Wisconsin Medical Billing Rights: What Patients Need to Know",
-    "meta_description": "Wisconsin patients have 7 key billing rights including charity care, itemized bills in 7 days, and federal surprise billing protections. Learn how to save thousands.",
+    "meta_description": "Wisconsin patients have 7 key billing rights: charity care, itemized bills within 7 days, and surprise billing protections. Learn how to save thousands.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Patient Rights",

@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("why-you-owe-after-insurance-paid", {
-    "title": "Why Do I Still Owe Money After Insurance Paid? A Complete Guide",
+    "title": "Why Do I Still Owe Money After Insurance Paid? (2026)",
     "meta_description": "You had insurance and they paid — so why is there still a balance? Learn the 7 reasons you owe after insurance, spot billing errors, and fight back.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("mri-costs", {
     "title": "How Much Does an MRI Cost? (2026 Price Guide)",
-    "meta_description": "MRI scans average $1,325 nationally but hospital charges range from $400 to $12,000. See 2026 Medicare rates for 5 common MRI CPT codes and learn how to dispute inflated bills.",
+    "meta_description": "MRI scans average $1,325 but hospitals charge $400–$12,000. See 2026 Medicare rates for 5 common CPT codes and learn how to dispute inflated bills.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Billing Basics",

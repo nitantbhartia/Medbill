@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("understanding-dental-billing", {
-    "title": "Understanding Dental Billing: Codes, Insurance, and How to Save",
+    "title": "Dental Billing: Codes, Insurance & How to Save (2026)",
     "meta_description": "Dental bills use CDT codes, not CPT codes. Learn how dental billing works, what common procedures cost, insurance coverage tiers, and how to fight.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

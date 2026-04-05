@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("no-surprises-act-explained", {
-    "title": "The No Surprises Act: Your Rights When You Get a Medical Bill",
+    "title": "The No Surprises Act: Your Rights Explained (2026)",
     "meta_description": "The No Surprises Act protects you from surprise out-of-network bills. Learn what's covered, how to spot violations, and what to do if you get a surprise bill.",
     "published": "2026-02-18",
     "author": "BillKarma Team",

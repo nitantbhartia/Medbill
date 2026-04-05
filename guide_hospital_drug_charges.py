@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("hospital-drug-charges", {
-    "title": "Hospital Drug Markups Exposed: What a $30 Tylenol Really Costs",
+    "title": "Hospital Drug Markups: What a $30 Tylenol Really Costs",
     "meta_description": "Hospitals mark up common drugs by 1,000% or more. See real chargemaster prices, understand why, and learn how to dispute inflated pharmacy charges.",
     "published": "2026-02-19",
     "author": "BillKarma Team",

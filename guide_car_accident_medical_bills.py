@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("car-accident-medical-bills", {
     "title": "Medical Bills After a Car Accident: Who Pays",
-    "meta_description": "After a car accident, medical bills can come from PIP, MedPay, at-fault insurance, or your health plan. Learn who pays, how subrogation works, and how to.",
+    "meta_description": "After a car accident, bills can come from PIP, MedPay, at-fault insurance, or your health plan. Learn who pays first, how subrogation works, and your rights.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Patient Rights",

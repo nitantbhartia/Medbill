@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("indiana-medical-billing-laws", {
     "title": "Indiana Medical Billing Laws: Facility Fee Restrictions",
-    "meta_description": "Indiana bans certain facility fees under HB 1004, requires hospital financial assistance, and limits wage garnishment.",
+    "meta_description": "Indiana bans certain facility fees under HB 1004 and limits wage garnishment. Learn Indiana hospital billing rights and how to dispute inflated bills.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

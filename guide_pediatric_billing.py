@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("pediatric-billing", {
     "title": "Children's Hospital Bills: Pediatric Billing",
-    "meta_description": "Children's hospitals charge 2-3x more than adult facilities for similar care. Learn CHIP eligibility, NICU billing, vaccine coverage under ACA, and how to.",
+    "meta_description": "Children's hospitals charge 2-3x more than adult facilities. Learn CHIP eligibility, NICU billing, vaccine coverage under the ACA, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

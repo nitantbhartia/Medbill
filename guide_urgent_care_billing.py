@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("urgent-care-billing", {
     "title": "Urgent Care Billing: Facility Fees",
-    "meta_description": "Urgent care bills are full of surprise facility fees, wrong codes, and ER-level charges for minor visits. Learn the CPT codes, billing rules, and how to.",
+    "meta_description": "Urgent care bills often include surprise facility fees, wrong CPT codes, and ER-level charges. Learn billing rules and how to dispute inflated charges.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Billing Basics",

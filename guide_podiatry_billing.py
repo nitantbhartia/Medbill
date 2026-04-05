@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("podiatry-billing", {
-    "title": "Podiatry Billing Explained: Costs, Codes, and Medicare Foot Care Rules",
-    "meta_description": "Medicare denies routine foot care but covers podiatry for diabetic patients. Learn 9 CPT codes, Medicare rates vs. hospital charges, and how to dispute wrong denials.",
+    "title": "Podiatry Billing: Costs, Codes & Medicare Rules (2026)",
+    "meta_description": "Medicare denies routine foot care but covers podiatry for diabetics. Learn 9 common CPT codes, Medicare rates vs. hospital charges, and how to dispute denials.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Billing Basics",

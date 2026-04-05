@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("anesthesia-billing", {
-    "title": "Why Is My Anesthesia Bill So High? How to Fight Overcharges (2026)",
+    "title": "Why Is My Anesthesia Bill So High? How to Fight It (2026)",
     "meta_description": "Anesthesia often costs more than surgery itself. Learn what's normal, how to spot billing errors, and steps to dispute an overcharge.",
     "published": "2026-02-19",
     "author": "BillKarma Team",

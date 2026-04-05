@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("fdcpa-rights-medical-debt-collectors", {
-    "title": "Your FDCPA Rights: 8 Things Medical Debt Collectors Cannot Do",
+    "title": "FDCPA Rights: 8 Things Debt Collectors Can't Do (2026)",
     "meta_description": "The FDCPA protects you from abusive medical debt collectors. Learn 8 illegal practices, how to file complaints, and what to do when a collector crosses the.",
     "published": "2026-02-24",
     "author": "BillKarma Team",

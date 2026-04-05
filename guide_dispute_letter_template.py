@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-bill-dispute-letter", {
-    "title": "Medical Bill Dispute Letter: Free Templates That Actually Work (2026)",
+    "title": "Medical Bill Dispute Letter: Free Templates (2026)",
     "meta_description": "Download free dispute letter templates for overcharges, billing errors, and insurance denials. Step-by-step guide to writing a letter that gets results.",
     "published": "2026-02-22",
     "author": "BillKarma Team",

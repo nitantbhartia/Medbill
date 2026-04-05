@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-negotiate-medical-bills", {
-    "title": "How to Negotiate Medical Bills: Scripts and Strategies That Work",
+    "title": "How to Negotiate Medical Bills: Scripts That Work (2026)",
     "meta_description": "Practical scripts and strategies to negotiate your medical bill down by 30-60%. Works whether you have insurance or not. Real examples with dollar amounts.",
     "published": "2026-02-18",
     "author": "BillKarma Team",

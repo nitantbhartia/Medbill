@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("missouri-medical-billing", {
-    "title": "Missouri Medical Billing Rights: State Laws and Patient Protections",
+    "title": "Missouri Medical Billing Laws & Patient Rights (2026)",
     "meta_description": "Missouri hospitals charge 5.2x Medicare rates. Learn 7 patient rights, MO HealthNet Medicaid eligibility, charity care options, and how to dispute your bill.",
     "published": "2026-04-05",
     "author": "BillKarma Team",

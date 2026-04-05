@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("ultrasound-costs", {
     "title": "How Much Does an Ultrasound Cost? (2026 Price Guide)",
-    "meta_description": "Hospital ultrasound charges average $1,000–$3,000 but freestanding centers charge $200–$600. See 2026 Medicare rates for 6 CPT codes and learn how to dispute overcharges.",
+    "meta_description": "Hospital ultrasounds average $1,000–$3,000 but imaging centers charge $200–$600. See 2026 Medicare rates for 6 CPT codes and how to dispute overcharges.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Billing Basics",

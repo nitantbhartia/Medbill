@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("ct-scan-costs", {
     "title": "How Much Does a CT Scan Cost? (2026 Price Guide)",
-    "meta_description": "CT scans average $3,275 at hospitals but cost as little as $270 at imaging centers. See 2026 Medicare rates for 5 common CT CPT codes and how to dispute inflated bills.",
+    "meta_description": "CT scans average $3,275 at hospitals but only $270 at imaging centers. See 2026 Medicare rates for 5 common CPT codes and how to dispute inflated bills.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Billing Basics",

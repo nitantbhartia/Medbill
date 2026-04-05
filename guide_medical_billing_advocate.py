@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-billing-advocate", {
-    "title": "Medical Billing Advocates: What They Cost and When You Need One",
+    "title": "Medical Billing Advocate: Cost & When You Need One (2026)",
     "meta_description": "Medical billing advocates typically charge $50-200/hr or 25-35% of savings. Learn when it's worth hiring one and how to find a good one.",
     "published": "2026-02-22",
     "author": "BillKarma Team",

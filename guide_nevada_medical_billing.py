@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("nevada-medical-billing", {
     "title": "Nevada Medical Billing Rights: What Patients Can Do",
-    "meta_description": "Nevada bans surprise billing and requires charity care for patients under 300% FPL. Learn your rights, how to apply, and how to dispute inflated hospital charges.",
+    "meta_description": "Nevada bans surprise billing and requires charity care under 300% FPL. Learn your rights, how to apply for assistance, and how to dispute inflated bills.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Patient Rights",
