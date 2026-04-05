@@ -859,8 +859,89 @@ _STATE_NAMES = {
 _FPL_BASE = 15650   # 2026 federal poverty level, 1 person
 _FPL_ADD  =  5380   # each additional person
 
+# State billing protection scores for the interactive map
+# Score 0-100 based on: Medicaid expansion, surprise billing law, charity care FPL, debt protections, garnishment
+_STATE_SCORES = {
+    "AL": {"score": 22, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "No Medicaid expansion. Voluntary charity care. Few state protections beyond federal law."},
+    "AK": {"score": 38, "grade": "D", "medicaid": True, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 3, "garnish": "25%", "highlight": "Medicaid expanded but no state surprise billing law. Highest healthcare costs in the US."},
+    "AZ": {"score": 44, "grade": "D+", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded. Limited state billing protections beyond federal baseline."},
+    "AR": {"score": 46, "grade": "C-", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "ARHOME Medicaid expansion. ACE Act adds some debt collection limits."},
+    "CA": {"score": 95, "grade": "A+", "medicaid": True, "surprise": "Strong (AB 72)", "charity_fpl": "350%", "sol": 4, "garnish": "25%", "highlight": "Best patient protections in the US. AB 1020 free care to 250% FPL, discounts to 350%. 180-day billing delay before collections."},
+    "CO": {"score": 72, "grade": "B+", "medicaid": True, "surprise": "Strong", "charity_fpl": "250%", "sol": 6, "garnish": "25%", "highlight": "Strong Medicaid and surprise billing protections. Charity care up to 250% FPL."},
+    "CT": {"score": 78, "grade": "A-", "medicaid": True, "surprise": "Strong", "charity_fpl": "300%", "sol": 6, "garnish": "25%", "highlight": "Charity care up to 300% FPL. Bans facility fees at hospital-owned offices. Strong consumer protections."},
+    "DE": {"score": 65, "grade": "B", "medicaid": True, "surprise": "SB 125", "charity_fpl": "~200%", "sol": 3, "garnish": "15%", "highlight": "Lower garnishment limit (15%) than most states. Medicaid expanded. SB 125 surprise billing protections."},
+    "FL": {"score": 30, "grade": "D-", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 5, "garnish": "Exempt*", "highlight": "Did not expand Medicaid. No state surprise billing law. Voluntary charity care only. Head-of-household wage garnishment exemption."},
+    "GA": {"score": 28, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 6, "garnish": "25%", "highlight": "Did not fully expand Medicaid (limited waiver). Voluntary charity care. Weak state protections."},
+    "HI": {"score": 88, "grade": "A", "medicaid": True, "surprise": "HRS 432E", "charity_fpl": "~200%", "sol": 6, "garnish": "5%", "highlight": "Near-universal coverage via employer mandate (Prepaid Health Care Act). Very low garnishment limit (5%). Medicaid expanded."},
+    "ID": {"score": 42, "grade": "D+", "medicaid": True, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 5, "garnish": "25%", "highlight": "Expanded Medicaid in 2020. No state surprise billing law. Voluntary charity care."},
+    "IL": {"score": 82, "grade": "A-", "medicaid": True, "surprise": "Strong", "charity_fpl": "600%", "sol": 5, "garnish": "15%", "highlight": "Most generous charity care law in the US — free care up to 600% FPL. Lower garnishment limit. Strong surprise billing law."},
+    "IN": {"score": 48, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "HB 1004 bans certain facility fees. Medicaid expanded (HIP 2.0). Limited state surprise billing protections."},
+    "IA": {"score": 55, "grade": "C+", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "Medicaid expanded. Iowa Consumer Credit Code provides some debt protections. No state surprise billing law."},
+    "KS": {"score": 25, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 5, "garnish": "25%", "highlight": "Did not expand Medicaid. Voluntary charity care. Few state protections."},
+    "KY": {"score": 60, "grade": "B-", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "Full Medicaid expansion via kynect (1.6M enrolled). No state surprise billing law. KRS 311.372 charity care."},
+    "LA": {"score": 52, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 3, "garnish": "25%", "highlight": "Medicaid expanded. Charity hospital legacy system. Short 3-year SOL (Louisiana uses prescriptive periods)."},
+    "ME": {"score": 62, "grade": "B-", "medicaid": True, "surprise": "LD 1472", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded in 2019. LD 1472 surprise billing protections. DHHS charity care rules."},
+    "MD": {"score": 70, "grade": "B+", "medicaid": True, "surprise": "Strong", "charity_fpl": "300%", "sol": 3, "garnish": "25%", "highlight": "Charity care to 300% FPL. Strong surprise billing law. All-payer rate setting system keeps hospital prices lower."},
+    "MA": {"score": 85, "grade": "A", "medicaid": True, "surprise": "Strong (Ch. 288)", "charity_fpl": "400%", "sol": 6, "garnish": "25%", "highlight": "Near-universal coverage since 2006. Charity care up to 400% FPL. Strong surprise billing protections."},
+    "MI": {"score": 58, "grade": "C+", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded (Healthy Michigan). No state surprise billing law. Federal NSA applies."},
+    "MN": {"score": 75, "grade": "A-", "medicaid": True, "surprise": "62Q.556", "charity_fpl": "300%", "sol": 6, "garnish": "25%", "highlight": "Charity care up to 300% FPL. Strong surprise billing law (62Q.556). Medical Assistance (Medicaid) well-funded."},
+    "MS": {"score": 18, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 3, "garnish": "25%", "highlight": "Did not expand Medicaid. Highest uninsured rate in US. Voluntary charity care only. Weakest state protections in the nation."},
+    "MO": {"score": 45, "grade": "C-", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "Medicaid expansion passed 2021 (Amendment 2). Hospitals charge 5.2× Medicare rates on average. No state surprise billing law."},
+    "MT": {"score": 58, "grade": "C+", "medicaid": True, "surprise": "MCA 33-22-2001", "charity_fpl": "~200%", "sol": 8, "garnish": "25%", "highlight": "Medicaid expanded (HELP Act). State surprise billing law. Longest SOL among expanded states (8 years)."},
+    "NE": {"score": 50, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "Medicaid expanded in 2020 (Initiative 427). LB 1105 limits collection practices. No state surprise billing law."},
+    "NV": {"score": 72, "grade": "B+", "medicaid": True, "surprise": "NRS 695B", "charity_fpl": "300%", "sol": 6, "garnish": "25%", "highlight": "Charity care up to 300% FPL. Strong surprise billing law. Medicaid expanded. Good consumer protections."},
+    "NH": {"score": 60, "grade": "B-", "medicaid": True, "surprise": "RSA 420-J", "charity_fpl": "~200%", "sol": 3, "garnish": "25%", "highlight": "Medicaid expanded (Granite Advantage). RSA 420-J surprise billing protections. Short 3-year SOL."},
+    "NJ": {"score": 74, "grade": "B+", "medicaid": True, "surprise": "Strong", "charity_fpl": "~200%", "sol": 6, "garnish": "10%", "highlight": "Very low garnishment limit (10%). Medicaid expanded. Strong surprise billing protections. Good consumer laws."},
+    "NM": {"score": 80, "grade": "A-", "medicaid": True, "surprise": "Federal+", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "HB 372 (2023) bans medical debt from credit reports — one of only a few states. High Medicaid enrollment (~40% of population)."},
+    "NY": {"score": 88, "grade": "A", "medicaid": True, "surprise": "Strong (PHL 24)", "charity_fpl": "400%", "sol": 6, "garnish": "10%", "highlight": "Charity care up to 400% FPL. Very low garnishment limit (10%). Strongest surprise billing law in US alongside CA. 180-day billing protection."},
+    "NC": {"score": 48, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 3, "garnish": "No wage garnishment for consumer debt", "highlight": "Expanded Medicaid 2023. North Carolina is one of very few states with NO wage garnishment for consumer medical debt — huge protection."},
+    "ND": {"score": 58, "grade": "C+", "medicaid": True, "surprise": "NDCC 26.1-36", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded. State surprise billing law (NDCC 26.1-36). Required hospital charity care."},
+    "OH": {"score": 52, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded. No state surprise billing law. Federal NSA applies. ORC § 2305.07 SOL."},
+    "OK": {"score": 45, "grade": "C-", "medicaid": True, "surprise": "HB 2846", "charity_fpl": "Voluntary", "sol": 5, "garnish": "25%", "highlight": "Medicaid expanded in 2021 (SQ 802). HB 2846 surprise billing. Voluntary charity care only — no state mandate."},
+    "OR": {"score": 82, "grade": "A-", "medicaid": True, "surprise": "ORS 743B", "charity_fpl": "400%", "sol": 6, "garnish": "25%", "highlight": "Charity care up to 400% FPL. Strong surprise billing law. Free patient advocates. Medicaid covers ~25% of population."},
+    "PA": {"score": 62, "grade": "B-", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 4, "garnish": "No wage garnishment*", "highlight": "Pennsylvania does not allow wage garnishment for most consumer debt — major protection. Medicaid expanded. 4-year SOL."},
+    "RI": {"score": 68, "grade": "B", "medicaid": True, "surprise": "OHIC regs", "charity_fpl": "~200%", "sol": 10, "garnish": "25%", "highlight": "Longest SOL in US (10 years). Medicaid expanded. OHIC surprise billing regulations. Required charity care."},
+    "SC": {"score": 40, "grade": "D+", "medicaid": True, "surprise": "SB 1072", "charity_fpl": "~200%", "sol": 3, "garnish": "25%", "highlight": "Medicaid expanded. SB 1072 surprise billing. Charity care required under § 44-7-3410. Short 3-year SOL."},
+    "SD": {"score": 35, "grade": "D", "medicaid": True, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 6, "garnish": "20%", "highlight": "Medicaid expanded 2023 (Amendment D). No state surprise billing law. Voluntary charity care. Late Medicaid expansion."},
+    "TN": {"score": 28, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "~200%*", "sol": 6, "garnish": "25%", "highlight": "Did not expand Medicaid (300,000+ uninsured). Nonprofit hospitals must provide charity care. No state surprise billing law."},
+    "TX": {"score": 25, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 4, "garnish": "No wage garnishment*", "highlight": "Largest uninsured population in US. Did not expand Medicaid. Voluntary charity care. Texas does not allow wage garnishment for most consumer debt — one bright spot."},
+    "UT": {"score": 52, "grade": "C", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "25%", "highlight": "Medicaid expanded. UT Code § 26B-2-224 charity care (covers for-profit hospitals too). HB 228 debt protections. No state surprise billing law."},
+    "VT": {"score": 80, "grade": "A-", "medicaid": True, "surprise": "8 V.S.A. 4089h", "charity_fpl": "~200%", "sol": 6, "garnish": "15%", "highlight": "Near-universal coverage via Green Mountain Care. Very low garnishment limit (15%). Strong surprise billing law. Medicaid well-funded."},
+    "VA": {"score": 65, "grade": "B", "medicaid": True, "surprise": "HB 1251", "charity_fpl": "~200%", "sol": 5, "garnish": "25%", "highlight": "Medicaid expanded 2019. HB 1251 bans surprise balance bills. VHHA charity care standards."},
+    "WA": {"score": 90, "grade": "A+", "medicaid": True, "surprise": "Strong (BBPA)", "charity_fpl": "400%", "sol": 6, "garnish": "25%", "highlight": "Second best patient protections in US after CA. Charity care up to 400% FPL. BBPA is strongest surprise billing law in US. Medicaid covers ~20% of population."},
+    "WV": {"score": 45, "grade": "C-", "medicaid": True, "surprise": "WV Code 33-25A", "charity_fpl": "~200%", "sol": 10, "garnish": "20%", "highlight": "Longest SOL in US (10 years, tied with RI). Medicaid expanded. Highest medical debt burden in US despite some state protections."},
+    "WI": {"score": 55, "grade": "C+", "medicaid": True, "surprise": "Federal only", "charity_fpl": "~200%", "sol": 6, "garnish": "20%", "highlight": "Medicaid expanded (BadgerCare+). 7 key patient billing rights. No state surprise billing law. 20% garnishment limit."},
+    "WY": {"score": 20, "grade": "F", "medicaid": False, "surprise": "Federal only", "charity_fpl": "Voluntary", "sol": 8, "garnish": "25%", "highlight": "Did not expand Medicaid. Voluntary charity care only. Highest hospital charge-to-Medicare ratio in rural US. No state consumer protections."},
+    "DC": {"score": 85, "grade": "A", "medicaid": True, "surprise": "Strong", "charity_fpl": "400%", "sol": 3, "garnish": "25%", "highlight": "Near-universal coverage. Charity care up to 400% FPL. Strong surprise billing protections. DC Health Benefit Exchange."},
+}
 
-@app.get("/tools/sol-lookup/", response_class=HTMLResponse)
+
+@app.get("/map/", response_class=HTMLResponse)
+async def state_protections_map(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/map/"
+    import json
+    return templates.TemplateResponse("state_map.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "Interactive Medical Billing Protections Map by State | BillKarma",
+        "meta_description": "See how your state ranks on medical billing protections — charity care, surprise billing laws, Medicaid expansion, and debt limits. Color-coded for all 50 states.",
+        "meta_robots": "index, follow",
+        "state_data_json": json.dumps(_STATE_SCORES),
+    })
+
+
+@app.get("/research/2026-medical-billing-report/", response_class=HTMLResponse)
+async def annual_report_2026(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/research/2026-medical-billing-report/"
+    return templates.TemplateResponse("annual_report_2026.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "2026 Medical Billing Errors Report | BillKarma Research",
+        "meta_description": "BillKarma analyzed thousands of medical bills in 2026. Key findings: 1 in 3 bills contain errors, average overcharge $1,300, cardiac bills have highest error rate.",
+        "meta_robots": "index, follow",
+    })
+
+
 async def sol_lookup(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/tools/sol-lookup/"
     rows = [
