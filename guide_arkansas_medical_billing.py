@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("arkansas-medical-billing", {
     "title": "Arkansas Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "Arkansas requires charity care under AR Code § 20-9-1501 and expanded Medicaid via Arkansas Works. Learn the 5-year debt SOL and how to reduce your hospital bill.",
+    "meta_description": "AR Code § 20-9-1501 requires charity care at Arkansas hospitals. Learn ARHOME Medicaid, 5-year SOL, and how to cut your hospital bill. Free analysis.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",

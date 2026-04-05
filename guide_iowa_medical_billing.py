@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("iowa-medical-billing", {
     "title": "Iowa Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "Iowa requires charity care under IA Code § 135.71 and expanded Medicaid. Learn the 5-year debt SOL, Iowa Consumer Credit Code protections, and how to cut your bill.",
+    "meta_description": "IA Code § 135.71 requires charity care at Iowa hospitals. Learn IHAWP Medicaid, Iowa Consumer Credit Code, 5-year SOL, and how to cut your bill.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",
@@ -241,6 +241,31 @@ register("iowa-medical-billing", {
 
 <div class="key-takeaway">
     <strong>Iowa&rsquo;s Iowa Consumer Credit Code gives you extra protection against abusive collectors.</strong> If a debt collector uses threats, false statements, or deceptive practices, you may be entitled to damages under both the Iowa CCC and the federal FDCPA. Document all collector communications and report violations to the <a href="https://www.iowaattorneygeneral.gov/for-consumers" target="_blank" rel="noopener">Iowa Attorney General</a>.
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+
+<div class="faq-section">
+    <div class="faq-item">
+        <h3>Are Iowa hospitals required to offer charity care?</h3>
+        <p>Yes. Iowa Code &sect;&nbsp;135.71 requires all Iowa hospitals to maintain a financial assistance program and to screen uninsured patients for eligibility before referring accounts to external collections. Income thresholds vary by hospital. Ask the billing department for the financial assistance application form before making any payment.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Does Iowa have Medicaid expansion?</h3>
+        <p>Yes. Iowa expanded Medicaid through the Iowa Health and Wellness Plan (IHAWP), covering adults earning up to 138% FPL (approximately $20,783 for a single person in 2026). Apply at <a href="https://dhs.iowa.gov" target="_blank" rel="noopener">dhs.iowa.gov</a> or call 1-800-338-8366. Coverage can be retroactive for up to 3 months, potentially covering a recent hospital bill.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the statute of limitations on medical debt in Iowa?</h3>
+        <p>Iowa has a 5-year SOL on both written contracts and open accounts under Iowa Code &sect;&nbsp;614.1. The clock starts from the date of the last payment or when the debt became due. Be aware that Iowa&rsquo;s court judgment period is 20 years &mdash; one of the longest in the nation. Resolving medical debt through charity care or negotiation is far preferable to letting it reach litigation.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the Iowa Consumer Credit Code?</h3>
+        <p>The Iowa Consumer Credit Code (Iowa Code &sect;&nbsp;537) prohibits abusive, deceptive, or unfair debt collection practices in Iowa. It works alongside the federal FDCPA to protect patients. Violations can result in actual damages, statutory damages, and attorney fees. File complaints with the <a href="https://www.iowaattorneygeneral.gov/for-consumers" target="_blank" rel="noopener">Iowa Attorney General&rsquo;s Consumer Protection Division</a>.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Does Iowa protect patients from surprise medical bills?</h3>
+        <p>Iowa relies on the federal No Surprises Act for surprise billing protection. Under the NSA, you cannot be balance-billed for emergency services or for non-emergency care from out-of-network ancillary providers at in-network facilities without advance written consent. Report violations to CMS at 1-800-985-3059 or the <a href="https://iid.iowa.gov/consumers" target="_blank" rel="noopener">Iowa Insurance Division</a>.</p>
+    </div>
 </div>
 
 <h2 id="sources">Sources</h2>
