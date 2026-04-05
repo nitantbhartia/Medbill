@@ -464,3 +464,4 @@ import guide_ultrasound_cost
 import guide_birth_control_insurance_coverage
 import guide_drug_formulary_tiers
 import guide_medical_billing_advocate
+import guide_tummy_tuck_insurance_coverage
