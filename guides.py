@@ -397,3 +397,5 @@ import guide_lasik_cost
 import guide_open_enrollment_guide
 import guide_utah_medical_billing
 import guide_arkansas_medical_billing
+import guide_iowa_medical_billing
+import guide_new_mexico_medical_billing
