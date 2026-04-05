@@ -33,6 +33,8 @@ register("how-to-apply-for-medicaid", {
     "body": f"""
 <p class="lead">More than <strong>90 million Americans</strong> are enrolled in Medicaid, making it the largest health insurance program in the country. Yet millions of eligible people never apply &mdash; often because they assume they won&rsquo;t qualify or don&rsquo;t know where to start. In expansion states, a single adult earning under <strong>$21,597 per year</strong> qualifies, and the application takes as little as 15 minutes online.</p>
 
+<div class="answer-box"><strong>Quick answer</strong>Apply online at Healthcare.gov or your state Medicaid portal, by phone, or in person at your local Medicaid office. Approval typically takes 45 days (90 days for disability cases). Coverage can be retroactive to 3 months before your application date.</div>
+
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>

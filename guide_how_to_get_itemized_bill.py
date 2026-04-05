@@ -37,6 +37,8 @@ register("how-to-get-itemized-hospital-bill", {
     "body": f"""
 <p class="lead">A summary bill just shows totals. An itemized bill shows every single charge&mdash;every IV bag, every pill, every minute of anesthesia. It&rsquo;s the only way to spot overcharges, and hospitals are legally required to provide one when you ask. Yet most patients never request one, and most hospitals don&rsquo;t send one automatically. This guide shows you exactly how to get yours, how to read it, and what to do when you find errors.</p>
 
+<div class="answer-box"><strong>Quick answer</strong>Call the billing department and say "I am requesting an itemized bill showing each CPT code and charge." Hospitals are legally required to provide one. Allow 5–10 business days. If refused, file a complaint with your state health department.</div>
+
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>

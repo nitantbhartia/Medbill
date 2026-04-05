@@ -37,6 +37,8 @@ register("how-to-dispute-a-medical-bill", {
     "body": f"""
 <p class="lead">You found an error on your medical bill. Now what? Most patients never dispute because they don&rsquo;t know where to start. This guide walks you through the entire process&mdash;from writing your first dispute letter to escalating if the hospital won&rsquo;t budge&mdash;with real templates you can copy and send today.</p>
 
+<div class="answer-box"><strong>Quick answer</strong>Request an itemized bill, compare each charge to the Medicare rate using BillKarma's free tool, then send a written dispute letter citing the specific error. Most hospitals resolve disputes within 30–60 days. If denied, escalate to your state insurance commissioner.</div>
+
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>

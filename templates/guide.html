@@ -46,6 +46,9 @@
     ]
 }
 </script>
+{% if howto_schema %}
+<script type="application/ld+json">{{ howto_schema | safe }}</script>
+{% endif %}
 {% if guide.faqs %}
 <script type="application/ld+json">
 {
@@ -239,6 +242,25 @@
         font-size: 1rem; text-decoration: none;
     }
     .article-cta a:hover { background: #f0f0f0; }
+
+    .answer-box {
+        background: #F0FDF4;
+        border-left: 4px solid #059669;
+        border-radius: 0 12px 12px 0;
+        padding: 16px 20px;
+        margin: 0 0 28px 0;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    .answer-box strong {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #059669;
+        margin-bottom: 6px;
+    }
 
     @media (max-width: 768px) {
         .article-hero { padding: 40px 18px 36px; border-radius: 0 0 24px 24px; }

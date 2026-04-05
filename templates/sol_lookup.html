@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+.tool-hero { background: linear-gradient(135deg,#059669 0%,#047857 100%); color:#fff; padding:48px 24px 36px; text-align:center; }
+.tool-hero h1 { font-size:2rem; font-weight:800; margin:0 0 12px; }
+.tool-hero p { font-size:1.05rem; opacity:.9; max-width:600px; margin:0 auto; }
+.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; max-width:720px; margin:-28px auto 32px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.tool-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6B7280; margin-bottom:6px; }
+.tool-select { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #E5E7EB; border-radius:10px; background:#F9FAFB; appearance:none; cursor:pointer; }
+.tool-select:focus { outline:none; border-color:#059669; }
+.sol-result { display:none; margin-top:20px; background:#F0FDF4; border:2px solid #059669; border-radius:12px; padding:20px 24px; }
+.sol-result.show { display:block; }
+.sol-years { font-size:2.5rem; font-weight:800; color:#059669; line-height:1; }
+.sol-label { font-size:.85rem; color:#6B7280; margin-top:2px; }
+.sol-statute { font-size:.82rem; color:#9CA3AF; margin-top:8px; font-style:italic; }
+.sol-warning { background:#FEF3C7; border:1px solid #F59E0B; border-radius:8px; padding:10px 14px; margin-top:14px; font-size:.88rem; color:#92400E; }
+.container { max-width:860px; margin:0 auto; padding:0 24px 48px; }
+.sol-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:.9rem; }
+.sol-table th { background:#F9FAFB; padding:10px 14px; text-align:left; font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; }
+.sol-table td { padding:9px 14px; border-bottom:1px solid #F3F4F6; }
+.sol-table tr:hover td { background:#F9FAFB; }
+.badge { display:inline-block; padding:2px 8px; border-radius:100px; font-size:.75rem; font-weight:700; }
+.badge-short { background:#FEE2E2; color:#991B1B; }
+.badge-long { background:#D1FAE5; color:#065F46; }
+.badge-mid { background:#E0F2FE; color:#0369A1; }
+.cta-box { background:linear-gradient(135deg,#059669,#047857); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
+.cta-box h3 { margin:0 0 8px; font-size:1.3rem; }
+.cta-box p { margin:0 0 16px; opacity:.9; font-size:.95rem; }
+.cta-btn { background:#fff; color:#059669; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="tool-hero">
+    <h1>Medical Debt Statute of Limitations (2026)</h1>
+    <p>After your state's deadline, collectors can't win a lawsuit against you. Look up your state's exact limit.</p>
+</div>
+
+<div class="container">
+    <div class="tool-card">
+        <div class="tool-label">Select your state</div>
+        <select class="tool-select" id="stateSelect" onchange="showResult()">
+            <option value="">— Choose a state —</option>
+            {% for row in sol_rows %}
+            <option value="{{ row.years }}" data-statute="{{ row.statute }}" data-name="{{ row.name }}">{{ row.name }}</option>
+            {% endfor %}
+        </select>
+        <div class="sol-result" id="solResult">
+            <div class="sol-years" id="solYears"></div>
+            <div class="sol-label">year statute of limitations on medical debt</div>
+            <div class="sol-statute" id="solStatute"></div>
+            <div class="sol-warning">
+                ⚠️ Making any payment — even $1 — can reset the clock and restart the SOL from zero. Don't pay without understanding your rights first.
+            </div>
+        </div>
+    </div>
+
+    <h2 style="font-size:1.3rem;font-weight:700;margin:32px 0 16px;">All 50 States + D.C.</h2>
+    <table class="sol-table">
+        <thead>
+            <tr><th>State</th><th>SOL (Years)</th><th>Statute</th></tr>
+        </thead>
+        <tbody>
+            {% for row in sol_rows %}
+            <tr>
+                <td><strong>{{ row.name }}</strong></td>
+                <td>
+                    <span class="badge {% if row.years <= 3 %}badge-short{% elif row.years >= 8 %}badge-long{% else %}badge-mid{% endif %}">
+                        {{ row.years }} years
+                    </span>
+                </td>
+                <td style="color:#6B7280;font-size:.82rem;">{{ row.statute }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top:20px;padding:16px 20px;background:#F9FAFB;border-radius:10px;font-size:.88rem;color:#6B7280;line-height:1.6;">
+        <strong>Important:</strong> These are general statutes of limitations for written contracts. Courts sometimes apply different SOLs to medical debt specifically. This is not legal advice — consult a consumer attorney if you're being sued.
+    </div>
+
+    <div class="cta-box">
+        <h3>Is your debt past the SOL? Don't pay until you know.</h3>
+        <p>BillKarma helps you understand your rights and generate the right response letter for free.</p>
+        <a href="/fight-debt" class="cta-btn">Fight My Medical Debt</a>
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:700;margin:32px 0 12px;">Related guides</h2>
+    <ul style="line-height:2;">
+        <li><a href="/guides/medical-debt-statute-of-limitations/">Medical Debt Statute of Limitations: Full Guide</a></li>
+        <li><a href="/guides/debt-validation-letter-medical-debt/">How to Send a Debt Validation Letter</a></li>
+        <li><a href="/guides/fdcpa-rights-medical-debt-collectors/">Your FDCPA Rights: 8 Things Debt Collectors Can't Do</a></li>
+        <li><a href="/guides/what-happens-if-you-dont-pay-medical-bills/">What Happens If You Don't Pay Medical Bills?</a></li>
+    </ul>
+</div>
+
+<script>
+function showResult() {
+    const sel = document.getElementById('stateSelect');
+    const result = document.getElementById('solResult');
+    const opt = sel.options[sel.selectedIndex];
+    if (!sel.value) { result.classList.remove('show'); return; }
+    document.getElementById('solYears').textContent = sel.value;
+    document.getElementById('solStatute').textContent = opt.dataset.statute;
+    result.classList.add('show');
+}
+</script>
+{% endblock %}
