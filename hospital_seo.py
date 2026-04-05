@@ -2051,7 +2051,7 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
             )
             schema = {
                 "@context": "https://schema.org",
-                "@type": "MedicalOrganization",
+                "@type": "Hospital",
                 "name": data["name"],
                 "address": {
                     "@type": "PostalAddress",

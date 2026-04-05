@@ -670,11 +670,14 @@ async def calculator_embed(
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
+    import re
     from guides import get_guide, get_related_guides
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}/"
+    word_count = len(re.sub(r"<[^>]+>", "", guide["body"]).split())
+    reading_time = max(1, round(word_count / 250))
     return templates.TemplateResponse(
         "guide.html",
         {
@@ -686,6 +689,7 @@ async def guide_page(request: Request, slug: str):
             "meta_description": guide["meta_description"],
             "meta_robots": "index, follow",
             "related_guides": get_related_guides(slug),
+            "reading_time": reading_time,
         },
     )
 
@@ -693,17 +697,42 @@ async def guide_page(request: Request, slug: str):
 @app.get("/guides/", response_class=HTMLResponse)
 async def guides_index(request: Request):
     """List all published guides."""
-    from guides import list_guides
+    from guides import list_guides, get_all_categories
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/"
     return templates.TemplateResponse(
         "guides_index.html",
         {
             "request": request,
             "guides": list_guides(),
+            "all_categories": get_all_categories(),
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Guides | BillKarma",
             "og_description": "Free guides on how to read, dispute, and reduce medical bills.",
             "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/guides/category/{slug}/", response_class=HTMLResponse)
+async def guides_category(request: Request, slug: str):
+    """List guides in a specific category."""
+    from guides import get_guides_by_category, get_all_categories
+    guides_in_cat = get_guides_by_category(slug)
+    all_cats = get_all_categories()
+    matched = next((c for c in all_cats if c["slug"] == slug), None)
+    if not matched or not guides_in_cat:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Category not found"}, status_code=404)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/category/{slug}/"
+    return templates.TemplateResponse(
+        "guides_category.html",
+        {
+            "request": request,
+            "category": matched,
+            "guides": guides_in_cat,
+            "all_categories": all_cats,
+            "canonical_url": canonical_url,
+            "og_title": f"{matched['name']} Guides | BillKarma",
+            "meta_description": f"BillKarma's {matched['name'].lower()} guides — {matched['count']} free articles on how to understand, dispute, and reduce your medical bills.",
         },
     )
 
@@ -1399,8 +1428,13 @@ async def guides_sitemap():
         for loc, lastmod, priority in static_urls
     )
     guide_entries = "".join(
-        f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
+    )
+    from guides import get_all_categories as _get_all_cats
+    category_entries = "".join(
+        f"<url><loc>{base}/guides/category/{c['slug']}/</loc><lastmod>2026-04-05</lastmod><priority>0.7</priority></url>"
+        for c in _get_all_cats()
     )
     tool_entries = "".join(
         f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
@@ -1423,7 +1457,7 @@ async def guides_sitemap():
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{tool_entries}{rights_entries}{cost_entries}{procedure_entries}</urlset>"
+        f"{static_entries}{guide_entries}{category_entries}{tool_entries}{rights_entries}{cost_entries}{procedure_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -1479,6 +1513,46 @@ async def facilities_sitemap():
         f"{entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/og/{slug}.svg")
+async def og_image_svg(slug: str):
+    """Return a branded SVG social preview image for a guide."""
+    import textwrap
+    from guides import get_guide
+    guide = get_guide(slug)
+    title = guide["title"] if guide else "BillKarma Medical Billing Guide"
+    category = guide.get("category", "") if guide else ""
+
+    # Wrap title text to fit SVG width (~42 chars per line at font-size 52)
+    lines = textwrap.wrap(title, width=28)[:3]
+    # Build SVG text elements, each line 68px apart
+    text_y_start = 260 - (len(lines) - 1) * 34
+    text_els = "".join(
+        f'<text x="60" y="{text_y_start + i * 68}" font-family="system-ui,-apple-system,sans-serif" '
+        f'font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-1">{line}</text>'
+        for i, line in enumerate(lines)
+    )
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#1a5c38"/>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a5c38;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0d3d24;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <!-- BillKarma wordmark -->
+  <text x="60" y="90" font-family="system-ui,-apple-system,sans-serif" font-size="32" font-weight="800" fill="#a3e4b8" letter-spacing="0">BillKarma</text>
+  <!-- Category badge -->
+  {f'<rect x="58" y="112" width="{len(category) * 13 + 28}" height="36" rx="18" fill="rgba(255,255,255,0.15)"/><text x="72" y="136" font-family="system-ui,-apple-system,sans-serif" font-size="18" font-weight="700" fill="#ffffff" letter-spacing="1" text-transform="uppercase">{category.upper()}</text>' if category else ''}
+  <!-- Title -->
+  {text_els}
+  <!-- Bottom tagline -->
+  <text x="60" y="570" font-family="system-ui,-apple-system,sans-serif" font-size="24" font-weight="500" fill="rgba(255,255,255,0.65)">billkarma.app/guides/{slug}/</text>
+</svg>"""
+    return Response(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.get("/robots.txt")
