@@ -253,6 +253,8 @@ import guide_how_to_choose_health_insurance
 # Batch 8: imaging, procedure, and specialty guides
 import guide_mri_costs
 import guide_ct_scan_costs
+import guide_ultrasound_costs
 import guide_hernia_surgery_costs
 import guide_hysterectomy_costs
 import guide_endoscopy_billing
+import guide_wisconsin_medical_billing
