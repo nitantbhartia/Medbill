@@ -8,6 +8,11 @@
 <meta property="og:title" content="{{ og_title }}">
 <meta property="og:description" content="{{ og_description }}">
 <meta property="og:type" content="article">
+<meta property="og:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/og/{{ guide.slug }}.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/og/{{ guide.slug }}.svg">
 <meta name="robots" content="{{ meta_robots }}">
 {% if guide.published %}
 <meta property="article:published_time" content="{{ guide.published }}">

@@ -9,9 +9,12 @@ from __future__ import annotations
 GUIDES = {}
 
 
+_DEFAULT_REVIEWED = "2026-04-05"
+
+
 def register(slug: str, guide: dict):
     published = guide.get("published")
-    reviewed_on = guide.get("reviewed_on") or published
+    reviewed_on = guide.get("reviewed_on") or _DEFAULT_REVIEWED
     GUIDES[slug] = {**guide, "slug": slug, "reviewed_on": reviewed_on}
 
 
@@ -48,6 +51,32 @@ def get_related_guides(slug: str, limit: int = 3) -> list[dict]:
 
 def get_guide_slugs() -> list[str]:
     return list(GUIDES.keys())
+
+
+def _category_slug(name: str) -> str:
+    return name.lower().replace(" ", "-").replace("&", "and").replace("/", "-")
+
+
+def get_all_categories() -> list[dict]:
+    """Return categories sorted by guide count descending."""
+    counts: dict[str, int] = {}
+    for g in GUIDES.values():
+        cat = g.get("category", "")
+        if cat:
+            counts[cat] = counts.get(cat, 0) + 1
+    return sorted(
+        [{"name": name, "slug": _category_slug(name), "count": count} for name, count in counts.items()],
+        key=lambda c: -c["count"],
+    )
+
+
+def get_guides_by_category(category_slug: str) -> list[dict]:
+    """Return all guides matching a category slug, sorted newest first."""
+    return sorted(
+        [g for g in GUIDES.values() if _category_slug(g.get("category", "")) == category_slug],
+        key=lambda g: g.get("published", ""),
+        reverse=True,
+    )
 
 
 def get_guides_for_sitemap() -> list[tuple[str, str]]:

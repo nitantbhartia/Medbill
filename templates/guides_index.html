@@ -77,9 +77,19 @@
 </div>
 
 <div class="guides-content">
+    {% if all_categories %}
+    <nav style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;" aria-label="Guide categories">
+        <a href="/guides/" style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;padding:6px 14px;border-radius:100px;text-decoration:none;border:1.5px solid var(--bk-green);color:var(--bk-green);background:#E6F4EA;">All</a>
+        {% for cat in all_categories %}
+        <a href="/guides/category/{{ cat.slug }}/" style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;padding:6px 14px;border-radius:100px;text-decoration:none;border:1.5px solid var(--bk-gray-border);color:var(--bk-secondary);transition:border-color 0.15s,color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.color='var(--bk-green)';this.style.background='#E6F4EA'" onmouseout="this.style.borderColor='var(--bk-gray-border)';this.style.color='var(--bk-secondary)';this.style.background='transparent'">
+            {{ cat.name }} <span style="opacity:0.6;font-weight:500;">({{ cat.count }})</span>
+        </a>
+        {% endfor %}
+    </nav>
+    {% endif %}
     {% if guides %}
         {% for g in guides %}
-        <a href="/guides/{{ g.slug }}" class="guide-card">
+        <a href="/guides/{{ g.slug }}/" class="guide-card">
             <div class="guide-card-meta">
                 {% if g.category %}
                 <span class="guide-card-category">{{ g.category }}</span>
