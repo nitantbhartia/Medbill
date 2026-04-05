@@ -184,6 +184,10 @@ register("hysterectomy-costs", {
 
 <p>Review your plan&rsquo;s <a href="/guides/inpatient-outpatient">inpatient vs. outpatient</a> coverage differences before your procedure. Some plans have different cost-sharing for inpatient admissions that can significantly raise your out-of-pocket cost.</p>
 
+<div class="key-takeaway">
+    <strong>Not sure if your hysterectomy approach was billed correctly?</strong> Request your operative report from the hospital and <a href="/scan">upload it alongside your bill to BillKarma</a> &mdash; we&rsquo;ll check whether the CPT code matches what was actually performed.
+</div>
+
 <h2 id="billing-errors">7. Common billing errors</h2>
 
 <p>Hysterectomy bills have a higher-than-average error rate because the procedure involves multiple CPT codes, often multiple surgeons, and sometimes multiple facilities. BillKarma&rsquo;s analysis of hysterectomy bills at 6,000+ hospitals found the following errors most frequently:</p>

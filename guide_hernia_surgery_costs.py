@@ -196,6 +196,10 @@ register("hernia-surgery-costs", {
 
 <p>If you have a high-deductible health plan (HDHP), you will likely owe your full deductible (often $1,500&ndash;$5,000) before insurance begins paying. Run the numbers using your plan&rsquo;s Summary of Benefits before proceeding. You can also use a <a href="/calculator">cost calculator</a> to model your expected out-of-pocket cost based on your specific plan.</p>
 
+<div class="key-takeaway">
+    <strong>Want to verify your hernia repair CPT code and anesthesia units?</strong> Request your operative report from the hospital &mdash; it&rsquo;s free, and you can <a href="/scan">upload both your bill and operative report to BillKarma</a> to automatically check for mismatches.
+</div>
+
 <h2 id="bill-example">8. Annotated bill example</h2>
 
 <p>Below is a representative itemized bill for a laparoscopic inguinal hernia repair (CPT 49650) at a hospital outpatient department. Items marked as <strong>flagged</strong> warrant a closer look; items marked as <strong>errors</strong> should be disputed.</p>

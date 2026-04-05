@@ -258,3 +258,4 @@ import guide_hernia_surgery_costs
 import guide_hysterectomy_costs
 import guide_endoscopy_billing
 import guide_wisconsin_medical_billing
+import guide_missouri_medical_billing
