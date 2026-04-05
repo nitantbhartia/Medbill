@@ -387,3 +387,4 @@ import guide_nursing_home_billing
 import guide_south_carolina_medical_billing
 import guide_dental_implant_cost
 import guide_root_canal_cost
+import guide_wisdom_teeth_removal_cost
