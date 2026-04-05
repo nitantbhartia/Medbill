@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("invisalign-braces-cost", {
     "title": "Invisalign & Braces Cost: 2026 Insurance Guide",
-    "meta_description": "Invisalign costs $3,000–$8,000 in 2026; traditional braces run $2,500–$7,500. See insurance lifetime maximums, FSA rules, and how to negotiate orthodontic fees.",
+    "meta_description": "Invisalign costs $3,000–$8,000 in 2026; braces run $2,500–$7,500. See insurance lifetime maximums, FSA rules, and how to negotiate orthodontic fees.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Procedure Costs",

@@ -152,6 +152,10 @@ register("wisdom-teeth-removal-cost", {
     <li><strong>Request a corrected claim.</strong> Contact the billing office with the discrepancy. Most legitimate practices will review and correct it promptly.</li>
 </ol>
 
+<div class="key-takeaway">
+    <strong>If you have both dental and medical insurance</strong>, ask your oral surgeon&rsquo;s office to submit to both. Coordination of benefits can reduce your share significantly when anesthesia and medically necessary extraction are documented properly.
+</div>
+
 <h2 id="dentist-vs-surgeon">5. General dentist vs. oral surgeon pricing</h2>
 
 <p>For partially or fully impacted wisdom teeth, you may have a choice between a general dentist and an oral and maxillofacial surgeon (OMS). Here is how the economics compare:</p>

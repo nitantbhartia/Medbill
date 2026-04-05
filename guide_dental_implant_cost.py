@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("dental-implant-cost", {
     "title": "Dental Implant Cost: Prices & Insurance (2026)",
-    "meta_description": "A single dental implant costs $3,000–$6,000 total in 2026. Most insurance won't cover the implant post. See financing options, FSA rules, and All-on-4 pricing.",
+    "meta_description": "A single dental implant costs $3,000–$6,000 in 2026. Most insurance skips the implant post. See FSA rules, financing options, and All-on-4 pricing.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Procedure Costs",
