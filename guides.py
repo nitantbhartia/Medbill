@@ -448,3 +448,6 @@ import guide_medical_bill_negotiation_script
 import guide_mental_health_parity_billing
 import guide_physical_therapy_cost_session
 import guide_stent_surgery_cost
+import guide_cpap_machine_cost
+import guide_insulin_cost
+import guide_knee_arthroscopy_cost
