@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("best-worst-states-medical-debt", {
     "title": "Best and Worst States for Medical Debt Protections",
-    "meta_description": "Patients in top-5 states pay 67% less on identical hospital bills than those in bottom-5 states. See our full 50-state scorecard on medical debt protections.",
+    "meta_description": "Patients in top-5 states pay 67% less on identical hospital bills than bottom-5 states. See our full 50-state scorecard on medical debt protections.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Patient Rights",

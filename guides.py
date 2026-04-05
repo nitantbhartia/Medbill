@@ -415,4 +415,6 @@ import guide_addiction_treatment_billing
 import guide_dental_insurance_explained
 import guide_dental_discount_plan_vs_insurance
 import guide_best_worst_states_medical_debt
+import guide_hospital_vs_asc_cost
+import guide_dental_implant_alternatives
 import guide_medicare_advantage

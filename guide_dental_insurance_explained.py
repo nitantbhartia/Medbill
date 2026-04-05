@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("dental-insurance-explained", {
     "title": "Dental Insurance: Coverage, Limits & Hidden Gaps (2026)",
-    "meta_description": "Dental insurance annual maximums top out at $2,000 while implants cost $5,000. Learn how waiting periods, downgrades, and frequency limits shrink your real coverage.",
+    "meta_description": "Dental plans cap benefits at $1,500 yet a crown costs $2,000. Learn how waiting periods, downgrades, and frequency limits slash your real coverage.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Insurance Basics",
