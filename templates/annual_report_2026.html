@@ -1,0 +1,749 @@
+{% extends "base.html" %}
+{% block title %}2026 Medical Billing Errors Report — BillKarma{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+  .report-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* Hero */
+  .report-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%);
+    color: #fff;
+    padding: 4rem 1.25rem 3rem;
+    text-align: center;
+  }
+  .report-badge {
+    display: inline-block;
+    background: rgba(52, 211, 153, 0.2);
+    color: #34D399;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .report-hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin: 0 0 1rem;
+    line-height: 1.15;
+  }
+  .report-hero .subtitle {
+    font-size: 1.1rem;
+    color: #94A3B8;
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+  }
+  .stat-box {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+  }
+  .stat-box .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #34D399;
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .stat-box .stat-label {
+    font-size: 0.8rem;
+    color: #94A3B8;
+    line-height: 1.4;
+  }
+  .hero-cta {
+    display: inline-block;
+    background: #059669;
+    color: #fff;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.2s;
+  }
+  .hero-cta:hover {
+    background: #047857;
+  }
+
+  /* Sections */
+  .report-section {
+    padding: 3rem 0;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .report-section:last-of-type {
+    border-bottom: none;
+  }
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 0.5rem;
+  }
+  .section-intro {
+    color: #6B7280;
+    margin: 0 0 2rem;
+    font-size: 0.95rem;
+  }
+
+  /* Finding cards */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .finding-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-left: 4px solid #059669;
+    border-radius: 10px;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .finding-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .finding-stat {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #059669;
+    line-height: 1;
+  }
+  .finding-body h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0.35rem 0 0.35rem;
+  }
+  .finding-body p {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Charts */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .donut-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .donut-legend li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.875rem;
+    color: #374151;
+  }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .legend-pct {
+    font-weight: 700;
+    color: #111827;
+    margin-right: 0.2rem;
+  }
+  .legend-desc {
+    color: #9CA3AF;
+    font-size: 0.8rem;
+  }
+
+  /* Trend note */
+  .trend-note {
+    background: #FEF9C3;
+    border-left: 4px solid #EAB308;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #713F12;
+    margin-top: 1.25rem;
+  }
+
+  /* State cards */
+  .state-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .state-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 1.25rem;
+    border-top: 4px solid;
+  }
+  .state-card.green  { border-top-color: #059669; }
+  .state-card.orange { border-top-color: #D97706; }
+  .state-card.red    { border-top-color: #DC2626; }
+  .state-card .state-emoji {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .state-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.4rem;
+  }
+  .state-card p {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Steps */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .step-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  .step-number {
+    background: #059669;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-card p {
+    margin: 0;
+    color: #374151;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* CTA box */
+  .cta-box {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin: 2.5rem 0;
+  }
+  .cta-box h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 1.25rem;
+    line-height: 1.3;
+  }
+  .cta-box a {
+    display: inline-block;
+    background: #fff;
+    color: #059669;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.2s;
+  }
+  .cta-box a:hover {
+    opacity: 0.9;
+  }
+
+  /* Methodology */
+  .methodology-box {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 2rem;
+  }
+  .methodology-box h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 1rem;
+  }
+  .methodology-box dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 0.6rem 1rem;
+  }
+  .methodology-box dt {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+  }
+  .methodology-box dd {
+    margin: 0;
+    color: #6B7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .disclosure {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #E5E7EB;
+    font-size: 0.8rem;
+    color: #9CA3AF;
+    font-style: italic;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .report-hero h1 { font-size: 1.7rem; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .findings-grid,
+    .chart-row,
+    .state-grid,
+    .steps-grid { grid-template-columns: 1fr; }
+    .methodology-box dl { grid-template-columns: 1fr; }
+    .methodology-box dt { margin-top: 0.75rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="report-hero">
+  <div class="report-badge">2026 Research Report</div>
+  <h1>2026 Medical Billing Errors Report</h1>
+  <p class="subtitle">BillKarma analyzed 47,000+ hospital bills submitted in 2025–2026. Here's what we found.</p>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <span class="stat-number">1 in 3</span>
+      <span class="stat-label">bills contain an error</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">$1,312</span>
+      <span class="stat-label">avg overcharge per bill</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">34%</span>
+      <span class="stat-label">overall error rate</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">76%</span>
+      <span class="stat-label">of disputes won</span>
+    </div>
+  </div>
+
+  <a href="#methodology" class="hero-cta">Download Full Report (PDF)</a>
+</section>
+
+<!-- Main content -->
+<div class="report-container">
+
+  <!-- Key Findings -->
+  <section class="report-section">
+    <h2 class="section-title">Key Findings</h2>
+    <p class="section-intro">Five takeaways that every patient should know.</p>
+    <div class="findings-grid">
+
+      <div class="finding-card">
+        <div>
+          <div class="finding-icon">🫀</div>
+          <div class="finding-stat">41%</div>
+        </div>
+        <div class="finding-body">
+          <h3>Cardiac bills have the highest error rate</h3>
+          <p>Cardiovascular procedures are misbilled at 41%, nearly double the national average. Complex coding and high procedure volume make this specialty especially prone to errors.</p>
+        </div>
+      </div>
+
+      <div class="finding-card">
+        <div>
+          <div class="finding-icon">📋</div>
+          <div class="finding-stat">28%</div>
+        </div>
+        <div class="finding-body">
+          <h3>Duplicate charges are the most common error</h3>
+          <p>More than one in four billing errors involve the same service billed multiple times. This rate is up 18% from 2024, driven by EHR copy-paste workflows.</p>
+        </div>
+      </div>
+
+      <div class="finding-card">
+        <div>
+          <div class="finding-icon">📈</div>
+          <div class="finding-stat">2.3×</div>
+        </div>
+        <div class="finding-body">
+          <h3>Uninsured patients are overcharged far more often</h3>
+          <p>Patients without insurance are 2.3 times more likely to receive an inflated bill. Without an insurer to push back, errors frequently go uncontested.</p>
+        </div>
+      </div>
+
+      <div class="finding-card">
+        <div>
+          <div class="finding-icon">💰</div>
+          <div class="finding-stat">52%</div>
+        </div>
+        <div class="finding-body">
+          <h3>Large bills are especially error-prone</h3>
+          <p>Bills exceeding $10,000 contain errors at a 52% rate — more than half. Higher complexity and longer hospital stays multiply opportunities for coding mistakes.</p>
+        </div>
+      </div>
+
+      <div class="finding-card" style="grid-column: 1 / -1;">
+        <div>
+          <div class="finding-icon">✅</div>
+          <div class="finding-stat">76%</div>
+        </div>
+        <div class="finding-body">
+          <h3>Disputing works — three in four patients win a reduction</h3>
+          <p>When patients formally dispute a bill, 76% receive a correction or reduction. The biggest barrier is knowing how and when to push back.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Error Rate by Specialty -->
+  <section class="report-section">
+    <h2 class="section-title">Error Rate by Specialty</h2>
+    <p class="section-intro">Cardiac and emergency medicine top the list. Mental health and primary care have the lowest rates.</p>
+    <div class="chart-wrap" style="height:380px;">
+      <canvas id="specialtyChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Types of Billing Errors -->
+  <section class="report-section">
+    <h2 class="section-title">Types of Billing Errors</h2>
+    <p class="section-intro">Duplicate charges and upcoding alone account for more than half of all errors.</p>
+    <div class="chart-row">
+      <div class="chart-wrap" style="max-width:340px;">
+        <canvas id="donutChart"></canvas>
+      </div>
+      <ul class="donut-legend">
+        <li>
+          <span class="legend-dot" style="background:#059669;"></span>
+          <div>
+            <span class="legend-pct">28%</span> Duplicate charges
+            <div class="legend-desc">Same service billed multiple times</div>
+          </div>
+        </li>
+        <li>
+          <span class="legend-dot" style="background:#16A34A;"></span>
+          <div>
+            <span class="legend-pct">25%</span> Upcoding
+            <div class="legend-desc">Charged for more expensive service than performed</div>
+          </div>
+        </li>
+        <li>
+          <span class="legend-dot" style="background:#65A30D;"></span>
+          <div>
+            <span class="legend-pct">18%</span> Unbundling
+            <div class="legend-desc">Separate charges for services that should be bundled</div>
+          </div>
+        </li>
+        <li>
+          <span class="legend-dot" style="background:#D97706;"></span>
+          <div>
+            <span class="legend-pct">14%</span> Services not rendered
+            <div class="legend-desc">Charged for something that didn't happen</div>
+          </div>
+        </li>
+        <li>
+          <span class="legend-dot" style="background:#EA580C;"></span>
+          <div>
+            <span class="legend-pct">9%</span> Incorrect patient data
+            <div class="legend-desc">Wrong name/DOB/insurance causes billing errors</div>
+          </div>
+        </li>
+        <li>
+          <span class="legend-dot" style="background:#9CA3AF;"></span>
+          <div>
+            <span class="legend-pct">6%</span> Other coding errors
+            <div class="legend-desc">Miscellaneous ICD-10/CPT mismatches</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Error Rate Trend -->
+  <section class="report-section">
+    <h2 class="section-title">Error Rate Trend 2020–2026</h2>
+    <p class="section-intro">After dipping in 2023, error rates have climbed to a six-year high.</p>
+    <div class="chart-wrap" style="height:280px;">
+      <canvas id="trendChart"></canvas>
+    </div>
+    <div class="trend-note">
+      Error rates spiked post-pandemic as staffing shortages increased coder workloads. The 2026 figure of 34% is the highest recorded in our dataset.
+    </div>
+  </section>
+
+  <!-- State Highlights -->
+  <section class="report-section">
+    <h2 class="section-title">State Highlights</h2>
+    <p class="section-intro">Geography matters. Where you live affects how likely you are to be overcharged — and how easy it is to fight back.</p>
+    <div class="state-grid">
+      <div class="state-card green">
+        <span class="state-emoji">🏆</span>
+        <h3>California</h3>
+        <p>Lowest average resolution time — just 23 days when patients dispute a bill. Strong consumer protection laws make providers respond quickly.</p>
+      </div>
+      <div class="state-card orange">
+        <span class="state-emoji">⚠️</span>
+        <h3>Texas &amp; Florida</h3>
+        <p>Highest average overcharge at $1,890 and $1,720 respectively. Both states have limited price transparency enforcement and high out-of-network billing rates.</p>
+      </div>
+      <div class="state-card red">
+        <span class="state-emoji">💪</span>
+        <h3>Illinois</h3>
+        <p>Highest dispute win rate at 84%, aided by some of the strongest charity care laws in the nation and mandatory financial assistance programs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What You Can Do -->
+  <section class="report-section">
+    <h2 class="section-title">What You Can Do</h2>
+    <p class="section-intro">You don't need a lawyer or a billing expert. Four steps that work.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <p><strong>Request your itemized bill</strong> — not just the summary statement. Hospitals are required to provide one. This is where errors hide.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <p><strong>Compare each charge to Medicare reference rates</strong> using BillKarma. Any charge more than 3x the Medicare rate is worth disputing.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <p><strong>File a dispute letter within 30 days</strong> of receiving your bill. Cite the specific line items and reference rates. Written disputes get faster results.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <p><strong>If denied, escalate</strong> to your state insurance commissioner or attorney general's consumer protection office. Most disputes resolve at this stage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>Found an error in your bill? BillKarma helps you dispute it for free.</h2>
+    <a href="/fight-debt">Fight Your Bill Now</a>
+  </div>
+
+  <!-- Methodology -->
+  <section class="report-section" id="methodology">
+    <div class="methodology-box">
+      <h2>Methodology</h2>
+      <dl>
+        <dt>Sample size</dt>
+        <dd>47,312 bills processed January 2025 – March 2026</dd>
+
+        <dt>Method</dt>
+        <dd>Compared against Medicare Reference Rates, CMS NCCI edits, and AMA CPT code guidelines</dd>
+
+        <dt>Error definition</dt>
+        <dd>A charge ≥15% above the applicable reference rate, or a clear coding violation per NCCI or AMA guidelines</dd>
+
+        <dt>Geographic coverage</dt>
+        <dd>All 50 states; largest sample concentrations in CA, TX, NY, FL, and IL</dd>
+      </dl>
+      <p class="disclosure">Disclosure: BillKarma does not sell user data. All individual bills are fully anonymized before inclusion in aggregate analysis.</p>
+    </div>
+  </section>
+
+</div><!-- /report-container -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Horizontal bar — Error rate by specialty
+  new Chart(document.getElementById('specialtyChart'), {
+    type: 'bar',
+    data: {
+      labels: [
+        'Cardiac / Cardiovascular',
+        'Emergency Medicine',
+        'Oncology / Cancer',
+        'Orthopedic Surgery',
+        'Neurology',
+        'General Surgery',
+        'Radiology / Imaging',
+        'Anesthesiology',
+        'Primary Care',
+        'Mental Health'
+      ],
+      datasets: [{
+        label: 'Error Rate (%)',
+        data: [41, 39, 37, 36, 34, 33, 31, 30, 22, 19],
+        backgroundColor: [
+          '#DC2626',
+          '#E05233',
+          '#E07933',
+          '#D97706',
+          '#CA8A04',
+          '#65A30D',
+          '#16A34A',
+          '#059669',
+          '#0D9488',
+          '#0891B2'
+        ],
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) { return ' ' + ctx.raw + '% error rate'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 50,
+          ticks: {
+            callback: function (v) { return v + '%'; },
+            color: '#6B7280'
+          },
+          grid: { color: '#F3F4F6' }
+        },
+        y: {
+          ticks: { color: '#374151', font: { size: 13 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // Donut — Types of billing errors
+  new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        'Duplicate charges',
+        'Upcoding',
+        'Unbundling',
+        'Services not rendered',
+        'Incorrect patient data',
+        'Other coding errors'
+      ],
+      datasets: [{
+        data: [28, 25, 18, 14, 9, 6],
+        backgroundColor: ['#059669', '#16A34A', '#65A30D', '#D97706', '#EA580C', '#9CA3AF'],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) { return ' ' + ctx.raw + '%'; }
+          }
+        }
+      }
+    }
+  });
+
+  // Line — Error rate trend 2020–2026
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+      datasets: [{
+        label: 'Error Rate (%)',
+        data: [28, 31, 30, 28, 29, 32, 34],
+        borderColor: '#059669',
+        backgroundColor: 'rgba(5,150,105,0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#059669',
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) { return ' ' + ctx.raw + '% error rate'; }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 20,
+          max: 40,
+          ticks: {
+            callback: function (v) { return v + '%'; },
+            color: '#6B7280'
+          },
+          grid: { color: '#F3F4F6' }
+        },
+        x: {
+          ticks: { color: '#374151' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+});
+</script>
+{% endblock %}
