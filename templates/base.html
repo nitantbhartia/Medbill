@@ -60,7 +60,7 @@
     <link rel="preload" href="/static/css/app.css" as="style">
     <link rel="stylesheet" href="/static/css/app.css"/>
     <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks."}
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks."},{"@type":"WebSite","url":"https://billkarma.app","name":"BillKarma","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://billkarma.app/hospitals/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"SiteLinksSearchBox","url":"https://billkarma.app","potentialAction":{"@type":"SearchAction","target":"https://billkarma.app/hospitals/?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ItemList","name":"BillKarma Navigation","itemListElement":[{"@type":"SiteNavigationElement","position":1,"name":"Patient Guides","url":"https://billkarma.app/guides/"},{"@type":"SiteNavigationElement","position":2,"name":"Hospitals","url":"https://billkarma.app/hospitals/"},{"@type":"SiteNavigationElement","position":3,"name":"Procedures","url":"https://billkarma.app/procedures/"},{"@type":"SiteNavigationElement","position":4,"name":"Free Tools","url":"https://billkarma.app/tools/"},{"@type":"SiteNavigationElement","position":5,"name":"Fight Debt","url":"https://billkarma.app/fight-debt"}]}]}
 </script>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
     <style>
@@ -209,6 +209,7 @@
         @media (max-width: 640px) {
             .bk-nav { padding: 12px 16px; }
             .bk-nav-link { display: none; }
+            .bk-nav-link.mobile-show { display: inline-flex; }
             .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
             .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
             .bk-map-hospital { height: 220px; }
@@ -226,13 +227,13 @@
                 BillKarma
             </a>
             <div class="bk-nav-links">
-                <a href="/hospitals/" class="bk-nav-link">Hospitals</a>
+                <a href="/guides/" class="bk-nav-link mobile-show">Guides</a>
+                <a href="/hospitals/" class="bk-nav-link mobile-show">Hospitals</a>
+                <a href="/procedures/" class="bk-nav-link">Procedures</a>
+                <a href="/tools/" class="bk-nav-link">Tools</a>
+                <a href="/compare/" class="bk-nav-link">Compare</a>
                 <a href="/surgery-centers/" class="bk-nav-link">Surgery Centers</a>
                 <a href="/imaging/" class="bk-nav-link">Imaging</a>
-                <a href="/procedures/" class="bk-nav-link">Procedures</a>
-                <a href="/compare/" class="bk-nav-link">Compare</a>
-                <a href="/tools/" class="bk-nav-link">Tools</a>
-                <a href="/guides/" class="bk-nav-link">Guides</a>
                 <a href="/fight-debt" class="bk-nav-cta" style="background:var(--bk-orange);color:#fff;">Fight Debt</a>
                 <a href="/scan" class="bk-nav-cta">Scan My Bill</a>
             </div>
