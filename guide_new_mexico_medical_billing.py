@@ -45,6 +45,7 @@ register("new-mexico-medical-billing", {
         <li><a href="#how-to-dispute">How to dispute a New Mexico hospital bill</a></li>
         <li><a href="#bill-example">Annotated New Mexico hospital bill</a></li>
         <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
 </nav>
@@ -239,6 +240,31 @@ register("new-mexico-medical-billing", {
 
 <div class="key-takeaway">
     <strong>New Mexico&rsquo;s medical debt credit reporting ban is automatic protection &mdash; but you still owe the debt.</strong> HB 372 prevents credit damage, but the hospital can still sue you for payment. Use Medicaid, charity care, and negotiation tools to resolve the underlying bill. <a href="/scan">BillKarma can help you find every available discount.</a>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+
+<div class="faq-section">
+    <div class="faq-item">
+        <h3>Did New Mexico ban reporting medical debt to credit bureaus?</h3>
+        <p>Yes. New Mexico HB 372 (2023) prohibits medical providers and collection agencies from reporting any medical debt to consumer reporting agencies. This is one of the strongest state-level credit reporting bans in the country. If a collector threatens to report your medical debt to a credit bureau in New Mexico, that threat is illegal. File a complaint with the <a href="https://www.nmag.gov/consumer-protection/" target="_blank" rel="noopener">New Mexico Attorney General</a>.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Are New Mexico hospitals required to offer charity care?</h3>
+        <p>Yes. Under NM Statute &sect;&nbsp;24-14A (New Mexico Hospital Financial Assistance Act), nonprofit hospitals must maintain a written financial assistance policy, notify patients of available assistance, and screen patients for eligibility before taking extraordinary collection actions such as lawsuits, liens, or credit reporting. Apply within 240 days of your first billing statement.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Does New Mexico have strong Medicaid coverage?</h3>
+        <p>Yes. New Mexico&rsquo;s Centennial Care program covers adults earning up to 138% FPL (approximately $20,783 for a single person in 2026) and covers roughly 40% of the state population. Coverage is retroactive for up to 3 months. Apply at <a href="https://www.bewellnm.com" target="_blank" rel="noopener">bewellnm.com</a> or call 1-833-862-3935.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the statute of limitations on medical debt in New Mexico?</h3>
+        <p>New Mexico has a 6-year SOL on written contracts under NMSA &sect;&nbsp;37-1-3. Most hospital bills fall under this period. Warning: New Mexico&rsquo;s court judgment period is 14 years &mdash; one of the longest in the country. Resolving medical debt before litigation is essential in New Mexico.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Does New Mexico protect patients from surprise medical bills?</h3>
+        <p>New Mexico patients are protected by the federal No Surprises Act for all plan types. If you received care at an in-network New Mexico facility and received a separate bill from an out-of-network provider you did not choose, that bill is likely prohibited. File a dispute with the provider and contact CMS at 1-800-985-3059 if needed.</p>
+    </div>
 </div>
 
 <h2 id="sources">Sources</h2>
