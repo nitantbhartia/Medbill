@@ -80,7 +80,7 @@ register("therapy-cost-per-session", {
 
 <p>Look up the Medicare rate for your therapy session CPT code:</p>
 
-{_embed(mode="cost", cpt="90837", title="Therapy Session Cost", subtitle="90837 \u2013 Individual psychotherapy, 60 min")}
+{_embed(mode="cost", cpt="90837", title="Therapy Session Cost", subtitle="90837 – Individual psychotherapy, 60 min")}
 
 <h2 id="insurance-coverage">2. How insurance covers therapy</h2>
 

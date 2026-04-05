@@ -79,7 +79,7 @@ register("chemotherapy-cost", {
 
 <p>Look up what Medicare pays for chemotherapy infusion at your facility:</p>
 
-{_embed(mode="cost", cpt="96413", title="Chemotherapy Infusion Cost", subtitle="96413 \u2013 Chemotherapy infusion, first hour")}
+{_embed(mode="cost", cpt="96413", title="Chemotherapy Infusion Cost", subtitle="96413 – Chemotherapy infusion, first hour")}
 
 <h2 id="oral-vs-iv">2. Oral vs. IV chemotherapy cost comparison</h2>
 

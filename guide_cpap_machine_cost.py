@@ -77,7 +77,7 @@ register("cpap-machine-cost", {
 
 <p>Estimate your CPAP setup cost with insurance or Medicare:</p>
 
-{_embed(mode="cost", cpt="94660", title="CPAP Setup Cost", subtitle="94660 \u2013 CPAP initiation and management")}
+{_embed(mode="cost", cpt="94660", title="CPAP Setup Cost", subtitle="94660 – CPAP initiation and management")}
 
 <h2 id="supply-costs">2. Annual CPAP supply costs</h2>
 

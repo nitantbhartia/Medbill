@@ -79,7 +79,7 @@ register("heart-bypass-surgery-cost", {
 
 <p>Look up the Medicare benchmark for your bypass surgery CPT code:</p>
 
-{_embed(mode="cost", cpt="33533", title="Bypass Surgery Cost", subtitle="33533 \u2013 Coronary artery bypass, arterial graft")}
+{_embed(mode="cost", cpt="33533", title="Bypass Surgery Cost", subtitle="33533 – Coronary artery bypass, arterial graft")}
 
 <h2 id="what-drives-cost">2. What drives the total hospital bill</h2>
 
