@@ -418,3 +418,18 @@ import guide_best_worst_states_medical_debt
 import guide_hospital_vs_asc_cost
 import guide_dental_implant_alternatives
 import guide_medicare_advantage
+# Batch 12: remaining state guides (AK, DE, HI, ID, ME, MS, MT, NH, ND, RI, SD, VT, WV, WY)
+import guide_alaska_medical_billing
+import guide_delaware_medical_billing
+import guide_hawaii_medical_billing
+import guide_idaho_medical_billing
+import guide_maine_medical_billing
+import guide_mississippi_medical_billing
+import guide_montana_medical_billing
+import guide_new_hampshire_medical_billing
+import guide_north_dakota_medical_billing
+import guide_rhode_island_medical_billing
+import guide_south_dakota_medical_billing
+import guide_vermont_medical_billing
+import guide_west_virginia_medical_billing
+import guide_wyoming_medical_billing
