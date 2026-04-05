@@ -454,3 +454,14 @@ import guide_knee_arthroscopy_cost
 import guide_radiation_therapy_cost
 import guide_autism_aba_billing
 import guide_er_vs_urgent_care_cost
+# Batch 14: high-volume cost + coverage guides
+import guide_cataract_surgery_cost
+import guide_colonoscopy_cost
+import guide_hip_replacement_cost
+import guide_sleep_study_cost
+import guide_observation_status_billing
+import guide_ultrasound_cost
+import guide_birth_control_insurance_coverage
+import guide_drug_formulary_tiers
+import guide_medical_billing_advocate
+import guide_tummy_tuck_insurance_coverage
