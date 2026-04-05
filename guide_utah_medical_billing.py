@@ -45,6 +45,7 @@ register("utah-medical-billing", {
         <li><a href="#how-to-dispute">How to dispute a Utah hospital bill</a></li>
         <li><a href="#bill-example">Annotated Utah hospital bill</a></li>
         <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
 </nav>
