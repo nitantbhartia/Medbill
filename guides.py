@@ -259,3 +259,10 @@ import guide_hysterectomy_costs
 import guide_endoscopy_billing
 import guide_wisconsin_medical_billing
 import guide_missouri_medical_billing
+import guide_stroke_treatment_billing
+import guide_plastic_surgery_billing
+import guide_podiatry_billing
+import guide_nevada_medical_billing
+import guide_oregon_medical_billing
+import guide_tennessee_hospital_charity_care
+import guide_nursing_home_billing
