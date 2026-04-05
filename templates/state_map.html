@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+.map-hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #0D4F3C 100%);
+  color: #fff;
+  padding: 56px 24px 48px;
+  text-align: center;
+}
+.map-hero h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 12px; letter-spacing: -.02em; }
+.map-hero p { font-size: 1.05rem; opacity: .85; max-width: 640px; margin: 0 auto; line-height: 1.6; }
+.hero-stats {
+  display: flex; justify-content: center; gap: 40px; margin-top: 32px; flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat .val { font-size: 2rem; font-weight: 800; color: #34D399; line-height: 1; }
+.hero-stat .lbl { font-size: .78rem; opacity: .7; margin-top: 4px; text-transform: uppercase; letter-spacing: .06em; }
+
+.map-container {
+  max-width: 1100px; margin: 0 auto; padding: 0 16px 48px;
+}
+.map-wrap {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 24px 16px 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.08);
+  margin: -20px 0 32px;
+  position: relative;
+  overflow: hidden;
+}
+#map-svg { width: 100%; height: auto; display: block; cursor: pointer; }
+.state-shape {
+  stroke: #fff;
+  stroke-width: 0.6;
+  transition: opacity 0.12s;
+}
+.state-shape:hover { opacity: 0.82; stroke-width: 2; stroke: #1F2937; }
+
+.map-legend {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 4px 0 16px; flex-wrap: wrap;
+}
+.legend-label { font-size: .78rem; color: #6B7280; font-weight: 600; }
+.legend-swatch {
+  display: flex; align-items: center; gap: 5px; font-size: .78rem; color: #374151;
+}
+.legend-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+#map-tooltip {
+  position: fixed;
+  background: #0F172A;
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: .88rem;
+  max-width: 280px;
+  min-width: 220px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  line-height: 1.5;
+}
+#map-tooltip.show { opacity: 1; }
+.tt-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tt-name { font-size: 1.05rem; font-weight: 800; }
+.tt-grade { font-size: .85rem; font-weight: 800; padding: 3px 10px; border-radius: 100px; background: rgba(255,255,255,.15); }
+.tt-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; font-size: .82rem; }
+.tt-lbl { opacity: .6; }
+.tt-val { font-weight: 700; text-align: right; flex: 1; }
+.tt-note { margin-top: 10px; font-size: .79rem; opacity: .75; line-height: 1.45; border-top: 1px solid rgba(255,255,255,.12); padding-top: 9px; }
+.tt-link { display: block; margin-top: 9px; color: #34D399; font-size: .8rem; font-weight: 700; }
+
+.section-title {
+  font-size: 1.3rem; font-weight: 800; color: #111827; margin: 40px 0 16px;
+  padding-bottom: 12px; border-bottom: 2px solid #E5E7EB;
+}
+.insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.insight-card {
+  background: #fff; border: 1px solid #E5E7EB; border-radius: 14px; padding: 20px 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.insight-card .big { font-size: 1.8rem; font-weight: 800; color: #059669; line-height: 1; margin-bottom: 6px; }
+.insight-card h3 { font-size: .95rem; font-weight: 800; margin: 0 0 8px; color: #111827; }
+.insight-card p { font-size: .88rem; color: #6B7280; margin: 0; line-height: 1.55; }
+
+.score-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 24px 0;
+}
+.score-card {
+  background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 13px 15px;
+  display: flex; align-items: center; gap: 11px;
+  text-decoration: none; color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.score-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); border-color: #059669; }
+.sc-grade {
+  width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center;
+  justify-content: center; font-size: .9rem; font-weight: 800; flex-shrink: 0; color: #fff;
+}
+.sc-info { min-width: 0; }
+.sc-name { font-size: .86rem; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-score { font-size: .76rem; color: #6B7280; }
+.sc-bar { height: 3px; border-radius: 2px; margin-top: 5px; background: #E5E7EB; position: relative; overflow: hidden; }
+.sc-bar-fill { height: 100%; border-radius: 2px; }
+
+.cta-box {
+  background: linear-gradient(135deg, #059669, #047857); color: #fff;
+  border-radius: 16px; padding: 28px 32px; margin: 32px 0; text-align: center;
+}
+.cta-box h3 { margin: 0 0 8px; font-size: 1.3rem; }
+.cta-box p { margin: 0 0 16px; opacity: .9; font-size: .95rem; }
+.cta-btn { background: #fff; color: #059669; font-weight: 700; padding: 12px 28px; border-radius: 10px; text-decoration: none; display: inline-block; }
+.map-loading { text-align: center; padding: 80px 0; color: #9CA3AF; }
+.map-loading .spinner { width: 32px; height: 32px; border: 3px solid #E5E7EB; border-top-color: #059669; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .map-hero h1 { font-size: 1.5rem; }
+  .hero-stats { gap: 20px; }
+  .hero-stat .val { font-size: 1.5rem; }
+  .score-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="map-hero">
+  <h1>Medical Billing Protections by State (2026)</h1>
+  <p>How well does your state protect you from surprise bills, unaffordable hospital charges, and aggressive debt collection?</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val">51</div><div class="lbl">States Ranked</div></div>
+    <div class="hero-stat"><div class="val">6</div><div class="lbl">Grade Tiers</div></div>
+    <div class="hero-stat"><div class="val">A+</div><div class="lbl">Best: CA &amp; WA</div></div>
+    <div class="hero-stat"><div class="val">F</div><div class="lbl">Worst: MS &amp; WY</div></div>
+  </div>
+</div>
+
+<div class="map-container">
+  <div class="map-wrap">
+    <div class="map-legend">
+      <span class="legend-label">Grade:</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#047857"></span>A+ / A</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#16A34A"></span>A- / B+</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#65A30D"></span>B / B-</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#D97706"></span>C+ / C / C-</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#EA580C"></span>D+ / D / D-</span>
+      <span class="legend-swatch"><span class="legend-dot" style="background:#DC2626"></span>F</span>
+    </div>
+    <div id="map-loading" class="map-loading">
+      <div class="spinner"></div>
+      <div>Loading map…</div>
+    </div>
+    <svg id="map-svg" viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" style="display:none"></svg>
+  </div>
+
+  <div id="map-tooltip">
+    <div class="tt-head">
+      <span class="tt-name" id="tt-name"></span>
+      <span class="tt-grade" id="tt-grade"></span>
+    </div>
+    <div class="tt-row"><span class="tt-lbl">Score</span><span class="tt-val" id="tt-score"></span></div>
+    <div class="tt-row"><span class="tt-lbl">Medicaid Expanded</span><span class="tt-val" id="tt-medicaid"></span></div>
+    <div class="tt-row"><span class="tt-lbl">Surprise Billing Law</span><span class="tt-val" id="tt-surprise"></span></div>
+    <div class="tt-row"><span class="tt-lbl">Free Care Up To</span><span class="tt-val" id="tt-charity"></span></div>
+    <div class="tt-row"><span class="tt-lbl">Debt SOL</span><span class="tt-val" id="tt-sol"></span></div>
+    <div class="tt-row"><span class="tt-lbl">Wage Garnishment</span><span class="tt-val" id="tt-garnish"></span></div>
+    <div class="tt-note" id="tt-note"></div>
+    <a class="tt-link" id="tt-link" href="#">View full state guide →</a>
+  </div>
+
+  <div class="section-title">Key Insights</div>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="big">CA &amp; WA</div>
+      <h3>Top-ranked states</h3>
+      <p>California and Washington offer the strongest patient protections — free charity care to 350–400% FPL, landmark surprise billing laws, and strong debt collection limits.</p>
+    </div>
+    <div class="insight-card">
+      <div class="big">8</div>
+      <h3>States without Medicaid expansion</h3>
+      <p>Alabama, Florida, Georgia, Kansas, Mississippi, Tennessee, Wyoming, and (until recently) South Carolina left millions uninsured and exposed to catastrophic medical debt.</p>
+    </div>
+    <div class="insight-card">
+      <div class="big">NC &amp; PA</div>
+      <h3>Wage garnishment banned</h3>
+      <p>North Carolina and Pennsylvania prohibit wage garnishment for consumer medical debt — a powerful protection most states don't offer.</p>
+    </div>
+    <div class="insight-card">
+      <div class="big">IL</div>
+      <h3>Most generous charity care</h3>
+      <p>Illinois requires hospitals to provide free or reduced care up to 600% of the federal poverty level — the most generous charity care law in the nation.</p>
+    </div>
+  </div>
+
+  <div class="section-title">All 50 States + D.C. Ranked</div>
+  <div class="score-grid" id="score-grid"></div>
+
+  <div class="cta-box">
+    <h3>Know your rights. Fight your bill.</h3>
+    <p>BillKarma analyzes your hospital bill, identifies overcharges, and helps you dispute or negotiate — for free.</p>
+    <a href="/fight-debt" class="cta-btn">Check My Bill Now</a>
+  </div>
+
+  <div class="section-title">How States Are Scored</div>
+  <p style="color:#6B7280;font-size:.92rem;line-height:1.7;max-width:720px;margin-bottom:24px;">
+    Each state is scored on a 100-point scale across five dimensions:
+    <strong>Medicaid expansion</strong> (20 pts),
+    <strong>surprise billing protections</strong> (25 pts — state law vs. federal-only),
+    <strong>charity care mandate</strong> (25 pts — % FPL threshold required by law),
+    <strong>statute of limitations</strong> (15 pts — longer SOL = more consumer protection),
+    and <strong>wage garnishment limits</strong> (15 pts — lower cap = stronger protection).
+    Data reflects laws in effect as of April 2026.
+  </p>
+
+  <p style="font-size:.82rem;color:#9CA3AF;margin-top:8px;">
+    Sources: State statutes, Kaiser Family Foundation, National Consumer Law Center, CMS, Hospital Price Transparency data.
+    General information only — not legal advice. Consult a consumer attorney for your specific situation.
+  </p>
+</div>
+
+<script>
+const STATE_DATA = {{ state_data_json | safe }};
+
+const STATE_NAMES = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",
+  CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",
+  IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",
+  ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",
+  MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",
+  NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",
+  OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
+  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",
+  WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",DC:"D.C."
+};
+
+const STATE_SLUGS = {
+  AL:"alabama",AK:"alaska",AZ:"arizona",AR:"arkansas",CA:"california",CO:"colorado",
+  CT:"connecticut",DE:"delaware",FL:"florida",GA:"georgia",HI:"hawaii",ID:"idaho",
+  IL:"illinois",IN:"indiana",IA:"iowa",KS:"kansas",KY:"kentucky",LA:"louisiana",
+  ME:"maine",MD:"maryland",MA:"massachusetts",MI:"michigan",MN:"minnesota",MS:"mississippi",
+  MO:"missouri",MT:"montana",NE:"nebraska",NV:"nevada",NH:"new-hampshire",NJ:"new-jersey",
+  NM:"new-mexico",NY:"new-york",NC:"north-carolina",ND:"north-dakota",OH:"ohio",
+  OK:"oklahoma",OR:"oregon",PA:"pennsylvania",RI:"rhode-island",SC:"south-carolina",
+  SD:"south-dakota",TN:"tennessee",TX:"texas",UT:"utah",VT:"vermont",VA:"virginia",
+  WA:"washington",WV:"west-virginia",WI:"wisconsin",WY:"wyoming",DC:"district-of-columbia"
+};
+
+const FIPS_TO_ABBR = {
+  "01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE",
+  "11":"DC","12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA",
+  "20":"KS","21":"KY","22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN",
+  "28":"MS","29":"MO","30":"MT","31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM",
+  "36":"NY","37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA","44":"RI",
+  "45":"SC","46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA",
+  "54":"WV","55":"WI","56":"WY"
+};
+
+function gradeColor(grade) {
+  if (grade === "A+" || grade === "A") return "#047857";
+  if (grade === "A-" || grade === "B+") return "#16A34A";
+  if (grade === "B" || grade === "B-")  return "#65A30D";
+  if (grade.startsWith("C"))            return "#D97706";
+  if (grade.startsWith("D"))            return "#EA580C";
+  return "#DC2626"; // F
+}
+
+// Build score grid
+(function() {
+  const grid = document.getElementById("score-grid");
+  const sorted = Object.entries(STATE_DATA).sort((a, b) => b[1].score - a[1].score);
+  sorted.forEach(([abbr, d]) => {
+    const slug = STATE_SLUGS[abbr] || abbr.toLowerCase();
+    const col = gradeColor(d.grade);
+    const card = document.createElement("a");
+    card.className = "score-card";
+    card.href = `/guides/${slug}-medical-billing/`;
+    card.innerHTML = `
+      <div class="sc-grade" style="background:${col}">${d.grade}</div>
+      <div class="sc-info">
+        <div class="sc-name">${STATE_NAMES[abbr] || abbr}</div>
+        <div class="sc-score">Score: ${d.score}/100</div>
+        <div class="sc-bar"><div class="sc-bar-fill" style="width:${d.score}%;background:${col}"></div></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+})();
+
+// Load D3 + topojson then render map
+(async function() {
+  const svg = document.getElementById("map-svg");
+  const loading = document.getElementById("map-loading");
+  try {
+    await loadScript("https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js");
+    await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js");
+    const us = await fetch("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json").then(r => r.json());
+
+    const projection = d3.geoAlbersUsa().scale(1300).translate([487.5, 305]);
+    const path = d3.geoPath().projection(projection);
+    const features = topojson.feature(us, us.objects.states).features;
+
+    const svgEl = d3.select(svg);
+
+    // State shapes
+    svgEl.selectAll(".state-shape")
+      .data(features)
+      .enter().append("path")
+      .attr("class", "state-shape")
+      .attr("d", path)
+      .attr("fill", f => {
+        const abbr = FIPS_TO_ABBR[f.id.toString().padStart(2, "0")];
+        return abbr && STATE_DATA[abbr] ? gradeColor(STATE_DATA[abbr].grade) : "#D1D5DB";
+      })
+      .attr("data-abbr", f => FIPS_TO_ABBR[f.id.toString().padStart(2, "0")] || "")
+      .on("mousemove", handleHover)
+      .on("mouseleave", handleLeave)
+      .on("click", handleClick);
+
+    // State borders
+    svgEl.append("path")
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+      .attr("fill", "none")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", "0.5")
+      .attr("pointer-events", "none")
+      .attr("d", path);
+
+    // State abbreviation labels for larger states
+    const LABEL_STATES = new Set([
+      "CA","TX","NY","FL","PA","IL","OH","GA","NC","MI","VA","WA","AZ","TN",
+      "IN","MO","WI","CO","MN","AL","LA","KY","OR","OK","IA","MS","AR","KS",
+      "UT","NV","NE","WV","ID","NM","SD","ND","MT","WY","ME","MT"
+    ]);
+    features.forEach(f => {
+      const abbr = FIPS_TO_ABBR[f.id.toString().padStart(2, "0")];
+      if (!abbr || !LABEL_STATES.has(abbr)) return;
+      const c = path.centroid(f);
+      if (!c || isNaN(c[0])) return;
+      svgEl.append("text")
+        .attr("x", c[0]).attr("y", c[1] + 4)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#fff")
+        .attr("font-size", "7")
+        .attr("font-weight", "700")
+        .attr("font-family", "system-ui, sans-serif")
+        .attr("pointer-events", "none")
+        .text(abbr);
+    });
+
+    loading.style.display = "none";
+    svg.style.display = "block";
+    attachTooltip();
+  } catch(err) {
+    loading.innerHTML = '<p style="color:#9CA3AF">Map requires an internet connection. See the ranked list below.</p>';
+    console.warn("Map error:", err);
+  }
+})();
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+const tooltip = document.getElementById("map-tooltip");
+let tooltipVisible = false;
+
+function handleHover(event, f) {
+  const abbr = FIPS_TO_ABBR[f.id.toString().padStart(2, "0")];
+  if (!abbr || !STATE_DATA[abbr]) return;
+  const d = STATE_DATA[abbr];
+  const slug = STATE_SLUGS[abbr] || abbr.toLowerCase();
+
+  document.getElementById("tt-name").textContent = STATE_NAMES[abbr] || abbr;
+  document.getElementById("tt-grade").textContent = d.grade;
+  document.getElementById("tt-score").textContent = d.score + " / 100";
+  document.getElementById("tt-medicaid").textContent = d.medicaid ? "✓ Yes" : "✗ No";
+  document.getElementById("tt-surprise").textContent = d.surprise;
+  document.getElementById("tt-charity").textContent = d.charity_fpl + " FPL";
+  document.getElementById("tt-sol").textContent = d.sol + " years";
+  document.getElementById("tt-garnish").textContent = d.garnish;
+  document.getElementById("tt-note").textContent = d.highlight;
+  document.getElementById("tt-link").href = `/guides/${slug}-medical-billing/`;
+
+  positionTooltip(event);
+  tooltip.classList.add("show");
+}
+
+function handleLeave() {
+  tooltip.classList.remove("show");
+}
+
+function handleClick(event, f) {
+  const abbr = FIPS_TO_ABBR[f.id.toString().padStart(2, "0")];
+  if (!abbr) return;
+  const slug = STATE_SLUGS[abbr] || abbr.toLowerCase();
+  window.location.href = `/guides/${slug}-medical-billing/`;
+}
+
+function positionTooltip(event) {
+  const x = Math.min(event.clientX + 18, window.innerWidth - 300);
+  const y = Math.min(event.clientY - 10, window.innerHeight - 340);
+  tooltip.style.left = x + "px";
+  tooltip.style.top  = y + "px";
+}
+
+function attachTooltip() {
+  document.addEventListener("mousemove", e => {
+    if (tooltip.classList.contains("show")) positionTooltip(e);
+  });
+}
+</script>
+{% endblock %}
