@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("iowa-medical-billing", {
     "title": "Iowa Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "Iowa requires charity care under IA Code § 135.71 and expanded Medicaid. Learn the 5-year debt SOL, Iowa Consumer Credit Code protections, and how to cut your bill.",
+    "meta_description": "IA Code § 135.71 requires charity care at Iowa hospitals. Learn IHAWP Medicaid, Iowa Consumer Credit Code, 5-year SOL, and how to cut your bill.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",

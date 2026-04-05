@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("utah-medical-billing", {
     "title": "Utah Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "Utah requires charity care under UT Code § 26B-2-224 and passed HB 228 medical debt protections. Learn the 6-year debt SOL and how to fight your hospital bill.",
+    "meta_description": "Utah hospitals must provide charity care under UT Code § 26B-2-224. Learn HB 228 debt rules, 6-year SOL, and how to cut your bill. Free analysis.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",

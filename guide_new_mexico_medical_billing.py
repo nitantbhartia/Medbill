@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("new-mexico-medical-billing", {
     "title": "New Mexico Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "New Mexico banned medical debt credit reporting (HB 372, 2023) and has robust Medicaid at 138% FPL. Learn the 6-year debt SOL and how to cut your hospital bill.",
+    "meta_description": "New Mexico HB 372 bans medical debt from credit reports. Learn Centennial Care Medicaid, 6-year SOL, and how to cut your hospital bill. Free analysis.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",

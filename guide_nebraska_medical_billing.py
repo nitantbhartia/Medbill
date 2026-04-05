@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("nebraska-medical-billing", {
     "title": "Nebraska Medical Billing Laws & Patient Rights (2026)",
-    "meta_description": "Nebraska expanded Medicaid in 2020 (Initiative 427) and passed LB 1105 medical debt collection limits. Learn the 5-year debt SOL and how to fight your hospital bill.",
+    "meta_description": "Nebraska expanded Medicaid via Initiative 427 and passed LB 1105 debt protections. Learn the 5-year SOL and how to cut your hospital bill. Free analysis.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "State Guides",
@@ -45,6 +45,7 @@ register("nebraska-medical-billing", {
         <li><a href="#how-to-dispute">How to dispute a Nebraska hospital bill</a></li>
         <li><a href="#bill-example">Annotated Nebraska hospital bill</a></li>
         <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
 </nav>
@@ -250,6 +251,31 @@ register("nebraska-medical-billing", {
 
 <div class="key-takeaway">
     <strong>Nebraska Initiative 427 Medicaid expansion was voter-approved &mdash; making it more durable than legislative expansions.</strong> If you earn under 138% FPL and recently had a hospital visit without insurance, applying for retroactive Nebraska Medicaid is almost always your best first step. <a href="/charity-care">Check your eligibility now.</a>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+
+<div class="faq-section">
+    <div class="faq-item">
+        <h3>When did Nebraska expand Medicaid and who qualifies?</h3>
+        <p>Nebraska voters approved Medicaid expansion through Initiative 427 in November 2018. The expansion took effect October 1, 2020, covering adults age 19&ndash;64 with incomes up to 138% FPL (approximately $20,783 for a single person in 2026). Apply at <a href="https://dhhs.ne.gov/Pages/Medicaid.aspx" target="_blank" rel="noopener">dhhs.ne.gov</a>. Coverage can be retroactive for up to 3 months.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What did Nebraska LB 1105 do for patients?</h3>
+        <p>Nebraska LB 1105 (2022) requires hospitals to provide itemized bills on request, disclose financial assistance programs before sending accounts to collections, offer reasonable payment plans, and limits interest on medical debt payment plans. Hospitals that skip these steps before pursuing collection action may be violating LB 1105 &mdash; file a complaint with Nebraska DHHS.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Are Nebraska hospitals required to offer charity care?</h3>
+        <p>Nebraska does not have a state charity care mandate, but federal IRS 501(r) rules require all 501(c)(3) nonprofit hospitals to maintain a financial assistance policy. Nebraska LB 1105 also requires hospitals to disclose these programs before collections. Most Nebraska nonprofit hospitals provide free care up to 200% FPL and discounts up to 300% FPL. Always ask for the application before paying.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the statute of limitations on medical debt in Nebraska?</h3>
+        <p>Nebraska has a 5-year SOL on written contracts under Neb. Rev. Stat. &sect;&nbsp;25-205 and a 4-year SOL on open accounts under &sect;&nbsp;25-206. The clock starts from the date of last payment or when the debt became due. Any voluntary payment restarts the clock. Judgments can be renewed every 5 years, so responding to lawsuits is critical.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Does Nebraska protect patients from surprise medical bills?</h3>
+        <p>Nebraska relies on the federal No Surprises Act for surprise billing protection. Under the NSA, you cannot be balance-billed for emergency services or for non-emergency care from out-of-network ancillary providers at in-network facilities without advance written consent. Report violations to CMS at 1-800-985-3059 or the <a href="https://doi.nebraska.gov/consumer-resources/file-a-complaint" target="_blank" rel="noopener">Nebraska Department of Insurance</a>.</p>
+    </div>
 </div>
 
 <h2 id="sources">Sources</h2>
