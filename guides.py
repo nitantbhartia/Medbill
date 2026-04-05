@@ -87,6 +87,94 @@ def get_guides_for_sitemap() -> list[tuple[str, str]]:
     ]
 
 
+# Keyword → slug map for auto internal linking (most specific phrases first)
+_LINK_MAP: list[tuple[str, str]] = [
+    ("No Surprises Act", "no-surprises-act-explained"),
+    ("Good Faith Estimate", "good-faith-estimate-rights"),
+    ("explanation of benefits", "understanding-your-eob"),
+    ("Explanation of Benefits", "understanding-your-eob"),
+    ("charity care", "hospital-financial-assistance-charity-care"),
+    ("balance billing", "balance-billing"),
+    ("balance bill", "balance-billing"),
+    ("prior authorization", "prior-authorization-denials"),
+    ("prior auth", "prior-authorization-denials"),
+    ("observation status", "observation-status-billing"),
+    ("itemized bill", "how-to-get-itemized-hospital-bill"),
+    ("medical debt collections", "medical-bill-collections-rights"),
+    ("debt collector", "fdcpa-rights-medical-debt-collectors"),
+    ("FDCPA", "fdcpa-rights-medical-debt-collectors"),
+    ("debt validation", "debt-validation-letter-medical-debt"),
+    ("statute of limitations", "medical-debt-statute-of-limitations"),
+    ("hospital lien", "hospital-liens-explained"),
+    ("CPT code", "what-are-cpt-codes"),
+    ("DRG code", "icd10-drg-codes"),
+    ("ICD-10", "icd10-drg-codes"),
+    ("out-of-pocket maximum", "out-of-pocket-maximum-explained"),
+    ("out of pocket maximum", "out-of-pocket-maximum-explained"),
+    ("deductible", "copay-vs-coinsurance-vs-deductible"),
+    ("coinsurance", "copay-vs-coinsurance-vs-deductible"),
+    ("HSA", "hsa-fsa-pay-medical-bills"),
+    ("FSA", "hsa-fsa-pay-medical-bills"),
+    ("COBRA", "cobra-insurance-billing-guide"),
+    ("medical billing advocate", "medical-billing-advocate"),
+    ("superbill", "what-is-a-superbill"),
+    ("appeal", "how-to-appeal-insurance-denial-and-win"),
+    ("dispute letter", "medical-bill-dispute-letter"),
+    ("payment plan", "hospital-payment-plans"),
+    ("wage garnishment", "medical-debt-wage-garnishment"),
+    ("medical bankruptcy", "medical-bankruptcy-guide"),
+    ("hardship", "medical-bill-financial-hardship"),
+    ("surprise bill", "no-surprises-act-explained"),
+    ("facility fee", "guide_facility_fees_explained"),
+    ("chargemaster", "hospital-chargemaster-explained"),
+]
+
+
+def inject_internal_links(html: str, current_slug: str) -> str:
+    """Auto-link first occurrence of key phrases to relevant guides (skips current slug)."""
+    import re
+    # Pre-seed with slugs already linked in the HTML so we don't double-link
+    already = set(re.findall(r'/guides/([^/"]+)/', html))
+    linked_slugs: set[str] = {current_slug} | already
+
+    # Split HTML into alternating text/tag segments; only modify text segments
+    segments = re.split(r"(<[^>]+>)", html)
+    inside_anchor = 0
+    result = []
+
+    for seg in segments:
+        if seg.startswith("<"):
+            tag_lower = seg.lower()
+            if tag_lower.startswith("<a"):
+                inside_anchor += 1
+            elif tag_lower.startswith("</a"):
+                inside_anchor = max(0, inside_anchor - 1)
+            result.append(seg)
+            continue
+
+        if inside_anchor or not seg.strip():
+            result.append(seg)
+            continue
+
+        for phrase, slug in _LINK_MAP:
+            if slug in linked_slugs:
+                continue
+            idx = seg.find(phrase)
+            if idx == -1:
+                continue
+            linked_slugs.add(slug)
+            seg = (
+                seg[:idx]
+                + f'<a href="/guides/{slug}/">{phrase}</a>'
+                + seg[idx + len(phrase):]
+            )
+            break  # one link per text segment to avoid over-linking
+
+        result.append(seg)
+
+    return "".join(result)
+
+
 def _embed(mode="cost", cpt="", title="", subtitle="", height="380"):
     """Return an iframe snippet for embedding a calculator in article body."""
     params = f"mode={mode}"

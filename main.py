@@ -671,18 +671,19 @@ async def calculator_embed(
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
     import re
-    from guides import get_guide, get_related_guides
+    from guides import get_guide, get_related_guides, inject_internal_links
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}/"
     word_count = len(re.sub(r"<[^>]+>", "", guide["body"]).split())
     reading_time = max(1, round(word_count / 250))
+    linked_body = inject_internal_links(guide["body"], slug)
     return templates.TemplateResponse(
         "guide.html",
         {
             "request": request,
-            "guide": guide,
+            "guide": {**guide, "body": linked_body},
             "canonical_url": canonical_url,
             "og_title": guide["title"] + " | BillKarma",
             "og_description": guide["meta_description"],
