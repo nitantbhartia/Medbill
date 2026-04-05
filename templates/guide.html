@@ -18,14 +18,27 @@
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     "headline": "{{ guide.title }}",
     "description": "{{ meta_description }}",
     "datePublished": "{{ guide.published }}",
     "dateModified": "{{ guide.reviewed_on or guide.published }}",
     "mainEntityOfPage": "{{ canonical_url }}",
     "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
-    "publisher": {"@type": "Organization", "name": "BillKarma"}
+    "publisher": {"@type": "Organization", "name": "BillKarma", "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
+    "wordCount": {{ reading_time * 250 }}
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+        {"@type": "ListItem", "position": 2, "name": "Guides", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},
+        {% if guide.category %} {"@type": "ListItem", "position": 3, "name": "{{ guide.category }}", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},{% endif %}
+        {"@type": "ListItem", "position": {% if guide.category %}4{% else %}3{% endif %}, "name": "{{ guide.title }}", "item": "{{ canonical_url }}"}
+    ]
 }
 </script>
 {% if guide.faqs %}
@@ -230,6 +243,9 @@
             {% endif %}
             {% if guide.reviewed_on %}
             <span class="meta-date">Reviewed {{ guide.reviewed_on }}</span>
+            {% endif %}
+            {% if reading_time %}
+            <span class="meta-date">{{ reading_time }} min read</span>
             {% endif %}
         </div>
         <h1>{{ guide.title }}</h1>

@@ -670,11 +670,14 @@ async def calculator_embed(
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
+    import re
     from guides import get_guide, get_related_guides
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}/"
+    word_count = len(re.sub(r"<[^>]+>", "", guide["body"]).split())
+    reading_time = max(1, round(word_count / 250))
     return templates.TemplateResponse(
         "guide.html",
         {
@@ -686,6 +689,7 @@ async def guide_page(request: Request, slug: str):
             "meta_description": guide["meta_description"],
             "meta_robots": "index, follow",
             "related_guides": get_related_guides(slug),
+            "reading_time": reading_time,
         },
     )
 
@@ -1399,7 +1403,7 @@ async def guides_sitemap():
         for loc, lastmod, priority in static_urls
     )
     guide_entries = "".join(
-        f"<url><loc>{base}/guides/{slug}</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
     )
     tool_entries = "".join(
