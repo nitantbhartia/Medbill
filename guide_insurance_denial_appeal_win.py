@@ -37,6 +37,8 @@ register("how-to-appeal-insurance-denial-and-win", {
     "body": f"""
 <p class="lead">Your insurance denied your claim. Most people just pay the bill or give up. But here&rsquo;s what the insurance industry doesn&rsquo;t want you to know: <strong>fewer than 1% of denied claims are appealed</strong>, yet when patients DO appeal, they win <strong>44&ndash;80% of the time</strong>. Among ACA marketplace plans, only 0.1% of denied claims are appealed&mdash;a staggeringly low number given the success rates. A 2024 KFF poll found that 55% of Americans say regulating insurer claim decisions should be a &ldquo;top priority.&rdquo; The math is overwhelmingly in your favor. This guide shows you exactly how to appeal, step by step, so you can join the small percentage of patients who fight back&mdash;and win.</p>
 
+<div class="answer-box"><strong>Quick answer</strong>Request the denial reason in writing (insurers must provide it), then file an internal appeal within 180 days citing medical necessity. If denied again, request an external review — an independent reviewer overturns 40% of appeals. It costs you nothing.</div>
+
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>

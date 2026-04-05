@@ -666,6 +666,43 @@ async def calculator_embed(
     )
 
 
+def _extract_howto_schema(guide: dict) -> str | None:
+    import re, json
+    slug = guide.get("slug", "")
+    title = guide.get("title", "")
+    if "how-to" not in slug and not title.lower().startswith("how to"):
+        return None
+    body = guide.get("body", "")
+    ol_match = re.search(r'<ol[^>]*>(.*?)</ol>', body, re.DOTALL)
+    if not ol_match:
+        return None
+    items = re.findall(r'<li[^>]*>(.*?)</li>', ol_match.group(1), re.DOTALL)
+    if len(items) < 3:
+        return None
+    steps = []
+    for i, item in enumerate(items[:10], 1):
+        text = re.sub(r'<[^>]+>', '', item).strip()
+        text = text[:200]
+        if not text:
+            continue
+        steps.append({
+            "@type": "HowToStep",
+            "position": i,
+            "name": text[:60],
+            "text": text
+        })
+    if len(steps) < 3:
+        return None
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": title,
+        "description": guide.get("meta_description", ""),
+        "step": steps
+    }
+    return json.dumps(schema)
+
+
 @app.get("/guides/{slug}", response_class=HTMLResponse)
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
@@ -691,6 +728,7 @@ async def guide_page(request: Request, slug: str):
             "meta_robots": "index, follow",
             "related_guides": get_related_guides(slug),
             "reading_time": reading_time,
+            "howto_schema": _extract_howto_schema({**guide, "slug": slug}),
         },
     )
 
@@ -773,6 +811,30 @@ async def tool_detail(request: Request, slug: str):
             "meta_robots": "index, follow",
         },
     )
+
+
+@app.get("/tools/sol-lookup/", response_class=HTMLResponse)
+async def sol_lookup(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/sol-lookup/"
+    return templates.TemplateResponse("sol_lookup.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "Medical Debt Statute of Limitations by State (2026) | BillKarma",
+        "meta_description": "Look up your state's medical debt statute of limitations. Most states are 3–6 years. After the deadline, collectors can't win a lawsuit against you.",
+        "meta_robots": "index, follow",
+    })
+
+
+@app.get("/tools/charity-care/", response_class=HTMLResponse)
+async def charity_care_tool(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/tools/charity-care/"
+    return templates.TemplateResponse("charity_care_tool.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "Charity Care Eligibility Checker — Free Hospital Care (2026) | BillKarma",
+        "meta_description": "Find out if you qualify for free or reduced hospital care. Enter your state, household size, and income to check your charity care eligibility instantly.",
+        "meta_robots": "index, follow",
+    })
 
 
 @app.get("/hospital")
