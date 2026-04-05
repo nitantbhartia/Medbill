@@ -232,6 +232,31 @@ register("utah-medical-billing", {
     <strong>Utah covers both nonprofit AND for-profit hospitals under its charity care law.</strong> UT Code &sect;&nbsp;26B-2-224 is broader than most states. Even if you were treated at a for-profit hospital, you can apply for financial assistance. <a href="/scan">Upload your bill to BillKarma</a> to check eligibility and get a pre-filled application.
 </div>
 
+<h2 id="faq">Frequently asked questions</h2>
+
+<div class="faq-section">
+    <div class="faq-item">
+        <h3>Are Utah hospitals required to offer charity care?</h3>
+        <p>Yes. Utah Code &sect;&nbsp;26B-2-224 requires all licensed hospitals &mdash; both nonprofit and for-profit &mdash; to maintain a written charity care program. This is broader than most states, which only cover nonprofits. The billing department is required to provide the financial assistance application on request.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What is the statute of limitations on medical debt in Utah?</h3>
+        <p>Utah has a 6-year SOL on written contracts under Utah Code &sect;&nbsp;78B-2-309. Most hospital bills where you signed any financial responsibility form fall under this 6-year window. Any payment &mdash; even a small one &mdash; restarts the clock. Open accounts without a signed contract have a 4-year SOL under &sect;&nbsp;78B-2-307.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Did Utah fully expand Medicaid?</h3>
+        <p>Yes. Utah implemented full Medicaid expansion in January 2020, covering adults up to 138% FPL (approximately $20,783 for a single person in 2026). Apply at <a href="https://healthinsurance.utah.gov" target="_blank" rel="noopener">healthinsurance.utah.gov</a> or call 1-844-786-2446. Coverage can be retroactive for up to 3 months.</p>
+    </div>
+    <div class="faq-item">
+        <h3>What did Utah HB 228 do for patients?</h3>
+        <p>Utah HB 228 (2022) strengthened medical debt protections by requiring hospitals to provide clearer financial assistance disclosures, mandating reasonable payment plan arrangements before sending accounts to collections, and limiting aggressive collection tactics against patients who have applied for or been denied financial assistance. It works alongside UT Code &sect;&nbsp;26B-2-224.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Can a Utah hospital garnish my wages for medical debt?</h3>
+        <p>Yes, but only after obtaining a court judgment. Utah follows federal garnishment limits of up to 25% of disposable earnings. Utah Code &sect;&nbsp;70C-7-103 provides a head-of-household exemption for those providing at least 50% of support for a dependent. Never ignore a court summons &mdash; a default judgment will be entered if you do not respond.</p>
+    </div>
+</div>
+
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
