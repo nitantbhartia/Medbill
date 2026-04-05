@@ -408,3 +408,6 @@ import guide_dexa_scan_cost
 import guide_medigap_medicare_supplement
 import guide_carpal_tunnel_surgery_cost
 import guide_pet_scan_cost
+import guide_medicare_part_d_explained
+import guide_short_term_health_insurance
+import guide_addiction_treatment_billing
