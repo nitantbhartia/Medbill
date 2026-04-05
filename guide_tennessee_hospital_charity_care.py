@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("tennessee-hospital-charity-care", {
-    "title": "Tennessee Hospital Charity Care: How to Apply and What You Qualify For",
-    "meta_description": "Tennessee did not expand Medicaid, leaving 300,000 uninsured. But nonprofit hospitals must provide free care under 200% FPL. Learn how to apply and what to expect.",
+    "title": "Tennessee Hospital Charity Care: How to Apply (2026)",
+    "meta_description": "Tennessee didn't expand Medicaid, leaving 300,000 uninsured. Nonprofit hospitals must provide free care under 200% FPL. Learn how to apply and qualify.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Negotiation",

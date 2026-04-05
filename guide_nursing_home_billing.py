@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("nursing-home-billing", {
     "title": "Nursing Home Billing: Common Errors and How to Dispute Them",
-    "meta_description": "Nursing homes average $8,929/month. Medicare covers only days 1–100. Learn the most common nursing home billing errors—therapy upcoding, phantom charges—and how to dispute.",
+    "meta_description": "Nursing homes average $8,929/month. Medicare covers only days 1–100. Learn common billing errors like therapy upcoding and phantom charges, and how to dispute.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Billing Basics",

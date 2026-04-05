@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("hospital-payment-plans", {
-    "title": "Hospital Payment Plans: 0% Interest Options Every Patient Should Know",
+    "title": "Hospital Payment Plans: 0% Interest Options (2026)",
     "meta_description": "Most hospitals offer interest-free payment plans but don't advertise them. Here's how to get one, what to negotiate, and traps to avoid.",
     "published": "2026-02-24",
     "author": "BillKarma Team",

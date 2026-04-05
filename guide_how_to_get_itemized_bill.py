@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-get-itemized-hospital-bill", {
-    "title": "How to Get an Itemized Hospital Bill (And Why You Always Should)",
+    "title": "How to Get an Itemized Hospital Bill — And Why You Should",
     "meta_description": "Learn how to request an itemized hospital bill, read every charge, and spot overcharges. Hospitals must provide one by law. Here's exactly how to get yours.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

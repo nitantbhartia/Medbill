@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("plastic-surgery-billing", {
-    "title": "Plastic Surgery Billing: Cosmetic vs. Reconstructive Coverage Explained",
-    "meta_description": "38% of plastic surgery denials are overturned on first appeal. Learn which procedures insurance must cover, how to document medical necessity, and how to appeal.",
+    "title": "Plastic Surgery Insurance Coverage: What's Covered (2026)",
+    "meta_description": "38% of plastic surgery denials are overturned on appeal. Learn which procedures insurance must cover, how to document medical necessity, and how to appeal.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

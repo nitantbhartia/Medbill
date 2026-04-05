@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("washington-state-medical-billing-laws", {
     "title": "Washington State Medical Billing Laws",
-    "meta_description": "Washington has among the strongest surprise billing and charity care protections in the US. Learn your rights under the BBPA, WA Charity Care Act, and how to.",
+    "meta_description": "Washington bans surprise billing and requires charity care up to 400% FPL. Learn your rights under the BBPA, WA Charity Care Act, and how to dispute.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

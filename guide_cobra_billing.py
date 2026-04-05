@@ -6,7 +6,7 @@ register(
     "cobra-insurance-billing-guide",
     {
         "title": "COBRA Insurance: What It Costs and When to Use It",
-        "meta_description": "COBRA lets you keep employer coverage after job loss—but premiums average $7,739/year for individuals. Learn when COBRA makes financial sense and how to.",
+        "meta_description": "COBRA lets you keep employer coverage after job loss but premiums average $7,739/year. Learn when COBRA makes sense and how to avoid overpaying.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
         "category": "Health Insurance",

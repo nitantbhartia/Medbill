@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("hospital-financial-assistance-charity-care", {
-    "title": "Hospital Charity Care: Do You Qualify for Free or Reduced Bills?",
+    "title": "Hospital Charity Care: Do You Qualify? (2026 Guide)",
     "meta_description": "Most nonprofit hospitals must offer free or reduced-cost care by law. Check income limits, get the application steps, and see what your hospital offers.",
     "published": "2026-02-20",
     "author": "BillKarma Team",

@@ -4,7 +4,7 @@ from guides import register
 
 register("medical-billing-scams", {
     "title": "Medical Billing Scams: How to Spot Fake Bills in 2026",
-    "meta_description": "Medical billing scams cost Americans $2.7B per year. Learn 8 red flags of a fake medical bill, how to verify any bill is real, and what to do if you're targeted.",
+    "meta_description": "Medical billing scams cost Americans $2.7B per year. Learn 8 red flags of a fake medical bill, how to verify any bill is real, and what to do if targeted.",
     "published": "2026-04-04",
     "author": "BillKarma Team",
     "category": "Taking Action",

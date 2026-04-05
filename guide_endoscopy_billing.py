@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("endoscopy-billing", {
-    "title": "Endoscopy Billing Explained: Costs, Codes, and Common Errors (2026)",
+    "title": "Endoscopy Billing: Costs, Codes & Common Errors (2026)",
     "meta_description": "Upper endoscopy costs $800\u2013$8,000 depending on facility. See 2026 CPT codes, Medicare rates, and how to dispute the preventive-to-diagnostic billing trap.",
     "published": "2026-04-05",
     "author": "BillKarma Team",

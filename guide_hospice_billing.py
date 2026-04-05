@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("hospice-billing", {
     "title": "Hospice Billing: What Medicare Covers",
-    "meta_description": "Medicare hospice covers nearly all end-of-life care costs. Learn the 4 levels of hospice care, what is NOT covered, room and board rules, and how to spot.",
+    "meta_description": "Medicare hospice covers nearly all end-of-life care. Learn the 4 care levels, what is NOT covered, room and board rules, and how to spot billing errors.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Billing Basics",

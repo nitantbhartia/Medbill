@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("physical-therapy-billing", {
-    "title": "Physical Therapy Billing: Common Errors and How to Dispute Them",
+    "title": "Physical Therapy Billing: Common Errors & Disputes (2026)",
     "meta_description": "Physical therapy billing errors cost patients hundreds. Learn the CPT codes, 8-minute rule, and how to spot duplicate charges before paying your PT bill.",
     "published": "2026-02-22",
     "author": "BillKarma Team",

@@ -5,7 +5,7 @@ from guides import register, _embed
 _pt_embed = _embed(mode="cost", title="Look up Medicare rates for any procedure", subtitle="Enter a CPT code to see what Medicare pays -- a useful benchmark even when hospital prices are not available.", height="400")
 
 register("hospital-price-transparency", {
-    "title": "Hospital Price Transparency: Which Hospitals Post Their Prices",
+    "title": "Hospital Price Transparency: Who Posts Their Prices (2026)",
     "meta_description": "CMS requires all hospitals to post machine-readable price files or face fines up to $5,500/day. Learn who's complying, who isn't, and how to find your.",
     "published": "2026-02-20",
     "author": "BillKarma Team",

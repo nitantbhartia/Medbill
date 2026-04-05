@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("stroke-treatment-billing", {
-    "title": "Stroke Treatment Billing: What to Expect and How to Dispute Charges",
+    "title": "Stroke Treatment Billing: Costs & How to Dispute (2026)",
     "meta_description": "Stroke bills average $20,396 for ischemic and $40,000+ for hemorrhagic events. Learn 7 common billing errors and how to dispute tPA markups and ICU overcharges.",
     "published": "2026-04-05",
     "author": "BillKarma Team",

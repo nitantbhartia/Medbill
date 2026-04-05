@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("copay-vs-coinsurance-vs-deductible", {
     "title": "Copay vs. Coinsurance vs. Deductible",
-    "meta_description": "Copay, coinsurance, deductible — most Americans mix them up and overpay. Learn exactly what each term means, how they stack, and how to spot errors on your.",
+    "meta_description": "Copay, coinsurance, deductible — most Americans mix them up and overpay. Learn what each term means, how they interact, and how to spot billing errors.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

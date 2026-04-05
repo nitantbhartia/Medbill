@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-appeal-insurance-denial-and-win", {
-    "title": "How to Appeal a Denied Insurance Claim (And Why You’ll Probably",
+    "title": "How to Appeal a Denied Insurance Claim (And Win) (2026)",
     "meta_description": "Under 1% of denied claims are appealed, yet 44-80% of appeals succeed. Learn the step-by-step process to write a winning appeal letter.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

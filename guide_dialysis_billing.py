@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("dialysis-billing", {
     "title": "Dialysis Billing: Costs",
-    "meta_description": "Dialysis costs $90,000+/year. Learn how Medicare ESRD coverage works, the 3-month waiting period, DaVita/Fresenius pricing, common billing errors, and how to.",
+    "meta_description": "Dialysis costs $90,000+/year. Learn how Medicare ESRD coverage works, the 3-month waiting period, common billing errors, and how to dispute them.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Procedures",

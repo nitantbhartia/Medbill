@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("aca-subsidy-cliff-2026", {
-    "title": "ACA Subsidy Cliff 2026: Your Health Insurance Premium Doubled",
-    "meta_description": "Enhanced ACA subsidies expired January 1, 2026, doubling premiums for 22 million Americans. Learn your options for coverage, medical bills, and financial.",
+    "title": "ACA Subsidy Cliff 2026: What to Do If Your Premium Doubled",
+    "meta_description": "Enhanced ACA subsidies expired in 2026, raising premiums for 22 million Americans. Learn your coverage options, how to appeal bills, and financial help.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
     "category": "Health Insurance",
