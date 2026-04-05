@@ -6,7 +6,7 @@ register("medical-bill-hardship-letter", {
     "meta_description": "Free medical bill hardship letter template with step-by-step instructions. Learn what to include to get bills reduced 50-100% through hospital financial.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Debt Relief",
+    "category": "Medical Debt",
     "faqs": [
         {
             "q": "What is a medical bill hardship letter?",

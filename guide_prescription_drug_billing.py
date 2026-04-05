@@ -7,7 +7,7 @@ register("prescription-drug-billing-errors", {
     "meta_description": "Pharmacy billing errors cost Americans billions annually. A generic drug that costs $4 can be billed at $80. Learn the most common prescription billing.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
-    "category": "Prescription Drugs",
+    "category": "Billing Basics",
     "faqs": [
         {
             "q": "What is a DAW code on a pharmacy bill?",

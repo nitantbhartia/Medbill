@@ -7,7 +7,7 @@ register("surgery-center-vs-hospital-cost", {
     "meta_description": "Ambulatory surgery centers cost 40-60% less than hospitals for the same procedure. Compare costs for 10 common surgeries and see if an ASC is right for you.",
     "published": "2026-04-04",
     "author": "BillKarma Team",
-    "category": "Saving Money",
+    "category": "Billing Basics",
     "faqs": [
         {
             "q": "How much cheaper is a surgery center than a hospital?",

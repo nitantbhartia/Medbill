@@ -7,7 +7,7 @@ register("how-health-insurance-works", {
     "meta_description": "Understand how health insurance actually works: premiums, deductibles, copays, coinsurance, out-of-pocket maximums, how claims flow, and network types.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Insurance",
+    "category": "Insurance Basics",
     "faqs": [
         {
             "q": "What is the difference between a deductible and an out-of-pocket maximum?",

@@ -7,7 +7,7 @@ register("genetic-testing-billing", {
     "meta_description": "Genetic tests cost $250-$10,000 and surprise bills are common. Learn about BRCA, prenatal, and pharmacogenomic testing costs, insurance pre-auth rules, and.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much do genetic tests cost without insurance?",

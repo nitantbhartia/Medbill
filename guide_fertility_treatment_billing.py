@@ -7,7 +7,7 @@ register("fertility-treatment-billing", {
     "meta_description": "A single IVF cycle costs $15,000-$30,000. Learn which states mandate coverage, how to appeal denials, medication savings, and financing options that cut.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does one IVF cycle cost?",

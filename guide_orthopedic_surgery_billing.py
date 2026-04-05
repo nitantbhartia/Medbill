@@ -7,7 +7,7 @@ register("orthopedic-surgery-billing-costs", {
     "meta_description": "Knee replacements average $35,000. BillKarma finds the same procedure varies by $40,000 between hospitals in the same city. Learn how to pay less.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
-    "category": "Surgery",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does a knee replacement cost with insurance?",

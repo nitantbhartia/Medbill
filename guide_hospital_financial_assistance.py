@@ -7,7 +7,7 @@ register("hospital-financial-assistance-guide", {
     "meta_description": "Nonprofit hospitals must offer financial assistance by law. Learn 501(r) requirements, income thresholds, the application process, and what to do if denied.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Financial Assistance",
+    "category": "Taking Action",
     "faqs": [
         {
             "q": "Who qualifies for hospital financial assistance?",

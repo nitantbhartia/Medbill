@@ -7,7 +7,7 @@ register("allergy-testing-billing", {
     "meta_description": "A blood allergy panel can cost $4,200 when a $380 skin prick test is appropriate. Learn allergy test CPT codes, insurance rules, and how to dispute.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does allergy testing cost?",

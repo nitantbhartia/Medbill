@@ -9,7 +9,7 @@ register(
         "meta_description": "The average hospital birth costs $13,811. Parents get 2 separate bills—one for mom, one for baby—and miss errors in both. Here's how to catch them.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
-        "category": "Maternity & Birth",
+        "category": "Procedure Costs",
         "faqs": [
             {
                 "q": "Why did I get two separate hospital bills for my baby?",

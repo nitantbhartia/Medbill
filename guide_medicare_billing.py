@@ -9,7 +9,7 @@ register(
         "meta_description": "Medicare covers 67 million Americans. Learn how Part A and Part B billing work, what you'll owe, and how to catch and fix errors.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
-        "category": "Medicare",
+        "category": "Insurance Basics",
         "faqs": [
             {
                 "q": "What is the Medicare Part A deductible?",

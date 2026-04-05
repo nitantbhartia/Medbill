@@ -7,7 +7,7 @@ register("cancer-treatment-billing-guide", {
     "meta_description": "Cancer patients face an average $150,000 in treatment costs. Learn how chemotherapy, radiation, and immunotherapy are billed, what assistance is available.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
-    "category": "Cancer Care",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "Why does chemotherapy cost so much?",

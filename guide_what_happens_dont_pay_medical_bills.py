@@ -7,7 +7,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
     "meta_description": "What really happens when you don\u2019t pay medical bills? Month-by-month timeline from first notice to collections, credit damage, lawsuits, and wage garnishment.",
     "published": "2026-03-01",
     "author": "BillKarma Team",
-    "category": "Debt Relief",
+    "category": "Medical Debt",
     "faqs": [
         {
             "q": "How long before an unpaid medical bill goes to collections?",
