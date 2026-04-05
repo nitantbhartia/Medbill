@@ -476,3 +476,13 @@ import guide_balance_billing
 import guide_eye_exam_cost
 import guide_medical_debt_bankruptcy
 import guide_gallbladder_surgery_cost
+# Batch 16: hernia, appendectomy, tonsillectomy, STD testing, blood work, dermatology, echo, anesthesia, kidney stone
+import guide_hernia_surgery_cost
+import guide_appendectomy_cost
+import guide_tonsillectomy_cost
+import guide_std_testing_cost
+import guide_blood_work_cost
+import guide_dermatologist_cost
+import guide_echocardiogram_cost
+import guide_anesthesia_billing
+import guide_kidney_stone_treatment_cost
