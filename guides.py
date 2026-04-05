@@ -395,3 +395,5 @@ import guide_kentucky_medical_billing
 import guide_oklahoma_medical_billing
 import guide_lasik_cost
 import guide_open_enrollment_guide
+import guide_utah_medical_billing
+import guide_arkansas_medical_billing
