@@ -228,3 +228,25 @@ import guide_how_to_get_medical_bills_reduced
 import guide_hospital_liens_explained
 import guide_air_ambulance_bills
 import guide_medical_billing_coding_mistakes
+# Batch 6: SEO guide expansion
+import guide_csection_costs
+import guide_medical_tax_deduction
+import guide_how_to_apply_for_medicaid
+import guide_medical_billing_scams
+import guide_appendectomy_costs
+import guide_veterans_medical_bills
+import guide_medicare_vs_medicaid
+import guide_knee_replacement_costs
+import guide_surgery_center_vs_hospital
+import guide_medical_debt_divorce
+# Batch 7: procedure cost guides
+import guide_hip_replacement_costs
+import guide_spinal_fusion_costs
+import guide_blood_test_costs
+import guide_epidural_costs
+import guide_tonsillectomy_costs
+import guide_cataract_surgery_costs
+import guide_acl_surgery_costs
+import guide_gallbladder_surgery_costs
+import guide_xray_costs
+import guide_how_to_choose_health_insurance
