@@ -813,15 +813,67 @@ async def tool_detail(request: Request, slug: str):
     )
 
 
+_SOL_DATA = {
+    "AL": (6, "AL Code § 6-2-34"), "AK": (3, "AS § 09.10.053"),
+    "AZ": (6, "ARS § 12-548"), "AR": (5, "Ark. Code § 16-56-111"),
+    "CA": (4, "CCP § 337"), "CO": (6, "CRS § 13-80-103.5"),
+    "CT": (6, "CGS § 52-576"), "DE": (3, "10 Del. C. § 8106"),
+    "FL": (5, "Fla. Stat. § 95.11"), "GA": (6, "OCGA § 9-3-24"),
+    "HI": (6, "HRS § 657-1"), "ID": (5, "Idaho Code § 5-216"),
+    "IL": (5, "735 ILCS 5/13-206"), "IN": (6, "IC 34-11-2-9"),
+    "IA": (5, "Iowa Code § 614.1"), "KS": (5, "KSA § 60-512"),
+    "KY": (5, "KRS § 413.120"), "LA": (3, "LA Civ. Code Art. 3494"),
+    "ME": (6, "14 MRS § 752"), "MD": (3, "Md. Code § 5-101"),
+    "MA": (6, "MGL c. 260 § 2"), "MI": (6, "MCL § 600.5807"),
+    "MN": (6, "Minn. Stat. § 541.05"), "MS": (3, "Miss. Code § 15-1-29"),
+    "MO": (5, "RSMo § 516.120"), "MT": (8, "MCA § 27-2-202"),
+    "NE": (5, "Neb. Rev. Stat. § 25-205"), "NV": (6, "NRS § 11.190"),
+    "NH": (3, "RSA 508:4"), "NJ": (6, "NJSA 2A:14-1"),
+    "NM": (6, "NMSA § 37-1-3"), "NY": (6, "CPLR § 213"),
+    "NC": (3, "NCGS § 1-52"), "ND": (6, "NDCC § 28-01-16"),
+    "OH": (6, "ORC § 2305.07"), "OK": (5, "12 Okla. Stat. § 95"),
+    "OR": (6, "ORS § 12.080"), "PA": (4, "42 Pa.C.S. § 5525"),
+    "RI": (10, "RIGL § 9-1-13"), "SC": (3, "SC Code § 15-3-530"),
+    "SD": (6, "SDCL § 15-2-13"), "TN": (6, "TCA § 28-3-109"),
+    "TX": (4, "Tex. Civ. Prac. § 16.004"), "UT": (6, "UCA § 78B-2-309"),
+    "VT": (6, "12 VSA § 511"), "VA": (5, "Va. Code § 8.01-246"),
+    "WA": (6, "RCW 4.16.040"), "WV": (10, "WV Code § 55-2-6"),
+    "WI": (6, "Wis. Stat. § 893.43"), "WY": (8, "Wyo. Stat. § 1-3-105"),
+    "DC": (3, "DC Code § 12-301"),
+}
+
+_STATE_NAMES = {
+    "AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California",
+    "CO":"Colorado","CT":"Connecticut","DE":"Delaware","FL":"Florida","GA":"Georgia",
+    "HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas",
+    "KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts",
+    "MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana",
+    "NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico",
+    "NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma",
+    "OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina",
+    "SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont",
+    "VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin",
+    "WY":"Wyoming","DC":"Washington D.C.",
+}
+
+_FPL_BASE = 15650   # 2026 federal poverty level, 1 person
+_FPL_ADD  =  5380   # each additional person
+
+
 @app.get("/tools/sol-lookup/", response_class=HTMLResponse)
 async def sol_lookup(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/tools/sol-lookup/"
+    rows = [
+        {"abbr": abbr, "name": _STATE_NAMES[abbr], "years": years, "statute": statute}
+        for abbr, (years, statute) in sorted(_SOL_DATA.items(), key=lambda x: _STATE_NAMES[x[0]])
+    ]
     return templates.TemplateResponse("sol_lookup.html", {
         "request": request,
         "canonical_url": canonical_url,
         "og_title": "Medical Debt Statute of Limitations by State (2026) | BillKarma",
         "meta_description": "Look up your state's medical debt statute of limitations. Most states are 3–6 years. After the deadline, collectors can't win a lawsuit against you.",
         "meta_robots": "index, follow",
+        "sol_rows": rows,
     })
 
 
@@ -834,6 +886,8 @@ async def charity_care_tool(request: Request):
         "og_title": "Charity Care Eligibility Checker — Free Hospital Care (2026) | BillKarma",
         "meta_description": "Find out if you qualify for free or reduced hospital care. Enter your state, household size, and income to check your charity care eligibility instantly.",
         "meta_robots": "index, follow",
+        "fpl_base": _FPL_BASE,
+        "fpl_add": _FPL_ADD,
     })
 
 
