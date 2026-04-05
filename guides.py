@@ -465,3 +465,13 @@ import guide_birth_control_insurance_coverage
 import guide_drug_formulary_tiers
 import guide_medical_billing_advocate
 import guide_tummy_tuck_insurance_coverage
+# Batch 15: IVF, dental crown, hearing aids, spinal fusion, endoscopy, vision, balance billing, eye exam, bankruptcy
+import guide_ivf_cost
+import guide_dental_crown_cost
+import guide_hearing_aid_cost
+import guide_spinal_fusion_cost
+import guide_endoscopy_cost
+import guide_vision_insurance_explained
+import guide_balance_billing
+import guide_eye_exam_cost
+import guide_medical_debt_bankruptcy
