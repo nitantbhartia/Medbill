@@ -1,48 +1,53 @@
-"""Guide: Medical Bills After a Car Accident."""
+"""Guide: Car Accident Medical Bills: Who Pays & How It Works (2026)."""
 
 from guides import register, _embed
 
 register("car-accident-medical-bills", {
-    "title": "Medical Bills After a Car Accident: Who Pays",
-    "meta_description": "After a car accident, bills can come from PIP, MedPay, at-fault insurance, or your health plan. Learn who pays first, how subrogation works, and your rights.",
-    "published": "2026-02-26",
+    "title": "Car Accident Medical Bills: Who Pays & How It Works (2026)",
+    "meta_description": "Car accident medical bills average $18,500 and 34% contain billing errors. Learn who pays first, how PIP and MedPay work, and how to manage bills while your case is open.",
+    "published": "2026-04-05",
     "author": "BillKarma Team",
-    "category": "Patient Rights",
+    "category": "Understanding Your Bill",
     "faqs": [
         {
             "q": "Who pays my medical bills after a car accident?",
-            "a": "It depends on your state and insurance coverage. In no-fault states, your own PIP (Personal Injury Protection) coverage pays first, regardless of who caused the accident. In at-fault states, the at-fault driver's liability insurance pays. MedPay (Medical Payments coverage) pays regardless of fault in both state types. Your health insurance can also be used, but your insurer may seek reimbursement from the at-fault party through subrogation.",
+            "a": "Who pays first depends on whether you live in a no-fault or at-fault state. In the 12 no-fault states, your own Personal Injury Protection (PIP) insurance pays your medical bills first, regardless of who caused the accident. In at-fault states, the at-fault driver&rsquo;s liability insurance is ultimately responsible, but you may use your own MedPay or health insurance in the interim. In both cases, if your medical bills exceed insurance limits and you have a personal injury claim, you may recover additional compensation through a settlement or lawsuit.",
         },
         {
-            "q": "What is PIP insurance and do I have to have it?",
-            "a": "PIP (Personal Injury Protection) is insurance that pays your medical bills after a car accident regardless of who is at fault. It is required in the 12 no-fault states (Florida, Hawaii, Kansas, Kentucky, Massachusetts, Michigan, Minnesota, New Jersey, New York, North Dakota, Pennsylvania, Utah) and optional in many others. PIP typically covers $10,000-$50,000 in medical expenses, lost wages, and funeral costs.",
+            "q": "What is PIP (Personal Injury Protection) insurance?",
+            "a": "Personal Injury Protection (PIP) is a type of auto insurance that covers your medical bills regardless of who caused the accident. It is mandatory in the 12 no-fault states (Florida, Michigan, New York, New Jersey, Pennsylvania, Hawaii, Kansas, Kentucky, Massachusetts, Minnesota, North Dakota, Utah) and optional in many others. PIP typically covers $10,000 to $50,000 in medical expenses per person, plus lost wages and other expenses. It pays quickly&mdash;without waiting for fault to be determined&mdash;making it valuable for covering immediate medical costs.",
         },
         {
-            "q": "What is subrogation and how does it affect me?",
-            "a": "Subrogation is the process where your health insurance company seeks reimbursement from the at-fault driver's insurance after paying your medical bills. If your health insurer pays $30,000 for accident-related care and the at-fault driver's insurer later settles with you for $50,000, your health insurer can claim back the $30,000 from your settlement. This is why settlement amounts often seem large but the patient keeps less than expected.",
+            "q": "What is subrogation and how does it affect my car accident settlement?",
+            "a": "Subrogation is the legal right of your health insurer to be repaid from any settlement or judgment you receive if they paid your medical bills after the accident. For example, if your health insurance paid $15,000 in medical bills and you later receive a $40,000 settlement from the at-fault driver, your health insurer can claim up to $15,000 of that settlement. Your attorney can often negotiate a reduction of the subrogation lien, especially if your total damages exceed the at-fault driver&rsquo;s insurance limits.",
         },
         {
-            "q": "Can a hospital put a lien on my accident settlement?",
-            "a": "Yes. In most states, hospitals can file a medical lien against your personal injury settlement or judgment. This means the hospital gets paid from your settlement before you receive any money. Hospital liens are particularly common when patients are uninsured or when treatment exceeds PIP or MedPay limits. You can negotiate the lien amount, often reducing it by 25-50%.",
+            "q": "What is a letter of protection in a personal injury case?",
+            "a": "A letter of protection (LOP) is a document your personal injury attorney sends to a medical provider guaranteeing payment from any future settlement or judgment. The provider treats you now and waits for payment. This allows accident victims to receive needed medical care even when they have no insurance or have exhausted PIP limits. However, if your case does not settle or settles for less than expected, you are still personally liable for those medical bills.",
         },
         {
-            "q": "Should I use my health insurance for car accident injuries?",
-            "a": "Yes, in most cases. Using your health insurance gets you the benefit of negotiated in-network rates, which can be 40-70% lower than hospital chargemaster prices. Without insurance, hospitals may bill at full rates and place a lien on your settlement. The downside is subrogation: your health insurer may seek reimbursement from any settlement. Even so, the lower negotiated rates usually result in a better financial outcome.",
+            "q": "Should I use my health insurance or auto insurance for car accident medical bills?",
+            "a": "Use whatever pays first and covers the most. In no-fault states, PIP pays first&mdash;use it. In at-fault states, if you have MedPay, use it for immediate bills. If you have health insurance, it can pay what PIP or MedPay do not cover. The key is not to ignore bills while waiting for an at-fault driver&rsquo;s insurer to accept liability&mdash;that can take months. Use available coverage now and sort out reimbursement later through your attorney or insurer&rsquo;s subrogation process.",
         },
     ],
     "body": f"""
-<p class="lead">The average car accident injury claim involves <strong>$20,000&ndash;$50,000</strong> in medical bills. A serious crash with surgery, hospitalization, and rehabilitation can exceed <strong>$200,000</strong>. Who pays those bills&mdash;and in what order&mdash;depends on your state, your insurance coverage, and who was at fault. Getting this wrong can cost you tens of thousands of dollars. Here&rsquo;s how it works.</p>
+<p class="lead">Car accident medical billing is unlike any other healthcare billing situation. The average car accident generates <strong>$18,500 in medical bills</strong>&mdash;and BillKarma data shows <strong>34% of those bills contain errors</strong>, often inflated charges that appear when providers know a personal injury case is involved. Who pays your bills, in what order, and how much you ultimately owe depends on your state, your auto insurance coverage, and whether you have health insurance. This guide explains every piece of the puzzle.</p>
+
+<div class="answer-box">
+    <strong>Quick answer:</strong> In no-fault states (12 states), your own PIP auto insurance pays first. In at-fault states, the at-fault driver&rsquo;s liability insurance is responsible, but you&rsquo;ll use your own MedPay or health insurance in the interim. Don&rsquo;t ignore bills while waiting for the case to resolve&mdash;document everything and keep every provider informed that a PI case is pending.
+</div>
 
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>
-        <li><a href="#who-pays">Who pays: the coverage hierarchy</a></li>
-        <li><a href="#no-fault-states">No-fault states and PIP coverage</a></li>
-        <li><a href="#at-fault">At-fault states and liability claims</a></li>
-        <li><a href="#subrogation">Health insurance subrogation explained</a></li>
-        <li><a href="#liens">Hospital liens and provider liens</a></li>
-        <li><a href="#negotiate">Negotiating your medical bills after an accident</a></li>
-        <li><a href="#protect-yourself">Steps to protect yourself</a></li>
+        <li><a href="#no-fault-vs-at-fault">No-fault vs. at-fault states</a></li>
+        <li><a href="#pip-coverage">PIP: Personal Injury Protection</a></li>
+        <li><a href="#medpay">MedPay: Medical Payments coverage</a></li>
+        <li><a href="#health-insurance-role">How your health insurance fits in</a></li>
+        <li><a href="#subrogation">Subrogation: when insurers want repayment</a></li>
+        <li><a href="#medical-liens">Medical liens and letters of protection</a></li>
+        <li><a href="#managing-open-case">Managing bills while your case is open</a></li>
+        <li><a href="#negotiating-after-settlement">Negotiating bills after settlement</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
