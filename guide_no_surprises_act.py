@@ -1,271 +1,158 @@
-"""Guide: The No Surprises Act Explained."""
+"""Guide: The No Surprises Act: What It Covers and What It Doesn't."""
 
 from guides import register, _embed
 
 register("no-surprises-act-explained", {
-    "title": "The No Surprises Act: Your Rights Explained (2026)",
-    "meta_description": "The No Surprises Act protects you from surprise out-of-network bills. Learn what's covered, how to spot violations, and what to do if you get a surprise bill.",
-    "published": "2026-02-18",
+    "title": "The No Surprises Act: What It Covers and What It Doesn't",
+    "meta_description": "The No Surprises Act bans most surprise medical bills, but has important gaps. Learn what's covered, what isn't, and what to do if you're balance billed illegally.",
+    "published": "2026-04-06",
     "author": "BillKarma Team",
     "category": "Patient Rights",
     "faqs": [
         {
-            "q": "What is the No Surprises Act?",
-            "a": "The No Surprises Act is a federal law that took effect January 1, 2022. It protects patients from surprise medical bills when they receive emergency care or are treated by out-of-network providers at in-network facilities. Under the law, patients can only be charged in-network cost-sharing rates in these situations, regardless of whether the provider is in their insurance network.",
-        },
-        {
-            "q": "Does the No Surprises Act apply to me if I have insurance?",
-            "a": "Yes, if you have private health insurance (through an employer, marketplace, or individual plan). The law applies to most commercial insurance plans. It does not apply to Medicare, Medicaid, TRICARE, or VA benefits, which have their own protections. Uninsured patients receive separate protections under the law, including the right to a good faith estimate before scheduled services.",
-        },
-        {
-            "q": "What should I do if I receive a surprise bill?",
-            "a": "First, check if the No Surprises Act applies (emergency care, or out-of-network provider at an in-network facility where you did not consent to out-of-network billing). If it does, contact your insurance company and the provider's billing department. Cite the No Surprises Act and request the bill be reprocessed at in-network rates. If the provider refuses, file a complaint at cms.gov/nosurprises or call 1-800-985-3059.",
-        },
-        {
-            "q": "What is a good faith estimate under the No Surprises Act?",
-            "a": "If you are uninsured or self-pay, healthcare providers must give you a written good faith estimate of expected charges before a scheduled service. If the final bill exceeds the estimate by $400 or more, you can dispute it through the patient-provider dispute resolution process. You must file within 120 days of receiving the bill.",
-        },
-        {
             "q": "Does the No Surprises Act cover ground ambulance bills?",
-            "a": "No. Ground ambulance services are currently exempt from the No Surprises Act. Air ambulance services are covered, meaning you cannot be surprise-billed by an out-of-network air ambulance provider. Ground ambulance billing remains one of the most common sources of surprise medical bills, and legislation to address it is being considered.",
+            "a": "No&mdash;not yet. Ground ambulance was explicitly excluded from the original No Surprises Act while a federal advisory committee studied the issue. As of 2026, CMS has proposed rules to extend protections to ground ambulance, but the final rule has not been issued. Air ambulance (helicopter and fixed-wing) is fully protected under the NSA. Check your state&rsquo;s insurance commissioner website for any state-level ground ambulance balance billing protections.",
+        },
+        {
+            "q": "What do I do if a provider illegally balance bills me under the No Surprises Act?",
+            "a": "File a complaint immediately. You can submit complaints to the federal No Surprises Help Desk at 1-800-985-3059 or online at CMS.gov. You can also file with your state insurance commissioner. Providers who violate the NSA can face civil monetary penalties of up to $10,000 per violation. Keep records of the bill, any EOB from your insurer, and all communications with the provider.",
+        },
+        {
+            "q": "Does the No Surprises Act apply to self-pay patients?",
+            "a": "The NSA&rsquo;s balance billing protections primarily apply to patients with insurance. However, the NSA also established Good Faith Estimate requirements: providers must give uninsured and self-pay patients a written cost estimate before scheduled services. If your actual bill exceeds the estimate by more than $400, you have the right to dispute it through the Patient-Provider Dispute Resolution process.",
         },
     ],
-    "body": f"""
-<p class="lead">Before 2022, one in five ER visits resulted in a surprise bill&mdash;an unexpected charge from a doctor or provider who wasn&rsquo;t in your insurance network, even though you went to an in-network hospital. The average surprise bill was <strong>$1,219</strong>. The No Surprises Act changed that. Here&rsquo;s what the law actually covers, where the gaps are, and exactly what to do if you get a bill that violates it.</p>
+    "body": f"""<article>
+
+<div class="answer-box" style="border-left: 4px solid #22c55e; padding: 1rem 1.25rem; background: #f0fdf4; margin-bottom: 1.5rem;">
+    <strong>The short answer:</strong> The No Surprises Act (effective January 2022) bans balance billing in emergencies and from out-of-network providers at in-network facilities&mdash;covering surprise bills from anesthesiologists, radiologists, and other providers you didn&rsquo;t choose. But it has significant gaps: ground ambulance, out-of-network facilities you voluntarily chose, and certain plan types are not covered.
+</div>
+
+<p class="lead">Before 2022, receiving emergency care at an out-of-network hospital&mdash;or even choosing an in-network hospital and unknowingly receiving care from an out-of-network anesthesiologist&mdash;could result in a surprise bill for thousands of dollars. The No Surprises Act changed that for many situations. But the law has important gaps, and knowing the difference between what&rsquo;s protected and what isn&rsquo;t could save you significant money.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>
         <li><a href="#what-it-covers">What the No Surprises Act covers</a></li>
-        <li><a href="#what-it-doesnt">What it does NOT cover</a></li>
-        <li><a href="#how-it-works">How the protections work in practice</a></li>
-        <li><a href="#good-faith-estimates">Good faith estimates for uninsured patients</a></li>
-        <li><a href="#spot-violation">How to spot a No Surprises Act violation</a></li>
-        <li><a href="#what-to-do">What to do if you get a surprise bill</a></li>
-        <li><a href="#real-examples">Real examples of No Surprises Act protections</a></li>
-        <li><a href="#faq">Frequently asked questions</a></li>
-        <li><a href="#sources">Sources</a></li>
+        <li><a href="#what-it-doesnt-cover">What it does NOT cover</a></li>
+        <li><a href="#cost-sharing-rules">How cost-sharing works under the NSA</a></li>
+        <li><a href="#idr-process">The Independent Dispute Resolution process</a></li>
+        <li><a href="#good-faith-estimates">Good Faith Estimates for self-pay patients</a></li>
+        <li><a href="#if-balance-billed">What to do if you&rsquo;re balance billed illegally</a></li>
     </ol>
 </nav>
 
-<h2 id="what-it-covers">1. What the No Surprises Act covers</h2>
+<h2 id="what-it-covers">What the No Surprises Act covers</h2>
 
-<p>The No Surprises Act (NSA) protects you in three specific scenarios:</p>
+<p>The NSA applies to emergency services and to non-emergency services from out-of-network providers at in-network facilities. Here is a precise breakdown of each protected scenario:</p>
 
-<h3>a) Emergency services</h3>
+<h3>Emergency care at any facility</h3>
+<p>If you receive emergency care at any hospital emergency department&mdash;regardless of whether that hospital is in your insurance network&mdash;you cannot be billed more than your in-network cost-sharing (deductible, copay, coinsurance) for the emergency services. This applies even if:</p>
+<ul>
+    <li>You were transported to the nearest hospital, which happened to be out of network</li>
+    <li>Your condition was stabilized at an out-of-network facility before transfer</li>
+    <li>You received post-stabilization care as an inpatient after an emergency admission</li>
+</ul>
+<p>Once you are stabilized and can safely be transferred, the post-stabilization rules apply: the provider must notify you of your out-of-network status and give you the option to transfer to an in-network facility. If you consent in writing to stay at the out-of-network facility for continued care, the NSA balance billing protection ends for that portion of your stay.</p>
 
-<p>If you go to an ER, you cannot be billed at out-of-network rates&mdash;regardless of whether the hospital or any provider who treats you is in your network. This includes the ER physician, radiologist, anesthesiologist, and any specialist called in during your emergency visit. (For more on how ER bills work, see our <a href="/guides/why-emergency-room-bills-are-so-high">ER bill guide</a>.)</p>
+<h3>Out-of-network providers at in-network facilities</h3>
+<p>This provision eliminates the &ldquo;phantom provider&rdquo; problem. When you schedule a procedure at an in-network hospital or surgery center, you cannot always control which individual providers treat you. The NSA protects you from surprise bills from:</p>
+<ul>
+    <li><strong>Anesthesiologists</strong> you didn&rsquo;t choose and couldn&rsquo;t have reasonably avoided</li>
+    <li><strong>Radiologists</strong> who read your imaging studies</li>
+    <li><strong>Pathologists</strong> who analyzed your lab samples</li>
+    <li><strong>Hospitalists</strong> or consulting physicians your treating doctor brought in</li>
+    <li><strong>Neonatologists</strong> who cared for a newborn during delivery</li>
+    <li><strong>Assistant surgeons</strong> assigned by the facility rather than chosen by you</li>
+</ul>
+<p>For all of these providers, you pay only your in-network cost-sharing. The provider and your insurer resolve their payment dispute directly, without involving you in the financial gap.</p>
 
-<p><strong>What this means for your bill:</strong> Your cost-sharing (deductible, copay, coinsurance) must be calculated at in-network rates. The provider cannot bill you for the difference between what they charge and what your insurance pays (this practice was called &ldquo;balance billing&rdquo;).</p>
+<h3>Air ambulance</h3>
+<p>Air ambulance (helicopter and fixed-wing aircraft) is fully protected under the NSA. Regardless of whether the air ambulance company is in your insurance network, you pay only your in-network cost-sharing. This protection applies to all non-grandfathered group and individual health plans.</p>
 
-<h3>b) Out-of-network providers at in-network facilities</h3>
+{_embed(mode="cost", cpt="A0431", title="Air ambulance Medicare rates", subtitle="See what Medicare pays for helicopter ambulance transport.")}
 
-<p>If you go to an in-network hospital for a scheduled procedure and are treated by an out-of-network provider you didn&rsquo;t choose (a common scenario with anesthesiologists, pathologists, and radiologists), you&rsquo;re protected. The out-of-network provider must bill you at in-network rates.</p>
+<h2 id="what-it-doesnt-cover">What the No Surprises Act does NOT cover</h2>
 
-<h3>c) Air ambulance services</h3>
+<p>Understanding the gaps in the NSA is just as important as knowing what it covers. These are the situations where you remain vulnerable to surprise bills:</p>
 
-<p>Out-of-network air ambulance providers cannot balance bill you. Your cost-sharing is limited to in-network rates. (Note: ground ambulances are <strong>not</strong> covered.)</p>
+<h3>Ground ambulance</h3>
+<p>Ground ambulance was explicitly carved out of the original NSA. Congress directed a federal advisory committee to study ground ambulance balance billing separately. CMS published proposed rules in 2024, but as of 2026 the final rule has not been issued. If you receive a ground ambulance bill with a balance beyond your cost-sharing, you are not automatically protected under federal law&mdash;unless your state has its own ground ambulance balance billing statute.</p>
 
-<div class="key-takeaway">
-    <strong>The core rule:</strong> You cannot be billed more than your in-network cost-sharing amount for emergency services, or for out-of-network providers at in-network facilities that you did not choose. The provider and your insurer work out the payment between themselves.
-</div>
+<h3>Out-of-network facilities you voluntarily chose</h3>
+<p>If you chose an out-of-network hospital or facility for a non-emergency procedure&mdash;and you received and signed a proper consent form acknowledging the out-of-network status at least 72 hours before the service&mdash;the NSA does not protect you from balance billing by that facility. The individual out-of-network providers at that facility may still be protected if you didn&rsquo;t specifically choose them.</p>
 
-<h2 id="what-it-doesnt">2. What it does NOT cover</h2>
+<h3>Out-of-network providers when you had a genuine choice</h3>
+<p>If the facility offered you an in-network provider as an alternative and you voluntarily chose an out-of-network provider instead, you can be balance billed for that provider&rsquo;s services. The key legal question is whether you received and signed valid consent in writing at least 72 hours before the service&mdash;a provider who fails to get proper written consent cannot balance bill you.</p>
 
-<p>The No Surprises Act has important gaps:</p>
+<h3>Dental-only and vision-only plans</h3>
+<p>Standalone dental and vision plans are not subject to the NSA. Behavioral health services have complex coverage rules that depend on your specific plan type. If you have a standalone dental or vision plan, the NSA does not apply to those bills.</p>
 
-<table>
-    <thead>
-        <tr><th>Not Covered</th><th>Why It Matters</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>Ground ambulances</td><td>Average ground ambulance bill: $1,200. Out-of-network ground ambulance bills remain a major source of surprise charges.</td></tr>
-        <tr><td>Out-of-network providers you consent to</td><td>If you sign a written consent form agreeing to out-of-network care at least 72 hours before a scheduled service, the NSA protections may not apply.</td></tr>
-        <tr><td>Post-stabilization transfers</td><td>After an ER visit, if you are stable and voluntarily transfer to an out-of-network facility, the NSA may not cover the transfer facility&rsquo;s charges.</td></tr>
-        <tr><td>Medicare, Medicaid, TRICARE, VA</td><td>These programs have their own billing protections. The NSA specifically applies to commercial insurance plans.</td></tr>
-        <tr><td>Non-emergency out-of-network care you choose</td><td>If you voluntarily go to an out-of-network provider for non-emergency care, standard out-of-network billing applies.</td></tr>
-    </tbody>
-</table>
+<h3>Short-term health plans and grandfathered plans</h3>
+<p>Short-term limited duration health insurance plans and grandfathered health plans (plans that predated the ACA and have not made significant changes) are generally exempt from the NSA. If you have one of these plan types, review your plan documents carefully or contact your state insurance commissioner to understand your protections.</p>
 
-<div class="key-takeaway">
-    <strong>Seeing charges on your bill that look out-of-network?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we automatically identify which charges fall under No Surprises Act protections and show you exactly what you should owe instead.
-</div>
+<h2 id="cost-sharing-rules">How cost-sharing works under the NSA</h2>
 
-<h2 id="how-it-works">3. How the protections work in practice</h2>
-
-<p>Here&rsquo;s what happens behind the scenes when the NSA applies to your bill:</p>
-
-<ol>
-    <li><strong>You receive care.</strong> An out-of-network provider treats you in a covered scenario (ER visit, or at an in-network facility).</li>
-    <li><strong>The provider bills your insurance.</strong> Your insurer processes the claim and calculates your cost-sharing at in-network rates.</li>
-    <li><strong>You pay only in-network cost-sharing.</strong> Your deductible, copay, and coinsurance are based on your plan&rsquo;s in-network rates. No balance billing.</li>
-    <li><strong>Provider and insurer negotiate.</strong> If the provider and insurer disagree on payment, they enter an Independent Dispute Resolution (IDR) process. This happens between them&mdash;you are not involved and owe nothing additional.</li>
-</ol>
-
-
-
-<div class="case-study">
-    <h3>Example: How the NSA saves you money</h3>
-    <p>You go to an in-network ER with chest pain. The ER doctor is in-network, but the cardiologist called in to read your EKG is out-of-network. The cardiologist bills $1,800 for an interpretation (CPT 93010).</p>
-    <p><strong>Without the NSA:</strong> Your insurance pays the &ldquo;out-of-network allowable&rdquo; of $250. The cardiologist bills you for the remaining $1,550. You owe <strong>$1,550</strong> in surprise charges plus your normal copay.</p>
-    <p><strong>With the NSA:</strong> Your insurance processes the claim at in-network rates. Your copay/coinsurance is calculated on the in-network rate (let&rsquo;s say $300). You owe your normal cost-sharing on $300&mdash;perhaps <strong>$60</strong> in coinsurance. The cardiologist and your insurer sort out the rest.</p>
-    <p><strong>Savings: $1,490.</strong></p>
-</div>
-
-<div class="key-takeaway">
-    <strong>Did your ER visit produce bills from multiple providers you never chose?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we break down every charge and highlight which ones qualify for No Surprises Act protection so you know exactly what to dispute.
-</div>
-
-
-<h2 id="good-faith-estimates">4. Good faith estimates for uninsured patients</h2>
-
-<p>If you are uninsured or choose to self-pay, the No Surprises Act gives you a separate set of protections. (For additional strategies to reduce your bill as an uninsured patient, see our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.)</p>
+<p>When the NSA applies, your cost-sharing is calculated as if the out-of-network provider were in-network. In practice:</p>
 
 <ul>
-    <li><strong>Right to a good faith estimate:</strong> Before any scheduled service, the provider must give you a written estimate of expected charges. You can also request one at any time.</li>
-    <li><strong>$400 dispute threshold:</strong> If the final bill exceeds the good faith estimate by <strong>$400 or more</strong>, you can dispute it through the patient-provider dispute resolution process.</li>
-    <li><strong>120-day filing window:</strong> You have 120 days from the date of the bill to initiate a dispute.</li>
-    <li><strong>Independent review:</strong> A third-party reviewer examines the estimate and the final bill. If they side with you, the provider must accept a payment amount determined by the reviewer.</li>
+    <li>The charge applies to your <strong>in-network deductible</strong>, not your higher out-of-network deductible</li>
+    <li>You pay your <strong>in-network coinsurance or copay</strong> rate</li>
+    <li>The charges count toward your <strong>in-network out-of-pocket maximum</strong></li>
 </ul>
 
-<div class="key-takeaway">
-    <strong>For uninsured patients:</strong> Always request a good faith estimate in writing before any scheduled procedure. This creates a documented price commitment and gives you legal standing to dispute if the final bill is significantly higher.
-</div>
+<p>If your insurer processes the claim at out-of-network rates and charges you more than your in-network cost-sharing, that is a violation of the NSA. File an internal appeal with your insurer first&mdash;this is often a processing error that can be corrected. If your insurer refuses to correct it, file a complaint with your state insurance commissioner or the federal No Surprises Help Desk.</p>
 
-<h2 id="spot-violation">5. How to spot a No Surprises Act violation</h2>
+<h2 id="idr-process">The Independent Dispute Resolution (IDR) process</h2>
 
-<p>Here&rsquo;s what a surprise bill looks like in practice. This patient went to an in-network ER, but the radiologist and anesthesiologist were out-of-network:</p>
-
-<div class="bill-example">
-    <div class="bill-header">Patient Bills Received &mdash; Memorial Hospital ER &mdash; Date of Service: 01/10/2026</div>
-    <div class="line-item">
-        <span><strong>Hospital bill (in-network)</strong></span>
-        <span></span>
-    </div>
-    <div class="line-item">
-        <span>99284 &mdash; ER Visit Level 4</span>
-        <span>$2,890.00</span>
-    </div>
-    <div class="line-item">
-        <span>74178 &mdash; CT Abdomen w/Contrast</span>
-        <span>$2,400.00</span>
-    </div>
-    <div class="line-item">
-        <span><strong>Separate bill from radiology group (out-of-network)</strong></span>
-        <span></span>
-    </div>
-    <div class="line-item error">
-        <span>74178-26 &mdash; CT Interpretation &nbsp; &#10060; <em>NSA violation: out-of-network provider at in-network ER</em></span>
-        <span>$1,100.00</span>
-    </div>
-    <div class="line-item">
-        <span><strong>Separate bill from anesthesia group (out-of-network)</strong></span>
-        <span></span>
-    </div>
-    <div class="line-item error">
-        <span>01916 &mdash; Anesthesia for CT &nbsp; &#10060; <em>NSA violation: patient did not choose this provider</em></span>
-        <span>$1,800.00</span>
-    </div>
-    <div class="line-total">
-        <span>TOTAL SURPRISE BILLS</span>
-        <span>$2,900.00</span>
-    </div>
-</div>
-
-<p>Under the No Surprises Act, the patient should owe only their in-network cost-sharing on the two surprise bills&mdash;not $2,900. If these were processed at in-network rates (approximately $180 + $240 in cost-sharing), the savings would be <strong>$2,480</strong>.</p>
-
-<p>Check your bill for these red flags:</p>
-
-<table>
-    <thead>
-        <tr><th>Red Flag</th><th>What It Means</th><th>Example</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>&ldquo;Out-of-network&rdquo; charges on an ER bill</td><td>ER visits are always covered by the NSA, regardless of network status.</td><td>An ER radiologist&rsquo;s bill says &ldquo;out-of-network, patient responsibility: $2,100&rdquo;</td></tr>
-        <tr><td>Balance billing from a provider you didn&rsquo;t choose</td><td>If you went to an in-network hospital and received an out-of-network provider bill, this may violate the NSA.</td><td>An anesthesiologist sends a separate $3,400 bill for a surgery at an in-network hospital.</td></tr>
-        <tr><td>Cost-sharing above in-network rates</td><td>Your copay/coinsurance should be calculated at in-network rates for NSA-covered services.</td><td>Your insurer applies a $5,000 out-of-network deductible instead of your $1,500 in-network deductible for an ER visit.</td></tr>
-        <tr><td>A bill that exceeds a good faith estimate by $400+</td><td>If you&rsquo;re uninsured and received a written estimate, the $400 threshold triggers dispute rights.</td><td>Estimate said $3,200 for a knee MRI; final bill is $4,800.</td></tr>
-    </tbody>
-</table>
-
-<p>If you suspect a surprise bill, look up the CPT codes to see what the in-network rate should be. The gap between what you were billed and the Medicare benchmark gives you a sense of how much may be in dispute:</p>
-
-{_embed(mode="markup", title="Check your surprise bill", subtitle="Enter a CPT code and the amount you were billed to see the Medicare rate.", height="420")}
-
-<p>You can also <a href="/scan">upload your bill to BillKarma</a> and our scanner automatically checks for potential No Surprises Act violations alongside other billing errors.</p>
-
-<h2 id="what-to-do">6. What to do if you get a surprise bill</h2>
+<p>When an out-of-network provider and an insurer cannot agree on payment under the NSA, they can take the dispute to federal Independent Dispute Resolution (IDR). Here is how the process works:</p>
 
 <ol>
-    <li><strong>Confirm the NSA applies.</strong> Was it an emergency visit? Was it an out-of-network provider at an in-network facility you didn&rsquo;t consent to? If yes, you&rsquo;re protected.</li>
-    <li><strong>Contact your insurance company.</strong> Call the member services number on your insurance card. Tell them you believe you have a No Surprises Act-protected claim and ask them to reprocess it at in-network rates.</li>
-    <li><strong>Contact the provider&rsquo;s billing department.</strong> Tell them the bill violates the No Surprises Act. Cite the specific situation (emergency care, or out-of-network provider at an in-network facility). Request they resubmit to your insurer or adjust the bill.</li>
-    <li><strong>Do not pay the surprise amount.</strong> Pay only your in-network cost-sharing (copay, coinsurance). Do not pay balance-billed amounts while the dispute is active.</li>
-    <li><strong>File a complaint if the provider refuses.</strong> File at <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a> or call the No Surprises Help Desk at 1-800-985-3059.</li>
-    <li><strong>For uninsured disputes (good faith estimate):</strong> Initiate the patient-provider dispute resolution process at <a href="https://www.cms.gov/nosurprises/consumers/uninsured-or-self-pay-patients" target="_blank" rel="noopener">cms.gov/nosurprises</a> within 120 days.</li>
+    <li><strong>Open negotiation (30 days):</strong> After the insurer issues payment, the provider has 30 days to negotiate directly with the insurer. You are not a party to these negotiations.</li>
+    <li><strong>IDR initiation:</strong> If negotiation fails, either party can initiate federal IDR within 4 days of the negotiation deadline. An independent certified IDR entity is selected by both parties or assigned by default.</li>
+    <li><strong>Baseball arbitration:</strong> Each party submits a single payment amount. The IDR entity must choose one of the two amounts&mdash;it cannot split the difference. The entity must give substantial weight to the Qualifying Payment Amount (QPA), which is the insurer&rsquo;s median in-network contracted rate for the service in the geographic area.</li>
+    <li><strong>Binding decision:</strong> The losing party pays the IDR administrative fee (typically $350&ndash;$600 per dispute). The result is final and binding.</li>
 </ol>
 
-<div class="key-takeaway">
-    <strong>Keep all documents.</strong> Save your <a href="/guides/understanding-explanation-of-benefits">EOB</a>, the surprise bill, any good faith estimates, and records of all phone calls. These are your evidence if you need to file a formal complaint. Need help writing a dispute letter? See our <a href="/guides/how-to-dispute-a-medical-bill">step-by-step dispute guide</a>.
-</div>
+<p><strong>What this means for you as a patient:</strong> You are not a party to IDR. Whatever the outcome between the provider and the insurer, you pay only your in-network cost-sharing. The process fully insulates you from the payment gap&mdash;which is the entire point of the NSA&rsquo;s structure.</p>
 
+<h2 id="good-faith-estimates">Good Faith Estimates for self-pay patients</h2>
 
+<p>The NSA created a separate protection for uninsured and self-pay patients through the Good Faith Estimate (GFE) requirement. Any provider scheduling a non-emergency service for an uninsured or self-pay patient must provide a written GFE at least one business day before the service. The GFE must include:</p>
 
-<h2 id="real-examples">7. Real examples of No Surprises Act protections</h2>
+<ul>
+    <li>Expected charges for the primary service and all anticipated ancillary services (labs, anesthesia, assistant surgeons)</li>
+    <li>Diagnosis codes, service codes, and expected charge for each item</li>
+    <li>The name, NPI, and tax identification number of each provider included</li>
+</ul>
 
-<div class="case-study">
-    <h3>Example 1: Out-of-network anesthesiologist at in-network surgery center</h3>
-    <p>A patient had outpatient knee surgery at an in-network surgery center. The anesthesiologist was out-of-network and billed <strong>$4,200</strong> for general anesthesia (CPT 01382). Under the NSA, the patient&rsquo;s cost-sharing was recalculated at in-network rates&mdash;a $60 copay instead of the $3,200 balance bill they initially received. <strong>Savings: $3,140.</strong></p>
-</div>
+<p>If your actual bill exceeds the GFE by more than $400, you can initiate a Patient-Provider Dispute Resolution (PPDR) within 120 days of receiving the bill. The filing fee is $25. If the dispute is decided in your favor, the provider refunds the filing fee and must accept a payment at or near the GFE amount.</p>
 
-<div class="case-study">
-    <h3>Example 2: ER visit with out-of-network radiologist</h3>
-    <p>A patient went to an in-network ER for a fall and had a CT scan. The ER doctor was in-network, but the radiologist who read the CT was out-of-network. The radiologist billed <strong>$1,100</strong> for the CT interpretation (CPT 74178-26). The patient&rsquo;s insurer initially processed it as out-of-network. After citing the NSA, it was reprocessed at in-network rates. The patient owed only their $40 copay. <strong>Savings: $870.</strong></p>
-</div>
+<h2 id="if-balance-billed">What to do if you&rsquo;re balance billed illegally</h2>
 
-<div class="case-study">
-    <h3>Example 3: Good faith estimate exceeded by $1,600</h3>
-    <p>An uninsured patient received a good faith estimate of <strong>$2,400</strong> for an outpatient MRI. The final bill was <strong>$4,000</strong>&mdash;$1,600 over the estimate. The patient filed a dispute through the patient-provider dispute resolution process. The independent reviewer determined the reasonable charge was $2,700. <strong>Savings: $1,300.</strong></p>
-</div>
+<p>If you receive a bill that you believe violates the No Surprises Act, take these steps in order:</p>
 
-<h2 id="faq">Frequently asked questions</h2>
+<ol>
+    <li><strong>Pull your EOB.</strong> Verify that your insurer processed the claim at in-network rates. Many apparent NSA violations are actually insurer processing errors. Call your insurer first&mdash;ask them to reprocess the claim under NSA guidelines.</li>
+    <li><strong>Contact the provider in writing.</strong> State that the service is subject to the No Surprises Act, that your cost-sharing should be calculated at in-network rates, and request a corrected bill. Send via certified mail and keep the tracking number.</li>
+    <li><strong>File a federal complaint.</strong> Call the No Surprises Help Desk at <strong>1-800-985-3059</strong> or file online at <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a>. CMS and DOL share enforcement responsibility. Providers who violate the NSA face civil monetary penalties up to $10,000 per violation.</li>
+    <li><strong>File a state complaint.</strong> Your state insurance commissioner may have concurrent enforcement authority. Many states have expedited complaint processes for surprise billing violations.</li>
+    <li><strong>Do not pay the disputed balance while the complaint is pending.</strong> Request a billing hold from the provider. Paying the balance does not waive your rights, but it complicates the refund process.</li>
+</ol>
 
-<div class="faq-section">
-    <div class="faq-item">
-        <h3>What is the No Surprises Act?</h3>
-        <p>The No Surprises Act is a federal law effective January 1, 2022, that protects patients from surprise medical bills in emergency situations and from out-of-network providers at in-network facilities. You can only be charged in-network cost-sharing rates in these situations.</p>
-    </div>
-
-    <div class="faq-item">
-        <h3>Does the No Surprises Act apply to me if I have insurance?</h3>
-        <p>Yes, if you have private health insurance (employer, marketplace, or individual plan). It does not apply to Medicare, Medicaid, TRICARE, or VA benefits, which have their own protections. Uninsured patients receive separate protections including the right to good faith estimates.</p>
-    </div>
-
-    <div class="faq-item">
-        <h3>What should I do if I receive a surprise bill?</h3>
-        <p>Contact your insurance company and the provider&rsquo;s billing department. Cite the No Surprises Act and request the bill be reprocessed at in-network rates. If they refuse, file a complaint at <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a> or call 1-800-985-3059. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has detailed templates.</p>
-    </div>
-
-    <div class="faq-item">
-        <h3>What is a good faith estimate under the No Surprises Act?</h3>
-        <p>A written estimate of expected charges that healthcare providers must give uninsured or self-pay patients before scheduled services. If the final bill exceeds the estimate by $400 or more, you can dispute it within 120 days through the patient-provider dispute resolution process.</p>
-    </div>
-
-    <div class="faq-item">
-        <h3>Does the No Surprises Act cover ground ambulance bills?</h3>
-        <p>No. Ground ambulance services are currently exempt. Air ambulance services are covered&mdash;you cannot be surprise-billed by an out-of-network air ambulance provider. Ground ambulance billing remains one of the most common sources of surprise bills.</p>
-    </div>
+<div class="key-takeaway" style="border-left: 4px solid #22c55e; padding: 1rem 1.25rem; background: #f0fdf4; margin: 1.5rem 0;">
+    <strong>Not sure if your bill violates the No Surprises Act?</strong> <a href="/scan">Upload your bill to BillKarma</a> and we&rsquo;ll identify whether NSA protections apply to your situation and help you draft a dispute letter.
 </div>
 
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
-    <li><a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">CMS: No Surprises Act &mdash; Overview and Consumer Resources</a></li>
-    <li><a href="https://www.cms.gov/nosurprises/consumers/uninsured-or-self-pay-patients" target="_blank" rel="noopener">CMS: Good Faith Estimates for Uninsured Patients</a></li>
-    <li><a href="https://www.congress.gov/bill/116th-congress/house-bill/133" target="_blank" rel="noopener">No Surprises Act (Consolidated Appropriations Act, 2021) &mdash; Full Text</a></li>
-    <li><a href="https://www.kff.org/private-insurance/issue-brief/no-surprises-act-implementation/" target="_blank" rel="noopener">KFF: No Surprises Act Implementation &mdash; What to Know</a></li>
-    <li><a href="https://www.healthaffairs.org/content/forefront/no-surprises-act-year-later" target="_blank" rel="noopener">Health Affairs: The No Surprises Act, Impact Analysis</a></li>
-    <li><a href="https://www.cms.gov/files/document/federal-independent-dispute-resolution-idr-process-guidance-disputes.pdf" target="_blank" rel="noopener">CMS: Independent Dispute Resolution (IDR) Process Guidance</a></li>
+    <li><a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">CMS: No Surprises Act Resources and Consumer Tools</a></li>
+    <li><a href="https://www.hhs.gov/sites/default/files/surprise-billing-consumer-protections.pdf" target="_blank" rel="noopener">HHS: No Surprises Act Consumer Protections Fact Sheet</a></li>
+    <li><a href="https://www.kff.org/health-costs/issue-brief/no-surprises-act-implementation/" target="_blank" rel="noopener">KFF: No Surprises Act Implementation and Consumer Impact (2024)</a></li>
+    <li><a href="https://www.dol.gov/agencies/ebsa/laws-and-regulations/laws/no-surprises-act" target="_blank" rel="noopener">DOL: No Surprises Act &mdash; Group Health Plan Requirements</a></li>
+    <li><a href="https://www.cms.gov/files/document/idr-process-overview.pdf" target="_blank" rel="noopener">CMS: Independent Dispute Resolution Process Overview</a></li>
 </ul>
-""",
+
+</article>""",
 })
