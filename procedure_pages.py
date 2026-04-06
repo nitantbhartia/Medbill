@@ -1145,16 +1145,26 @@ def _build_procedure_seo(
     latest_data_year: int | None,
     faq: list[dict],
 ) -> dict:
-    rate_str = f"${medicare_rate:,.0f}" if medicare_rate else "N/A"
-    avg_str = f"${avg_charge:,.0f}" if avg_charge else "N/A"
+    rate_str = f"${medicare_rate:,.0f}" if medicare_rate else None
+    avg_str = f"${avg_charge:,.0f}" if avg_charge else None
     reviewed_on = date.today().isoformat()
-    title = f"{name} Cost & Fair Price | BillKarma"
+    if rate_str and avg_str:
+        title = f"{name} Cost: {rate_str} Medicare vs {avg_str} Avg (2026)"
+    elif rate_str:
+        title = f"{name} Cost: {rate_str} Medicare Rate (2026)"
+    else:
+        title = f"{name} Cost & Fair Price (2026)"
     if len(title) > 60:
-        short = name[:28].rsplit(" ", 1)[0] if len(name) > 28 else name
-        title = f"{short} Fair Price | BillKarma"
+        short = name[:20].rsplit(" ", 1)[0] if len(name) > 20 else name
+        if rate_str and avg_str:
+            title = f"{short} Cost: {rate_str} vs {avg_str} Avg | BillKarma"
+        else:
+            title = f"{short} Cost & Fair Price | BillKarma"
+    if len(title) > 60:
+        title = title[:57] + "..."
     desc = (
-        f"CPT {cpt_code}. Medicare rate {rate_str}. National average charge {avg_str}. "
-        f"Compare {hospital_count:,} local providers, fair prices, and billing grades before you schedule."
+        f"What should {name} (CPT {cpt_code}) cost? Medicare pays {rate_str or 'N/A'}. "
+        f"Hospitals charge {avg_str or 'varies'}. Compare {hospital_count:,} providers near you."
     )
     if len(desc) > 155:
         desc = desc[:152].rsplit(" ", 1)[0] + "..."
