@@ -465,3 +465,25 @@ import guide_birth_control_insurance_coverage
 import guide_drug_formulary_tiers
 import guide_medical_billing_advocate
 import guide_tummy_tuck_insurance_coverage
+# Batch 15: IVF, dental crown, hearing aids, spinal fusion, endoscopy, vision, balance billing, eye exam, bankruptcy
+import guide_ivf_cost
+import guide_dental_crown_cost
+import guide_hearing_aid_cost
+import guide_spinal_fusion_cost
+import guide_endoscopy_cost
+import guide_vision_insurance_explained
+import guide_balance_billing
+import guide_eye_exam_cost
+import guide_medical_debt_bankruptcy
+import guide_gallbladder_surgery_cost
+# Batch 16: hernia, appendectomy, tonsillectomy, STD testing, blood work, dermatology, echo, anesthesia, kidney stone
+import guide_hernia_surgery_cost
+import guide_appendectomy_cost
+import guide_tonsillectomy_cost
+import guide_std_testing_cost
+import guide_blood_work_cost
+import guide_dermatologist_cost
+import guide_echocardiogram_cost
+import guide_anesthesia_billing
+import guide_kidney_stone_treatment_cost
+import guide_cgm_cost
