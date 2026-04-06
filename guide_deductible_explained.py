@@ -240,6 +240,10 @@ register("what-is-a-deductible", {
     </div>
 </div>
 
+<div class="key-takeaway">
+    <strong>Think you were charged more than your deductible requires?</strong> If your provider billed you for the full amount instead of applying the insurance-allowed rate &mdash; or billed services you didn&rsquo;t receive &mdash; <a href="/fight-debt">BillKarma can help you dispute the charges and get your money back.</a>
+</div>
+
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">
