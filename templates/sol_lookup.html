@@ -1,107 +1,225 @@
 {% extends "base.html" %}
+{% block title %}Medical Debt Statute of Limitations by State (2026) | BillKarma{% endblock %}
 {% block head %}
+<meta name="description" content="{{ meta_description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_description }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta name="robots" content="{{ meta_robots }}">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is the statute of limitations on medical debt?","acceptedAnswer":{"@type":"Answer","text":"The statute of limitations (SOL) is the deadline for a creditor to sue you over unpaid medical debt. It ranges from 3 years (DC, MD, NC) to 10 years (RI, WV). After the deadline passes, the debt is time-barred and collectors cannot win a lawsuit."}},
+{"@type":"Question","name":"Does making a payment reset the medical debt statute of limitations?","acceptedAnswer":{"@type":"Answer","text":"Yes — in virtually every state, making any payment (even $1) or acknowledging the debt in writing restarts the statute of limitations clock from zero. Never make a partial payment on old medical debt without understanding your rights first."}},
+{"@type":"Question","name":"Can a hospital garnish my wages for unpaid medical debt?","acceptedAnswer":{"@type":"Answer","text":"Most states allow wage garnishment up to 25% of disposable income, but several states have stronger protections. North Carolina, Pennsylvania, and Texas do not allow wage garnishment for most consumer medical debt. Hawaii caps garnishment at just 5% of disposable income."}}
+]}
+</script>
 <style>
-.tool-hero { background: linear-gradient(135deg,#059669 0%,#047857 100%); color:#fff; padding:48px 24px 36px; text-align:center; }
+.tool-hero { background: linear-gradient(135deg,#059669 0%,#047857 100%); color:#fff; padding:52px 24px 40px; text-align:center; border-radius:0 0 40px 40px; }
 .tool-hero h1 { font-size:2rem; font-weight:800; margin:0 0 12px; }
 .tool-hero p { font-size:1.05rem; opacity:.9; max-width:600px; margin:0 auto; }
-.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; max-width:720px; margin:-28px auto 32px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.container { max-width:900px; margin:0 auto; padding:0 24px 64px; }
+.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; margin:-28px auto 40px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.tool-card .intro-text { font-size:.95rem; color:#374151; line-height:1.6; margin-bottom:20px; background:#F0FDF4; border-left:3px solid #059669; padding:12px 16px; border-radius:0 8px 8px 0; }
 .tool-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6B7280; margin-bottom:6px; }
 .tool-select { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #E5E7EB; border-radius:10px; background:#F9FAFB; appearance:none; cursor:pointer; }
 .tool-select:focus { outline:none; border-color:#059669; }
 .sol-result { display:none; margin-top:20px; background:#F0FDF4; border:2px solid #059669; border-radius:12px; padding:20px 24px; }
 .sol-result.show { display:block; }
-.sol-years { font-size:2.5rem; font-weight:800; color:#059669; line-height:1; }
-.sol-label { font-size:.85rem; color:#6B7280; margin-top:2px; }
-.sol-statute { font-size:.82rem; color:#9CA3AF; margin-top:8px; font-style:italic; }
-.sol-warning { background:#FEF3C7; border:1px solid #F59E0B; border-radius:8px; padding:10px 14px; margin-top:14px; font-size:.88rem; color:#92400E; }
-.container { max-width:860px; margin:0 auto; padding:0 24px 48px; }
-.sol-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:.9rem; }
-.sol-table th { background:#F9FAFB; padding:10px 14px; text-align:left; font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; }
-.sol-table td { padding:9px 14px; border-bottom:1px solid #F3F4F6; }
-.sol-table tr:hover td { background:#F9FAFB; }
-.badge { display:inline-block; padding:2px 8px; border-radius:100px; font-size:.75rem; font-weight:700; }
+.sol-top { display:flex; align-items:baseline; gap:12px; margin-bottom:4px; }
+.sol-years { font-size:2.8rem; font-weight:800; color:#059669; line-height:1; }
+.sol-unit { font-size:1rem; font-weight:600; color:#059669; }
+.sol-state-name { font-size:1.2rem; font-weight:700; color:#111827; }
+.sol-statute { font-size:.82rem; color:#9CA3AF; margin:4px 0 12px; font-style:italic; }
+.sol-warning { background:#FEF3C7; border:1px solid #F59E0B; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:.88rem; color:#92400E; }
+.sol-details-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+.detail-item { background:#fff; border:1px solid #D1FAE5; border-radius:8px; padding:10px 14px; }
+.detail-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#6B7280; margin-bottom:3px; }
+.detail-value { font-size:.88rem; font-weight:700; color:#111827; line-height:1.4; }
+.sol-share-row { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+.share-btn { background:#059669; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:.85rem; font-weight:700; cursor:pointer; }
+.share-btn:hover { background:#047857; }
+.share-btn.secondary { background:#F0FDF4; color:#059669; border:1px solid #059669; }
+.badge { display:inline-block; padding:2px 8px; border-radius:100px; font-size:.72rem; font-weight:700; }
 .badge-short { background:#FEE2E2; color:#991B1B; }
 .badge-long { background:#D1FAE5; color:#065F46; }
 .badge-mid { background:#E0F2FE; color:#0369A1; }
+.sol-table-wrap { overflow-x:auto; margin-top:8px; }
+.sol-table { width:100%; border-collapse:collapse; font-size:.875rem; }
+.sol-table th { background:#F9FAFB; padding:10px 14px; text-align:left; font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; white-space:nowrap; }
+.sol-table td { padding:9px 14px; border-bottom:1px solid #F3F4F6; vertical-align:top; }
+.sol-table tr:hover td { background:#F9FAFB; }
+.check-yes { color:#059669; font-weight:700; }
+.check-no { color:#DC2626; font-weight:700; }
+.garnish-good { color:#059669; font-size:.82rem; }
+.garnish-warn { color:#D97706; font-size:.82rem; }
 .cta-box { background:linear-gradient(135deg,#059669,#047857); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
 .cta-box h3 { margin:0 0 8px; font-size:1.3rem; }
 .cta-box p { margin:0 0 16px; opacity:.9; font-size:.95rem; }
 .cta-btn { background:#fff; color:#059669; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
+@media (max-width:640px) {
+  .sol-details-grid { grid-template-columns:1fr; }
+  .tool-hero h1 { font-size:1.6rem; }
+}
 </style>
 {% endblock %}
 {% block content %}
 <div class="tool-hero">
-    <h1>Medical Debt Statute of Limitations (2026)</h1>
-    <p>After your state's deadline, collectors can't win a lawsuit against you. Look up your state's exact limit.</p>
+  <h1>Medical Debt Statute of Limitations (2026)</h1>
+  <p>After your state's deadline, collectors can't win a lawsuit. Pick your state to see your exact rights.</p>
 </div>
 
 <div class="container">
-    <div class="tool-card">
-        <div class="tool-label">Select your state</div>
-        <select class="tool-select" id="stateSelect" onchange="showResult()">
-            <option value="">— Choose a state —</option>
-            {% for row in sol_rows %}
-            <option value="{{ row.years }}" data-statute="{{ row.statute }}" data-name="{{ row.name }}">{{ row.name }}</option>
-            {% endfor %}
-        </select>
-        <div class="sol-result" id="solResult">
-            <div class="sol-years" id="solYears"></div>
-            <div class="sol-label">year statute of limitations on medical debt</div>
-            <div class="sol-statute" id="solStatute"></div>
-            <div class="sol-warning">
-                ⚠️ Making any payment — even $1 — can reset the clock and restart the SOL from zero. Don't pay without understanding your rights first.
-            </div>
+  <div class="tool-card">
+    <div class="intro-text">
+      The <strong>statute of limitations (SOL)</strong> is the deadline for a creditor to sue you over unpaid medical debt. Once it expires, the debt is <strong>time-barred</strong> — you can raise it as a complete defense in court. But be careful: making any payment or acknowledging the debt in writing can <strong>restart the clock from zero</strong>.
+    </div>
+
+    <div class="tool-label">Select your state</div>
+    <select class="tool-select" id="stateSelect" onchange="showResult()">
+      <option value="">— Choose a state —</option>
+      {% for row in sol_rows %}
+      <option value="{{ row.abbr }}" data-name="{{ row.name }}">{{ row.name }}</option>
+      {% endfor %}
+    </select>
+
+    <div class="sol-result" id="solResult">
+      <div class="sol-top">
+        <span class="sol-years" id="solYears"></span>
+        <span class="sol-unit">years</span>
+        <span class="sol-state-name" id="solStateName"></span>
+      </div>
+      <div class="sol-statute" id="solStatute"></div>
+      <div class="sol-warning">
+        ⚠️ <strong>Payment resets the clock.</strong> Even paying $1 on an old medical debt restarts the SOL in virtually every state. Never pay without knowing your rights first.
+      </div>
+      <div class="sol-details-grid">
+        <div class="detail-item">
+          <div class="detail-label">📄 Debt classified as</div>
+          <div class="detail-value" id="solContractType"></div>
         </div>
+        <div class="detail-item">
+          <div class="detail-label">💼 Wage garnishment</div>
+          <div class="detail-value" id="solGarnish"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">🏥 Surprise billing protection</div>
+          <div class="detail-value" id="solSurprise"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">❤️ Charity care eligibility</div>
+          <div class="detail-value" id="solCharity"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">🏛️ Medicaid expanded?</div>
+          <div class="detail-value" id="solMedicaid"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">⚖️ Clock reset by payment?</div>
+          <div class="detail-value" style="color:#DC2626;">Yes — any payment restarts SOL</div>
+        </div>
+      </div>
+      <div class="sol-share-row">
+        <button class="share-btn" onclick="shareState()">📤 Share</button>
+        <button class="share-btn secondary" onclick="copyLink()">🔗 Copy link</button>
+        <a class="share-btn secondary" href="/fight-debt" style="text-decoration:none;">Fight your bill →</a>
+      </div>
     </div>
+  </div>
 
-    <h2 style="font-size:1.3rem;font-weight:700;margin:32px 0 16px;">All 50 States + D.C.</h2>
+  <h2 style="font-size:1.3rem;font-weight:800;color:#111827;margin:0 0 16px;">All 50 States + D.C.</h2>
+  <div class="sol-table-wrap">
     <table class="sol-table">
-        <thead>
-            <tr><th>State</th><th>SOL (Years)</th><th>Statute</th></tr>
-        </thead>
-        <tbody>
-            {% for row in sol_rows %}
-            <tr>
-                <td><strong>{{ row.name }}</strong></td>
-                <td>
-                    <span class="badge {% if row.years <= 3 %}badge-short{% elif row.years >= 8 %}badge-long{% else %}badge-mid{% endif %}">
-                        {{ row.years }} years
-                    </span>
-                </td>
-                <td style="color:#6B7280;font-size:.82rem;">{{ row.statute }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>SOL</th>
+          <th>Statute</th>
+          <th>Wage Garnishment</th>
+          <th>Medicaid</th>
+          <th>Surprise Billing</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in sol_rows %}
+        <tr>
+          <td><strong>{{ row.name }}</strong></td>
+          <td>
+            {% if row.years <= 3 %}<span class="badge badge-short">{{ row.years }}yr</span>
+            {% elif row.years >= 8 %}<span class="badge badge-long">{{ row.years }}yr</span>
+            {% else %}<span class="badge badge-mid">{{ row.years }}yr</span>{% endif %}
+          </td>
+          <td style="color:#9CA3AF;font-style:italic;font-size:.82rem;">{{ row.statute }}</td>
+          <td class="{% if 'No wage' in row.garnish %}garnish-good{% else %}garnish-warn{% endif %}">{{ row.garnish }}</td>
+          <td class="{% if row.medicaid %}check-yes{% else %}check-no{% endif %}">{% if row.medicaid %}✓ Yes{% else %}✗ No{% endif %}</td>
+          <td style="font-size:.82rem;">{{ row.surprise }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
 
-    <div style="margin-top:20px;padding:16px 20px;background:#F9FAFB;border-radius:10px;font-size:.88rem;color:#6B7280;line-height:1.6;">
-        <strong>Important:</strong> These are general statutes of limitations for written contracts. Courts sometimes apply different SOLs to medical debt specifically. This is not legal advice — consult a consumer attorney if you're being sued.
-    </div>
-
-    <div class="cta-box">
-        <h3>Is your debt past the SOL? Don't pay until you know.</h3>
-        <p>BillKarma helps you understand your rights and generate the right response letter for free.</p>
-        <a href="/fight-debt" class="cta-btn">Fight My Medical Debt</a>
-    </div>
-
-    <h2 style="font-size:1.2rem;font-weight:700;margin:32px 0 12px;">Related guides</h2>
-    <ul style="line-height:2;">
-        <li><a href="/guides/medical-debt-statute-of-limitations/">Medical Debt Statute of Limitations: Full Guide</a></li>
-        <li><a href="/guides/debt-validation-letter-medical-debt/">How to Send a Debt Validation Letter</a></li>
-        <li><a href="/guides/fdcpa-rights-medical-debt-collectors/">Your FDCPA Rights: 8 Things Debt Collectors Can't Do</a></li>
-        <li><a href="/guides/what-happens-if-you-dont-pay-medical-bills/">What Happens If You Don't Pay Medical Bills?</a></li>
-    </ul>
+  <div class="cta-box" style="margin-top:40px;">
+    <h3>Is a debt collector calling about a medical bill?</h3>
+    <p>BillKarma can help you check if the debt is time-barred, find errors, and write a dispute letter — free.</p>
+    <a href="/fight-debt" class="cta-btn">Fight Your Bill Now</a>
+  </div>
 </div>
 
 <script>
-function showResult() {
+const SOL_DATA = {{ sol_rows | tojson | safe }};
+
+// Pre-populate from URL param ?state=CA
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const s = p.get('state');
+  if (s) {
     const sel = document.getElementById('stateSelect');
-    const result = document.getElementById('solResult');
-    const opt = sel.options[sel.selectedIndex];
-    if (!sel.value) { result.classList.remove('show'); return; }
-    document.getElementById('solYears').textContent = sel.value;
-    document.getElementById('solStatute').textContent = opt.dataset.statute;
-    result.classList.add('show');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === s) { sel.selectedIndex = i; break; }
+    }
+    showResult();
+  }
+})();
+
+function showResult() {
+  const sel = document.getElementById('stateSelect');
+  const abbr = sel.value;
+  if (!abbr) { document.getElementById('solResult').classList.remove('show'); return; }
+  const row = SOL_DATA.find(r => r.abbr === abbr);
+  if (!row) return;
+  document.getElementById('solYears').textContent = row.years;
+  document.getElementById('solStateName').textContent = row.name;
+  document.getElementById('solStatute').textContent = row.statute;
+  document.getElementById('solContractType').textContent = row.contract_type;
+  document.getElementById('solGarnish').textContent = row.garnish;
+  document.getElementById('solSurprise').textContent = row.surprise;
+  document.getElementById('solCharity').textContent = 'Up to ' + row.charity_fpl + ' FPL';
+  const med = document.getElementById('solMedicaid');
+  med.textContent = row.medicaid ? '✓ Yes — Medicaid expanded' : '✗ No expansion';
+  med.style.color = row.medicaid ? '#059669' : '#DC2626';
+  document.getElementById('solResult').classList.add('show');
+  // Update URL without reload
+  const url = new URL(window.location);
+  url.searchParams.set('state', abbr);
+  window.history.replaceState({}, '', url);
+}
+
+function shareState() {
+  const url = window.location.href;
+  if (navigator.share) {
+    const sel = document.getElementById('stateSelect');
+    const name = sel.options[sel.selectedIndex].dataset.name || 'your state';
+    navigator.share({ title: name + ' Medical Debt SOL', url });
+  } else { copyLink(); }
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.querySelector('.share-btn.secondary');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '🔗 Copy link', 2000);
+  });
 }
 </script>
 {% endblock %}

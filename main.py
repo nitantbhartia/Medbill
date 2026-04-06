@@ -1054,6 +1054,19 @@ async def tools_index(request: Request):
     )
 
 
+@app.get("/chargemaster/", response_class=HTMLResponse)
+async def chargemaster_page(request: Request):
+    """Hospital chargemaster database — what hospitals charge vs actual cost."""
+    canonical_url = f"{config.APP_URL.rstrip('/')}/chargemaster/"
+    return templates.TemplateResponse("chargemaster.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "Hospital Chargemaster Database: What Your Hospital Charges for Tylenol | BillKarma",
+        "meta_description": "Search 6,800+ hospitals to see what they charge for common items like Tylenol, saline bags, and gauze — vs. what they actually cost. The markups will shock you.",
+        "meta_robots": "index, follow",
+    })
+
+
 @app.get("/tools/{slug}/", response_class=HTMLResponse)
 async def tool_detail(request: Request, slug: str):
     tool = get_tool(slug)
@@ -1073,6 +1086,61 @@ async def tool_detail(request: Request, slug: str):
         },
     )
 
+
+# Extra SOL context: (partial_payment_resets, contract_type, garnish_note)
+_SOL_EXTRA = {
+    "AL": (True,  "Written contract", "25% of disposable income"),
+    "AK": (True,  "Written contract", "25% of disposable income"),
+    "AZ": (True,  "Written contract", "25% of disposable income"),
+    "AR": (True,  "Written contract", "25% of disposable income"),
+    "CA": (True,  "Written contract", "25% of disposable income; 180-day collections delay"),
+    "CO": (True,  "Written contract", "25% of disposable income"),
+    "CT": (True,  "Written contract", "25% of disposable income; facility fee ban"),
+    "DE": (True,  "Written contract", "15% of disposable income — lower than most states"),
+    "FL": (True,  "Written contract", "Wages exempt for heads of household"),
+    "GA": (True,  "Written contract", "25% of disposable income"),
+    "HI": (True,  "Written contract", "Only 5% of disposable income — best in US"),
+    "ID": (True,  "Written contract", "25% of disposable income"),
+    "IL": (True,  "Written contract", "15% of disposable income"),
+    "IN": (True,  "Written contract", "25% of disposable income"),
+    "IA": (True,  "Written contract", "25% of disposable income"),
+    "KS": (True,  "Written contract", "25% of disposable income"),
+    "KY": (True,  "Written contract", "25% of disposable income"),
+    "LA": (True,  "Prescriptive period", "25% of disposable income"),
+    "ME": (True,  "Written contract", "25% of disposable income"),
+    "MD": (True,  "Written contract", "25% of disposable income; all-payer rate system"),
+    "MA": (True,  "Written contract", "25% of disposable income"),
+    "MI": (True,  "Written contract", "25% of disposable income"),
+    "MN": (True,  "Written contract", "25% of disposable income"),
+    "MS": (True,  "Written contract", "25% of disposable income"),
+    "MO": (True,  "Written contract", "25% of disposable income"),
+    "MT": (True,  "Written contract", "25% of disposable income"),
+    "NE": (True,  "Written contract", "25% of disposable income"),
+    "NV": (True,  "Written contract", "25% of disposable income"),
+    "NH": (True,  "Written contract", "25% of disposable income"),
+    "NJ": (True,  "Written contract", "Only 10% of disposable income"),
+    "NM": (True,  "Written contract", "25% of disposable income; credit report ban"),
+    "NY": (True,  "Written contract", "Only 10% of disposable income; 180-day protection"),
+    "NC": (True,  "Written contract", "NO wage garnishment for consumer debt — huge win"),
+    "ND": (True,  "Written contract", "25% of disposable income"),
+    "OH": (True,  "Written contract", "25% of disposable income"),
+    "OK": (True,  "Written contract", "25% of disposable income"),
+    "OR": (True,  "Written contract", "25% of disposable income; free patient advocates"),
+    "PA": (True,  "Written contract", "NO wage garnishment for most consumer debt"),
+    "RI": (True,  "Written contract", "25% of disposable income"),
+    "SC": (True,  "Written contract", "25% of disposable income"),
+    "SD": (True,  "Written contract", "20% of disposable income"),
+    "TN": (True,  "Written contract", "25% of disposable income"),
+    "TX": (True,  "Written contract", "NO wage garnishment for most consumer debt"),
+    "UT": (True,  "Written contract", "25% of disposable income"),
+    "VT": (True,  "Written contract", "15% of disposable income"),
+    "VA": (True,  "Written contract", "25% of disposable income"),
+    "WA": (True,  "Written contract", "25% of disposable income; BBPA strongest surprise billing law"),
+    "WV": (True,  "Written contract", "20% of disposable income"),
+    "WI": (True,  "Written contract", "20% of disposable income"),
+    "WY": (True,  "Written contract", "25% of disposable income"),
+    "DC": (True,  "Written contract", "25% of disposable income"),
+}
 
 _SOL_DATA = {
     "AL": (6, "AL Code § 6-2-34"), "AK": (3, "AS § 09.10.053"),
@@ -1205,10 +1273,22 @@ async def annual_report_2026(request: Request):
 
 async def sol_lookup(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/tools/sol-lookup/"
-    rows = [
-        {"abbr": abbr, "name": _STATE_NAMES[abbr], "years": years, "statute": statute}
-        for abbr, (years, statute) in sorted(_SOL_DATA.items(), key=lambda x: _STATE_NAMES[x[0]])
-    ]
+    rows = []
+    for abbr, (years, statute) in sorted(_SOL_DATA.items(), key=lambda x: _STATE_NAMES[x[0]]):
+        extra = _SOL_EXTRA.get(abbr, (True, "Written contract", "25% of disposable income"))
+        score_data = _STATE_SCORES.get(abbr, {})
+        rows.append({
+            "abbr": abbr,
+            "name": _STATE_NAMES[abbr],
+            "years": years,
+            "statute": statute,
+            "resets": extra[0],
+            "contract_type": extra[1],
+            "garnish": extra[2],
+            "surprise": score_data.get("surprise", "Federal only"),
+            "charity_fpl": score_data.get("charity_fpl", "~200%"),
+            "medicaid": score_data.get("medicaid", False),
+        })
     return templates.TemplateResponse("sol_lookup.html", {
         "request": request,
         "canonical_url": canonical_url,
@@ -1841,6 +1921,7 @@ async def sitemap_index():
         (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
         (f"{base}/press/", "2026-04-01", "0.7"),
+        (f"{base}/chargemaster/", "2026-04-01", "0.9"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
