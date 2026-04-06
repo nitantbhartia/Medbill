@@ -752,6 +752,193 @@ async def guides_index(request: Request):
     )
 
 
+_CATEGORY_META = {
+    "procedure-costs": {
+        "icon": "🏥",
+        "intro": "Medical procedures can cost anywhere from a few hundred to tens of thousands of dollars depending on where you go. Our procedure cost guides break down what hospitals actually charge, what Medicare pays, and how to find fair prices before you book.",
+        "stat": {"value": "4.2x", "label": "average hospital markup over Medicare"},
+        "faqs": [
+            {"question": "Why do hospitals charge so much more than Medicare rates?", "answer": "Hospitals set their own chargemaster prices, which can be 3–10x the Medicare-approved rate. Medicare rates represent what the government considers fair payment. The difference is negotiable — and BillKarma helps you do exactly that."},
+            {"question": "How do I find out what a procedure costs before I have it?", "answer": "Under the Hospital Price Transparency Rule (effective 2021), hospitals must publish their prices online. BillKarma aggregates this data so you can compare costs across providers before you schedule."},
+            {"question": "Can I negotiate a medical bill after the fact?", "answer": "Yes — most hospitals will negotiate. Ask for an itemized bill, compare it to Medicare rates, and request a reduction. Hospital billing departments expect negotiation, especially for self-pay or high-deductible patients."},
+            {"question": "What is the Medicare rate and why does it matter?", "answer": "The Medicare rate is what the federal government pays for a procedure. It's the closest thing to a 'fair market price' for medical care. Anything above 2–3x Medicare is worth questioning."},
+        ],
+    },
+    "state-guides": {
+        "icon": "🗺️",
+        "intro": "Your state determines much of what protections you have against surprise billing, aggressive debt collection, and unaffordable hospital charges. These state-by-state guides explain your specific rights and what to do when hospitals don't follow the rules.",
+        "stat": {"value": "51", "label": "states covered"},
+        "faqs": [
+            {"question": "Do state laws protect me from surprise medical bills?", "answer": "The federal No Surprises Act (2022) covers most out-of-network situations, but many states have additional protections. Some states cap what providers can charge, require more charity care, or limit medical debt collection."},
+            {"question": "What state has the best medical billing protections?", "answer": "California, New York, and Colorado consistently rank highest for patient billing protections, with strong charity care laws, low statute of limitations on medical debt, and robust surprise billing rules."},
+            {"question": "Can a hospital sue me for an unpaid medical bill?", "answer": "Yes, but the statute of limitations varies by state — from 2 years (some states) to 10+ years. Many states also prohibit wage garnishment for medical debt. Check your state's guide for specifics."},
+        ],
+    },
+    "insurance-coverage": {
+        "icon": "📋",
+        "intro": "Health insurance is designed to protect you — but the fine print often works against you. These guides decode the jargon, explain your rights when insurers deny coverage, and show you how to fight back when you're wrongly billed.",
+        "stat": {"value": "30%", "label": "of insurance denials are overturned on appeal"},
+        "faqs": [
+            {"question": "What can I do if my insurance denies a claim?", "answer": "You have the right to appeal any denial. First request the denial reason in writing, then file an internal appeal with your insurer. If that fails, request an external review — an independent organization reviews the denial. Roughly 30% of externally appealed denials are reversed."},
+            {"question": "Am I protected from surprise out-of-network bills?", "answer": "The federal No Surprises Act protects you from surprise out-of-network bills for emergency care and from certain providers at in-network facilities (like anesthesiologists). Your cost share is limited to in-network amounts."},
+            {"question": "What is prior authorization and when is it required?", "answer": "Prior authorization is approval your insurer requires before you receive certain services. If you skip it, your claim may be denied. Always verify auth requirements before elective procedures, specialty visits, or high-cost imaging."},
+        ],
+    },
+    "insurance-basics": {
+        "icon": "📘",
+        "intro": "Health insurance has its own language — deductibles, copays, coinsurance, networks — and misunderstanding one term can cost you thousands. These guides explain every concept in plain English so you can choose the right plan and use it wisely.",
+        "stat": {"value": "60%", "label": "of patients don't understand their EOB"},
+        "faqs": [
+            {"question": "What is the difference between a deductible and an out-of-pocket maximum?", "answer": "Your deductible is what you pay before insurance kicks in. Your out-of-pocket maximum is the most you'll pay in a year — after that, insurance covers 100%. Premiums don't count toward either."},
+            {"question": "What does coinsurance mean?", "answer": "Coinsurance is your share of costs after you've met your deductible, expressed as a percentage. If your coinsurance is 20% and a procedure costs $1,000, you pay $200 and insurance pays $800."},
+            {"question": "Is an HMO or PPO better?", "answer": "HMOs generally have lower premiums but require referrals and restrict you to a network. PPOs cost more but give flexibility to see any provider. If you have a preferred specialist or travel frequently, a PPO may be worth the higher premium."},
+        ],
+    },
+    "understanding-your-bill": {
+        "icon": "🧾",
+        "intro": "Medical bills are among the most confusing documents Americans receive. Studies show 1 in 5 contains errors. These guides teach you to read an itemized bill, spot overcharges, and understand the codes that determine what you owe.",
+        "stat": {"value": "1 in 5", "label": "medical bills contains an error"},
+        "faqs": [
+            {"question": "How do I get an itemized medical bill?", "answer": "You have the legal right to an itemized bill. Call the hospital billing department and request one specifically — the summary bill you receive by default doesn't show individual charges. Review each line item and CPT code."},
+            {"question": "What are CPT codes?", "answer": "CPT (Current Procedural Terminology) codes are 5-digit numbers that identify every medical service. Each code has a Medicare-set price. If you're billed for a CPT code you don't recognize, look it up — you may have been charged for a service you didn't receive."},
+            {"question": "What is upcoding?", "answer": "Upcoding is when a provider bills for a more expensive service than was actually performed. For example, billing a Level 5 ER visit when only a Level 3 was warranted. It's one of the most common billing errors and is worth disputing."},
+        ],
+    },
+    "appeals-disputes": {
+        "icon": "⚖️",
+        "intro": "Disputing a medical bill or insurance denial feels overwhelming — but the process is more straightforward than you think. These guides walk you through every step, from writing a dispute letter to requesting an external review.",
+        "stat": {"value": "40%", "label": "of disputed bills are reduced or eliminated"},
+        "faqs": [
+            {"question": "How do I dispute a medical bill?", "answer": "Start by getting an itemized bill and comparing each charge to the Medicare rate. For errors, write a formal dispute letter to the billing department citing the specific codes and discrepancies. Follow up in writing and keep copies of everything."},
+            {"question": "How long do I have to dispute a medical bill?", "answer": "There's no federal deadline for disputing billing errors, but do it quickly — ideally within 30–60 days of receiving the bill. Your insurer typically has 30-day deadlines for claim appeals from the date of denial."},
+            {"question": "Can I dispute a bill that's already in collections?", "answer": "Yes. Under the Fair Debt Collection Practices Act, you can request debt validation within 30 days of first contact from a collector. You can also dispute billing errors with the original provider even after the account has been sent to collections."},
+        ],
+    },
+    "medical-debt": {
+        "icon": "💳",
+        "intro": "Medical debt is the leading cause of personal bankruptcy in the US. But it's also one of the most negotiable forms of debt — with options ranging from payment plans to charity care to debt settlement. These guides show you every path out.",
+        "stat": {"value": "#1", "label": "cause of US personal bankruptcy"},
+        "faqs": [
+            {"question": "Does medical debt affect my credit score?", "answer": "Medical debt under $500 is excluded from credit reports (as of 2023). The three major bureaus now remove paid medical collections immediately. Unpaid medical debt over $500 can still appear after 1 year, but new rules have significantly reduced medical debt's credit impact."},
+            {"question": "Can a hospital sue me over unpaid medical debt?", "answer": "Yes, but this is rare for smaller debts. Hospitals more commonly sell debt to collectors. You have legal rights under the FDCPA, and many states have additional protections against wage garnishment for medical debt."},
+            {"question": "What is a medical debt settlement?", "answer": "You negotiate to pay less than the full balance — often 20–60 cents on the dollar for older debt. Hospitals and collection agencies expect this. Offer a lump sum payment and get any agreement in writing before paying."},
+        ],
+    },
+    "negotiating-bills": {
+        "icon": "🤝",
+        "intro": "Every medical bill is negotiable. Hospital billing departments have discretion to reduce charges, set up payment plans, and apply discounts — but they almost never volunteer it. These guides give you the scripts and strategies to get a lower bill.",
+        "stat": {"value": "35%", "label": "average reduction when patients negotiate"},
+        "faqs": [
+            {"question": "Is it really possible to negotiate a hospital bill?", "answer": "Yes — hospital billing staff expect negotiation, especially from self-pay patients or those with high deductibles. Hospitals typically accept 30–60% of billed charges from commercial payers, so there's significant room to negotiate."},
+            {"question": "What's the best negotiation strategy for a medical bill?", "answer": "Get an itemized bill, look up Medicare rates for each CPT code, and offer to pay 1.5–2x the Medicare rate as a lump sum. Be polite but persistent. Ask specifically for the 'prompt pay discount' or 'self-pay rate.'"},
+            {"question": "Should I hire a medical billing advocate?", "answer": "For bills over $5,000, a professional advocate often pays for themselves — they typically charge 20–35% of savings achieved. For smaller bills, use BillKarma's free guides and dispute tools first."},
+        ],
+    },
+    "financial-assistance": {
+        "icon": "🏦",
+        "intro": "Nonprofit hospitals are required by the IRS to offer charity care programs, but most don't advertise them. Many patients who qualify never apply. These guides show you how to access hospital financial assistance, Medicaid, and other programs.",
+        "stat": {"value": "$42B", "label": "in charity care provided annually"},
+        "faqs": [
+            {"question": "What is hospital charity care?", "answer": "Nonprofit hospitals must provide free or discounted care to low-income patients to maintain their tax-exempt status. Income eligibility typically ranges from 200% to 400% of the federal poverty level, depending on the hospital."},
+            {"question": "How do I apply for hospital financial assistance?", "answer": "Ask the billing department for a 'financial assistance application' or 'charity care application.' You'll typically need to provide income documentation (pay stubs, tax returns) and proof of expenses. Apply before the bill goes to collections."},
+            {"question": "Can I get financial assistance if I have insurance?", "answer": "Yes — many hospitals offer assistance for the portion not covered by insurance, especially for patients with high deductibles or copays. Don't assume having insurance disqualifies you."},
+        ],
+    },
+    "patient-rights": {
+        "icon": "🛡️",
+        "intro": "Patients have more legal rights than most realize — from the right to an itemized bill, to protections against balance billing, to the right to appeal any insurance denial. These guides document exactly what you're entitled to under federal and state law.",
+        "stat": {"value": "80%", "label": "of patients don't know their full billing rights"},
+        "faqs": [
+            {"question": "What are my rights under the No Surprises Act?", "answer": "The No Surprises Act (2022) protects you from unexpected out-of-network bills for emergency care and from certain providers at in-network facilities. Your cost share can't exceed your in-network rate. Disputes go to independent arbitration."},
+            {"question": "Do I have the right to see my medical records?", "answer": "Yes — under HIPAA, you have the right to access your medical records within 30 days of request. Providers can charge a reasonable copying fee but cannot deny access. Electronic records must be provided electronically if requested."},
+            {"question": "Can a hospital discharge me while I'm still sick?", "answer": "You have the right to appeal a discharge decision before leaving the hospital. If Medicare-insured, request a written 'Notice of Medicare Non-Coverage' and appeal to your Quality Improvement Organization (QIO) — the discharge is paused during review."},
+        ],
+    },
+    "prior-authorization": {
+        "icon": "📝",
+        "intro": "Prior authorization — the requirement to get insurer approval before receiving care — causes treatment delays and denials that harm patients. These guides explain when auth is required, how to get it approved, and what to do when it's denied.",
+        "stat": {"value": "93%", "label": "of physicians say prior auth delays necessary care"},
+        "faqs": [
+            {"question": "What is prior authorization?", "answer": "Prior authorization (PA) is your insurer's requirement to approve certain procedures, medications, or specialist visits before you receive them. Without approval, the claim may be denied. PAs are most common for specialty drugs, imaging, surgery, and mental health services."},
+            {"question": "How long does prior authorization take?", "answer": "Standard PA requests must be decided within 15 days under federal rules (or 72 hours for urgent cases). Many states have faster requirements. If your insurer takes longer, escalate to your HR department or state insurance commissioner."},
+            {"question": "What do I do if prior authorization is denied?", "answer": "Request the specific denial reason and clinical criteria in writing. Your doctor can submit a peer-to-peer review (doctor calls the insurer's medical director directly) — this reverses roughly 50% of denials. If that fails, file a formal appeal."},
+        ],
+    },
+}
+
+_CITY_DATA = {
+    "new-york": {"name": "New York", "state": "NY", "zip": "10001", "state_slug": "new-york"},
+    "los-angeles": {"name": "Los Angeles", "state": "CA", "zip": "90001", "state_slug": "california"},
+    "chicago": {"name": "Chicago", "state": "IL", "zip": "60601", "state_slug": "illinois"},
+    "houston": {"name": "Houston", "state": "TX", "zip": "77001", "state_slug": "texas"},
+    "phoenix": {"name": "Phoenix", "state": "AZ", "zip": "85001", "state_slug": "arizona"},
+    "philadelphia": {"name": "Philadelphia", "state": "PA", "zip": "19101", "state_slug": "pennsylvania"},
+    "san-antonio": {"name": "San Antonio", "state": "TX", "zip": "78201", "state_slug": "texas"},
+    "san-diego": {"name": "San Diego", "state": "CA", "zip": "92101", "state_slug": "california"},
+    "dallas": {"name": "Dallas", "state": "TX", "zip": "75201", "state_slug": "texas"},
+    "san-jose": {"name": "San Jose", "state": "CA", "zip": "95101", "state_slug": "california"},
+    "austin": {"name": "Austin", "state": "TX", "zip": "78701", "state_slug": "texas"},
+    "jacksonville": {"name": "Jacksonville", "state": "FL", "zip": "32099", "state_slug": "florida"},
+    "fort-worth": {"name": "Fort Worth", "state": "TX", "zip": "76101", "state_slug": "texas"},
+    "columbus": {"name": "Columbus", "state": "OH", "zip": "43085", "state_slug": "ohio"},
+    "charlotte": {"name": "Charlotte", "state": "NC", "zip": "28201", "state_slug": "north-carolina"},
+    "indianapolis": {"name": "Indianapolis", "state": "IN", "zip": "46201", "state_slug": "indiana"},
+    "san-francisco": {"name": "San Francisco", "state": "CA", "zip": "94102", "state_slug": "california"},
+    "seattle": {"name": "Seattle", "state": "WA", "zip": "98101", "state_slug": "washington"},
+    "denver": {"name": "Denver", "state": "CO", "zip": "80201", "state_slug": "colorado"},
+    "nashville": {"name": "Nashville", "state": "TN", "zip": "37201", "state_slug": "tennessee"},
+    "oklahoma-city": {"name": "Oklahoma City", "state": "OK", "zip": "73101", "state_slug": "oklahoma"},
+    "el-paso": {"name": "El Paso", "state": "TX", "zip": "79901", "state_slug": "texas"},
+    "washington-dc": {"name": "Washington", "state": "DC", "zip": "20001", "state_slug": "district-of-columbia"},
+    "las-vegas": {"name": "Las Vegas", "state": "NV", "zip": "89101", "state_slug": "nevada"},
+    "louisville": {"name": "Louisville", "state": "KY", "zip": "40201", "state_slug": "kentucky"},
+    "memphis": {"name": "Memphis", "state": "TN", "zip": "38101", "state_slug": "tennessee"},
+    "portland": {"name": "Portland", "state": "OR", "zip": "97201", "state_slug": "oregon"},
+    "baltimore": {"name": "Baltimore", "state": "MD", "zip": "21201", "state_slug": "maryland"},
+    "milwaukee": {"name": "Milwaukee", "state": "WI", "zip": "53201", "state_slug": "wisconsin"},
+    "albuquerque": {"name": "Albuquerque", "state": "NM", "zip": "87101", "state_slug": "new-mexico"},
+    "tucson": {"name": "Tucson", "state": "AZ", "zip": "85701", "state_slug": "arizona"},
+    "fresno": {"name": "Fresno", "state": "CA", "zip": "93701", "state_slug": "california"},
+    "mesa": {"name": "Mesa", "state": "AZ", "zip": "85201", "state_slug": "arizona"},
+    "sacramento": {"name": "Sacramento", "state": "CA", "zip": "95814", "state_slug": "california"},
+    "atlanta": {"name": "Atlanta", "state": "GA", "zip": "30301", "state_slug": "georgia"},
+    "kansas-city": {"name": "Kansas City", "state": "MO", "zip": "64101", "state_slug": "missouri"},
+    "omaha": {"name": "Omaha", "state": "NE", "zip": "68101", "state_slug": "nebraska"},
+    "raleigh": {"name": "Raleigh", "state": "NC", "zip": "27601", "state_slug": "north-carolina"},
+    "miami": {"name": "Miami", "state": "FL", "zip": "33101", "state_slug": "florida"},
+    "minneapolis": {"name": "Minneapolis", "state": "MN", "zip": "55401", "state_slug": "minnesota"},
+    "cleveland": {"name": "Cleveland", "state": "OH", "zip": "44101", "state_slug": "ohio"},
+    "wichita": {"name": "Wichita", "state": "KS", "zip": "67201", "state_slug": "kansas"},
+    "tampa": {"name": "Tampa", "state": "FL", "zip": "33601", "state_slug": "florida"},
+    "new-orleans": {"name": "New Orleans", "state": "LA", "zip": "70112", "state_slug": "louisiana"},
+    "pittsburgh": {"name": "Pittsburgh", "state": "PA", "zip": "15201", "state_slug": "pennsylvania"},
+    "cincinnati": {"name": "Cincinnati", "state": "OH", "zip": "45201", "state_slug": "ohio"},
+    "st-louis": {"name": "St. Louis", "state": "MO", "zip": "63101", "state_slug": "missouri"},
+    "richmond": {"name": "Richmond", "state": "VA", "zip": "23218", "state_slug": "virginia"},
+    "orlando": {"name": "Orlando", "state": "FL", "zip": "32801", "state_slug": "florida"},
+    "boston": {"name": "Boston", "state": "MA", "zip": "02101", "state_slug": "massachusetts"},
+}
+
+_PROCEDURE_SLUGS = {
+    "knee-replacement": {"cpt": "27447", "name": "Knee Replacement"},
+    "hip-replacement": {"cpt": "27130", "name": "Hip Replacement"},
+    "colonoscopy": {"cpt": "45378", "name": "Colonoscopy"},
+    "appendectomy": {"cpt": "44970", "name": "Appendectomy"},
+    "mri-brain": {"cpt": "70551", "name": "MRI of the Brain"},
+    "ct-abdomen": {"cpt": "74177", "name": "CT Scan Abdomen/Pelvis"},
+    "mammogram": {"cpt": "77067", "name": "Mammogram (Screening)"},
+    "cataract-surgery": {"cpt": "66984", "name": "Cataract Surgery"},
+    "gallbladder-removal": {"cpt": "47562", "name": "Gallbladder Removal"},
+    "spinal-fusion": {"cpt": "22612", "name": "Spinal Fusion"},
+    "hernia-repair": {"cpt": "49505", "name": "Hernia Repair"},
+    "tonsillectomy": {"cpt": "42821", "name": "Tonsillectomy"},
+    "echocardiogram": {"cpt": "93306", "name": "Echocardiogram"},
+    "sleep-study": {"cpt": "95810", "name": "Sleep Study"},
+    "basic-metabolic-panel": {"cpt": "80048", "name": "Basic Metabolic Panel"},
+    "er-visit": {"cpt": "99284", "name": "ER Visit (Level 4)"},
+}
+
+
 @app.get("/guides/category/{slug}/", response_class=HTMLResponse)
 async def guides_category(request: Request, slug: str):
     """List guides in a specific category."""
@@ -762,6 +949,7 @@ async def guides_category(request: Request, slug: str):
     if not matched or not guides_in_cat:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Category not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/category/{slug}/"
+    category_meta = _CATEGORY_META.get(slug)
     return templates.TemplateResponse(
         "guides_category.html",
         {
@@ -772,6 +960,79 @@ async def guides_category(request: Request, slug: str):
             "canonical_url": canonical_url,
             "og_title": f"{matched['name']} Guides | BillKarma",
             "meta_description": f"BillKarma's {matched['name'].lower()} guides — {matched['count']} free articles on how to understand, dispute, and reduce your medical bills.",
+            "category_meta": category_meta,
+        },
+    )
+
+
+@app.get("/costs/{proc_slug}/{city_slug}/", response_class=HTMLResponse)
+async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
+    """Programmatic procedure × city cost page."""
+    proc = _PROCEDURE_SLUGS.get(proc_slug)
+    city = _CITY_DATA.get(city_slug)
+    if not proc or not city:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Page not found"}, status_code=404)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{city_slug}/"
+    profile = get_procedure_profile(proc["cpt"])
+    hospitals = get_hospitals_near_zip_for_cpt(proc["cpt"], city["zip"], limit=10)
+    nearby_procedures = [
+        {"name": v["name"], "slug": k, "cpt": v["cpt"]}
+        for k, v in _PROCEDURE_SLUGS.items()
+        if k != proc_slug
+    ][:8]
+    nearby_cities = [
+        {"name": v["name"], "state": v["state"], "slug": k}
+        for k, v in _CITY_DATA.items()
+        if k != city_slug
+    ][:10]
+    avg_charge = profile.get("avg_charge") if profile else None
+    medicare_rate = profile.get("medicare_rate") if profile else None
+    if avg_charge:
+        avg_str = f"${avg_charge:,.0f}"
+    else:
+        avg_str = "varies"
+    meta_description = (
+        f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
+        f"Compare prices from {len(hospitals)} nearby hospitals. Find fair prices with BillKarma."
+    )
+    return templates.TemplateResponse(
+        "procedure_city.html",
+        {
+            "request": request,
+            "procedure": {"name": proc["name"], "cpt_code": proc["cpt"], "slug": proc_slug},
+            "city": city,
+            "profile": profile or {},
+            "hospitals": hospitals,
+            "canonical_url": canonical_url,
+            "og_title": f"{proc['name']} Cost in {city['name']}, {city['state']} | BillKarma",
+            "meta_description": meta_description,
+            "nearby_procedures": nearby_procedures,
+            "nearby_cities": nearby_cities,
+        },
+    )
+
+
+@app.get("/press/", response_class=HTMLResponse)
+async def press_page(request: Request):
+    """Press and media kit page."""
+    from guides import list_guides
+    canonical_url = f"{config.APP_URL.rstrip('/')}/press/"
+    guide_count = len(list_guides())
+    stats = {
+        "hospitals_tracked": 6000,
+        "guides_published": guide_count,
+        "avg_markup": 4.2,
+        "states_covered": 51,
+        "data_year": "2026",
+    }
+    return templates.TemplateResponse(
+        "press.html",
+        {
+            "request": request,
+            "canonical_url": canonical_url,
+            "og_title": "Press & Research | BillKarma",
+            "meta_description": "Data, research assets, and media contact for journalists covering US hospital pricing, medical billing errors, and patient rights.",
+            "stats": stats,
         },
     )
 
@@ -1579,9 +1840,11 @@ async def sitemap_index():
         (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
         (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
+        (f"{base}/press/", "2026-04-01", "0.7"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
+        (f"{base}/sitemap-costs.xml", "2026-04-01", "0.5"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
@@ -1713,6 +1976,23 @@ async def facilities_sitemap():
     return Response(content=xml, media_type="application/xml")
 
 
+@app.get("/sitemap-costs.xml")
+async def costs_sitemap():
+    """Sitemap for procedure × city cost pages."""
+    base = config.APP_URL.rstrip("/")
+    entries = "".join(
+        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>2026-04-01</lastmod><priority>0.7</priority></url>"
+        for proc_slug in _PROCEDURE_SLUGS
+        for city_slug in _CITY_DATA
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
 @app.get("/og/{slug}.svg")
 async def og_image_svg(slug: str):
     """Return a branded SVG social preview image for a guide."""
@@ -1762,6 +2042,7 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-hospitals.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-costs.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 

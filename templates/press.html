@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% block title %}Press & Media Kit — BillKarma{% endblock %}
+
+{% block head %}
+<style>
+  .press-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero */
+  .press-hero {
+    background: #064E3B;
+    color: #fff;
+    padding: 72px 24px 96px;
+    border-radius: 0 0 40px 40px;
+    text-align: center;
+  }
+  .press-hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.85);
+  }
+  .press-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 16px;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+  .press-hero .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.75);
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+
+  /* Stats Bar */
+  .press-stats-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: -32px auto 48px;
+    max-width: 900px;
+    padding: 0 24px;
+  }
+  .press-stat-tile {
+    background: #fff;
+    border: 1px solid var(--bk-gray-border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    text-align: center;
+    flex: 1;
+    min-width: 160px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .press-stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--bk-green);
+    line-height: 1.1;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .press-stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--bk-gray-text);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  /* Section headings */
+  .press-section {
+    margin-bottom: 56px;
+  }
+  .press-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--bk-black);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  .press-section-intro {
+    font-size: 0.95rem;
+    color: var(--bk-gray-text);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  /* Research cards */
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .research-card {
+    background: #fff;
+    border: 1px solid var(--bk-gray-border);
+    border-radius: 16px;
+    border-top: 4px solid var(--bk-green);
+    padding: 24px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .research-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .research-card-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--bk-green);
+    margin-bottom: 10px;
+  }
+  .research-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--bk-black);
+    margin: 0 0 10px;
+    line-height: 1.35;
+  }
+  .research-card-desc {
+    font-size: 0.875rem;
+    color: var(--bk-gray-text);
+    line-height: 1.6;
+    margin: 0 0 16px;
+    flex: 1;
+  }
+  .research-card-cta {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--bk-green);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .research-card-cta::after {
+    content: "→";
+    transition: transform 0.15s;
+  }
+  .research-card:hover .research-card-cta::after {
+    transform: translateX(3px);
+  }
+
+  /* Story ideas */
+  .story-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .story-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--bk-gray-border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 0.925rem;
+    color: var(--bk-black);
+    line-height: 1.55;
+  }
+  .story-bullet {
+    width: 20px;
+    height: 20px;
+    background: var(--bk-green);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .story-bullet svg {
+    width: 10px;
+    height: 10px;
+    color: #fff;
+  }
+
+  /* Methodology */
+  .methodology-card {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 16px;
+    padding: 28px 32px;
+    font-size: 0.925rem;
+    color: #064E3B;
+    line-height: 1.7;
+  }
+
+  /* Contact card */
+  .contact-card {
+    background: #fff;
+    border: 1px solid var(--bk-gray-border);
+    border-radius: 20px;
+    padding: 36px 40px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .contact-card p {
+    font-size: 1rem;
+    color: var(--bk-gray-text);
+    line-height: 1.65;
+    margin: 0 0 20px;
+  }
+  .contact-email-btn {
+    display: inline-block;
+    background: var(--bk-green);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 14px 32px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .contact-email-btn:hover {
+    background: var(--bk-green-dark);
+    color: #fff;
+  }
+
+  /* Divider */
+  .press-divider {
+    border: none;
+    border-top: 1px solid var(--bk-gray-border);
+    margin: 0 0 56px;
+  }
+
+  @media (max-width: 640px) {
+    .press-hero h1 { font-size: 1.75rem; }
+    .press-hero .subtitle { font-size: 0.95rem; }
+    .press-stat-tile { min-width: 130px; padding: 18px 16px; }
+    .press-stat-number { font-size: 1.6rem; }
+    .research-grid { grid-template-columns: 1fr; }
+    .contact-card { padding: 24px 20px; }
+    .methodology-card { padding: 20px 20px; }
+  }
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "BillKarma",
+      "url": "https://billkarma.app",
+      "logo": "https://billkarma.app/static/img/billkarma-og.svg",
+      "description": "BillKarma is a medical billing transparency platform that tracks hospital pricing, grades billing fairness, and empowers patients to understand and dispute medical bills.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "press@billkarma.app",
+        "contactType": "Press"
+      },
+      "sameAs": []
+    },
+    {
+      "@type": "Dataset",
+      "name": "BillKarma Hospital Pricing Dataset {{ stats.data_year | default('2026') }}",
+      "description": "Aggregated hospital chargemaster data for {{ stats.hospitals_tracked | default(6000) | int }}+ US hospitals, covering facility rates, Medicare benchmarks, and billing transparency scores across {{ stats.states_covered | default(51) }} states.",
+      "url": "{{ canonical_url }}",
+      "creator": {
+        "@type": "Organization",
+        "name": "BillKarma",
+        "url": "https://billkarma.app"
+      },
+      "dateModified": "{{ stats.data_year | default('2026') }}",
+      "license": "https://billkarma.app/terms/",
+      "keywords": ["hospital pricing", "medical billing", "healthcare transparency", "chargemaster", "Medicare rates"],
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "United States"
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="press-hero">
+  <div class="press-hero-badge">Press &amp; Media Kit</div>
+  <h1>BillKarma Press &amp; Research</h1>
+  <p class="subtitle">Data, research, and resources for journalists covering healthcare pricing and medical billing.</p>
+</section>
+
+<!-- Stats Bar -->
+<div class="press-stats-bar">
+  <div class="press-stat-tile">
+    <span class="press-stat-number">{{ stats.hospitals_tracked | default(6000) | int }}+</span>
+    <span class="press-stat-label">Hospitals Tracked</span>
+  </div>
+  <div class="press-stat-tile">
+    <span class="press-stat-number">{{ stats.guides_published | default(300) | int }}+</span>
+    <span class="press-stat-label">Guides Published</span>
+  </div>
+  <div class="press-stat-tile">
+    <span class="press-stat-number">{{ stats.avg_markup | default(4.2) }}x</span>
+    <span class="press-stat-label">Avg Hospital Markup</span>
+  </div>
+  <div class="press-stat-tile">
+    <span class="press-stat-number">{{ stats.states_covered | default(51) }}</span>
+    <span class="press-stat-label">States Covered</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="press-container">
+
+  <!-- Research Assets -->
+  <section class="press-section">
+    <h2 class="press-section-title">Research Assets</h2>
+    <p class="press-section-intro">Linkable, citable resources built from real hospital pricing data. Free to reference with attribution.</p>
+    <div class="research-grid">
+
+      <a href="/research/2026-medical-billing-report/" class="research-card">
+        <div class="research-card-label">Annual Report</div>
+        <div class="research-card-title">{{ stats.data_year | default('2026') }} Medical Billing Report</div>
+        <p class="research-card-desc">Comprehensive analysis of billing errors, markups, and patient rights across all 50 states.</p>
+        <span class="research-card-cta">View Report</span>
+      </a>
+
+      <a href="/hospitals/" class="research-card">
+        <div class="research-card-label">Data Tool</div>
+        <div class="research-card-title">Hospital Billing Grades</div>
+        <p class="research-card-desc">Our proprietary A–F grading system scores 6,000+ US hospitals on price transparency and billing fairness.</p>
+        <span class="research-card-cta">Explore Grades</span>
+      </a>
+
+      <a href="/map/" class="research-card">
+        <div class="research-card-label">Interactive Map</div>
+        <div class="research-card-title">State Patient Rights Map</div>
+        <p class="research-card-desc">Interactive map showing how each state scores on medical debt protections, surprise billing laws, and charity care.</p>
+        <span class="research-card-cta">Explore Map</span>
+      </a>
+
+    </div>
+  </section>
+
+  <hr class="press-divider">
+
+  <!-- Story Ideas -->
+  <section class="press-section">
+    <h2 class="press-section-title">Story Ideas for Journalists</h2>
+    <p class="press-section-intro">We can provide data, expert commentary, and patient case studies to support any of these angles.</p>
+    <ul class="story-list">
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        Hospital markups in [your city]: we have price data for 6,000+ facilities
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        Which states protect patients best from surprise billing?
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        The cost of the same MRI ranges from $400 to $8,000 — why?
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        Medical debt is the #1 cause of personal bankruptcy — what can patients do?
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        Only 30% of hospitals are fully price-transparent. We grade them all.
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        The {{ stats.data_year | default('2026') }} medical billing error rate — what's driving it?
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        How to read your Explanation of Benefits (and catch overcharges)
+      </li>
+      <li>
+        <span class="story-bullet">
+          <svg fill="none" viewBox="0 0 10 10" stroke="currentColor" stroke-width="2"><polyline points="2,5 4.5,7.5 8,3"/></svg>
+        </span>
+        Out-of-network billing: what patients don't know is costing them thousands
+      </li>
+    </ul>
+  </section>
+
+  <hr class="press-divider">
+
+  <!-- Data & Methodology -->
+  <section class="press-section">
+    <h2 class="press-section-title">Data &amp; Methodology</h2>
+    <div class="methodology-card">
+      BillKarma aggregates hospital chargemaster data filed under the CMS Hospital Price Transparency Rule, Medicare fee schedules, and state billing regulations. Data is updated annually. Methodology details are available upon request.
+    </div>
+  </section>
+
+  <hr class="press-divider">
+
+  <!-- Contact -->
+  <section class="press-section">
+    <h2 class="press-section-title">Media Contact</h2>
+    <div class="contact-card">
+      <p>For press inquiries, data requests, or interview scheduling, reach our media team directly. We typically respond within one business day.</p>
+      <a href="mailto:press@billkarma.app" class="contact-email-btn">press@billkarma.app</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
