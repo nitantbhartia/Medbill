@@ -2131,7 +2131,7 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
 
 
 def _build_page_title(name: str) -> str:
-    suffix = " Billing Grade, Prices & Charity Care | BillKarma"
+    suffix = " Billing Grade & Prices | BillKarma"
     max_name = 60 - len(suffix)
     return _truncate_name(name, max_name) + suffix
 
@@ -2149,9 +2149,8 @@ def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
     proc_txt = f"See {proc_count} procedure prices, " if proc_count else "See procedure prices, "
 
     desc = (
-        f"{name}{loc} has a BillKarma billing grade of {grade} "
-        f"with an average markup of {markup_txt} Medicare. "
-        f"{proc_txt}compare nearby hospitals, and scan your bill free."
+        f"{name}{loc}: billing grade {grade}, charging {markup_txt} Medicare rates. "
+        f"{proc_txt}check if your bill is fair, and find cheaper alternatives nearby."
     )
     if len(desc) <= 155:
         return desc
