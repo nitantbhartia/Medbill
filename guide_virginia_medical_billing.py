@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("virginia-medical-billing-laws", {
     "title": "Virginia Medical Billing Laws: Balance Billing Protections",
-    "meta_description": "Virginia&rsquo;s HB 1251 bans surprise balance bills. Learn Virginia charity care rules, medical debt protections, wage garnishment limits, and how to.",
+    "meta_description": "Virginia's HB 1251 bans surprise balance bills. Learn Virginia charity care rules, medical debt protections, wage garnishment limits, and how to dispute.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "State Guides",

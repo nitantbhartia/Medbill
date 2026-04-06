@@ -2051,7 +2051,7 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
             )
             schema = {
                 "@context": "https://schema.org",
-                "@type": "MedicalOrganization",
+                "@type": "Hospital",
                 "name": data["name"],
                 "address": {
                     "@type": "PostalAddress",
@@ -2131,26 +2131,22 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
 
 
 def _build_page_title(name: str) -> str:
-    suffix = " Billing Grade & Prices | BillKarma"
-    max_name = 60 - len(suffix)
-    return _truncate_name(name, max_name) + suffix
+    full_suffix = " Billing: Phone, Pay Online & Financial Help | BillKarma"
+    short_suffix = " Billing & Financial Help | BillKarma"
+    title = name + full_suffix
+    if len(title) > 60:
+        title = name + short_suffix
+    if len(title) > 60:
+        title = _truncate_name(name, 60 - len(short_suffix)) + short_suffix
+    return title
 
 
 def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
     name = hospital_d.get("name", "")
-    city = hospital_d.get("city", "")
-    state_code = hospital_d.get("_state_code") or ""  # raw abbreviation stored by caller
-    grade = hospital_d.get("billing_grade") or "N/A"
-    markup = hospital_d.get("avg_markup_vs_medicare")
-    proc_count = hospital_d.get("procedures_compared") or len(prices_d)
-
-    markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
-    loc = f" in {city}, {state_code}" if city and state_code else ""
-    proc_txt = f"See {proc_count} procedure prices, " if proc_count else "See procedure prices, "
-
     desc = (
-        f"{name}{loc}: billing grade {grade}, charging {markup_txt} Medicare rates. "
-        f"{proc_txt}check if your bill is fair, and find cheaper alternatives nearby."
+        f"Contact {name} billing department. "
+        f"Find the billing phone number, pay your bill online, "
+        f"request an itemized statement, or apply for financial assistance."
     )
     if len(desc) <= 155:
         return desc

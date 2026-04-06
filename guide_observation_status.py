@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("observation-status-billing", {
     "title": "Observation Status vs. Inpatient",
-    "meta_description": "Being placed on 'observation status' instead of admitted as an inpatient can cost you thousands more out of pocket.",
+    "meta_description": "Observation status instead of inpatient admission can cost thousands more. Learn the difference, Medicare rules, and how to challenge your status.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",

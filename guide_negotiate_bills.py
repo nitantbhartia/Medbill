@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-to-negotiate-medical-bills", {
-    "title": "How to Negotiate Medical Bills: Scripts and Strategies That Work",
+    "title": "How to Negotiate Medical Bills: Scripts That Work (2026)",
     "meta_description": "Practical scripts and strategies to negotiate your medical bill down by 30-60%. Works whether you have insurance or not. Real examples with dollar amounts.",
     "published": "2026-02-18",
     "author": "BillKarma Team",
@@ -32,6 +32,8 @@ register("how-to-negotiate-medical-bills", {
     ],
     "body": f"""
 <p class="lead">Hospitals accept less than the billed amount on virtually every bill. Insurance companies negotiate 40&ndash;60% discounts. Medicare pays a fraction of chargemaster prices. Yet most patients pay the sticker price without question. Here are the specific scripts and strategies to negotiate your medical bill down&mdash;with real dollar examples at every step.</p>
+
+<div class="answer-box"><strong>Quick answer</strong>Call the billing department, ask for the "self-pay discount" or "prompt-pay rate" (typically 20–40% off), then offer a lump sum. Hospitals accept settlements in writing. Most patients who ask get at least 20% off without any hardship documentation.</div>
 
 <nav class="toc">
     <h2>In this guide</h2>

@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("medical-bill-financial-hardship", {
     "title": "Financial Hardship and Medical Bills",
-    "meta_description": "Facing financial hardship from medical bills? There are 9 programs that can help — from charity care to Medicaid to state aid. Learn who qualifies and how to.",
+    "meta_description": "Struggling with medical bills? 9 programs can help — from charity care to Medicaid to state aid. Learn who qualifies and how to apply for free assistance.",
     "published": "2026-02-24",
     "author": "BillKarma Team",
     "category": "Negotiation",

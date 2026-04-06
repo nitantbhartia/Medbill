@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("how-much-does-surgery-cost", {
-    "title": "How Much Does Surgery Cost? A Guide to Common Procedure Prices",
+    "title": "How Much Does Surgery Cost? Common Procedure Prices (2026)",
     "meta_description": "Surgery costs range from $3,500 to $100,000+ depending on procedure and location. Learn what drives costs, compare prices, and find ways to save thousands.",
     "published": "2026-02-20",
     "author": "BillKarma Team",

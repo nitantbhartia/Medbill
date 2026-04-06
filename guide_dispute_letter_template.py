@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-bill-dispute-letter", {
-    "title": "Medical Bill Dispute Letter: Templates",
-    "meta_description": "A written dispute letter reduces medical bills in 67% of cases. Learn the exact language to use, what to include, and get a free template you can send today.",
+    "title": "Medical Bill Dispute Letter: Free Templates (2026)",
+    "meta_description": "Download free dispute letter templates for overcharges, billing errors, and insurance denials. Step-by-step guide to writing a letter that gets results.",
     "published": "2026-02-22",
     "author": "BillKarma Team",
     "category": "Taking Action",

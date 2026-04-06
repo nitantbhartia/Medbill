@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-debt-wage-garnishment", {
-    "title": "Can Hospitals Garnish Your Wages for Medical Debt? to Know in",
+    "title": "Can Hospitals Garnish Your Wages for Medical Debt? (2026)",
     "meta_description": "Hospitals can garnish wages for medical debt only after a court judgment. Federal law caps garnishment at 25%. Learn state protections and how to prevent it.",
     "published": "2026-02-27",
     "author": "BillKarma Team",

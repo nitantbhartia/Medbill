@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("texas-hospital-charity-care", {
-    "title": "Texas Hospital Charity Care: How to Get Free or Reduced-Cost Care",
+    "title": "Texas Hospital Charity Care: Free & Reduced Care (2026)",
     "meta_description": "Texas has more uninsured residents than any state — but nonprofit hospitals must provide charity care. Learn income limits, how to apply, and your rights.",
     "published": "2026-02-22",
     "author": "BillKarma Team",

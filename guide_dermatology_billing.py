@@ -4,10 +4,10 @@ from guides import register, _embed
 
 register("dermatology-billing", {
     "title": "Dermatology Billing: Mohs Surgery",
-    "meta_description": "Dermatology bills are full of upcoded biopsies, unbundled Mohs surgery fees, and cosmetic-vs-medical disputes.",
+    "meta_description": "Dermatology bills are full of upcoded biopsies and unbundled Mohs surgery fees. Learn 7 common errors, CPT codes, and how to dispute overcharges.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does a skin biopsy cost?",

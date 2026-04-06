@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("medical-bill-audit-checklist", {
-    "title": "Medical Bill Audit Checklist: 12 Things to Check Before You Pay",
+    "title": "Medical Bill Audit Checklist: 12 Things to Check (2026)",
     "meta_description": "Don't pay a medical bill without checking it first. This 12-point audit checklist catches duplicate charges, upcoding, unbundling, and billing errors.",
     "published": "2026-02-26",
     "author": "BillKarma Team",

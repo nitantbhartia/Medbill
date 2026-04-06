@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+.tool-hero { background:linear-gradient(135deg,#059669 0%,#047857 100%); color:#fff; padding:48px 24px 36px; text-align:center; }
+.tool-hero h1 { font-size:2rem; font-weight:800; margin:0 0 12px; }
+.tool-hero p { font-size:1.05rem; opacity:.9; max-width:600px; margin:0 auto; }
+.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; max-width:720px; margin:-28px auto 32px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
+.tool-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6B7280; margin-bottom:6px; }
+.tool-select, .tool-input { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #E5E7EB; border-radius:10px; background:#F9FAFB; box-sizing:border-box; }
+.tool-select:focus, .tool-input:focus { outline:none; border-color:#059669; }
+.cc-result { display:none; margin-top:8px; border-radius:12px; padding:20px 24px; }
+.cc-result.show { display:block; }
+.cc-free { background:#F0FDF4; border:2px solid #059669; }
+.cc-reduced { background:#ECFDF5; border:2px solid #34D399; }
+.cc-partial { background:#FEF3C7; border:2px solid #F59E0B; }
+.cc-standard { background:#F9FAFB; border:2px solid #E5E7EB; }
+.cc-pct { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+.cc-desc { font-size:.92rem; line-height:1.55; color:#374151; margin-top:6px; }
+.fpl-display { font-size:.82rem; color:#6B7280; margin-top:10px; }
+.container { max-width:860px; margin:0 auto; padding:0 24px 48px; }
+.state-table { width:100%; border-collapse:collapse; font-size:.88rem; margin-top:8px; }
+.state-table th { background:#F9FAFB; padding:9px 14px; text-align:left; font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; }
+.state-table td { padding:8px 14px; border-bottom:1px solid #F3F4F6; }
+.cta-box { background:linear-gradient(135deg,#059669,#047857); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
+.cta-box h3 { margin:0 0 8px; font-size:1.3rem; }
+.cta-box p { margin:0 0 16px; opacity:.9; font-size:.95rem; }
+.cta-btn { background:#fff; color:#059669; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="tool-hero">
+    <h1>Charity Care Eligibility Checker (2026)</h1>
+    <p>Find out in seconds if you qualify for free or discounted hospital care based on your income.</p>
+</div>
+
+<div class="container">
+    <div class="tool-card">
+        <div class="form-row">
+            <div>
+                <div class="tool-label">Household size</div>
+                <select class="tool-select" id="hhSize" onchange="calcFPL()">
+                    <option value="1">1 person</option>
+                    <option value="2">2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4" selected>4 people</option>
+                    <option value="5">5 people</option>
+                    <option value="6">6 people</option>
+                    <option value="7">7 people</option>
+                    <option value="8">8+ people</option>
+                </select>
+            </div>
+            <div>
+                <div class="tool-label">Annual household income</div>
+                <input class="tool-input" type="number" id="income" placeholder="e.g. 42000" oninput="calcFPL()" min="0" step="1000">
+            </div>
+        </div>
+
+        <div class="cc-result" id="ccResult">
+            <div class="cc-pct" id="ccPct"></div>
+            <div class="cc-desc" id="ccDesc"></div>
+            <div class="fpl-display" id="fplDisplay"></div>
+        </div>
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:700;margin:8px 0 6px;">How the 2026 Federal Poverty Level works</h2>
+    <p style="color:#6B7280;font-size:.92rem;line-height:1.6;margin-bottom:24px;">
+        The FPL for a household of 1 is <strong>${{ "{:,}".format(fpl_base) }}</strong> in 2026.
+        Each additional household member adds <strong>${{ "{:,}".format(fpl_add) }}</strong>.
+        Hospitals use your FPL percentage to determine eligibility — most nonprofits must offer
+        free care at or below 200% FPL under IRS 501(r) rules, and many states require coverage up to 300–400% FPL.
+    </p>
+
+    <h2 style="font-size:1.2rem;font-weight:700;margin:0 0 12px;">States with the most generous charity care laws</h2>
+    <table class="state-table">
+        <thead>
+            <tr><th>State</th><th>Free care up to</th><th>Discount up to</th><th>Key law</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>California</strong></td><td>250% FPL</td><td>350% FPL</td><td>AB 1020</td></tr>
+            <tr><td><strong>New York</strong></td><td>200% FPL</td><td>400% FPL</td><td>PHL § 2807-k</td></tr>
+            <tr><td><strong>Washington</strong></td><td>100% FPL</td><td>400% FPL</td><td>WA Charity Care Act</td></tr>
+            <tr><td><strong>Oregon</strong></td><td>200% FPL</td><td>400% FPL</td><td>ORS § 441.065</td></tr>
+            <tr><td><strong>Illinois</strong></td><td>200% FPL</td><td>600% FPL</td><td>Ill. Admin. Code</td></tr>
+            <tr><td><strong>Nevada</strong></td><td>200% FPL</td><td>300% FPL</td><td>NRS § 439B.260</td></tr>
+            <tr><td><strong>Connecticut</strong></td><td>200% FPL</td><td>300% FPL</td><td>CGS § 19a-673</td></tr>
+            <tr><td><strong>Massachusetts</strong></td><td>200% FPL</td><td>400% FPL</td><td>940 CMR 27.00</td></tr>
+            <tr><td><strong>Maryland</strong></td><td>200% FPL</td><td>300% FPL</td><td>COMAR 10.37.08</td></tr>
+            <tr><td><strong>Minnesota</strong></td><td>275% FPL</td><td>300% FPL</td><td>Minn. Stat. § 144.586</td></tr>
+            <tr><td><strong>All nonprofits</strong></td><td>~200% FPL</td><td>Varies</td><td>IRS 501(r)</td></tr>
+        </tbody>
+    </table>
+
+    <div class="cta-box" style="margin-top:32px;">
+        <h3>Think you qualify? Let BillKarma help you apply.</h3>
+        <p>We generate charity care application letters and identify every program you're eligible for — free.</p>
+        <a href="/fight-debt" class="cta-btn">Check My Bill Now</a>
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:700;margin:32px 0 12px;">Related guides</h2>
+    <ul style="line-height:2;">
+        <li><a href="/guides/hospital-financial-assistance-charity-care/">Hospital Charity Care: Do You Qualify?</a></li>
+        <li><a href="/guides/income-based-medical-bill-discounts/">Income-Based Medical Bill Discounts</a></li>
+        <li><a href="/guides/medical-bill-financial-hardship/">Financial Hardship and Medical Bills</a></li>
+        <li><a href="/guides/how-to-apply-for-medicaid/">How to Apply for Medicaid in 2026</a></li>
+    </ul>
+</div>
+
+<script>
+const FPL_BASE = {{ fpl_base }};
+const FPL_ADD  = {{ fpl_add }};
+
+function calcFPL() {
+    const size   = parseInt(document.getElementById('hhSize').value) || 1;
+    const income = parseFloat(document.getElementById('income').value) || 0;
+    if (!income) { document.getElementById('ccResult').classList.remove('show'); return; }
+
+    const fpl  = FPL_BASE + (size - 1) * FPL_ADD;
+    const pct  = (income / fpl) * 100;
+    const result = document.getElementById('ccResult');
+    const pctEl  = document.getElementById('ccPct');
+    const descEl = document.getElementById('ccDesc');
+    const fplEl  = document.getElementById('fplDisplay');
+
+    result.className = 'cc-result show ';
+    pctEl.textContent = Math.round(pct) + '% of the Federal Poverty Level';
+    fplEl.textContent = '2026 FPL for ' + size + '-person household: $' + fpl.toLocaleString();
+
+    if (pct <= 100) {
+        result.className += 'cc-free';
+        descEl.textContent = 'You almost certainly qualify for FREE care. Medicaid covers you in expansion states, and all nonprofit hospitals must provide full charity care at or below 100% FPL under IRS 501(r). Ask the billing department for their financial assistance application immediately.';
+    } else if (pct <= 200) {
+        result.className += 'cc-free';
+        descEl.textContent = 'You very likely qualify for FREE or deeply discounted care (0–25% of your bill). Federal law (IRS 501(r)) requires nonprofit hospitals to provide free or reduced care at this income level. Most states require free care up to 200% FPL. Ask for the hospital\'s Financial Assistance Program application.';
+    } else if (pct <= 300) {
+        result.className += 'cc-reduced';
+        descEl.textContent = 'You likely qualify for a significant discount (25–50% off your bill). Many states — including CA, NY, WA, OR, IL, NV, CT, MA, MD — require charity care discounts up to 300% FPL. Even without a state mandate, most nonprofit hospitals offer sliding-scale discounts at this level.';
+    } else if (pct <= 400) {
+        result.className += 'cc-partial';
+        descEl.textContent = 'You may qualify for a partial discount in states with expanded charity care (CA up to 350% FPL, NY/WA/OR/MA up to 400% FPL). Ask the hospital specifically for their financial assistance policy — many have internal policies beyond state minimums.';
+    } else {
+        result.className += 'cc-standard';
+        descEl.textContent = 'At this income level, standard rates typically apply. However, you can still negotiate: ask for the self-pay discount (often 20–40% off), request a payment plan, or dispute any billing errors. BillKarma can help identify overcharges regardless of income.';
+    }
+
+    result.classList.add('show');
+}
+</script>
+{% endblock %}

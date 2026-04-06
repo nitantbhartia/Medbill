@@ -5,11 +5,11 @@ from guides import register, _embed
 register(
     "newborn-hospital-bill-guide",
     {
-        "title": "Newborn Hospital Bills: What to Expect and How to Audit Yours",
-        "meta_description": "The average hospital birth costs $13,811. But many parents get two separate bills—one for mom and one for baby—and miss billing errors in both. Here's how to.",
+        "title": "Newborn Hospital Bills: What to Expect and How to Audit",
+        "meta_description": "The average hospital birth costs $13,811. Parents get 2 separate bills—one for mom, one for baby—and miss errors in both. Here's how to catch them.",
         "published": "2026-02-23",
         "author": "BillKarma Team",
-        "category": "Maternity & Birth",
+        "category": "Procedure Costs",
         "faqs": [
             {
                 "q": "Why did I get two separate hospital bills for my baby?",

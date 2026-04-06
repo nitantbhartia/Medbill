@@ -7,7 +7,7 @@ register("hearing-aids-billing", {
     "meta_description": "Hearing aids cost $1,000-$6,000 per ear. OTC options start at $200. Learn insurance coverage rules, Medicare limits, state mandates, and how to save.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "Does Medicare cover hearing aids?",

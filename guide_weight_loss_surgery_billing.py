@@ -7,7 +7,7 @@ register("weight-loss-surgery-billing", {
     "meta_description": "Bariatric surgery costs $15,000-$35,000. Learn insurance BMI requirements, the 6-month diet rule, how to appeal denials, and Centers of Excellence discounts.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Procedures",
+    "category": "Procedure Costs",
     "faqs": [
         {
             "q": "How much does bariatric surgery cost without insurance?",

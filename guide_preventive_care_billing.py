@@ -7,7 +7,7 @@ register("preventive-care-billing", {
     "meta_description": "The ACA requires insurers to cover preventive care at no cost. Learn which services are free, when preventive turns diagnostic, and how to fight.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
-    "category": "Insurance",
+    "category": "Insurance Basics",
     "faqs": [
         {
             "q": "Why did I get a bill for a preventive care visit that should be free?",

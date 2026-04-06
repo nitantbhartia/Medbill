@@ -1,13 +1,13 @@
-"""Guide: Anesthesia Bills Explained — Why Your Anesthesiologist Bill Is So Confusing."""
+"""Guide: Anesthesia Billing — Why It's So Confusing & How to Avoid Surprises."""
 
 from guides import register, _embed
 
 register("anesthesia-billing", {
-    "title": "Anesthesia Bills Explained",
-    "meta_description": "Anesthesia bills use a confusing 'units' system and often arrive as a surprise separate charge. Learn how anesthesia pricing works, what to check on your.",
-    "published": "2026-02-19",
+    "title": "Anesthesia Billing: Why It\u2019s So Confusing & How to Avoid Surprises",
+    "meta_description": "Anesthesia is billed using base units and time units — unlike any other medical service. Learn how the formula works, what the No Surprises Act covers, and how to audit your anesthesia bill.",
+    "published": "2026-04-05",
     "author": "BillKarma Team",
-    "category": "Billing Basics",
+    "category": "Understanding Your Bill",
     "faqs": [
         {
             "q": "Why did I get a separate bill from the anesthesiologist?",

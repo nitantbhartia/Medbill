@@ -7,16 +7,31 @@
     <meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">
     <meta name="theme-color" content="#00824F">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="BillKarma">
+    <meta property="og:locale" content="en_US">
     <meta property="og:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta property="og:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta property="og:url" content="{{ canonical_url if canonical_url else request.url }}">
     <meta property="og:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ og_title if og_title else 'BillKarma' }}">
     <meta name="twitter:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
     <meta name="twitter:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Search Console: <meta name="google-site-verification" content="YOUR_CODE_HERE"> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {% if config.GA_MEASUREMENT_ID %}
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.GA_MEASUREMENT_ID }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
+    </script>
+    {% endif %}
     <script>
         tailwind.config = {
             theme: {
@@ -48,6 +63,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="preload" href="/static/css/app.css" as="style">
     <link rel="stylesheet" href="/static/css/app.css"/>
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks."},{"@type":"WebSite","url":"https://billkarma.app","name":"BillKarma","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://billkarma.app/hospitals/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"SiteLinksSearchBox","url":"https://billkarma.app","potentialAction":{"@type":"SearchAction","target":"https://billkarma.app/hospitals/?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ItemList","name":"BillKarma Navigation","itemListElement":[{"@type":"SiteNavigationElement","position":1,"name":"Patient Guides","url":"https://billkarma.app/guides/"},{"@type":"SiteNavigationElement","position":2,"name":"Hospitals","url":"https://billkarma.app/hospitals/"},{"@type":"SiteNavigationElement","position":3,"name":"Procedures","url":"https://billkarma.app/procedures/"},{"@type":"SiteNavigationElement","position":4,"name":"Free Tools","url":"https://billkarma.app/tools/"},{"@type":"SiteNavigationElement","position":5,"name":"Fight Debt","url":"https://billkarma.app/fight-debt"}]}]}
+</script>
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
     <style>
         :root {
@@ -195,6 +213,7 @@
         @media (max-width: 640px) {
             .bk-nav { padding: 12px 16px; }
             .bk-nav-link { display: none; }
+            .bk-nav-link.mobile-show { display: inline-flex; }
             .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
             .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
             .bk-map-hospital { height: 220px; }
@@ -212,13 +231,13 @@
                 BillKarma
             </a>
             <div class="bk-nav-links">
-                <a href="/hospitals/" class="bk-nav-link">Hospitals</a>
+                <a href="/guides/" class="bk-nav-link mobile-show">Guides</a>
+                <a href="/hospitals/" class="bk-nav-link mobile-show">Hospitals</a>
+                <a href="/procedures/" class="bk-nav-link">Procedures</a>
+                <a href="/tools/" class="bk-nav-link">Tools</a>
+                <a href="/compare/" class="bk-nav-link">Compare</a>
                 <a href="/surgery-centers/" class="bk-nav-link">Surgery Centers</a>
                 <a href="/imaging/" class="bk-nav-link">Imaging</a>
-                <a href="/procedures/" class="bk-nav-link">Procedures</a>
-                <a href="/compare/" class="bk-nav-link">Compare</a>
-                <a href="/tools/" class="bk-nav-link">Tools</a>
-                <a href="/guides/" class="bk-nav-link">Guides</a>
                 <a href="/fight-debt" class="bk-nav-cta" style="background:var(--bk-orange);color:#fff;">Fight Debt</a>
                 <a href="/scan" class="bk-nav-cta">Scan My Bill</a>
             </div>
@@ -265,12 +284,12 @@
             <div>
                 <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">About</div>
                 <a href="/guides/hospital-billing-grades-explained" style="display:block;padding:3px 0;">Our Methodology</a>
-                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a></span>
+                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a></span>
                 <span style="display:block;padding:3px 0;font-size:0.72rem;color:#9CA3AF;">Not medical, legal, or financial advice.</span>
             </div>
         </div>
         <div style="width:100%;max-width:1200px;margin:0 auto;padding:12px 40px 0;border-top:1px solid rgba(0,0,0,0.06);font-size:0.72rem;">
-            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
+            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
         </div>
     </footer>
 

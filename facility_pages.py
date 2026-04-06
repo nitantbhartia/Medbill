@@ -601,3 +601,35 @@ def get_facility_profile(facility_type: str, state_slug: str, city_slug: str, sl
         }
     )
     return data
+
+
+def get_facility_sitemap_paths() -> list[str]:
+    """Return all facility URL paths for ASC and imaging center pages."""
+    with get_db() as db:
+        asc_states = db.execute(
+            "SELECT DISTINCT state_slug FROM facilities WHERE facility_type = 'asc' AND state_slug IS NOT NULL ORDER BY state_slug"
+        ).fetchall()
+        asc_cities = db.execute(
+            "SELECT DISTINCT state_slug, city_slug FROM facilities WHERE facility_type = 'asc' AND state_slug IS NOT NULL AND city_slug IS NOT NULL ORDER BY state_slug, city_slug"
+        ).fetchall()
+        asc_facilities = db.execute(
+            "SELECT state_slug, city_slug, slug FROM facilities WHERE facility_type = 'asc' AND state_slug IS NOT NULL AND city_slug IS NOT NULL AND slug IS NOT NULL ORDER BY state_slug, city_slug, slug"
+        ).fetchall()
+        img_states = db.execute(
+            "SELECT DISTINCT state_slug FROM facilities WHERE facility_type = 'imaging_center' AND state_slug IS NOT NULL ORDER BY state_slug"
+        ).fetchall()
+        img_cities = db.execute(
+            "SELECT DISTINCT state_slug, city_slug FROM facilities WHERE facility_type = 'imaging_center' AND state_slug IS NOT NULL AND city_slug IS NOT NULL ORDER BY state_slug, city_slug"
+        ).fetchall()
+        img_facilities = db.execute(
+            "SELECT state_slug, city_slug, slug FROM facilities WHERE facility_type = 'imaging_center' AND state_slug IS NOT NULL AND city_slug IS NOT NULL AND slug IS NOT NULL ORDER BY state_slug, city_slug, slug"
+        ).fetchall()
+
+    paths = ["/surgery-centers/", "/imaging/"]
+    paths.extend([f"/surgery-centers/{r['state_slug']}/" for r in asc_states])
+    paths.extend([f"/surgery-centers/{r['state_slug']}/{r['city_slug']}/" for r in asc_cities])
+    paths.extend([f"/surgery-centers/{r['state_slug']}/{r['city_slug']}/{r['slug']}/" for r in asc_facilities])
+    paths.extend([f"/imaging/{r['state_slug']}/" for r in img_states])
+    paths.extend([f"/imaging/{r['state_slug']}/{r['city_slug']}/" for r in img_cities])
+    paths.extend([f"/imaging/{r['state_slug']}/{r['city_slug']}/{r['slug']}/" for r in img_facilities])
+    return paths

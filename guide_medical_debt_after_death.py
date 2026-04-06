@@ -3,8 +3,8 @@
 from guides import register, _embed
 
 register("medical-debt-after-death", {
-    "title": "Medical Debt After Death: Who Pays and How to Protect Your Family",
-    "meta_description": "When someone dies with medical debt, the estate may owe but family members usually do not. Learn who is responsible, community property rules, and how to.",
+    "title": "Medical Debt After Death: Who Is Responsible? (2026)",
+    "meta_description": "When someone dies with medical debt, the estate may owe but family rarely does. Learn who is responsible, community property rules, and how to respond.",
     "published": "2026-02-26",
     "author": "BillKarma Team",
     "category": "Medical Debt",

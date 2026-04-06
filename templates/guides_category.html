@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} Guides | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_description }}">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+        {"@type": "ListItem", "position": 2, "name": "Guides", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},
+        {"@type": "ListItem", "position": 3, "name": "{{ category.name }}", "item": "{{ canonical_url }}"}
+    ]
+}
+</script>
+{% if category_meta and category_meta.faqs %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for faq in category_meta.faqs %}
+        {
+            "@type": "Question",
+            "name": {{ faq.question | tojson }},
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ faq.answer | tojson }}
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endif %}
+<style>
+    .guides-hero {
+        background-color: var(--bk-green);
+        border-radius: 0 0 40px 40px;
+        padding: 64px 24px 56px;
+        margin-bottom: 40px;
+    }
+    .guides-hero-inner { max-width: 900px; margin: 0 auto; }
+    .guides-hero .breadcrumb { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .guides-hero .breadcrumb a { color: rgba(255,255,255,0.85); text-decoration: underline; }
+    .guides-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; margin-bottom: 10px; }
+    .guides-hero .subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.8); font-weight: 500; }
+
+    .stat-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.2); border-radius: 100px;
+        padding: 6px 16px; font-size: 0.9rem; font-weight: 700;
+        color: #fff; margin-top: 14px;
+    }
+    .stat-badge-value { font-size: 1.05rem; }
+    .stat-badge-sep { opacity: 0.5; }
+
+    .guides-content { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+    .cat-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
+    .cat-pill {
+        font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+        padding: 6px 14px; border-radius: 100px; text-decoration: none;
+        border: 1.5px solid var(--bk-gray-border); color: var(--bk-secondary);
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .cat-pill:hover, .cat-pill.active { border-color: var(--bk-green); color: var(--bk-green); background: #E6F4EA; }
+
+    .section-label {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.06em; color: var(--bk-secondary); margin-bottom: 14px;
+    }
+
+    .featured-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px; margin-bottom: 40px;
+    }
+    .featured-card {
+        white-space: normal; border: 1px solid var(--bk-gray-border); border-radius: 20px;
+        overflow: hidden; text-decoration: none; color: var(--bk-black);
+        display: block; transition: transform 0.15s, box-shadow 0.15s;
+        background: #fff;
+    }
+    .featured-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.09); }
+    .featured-card-accent { height: 6px; background: var(--bk-green); }
+    .featured-card-body { padding: 20px 22px; }
+    .featured-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+    .featured-card p { font-size: 0.9rem; color: var(--bk-secondary); line-height: 1.5; }
+    .featured-card .read-link { font-size: 0.85rem; font-weight: 700; color: var(--bk-green); margin-top: 12px; display: block; }
+
+    .guide-card {
+        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 16px;
+        padding: 20px 24px; margin-bottom: 10px; text-decoration: none;
+        color: var(--bk-black); display: block;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .guide-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.07); }
+    .guide-card-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
+    .guide-card-date { font-size: 0.82rem; color: var(--bk-secondary); font-weight: 600; }
+    .guide-card h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .guide-card p { font-size: 0.92rem; color: var(--bk-secondary); font-weight: 500; line-height: 1.5; }
+
+    .guide-list-header {
+        font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;
+        margin-bottom: 16px; margin-top: 8px;
+    }
+
+    .faq-section { margin-top: 48px; }
+    .faq-section > h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+    .faq-item {
+        border: 1px solid var(--bk-gray-border); border-radius: 12px;
+        margin-bottom: 8px; overflow: hidden;
+    }
+    .faq-item summary {
+        padding: 16px 20px; font-weight: 700; cursor: pointer;
+        font-size: 0.97rem; list-style: none; display: flex;
+        justify-content: space-between; align-items: center;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: "+"; font-size: 1.2rem; color: var(--bk-green); }
+    .faq-item[open] summary::after { content: "−"; }
+    .faq-item p { padding: 0 20px 16px; color: var(--bk-secondary); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+
+    .related-cats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 48px; }
+    .related-cats-header { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 14px; }
+    .related-cat-pill {
+        font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+        padding: 9px 18px; border-radius: 100px; text-decoration: none;
+        border: 1.5px solid var(--bk-gray-border); color: var(--bk-secondary);
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .related-cat-pill:hover { border-color: var(--bk-green); color: var(--bk-green); background: #E6F4EA; }
+
+    @media (max-width: 768px) {
+        .guides-hero { padding: 40px 18px 36px; border-radius: 0 0 24px 24px; }
+        .guides-hero h1 { font-size: 1.8rem; }
+        .guides-content { padding: 0 18px 56px; }
+        .guide-card { padding: 16px 16px; }
+        .guide-card h2 { font-size: 1.05rem; }
+        .featured-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="guides-hero">
+    <div class="guides-hero-inner">
+        <div class="breadcrumb">
+            <a href="/">Home</a> &rsaquo; <a href="/guides/">Guides</a> &rsaquo; {{ category.name }}
+        </div>
+        <h1>{{ category_meta.icon if category_meta else "📚" }} {{ category.name }}</h1>
+        <p class="subtitle">
+            {% if category_meta %}
+                {{ category_meta.intro }}
+            {% else %}
+                {{ guides | length }} guide{{ 's' if guides | length != 1 }} on {{ category.name | lower }}.
+            {% endif %}
+        </p>
+        {% if category_meta and category_meta.stat %}
+        <div class="stat-badge">
+            <span class="stat-badge-value">{{ category_meta.stat.value }}</span>
+            <span class="stat-badge-sep">·</span>
+            <span>{{ category_meta.stat.label }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="guides-content">
+    <nav class="cat-nav" aria-label="Guide categories">
+        <a href="/guides/" class="cat-pill">All guides</a>
+        {% for cat in all_categories %}
+        <a href="/guides/category/{{ cat.slug }}/" class="cat-pill {% if cat.slug == category.slug %}active{% endif %}">
+            {{ cat.name }} <span style="opacity:0.6;font-weight:500;">({{ cat.count }})</span>
+        </a>
+        {% endfor %}
+    </nav>
+
+    {% set featured = guides[:3] %}
+    {% if featured %}
+    <section class="featured-section">
+        <div class="section-label">Featured Guides</div>
+        <div class="featured-grid">
+            {% for g in featured %}
+            <a href="/guides/{{ g.slug }}/" class="featured-card">
+                <div class="featured-card-accent"></div>
+                <div class="featured-card-body">
+                    <h3>{{ g.title }}</h3>
+                    <p>{{ g.meta_description }}</p>
+                    <span class="read-link">Read guide &rarr;</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if guides %}
+    <h2 class="guide-list-header">All {{ category.name }} Guides ({{ guides | length }})</h2>
+    <div class="guide-list">
+        {% for g in guides %}
+        <a href="/guides/{{ g.slug }}/" class="guide-card">
+            <div class="guide-card-meta">
+                {% if g.published %}
+                <span class="guide-card-date">{{ g.published }}</span>
+                {% endif %}
+            </div>
+            <h2>{{ g.title }}</h2>
+            <p>{{ g.meta_description }}</p>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if category_meta and category_meta.faqs %}
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        {% for faq in category_meta.faqs %}
+        <details class="faq-item">
+            <summary>{{ faq.question }}</summary>
+            <p>{{ faq.answer }}</p>
+        </details>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% set related = all_categories | selectattr("slug", "ne", category.slug) | list %}
+    {% if related %}
+    <div class="related-cats-header">More Guide Categories</div>
+    <div class="related-cats">
+        {% for cat in related %}
+        <a href="/guides/category/{{ cat.slug }}/" class="related-cat-pill">
+            {{ cat.name }} <span style="opacity:0.6;font-weight:500;">({{ cat.count }})</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

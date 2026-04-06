@@ -3,7 +3,7 @@
 from guides import register, _embed
 
 register("sued-for-medical-debt", {
-    "title": "Sued for Medical Debt? How to Respond and Defend Yourself in 2026",
+    "title": "Sued for Medical Debt? How to Defend Yourself in 2026",
     "meta_description": "Got a lawsuit summons for medical debt? Don't ignore it. Learn how to respond, raise defenses like expired SOL, and avoid a default judgment — step by step.",
     "published": "2026-02-24",
     "author": "BillKarma Team",

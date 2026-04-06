@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("out-of-network-medical-bills", {
     "title": "Out-of-Network Medical Bills: Your Rights",
-    "meta_description": "Out-of-network bills can cost 2-5x more than in-network. Learn your rights under the No Surprises Act, how insurance calculates OON reimbursement, and 7.",
+    "meta_description": "Out-of-network bills can cost 2-5x more. Learn your No Surprises Act rights, how insurance calculates OON reimbursement, and 7 ways to reduce your bill.",
     "published": "2026-02-28",
     "author": "BillKarma Team",
     "category": "Insurance Basics",

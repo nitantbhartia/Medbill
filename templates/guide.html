@@ -8,6 +8,11 @@
 <meta property="og:title" content="{{ og_title }}">
 <meta property="og:description" content="{{ og_description }}">
 <meta property="og:type" content="article">
+<meta property="og:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/og/{{ guide.slug }}.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/og/{{ guide.slug }}.svg">
 <meta name="robots" content="{{ meta_robots }}">
 {% if guide.published %}
 <meta property="article:published_time" content="{{ guide.published }}">
@@ -18,16 +23,32 @@
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     "headline": "{{ guide.title }}",
     "description": "{{ meta_description }}",
     "datePublished": "{{ guide.published }}",
     "dateModified": "{{ guide.reviewed_on or guide.published }}",
     "mainEntityOfPage": "{{ canonical_url }}",
     "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
-    "publisher": {"@type": "Organization", "name": "BillKarma"}
+    "publisher": {"@type": "Organization", "name": "BillKarma", "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
+    "wordCount": {{ reading_time * 250 }}
 }
 </script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+        {"@type": "ListItem", "position": 2, "name": "Guides", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},
+        {% if guide.category %} {"@type": "ListItem", "position": 3, "name": "{{ guide.category }}", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},{% endif %}
+        {"@type": "ListItem", "position": {% if guide.category %}4{% else %}3{% endif %}, "name": "{{ guide.title }}", "item": "{{ canonical_url }}"}
+    ]
+}
+</script>
+{% if howto_schema %}
+<script type="application/ld+json">{{ howto_schema | safe }}</script>
+{% endif %}
 {% if guide.faqs %}
 <script type="application/ld+json">
 {
@@ -75,6 +96,11 @@
         background: rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 100px;
     }
     .meta-date { font-size: 0.88rem; color: rgba(255,255,255,0.8); font-weight: 600; }
+    .meta-reviewed {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 0.82rem; color: rgba(255,255,255,0.75); font-weight: 500;
+    }
+    .meta-reviewed svg { flex-shrink: 0; }
 
     .article-hero h1 {
         font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
@@ -153,6 +179,15 @@
     }
     .article-body .key-takeaway strong { font-weight: 800; }
 
+    .eeat-bar {
+        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 14px;
+        padding: 16px 20px; margin-bottom: 32px;
+        display: flex; align-items: flex-start; gap: 14px;
+        font-size: 0.88rem; line-height: 1.5; color: #4B5563;
+    }
+    .eeat-bar-icon { flex-shrink: 0; margin-top: 2px; }
+    .eeat-bar strong { color: #1A1A1A; display: block; margin-bottom: 2px; }
+
     .article-body .faq-section { margin-top: 48px; }
     .article-body .faq-item {
         background: #fff; border-radius: 14px; padding: 22px 26px;
@@ -208,6 +243,25 @@
     }
     .article-cta a:hover { background: #f0f0f0; }
 
+    .answer-box {
+        background: #F0FDF4;
+        border-left: 4px solid #059669;
+        border-radius: 0 12px 12px 0;
+        padding: 16px 20px;
+        margin: 0 0 28px 0;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    .answer-box strong {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #059669;
+        margin-bottom: 6px;
+    }
+
     @media (max-width: 768px) {
         .article-hero { padding: 40px 18px 36px; border-radius: 0 0 24px 24px; }
         .article-hero h1 { font-size: 1.8rem; }
@@ -231,15 +285,44 @@
             {% if guide.reviewed_on %}
             <span class="meta-date">Reviewed {{ guide.reviewed_on }}</span>
             {% endif %}
+            {% if reading_time %}
+            <span class="meta-date">{{ reading_time }} min read</span>
+            {% endif %}
+            <span class="meta-reviewed">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="rgba(255,255,255,0.7)"/><path d="M4 7l2 2 4-4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Reviewed by BillKarma Team
+            </span>
         </div>
         <h1>{{ guide.title }}</h1>
     </div>
 </div>
 
 <article class="article-container">
+    <div class="eeat-bar">
+        <svg class="eeat-bar-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.5" stroke="#059669"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+            <strong>Fact-checked &amp; reviewed by the BillKarma Team</strong>
+            BillKarma researchers verify every guide against federal Medicare data, state law, and hospital chargemaster records. We update guides when laws change.
+            {% if guide.reviewed_on %}<span style="margin-left:6px;color:#6B7280;">Last reviewed {{ guide.reviewed_on }}.</span>{% endif %}
+        </div>
+    </div>
     <div class="article-body">
         {{ guide.body | safe }}
     </div>
+
+    {% if related_guides %}
+    <div class="mt-10 pt-8 border-t border-gray-200">
+        <h2 style="font-size:1.15rem;font-weight:800;margin-bottom:16px;">Related Guides</h2>
+        <div style="display:grid;gap:12px;">
+            {% for rg in related_guides %}
+            <a href="/guides/{{ rg.slug }}/" style="display:block;padding:16px;border-radius:14px;border:1px solid #E5E7EB;text-decoration:none;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.background='#E6F4EA'" onmouseout="this.style.borderColor='#E5E7EB';this.style.background='transparent'">
+                <div style="font-weight:600;color:#1A1A1A;">{{ rg.title }}</div>
+                <div style="font-size:0.82rem;color:#6B7280;margin-top:4px;">{{ rg.category }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     {% if not guide.hide_default_cta %}
     <div class="article-cta">

@@ -7,7 +7,7 @@ register("workers-compensation-medical-billing", {
     "meta_description": "Workers' compensation should cover 100% of your medical bills from a work injury. But billing disputes, denied claims, and provider confusion are common.",
     "published": "2026-02-23",
     "author": "BillKarma Team",
-    "category": "Workers' Comp",
+    "category": "Patient Rights",
     "faqs": [
         {
             "q": "Do I pay anything for workers comp medical bills?",
