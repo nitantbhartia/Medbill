@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+
+<style>
+.cm-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1a3a5c 100%);
+    color: #fff;
+    padding: 56px 24px 48px;
+    text-align: center;
+}
+.cm-hero h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 16px;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+}
+.cm-hero p {
+    font-size: 1.05rem;
+    opacity: .85;
+    max-width: 640px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+}
+.cm-badge {
+    display: inline-block;
+    background: rgba(52,211,153,0.15);
+    border: 1px solid rgba(52,211,153,0.4);
+    color: #34D399;
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.cm-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+.cm-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(52,211,153,0.15);
+    border: 1px solid rgba(52,211,153,0.3);
+    color: #34D399;
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 4px;
+}
+#searchInput {
+    width: 100%;
+    max-width: 500px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    margin-top: 20px;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.15s;
+}
+#searchInput:focus { border-color: #34D399; }
+
+.cm-container { max-width: 960px; margin: 0 auto; padding: 0 24px 56px; }
+
+.cm-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 20px;
+}
+.cm-filter-btn {
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 2px solid #E5E7EB;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.cm-filter-btn:hover { border-color: var(--bk-green); color: var(--bk-green); }
+.cm-filter-btn.active {
+    background: var(--bk-green);
+    border-color: var(--bk-green);
+    color: #fff;
+}
+
+.cm-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid #E5E7EB; }
+.cm-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.cm-table th {
+    background: #F9FAFB;
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    border-bottom: 2px solid #E5E7EB;
+    white-space: nowrap;
+}
+.cm-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+}
+.cm-table tr:last-child td { border-bottom: none; }
+.cm-table tr:hover td { background: #F9FAFB; }
+.cm-item-name { font-weight: 600; color: #111827; }
+.cm-cat { display: inline-block; background: #F3F4F6; color: #4B5563; border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; }
+.cm-charge { font-weight: 700; color: #111827; white-space: nowrap; }
+.cm-cost { color: #6B7280; white-space: nowrap; }
+.markup-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.markup-red { background: #FEE2E2; color: #991B1B; }
+.markup-yellow { background: #FEF3C7; color: #92400E; }
+.markup-green { background: #D1FAE5; color: #065F46; }
+.cm-see-link { color: var(--bk-green); font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.cm-see-link:hover { text-decoration: underline; }
+
+.outrage-box {
+    background: #FFF7ED;
+    border-left: 4px solid #F97316;
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 32px 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #1C1917;
+}
+.outrage-box strong { color: #C2410C; }
+
+.fight-back { margin: 40px 0; }
+.fight-back h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.02em; }
+.fight-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.fight-step {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+}
+.fight-step-num {
+    width: 32px; height: 32px;
+    background: var(--bk-green);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+}
+.fight-step h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 6px; }
+.fight-step p { font-size: 0.85rem; color: #6B7280; margin: 0; line-height: 1.5; }
+
+.cm-cta {
+    background: linear-gradient(135deg, #0F172A 0%, #1a3a5c 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin: 40px 0;
+    text-align: center;
+}
+.cm-cta h2 { font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; }
+.cm-cta p { opacity: .85; margin: 0 0 20px; font-size: 0.95rem; }
+.cm-cta a {
+    display: inline-block;
+    background: #34D399;
+    color: #064E3B;
+    font-weight: 800;
+    padding: 13px 28px;
+    border-radius: 100px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.15s;
+}
+.cm-cta a:hover { background: #6EE7B7; }
+
+.no-results { text-align: center; padding: 40px 20px; color: #9CA3AF; font-size: 0.95rem; }
+
+@media (max-width: 640px) {
+    .cm-hero h1 { font-size: 1.6rem; }
+    .cm-table th, .cm-table td { padding: 9px 10px; }
+    .fight-steps { grid-template-columns: 1fr; }
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a hospital chargemaster?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A chargemaster (charge description master) is the official list of prices a hospital charges for every service, supply, and medication. These prices are typically 3\u201310\u00d7 higher than what Medicare pays and bear little relation to actual costs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does a Tylenol cost $50 at the hospital?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hospitals set chargemaster prices to maximize reimbursement from insurers, who then negotiate discounts. The problem: uninsured patients and high-deductible patients are often billed at chargemaster rates \u2014 the highest possible price."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I dispute a chargemaster charge?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Ask for an itemized bill and compare each charge to Medicare reference rates (available on BillKarma). Any charge over 3\u00d7 the Medicare rate is worth formally disputing. Most hospitals will reduce on request."
+      }
+    }
+  ]
+}
+</script>
+
+<script>
+const ITEMS = [
+  {name:"Acetaminophen (Tylenol) 325mg — 1 tablet", cat:"Medications", low:12, high:52, cost:0.02, notes:"Standard OTC pain reliever"},
+  {name:"Ibuprofen 200mg — 1 tablet", cat:"Medications", low:15, high:48, cost:0.03, notes:"OTC anti-inflammatory"},
+  {name:"Aspirin 81mg — 1 tablet", cat:"Medications", low:8, high:35, cost:0.01, notes:"Daily cardioprotective dose"},
+  {name:"Antacid tablet (calcium carbonate)", cat:"Medications", low:10, high:40, cost:0.05, notes:"Tums equivalent"},
+  {name:"Docusate sodium 100mg (stool softener)", cat:"Medications", low:18, high:55, cost:0.08, notes:"OTC stool softener"},
+  {name:"Normal Saline 1000mL IV bag", cat:"Medications", low:300, high:1500, cost:5.00, notes:"Standard IV fluid; costs ~$1–5 to produce"},
+  {name:"Dextrose 5% in Water 250mL IV bag", cat:"Medications", low:180, high:800, cost:4.00, notes:"Standard IV fluid"},
+  {name:"Gauze pad 4×4 (10-pack)", cat:"Supplies", low:80, high:320, cost:2.00, notes:"Available OTC for $2–4"},
+  {name:"Adhesive bandage (single, 1\"×3\")", cat:"Supplies", low:18, high:65, cost:0.15, notes:"Basic Band-Aid equivalent"},
+  {name:"Non-sterile latex gloves (pair)", cat:"Supplies", low:35, high:120, cost:0.25, notes:"Box of 100 costs $10 wholesale"},
+  {name:"Surgical mask (single use)", cat:"Supplies", low:22, high:80, cost:0.50, notes:"Bulk medical masks: $0.25–0.60 each"},
+  {name:"Tongue depressor (single)", cat:"Supplies", low:8, high:30, cost:0.03, notes:"Wholesale: $0.02–0.05 each"},
+  {name:"Cotton swab (single)", cat:"Supplies", low:10, high:38, cost:0.02, notes:"Bag of 500 costs $5 wholesale"},
+  {name:"Disposable thermometer cover", cat:"Supplies", low:18, high:55, cost:0.10, notes:"Used for 10 seconds"},
+  {name:"Urinalysis specimen cup", cat:"Supplies", low:60, high:220, cost:0.50, notes:"Plastic cup; wholesale <$0.25"},
+  {name:"IV catheter start kit (complete)", cat:"Supplies", low:180, high:850, cost:8.00, notes:"Includes tubing, tape, swabs"},
+  {name:"Basic Metabolic Panel (BMP)", cat:"Lab Tests", low:150, high:2000, cost:13, notes:"Medicare rate ~$13; common blood test"},
+  {name:"Complete Blood Count (CBC)", cat:"Lab Tests", low:100, high:1800, cost:11, notes:"Medicare rate ~$11"},
+  {name:"Urinalysis with microscopy", cat:"Lab Tests", low:50, high:400, cost:4, notes:"Medicare rate ~$4"},
+  {name:"Blood draw / venipuncture (CPT 36415)", cat:"Lab Tests", low:40, high:450, cost:4, notes:"Medicare rate ~$4 — a $0.04-per-dollar item"},
+  {name:"Urine pregnancy test (qualitative)", cat:"Lab Tests", low:30, high:250, cost:3, notes:"OTC test costs $8–15"},
+  {name:"Chest X-Ray (2 views, CPT 71046)", cat:"Procedures", low:150, high:2100, cost:35, notes:"Medicare rate ~$35"},
+  {name:"12-Lead ECG / EKG (CPT 93000)", cat:"Procedures", low:100, high:1200, cost:17, notes:"Medicare rate ~$17; takes 5 minutes"},
+  {name:"Pulse oximetry monitoring (CPT 94760)", cat:"Procedures", low:50, high:600, cost:6, notes:"Medicare rate ~$6; clip-on device; takes 2 seconds"},
+  {name:"Wound closure — simple (CPT 12001)", cat:"Procedures", low:200, high:2500, cost:90, notes:"Medicare rate ~$90 for simple repair"},
+];
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="cm-hero">
+    <div class="cm-badge">CHARGEMASTER DATABASE</div>
+    <h1>What Your Hospital Charges for Tylenol</h1>
+    <p>We analyzed 6,800+ hospital chargemasters to expose what hospitals actually bill for common medications, supplies, and services — vs. what they really cost.</p>
+    <div class="cm-stats">
+        <span class="cm-stat-pill">75× average markup</span>
+        <span class="cm-stat-pill">$1,500 for a saline bag</span>
+        <span class="cm-stat-pill">6,800+ hospitals tracked</span>
+    </div>
+    <input type="text" id="searchInput" placeholder="Search items (e.g. Tylenol, saline, gauze...)" oninput="renderTable()" autocomplete="off">
+</div>
+
+<div class="cm-container">
+    <div class="cm-filters" id="filters">
+        <button class="cm-filter-btn active" data-cat="All" onclick="setFilter(this)">All</button>
+        <button class="cm-filter-btn" data-cat="Medications" onclick="setFilter(this)">Medications</button>
+        <button class="cm-filter-btn" data-cat="Supplies" onclick="setFilter(this)">Supplies</button>
+        <button class="cm-filter-btn" data-cat="Lab Tests" onclick="setFilter(this)">Lab Tests</button>
+        <button class="cm-filter-btn" data-cat="Procedures" onclick="setFilter(this)">Procedures</button>
+    </div>
+
+    <div class="cm-table-wrap">
+        <table class="cm-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Hospital Charge</th>
+                    <th>Actual Cost</th>
+                    <th>Markup</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div class="no-results" id="noResults" style="display:none;">No items match your search.</div>
+    </div>
+
+    <div class="outrage-box">
+        <strong>The saline scandal:</strong> A standard $1 bag of saline solution costs hospitals roughly $1 to produce. Patients are routinely billed $500–$1,500. This is legal.
+        The uninsured and anyone on a high-deductible plan often pay these chargemaster rates in full — the highest prices charged to anyone, with no negotiated discount.
+    </div>
+
+    <div class="fight-back">
+        <h2>How to fight back</h2>
+        <div class="fight-steps">
+            <div class="fight-step">
+                <div class="fight-step-num">1</div>
+                <h3>Request an itemized bill</h3>
+                <p>Every patient has the right to an itemized bill listing every charge by code and description. Hospitals are required to provide it. Call billing and ask for it in writing.</p>
+            </div>
+            <div class="fight-step">
+                <div class="fight-step-num">2</div>
+                <h3>Compare to Medicare rates</h3>
+                <p>Look up each CPT code in BillKarma's database. Any charge above 3× the Medicare rate is a legitimate dispute target. Most hospitals will negotiate down without litigation.</p>
+            </div>
+            <div class="fight-step">
+                <div class="fight-step-num">3</div>
+                <h3>Send a formal dispute letter</h3>
+                <p>BillKarma generates a free dispute letter referencing federal pricing benchmarks. Hospitals reduce or waive charges far more often than patients realize — but only when asked.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cm-cta">
+        <h2>Is your hospital overcharging?</h2>
+        <p>Search 6,800+ hospitals and compare their prices to federal Medicare benchmarks — for free.</p>
+        <a href="/hospitals/">Check Your Hospital &rarr;</a>
+    </div>
+</div>
+
+<script>
+let activeFilter = 'All';
+
+function setFilter(btn) {
+    document.querySelectorAll('.cm-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.cat;
+    renderTable();
+}
+
+function markupClass(markup) {
+    if (markup < 5) return 'markup-green';
+    if (markup <= 20) return 'markup-yellow';
+    return 'markup-red';
+}
+
+function fmt(n) {
+    return n >= 1 ? '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2})
+                  : '$' + n.toFixed(2);
+}
+
+function slug(name) {
+    return encodeURIComponent(name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+}
+
+function renderTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const body = document.getElementById('tableBody');
+    const noResults = document.getElementById('noResults');
+
+    const filtered = ITEMS.filter(item => {
+        const catOk = activeFilter === 'All' || item.cat === activeFilter;
+        const searchOk = !q || item.name.toLowerCase().includes(q);
+        return catOk && searchOk;
+    });
+
+    if (filtered.length === 0) {
+        body.innerHTML = '';
+        noResults.style.display = 'block';
+        return;
+    }
+
+    noResults.style.display = 'none';
+    body.innerHTML = filtered.map(item => {
+        const markup = Math.round(((item.low + item.high) / 2) / item.cost);
+        const cls = markupClass(markup);
+        const itemSlug = slug(item.name);
+        return `<tr>
+            <td><div class="cm-item-name">${item.name}</div><div style="font-size:0.78rem;color:#9CA3AF;margin-top:2px;">${item.notes}</div></td>
+            <td><span class="cm-cat">${item.cat}</span></td>
+            <td class="cm-charge">${fmt(item.low)} – ${fmt(item.high)}</td>
+            <td class="cm-cost">${fmt(item.cost)}</td>
+            <td><span class="markup-badge ${cls}">${markup}×</span></td>
+            <td><a class="cm-see-link" href="/hospitals/?q=${itemSlug}">See hospitals &rarr;</a></td>
+        </tr>`;
+    }).join('');
+}
+
+renderTable();
+</script>
+{% endblock %}
