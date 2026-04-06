@@ -346,6 +346,13 @@
     .methodology-box dl { grid-template-columns: 1fr; }
     .methodology-box dt { margin-top: 0.75rem; }
   }
+@media print {
+  nav, header, footer, .hero-cta, .report-cta { display: none !important; }
+  body { background: #fff !important; }
+  .report-hero { background: #064E3B !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .report-section { page-break-inside: avoid; }
+  canvas { max-width: 100% !important; }
+}
 </style>
 {% endblock %}
 
@@ -375,7 +382,7 @@
     </div>
   </div>
 
-  <a href="#methodology" class="hero-cta">Download Full Report (PDF)</a>
+  <button onclick="window.print()" class="hero-cta">Download Full Report (PDF)</button>
 </section>
 
 <!-- Main content -->
