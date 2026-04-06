@@ -508,3 +508,5 @@ import guide_allergy_testing_cost
 import guide_car_accident_medical_bills
 import guide_genetic_testing_cost
 import guide_aca_marketplace_subsidies
+# Batch 17: insurance basics, cost guides, preventive care, specialty
+import guide_deductible_explained
