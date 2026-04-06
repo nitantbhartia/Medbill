@@ -510,3 +510,19 @@ import guide_genetic_testing_cost
 import guide_aca_marketplace_subsidies
 # Batch 17: insurance basics, cost guides, preventive care, specialty
 import guide_deductible_explained
+import guide_out_of_pocket_maximum
+import guide_hmo_ppo_plan_types
+import guide_eob_explained
+import guide_coinsurance_explained
+import guide_ambulance_bill
+import guide_prescription_drug_cost
+import guide_diabetes_management_cost
+import guide_preventive_care_free
+import guide_hpv_vaccine_cost
+import guide_asthma_treatment_cost
+import guide_critical_illness_insurance
+import guide_medical_records_request
+import guide_stroke_treatment_cost
+import guide_fertility_preservation_cost
+import guide_hospital_indemnity_insurance
+import guide_second_opinion_billing
