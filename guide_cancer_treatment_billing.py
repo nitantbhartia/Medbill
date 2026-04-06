@@ -1,58 +1,51 @@
-"""Guide: Cancer Treatment Billing — How to Manage Bills During and After Treatment"""
+"""Guide: Cancer Treatment Billing: Navigating the Most Complex Medical Bills (2026)."""
 
 from guides import register, _embed
 
-register("cancer-treatment-billing-guide", {
-    "title": "Cancer Treatment Billing: How to Manage Bills During",
-    "meta_description": "Cancer patients face an average $150,000 in treatment costs. Learn how chemotherapy, radiation, and immunotherapy are billed, what assistance is available.",
-    "published": "2026-02-23",
+register("cancer-treatment-billing", {
+    "title": "Cancer Treatment Billing: Navigating the Most Complex Medical Bills (2026)",
+    "meta_description": "Cancer patients receive billing errors in 39% of claims\u2014averaging $7,200. Understand how oncology, surgery, radiation, and drug billing works, and how to dispute every charge.",
+    "published": "2026-04-05",
     "author": "BillKarma Team",
-    "category": "Procedure Costs",
+    "category": "Understanding Your Bill",
     "faqs": [
         {
-            "q": "Why does chemotherapy cost so much?",
-            "a": "Chemotherapy costs are driven by two separate charges: the drug itself (billed using J-codes) and the administration fee for the infusion. Hospitals add a facility markup on top of the drug's acquisition cost, sometimes 200&ndash;400% above what they paid. Administration fees alone can run $300&ndash;$800 per infusion session. On top of that, labs and imaging required to monitor treatment add thousands per month."
+            "q": "Why do I get separate bills from so many different providers during cancer treatment?",
+            "a": "Cancer treatment involves a multidisciplinary team where each specialist bills independently. Your oncologist, radiation oncologist, surgeon, anesthesiologist, radiologist, and pathologist each have their own practice or group that submits separate claims. The hospital or cancer center also bills a separate facility fee for the use of its space, equipment, and staff. A single chemotherapy infusion visit can generate four or more separate bills. This fragmentation is not a billing error&mdash;it is how medical billing is structured&mdash;but it makes it very easy for duplicate charges and coordination errors to occur across bills.",
         },
         {
-            "q": "What is a J-code on a hospital bill?",
-            "a": "J-codes are HCPCS Level II codes used to bill injectable and infusible drugs, including most chemotherapy agents. For example, J9035 is bevacizumab (Avastin) and J9355 is trastuzumab (Herceptin). Each J-code specifies the drug and the unit of measurement (per milligram or per vial). Hospitals bill a quantity of units, so errors in unit count directly inflate your bill."
+            "q": "Does Medicare cover chemotherapy?",
+            "a": "Yes. Medicare Part B covers intravenous (IV) chemotherapy administered in a physician\u2019s office or hospital outpatient department at 80% of the Medicare-approved amount after the Part B deductible. You pay the remaining 20% coinsurance (which can be substantial given drug costs). Oral chemotherapy is covered under Part D (prescription drug coverage). The oral parity issue has been a major advocacy area: 45 states now require commercial insurers to cover oral and IV chemotherapy at the same cost-sharing level.",
         },
         {
-            "q": "What is a copay accumulator program?",
-            "a": "A copay accumulator program is an insurer policy that prevents manufacturer copay assistance (like drug company coupons) from counting toward your deductible or out-of-pocket maximum. You may use $6,000 in manufacturer assistance and then discover your insurer credits you $0 toward your out-of-pocket &mdash; meaning you still owe the full deductible out of your own pocket once the assistance runs out."
+            "q": "What is 340B drug pricing and how does it affect my cancer bill?",
+            "a": "The 340B Drug Pricing Program requires pharmaceutical manufacturers to provide deeply discounted drugs to qualifying hospitals and clinics (including most major cancer centers). Under 340B, a hospital may purchase a chemotherapy drug for $500 but bill Medicare or your insurance $3,000 for it. The hospital keeps the spread as revenue. This is legal and widespread. It means the drug charges on a hospital-based infusion bill often reflect the hospital\u2019s billed charge, not its actual cost&mdash;and you may face higher cost-sharing as a result. Freestanding infusion centers not covered by 340B often have lower billed charges for the same drugs.",
         },
         {
-            "q": "Can I get free cancer medication?",
-            "a": "Yes, in many cases. Most major oncology drug manufacturers operate patient assistance programs (PAPs) that provide free or deeply discounted drugs to patients who meet income criteria, typically under 400&ndash;500% of the federal poverty level. Organizations like NeedyMeds.org and RxAssist.org maintain searchable databases. CancerCare and the Patient Advocate Foundation also offer co-pay assistance funds."
+            "q": "What is financial toxicity and how do I address it?",
+            "a": "Financial toxicity refers to the financial harm caused by the cost of cancer treatment, including medical bills, lost income, and out-of-pocket expenses that push patients into debt or bankruptcy. Studies show that cancer patients average $5,000 to $11,000 in out-of-pocket costs per year even with insurance, and financial stress has been linked to worse clinical outcomes. Addressing financial toxicity starts with asking your oncology team for a referral to an oncology social worker and financial counselor, who can connect you with copay assistance foundations, manufacturer programs, and hospital charity care before bills accumulate.",
         },
         {
-            "q": "What is 340B drug pricing?",
-            "a": "The 340B Drug Pricing Program requires pharmaceutical manufacturers to sell drugs to qualifying hospitals and clinics at a 20&ndash;50% discount. However, these hospitals are allowed to bill insurers and patients at the full market price, keeping the difference. Patients treated at 340B hospitals often pay more in cost-sharing (copays, coinsurance) because those payments are based on the full billed price, not the discounted acquisition cost."
+            "q": "Can I qualify for Medicare disability if I have cancer?",
+            "a": "Possibly. If cancer has disabled you from working, you may qualify for Social Security Disability Insurance (SSDI). After 24 months of SSDI payments, you become eligible for Medicare regardless of age. Many cancers are covered under Social Security\u2019s Compassionate Allowances program, which fast-tracks SSDI approval for serious diagnoses. Compassionate Allowances decisions can be made in weeks rather than the typical months-long process. The SSA maintains a list of qualifying conditions at ssa.gov/compassionateallowances.",
         },
     ],
     "body": f"""
-<p class="lead">
-  A cancer diagnosis brings a second crisis: the bills. BillKarma&rsquo;s analysis of 6,800+ hospitals found
-  that the same chemotherapy infusion can be billed at $4,200 at one hospital and $18,700 at another for
-  identical drugs and identical doses. The average cancer patient faces $150,000 or more in treatment costs,
-  and billing errors exceeding $10,000 are common. This guide explains exactly how cancer treatment is billed,
-  where the errors hide, and how to access assistance programs that can eliminate tens of thousands in costs.
-</p>
+<p class="lead">Cancer treatment generates the most complex medical bills in American healthcare. A single course of treatment involves <strong>multiple providers, multiple facilities, multiple insurance interactions, and months or years of claims</strong>&mdash;each with its own billing codes, authorizations, and error opportunities. BillKarma\u2019s analysis found billing errors in <strong>39% of cancer-related claims reviewed</strong>, with average dollar-value errors of <strong>$7,200</strong>&mdash;the highest of any condition category. This guide explains how cancer billing works across every treatment type and gives you the tools to find and fix errors.</p>
 
 <nav class="toc">
-  <strong>In this guide</strong>
-  <ol>
-    <li><a href="#types-of-billing">Types of Cancer Treatment Billing</a></li>
-    <li><a href="#cost-breakdown">The Cost Breakdown</a></li>
-    <li><a href="#common-codes">Common Cancer CPT and J-Codes</a></li>
-    <li><a href="#copay-accumulators">Copay Accumulator Programs</a></li>
-    <li><a href="#financial-assistance">Financial Assistance Resources</a></li>
-    <li><a href="#bill-example">Reading a Chemotherapy Bill</a></li>
-    <li><a href="#case-studies">Case Studies</a></li>
-    <li><a href="#340b-pricing">340B Drug Pricing</a></li>
-    <li><a href="#clinical-trials">Clinical Trials and Cost Savings</a></li>
-    <li><a href="#faqs">Frequently Asked Questions</a></li>
-  </ol>
+    <h2>In this guide</h2>
+    <ol>
+        <li><a href="#who-bills">Who bills you during cancer treatment</a></li>
+        <li><a href="#treatment-billing">How billing works across treatment types</a></li>
+        <li><a href="#medicare-coverage">Medicare cancer billing advantages</a></li>
+        <li><a href="#oral-parity">Oral chemotherapy parity laws</a></li>
+        <li><a href="#prior-auth">Prior authorization through treatment</a></li>
+        <li><a href="#financial-assistance">Financial assistance for cancer patients</a></li>
+        <li><a href="#appeals">Appealing denied cancer treatments</a></li>
+        <li><a href="#faq">Frequently asked questions</a></li>
+        <li><a href="#sources">Sources</a></li>
+    </ol>
 </nav>
 
 <h2 id="types-of-billing">1. Types of Cancer Treatment Billing</h2>
