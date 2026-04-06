@@ -506,3 +506,4 @@ import guide_acne_treatment_cost
 import guide_eating_disorder_treatment_cost
 import guide_allergy_testing_cost
 import guide_car_accident_medical_bills
+import guide_genetic_testing_cost
