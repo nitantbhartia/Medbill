@@ -487,3 +487,5 @@ import guide_echocardiogram_cost
 import guide_anesthesia_billing
 import guide_kidney_stone_treatment_cost
 import guide_cgm_cost
+# Batch 17: baby cost, Ozempic, health insurance, car accident, ACA subsidies, Botox, telehealth, rhinoplasty, allergy, genetic testing, psych, home health, pain mgmt, acne, eating disorders, liposuction, workers comp, LTC, emergency dental, hair loss
+import guide_botox_insurance_coverage
