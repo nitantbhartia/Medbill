@@ -304,6 +304,10 @@ register("what-is-coinsurance", {
     </div>
 </div>
 
+<div class="key-takeaway">
+    <strong>Paying coinsurance on a bill that seems too high?</strong> Billing errors can inflate the allowed amount you&rsquo;re paying a percentage of &mdash; meaning you overpay coinsurance on a charge that shouldn&rsquo;t exist. <a href="/fight-debt">BillKarma can audit your bill and help you recover overpayments.</a>
+</div>
+
 <h2 id="sources">Sources</h2>
 
 <ul class="sources-list">

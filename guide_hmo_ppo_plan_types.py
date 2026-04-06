@@ -157,6 +157,34 @@ register("hmo-ppo-epo-hdhp-plan-types", {
 
 <p>The key benefit: HDHPs pair with a <strong>Health Savings Account (HSA)</strong>. HSA contributions are pre-tax, grow tax-free, and are withdrawn tax-free for qualified medical expenses. For a person in the 22% federal tax bracket, the tax benefit alone on a $4,300 HSA contribution saves $946 per year.</p>
 
+<div class="bill-example">
+    <div class="bill-header">HDHP vs. PPO &mdash; Annual Cost Comparison (Individual, Moderate Health Use)</div>
+    <div class="line-item">
+        <span>PPO: monthly premium &times; 12</span>
+        <span>$4,200.00</span>
+    </div>
+    <div class="line-item">
+        <span>PPO: deductible hit ($1,500) + coinsurance ($400)</span>
+        <span>$1,900.00</span>
+    </div>
+    <div class="line-total">
+        <span>PPO TOTAL ANNUAL COST</span>
+        <span>$6,100.00</span>
+    </div>
+    <div class="line-item">
+        <span>HDHP: monthly premium &times; 12</span>
+        <span>$2,100.00</span>
+    </div>
+    <div class="line-item">
+        <span>HDHP: deductible hit ($3,000) + coinsurance ($200)</span>
+        <span>$3,200.00</span>
+    </div>
+    <div class="line-total">
+        <span>HDHP TOTAL ANNUAL COST</span>
+        <span>$5,300.00</span>
+    </div>
+</div>
+
 <p><strong>HDHP + HSA math example:</strong> A standard PPO costs $350/month with a $1,500 deductible. An HDHP costs $175/month with a $3,000 deductible. Monthly premium savings: $175 &times; 12 = $2,100/year. Deductible gap: $1,500. Even if you hit the full deductible difference, you come out $600 ahead &mdash; and if you stay healthy and don&rsquo;t hit the higher deductible, you save more.</p>
 
 <p><strong>HDHP is a good fit if:</strong> You are generally healthy and rarely use medical care, you want to build long-term tax-advantaged savings for future medical costs, or you are willing to pay more upfront when you do need care in exchange for lower monthly costs.</p>
@@ -226,6 +254,10 @@ register("hmo-ppo-epo-hdhp-plan-types", {
         <h3>What happens if I go out-of-network on an EPO plan?</h3>
         <p>Out-of-network non-emergency care is not covered. You pay 100% of the bill. The No Surprises Act protects you from balance billing in genuine emergencies, but it does not extend EPO coverage to elective out-of-network care.</p>
     </div>
+</div>
+
+<div class="key-takeaway">
+    <strong>Already dealing with an unexpected out-of-network bill?</strong> If you received a surprise charge from a provider who should have been covered in-network &mdash; or a balance bill you believe violates the No Surprises Act &mdash; <a href="/fight-debt">BillKarma can help you dispute it.</a>
 </div>
 
 <h2 id="sources">Sources</h2>
