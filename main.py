@@ -712,7 +712,12 @@ def _extract_howto_schema(guide: dict) -> str | None:
     return json.dumps(schema)
 
 
-@app.get("/guides/{slug}", response_class=HTMLResponse)
+@app.get("/guides/{slug}", response_class=RedirectResponse)
+async def guide_page_redirect(slug: str):
+    """Redirect no-slash guide URLs to canonical trailing-slash version."""
+    return RedirectResponse(url=f"/guides/{slug}/", status_code=301)
+
+
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
@@ -1004,6 +1009,9 @@ async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
         f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
         f"Compare prices from {len(hospitals)} nearby hospitals. Find fair prices with BillKarma."
     )
+    # Noindex pages with no real data — prevents thin-content crawl-not-indexed penalty
+    has_data = bool(hospitals or avg_charge)
+    meta_robots = "index, follow" if has_data else "noindex, follow"
     return templates.TemplateResponse(
         "procedure_city.html",
         {
@@ -1015,6 +1023,7 @@ async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
             "canonical_url": canonical_url,
             "og_title": f"{proc['name']} Cost in {city['name']}, {city['state']} | BillKarma",
             "meta_description": meta_description,
+            "meta_robots": meta_robots,
             "nearby_procedures": nearby_procedures,
             "nearby_cities": nearby_cities,
         },
@@ -1896,10 +1905,13 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
             "error.html",
             {"request": request, "message": "One or both hospitals not found."},
         )
+    # Redirect to canonical slug-based URL so Google only indexes one version
     if data["a"].get("slug") and data["b"].get("slug"):
-        canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{data['a']['slug']}-vs-{data['b']['slug']}/"
-    else:
-        canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
+        return RedirectResponse(
+            url=f"/compare/{data['a']['slug']}-vs-{data['b']['slug']}/",
+            status_code=301,
+        )
+    canonical_url = f"{config.APP_URL.rstrip('/')}/compare/{fid_a}/vs/{fid_b}/"
     seo = data.get("seo") or build_comparison_seo(
         data["a"],
         data["b"],
