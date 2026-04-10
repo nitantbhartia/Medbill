@@ -676,38 +676,45 @@ async def calculator_embed(
 
 
 def _extract_howto_schema(guide: dict) -> str | None:
-    import re, json
-    slug = guide.get("slug", "")
+    """Build HowTo JSON-LD for any guide with a numbered step sequence (3+ steps)."""
+    import re, json, html as html_mod
     title = guide.get("title", "")
-    if "how-to" not in slug and not title.lower().startswith("how to"):
-        return None
     body = guide.get("body", "")
-    ol_match = re.search(r'<ol[^>]*>(.*?)</ol>', body, re.DOTALL)
-    if not ol_match:
+
+    # Find the largest <ol> block — prefer sections with "step" or "how" context
+    ol_blocks = re.findall(r'<ol[^>]*>(.*?)</ol>', body, re.DOTALL)
+    if not ol_blocks:
         return None
-    items = re.findall(r'<li[^>]*>(.*?)</li>', ol_match.group(1), re.DOTALL)
+    # Pick the block with the most <li> items
+    best_block = max(ol_blocks, key=lambda b: len(re.findall(r'<li', b)))
+    items = re.findall(r'<li[^>]*>(.*?)</li>', best_block, re.DOTALL)
     if len(items) < 3:
         return None
+
     steps = []
-    for i, item in enumerate(items[:10], 1):
-        text = re.sub(r'<[^>]+>', '', item).strip()
-        text = text[:200]
-        if not text:
+    for i, item in enumerate(items[:12], 1):
+        # Try to get name from <strong> tag first, fall back to plain text
+        strong = re.search(r'<strong[^>]*>(.*?)</strong>', item, re.DOTALL)
+        name_raw = strong.group(1) if strong else item
+        name = html_mod.unescape(re.sub(r'<[^>]+>', '', name_raw).strip())[:80]
+        text = html_mod.unescape(re.sub(r'<[^>]+>', '', item).strip())[:250]
+        if not text or len(text) < 10:
             continue
         steps.append({
             "@type": "HowToStep",
             "position": i,
-            "name": text[:60],
-            "text": text
+            "name": name or text[:60],
+            "text": text,
         })
     if len(steps) < 3:
         return None
+
     schema = {
         "@context": "https://schema.org",
         "@type": "HowTo",
         "name": title,
         "description": guide.get("meta_description", ""),
-        "step": steps
+        "step": steps,
     }
     return json.dumps(schema)
 
@@ -1215,6 +1222,83 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
         "og_title": f"{proc['name']} Cost in {state['name']} | BillKarma",
         "meta_description": meta_description, "meta_robots": "index, follow",
         "nearby_procedures": [{"name": v["name"], "slug": k} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug][:8],
+    })
+
+
+@app.get("/guides/cheapest-cities-{proc_slug}-2026/", response_class=HTMLResponse)
+async def cheapest_cities_guide(request: Request, proc_slug: str):
+    """Data-driven guide: cheapest and most expensive cities for a given procedure."""
+    proc = _PROCEDURE_SLUGS.get(proc_slug)
+    if not proc:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
+    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
+    city_costs = _procedure_city_costs(proc["cpt"])  # already sorted cheapest→most expensive
+    cheapest = city_costs[:10]
+    most_expensive = list(reversed(city_costs[-10:]))
+    savings = most_expensive[0]["avg_charge"] - cheapest[0]["avg_charge"] if city_costs else 0
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/cheapest-cities-{proc_slug}-2026/"
+    title = f"Cheapest Cities for {proc['name']} in 2026"
+    meta_description = (
+        f"The cheapest city for {proc['name']} averages ${cheapest[0]['avg_charge']:,} vs ${most_expensive[0]['avg_charge']:,} "
+        f"in the most expensive — a ${savings:,} difference. See all 50 cities ranked by cost."
+    ) if city_costs else f"Compare {proc['name']} costs across 50 US cities."
+    return templates.TemplateResponse("cheapest_cities_guide.html", {
+        "request": request,
+        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
+        "ref": ref,
+        "cheapest": cheapest,
+        "most_expensive": most_expensive,
+        "all_cities": city_costs,
+        "savings": savings,
+        "canonical_url": canonical_url,
+        "og_title": f"{title} | BillKarma",
+        "meta_description": meta_description,
+        "other_procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug],
+    })
+
+
+@app.get("/guides/most-expensive-states-healthcare-2026/", response_class=HTMLResponse)
+async def state_cost_comparison_guide(request: Request):
+    """Data journalism: all US states ranked by healthcare cost index."""
+    # Build state rankings using average multiplier across all tracked procedures
+    # Use knee replacement (27447) as representative anchor — largest ticket item
+    anchor_cpt = "27447"
+    anchor_ref = _CPT_STATIC_RATES.get(anchor_cpt, {})
+    anchor_nat = anchor_ref.get("avg_charge", 30500)
+    states = []
+    for abbr, mult in sorted(_STATE_COST_MULTIPLIER.items(), key=lambda x: -x[1]):
+        # Find state name from _STATE_DATA
+        state_name = next(
+            (v["name"] for v in _STATE_DATA.values() if v["abbr"] == abbr),
+            abbr
+        )
+        state_slug = next(
+            (k for k, v in _STATE_DATA.items() if v["abbr"] == abbr),
+            abbr.lower()
+        )
+        states.append({
+            "abbr": abbr,
+            "name": state_name,
+            "slug": state_slug,
+            "multiplier": mult,
+            "knee_avg": round(anchor_nat * mult),
+            "vs_national_pct": round((mult - 1.0) * 100),
+        })
+    national_avg = anchor_nat
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/most-expensive-states-healthcare-2026/"
+    meta_description = (
+        f"DC, NY, CA, and MA have the highest hospital costs — up to 28% above the national average. "
+        f"MS and WV are the cheapest, 13% below average. Full state-by-state ranking for 2026."
+    )
+    return templates.TemplateResponse("state_cost_comparison.html", {
+        "request": request,
+        "states": states,
+        "national_avg": national_avg,
+        "anchor_procedure": "Knee Replacement",
+        "canonical_url": canonical_url,
+        "og_title": "Most Expensive States for Healthcare in 2026 | BillKarma",
+        "meta_description": meta_description,
+        "procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items()],
     })
 
 
@@ -2153,6 +2237,8 @@ async def sitemap_index():
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
         (f"{base}/sitemap-costs.xml", "2026-04-01", "0.5"),
+        (f"{base}/sitemap-data-guides.xml", "2026-04-10", "0.5"),
+        (f"{base}/guides/most-expensive-states-healthcare-2026/", "2026-04-10", "0.8"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
@@ -2326,6 +2412,67 @@ async def procedures_sitemap():
     return Response(content=xml, media_type="application/xml")
 
 
+@app.get("/sitemap-data-guides.xml")
+async def data_guides_sitemap():
+    """Sitemap for data-driven guide pages (cheapest cities + state comparison)."""
+    base = config.APP_URL.rstrip("/")
+    entries = (
+        f'<url><loc>{base}/guides/most-expensive-states-healthcare-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>'
+        + "".join(
+            f"<url><loc>{base}/guides/cheapest-cities-{slug}-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            for slug in _PROCEDURE_SLUGS
+        )
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get(f"/{config.INDEXNOW_KEY}.txt")
+async def indexnow_key_file():
+    """Serve IndexNow key verification file."""
+    return Response(content=config.INDEXNOW_KEY, media_type="text/plain")
+
+
+async def _ping_indexnow(urls: list[str]) -> bool:
+    """Submit URLs to IndexNow (Bing, Yandex). Returns True on success."""
+    import httpx
+    host = config.APP_URL.rstrip("/").replace("https://", "").replace("http://", "")
+    payload = {
+        "host": host,
+        "key": config.INDEXNOW_KEY,
+        "keyLocation": f"{config.APP_URL.rstrip('/')}/{config.INDEXNOW_KEY}.txt",
+        "urlList": urls[:10000],
+    }
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post("https://api.indexnow.org/indexnow", json=payload)
+            return r.status_code in (200, 202)
+    except Exception as e:
+        logging.warning("IndexNow ping failed: %s", e)
+        return False
+
+
+@app.post("/admin/ping-indexnow")
+async def admin_ping_indexnow(request: Request):
+    """Ping IndexNow with all procedure + cost pages. Requires ADMIN_API_TOKEN."""
+    token = request.headers.get("X-Admin-Token", "")
+    if config.ADMIN_API_TOKEN and token != config.ADMIN_API_TOKEN:
+        return JSONResponse({"status": "error", "message": "Unauthorized"}, status_code=401)
+    base = config.APP_URL.rstrip("/")
+    urls = (
+        [f"{base}/procedures/", f"{base}/guides/"]
+        + [f"{base}/procedures/{s}/" for s in _PROCEDURE_SLUGS]
+        + [f"{base}/costs/{p}/{c}/" for p in _PROCEDURE_SLUGS for c in _CITY_DATA]
+        + [f"{base}/costs/{p}/{s}/" for p in _PROCEDURE_SLUGS for s in _STATE_DATA if s not in _CITY_DATA]
+    )
+    ok = await _ping_indexnow(urls)
+    return JSONResponse({"status": "ok" if ok else "error", "urls_submitted": len(urls)})
+
+
 @app.get("/og/{slug}.svg")
 async def og_image_svg(slug: str):
     """Return a branded SVG social preview image for a guide."""
@@ -2377,6 +2524,7 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-costs.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-procedures.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-data-guides.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 

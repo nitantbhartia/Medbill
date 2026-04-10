@@ -16,6 +16,21 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "{{ procedure.name }} Cost by City — BillKarma 2026",
+  "description": "Hospital chargemaster prices vs CMS Medicare rates for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) across {{ city_costs|length }} US cities.",
+  "keywords": ["{{ procedure.name }}", "CPT {{ procedure.cpt_code }}", "hospital costs", "Medicare rates", "medical pricing"],
+  "creator": {"@type": "Organization", "name": "BillKarma", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "variableMeasured": ["Average Hospital Charge", "Medicare Reference Rate", "Charge-to-Medicare Markup Ratio"],
+  "spatialCoverage": {"@type": "Place", "name": "United States"},
+  "temporalCoverage": "2026",
+  "isBasedOn": {"@type": "CreativeWork", "name": "CMS Physician Fee Schedule 2026", "url": "https://www.cms.gov/medicare/payment/fee-schedules/physician"}
+}
+</script>
 {% if ref.medicare_rate %}
 <script type="application/ld+json">
 {
