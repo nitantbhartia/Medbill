@@ -1836,8 +1836,8 @@ async def procedure_index_page(request: Request):
             "groups": groups,
             "total": len(procedures),
             "canonical_url": canonical_url,
-            "og_title": "Procedure Cost Directory: Medicare Rates & Hospital Grades | BillKarma",
-            "og_description": "See Medicare rates, national average charges, and billing grades for 100 common procedures. Find the best-priced hospital near you.",
+            "og_title": "Medical Procedure Costs: Medicare Rates vs What Hospitals Actually Charge (2026)",
+            "og_description": "Compare what Medicare pays vs what hospitals charge for 100+ procedures. See which hospitals overcharge and find fair prices near you.",
             "meta_robots": "index, follow",
         },
     )
