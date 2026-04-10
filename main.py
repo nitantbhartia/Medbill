@@ -54,6 +54,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
+    # Force HTTPS — proxy (Railway/Render) sets X-Forwarded-Proto
+    if not config.DEBUG:
+        proto = request.headers.get("x-forwarded-proto", "https")
+        if proto == "http":
+            https_url = str(request.url).replace("http://", "https://", 1)
+            return RedirectResponse(url=https_url, status_code=301)
+
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     if not request.url.path.startswith("/embed/"):
@@ -62,6 +69,8 @@ async def security_headers(request: Request, call_next):
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
     if not config.DEBUG:
         response.headers.setdefault("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+    # Propagate noindex from template to X-Robots-Tag header so crawlers see it
+    # even before rendering — pick it up from the meta_robots context value if set
     return response
 
 templates = Jinja2Templates(directory="templates")
@@ -1358,7 +1367,8 @@ async def hospital_state_page(
     cities = get_cities_for_state(state_slug)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/"
     has_params = page > 1 or sort != "grade" or ownership
-    return templates.TemplateResponse(
+    robots = "noindex, follow" if has_params else "index, follow"
+    resp = templates.TemplateResponse(
         "hospitals_state.html",
         {
             "request": request,
@@ -1374,9 +1384,12 @@ async def hospital_state_page(
             "canonical_url": canonical_url,
             "og_title": f"{state_name} Hospital Billing Report Cards | BillKarma",
             "og_description": f"Compare billing grades and markup ratios for hospitals in {state_name}.",
-            "meta_robots": "noindex, follow" if has_params else "index, follow",
+            "meta_robots": robots,
         },
     )
+    if has_params:
+        resp.headers["X-Robots-Tag"] = "noindex, follow"
+    return resp
 
 
 @app.get("/hospitals/{state_slug}/{city_slug}/", response_class=HTMLResponse)
@@ -1829,6 +1842,13 @@ async def unified_find_page(request: Request, q: str = "", zip: str = "", type: 
 
 
 @app.get("/compare", response_class=HTMLResponse)
+async def compare_index_noslash(request: Request):
+    # Redirect no-trailing-slash variant to canonical /compare/ — eliminates duplicate URL
+    qs = str(request.query_params)
+    dest = "/compare/?" + qs if qs else "/compare/"
+    return RedirectResponse(url=dest, status_code=301)
+
+
 @app.get("/compare/", response_class=HTMLResponse)
 async def compare_index(
     request: Request,
@@ -1848,16 +1868,20 @@ async def compare_index(
     # Parameter URLs are just the empty form — don't let Google index them
     has_params = facility_a or facility_b
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
-    return templates.TemplateResponse(
+    robots = "noindex, follow" if has_params else "index, follow"
+    resp = templates.TemplateResponse(
         "compare_index.html",
         {
             "request": request,
             "canonical_url": canonical_url,
             "og_title": "Hospital Comparison Tool | BillKarma",
             "og_description": "Compare any two hospitals side-by-side: billing grade, markup vs Medicare, CMS stars, and procedure prices.",
-            "meta_robots": "noindex, follow" if has_params else "index, follow",
+            "meta_robots": robots,
         },
     )
+    if has_params:
+        resp.headers["X-Robots-Tag"] = "noindex, follow"
+    return resp
 
 
 @app.get("/compare/{fid_a}/vs/{fid_b}/", response_class=HTMLResponse)
