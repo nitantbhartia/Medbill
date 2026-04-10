@@ -1944,6 +1944,7 @@ async def sitemap_index():
         (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
         (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
         (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
+        (f"{base}/about/", "2026-04-10", "0.7"),
         (f"{base}/press/", "2026-04-01", "0.7"),
         (f"{base}/chargemaster/", "2026-04-01", "0.9"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
@@ -2850,6 +2851,17 @@ async def compare_seo_page(request: Request, slug_a: str, slug_b: str):
             "meta_robots": "index, follow",
         },
     )
+
+
+@app.get("/about/", response_class=HTMLResponse)
+async def about_page(request: Request):
+    canonical_url = f"{config.APP_URL.rstrip('/')}/about/"
+    return templates.TemplateResponse("about.html", {
+        "request": request,
+        "canonical_url": canonical_url,
+        "og_title": "About BillKarma — Medical Billing Transparency for Patients",
+        "meta_description": "BillKarma helps patients understand and dispute hospital bills using CMS price transparency data, Medicare rates, and billing error detection tools. Free for everyone.",
+    })
 
 
 if __name__ == "__main__":

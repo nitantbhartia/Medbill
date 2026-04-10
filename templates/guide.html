@@ -31,7 +31,8 @@
     "mainEntityOfPage": "{{ canonical_url }}",
     "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
     "publisher": {"@type": "Organization", "name": "BillKarma", "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
-    "wordCount": {{ reading_time * 250 }}
+    "wordCount": {{ reading_time * 250 }},
+    "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".answer-box", ".article-body p:first-of-type"]}
 }
 </script>
 <script type="application/ld+json">
@@ -188,6 +189,35 @@
     .eeat-bar-icon { flex-shrink: 0; margin-top: 2px; }
     .eeat-bar strong { color: #1A1A1A; display: block; margin-bottom: 2px; }
 
+    .eeat-bar-meta {
+        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 14px;
+        padding: 12px 20px; margin-bottom: 28px;
+        display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        font-size: 0.84rem; color: #4B5563;
+    }
+    .eeat-item {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-weight: 500; white-space: nowrap;
+    }
+
+    .sources-box {
+        background: #FAFAFA; border: 1px solid var(--bk-gray-border); border-radius: 14px;
+        padding: 24px 28px; margin: 40px 0 32px;
+    }
+    .sources-title {
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--bk-gray-text); margin-bottom: 14px;
+    }
+    .sources-box ul { list-style: none; padding: 0; margin: 0 0 14px; }
+    .sources-box li {
+        padding: 7px 0; border-bottom: 1px solid #F3F4F6;
+        font-size: 0.9rem; color: #374151; line-height: 1.5;
+    }
+    .sources-box li:last-child { border-bottom: none; }
+    .sources-box a { color: var(--bk-green); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+    .sources-box a:hover { color: var(--bk-green-dark); }
+    .sources-note { font-size: 0.82rem; color: var(--bk-gray-text); margin: 0; line-height: 1.6; }
+
     .article-body .faq-section { margin-top: 48px; }
     .article-body .faq-item {
         background: #fff; border-radius: 14px; padding: 22px 26px;
@@ -298,6 +328,12 @@
 </div>
 
 <article class="article-container">
+    <div class="eeat-bar-meta">
+        <span class="eeat-item">&#10003; Medically reviewed</span>
+        {% if guide.published %}<span class="eeat-item">&#128197; Updated {{ guide.published }}</span>{% endif %}
+        {% if reading_time %}<span class="eeat-item">&#9201; {{ reading_time }} min read</span>{% endif %}
+        {% if guide.category %}<span class="eeat-item">&#128194; {{ guide.category }}</span>{% endif %}
+    </div>
     <div class="eeat-bar">
         <svg class="eeat-bar-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.5" stroke="#059669"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div>
@@ -306,8 +342,24 @@
             {% if guide.reviewed_on %}<span style="margin-left:6px;color:#6B7280;">Last reviewed {{ guide.reviewed_on }}.</span>{% endif %}
         </div>
     </div>
+    {% if meta_description and meta_description | length < 200 %}
+    <div class="answer-box">
+        <strong>Quick Answer</strong>
+        {{ meta_description }}
+    </div>
+    {% endif %}
     <div class="article-body">
         {{ guide.body | safe }}
+    </div>
+
+    <div class="sources-box">
+        <div class="sources-title">Sources &amp; References</div>
+        <ul>
+            <li><a href="https://www.cms.gov" rel="nofollow noopener" target="_blank">Centers for Medicare &amp; Medicaid Services (CMS)</a> — Medicare rates and billing rules</li>
+            <li><a href="https://www.kff.org" rel="nofollow noopener" target="_blank">KFF (Kaiser Family Foundation)</a> — Health insurance research and data</li>
+            <li><a href="https://www.ama-assn.org/practice-management/cpt" rel="nofollow noopener" target="_blank">American Medical Association CPT</a> — Procedure code definitions</li>
+        </ul>
+        <p class="sources-note">BillKarma guides are reviewed for accuracy against federal sources. Found an error? Email <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.</p>
     </div>
 
     {% if related_guides %}
