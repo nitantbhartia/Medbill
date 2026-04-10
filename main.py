@@ -1006,7 +1006,52 @@ def _get_static_procedure_profile(cpt_code: str, state_abbr: str) -> dict:
     }
 
 
+# ── State data derived from _CITY_DATA ──────────────────────────────────────
 
+def _build_state_data() -> dict:
+    states: dict = {}
+    name_fixes = {"district-of-columbia": "District of Columbia", "new-mexico": "New Mexico",
+                  "new-york": "New York", "north-carolina": "North Carolina"}
+    for city_slug, city in _CITY_DATA.items():
+        s = city["state_slug"]
+        if s not in states:
+            states[s] = {
+                "name": name_fixes.get(s, s.replace("-", " ").title()),
+                "abbr": city["state"],
+                "state_slug": s,
+                "cities": [],
+            }
+        states[s]["cities"].append({"slug": city_slug, **city})
+    return states
+
+
+_STATE_DATA = _build_state_data()
+
+
+def _procedure_city_costs(cpt_code: str) -> list[dict]:
+    """Return per-city cost estimates for a procedure, sorted cheapest first."""
+    ref = _CPT_STATIC_RATES.get(cpt_code)
+    if not ref:
+        return []
+    rows = []
+    for city_slug, city in _CITY_DATA.items():
+        m = _STATE_COST_MULTIPLIER.get(city["state"], 1.0)
+        charge = round(ref["avg_charge"] * m)
+        rows.append({
+            "slug": city_slug,
+            "name": city["name"],
+            "state": city["state"],
+            "state_slug": city["state_slug"],
+            "avg_charge": charge,
+            "medicare_rate": ref["medicare_rate"],
+            "markup_ratio": round(charge / ref["medicare_rate"], 1),
+        })
+    rows.sort(key=lambda r: r["avg_charge"])
+    return rows
+
+
+@app.get("/guides/category/{slug}/", response_class=HTMLResponse)
+async def guides_category(request: Request, slug: str):
     """List guides in a specific category."""
     from guides import get_guides_by_category, get_all_categories
     guides_in_cat = get_guides_by_category(slug)
@@ -1031,54 +1076,146 @@ def _get_static_procedure_profile(cpt_code: str, state_abbr: str) -> dict:
     )
 
 
-@app.get("/costs/{proc_slug}/{city_slug}/", response_class=HTMLResponse)
-async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
-    """Programmatic procedure × city cost page."""
-    proc = _PROCEDURE_SLUGS.get(proc_slug)
-    city = _CITY_DATA.get(city_slug)
-    if not proc or not city:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Page not found"}, status_code=404)
-    canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{city_slug}/"
-    profile = get_procedure_profile(proc["cpt"])
-    if not profile:
-        profile = _get_static_procedure_profile(proc["cpt"], city["state"])
-    hospitals = get_hospitals_near_zip_for_cpt(proc["cpt"], city["zip"], limit=10)
-    nearby_procedures = [
-        {"name": v["name"], "slug": k, "cpt": v["cpt"]}
-        for k, v in _PROCEDURE_SLUGS.items()
-        if k != proc_slug
-    ][:8]
-    nearby_cities = [
-        {"name": v["name"], "state": v["state"], "slug": k}
-        for k, v in _CITY_DATA.items()
-        if k != city_slug
-    ][:10]
-    avg_charge = profile.get("avg_charge") if profile else None
-    medicare_rate = profile.get("medicare_rate") if profile else None
-    avg_str = f"${avg_charge:,.0f}" if avg_charge else "varies"
-    meta_description = (
-        f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
-        f"Compare prices vs Medicare rate ${medicare_rate:,.0f}. Find fair prices with BillKarma."
-        if medicare_rate else
-        f"{proc['name']} cost in {city['name']}, {city['state']}. Compare hospital prices and find fair rates with BillKarma."
-    )
-    meta_robots = "index, follow"
-    return templates.TemplateResponse(
-        "procedure_city.html",
+@app.get("/procedures/", response_class=HTMLResponse)
+async def procedures_index(request: Request):
+    """Index of all procedure cost hub pages."""
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/"
+    procs = [
         {
+            "slug": slug,
+            "name": info["name"],
+            "cpt": info["cpt"],
+            "medicare_rate": _CPT_STATIC_RATES.get(info["cpt"], {}).get("medicare_rate"),
+            "avg_charge": _CPT_STATIC_RATES.get(info["cpt"], {}).get("avg_charge"),
+        }
+        for slug, info in _PROCEDURE_SLUGS.items()
+    ]
+    procs.sort(key=lambda p: p["name"])
+    return templates.TemplateResponse("procedures_index.html", {
+        "request": request,
+        "procedures": procs,
+        "canonical_url": canonical_url,
+        "og_title": "Hospital Procedure Cost Guide | BillKarma",
+        "meta_description": "Compare what hospitals charge vs Medicare rates for 16 common procedures. Free data for every major US city.",
+    })
+
+
+@app.get("/procedures/{slug}/", response_class=HTMLResponse)
+async def procedure_hub(request: Request, slug: str):
+    """National procedure cost hub — aggregates all city + state data."""
+    proc = _PROCEDURE_SLUGS.get(slug)
+    if not proc:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
+    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
+    city_costs = _procedure_city_costs(proc["cpt"])
+    # State-level summary: average the city costs within each state
+    state_map: dict = {}
+    for c in city_costs:
+        s = c["state_slug"]
+        state_map.setdefault(s, {"charges": [], "state": c["state"]})
+        state_map[s]["charges"].append(c["avg_charge"])
+    state_costs = sorted(
+        [
+            {
+                "state_slug": s,
+                "state_name": _STATE_DATA[s]["name"] if s in _STATE_DATA else s.replace("-", " ").title(),
+                "state": v["state"],
+                "avg_charge": round(sum(v["charges"]) / len(v["charges"])),
+                "medicare_rate": ref.get("medicare_rate"),
+            }
+            for s, v in state_map.items()
+        ],
+        key=lambda x: x["avg_charge"],
+    )
+    national_avg = ref.get("avg_charge", 0)
+    medicare_rate = ref.get("medicare_rate", 0)
+    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{slug}/"
+    meta_description = (
+        f"{proc['name']} cost: national average ${national_avg:,}, Medicare rate ${medicare_rate:,}. "
+        f"Compare prices by city and state. Find fair prices with BillKarma."
+    )
+    related_procedures = [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != slug]
+    return templates.TemplateResponse("procedure_hub.html", {
+        "request": request,
+        "procedure": {"slug": slug, "name": proc["name"], "cpt_code": proc["cpt"]},
+        "ref": ref,
+        "city_costs": city_costs,
+        "state_costs": state_costs,
+        "related_procedures": related_procedures,
+        "canonical_url": canonical_url,
+        "og_title": f"{proc['name']} Cost: What Hospitals Charge vs Medicare | BillKarma",
+        "meta_description": meta_description,
+    })
+
+
+@app.get("/costs/{proc_slug}/{location_slug}/", response_class=HTMLResponse)
+async def procedure_location_page(request: Request, proc_slug: str, location_slug: str):
+    """Procedure cost page — handles both city slugs and state slugs."""
+    proc = _PROCEDURE_SLUGS.get(proc_slug)
+    if not proc:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Page not found"}, status_code=404)
+
+    # City takes priority (handles new-york → NYC)
+    city = _CITY_DATA.get(location_slug)
+    if city:
+        canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{location_slug}/"
+        profile = get_procedure_profile(proc["cpt"]) or _get_static_procedure_profile(proc["cpt"], city["state"])
+        hospitals = get_hospitals_near_zip_for_cpt(proc["cpt"], city["zip"], limit=10)
+        nearby_procedures = [{"name": v["name"], "slug": k, "cpt": v["cpt"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug][:8]
+        nearby_cities = [{"name": v["name"], "state": v["state"], "slug": k} for k, v in _CITY_DATA.items() if k != location_slug][:10]
+        avg_charge = profile.get("avg_charge") if profile else None
+        medicare_rate = profile.get("medicare_rate") if profile else None
+        avg_str = f"${avg_charge:,.0f}" if avg_charge else "varies"
+        meta_description = (
+            f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
+            f"Compare prices vs Medicare rate ${medicare_rate:,.0f}. Find fair prices with BillKarma."
+            if medicare_rate else
+            f"{proc['name']} cost in {city['name']}, {city['state']}. Compare hospital prices with BillKarma."
+        )
+        return templates.TemplateResponse("procedure_city.html", {
             "request": request,
             "procedure": {"name": proc["name"], "cpt_code": proc["cpt"], "slug": proc_slug},
-            "city": city,
-            "profile": profile or {},
-            "hospitals": hospitals,
+            "city": city, "profile": profile or {}, "hospitals": hospitals,
             "canonical_url": canonical_url,
             "og_title": f"{proc['name']} Cost in {city['name']}, {city['state']} | BillKarma",
-            "meta_description": meta_description,
-            "meta_robots": meta_robots,
-            "nearby_procedures": nearby_procedures,
-            "nearby_cities": nearby_cities,
-        },
+            "meta_description": meta_description, "meta_robots": "index, follow",
+            "nearby_procedures": nearby_procedures, "nearby_cities": nearby_cities,
+        })
+
+    # State page
+    state = _STATE_DATA.get(location_slug)
+    if not state:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Page not found"}, status_code=404)
+    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
+    multiplier = _STATE_COST_MULTIPLIER.get(state["abbr"], 1.0)
+    state_avg = round(ref.get("avg_charge", 0) * multiplier)
+    medicare_rate = ref.get("medicare_rate", 0)
+    city_costs = [
+        {
+            "slug": c["slug"], "name": c["name"], "state": c["state"],
+            "avg_charge": round(ref.get("avg_charge", 0) * multiplier),
+            "medicare_rate": medicare_rate,
+            "markup_ratio": round((ref.get("avg_charge", 0) * multiplier) / medicare_rate, 1) if medicare_rate else None,
+        }
+        for c in state["cities"]
+    ]
+    canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{location_slug}/"
+    meta_description = (
+        f"{proc['name']} cost in {state['name']}: average ${state_avg:,} vs Medicare rate ${medicare_rate:,}. "
+        f"Compare prices across {len(city_costs)} cities. Find fair prices with BillKarma."
     )
+    return templates.TemplateResponse("procedure_state.html", {
+        "request": request,
+        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
+        "state": state, "state_avg": state_avg, "medicare_rate": medicare_rate,
+        "markup_ratio": round(state_avg / medicare_rate, 1) if medicare_rate else None,
+        "city_costs": city_costs,
+        "national_avg": ref.get("avg_charge", 0),
+        "canonical_url": canonical_url,
+        "og_title": f"{proc['name']} Cost in {state['name']} | BillKarma",
+        "meta_description": meta_description, "meta_robots": "index, follow",
+        "nearby_procedures": [{"name": v["name"], "slug": k} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug][:8],
+    })
 
 
 @app.get("/press/", response_class=HTMLResponse)
@@ -2010,7 +2147,9 @@ async def sitemap_index():
         (f"{base}/about/", "2026-04-10", "0.7"),
         (f"{base}/press/", "2026-04-01", "0.7"),
         (f"{base}/chargemaster/", "2026-04-01", "0.9"),
+        (f"{base}/procedures/", "2026-04-10", "0.9"),
         (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
+        (f"{base}/sitemap-procedures.xml", "2026-04-10", "0.5"),
         (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
         (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
         (f"{base}/sitemap-costs.xml", "2026-04-01", "0.5"),
@@ -2147,12 +2286,37 @@ async def facilities_sitemap():
 
 @app.get("/sitemap-costs.xml")
 async def costs_sitemap():
-    """Sitemap for procedure × city cost pages."""
+    """Sitemap for procedure × city AND procedure × state cost pages."""
     base = config.APP_URL.rstrip("/")
-    entries = "".join(
-        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>2026-04-01</lastmod><priority>0.7</priority></url>"
+    city_entries = "".join(
+        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
         for proc_slug in _PROCEDURE_SLUGS
         for city_slug in _CITY_DATA
+    )
+    state_entries = "".join(
+        f"<url><loc>{base}/costs/{proc_slug}/{state_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
+        for proc_slug in _PROCEDURE_SLUGS
+        for state_slug in _STATE_DATA
+        if state_slug not in _CITY_DATA  # exclude new-york (served as city)
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{city_entries}{state_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-procedures.xml")
+async def procedures_sitemap():
+    """Sitemap for procedure hub pages."""
+    base = config.APP_URL.rstrip("/")
+    entries = (
+        f'<url><loc>{base}/procedures/</loc><lastmod>2026-04-10</lastmod><priority>0.9</priority></url>'
+        + "".join(
+            f"<url><loc>{base}/procedures/{slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            for slug in _PROCEDURE_SLUGS
+        )
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -2212,6 +2376,7 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-hospitals.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-costs.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-procedures.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 
