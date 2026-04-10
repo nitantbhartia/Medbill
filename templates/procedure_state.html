@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}{{ og_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<meta name="robots" content="{{ meta_robots }}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+    {"@type": "ListItem", "position": 2, "name": "Procedure Costs", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/procedures/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ procedure.name }}", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/procedures/{{ procedure.slug }}/"},
+    {"@type": "ListItem", "position": 4, "name": "{{ state.name }}", "item": "{{ canonical_url }}"}
+  ]
+}
+</script>
+{% if state_avg and medicare_rate %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does {{ procedure.name }} cost in {{ state.name }}?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The average hospital charge for {{ procedure.name }} in {{ state.name }} is approximately ${{ "{:,}".format(state_avg) }}, based on CMS national averages adjusted for {{ state.name }} regional cost factors. The Medicare reference rate is ${{ "{:,}".format(medicare_rate) }}."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the Medicare rate for {{ procedure.name }} in {{ state.name }}?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Medicare pays ${{ "{:,}".format(medicare_rate) }} for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) nationally. {{ state.name }} hospitals typically charge about {{ "%.1f"|format(markup_ratio) }}x this amount on their chargemaster list price."
+      }
+    }
+  ]
+}
+</script>
+{% endif %}
+<style>
+  .state-hero { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; padding: 56px 24px 64px; border-radius: 0 0 36px 36px; }
+  .state-hero-inner { max-width: 860px; margin: 0 auto; }
+  .state-hero-crumb { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: 12px; }
+  .state-hero-crumb a { color: rgba(255,255,255,.85); text-decoration: underline; }
+  .state-hero h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: #fff; margin: 0 0 18px; }
+  .state-stats { display: flex; gap: 14px; flex-wrap: wrap; }
+  .state-stat { background: rgba(255,255,255,.15); border-radius: 10px; padding: 12px 18px; }
+  .state-stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.7); margin-bottom: 3px; }
+  .state-stat-value { font-size: 1.4rem; font-weight: 800; color: #fff; }
+
+  .state-body { max-width: 860px; margin: 0 auto; padding: 36px 24px 72px; }
+  .answer-box { background: #F0FDF4; border-left: 4px solid #059669; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 28px; font-size: 1rem; line-height: 1.65; }
+  .answer-box strong.label { display: block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #059669; margin-bottom: 5px; }
+  .vs-bar { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .vs-item { flex: 1; min-width: 140px; }
+  .vs-item-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9CA3AF; margin-bottom: 4px; }
+  .vs-item-value { font-size: 1.6rem; font-weight: 800; color: #111827; }
+  .vs-item-sub { font-size: .78rem; color: #6B7280; margin-top: 2px; }
+
+  .city-table { width: 100%; border-collapse: collapse; font-size: .9rem; margin-bottom: 36px; }
+  .city-table thead th { background: #F9FAFB; text-align: left; padding: 10px 14px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #6B7280; border-bottom: 2px solid #E5E7EB; }
+  .city-table tbody td { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; }
+  .city-table tbody tr:hover { background: #F9FAFB; }
+  .city-table a { color: #059669; font-weight: 600; text-decoration: none; }
+  .city-table a:hover { text-decoration: underline; }
+  .section-h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; margin: 36px 0 14px; }
+  .proc-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .proc-pill { background: #F3F4F6; border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 600; text-decoration: none; color: #374151; }
+  .proc-pill:hover { background: #E6F4EA; color: #059669; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="state-hero">
+  <div class="state-hero-inner">
+    <div class="state-hero-crumb">
+      <a href="/procedures/">Procedure Costs</a> &rsaquo;
+      <a href="/procedures/{{ procedure.slug }}/">{{ procedure.name }}</a> &rsaquo;
+      {{ state.name }}
+    </div>
+    <h1>{{ procedure.name }} Cost in {{ state.name }}</h1>
+    <div class="state-stats">
+      {% if state_avg %}
+      <div class="state-stat">
+        <div class="state-stat-label">{{ state.name }} Avg Charge</div>
+        <div class="state-stat-value">${{ "{:,}".format(state_avg) }}</div>
+      </div>
+      {% endif %}
+      {% if medicare_rate %}
+      <div class="state-stat">
+        <div class="state-stat-label">Medicare Rate</div>
+        <div class="state-stat-value">${{ "{:,}".format(medicare_rate) }}</div>
+      </div>
+      {% endif %}
+      {% if markup_ratio %}
+      <div class="state-stat">
+        <div class="state-stat-label">Typical Markup</div>
+        <div class="state-stat-value">{{ "%.1f"|format(markup_ratio) }}x</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="state-body">
+  <div class="answer-box">
+    <strong class="label">Quick Answer</strong>
+    In {{ state.name }}, the average hospital charges
+    {% if state_avg %}<strong>${{ "{:,}".format(state_avg) }}</strong>{% endif %}
+    for {{ procedure.name }} (CPT {{ procedure.cpt_code }}),
+    compared to the Medicare reference rate of
+    {% if medicare_rate %}<strong>${{ "{:,}".format(medicare_rate) }}</strong>{% endif %}.
+    {% if markup_ratio %}That's a <strong>{{ "%.1f"|format(markup_ratio) }}x markup</strong>.{% endif %}
+    {% if national_avg and state_avg %}
+    {{ state.name }} is
+    {% if state_avg > national_avg %}
+    <strong>${{ "{:,}".format(state_avg - national_avg) }} above</strong>
+    {% elif state_avg < national_avg %}
+    <strong>${{ "{:,}".format(national_avg - state_avg) }} below</strong>
+    {% else %}at{% endif %}
+    the national average of ${{ "{:,}".format(national_avg) }}.
+    {% endif %}
+  </div>
+
+  {% if city_costs %}
+  <h2 class="section-h2">{{ procedure.name }} Cost in {{ state.name }} Cities</h2>
+  <table class="city-table">
+    <thead>
+      <tr>
+        <th>City</th>
+        <th>Avg Charge</th>
+        <th>Medicare Rate</th>
+        <th>Markup</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in city_costs | sort(attribute='avg_charge') %}
+      <tr>
+        <td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}</a></td>
+        <td>${{ "{:,}".format(c.avg_charge) }}</td>
+        <td>${{ "{:,}".format(c.medicare_rate) }}</td>
+        <td>{% if c.markup_ratio %}{{ "%.1f"|format(c.markup_ratio) }}x{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  <h2 class="section-h2">Other Procedures in {{ state.name }}</h2>
+  <div class="proc-pills">
+    {% for p in nearby_procedures %}
+    <a href="/costs/{{ p.slug }}/{{ state.state_slug }}/" class="proc-pill">{{ p.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div style="margin-top: 40px; background: #059669; border-radius: 20px; padding: 28px 24px; text-align: center; color: #fff;">
+    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">Got a bill for {{ procedure.name }}?</div>
+    <div style="font-size: .95rem; color: rgba(255,255,255,.85); margin-bottom: 16px;">Upload it to BillKarma to check for errors and compare against Medicare rates.</div>
+    <a href="/scan" style="background: #fff; color: #059669; border-radius: 999px; padding: 12px 24px; font-weight: 800; text-decoration: none; font-size: .95rem;">Scan My Bill Free &rarr;</a>
+  </div>
+
+  <p style="font-size:.78rem;color:#9CA3AF;margin-top:24px;text-align:center;">
+    Pricing estimates based on CMS Medicare fee schedule and national chargemaster averages adjusted for {{ state.name }} regional costs. Actual charges vary by facility. Not financial or medical advice.
+  </p>
+</div>
+{% endblock %}
