@@ -106,6 +106,37 @@
         </div>
     </div>
 
+    <!-- Internal link hub: pass authority to key SEO pages and help users take next step -->
+    <div class="rounded-lg border border-green-200 bg-green-50 p-5 mb-6">
+        <h2 class="text-base font-semibold text-gray-900 mb-3">Got a bill from {{ data.hospital.name }}? Here's what to do next.</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+            <a href="/chargemaster/" style="display:block;background:#fff;border:1px solid #D1FAE5;border-radius:10px;padding:12px 14px;text-decoration:none;color:#111827;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#059669;margin-bottom:4px;">Price Check</div>
+                <div style="font-size:.9rem;font-weight:600;">See what this hospital charges for Tylenol, saline &amp; more →</div>
+            </a>
+            <a href="/guides/how-to-get-itemized-hospital-bill/" style="display:block;background:#fff;border:1px solid #D1FAE5;border-radius:10px;padding:12px 14px;text-decoration:none;color:#111827;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#059669;margin-bottom:4px;">Step 1</div>
+                <div style="font-size:.9rem;font-weight:600;">Request your itemized bill and find errors →</div>
+            </a>
+            <a href="/guides/medical-bill-negotiation-script/" style="display:block;background:#fff;border:1px solid #D1FAE5;border-radius:10px;padding:12px 14px;text-decoration:none;color:#111827;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#059669;margin-bottom:4px;">Step 2</div>
+                <div style="font-size:.9rem;font-weight:600;">Word-for-word negotiation script →</div>
+            </a>
+            <a href="/hospitals/{{ data.hospital.state_slug }}/" style="display:block;background:#fff;border:1px solid #D1FAE5;border-radius:10px;padding:12px 14px;text-decoration:none;color:#111827;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#059669;margin-bottom:4px;">Compare</div>
+                <div style="font-size:.9rem;font-weight:600;">See all {{ data.hospital.state }} hospital grades →</div>
+            </a>
+            <a href="/guides/hospital-financial-assistance-programs/" style="display:block;background:#fff;border:1px solid #D1FAE5;border-radius:10px;padding:12px 14px;text-decoration:none;color:#111827;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#059669;margin-bottom:4px;">Can't Pay?</div>
+                <div style="font-size:.9rem;font-weight:600;">Apply for hospital financial assistance →</div>
+            </a>
+            <a href="/fight-debt" style="display:block;background:#059669;border:1px solid #047857;border-radius:10px;padding:12px 14px;text-decoration:none;color:#fff;">
+                <div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A7F3D0;margin-bottom:4px;">Free Tool</div>
+                <div style="font-size:.9rem;font-weight:600;">Dispute this bill with BillKarma →</div>
+            </a>
+        </div>
+    </div>
+
     <div class="rounded-lg border border-gray-200 p-5 overflow-x-auto">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Common Procedures and Prices</h2>
         <table class="min-w-full text-sm">
