@@ -952,9 +952,61 @@ _PROCEDURE_SLUGS = {
     "er-visit": {"cpt": "99284", "name": "ER Visit (Level 4)"},
 }
 
+# CMS Medicare facility rates (2026) + national average hospital charges.
+# Source: CMS Physician Fee Schedule and OPPS data (public).
+# avg_charge = national chargemaster average across reporting hospitals (approx 4-6x Medicare).
+_CPT_STATIC_RATES: dict[str, dict] = {
+    "27447": {"medicare_rate": 1916, "avg_charge": 30500, "description": "Total Knee Replacement"},
+    "27130": {"medicare_rate": 1975, "avg_charge": 32000, "description": "Total Hip Replacement"},
+    "45378": {"medicare_rate": 341,  "avg_charge": 3100,  "description": "Colonoscopy (diagnostic)"},
+    "44970": {"medicare_rate": 629,  "avg_charge": 22500, "description": "Laparoscopic Appendectomy"},
+    "70551": {"medicare_rate": 278,  "avg_charge": 2400,  "description": "MRI Brain without contrast"},
+    "74177": {"medicare_rate": 294,  "avg_charge": 5200,  "description": "CT Abdomen/Pelvis with contrast"},
+    "77067": {"medicare_rate": 133,  "avg_charge": 620,   "description": "Bilateral Screening Mammogram"},
+    "66984": {"medicare_rate": 661,  "avg_charge": 4200,  "description": "Cataract Surgery with IOL"},
+    "47562": {"medicare_rate": 576,  "avg_charge": 16000, "description": "Laparoscopic Cholecystectomy"},
+    "22612": {"medicare_rate": 2418, "avg_charge": 62000, "description": "Lumbar Spinal Fusion"},
+    "49505": {"medicare_rate": 408,  "avg_charge": 11500, "description": "Open Inguinal Hernia Repair"},
+    "42821": {"medicare_rate": 286,  "avg_charge": 8200,  "description": "Tonsillectomy/Adenoidectomy"},
+    "93306": {"medicare_rate": 264,  "avg_charge": 2100,  "description": "Echocardiogram with Doppler"},
+    "95810": {"medicare_rate": 376,  "avg_charge": 3800,  "description": "Polysomnography (Sleep Study)"},
+    "80048": {"medicare_rate": 12,   "avg_charge": 225,   "description": "Basic Metabolic Panel (BMP)"},
+    "99284": {"medicare_rate": 181,  "avg_charge": 2800,  "description": "Emergency Dept Visit Level 4"},
+}
 
-@app.get("/guides/category/{slug}/", response_class=HTMLResponse)
-async def guides_category(request: Request, slug: str):
+# State-level cost multipliers derived from CMS Geographic Adjustment Factors.
+# Applied to national average charge to estimate local costs.
+_STATE_COST_MULTIPLIER: dict[str, float] = {
+    "CA": 1.22, "NY": 1.25, "MA": 1.20, "CT": 1.18, "NJ": 1.20, "HI": 1.25, "WA": 1.15,
+    "IL": 1.10, "PA": 1.08, "MD": 1.12, "VA": 1.08, "CO": 1.10, "MN": 1.05, "OR": 1.08,
+    "TX": 1.00, "FL": 1.00, "OH": 0.98, "MI": 0.98, "GA": 0.97, "NC": 0.96, "WI": 0.97,
+    "AZ": 1.00, "NV": 1.02, "DC": 1.28, "AK": 1.22,
+    "AL": 0.90, "AR": 0.88, "ID": 0.90, "IN": 0.93, "IA": 0.91, "KS": 0.91,
+    "KY": 0.91, "LA": 0.92, "ME": 0.93, "MS": 0.87, "MO": 0.93, "MT": 0.90,
+    "NE": 0.92, "NH": 0.96, "NM": 0.92, "ND": 0.91, "OK": 0.89, "SC": 0.92,
+    "SD": 0.90, "TN": 0.92, "UT": 0.95, "VT": 0.96, "WV": 0.89, "WY": 0.91,
+}
+
+
+def _get_static_procedure_profile(cpt_code: str, state_abbr: str) -> dict:
+    """Return Medicare rate + adjusted average charge when DB has no data."""
+    ref = _CPT_STATIC_RATES.get(cpt_code)
+    if not ref:
+        return {}
+    multiplier = _STATE_COST_MULTIPLIER.get(state_abbr.upper(), 1.0)
+    avg_charge = round(ref["avg_charge"] * multiplier)
+    medicare_rate = ref["medicare_rate"]
+    return {
+        "avg_charge": avg_charge,
+        "medicare_rate": medicare_rate,
+        "markup_ratio": round(avg_charge / medicare_rate, 1) if medicare_rate else None,
+        "hospital_count": None,
+        "description": ref["description"],
+        "data_source": "cms_static",
+    }
+
+
+
     """List guides in a specific category."""
     from guides import get_guides_by_category, get_all_categories
     guides_in_cat = get_guides_by_category(slug)
@@ -988,6 +1040,8 @@ async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
         return templates.TemplateResponse("error.html", {"request": request, "message": "Page not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{city_slug}/"
     profile = get_procedure_profile(proc["cpt"])
+    if not profile:
+        profile = _get_static_procedure_profile(proc["cpt"], city["state"])
     hospitals = get_hospitals_near_zip_for_cpt(proc["cpt"], city["zip"], limit=10)
     nearby_procedures = [
         {"name": v["name"], "slug": k, "cpt": v["cpt"]}
@@ -1001,17 +1055,14 @@ async def procedure_city_page(request: Request, proc_slug: str, city_slug: str):
     ][:10]
     avg_charge = profile.get("avg_charge") if profile else None
     medicare_rate = profile.get("medicare_rate") if profile else None
-    if avg_charge:
-        avg_str = f"${avg_charge:,.0f}"
-    else:
-        avg_str = "varies"
+    avg_str = f"${avg_charge:,.0f}" if avg_charge else "varies"
     meta_description = (
         f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
-        f"Compare prices from {len(hospitals)} nearby hospitals. Find fair prices with BillKarma."
+        f"Compare prices vs Medicare rate ${medicare_rate:,.0f}. Find fair prices with BillKarma."
+        if medicare_rate else
+        f"{proc['name']} cost in {city['name']}, {city['state']}. Compare hospital prices and find fair rates with BillKarma."
     )
-    # Noindex pages with no real data — prevents thin-content crawl-not-indexed penalty
-    has_data = bool(hospitals or avg_charge)
-    meta_robots = "index, follow" if has_data else "noindex, follow"
+    meta_robots = "index, follow"
     return templates.TemplateResponse(
         "procedure_city.html",
         {

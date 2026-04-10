@@ -28,7 +28,7 @@
       "name": "How much does {{ procedure.name }} cost in {{ city.name }}?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "{% if profile.avg_charge %}The average cost of {{ procedure.name }} in {{ city.name }}, {{ city.state }} is ${{ "{:,.0f}".format(profile.avg_charge) }}. This is the gross list price charged by local hospitals and surgery centers before insurance adjustments.{% else %}Cost data for {{ procedure.name }} in {{ city.name }}, {{ city.state }} is not currently available. Use BillKarma to compare providers and negotiate your bill.{% endif %}"
+        "text": "{% if profile.avg_charge %}The average cost of {{ procedure.name }} in {{ city.name }}, {{ city.state }} is approximately ${{ "{:,.0f}".format(profile.avg_charge) }}{% if profile.data_source == 'cms_static' %} based on CMS national averages adjusted for {{ city.state }} costs{% endif %}. Hospitals charge this as the list price before insurance negotiation.{% else %}Cost data for {{ procedure.name }} in {{ city.name }}, {{ city.state }} is not currently available. Use BillKarma to compare providers and negotiate your bill.{% endif %}"
       }
     },
     {
@@ -319,6 +319,13 @@
         <p>BillKarma can help you negotiate your {{ procedure.name }} bill using federal pricing data.</p>
         <a href="/" class="cta-btn">Analyze My Bill for Free &rarr;</a>
     </div>
+
+    {% if profile.data_source == "cms_static" %}
+    <p style="font-size:.78rem;color:#9CA3AF;text-align:center;margin-top:24px;">
+        Pricing estimates based on CMS Medicare fee schedule and national hospital chargemaster averages.
+        Actual charges vary by facility. Not medical or financial advice.
+    </p>
+    {% endif %}
 
 </div>
 {% endblock %}
