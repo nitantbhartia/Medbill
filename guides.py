@@ -259,3 +259,17 @@ import guide_price_transparency_how_to_use
 import guide_outpatient_surgery_savings
 import guide_choosing_health_insurance_plan
 import guide_medical_bills_during_divorce
+# Batch 10: state billing law + charity care guides
+import guide_tennessee_medical_billing
+import guide_wisconsin_medical_billing
+import guide_missouri_medical_billing
+import guide_alabama_medical_billing
+import guide_south_carolina_medical_billing
+import guide_oregon_medical_billing
+import guide_nevada_medical_billing
+import guide_kentucky_medical_billing
+import guide_louisiana_medical_billing
+import guide_oklahoma_medical_billing
+import guide_tennessee_charity_care
+import guide_wisconsin_charity_care
+import guide_missouri_charity_care
