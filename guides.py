@@ -533,6 +533,18 @@ import guide_balance_billing_fight
 import guide_insurance_denial_appeal
 import guide_cpt_codes_explained
 import guide_surprise_ambulance_bill
+# Batch 20: Insurance carrier billing guides
+import guide_unitedhealthcare_billing
+import guide_aetna_billing_disputes
+import guide_bcbs_billing_disputes
+import guide_cigna_billing_disputes
+import guide_humana_billing_disputes
+import guide_kaiser_billing_disputes
+# Batch 20 part 2: Financial assistance guides
+import guide_charity_care_by_state
+import guide_hardship_payment_plan
+import guide_medical_debt_forgiveness_new
+import guide_negotiate_medical_bill_to_zero
 # Batch 19: Medicare & Medicaid billing cluster
 import guide_medicare_billing_disputes
 import guide_medicare_part_b_coverage
