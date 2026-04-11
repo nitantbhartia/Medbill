@@ -97,6 +97,10 @@ MAX_NOTE_LEN = 2000
 # Admin API access for destructive/ops endpoints
 ADMIN_API_TOKEN = os.getenv("ADMIN_API_TOKEN", "")
 
+# IndexNow — instant URL submission to Bing, Yandex, etc.
+# Generate once: python3 -c "import uuid; print(uuid.uuid4().hex)"
+INDEXNOW_KEY = os.getenv("INDEXNOW_KEY", "b3e8f2a1c4d74e9f8a2b1c3d5e7f9a0b")
+
 # Adaptive thresholds cache TTL (outcomes data changes slowly)
 ADAPTIVE_THRESHOLDS_CACHE_TTL_SECONDS = 300
 

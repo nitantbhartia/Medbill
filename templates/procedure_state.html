@@ -17,6 +17,21 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "{{ procedure.name }} Cost in {{ state.name }} — BillKarma 2026",
+  "description": "Hospital charges vs CMS Medicare rates for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) across cities in {{ state.name }}.",
+  "keywords": ["{{ procedure.name }}", "{{ state.name }}", "CPT {{ procedure.cpt_code }}", "hospital costs", "Medicare rates"],
+  "creator": {"@type": "Organization", "name": "BillKarma", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "variableMeasured": ["Average Hospital Charge", "Medicare Reference Rate", "Charge-to-Medicare Markup Ratio"],
+  "spatialCoverage": {"@type": "Place", "name": "{{ state.name }}, United States"},
+  "temporalCoverage": "2026",
+  "isBasedOn": {"@type": "CreativeWork", "name": "CMS Physician Fee Schedule 2026", "url": "https://www.cms.gov/medicare/payment/fee-schedules/physician"}
+}
+</script>
 {% if state_avg and medicare_rate %}
 <script type="application/ld+json">
 {

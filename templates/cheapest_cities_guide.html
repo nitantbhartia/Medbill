@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}{{ og_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_description }}">
+<meta property="og:type" content="article">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
+    {"@type": "ListItem", "position": 2, "name": "Guides", "item": "{{ request.url.scheme }}://{{ request.url.netloc }}/guides/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ og_title | replace(' | BillKarma', '') }}", "item": "{{ canonical_url }}"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "{{ procedure.name }} Cost by City 2026 — BillKarma",
+  "description": "{{ meta_description }}",
+  "keywords": ["{{ procedure.name }}", "CPT {{ procedure.cpt_code }}", "cheapest hospitals", "hospital cost comparison"],
+  "creator": {"@type": "Organization", "name": "BillKarma"},
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "variableMeasured": ["Average Hospital Charge", "Medicare Reference Rate", "Markup Ratio"],
+  "spatialCoverage": {"@type": "Place", "name": "United States"},
+  "temporalCoverage": "2026"
+}
+</script>
+{% if cheapest %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the cheapest city for {{ procedure.name }}?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ cheapest[0].name }}, {{ cheapest[0].state }} has the lowest average hospital charge for {{ procedure.name }} at ${{ '{:,}'.format(cheapest[0].avg_charge) }} — compared to the Medicare rate of ${{ '{:,}'.format(cheapest[0].medicare_rate) }}."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the most expensive city for {{ procedure.name }}?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{{ most_expensive[0].name }}, {{ most_expensive[0].state }} has the highest average hospital charge for {{ procedure.name }} at ${{ '{:,}'.format(most_expensive[0].avg_charge) }}, which is ${{ '{:,}'.format(savings) }} more than the cheapest city."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Medicare pay for {{ procedure.name }}?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Medicare pays ${{ '{:,}'.format(ref.medicare_rate) }} for {{ procedure.name }} (CPT {{ procedure.cpt_code }}). Hospitals across the US charge an average of ${{ '{:,}'.format(ref.avg_charge) }} — about {{ '%.1f' | format(ref.avg_charge / ref.medicare_rate) }}x the Medicare rate."
+      }
+    }
+  ]
+}
+</script>
+{% endif %}
+<style>
+  .cg-hero { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; padding: 60px 24px 68px; border-radius: 0 0 36px 36px; }
+  .cg-hero-inner { max-width: 860px; margin: 0 auto; }
+  .cg-crumb { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: 12px; }
+  .cg-crumb a { color: rgba(255,255,255,.85); text-decoration: underline; }
+  .cg-hero h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin: 0 0 16px; color: #fff; }
+  .cg-hero p { font-size: 1rem; color: rgba(255,255,255,.85); max-width: 620px; line-height: 1.6; margin: 0; }
+  .cg-stats { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px; }
+  .cg-stat { background: rgba(255,255,255,.15); border-radius: 10px; padding: 12px 18px; }
+  .cg-stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: rgba(255,255,255,.7); margin-bottom: 3px; }
+  .cg-stat-value { font-size: 1.35rem; font-weight: 800; color: #fff; }
+
+  .cg-body { max-width: 900px; margin: 0 auto; padding: 36px 24px 72px; }
+  .answer-box { background: #F0FDF4; border-left: 4px solid #059669; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 28px; font-size: 1rem; line-height: 1.65; }
+  .answer-box strong.label { display: block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #059669; margin-bottom: 5px; }
+  .section-h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; margin: 36px 0 14px; }
+
+  .rank-table { width: 100%; border-collapse: collapse; font-size: .9rem; margin-bottom: 32px; }
+  .rank-table thead th { background: #F9FAFB; text-align: left; padding: 10px 14px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #6B7280; border-bottom: 2px solid #E5E7EB; }
+  .rank-table tbody td { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; }
+  .rank-table tbody tr:hover { background: #F9FAFB; }
+  .rank-table a { color: #059669; font-weight: 600; text-decoration: none; }
+  .rank-table a:hover { text-decoration: underline; }
+  .rank-num { font-weight: 800; color: #9CA3AF; font-size: .85rem; }
+  .cheap-badge { background: #D1FAE5; color: #065F46; border-radius: 999px; padding: 2px 8px; font-size: .72rem; font-weight: 700; }
+  .exp-badge { background: #FEE2E2; color: #991B1B; border-radius: 999px; padding: 2px 8px; font-size: .72rem; font-weight: 700; }
+  .all-table-wrap { overflow-x: auto; }
+  .proc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .proc-pill { background: #F3F4F6; border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 600; text-decoration: none; color: #374151; }
+  .proc-pill:hover { background: #E6F4EA; color: #059669; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cg-hero">
+  <div class="cg-hero-inner">
+    <div class="cg-crumb">
+      <a href="/guides/">Guides</a> &rsaquo; Cheapest Cities for {{ procedure.name }}
+    </div>
+    <h1>Cheapest Cities for {{ procedure.name }} in 2026</h1>
+    <p>Hospital charges for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) vary by up to
+      {% if savings %}<strong>${{ "{:,}".format(savings) }}</strong>{% endif %}
+      depending on where you get care. Here are the cheapest — and most expensive — cities ranked.</p>
+    <div class="cg-stats">
+      {% if ref.medicare_rate %}
+      <div class="cg-stat">
+        <div class="cg-stat-label">Medicare Rate</div>
+        <div class="cg-stat-value">${{ "{:,}".format(ref.medicare_rate) }}</div>
+      </div>
+      {% endif %}
+      {% if cheapest %}
+      <div class="cg-stat">
+        <div class="cg-stat-label">Cheapest City Avg</div>
+        <div class="cg-stat-value">${{ "{:,}".format(cheapest[0].avg_charge) }}</div>
+      </div>
+      <div class="cg-stat">
+        <div class="cg-stat-label">Most Expensive Avg</div>
+        <div class="cg-stat-value">${{ "{:,}".format(most_expensive[0].avg_charge) }}</div>
+      </div>
+      {% endif %}
+      <div class="cg-stat">
+        <div class="cg-stat-label">Cities Compared</div>
+        <div class="cg-stat-value">{{ all_cities | length }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cg-body">
+  <div class="answer-box">
+    <strong class="label">Quick Answer</strong>
+    {{ meta_description }}
+    The Medicare reference rate for {{ procedure.name }} is
+    {% if ref.medicare_rate %}<strong>${{ "{:,}".format(ref.medicare_rate) }}</strong>{% endif %} —
+    even the cheapest cities charge
+    {% if cheapest and ref.medicare_rate %}
+      <strong>{{ "%.1f"|format(cheapest[0].avg_charge / ref.medicare_rate) }}x</strong> that rate.
+    {% endif %}
+  </div>
+
+  <h2 class="section-h2">10 Cheapest Cities for {{ procedure.name }}</h2>
+  <table class="rank-table">
+    <thead>
+      <tr><th>#</th><th>City</th><th>State</th><th>Avg Hospital Charge</th><th>Medicare Rate</th><th>Markup</th></tr>
+    </thead>
+    <tbody>
+      {% for c in cheapest %}
+      <tr>
+        <td class="rank-num">{{ loop.index }}</td>
+        <td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}</a> {% if loop.index == 1 %}<span class="cheap-badge">Cheapest</span>{% endif %}</td>
+        <td>{{ c.state }}</td>
+        <td>${{ "{:,}".format(c.avg_charge) }}</td>
+        <td>${{ "{:,}".format(c.medicare_rate) }}</td>
+        <td>{{ "%.1f"|format(c.markup_ratio) }}x</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="section-h2">10 Most Expensive Cities for {{ procedure.name }}</h2>
+  <table class="rank-table">
+    <thead>
+      <tr><th>#</th><th>City</th><th>State</th><th>Avg Hospital Charge</th><th>Medicare Rate</th><th>Markup</th></tr>
+    </thead>
+    <tbody>
+      {% for c in most_expensive %}
+      <tr>
+        <td class="rank-num">{{ loop.index }}</td>
+        <td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}</a> {% if loop.index == 1 %}<span class="exp-badge">Most Expensive</span>{% endif %}</td>
+        <td>{{ c.state }}</td>
+        <td>${{ "{:,}".format(c.avg_charge) }}</td>
+        <td>${{ "{:,}".format(c.medicare_rate) }}</td>
+        <td>{{ "%.1f"|format(c.markup_ratio) }}x</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="section-h2">All {{ all_cities | length }} Cities Ranked</h2>
+  <div class="all-table-wrap">
+    <table class="rank-table">
+      <thead>
+        <tr><th>#</th><th>City</th><th>State</th><th>Avg Charge</th><th>Markup</th></tr>
+      </thead>
+      <tbody>
+        {% for c in all_cities %}
+        <tr>
+          <td class="rank-num">{{ loop.index }}</td>
+          <td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}</a></td>
+          <td>{{ c.state }}</td>
+          <td>${{ "{:,}".format(c.avg_charge) }}</td>
+          <td>{{ "%.1f"|format(c.markup_ratio) }}x</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-h2">Compare Other Procedures</h2>
+  <div class="proc-pills">
+    {% for p in other_procedures %}
+    <a href="/guides/cheapest-cities-{{ p.slug }}-2026/" class="proc-pill">{{ p.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div style="background: #059669; border-radius: 20px; padding: 28px 24px; text-align: center; color: #fff; margin-bottom: 24px;">
+    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;">Got a bill for {{ procedure.name }}?</div>
+    <div style="font-size: .95rem; color: rgba(255,255,255,.85); margin-bottom: 16px;">Upload it to BillKarma to check for errors and compare against Medicare rates.</div>
+    <a href="/scan" style="background: #fff; color: #059669; border-radius: 999px; padding: 12px 24px; font-weight: 800; text-decoration: none; font-size: .95rem;">Scan My Bill Free &rarr;</a>
+  </div>
+
+  <p style="font-size:.78rem;color:#9CA3AF;margin-top:16px;text-align:center;">
+    Cost estimates based on CMS Medicare fee schedule and national chargemaster averages adjusted by CMS Geographic Adjustment Factors.
+    Actual charges vary by facility and insurance. Not financial or medical advice.
+  </p>
+</div>
+{% endblock %}
