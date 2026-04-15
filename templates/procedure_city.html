@@ -315,9 +315,11 @@
 
     {# CTA banner #}
     <div class="cta-banner">
-        <h2>Paying too much?</h2>
-        <p>BillKarma can help you negotiate your {{ procedure.name }} bill using federal pricing data.</p>
-        <a href="/" class="cta-btn">Analyze My Bill for Free &rarr;</a>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);margin-bottom:8px;">Free · No Account Needed</div>
+        <h2>Got a bill for {{ procedure.name }}?</h2>
+        <p>Upload it and we'll compare every charge against the Medicare rate{% if profile.medicare_rate %} of <strong style="color:#fff;">${{ "{:,.0f}".format(profile.medicare_rate) }}</strong>{% endif %} — flagging overcharges instantly.</p>
+        <a href="/scan" class="cta-btn">Scan My Bill Free &rarr;</a>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:12px;">Takes 60 seconds &middot; Results are instant</div>
     </div>
 
     {% if profile.data_source == "cms_static" %}

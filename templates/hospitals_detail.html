@@ -149,6 +149,15 @@
         </div>
     </div>
 
+    <div style="background:#1A1A1A;border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
+        <div>
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.45);margin-bottom:5px;">Free &middot; 60 seconds</div>
+            <div style="font-size:1rem;font-weight:800;color:#fff;margin-bottom:3px;">Got a bill from {{ data.hospital.name }}?</div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,.6);">We'll flag overcharges, duplicates, and errors against Medicare rates — instantly.</div>
+        </div>
+        <a href="/scan" style="background:var(--bk-green,#00824F);color:#fff;border-radius:999px;padding:11px 24px;font-weight:800;font-size:.875rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Scan My Bill Free &rarr;</a>
+    </div>
+
     {% if data.intro_paragraph %}
     <p class="text-sm text-gray-700 mb-4 leading-relaxed">{{ data.intro_paragraph }}</p>
     {% endif %}
