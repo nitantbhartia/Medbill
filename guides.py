@@ -130,6 +130,35 @@ _LINK_MAP: list[tuple[str, str]] = [
 ]
 
 
+_SCAN_CTA_BLOCK = (
+    '<div class="guide-cta-inline">'
+    '<h3>Got a bill for this? Check it free.</h3>'
+    '<p>Upload your medical bill and we\'ll compare every line against Medicare rates — flagging overcharges in 30 seconds. 1 in 4 bills has an error.</p>'
+    '<a href="/scan">Scan My Bill Free &rarr;</a>'
+    '</div>'
+)
+
+
+def inject_scan_cta(html: str) -> str:
+    """Inject a scan CTA after the 3rd </h2> for long guides that lack one."""
+    import re
+    if 'guide-cta-inline' in html:
+        return html
+    if len(re.sub(r'<[^>]+>', '', html).split()) < 500:
+        return html
+    # Insert after 3rd </h2>, falling back to halfway through
+    pos, count = 0, 0
+    while count < 3:
+        found = html.find('</h2>', pos)
+        if found == -1:
+            break
+        pos = found + len('</h2>')
+        count += 1
+    if count < 2:
+        pos = len(html) // 2
+    return html[:pos] + _SCAN_CTA_BLOCK + html[pos:]
+
+
 def inject_internal_links(html: str, current_slug: str) -> str:
     """Auto-link first occurrence of key phrases to relevant guides (skips current slug)."""
     import re
@@ -553,3 +582,27 @@ import guide_medicare_preventive_care
 import guide_medicaid_spend_down
 import guide_medicare_observation_status
 import guide_dual_eligible_billing
+# PAA (People Also Ask) guides
+import guide_paa_what_is_medical_bill_audit
+import guide_paa_average_hospital_markup
+import guide_paa_percentage_bills_have_errors
+import guide_paa_can_hospitals_charge_whatever
+import guide_paa_hospital_sue_unpaid
+import guide_paa_er_without_insurance
+import guide_paa_no_surprises_act_coverage
+import guide_paa_find_hospital_prices
+import guide_paa_medical_debt_7_years
+import guide_paa_itemized_bill_required
+for _paa in [
+    guide_paa_what_is_medical_bill_audit,
+    guide_paa_average_hospital_markup,
+    guide_paa_percentage_bills_have_errors,
+    guide_paa_can_hospitals_charge_whatever,
+    guide_paa_hospital_sue_unpaid,
+    guide_paa_er_without_insurance,
+    guide_paa_no_surprises_act_coverage,
+    guide_paa_find_hospital_prices,
+    guide_paa_medical_debt_7_years,
+    guide_paa_itemized_bill_required,
+]:
+    register(_paa.GUIDE["slug"], _paa.GUIDE)

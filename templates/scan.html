@@ -4,6 +4,31 @@
 
 {% block head %}
 <meta name="description" content="Upload your medical bill for a free AI-powered audit. Every charge is checked against Medicare rates to flag errors, duplicates, and overcharges in seconds.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BillKarma Medical Bill Scanner",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web",
+  "url": "https://billkarma.app/scan",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free medical bill audit"},
+  "description": "Upload your medical bill for a free AI-powered audit. Every charge is compared against CMS Medicare rates to flag errors, duplicates, and overcharges instantly.",
+  "featureList": ["Medicare rate comparison", "Duplicate charge detection", "Unbundling detection", "Upcoding detection", "Potential savings calculation"],
+  "creator": {"@type": "Organization", "name": "BillKarma", "url": "https://billkarma.app"}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is BillKarma's bill scanner really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Uploading your bill and getting a full analysis against Medicare rates is completely free. No account required. You only pay if you choose to use the paid dispute letter or negotiation services."}},
+    {"@type": "Question", "name": "What does the bill scanner check for?", "acceptedAnswer": {"@type": "Answer", "text": "BillKarma checks every line item against the CMS Medicare fee schedule, flags charges that exceed the Medicare rate by more than 3x, detects duplicate charges, identifies unbundled codes that should be combined, and checks for upcoded procedures."}},
+    {"@type": "Question", "name": "How long does the bill scan take?", "acceptedAnswer": {"@type": "Answer", "text": "Under 60 seconds for most bills. Upload a photo or PDF, enter your zip code, and BillKarma returns a full line-by-line analysis with flagged charges and estimated savings instantly."}}
+  ]
+}
+</script>
 <style>
     .scan-hero {
         background-color: #00824F;
