@@ -729,14 +729,14 @@ async def guide_page_redirect(slug: str):
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
     import re
-    from guides import get_guide, get_related_guides, inject_internal_links
+    from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/{slug}/"
     word_count = len(re.sub(r"<[^>]+>", "", guide["body"]).split())
     reading_time = max(1, round(word_count / 250))
-    linked_body = inject_internal_links(guide["body"], slug)
+    linked_body = inject_scan_cta(inject_internal_links(guide["body"], slug))
     return templates.TemplateResponse(
         "guide.html",
         {
@@ -2454,6 +2454,30 @@ async def _ping_indexnow(urls: list[str]) -> bool:
     except Exception as e:
         logging.warning("IndexNow ping failed: %s", e)
         return False
+
+
+@app.post("/newsletter/subscribe")
+async def newsletter_subscribe(request: Request):
+    """Store email for newsletter / checklist delivery. Simple opt-in."""
+    from fastapi import Form
+    form = await request.form()
+    email = str(form.get("email", "")).strip().lower()
+    source = str(form.get("source", "unknown"))[:100]
+    if not email or "@" not in email or len(email) > 254:
+        return JSONResponse({"status": "error", "message": "Invalid email"}, status_code=400)
+    try:
+        with db.get_db() as conn:
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS newsletter_subscribers "
+                "(id INTEGER PRIMARY KEY, email TEXT UNIQUE, source TEXT, subscribed_at TEXT)",
+            )
+            conn.execute(
+                "INSERT OR IGNORE INTO newsletter_subscribers (email, source, subscribed_at) VALUES (?, ?, datetime('now'))",
+                (email, source),
+            )
+    except Exception as e:
+        logging.warning("Newsletter subscribe error: %s", e)
+    return JSONResponse({"status": "ok"})
 
 
 @app.post("/admin/ping-indexnow")

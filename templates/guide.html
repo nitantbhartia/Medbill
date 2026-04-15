@@ -322,6 +322,41 @@
         text-decoration: none; white-space: nowrap; flex-shrink: 0;
     }
     .sticky-scan-bar-btn:hover { background: var(--bk-green-dark); color: #fff; }
+    .sticky-scan-bar-proof { font-size: .72rem; color: rgba(255,255,255,.4); border-left: 1px solid rgba(255,255,255,.15); padding-left: 14px; line-height: 1.4; }
+
+    /* === READING PROGRESS BAR === */
+    .reading-progress {
+        position: fixed; top: 60px; left: 0; right: 0;
+        height: 3px; background: transparent; z-index: 49; pointer-events: none;
+    }
+    .reading-progress-fill {
+        height: 100%; background: var(--bk-green);
+        width: 0%; transition: width 0.12s linear;
+    }
+
+    /* === EMAIL CAPTURE === */
+    .email-capture {
+        background: #F9FAFB; border: 1px solid var(--bk-gray-border);
+        border-radius: 16px; padding: 22px 24px;
+        margin: 32px 0; display: flex; align-items: center;
+        gap: 16px; flex-wrap: wrap;
+    }
+    .email-capture-label { flex: 1; min-width: 180px; }
+    .email-capture-label strong { display: block; font-size: .95rem; font-weight: 700; margin-bottom: 3px; color: #111827; }
+    .email-capture-label span { font-size: .82rem; color: #6B7280; }
+    .email-capture-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .email-capture-form input[type="email"] {
+        padding: 9px 14px; border: 1.5px solid #D1D5DB; border-radius: 8px;
+        font-size: .875rem; outline: none; min-width: 200px;
+        transition: border-color .15s;
+    }
+    .email-capture-form input[type="email"]:focus { border-color: var(--bk-green); }
+    .email-capture-form button {
+        background: var(--bk-green); color: #fff; border: none;
+        padding: 9px 18px; border-radius: 8px; font-weight: 700;
+        font-size: .875rem; cursor: pointer; white-space: nowrap;
+    }
+    .email-capture-form button:hover { background: var(--bk-green-dark); }
     .sticky-scan-bar-close {
         background: none; border: none; color: rgba(255,255,255,.45);
         font-size: 1.4rem; line-height: 1; cursor: pointer;
@@ -352,6 +387,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="reading-progress" aria-hidden="true"><div class="reading-progress-fill" id="reading-progress-fill"></div></div>
 <div class="article-hero">
     <div class="article-hero-inner">
         <div class="article-meta">
@@ -429,13 +465,25 @@
     </div>
     {% endif %}
 
+    <div class="email-capture">
+        <div class="email-capture-label">
+            <strong>Free: 7-Step Medical Bill Checklist</strong>
+            <span>Get our step-by-step guide to auditing any hospital bill.</span>
+        </div>
+        <form class="email-capture-form" action="/newsletter/subscribe" method="post">
+            <input type="hidden" name="source" value="guide-{{ guide.slug }}">
+            <input type="email" name="email" placeholder="your@email.com" required>
+            <button type="submit">Send it free &rarr;</button>
+        </form>
+    </div>
+
     {% if not guide.hide_default_cta %}
     <div class="article-cta">
         <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:10px;">Free Bill Analysis</div>
         <h3>Stop overpaying. Find out exactly what you should have been charged.</h3>
         <p>We'll flag every overcharge, duplicate, and upcoded line item against the federal Medicare benchmark — instantly.</p>
         <a href="/scan">Upload My Bill — It's Free &rarr;</a>
-        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:14px;">Takes 60 seconds &middot; No account needed &middot; Results are instant</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:14px;">1 in 4 hospital bills contains an error &middot; Takes 60 seconds &middot; No account needed</div>
     </div>
     {% endif %}
 </article>
@@ -443,6 +491,7 @@
 <div id="sticky-scan-bar" class="sticky-scan-bar" role="complementary" aria-label="Scan your bill">
     <span class="sticky-scan-bar-text">Your bill may have errors — check it against Medicare rates.</span>
     <a href="/scan" class="sticky-scan-bar-btn">Scan My Bill Free &rarr;</a>
+    <span class="sticky-scan-bar-proof">1 in 4 bills<br>has an error</span>
     <button class="sticky-scan-bar-close" onclick="this.closest('.sticky-scan-bar').remove()" aria-label="Dismiss">&times;</button>
 </div>
 {% endblock %}
@@ -450,14 +499,35 @@
 {% block scripts %}
 <script>
 (function() {
+    // Reading progress bar
+    var fill = document.getElementById('reading-progress-fill');
+    // Sticky scan bar
     var bar = document.getElementById('sticky-scan-bar');
-    if (!bar) return;
-    var shown = false;
+    var barShown = false;
+
     window.addEventListener('scroll', function() {
-        if (shown) return;
         var pct = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
-        if (pct > 0.28) { bar.classList.add('shown'); shown = true; }
+        if (fill) fill.style.width = Math.min(100, Math.round(pct * 100)) + '%';
+        if (bar && !barShown && pct > 0.28) { bar.classList.add('shown'); barShown = true; }
     }, { passive: true });
+
+    // Email capture form — show success inline
+    var form = document.querySelector('.email-capture-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var email = form.querySelector('input[type="email"]').value;
+            fetch('/newsletter/subscribe', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'email=' + encodeURIComponent(email) + '&source=' + encodeURIComponent(form.querySelector('[name=source]').value)
+            }).then(function() {
+                form.closest('.email-capture').innerHTML = '<div style="text-align:center;padding:8px 0;color:#065F46;font-weight:700;">&#10003; Checklist sent! Check your inbox.</div>';
+            }).catch(function() {
+                form.querySelector('button').textContent = 'Try again';
+            });
+        });
+    }
 })();
 </script>
 {% endblock %}

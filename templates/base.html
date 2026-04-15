@@ -299,6 +299,34 @@
         </div>
     </footer>
 
+    <!-- Exit-intent popup -->
+    <div id="exit-intent-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;" role="dialog" aria-modal="true" aria-label="Before you go">
+        <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+            <button onclick="document.getElementById('exit-intent-overlay').style.display='none';sessionStorage.setItem('exitSeen','1');" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.4rem;color:#9CA3AF;cursor:pointer;line-height:1;" aria-label="Close">&times;</button>
+            <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
+            <h2 style="font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin:0 0 10px;">Before you go — your bill may have errors</h2>
+            <p style="font-size:.9rem;color:#6B7280;line-height:1.6;margin:0 0 20px;">1 in 4 hospital bills contains at least one overcharge. A 60-second scan can recover hundreds — or thousands.</p>
+            <a href="/scan" onclick="sessionStorage.setItem('exitSeen','1');" style="display:block;background:var(--bk-green,#00824F);color:#fff;border-radius:999px;padding:14px 24px;font-weight:800;font-size:1rem;text-decoration:none;margin-bottom:10px;">Scan My Bill Free — 60 seconds &rarr;</a>
+            <button onclick="document.getElementById('exit-intent-overlay').style.display='none';sessionStorage.setItem('exitSeen','1');" style="background:none;border:none;color:#9CA3AF;font-size:.82rem;cursor:pointer;">No thanks, I'll leave money on the table</button>
+        </div>
+    </div>
+    <script>
+    (function() {
+        if (sessionStorage.getItem('exitSeen')) return;
+        var shown = false;
+        document.addEventListener('mouseleave', function(e) {
+            if (shown || e.clientY > 20) return;
+            shown = true;
+            var overlay = document.getElementById('exit-intent-overlay');
+            if (overlay) overlay.style.display = 'flex';
+        });
+        // Close on overlay click
+        document.getElementById('exit-intent-overlay').addEventListener('click', function(e) {
+            if (e.target === this) { this.style.display = 'none'; sessionStorage.setItem('exitSeen','1'); }
+        });
+    })();
+    </script>
+
     <script src="/static/js/app.js"></script>
     <script>
         window.BILLKARMA_MAP_TILE_URL = {{ config.MAP_TILE_URL | tojson if config is defined else '"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"' }};
