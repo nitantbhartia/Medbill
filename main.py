@@ -740,18 +740,12 @@ async def guide_page_redirect(slug: str):
     return RedirectResponse(url=f"/guides/{slug}/", status_code=301)
 
 
-_GUIDE_REDIRECTS = {
-    # EOB duplicate cluster → canonical
-    "understanding-explanation-of-benefits": "explanation-of-benefits-eob",
-    "explanation-of-benefits-eob-guide": "explanation-of-benefits-eob",
-}
-
-
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    if slug in _GUIDE_REDIRECTS:
-        return RedirectResponse(url=f"/guides/{_GUIDE_REDIRECTS[slug]}/", status_code=301)
+    from guides import GUIDE_REDIRECTS
+    if slug in GUIDE_REDIRECTS:
+        return RedirectResponse(url=f"/guides/{GUIDE_REDIRECTS[slug]}/", status_code=301)
     import re
     from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
     guide = get_guide(slug)

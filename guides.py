@@ -12,6 +12,14 @@ GUIDES = {}
 _DEFAULT_REVIEWED = "2026-04-05"
 
 
+# Legacy slug -> canonical slug. Routes 301 to the canonical and internal
+# surfaces (sitemap, related_guides, link map) skip / rewrite these.
+GUIDE_REDIRECTS = {
+    "understanding-explanation-of-benefits": "explanation-of-benefits-eob",
+    "explanation-of-benefits-eob-guide": "explanation-of-benefits-eob",
+}
+
+
 def register(slug: str, guide: dict):
     published = guide.get("published")
     reviewed_on = guide.get("reviewed_on") or _DEFAULT_REVIEWED
@@ -41,7 +49,7 @@ def get_related_guides(slug: str, limit: int = 5) -> list[dict]:
 
     scored = []
     for s, g in GUIDES.items():
-        if s == slug:
+        if s == slug or s in GUIDE_REDIRECTS:
             continue
         score = 0
         if g.get("category") == category:
@@ -93,6 +101,7 @@ def get_guides_for_sitemap() -> list[tuple[str, str]]:
     return [
         (slug, g.get("published", "2026-01-01"))
         for slug, g in sorted(GUIDES.items(), key=lambda x: x[1].get("published", ""), reverse=True)
+        if slug not in GUIDE_REDIRECTS
     ]
 
 
@@ -733,7 +742,7 @@ def _extend_link_map_from_guides():
     additions: list[tuple[str, str]] = []
 
     for slug, guide in GUIDES.items():
-        if slug in covered_slugs:
+        if slug in covered_slugs or slug in GUIDE_REDIRECTS:
             continue
         title = guide.get("title", "")
         # Use title up to first colon, dash, or em-dash as the phrase
@@ -751,4 +760,12 @@ def _extend_link_map_from_guides():
     _LINK_MAP.extend(additions)
 
 
+def _rewrite_redirected_link_targets():
+    """Retarget any _LINK_MAP entry that points at a redirected slug."""
+    for i, (phrase, slug) in enumerate(_LINK_MAP):
+        if slug in GUIDE_REDIRECTS:
+            _LINK_MAP[i] = (phrase, GUIDE_REDIRECTS[slug])
+
+
 _extend_link_map_from_guides()
+_rewrite_redirected_link_targets()
