@@ -26,27 +26,36 @@ def list_guides() -> list[dict]:
     return sorted(GUIDES.values(), key=lambda g: g.get("published", ""), reverse=True)
 
 
-def get_related_guides(slug: str, limit: int = 3) -> list[dict]:
-    """Return up to `limit` other guides related to the given slug, preferring same category."""
+def get_related_guides(slug: str, limit: int = 5) -> list[dict]:
+    """Return up to `limit` guides related to slug by category and title-keyword overlap."""
     current = GUIDES.get(slug)
     if not current:
         return []
 
     category = current.get("category", "")
-    same = [
-        {"slug": s, "title": g["title"], "category": g.get("category", "")}
-        for s, g in GUIDES.items()
-        if s != slug and g.get("category") == category
-    ]
-    if len(same) >= limit:
-        return same[:limit]
+    title_words = set(current.get("title", "").lower().split())
+    _STOP = {"a", "an", "the", "and", "or", "of", "in", "to", "for", "on", "at",
+             "your", "my", "how", "why", "what", "is", "are", "with", "from", "by",
+             "2026", "2025", "2024", "guide", "explained", "complete"}
+    title_keys = title_words - _STOP
 
-    other = [
+    scored = []
+    for s, g in GUIDES.items():
+        if s == slug:
+            continue
+        score = 0
+        if g.get("category") == category:
+            score += 10
+        other_words = set(g.get("title", "").lower().split()) - _STOP
+        score += len(title_keys & other_words) * 3
+        if score > 0:
+            scored.append((score, s, g))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [
         {"slug": s, "title": g["title"], "category": g.get("category", "")}
-        for s, g in GUIDES.items()
-        if s != slug and g.get("category") != category
+        for _, s, g in scored[:limit]
     ]
-    return (same + other)[:limit]
 
 
 def get_guide_slugs() -> list[str]:
@@ -217,6 +226,11 @@ _LINK_MAP: list[tuple[str, str]] = [
     # Audit & audit concepts
     ("medical bill audit", "what-is-a-medical-bill-audit"),
     ("billing error rate", "what-percentage-of-hospital-bills-have-errors"),
+    # Pillar guides
+    ("CPT codes and Medicare rates", "cpt-codes-medicare-rates-complete-guide"),
+    ("CPT code guide", "cpt-codes-medicare-rates-complete-guide"),
+    ("medical debt laws by state", "medical-debt-laws-by-state"),
+    ("state medical debt laws", "medical-debt-laws-by-state"),
     # Misc
     ("patient rights", "patient-rights-emergency-room"),
 ]
@@ -702,3 +716,39 @@ for _paa in [
 import guide_cpt_library  # noqa: F401
 # State medical debt law guides (self-registering on import)
 import guide_state_debt_laws  # noqa: F401
+# Pillar guides (hub pages for programmatic spoke clusters)
+import guide_pillar_cpt_codes  # noqa: F401
+import guide_pillar_state_debt_laws  # noqa: F401
+
+
+def _extend_link_map_from_guides():
+    """Auto-add title-based entries for guides not yet covered by _LINK_MAP."""
+    import re
+    _STOP = {"a", "an", "the", "and", "or", "of", "in", "to", "for", "on", "at",
+              "vs", "your", "my", "our", "how", "why", "what", "when", "is", "are",
+              "with", "from", "by", "as", "be", "has", "have", "after", "before",
+              "about", "—", "-", "&", "2026", "2025", "2024"}
+
+    covered_slugs = {slug for _, slug in _LINK_MAP}
+    additions: list[tuple[str, str]] = []
+
+    for slug, guide in GUIDES.items():
+        if slug in covered_slugs:
+            continue
+        title = guide.get("title", "")
+        # Use title up to first colon, dash, or em-dash as the phrase
+        phrase = re.split(r"[:\-—(]", title)[0].strip()
+        # Strip trailing punctuation and common suffixes like "(2026)"
+        phrase = re.sub(r"\s*\(?\d{4}\)?$", "", phrase).strip()
+        if not phrase or len(phrase) < 8:
+            continue
+        # Skip if phrase is all stop words
+        words = [w.lower().strip(".,") for w in phrase.split()]
+        if all(w in _STOP for w in words):
+            continue
+        additions.append((phrase, slug))
+
+    _LINK_MAP.extend(additions)
+
+
+_extend_link_map_from_guides()

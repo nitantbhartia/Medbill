@@ -20,19 +20,28 @@
 {% if guide.reviewed_on %}
 <meta property="article:modified_time" content="{{ guide.reviewed_on }}">
 {% endif %}
+{% set _medical_cats = ["Emergency Room", "Lab & Diagnostics", "Procedure Costs", "Imaging", "Orthopedic Surgery", "Billing Basics", "Taking Action", "Patient Rights", "Medical Debt"] %}
+{% set _is_medical = guide.category in _medical_cats %}
+{% set _schema_type = ["Article", "MedicalWebPage"] if _is_medical else "Article" %}
+{% set _body_text = guide.body | striptags | replace('"', '\\"') | replace('\n', ' ') | truncate(4000, True, '') %}
+{% set _keywords = (guide.title + ", " + (guide.category or "") + ", medical billing, BillKarma") %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": "{{ guide.title }}",
-    "description": "{{ meta_description }}",
+    "@type": {{ _schema_type | tojson }},
+    "headline": "{{ guide.title | replace('"', '\\"') }}",
+    "description": "{{ meta_description | replace('"', '\\"') }}",
     "datePublished": "{{ guide.published }}",
     "dateModified": "{{ guide.reviewed_on or guide.published }}",
     "mainEntityOfPage": "{{ canonical_url }}",
-    "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/about/", "sameAs": ["{{ request.url.scheme }}://{{ request.url.netloc }}/about/"]},
+    "author": {% if guide.reviewer %}{"@type": "Person", "name": "{{ guide.reviewer.name | replace('"', '\\"') }}"{% if guide.reviewer.credential %}, "hasCredential": {"@type": "EducationalOccupationalCredential", "credentialCategory": "{{ guide.reviewer.credential | replace('"', '\\"') }}"}{% endif %}{% if guide.reviewer.profile_url %}, "url": "{{ guide.reviewer.profile_url }}"{% endif %}}{% else %}{"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/about/", "sameAs": ["{{ request.url.scheme }}://{{ request.url.netloc }}/about/"]}{% endif %},
     "publisher": {"@type": "Organization", "name": "BillKarma", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/", "sameAs": ["{{ request.url.scheme }}://{{ request.url.netloc }}/about/"], "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
     "wordCount": {{ reading_time * 250 }},
-    "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".answer-box", ".article-body p:first-of-type"]}
+    "keywords": "{{ _keywords | replace('"', '\\"') }}",
+    "about": {"@type": "Thing", "name": "{{ guide.title | replace('"', '\\"') }}"},
+    "articleBody": "{{ _body_text }}",
+    "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".answer-box", ".article-body p:first-of-type"]}{% if _is_medical %},
+    "medicalAudience": {"@type": "MedicalAudience", "audienceType": "Patient"}{% endif %}
 }
 </script>
 <script type="application/ld+json">
@@ -59,10 +68,31 @@
         {% for faq in guide.faqs %}
         {
             "@type": "Question",
-            "name": "{{ faq.q }}",
+            "name": "{{ faq.q | replace('"', '\\"') }}",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "{{ faq.a }}"
+                "text": "{{ faq.a | replace('"', '\\"') }}"
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "QAPage",
+    "name": "{{ guide.title | replace('"', '\\"') }}",
+    "mainEntity": [
+        {% for faq in guide.faqs %}
+        {
+            "@type": "Question",
+            "name": "{{ faq.q | replace('"', '\\"') }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ faq.a | replace('"', '\\"') }}",
+                "upvoteCount": 0,
+                "url": "{{ canonical_url }}#faq-{{ loop.index }}"
             }
         }{% if not loop.last %},{% endif %}
         {% endfor %}
@@ -422,7 +452,11 @@
     <div class="eeat-bar">
         <svg class="eeat-bar-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.5" stroke="#059669"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div>
+            {% if guide.reviewer %}
+            <strong>Reviewed by {{ guide.reviewer.name }}{% if guide.reviewer.credential %}, {{ guide.reviewer.credential }}{% endif %}</strong>
+            {% else %}
             <strong>Fact-checked &amp; reviewed by the BillKarma Team</strong>
+            {% endif %}
             BillKarma researchers verify every guide against federal Medicare data, state law, and hospital chargemaster records. We update guides when laws change.
             {% if guide.reviewed_on %}<span style="margin-left:6px;color:#6B7280;">Last reviewed {{ guide.reviewed_on }}.</span>{% endif %}
         </div>
@@ -431,12 +465,10 @@
         <span class="guide-micro-cta-text">Got a bill related to this topic?</span>
         <a href="/scan" class="guide-micro-cta-btn">Check for errors — free, 60 sec &rarr;</a>
     </div>
-    {% if meta_description and meta_description | length < 200 %}
     <div class="answer-box">
         <strong>Quick Answer</strong>
-        {{ meta_description }}
+        {% if meta_description %}{{ meta_description }}{% else %}{{ guide.body | striptags | truncate(160, True, '…') }}{% endif %}
     </div>
-    {% endif %}
     <div class="article-body">
         {{ guide.body | safe }}
     </div>
