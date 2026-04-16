@@ -74,6 +74,10 @@ async def security_headers(request: Request, call_next):
         if proto == "http":
             https_url = str(request.url).replace("http://", "https://", 1)
             return RedirectResponse(url=https_url, status_code=301)
+        # Propagate the proxy-reported scheme into request.url so
+        # template-rendered canonical + JSON-LD URLs use https://.
+        if proto == "https" and request.scope.get("scheme") != "https":
+            request.scope["scheme"] = "https"
 
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -3302,4 +3306,14 @@ async def about_page(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=config.DEBUG)
+    # forwarded_allow_ips="*" trusts X-Forwarded-Proto from Railway's proxy so
+    # request.url.scheme resolves to "https" — otherwise JSON-LD breadcrumbs
+    # emit http:// URLs that Google marks "Page with redirect".
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=config.DEBUG,
+        proxy_headers=True,
+        forwarded_allow_ips="*",
+    )
