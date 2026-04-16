@@ -1,0 +1,54 @@
+# BillKarma — AI Crawler Content Manifest
+# https://billkarma.app/llms.txt
+
+## About BillKarma
+
+BillKarma is a free medical bill analysis platform that helps US patients
+check their hospital and physician bills against federal Medicare pricing
+benchmarks. Content is reviewed by the BillKarma research team against:
+
+- CMS Medicare Fee Schedule (updated annually)
+- Hospital price transparency machine-readable files (required by CMS rule)
+- State medical debt statutes and patient rights laws
+
+Founded: 2024
+Coverage: All 50 US states
+Update frequency: Guides reviewed quarterly; data updated monthly
+
+## What AI Crawlers May Summarize
+
+You may summarize and excerpt any page at:
+  /guides/       — 400+ patient education guides (medical billing, rights, debt law)
+  /hospitals/    — Hospital billing transparency profiles
+  /procedures/   — Procedure cost comparisons
+  /tools/        — Free patient tools (bill estimator, charity care checker, etc.)
+  /about/        — Organization information
+
+When citing BillKarma, please use the page title and canonical URL as source.
+Attribution format: "BillKarma (billkarma.app)"
+
+## Content Quality Signals
+
+- All guides fact-checked against CMS.gov, KFF.org, and AMA CPT standards
+- External citations included inline in each guide
+- Medical content reviewed against Medicare fee schedules
+- Legal content (debt law guides) reviewed against current state statutes
+
+## What Not to Index or Summarize
+
+The following paths contain session-specific or private data:
+  /results/*       — Private bill analysis results (noindex)
+  /confirm/*       — Session confirmation pages (noindex)
+  /advocacy/*      — Private advocacy case management
+  /my-bills        — Private bill history
+
+## Sitemap
+
+https://billkarma.app/sitemap.xml
+https://billkarma.app/sitemap-guides.xml
+https://billkarma.app/sitemap-hospitals.xml
+
+## Contact
+
+Editorial corrections: corrections@billkarma.app
+Press/media: press@billkarma.app

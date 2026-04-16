@@ -189,35 +189,58 @@ def _build_guide(code: str, name: str, slug_suffix: str, medicare_rate: int,
 
 <h2>What CPT {code} means on your bill</h2>
 <p>When you see CPT {code} on an itemized hospital bill or Explanation of Benefits, it means you were billed for {name.lower()}. This code is used by all hospitals, physician offices, and outpatient facilities in the United States to report this service to insurers and Medicare.</p>
-<p>The charge listed next to CPT {code} on your bill is the hospital's chargemaster (list) price — not what Medicare or your insurer pays. The actual cost to a Medicare patient is ${medicare_rate:,}. For insured commercial patients, the negotiated rate is typically ${int(medicare_rate * 1.8):,}–${int(medicare_rate * 2.5):,}.</p>
+<p>The charge listed next to CPT {code} on your bill is the hospital's chargemaster (list) price — not what Medicare or your insurer pays. The actual cost to a Medicare patient is ${medicare_rate:,}. For insured commercial patients, the negotiated rate is typically ${int(medicare_rate * 1.8):,}–${int(medicare_rate * 2.5):,}. Uninsured patients are often billed the full chargemaster amount of ${low:,}–${high:,} unless they specifically ask for a discount or a self-pay rate.</p>
 
-<h2>Medicare rate for CPT {code}</h2>
-<p>The CMS (Centers for Medicare &amp; Medicaid Services) Medicare rate for CPT {code} is approximately <strong>${medicare_rate:,}</strong> for facility-based services. This is the most transparent public benchmark for this procedure.</p>
+<h2>Medicare rate for CPT {code}: What payers actually pay</h2>
+<p>The CMS (Centers for Medicare &amp; Medicaid Services) Medicare rate for CPT {code} is approximately <strong>${medicare_rate:,}</strong> for facility-based services. This is the most transparent public benchmark for this procedure and is updated annually in the Medicare Physician Fee Schedule.</p>
 <table>
-  <tr><th>Payer</th><th>Typical payment for CPT {code}</th></tr>
-  <tr><td>Medicare</td><td>${medicare_rate:,}</td></tr>
-  <tr><td>Commercial insurance (negotiated)</td><td>${int(medicare_rate * 1.8):,}–${int(medicare_rate * 2.5):,}</td></tr>
-  <tr><td>Hospital chargemaster (list price)</td><td>${low:,}–${high:,}</td></tr>
-  <tr><td>Uninsured / self-pay (full charge)</td><td>${low:,}–${high:,}</td></tr>
+  <tr><th>Payer</th><th>Typical payment for CPT {code}</th><th>How it's set</th></tr>
+  <tr><td>Medicare (CMS)</td><td>${medicare_rate:,}</td><td>Federal fee schedule, published annually</td></tr>
+  <tr><td>Commercial insurance</td><td>${int(medicare_rate * 1.8):,}–${int(medicare_rate * 2.5):,}</td><td>Negotiated contract rate</td></tr>
+  <tr><td>Medicaid</td><td>${int(medicare_rate * 0.7):,}–${int(medicare_rate * 1.0):,}</td><td>State-set rate, typically lower than Medicare</td></tr>
+  <tr><td>Hospital chargemaster</td><td>${low:,}–${high:,}</td><td>Hospital's internal list price; almost nobody pays this</td></tr>
+  <tr><td>Uninsured / self-pay</td><td>${int(low * 0.4):,}–${high:,}</td><td>Full charge unless you negotiate or qualify for charity care</td></tr>
 </table>
 
 <h2>How to check your CPT {code} charge</h2>
 <ol>
-  <li><strong>Get the itemized bill.</strong> Confirm CPT {code} is listed with the date, quantity, and charge.</li>
+  <li><strong>Get the itemized bill.</strong> Confirm CPT {code} is listed with the date of service, quantity, and charge. Request it in writing if you only received a summary statement.</li>
   <li><strong>Check the Medicare rate.</strong> The benchmark for CPT {code} is ${medicare_rate:,}. Any charge above ${medicare_rate * 3:,} (3x Medicare) is worth disputing.</li>
   <li><strong>Verify it matches your records.</strong> CPT {code} should appear in your medical records as a documented service. If you don't recognize it, request your records and compare.</li>
-  <li><strong>Check for duplicates.</strong> CPT {code} on the same date more than once is a red flag — unless the procedure was genuinely performed multiple times with clinical justification.</li>
+  <li><strong>Check for duplicates.</strong> CPT {code} on the same date more than once is a red flag unless the procedure was genuinely performed multiple times with clinical justification.</li>
+  <li><strong>Confirm the code is correct for your situation.</strong> The code should match the actual complexity and nature of the service provided. Ask your provider to explain in writing why this specific code was chosen.</li>
 </ol>
+
+<h2>When CPT {code} is commonly overbilled</h2>
+<p>Billing departments may improperly bill CPT {code} in these situations:</p>
+<ul>
+  <li><strong>Upcoding:</strong> Billing CPT {code} when a lower-complexity code better reflects the actual service performed. This is especially common for evaluation and management (E/M) codes where the documentation doesn't support the level billed.</li>
+  <li><strong>Unbundling:</strong> Billing CPT {code} alongside other codes that should be included in a single bundled charge. CMS's National Correct Coding Initiative (NCCI) edits define which codes may not be billed together.</li>
+  <li><strong>Duplicate billing:</strong> The same CPT {code} appearing twice on the same date without documented clinical reason.</li>
+  <li><strong>Phantom charges:</strong> In rare cases, CPT {code} appears on a bill for a service you did not receive. Always cross-reference your bill with your medical records.</li>
+</ul>
+
+<h2>Sample dispute letter for a CPT {code} overcharge</h2>
+<p>If your bill shows CPT {code} at more than 3x the Medicare rate (${medicare_rate * 3:,}), use this letter as a starting point:</p>
+<blockquote>
+<p><em>Dear [Hospital] Billing Department,</em></p>
+<p><em>I am writing to dispute the charge of $[AMOUNT] for CPT code {code} ({name}) on my bill dated [DATE]. According to the CMS 2026 Medicare Physician Fee Schedule, the Medicare facility rate for CPT {code} is approximately ${medicare_rate:,}. My charge of $[AMOUNT] represents a markup of [X]x the Medicare benchmark.</em></p>
+<p><em>I am requesting: (1) a written explanation of how this charge was calculated; (2) any clinical documentation supporting this code; and (3) an adjusted rate closer to the Medicare benchmark or your lowest available self-pay rate.</em></p>
+<p><em>Please respond within 30 days. I am prepared to escalate this dispute to my state insurance commissioner and the CMS Price Transparency hotline if needed.</em></p>
+</blockquote>
+<p>For a complete customizable template, see our <a href="/guides/medical-bill-dispute-letter/">free medical bill dispute letter guide</a>.</p>
 
 <h2>Common billing problems with CPT {code}</h2>
 <ul>
-  <li><strong>Upcoding:</strong> Billing CPT {code} when a lower-level code better reflects the actual service performed.</li>
-  <li><strong>Duplicate billing:</strong> The same code appearing twice on the same date without documented clinical reason.</li>
-  <li><strong>Incorrect quantity:</strong> A quantity greater than 1 for a service that should only be performed once per encounter.</li>
-  <li><strong>Excessive markup:</strong> Charging more than 3–5x the Medicare rate of ${medicare_rate:,}.</li>
+  <li><strong>Excessive markup:</strong> Charging more than 3–5x the Medicare rate of ${medicare_rate:,} is worth a formal dispute.</li>
+  <li><strong>Missing itemization:</strong> You have the right to an itemized bill listing every CPT code. If you received only a summary, request the itemized version immediately.</li>
+  <li><strong>Wrong payer rate applied:</strong> If you have insurance, confirm your EOB shows the negotiated rate was applied — not the full chargemaster price.</li>
+  <li><strong>No prior authorization:</strong> Some insurers require prior authorization for CPT {code}. If it wasn't obtained, your insurer may deny the claim and bill you directly — even if the service was medically necessary.</li>
 </ul>
 
-<div class="key-takeaway"><strong>Bottom line:</strong> If you see CPT {code} on your bill, the Medicare benchmark is ${medicare_rate:,}. A charge of ${int(medicare_rate * 3):,} or more (3x Medicare) is worth a formal dispute. Upload your bill to BillKarma to check every line automatically.</div>""",
+<div class="key-takeaway"><strong>Bottom line:</strong> The Medicare benchmark for CPT {code} is ${medicare_rate:,}. A charge above ${int(medicare_rate * 3):,} (3x Medicare) is worth a formal dispute. Use the sample letter above or upload your bill to BillKarma for an automated check of every line item.</div>
+
+<p>For the full list of CPT codes and Medicare rates, see our <a href="/guides/cpt-codes-medicare-rates-complete-guide/">Complete CPT Codes &amp; Medicare Rates Guide</a>.</p>""",
     }
 
 
