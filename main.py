@@ -566,7 +566,7 @@ async def confirm_page(request: Request, bill_id: int):
     if not results:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
     log_audit(action="view_confirm", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
-    return templates.TemplateResponse("confirm.html", {"request": request, "data": results})
+    return templates.TemplateResponse("confirm.html", {"request": request, "data": results, "meta_robots": "noindex, nofollow"})
 
 
 @app.get("/results/{bill_id}", response_class=HTMLResponse)
@@ -629,6 +629,7 @@ async def results_page(request: Request, bill_id: int):
             "outcome_stats": outcome_stats,
             "dispute_fee_dollars": fee_cents / 100,
             "case_summary": case_summary,
+            "meta_robots": "noindex, nofollow",
         },
     )
 

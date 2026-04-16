@@ -7,23 +7,6 @@
 <script type="application/ld+json">{{ data.seo.hospital_schema_json | safe }}</script>
 <script type="application/ld+json">{{ data.seo.faq_schema_json | safe }}</script>
 <script type="application/ld+json">{{ data.seo.breadcrumb_schema_json | safe }}</script>
-{% if data.hospital.cms_star_rating and data.hospital.cms_star_rating | int > 0 %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "{{ data.hospital.name | e }}",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "{{ data.hospital.cms_star_rating }}",
-    "bestRating": "5",
-    "worstRating": "1",
-    "ratingCount": "1",
-    "description": "CMS Hospital Compare overall star rating"
-  }
-}
-</script>
-{% endif %}
 <style>
     .hospital-hero {
         background-color: var(--bk-green);

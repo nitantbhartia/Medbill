@@ -29,8 +29,8 @@
     "datePublished": "{{ guide.published }}",
     "dateModified": "{{ guide.reviewed_on or guide.published }}",
     "mainEntityOfPage": "{{ canonical_url }}",
-    "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}"},
-    "publisher": {"@type": "Organization", "name": "BillKarma", "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
+    "author": {"@type": "Organization", "name": "{{ guide.author or 'BillKarma' }}", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/about/", "sameAs": ["{{ request.url.scheme }}://{{ request.url.netloc }}/about/"]},
+    "publisher": {"@type": "Organization", "name": "BillKarma", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/", "sameAs": ["{{ request.url.scheme }}://{{ request.url.netloc }}/about/"], "logo": {"@type": "ImageObject", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/static/img/billkarma-og.svg"}},
     "wordCount": {{ reading_time * 250 }},
     "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".answer-box", ".article-body p:first-of-type"]}
 }
