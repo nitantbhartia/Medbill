@@ -180,7 +180,7 @@ register("hospital-payment-plans", {
 
 <ol>
     <li><strong>Check for billing errors.</strong> <a href="/scan">Upload your bill to BillKarma</a>. If errors are found, dispute them first and set up the plan on the corrected balance.</li>
-    <li><strong>Apply for financial assistance.</strong> If you qualify for <a href="/guides/hospital-financial-assistance-charity-care">charity care</a>, the hospital should apply the discount before setting up the payment plan. Use our <a href="/charity-care">eligibility checker</a>.</li>
+    <li><strong>Apply for financial assistance.</strong> If you qualify for <a href="/guides/hospital-financial-assistance-charity-care/">charity care</a>, the hospital should apply the discount before setting up the payment plan. Use our <a href="/charity-care">eligibility checker</a>.</li>
     <li><strong>Negotiate the total.</strong> Ask for a self-pay discount or offer a reduced amount. Then set up the payment plan on the negotiated balance.</li>
 </ol>
 

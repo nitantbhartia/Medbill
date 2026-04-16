@@ -204,7 +204,7 @@ register("endoscopy-billing", {
     </tbody>
 </table>
 
-<p>The key difference: colonoscopy biopsies taken during a preventive screening are protected by a 2023 federal rule for most insurance plans. Upper endoscopy has no equivalent federal protection, making the preventive-to-diagnostic reclassification much harder to fight. For more on the colonoscopy rule, see our <a href="/guides/colonoscopy-billing">colonoscopy billing guide</a>.</p>
+<p>The key difference: colonoscopy biopsies taken during a preventive screening are protected by a 2023 federal rule for most insurance plans. Upper endoscopy has no equivalent federal protection, making the preventive-to-diagnostic reclassification much harder to fight. For more on the colonoscopy rule, see our <a href="/guides/colonoscopy-billing/">colonoscopy billing guide</a>.</p>
 
 <h2 id="hospital-vs-asc">7. Hospital vs. surgery center costs</h2>
 
@@ -273,7 +273,7 @@ register("endoscopy-billing", {
     <li><strong>Duplicate pathology charges:</strong> Multiple pathology bills for a single biopsy specimen. Request each bill to confirm they cover different tissue samples or different analyses.</li>
 </ul>
 
-<p>See our <a href="/guides/dispute-bill">complete dispute guide</a> for letter templates. For additional help with endoscopy billing errors, <a href="/scan">upload your bill to BillKarma</a> for an automated review.</p>
+<p>See our <a href="/guides/dispute-bill/">complete dispute guide</a> for letter templates. For additional help with endoscopy billing errors, <a href="/scan">upload your bill to BillKarma</a> for an automated review.</p>
 
 <h2 id="case-studies">10. Case studies</h2>
 

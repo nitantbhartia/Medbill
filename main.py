@@ -2159,15 +2159,26 @@ async def compare_index(
     facility_a = _clean_fid(facility_a)
     facility_b = _clean_fid(facility_b)
     hospital = _clean_fid(hospital)
+    # Legacy `?hospital=X` param was never linked to a valid comparison on its
+    # own. Retire it: 301 to the hospital's canonical profile when resolvable,
+    # else the bare form. Eliminates a long tail of "Page with redirect" crawl
+    # entries in Search Console.
+    if hospital and not facility_b:
+        from compare_pages import get_hospital_for_compare
+        h = get_hospital_for_compare(hospital)
+        if h and h.get("slug") and h.get("state_slug") and h.get("city_slug"):
+            return RedirectResponse(
+                url=f"/hospitals/{h['state_slug']}/{h['city_slug']}/{h['slug']}/",
+                status_code=301,
+            )
+        return RedirectResponse(url="/compare/", status_code=301)
     # Deep-link support from ASC/imaging pages.
     if facility_a and facility_b:
         return RedirectResponse(url=f"/compare/{facility_a}/vs/{facility_b}/", status_code=301)
-    if hospital:
-        facility_a = hospital
-    # Parameter URLs are just the empty form — don't let Google index them
-    has_params = facility_a or facility_b
+    # Keep `?facility-a=X` as a prefill entry point (linked from hospital/ASC
+    # detail pages) but noindex it so only the canonical /compare/ is indexed.
+    has_params = bool(facility_a)
     canonical_url = f"{config.APP_URL.rstrip('/')}/compare/"
-    robots = "noindex, follow" if has_params else "index, follow"
     resp = templates.TemplateResponse(
         "compare_index.html",
         {
@@ -2175,7 +2186,7 @@ async def compare_index(
             "canonical_url": canonical_url,
             "og_title": "Hospital Comparison Tool | BillKarma",
             "og_description": "Compare any two hospitals side-by-side: billing grade, markup vs Medicare, CMS stars, and procedure prices.",
-            "meta_robots": robots,
+            "meta_robots": "noindex, follow" if has_params else "index, follow",
         },
     )
     if has_params:

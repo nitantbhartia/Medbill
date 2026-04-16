@@ -112,7 +112,7 @@ register("hospital-chargemaster-explained", {
 
 <p><strong>Medicaid</strong> pays even less than Medicare in most states, using state-set fee schedules that are often 60&ndash;80% of Medicare rates.</p>
 
-<p><strong>Uninsured patients</strong> are the most likely to be billed the full chargemaster price. Without an insurer to negotiate on their behalf, uninsured patients historically received bills at the gross charge &mdash; the highest price in the hospital&rsquo;s system. Since the CMS price transparency rule took effect in 2021, hospitals must post a &ldquo;discounted cash price&rdquo; for self-pay patients, but this price is still typically 2&ndash;5 times the Medicare rate. See our guide to <a href="/guides/hospital-cash-pay-self-pay-discount">hospital cash-pay discounts</a> for strategies on reducing these costs.</p>
+<p><strong>Uninsured patients</strong> are the most likely to be billed the full chargemaster price. Without an insurer to negotiate on their behalf, uninsured patients historically received bills at the gross charge &mdash; the highest price in the hospital&rsquo;s system. Since the CMS price transparency rule took effect in 2021, hospitals must post a &ldquo;discounted cash price&rdquo; for self-pay patients, but this price is still typically 2&ndash;5 times the Medicare rate. See our guide to <a href="/guides/hospital-cash-pay-self-pay-discount/">hospital cash-pay discounts</a> for strategies on reducing these costs.</p>
 
 <p><strong>Out-of-network patients</strong> face a different problem. When you receive care from an out-of-network provider, your insurer may pay its &ldquo;allowed amount&rdquo; &mdash; which could be based on Medicare rates or some other benchmark &mdash; but the hospital can bill you for the difference between the chargemaster price and the allowed amount. This gap is called <strong>balance billing</strong>, and it is the mechanism by which chargemaster prices directly hit patients&rsquo; wallets.</p>
 
@@ -203,7 +203,7 @@ register("hospital-chargemaster-explained", {
     <li><strong>De-identified minimum and maximum negotiated rates</strong> &mdash; the range across all payers</li>
 </ul>
 
-<p>Hospitals must publish this data in a CSV, JSON, or XML file (not PDF) on their website, accessible without login or registration. They must also provide a consumer-friendly display of prices for at least 300 &ldquo;shoppable&rdquo; services. For a detailed breakdown of the rule and compliance rates, see our <a href="/guides/hospital-price-transparency-rules-2026">hospital price transparency guide</a>.</p>
+<p>Hospitals must publish this data in a CSV, JSON, or XML file (not PDF) on their website, accessible without login or registration. They must also provide a consumer-friendly display of prices for at least 300 &ldquo;shoppable&rdquo; services. For a detailed breakdown of the rule and compliance rates, see our <a href="/guides/hospital-price-transparency-rules-2026/">hospital price transparency guide</a>.</p>
 
 <p><strong>How to find your hospital&rsquo;s chargemaster file:</strong></p>
 

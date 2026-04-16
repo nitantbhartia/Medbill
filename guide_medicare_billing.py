@@ -405,7 +405,7 @@ register(
   <p>
     You have 120 days from your MSN to file a Level 1 appeal. Don&rsquo;t wait. Most billing errors are
     correctable if you act within this window. Read our full guide on
-    <a href="/guides/how-to-appeal-a-medical-bill">how to appeal a medical bill</a> for a step-by-step walkthrough.
+    <a href="/guides/how-to-appeal-a-medical-bill/">how to appeal a medical bill</a> for a step-by-step walkthrough.
   </p>
 </div>
 

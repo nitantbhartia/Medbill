@@ -110,7 +110,7 @@ register("how-much-does-blood-test-cost", {
 
 <p><strong>Facility overhead allocation.</strong> Hospital labs are part of a larger facility with emergency departments, operating rooms, and administrative staff. Hospitals spread these overhead costs across all departments, including the lab. When you pay $300 for a CMP at a hospital, you&rsquo;re subsidizing the cost of running a 24/7 emergency department&mdash;not paying for a more accurate blood test.</p>
 
-<p><strong>Chargemaster pricing.</strong> Hospitals set prices via their Chargemaster&mdash;an internal, unregulated price list. These prices are not based on cost, market rates, or what Medicare pays. They&rsquo;re set by hospital administrators and are primarily used as a starting point for insurance negotiations. Uninsured patients who don&rsquo;t negotiate get the full Chargemaster price. Learn more in our <a href="/guides/why-lab-test-bills-are-so-high">guide to why lab test bills are so high</a>.</p>
+<p><strong>Chargemaster pricing.</strong> Hospitals set prices via their Chargemaster&mdash;an internal, unregulated price list. These prices are not based on cost, market rates, or what Medicare pays. They&rsquo;re set by hospital administrators and are primarily used as a starting point for insurance negotiations. Uninsured patients who don&rsquo;t negotiate get the full Chargemaster price. Learn more in our <a href="/guides/why-lab-test-bills-are-so-high/">guide to why lab test bills are so high</a>.</p>
 
 <p><strong>Volume economics.</strong> Quest Diagnostics processes over <strong>500 million tests per year</strong> across dedicated lab facilities optimized for throughput. Their cost per test is a fraction of a hospital lab that processes a few hundred tests daily alongside patient care. This scale advantage gets passed to consumers in the form of lower pricing.</p>
 
@@ -139,7 +139,7 @@ register("how-much-does-blood-test-cost", {
 <p>The exact same test&mdash;a lipid panel (CPT 80061)&mdash;can be free or cost you $200+ depending on how your doctor codes the visit. If the visit is coded as a <strong>preventive exam</strong> (ICD-10 code Z00.00), the lab work is covered at 100%. If the visit is coded as a <strong>follow-up for hyperlipidemia</strong> (ICD-10 code E78.5), the lab work becomes diagnostic and hits your deductible.</p>
 
 <div class="key-takeaway">
-    <strong>Ask your doctor before the visit:</strong> &ldquo;Will this lab work be coded as preventive?&rdquo; If your doctor says yes, confirm with the billing office that the visit will carry a preventive diagnosis code. This one question can save you $100&ndash;$500. Learn more in our <a href="/guides/preventive-care-billing">guide to preventive care billing</a>.
+    <strong>Ask your doctor before the visit:</strong> &ldquo;Will this lab work be coded as preventive?&rdquo; If your doctor says yes, confirm with the billing office that the visit will carry a preventive diagnosis code. This one question can save you $100&ndash;$500. Learn more in our <a href="/guides/preventive-care-billing/">guide to preventive care billing</a>.
 </div>
 
 <h2 id="free-tests">5. When blood tests are free under the ACA</h2>
@@ -172,7 +172,7 @@ register("how-much-does-blood-test-cost", {
     <li><strong>Use an independent lab instead of a hospital lab.</strong> Ask your doctor to route orders to Quest, LabCorp, or a local reference lab. Savings: 80&ndash;95% vs. hospital pricing. The results are identical.</li>
     <li><strong>Try direct-to-consumer lab services.</strong> If you don&rsquo;t need a doctor&rsquo;s order, services like Walk-In Lab and Ulta Lab Tests offer pre-negotiated cash prices. A comprehensive wellness panel (CBC + CMP + lipid + thyroid + A1C) typically costs $60&ndash;$100.</li>
     <li><strong>Confirm preventive coding before your visit.</strong> Ask your doctor: &ldquo;Will this visit and lab work be coded as preventive?&rdquo; Preventive labs are free under the ACA. One wrong diagnosis code can turn a $0 lab visit into a $400 bill.</li>
-    <li><strong>Ask for the self-pay rate.</strong> If you&rsquo;re uninsured or your deductible is high, tell the lab you want to pay the cash/self-pay rate. Hospital labs typically offer 40&ndash;60% off their Chargemaster price for self-pay patients. You can also use an HSA or FSA to pay&mdash;see our <a href="/guides/hsa-fsa-pay-medical-bills">HSA/FSA guide</a>.</li>
+    <li><strong>Ask for the self-pay rate.</strong> If you&rsquo;re uninsured or your deductible is high, tell the lab you want to pay the cash/self-pay rate. Hospital labs typically offer 40&ndash;60% off their Chargemaster price for self-pay patients. You can also use an HSA or FSA to pay&mdash;see our <a href="/guides/hsa-fsa-pay-medical-bills/">HSA/FSA guide</a>.</li>
     <li><strong>Audit your lab bill for errors.</strong> Lab bills are among the most error-prone in medical billing. Check for duplicate charges, unbundled panel codes, and tests you didn&rsquo;t order. <a href="/scan">Upload your bill to BillKarma</a> to check every line item automatically.</li>
 </ol>
 

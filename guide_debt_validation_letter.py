@@ -199,8 +199,8 @@ register("debt-validation-letter-medical-debt", {
 <p>If the collector sends back documentation proving the debt is valid and the amount is correct, you have several options:</p>
 
 <ul>
-    <li><a href="/guides/how-to-negotiate-medical-bills">Negotiate a settlement</a> — collectors accept 25-40% of the balance in most cases</li>
-    <li><a href="/guides/hospital-financial-assistance-charity-care">Apply for financial assistance</a> at the original hospital — yes, you can still do this after collections</li>
+    <li><a href="/guides/how-to-negotiate-medical-bills/">Negotiate a settlement</a> — collectors accept 25-40% of the balance in most cases</li>
+    <li><a href="/guides/hospital-financial-assistance-charity-care/">Apply for financial assistance</a> at the original hospital — yes, you can still do this after collections</li>
     <li>Set up a payment plan — many collectors offer interest-free installments</li>
     <li><a href="/settle-debt">Use a pay-for-delete settlement offer</a> to get the debt removed from credit reports</li>
 </ul>

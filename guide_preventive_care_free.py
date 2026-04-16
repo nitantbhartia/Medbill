@@ -114,7 +114,7 @@ register("what-preventive-care-is-free", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Watch for administration fees:</strong> Some providers bill a separate vaccine administration fee in addition to the vaccine itself. Both the vaccine and its administration must be covered at $0 under ACA-compliant plans. If you are charged an administration fee for a covered vaccine, that is a billing error. See our guide to <a href="/guides/hpv-vaccine-cost">HPV vaccine billing</a> for a specific example.
+    <strong>Watch for administration fees:</strong> Some providers bill a separate vaccine administration fee in addition to the vaccine itself. Both the vaccine and its administration must be covered at $0 under ACA-compliant plans. If you are charged an administration fee for a covered vaccine, that is a billing error. See our guide to <a href="/guides/hpv-vaccine-cost/">HPV vaccine billing</a> for a specific example.
 </div>
 
 <h2 id="medications">4. Free preventive medications</h2>

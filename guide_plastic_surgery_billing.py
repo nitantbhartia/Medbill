@@ -234,7 +234,7 @@ register("plastic-surgery-billing", {
 <div class="key-takeaway">
   <strong>Request your denial reason in writing.</strong> Every insurance denial must come with a
   specific reason and the clinical criteria used to make the decision. Use our
-  <a href="/guides/appeal-denial">insurance denial appeal guide</a> to craft a targeted response
+  <a href="/guides/appeal-denial/">insurance denial appeal guide</a> to craft a targeted response
   to the exact criteria your insurer applied.
 </div>
 
@@ -255,7 +255,7 @@ register("plastic-surgery-billing", {
   back pain&rdquo; are weak. Specific measurements &mdash; &ldquo;Numeric Pain Scale 7/10 for 18 months,
   PT completed 12 sessions without relief, bra strap grooving 1.2 cm deep bilaterally&rdquo; &mdash; are
   what reviewers need to approve coverage. Read our guide to
-  <a href="/guides/prior-authorization">prior authorization requirements</a> for more detail.
+  <a href="/guides/prior-authorization/">prior authorization requirements</a> for more detail.
 </p>
 
 <h2 id="prior-auth">5. Prior Authorization Requirements</h2>
@@ -335,13 +335,13 @@ register("plastic-surgery-billing", {
 <ol>
   <li><strong>Get the denial letter.</strong> Read it carefully. It must state the specific clinical criteria used to deny coverage. Note the exact language &mdash; your appeal must address those criteria directly.</li>
   <li><strong>Gather your documentation package</strong> (letter of medical necessity, objective findings, conservative treatment records, specialist notes) as described above.</li>
-  <li><strong>Write your appeal letter.</strong> Address each denial criterion point by point, citing specific page numbers in your supporting documentation. Use our <a href="/guides/dispute-letter-template">letter template</a> as a starting point.</li>
+  <li><strong>Write your appeal letter.</strong> Address each denial criterion point by point, citing specific page numbers in your supporting documentation. Use our <a href="/guides/dispute-letter-template/">letter template</a> as a starting point.</li>
   <li><strong>Submit by certified mail</strong> and keep a copy of everything you send. Note the date of submission &mdash; insurers are required to respond within 30 days for non-urgent appeals.</li>
   <li><strong>If the internal appeal fails</strong>, request an independent external review. This is a federal right under the ACA for most plans. An independent physician reviews the clinical evidence without deference to your insurer&rsquo;s decision. External review overturns internal denials approximately 40% of the time.</li>
 </ol>
 <p>
   You can also escalate to your state insurance commissioner if you believe the denial was improper.
-  See the <a href="/guides/insurance-denial-appeal-win">insurance denial appeal guide</a> for scripts,
+  See the <a href="/guides/insurance-denial-appeal-win/">insurance denial appeal guide</a> for scripts,
   templates, and state-specific escalation contacts.
 </p>
 

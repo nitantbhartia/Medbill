@@ -153,7 +153,7 @@ register("what-is-a-deductible", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Preventive care exception:</strong> Under the ACA, preventive services like annual physicals, mammograms, colonoscopies, and most vaccinations are covered at 100% with no cost-sharing — meaning you pay $0 even if you haven&rsquo;t met your deductible. This applies to in-network providers only. See <a href="/guides/preventive-care-billing">our guide to preventive care billing</a> for the full list.
+    <strong>Preventive care exception:</strong> Under the ACA, preventive services like annual physicals, mammograms, colonoscopies, and most vaccinations are covered at 100% with no cost-sharing — meaning you pay $0 even if you haven&rsquo;t met your deductible. This applies to in-network providers only. See <a href="/guides/preventive-care-billing/">our guide to preventive care billing</a> for the full list.
 </div>
 
 <h2 id="hdhp-hsa">5. HDHPs and Health Savings Accounts</h2>
@@ -194,7 +194,7 @@ register("what-is-a-deductible", {
     <p><strong>Maria&rsquo;s total cost: $8,000</strong> — not $85,000. The OOP max is a catastrophic cost ceiling. Without it, 20% of $85,000 would be $17,000. She also <a href="/scan">scanned her hospital bill</a> and found $3,400 in overcharges that were corrected before insurance processed the claim, preventing her from paying 20% on inflated charges.</p>
 </div>
 
-<p>For a deeper dive, see <a href="/guides/out-of-pocket-maximum">our complete guide to out-of-pocket maximums</a> and <a href="/guides/what-is-coinsurance">how coinsurance is calculated</a>.</p>
+<p>For a deeper dive, see <a href="/guides/out-of-pocket-maximum/">our complete guide to out-of-pocket maximums</a> and <a href="/guides/what-is-coinsurance/">how coinsurance is calculated</a>.</p>
 
 <h2 id="tracking">7. How to track your deductible progress</h2>
 

@@ -132,17 +132,17 @@ register("preventive-care-billing", {
 <p><strong>Colonoscopy polyp removal reclassification:</strong> Historically, insurers reclassified a screening colonoscopy as diagnostic if polyps were found and removed, triggering cost-sharing that could exceed <strong>$1,500</strong>. The ACA was updated to prohibit this, but some plans have been slow to update their claims processing. If you are billed for polyp removal during a screening colonoscopy, appeal immediately.</p>
 
 <div class="key-takeaway">
-    <strong>The ICD-10 code matters as much as the CPT code.</strong> A cholesterol test (CPT 80061) coded with an ICD-10 screening diagnosis (Z13.220) is free. The same test coded with a diagnostic diagnosis (E78.5, hyperlipidemia) is subject to cost-sharing. Ask your provider to use screening diagnosis codes for preventive services. Learn more about how procedure codes work in <a href="/guides/cpt-codes-explained">our CPT codes guide</a>.
+    <strong>The ICD-10 code matters as much as the CPT code.</strong> A cholesterol test (CPT 80061) coded with an ICD-10 screening diagnosis (Z13.220) is free. The same test coded with a diagnostic diagnosis (E78.5, hyperlipidemia) is subject to cost-sharing. Ask your provider to use screening diagnosis codes for preventive services. Learn more about how procedure codes work in <a href="/guides/cpt-codes-explained/">our CPT codes guide</a>.
 </div>
 
 <h2 id="fight-back">5. How to fight a wrongly-billed preventive visit</h2>
 
 <ol>
-    <li><strong>Get the EOB and itemized bill.</strong> Check the CPT codes and ICD-10 diagnosis codes. Identify whether the service was coded as preventive or diagnostic. For a step-by-step walkthrough, see <a href="/guides/how-to-read-your-eob">our guide to reading your EOB</a>.</li>
+    <li><strong>Get the EOB and itemized bill.</strong> Check the CPT codes and ICD-10 diagnosis codes. Identify whether the service was coded as preventive or diagnostic. For a step-by-step walkthrough, see <a href="/guides/how-to-read-your-eob/">our guide to reading your EOB</a>.</li>
     <li><strong>Call the provider&rsquo;s billing department.</strong> Ask them to review and resubmit the claim with the correct preventive CPT and ICD-10 codes. Many billing errors are resolved at this step.</li>
     <li><strong>File a formal appeal with your insurer.</strong> If the provider won&rsquo;t change the codes, appeal directly with your insurance company. Cite the specific ACA preventive care requirement and the USPSTF recommendation grade (A or B) for the service.</li>
     <li><strong>Include supporting documentation.</strong> Attach the USPSTF recommendation, the relevant CPT code, and a letter explaining that the service was a routine screening without diagnostic intent.</li>
-    <li><strong>File a complaint if needed.</strong> If the insurer denies your appeal, file a complaint with your state insurance commissioner and the U.S. Department of Health and Human Services. ACA preventive care coverage is a federal requirement, and regulators take violations seriously. For a full walkthrough of the appeals process, see <a href="/guides/how-to-appeal-a-medical-bill-denial">our guide to appealing insurance denials</a>.</li>
+    <li><strong>File a complaint if needed.</strong> If the insurer denies your appeal, file a complaint with your state insurance commissioner and the U.S. Department of Health and Human Services. ACA preventive care coverage is a federal requirement, and regulators take violations seriously. For a full walkthrough of the appeals process, see <a href="/guides/how-to-appeal-a-medical-bill-denial/">our guide to appealing insurance denials</a>.</li>
 </ol>
 
 <h2 id="protect-yourself">6. Protecting yourself before your visit</h2>

@@ -276,7 +276,7 @@ register("private-equity-hospital-billing", {
     </div>
     <div class="faq-item">
         <h3>Do insurance companies negotiate differently with PE hospitals?</h3>
-        <p>In markets where PE consolidation has reduced competition, insurers have less leverage to negotiate lower rates. A 2023 <em>Health Affairs</em> study found PE hospitals charged commercial insurers 30% more than comparable non-PE hospitals in the same markets. Fewer local hospital alternatives give PE systems more pricing power in contract negotiations, which ultimately flows through to patients as higher premiums and out-of-pocket costs. Learn more about how hospital billing grades relate to ownership in our <a href="/guides/hospital-billing-grades-explained">hospital billing grades guide</a>.</p>
+        <p>In markets where PE consolidation has reduced competition, insurers have less leverage to negotiate lower rates. A 2023 <em>Health Affairs</em> study found PE hospitals charged commercial insurers 30% more than comparable non-PE hospitals in the same markets. Fewer local hospital alternatives give PE systems more pricing power in contract negotiations, which ultimately flows through to patients as higher premiums and out-of-pocket costs. Learn more about how hospital billing grades relate to ownership in our <a href="/guides/hospital-billing-grades-explained/">hospital billing grades guide</a>.</p>
     </div>
 </div>
 

@@ -198,7 +198,7 @@ register("wisconsin-medical-billing", {
     <li><strong>Nonprofit hospital charity care denial:</strong> File IRS Form 13909 and contact Wisconsin DATCP</li>
 </ul>
 
-<p>Our <a href="/guides/dispute-bill">step-by-step dispute guide</a> walks through the full process with sample letter templates.</p>
+<p>Our <a href="/guides/dispute-bill/">step-by-step dispute guide</a> walks through the full process with sample letter templates.</p>
 
 <div class="key-takeaway">
     <strong>Found billing errors or a surprise balance bill?</strong> <a href="/hospitals/">Search our Wisconsin hospital directory</a> to check your hospital&rsquo;s pricing, charity care grade, and price transparency status &mdash; then use that data in your dispute letter.

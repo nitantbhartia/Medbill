@@ -143,7 +143,7 @@ register("ultrasound-costs", {
     <li><strong>Medicare rate:</strong> $131</li>
 </ul>
 
-<p>The facility fee at a hospital outpatient department can add $400 to $1,500 to an ultrasound bill even for a simple 20-minute scan. Our guide on <a href="/guides/facility-fees-explained">facility fees</a> explains how to identify and challenge these charges on your EOB.</p>
+<p>The facility fee at a hospital outpatient department can add $400 to $1,500 to an ultrasound bill even for a simple 20-minute scan. Our guide on <a href="/guides/facility-fees-explained/">facility fees</a> explains how to identify and challenge these charges on your EOB.</p>
 
 <h2 id="annotated-bill">5. Annotated ultrasound bill example</h2>
 
@@ -164,7 +164,7 @@ register("ultrasound-costs", {
     <li><strong>Abdominal ultrasound technical ($1,100)</strong> &mdash; The hospital&rsquo;s facility charge for the scan. At 8.4x the Medicare rate of $131, this is the primary dispute target. Freestanding centers charge $200&ndash;$400 for the equivalent service.</li>
     <li><strong>Radiology read ($140)</strong> &mdash; The radiologist&rsquo;s interpretation fee. At approximately 1x Medicare, this is reasonable.</li>
     <li><strong>Limited abdomen ultrasound ($620)</strong> &mdash; A limited abdominal ultrasound (76705) should only be billed when the complete ultrasound (76700) was not performed on the same date. Billing both 76700 and 76705 on the same date for the same patient is a Correct Coding Initiative (CCI) violation. Dispute this charge.</li>
-    <li><strong>Pelvic ultrasound duplicate ($880)</strong> &mdash; Appearing twice on the same date with no clinical note supporting two separate exams is a textbook duplicate charge. This is almost certainly a billing error. Flag and dispute immediately. See our guide on <a href="/guides/duplicate-charges">disputing duplicate charges</a>.</li>
+    <li><strong>Pelvic ultrasound duplicate ($880)</strong> &mdash; Appearing twice on the same date with no clinical note supporting two separate exams is a textbook duplicate charge. This is almost certainly a billing error. Flag and dispute immediately. See our guide on <a href="/guides/duplicate-charges/">disputing duplicate charges</a>.</li>
 </ul>
 
 <h2 id="get-cheaper">6. How to get a cheaper ultrasound</h2>
@@ -199,7 +199,7 @@ register("ultrasound-costs", {
     </li>
     <li><strong>Look up Medicare rates.</strong> Use our <a href="/calculator">cost calculator</a> to benchmark each charge. Any charge above 3x Medicare warrants a call to the billing department.</li>
     <li><strong>Call the billing department with specifics.</strong> For example: &ldquo;Medicare pays $131 for CPT 76700. I am being charged $1,100. I am requesting a reduction consistent with what commercial insurers pay for this service.&rdquo;</li>
-    <li><strong>For insurance denials,</strong> file a formal appeal citing the medical necessity documentation from your ordering physician. Most ultrasound denials are overturned on first appeal when clinical notes are included. Our <a href="/guides/appeal-denial">insurance denial guide</a> has templates.</li>
+    <li><strong>For insurance denials,</strong> file a formal appeal citing the medical necessity documentation from your ordering physician. Most ultrasound denials are overturned on first appeal when clinical notes are included. Our <a href="/guides/appeal-denial/">insurance denial guide</a> has templates.</li>
 </ol>
 
 <h2 id="case-studies">8. Real-world case studies</h2>

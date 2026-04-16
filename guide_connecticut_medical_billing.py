@@ -51,7 +51,7 @@ register("connecticut-medical-billing-laws", {
 
 <h2 id="facility-fee-ban">1. Connecticut&rsquo;s facility fee ban (PA 15-146 &amp; PA 23-171)</h2>
 
-<p>Connecticut was among the first states in the nation to address the growing problem of hospital <a href="/guides/hospital-facility-fees-explained">facility fees</a> charged at off-campus physician offices. When hospitals acquire independent physician practices, they often reclassify those offices as hospital outpatient departments (HOPDs) and add a facility fee on top of the physician&rsquo;s professional fee &mdash; sometimes doubling or tripling the cost of a routine office visit.</p>
+<p>Connecticut was among the first states in the nation to address the growing problem of hospital <a href="/guides/hospital-facility-fees-explained/">facility fees</a> charged at off-campus physician offices. When hospitals acquire independent physician practices, they often reclassify those offices as hospital outpatient departments (HOPDs) and add a facility fee on top of the physician&rsquo;s professional fee &mdash; sometimes doubling or tripling the cost of a routine office visit.</p>
 
 <p>Connecticut&rsquo;s response came in two waves:</p>
 

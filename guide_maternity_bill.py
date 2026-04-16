@@ -174,7 +174,7 @@ register("maternity-hospital-bill", {
     <li><strong>Get your nursing notes</strong> — ask the hospital for your labor and delivery nursing record. It documents every medication given, when the baby was in the nursery vs. your room, and the timeline of care. This is your evidence for disputing duplicate or incorrect charges.</li>
     <li><strong>Check your OB&rsquo;s bill separately</strong> — confirm they billed the global code (59400 or 59510) and not individual visits in addition to it.</li>
     <li><strong>Call your insurer</strong> — confirm what codes were submitted and what cost-sharing applies. If the anesthesiologist or neonatologist was out-of-network, the No Surprises Act limits your cost-sharing to the in-network amount.</li>
-    <li><strong>Write a formal dispute letter</strong> citing each incorrect line item, the nursing record evidence, and the corrected charge you&rsquo;re requesting. See our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> for a template.</li>
+    <li><strong>Write a formal dispute letter</strong> citing each incorrect line item, the nursing record evidence, and the corrected charge you&rsquo;re requesting. See our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> for a template.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -223,7 +223,7 @@ register("maternity-hospital-bill", {
 
     <div class="faq-item">
         <h3>Can I negotiate my maternity bill?</h3>
-        <p>Yes. Beyond disputing specific errors, you can negotiate the overall balance — especially if you&rsquo;re uninsured or have a high deductible. Most hospitals offer self-pay discounts of 30&ndash;50%. Nonprofit hospitals are required to have financial assistance programs; if your income qualifies, you may owe significantly less. See our <a href="/guides/how-to-negotiate-a-medical-bill">negotiation guide</a> for step-by-step instructions.</p>
+        <p>Yes. Beyond disputing specific errors, you can negotiate the overall balance — especially if you&rsquo;re uninsured or have a high deductible. Most hospitals offer self-pay discounts of 30&ndash;50%. Nonprofit hospitals are required to have financial assistance programs; if your income qualifies, you may owe significantly less. See our <a href="/guides/how-to-negotiate-a-medical-bill/">negotiation guide</a> for step-by-step instructions.</p>
     </div>
 </div>
 

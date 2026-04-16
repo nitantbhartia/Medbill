@@ -161,7 +161,7 @@ register("hospital-mergers-higher-prices", {
     </tbody>
 </table>
 
-<p>BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files shows hospitals in low-competition markets (fewer than 3 hospital systems) are <strong>2.4x more likely</strong> to receive a D or F billing grade than hospitals in markets with 5 or more competing systems. The connection between market structure and billing behavior is not theoretical &mdash; it shows up in the actual charges posted to price transparency files. For a full explanation of how billing grades are calculated, see our <a href="/guides/hospital-billing-grades-explained">Hospital Billing Grades Explained</a> guide.</p>
+<p>BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files shows hospitals in low-competition markets (fewer than 3 hospital systems) are <strong>2.4x more likely</strong> to receive a D or F billing grade than hospitals in markets with 5 or more competing systems. The connection between market structure and billing behavior is not theoretical &mdash; it shows up in the actual charges posted to price transparency files. For a full explanation of how billing grades are calculated, see our <a href="/guides/hospital-billing-grades-explained/">Hospital Billing Grades Explained</a> guide.</p>
 
 {_embed(mode="cost", title="Look up what Medicare pays for your procedure", subtitle="Enter any CPT code from your bill to see the 2026 Medicare facility rate.")}
 

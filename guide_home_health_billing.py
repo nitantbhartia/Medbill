@@ -320,7 +320,7 @@ register("home-health-billing", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>Does Medicare cover home health care?</h3>
-        <p>Yes. Medicare covers skilled home health — including skilled nursing, physical therapy, occupational therapy, speech therapy, and home health aide services provided alongside skilled care — when you are homebound, your doctor certifies medical necessity, the care is skilled, and the agency is Medicare-certified. There is no deductible or coinsurance for covered home health visits. Use our <a href="/guides/how-medicare-billing-works">Medicare billing guide</a> to understand how Medicare covers different settings of care.</p>
+        <p>Yes. Medicare covers skilled home health — including skilled nursing, physical therapy, occupational therapy, speech therapy, and home health aide services provided alongside skilled care — when you are homebound, your doctor certifies medical necessity, the care is skilled, and the agency is Medicare-certified. There is no deductible or coinsurance for covered home health visits. Use our <a href="/guides/how-medicare-billing-works/">Medicare billing guide</a> to understand how Medicare covers different settings of care.</p>
     </div>
 
     <div class="faq-item">
@@ -335,7 +335,7 @@ register("home-health-billing", {
 
     <div class="faq-item">
         <h3>How do I dispute a home health billing error?</h3>
-        <p>Start by collecting your itemized bill, your clinical visit log, and your Medicare Summary Notice. Document the specific date, code, and discrepancy in writing, and submit a dispute to the agency's billing department. If Medicare already paid the claim, call 1-800-MEDICARE to report the discrepancy — you have 120 days from your MSN to file a formal appeal. Our guide on <a href="/guides/dispute-bill">how to dispute a medical bill</a> walks through the full process.</p>
+        <p>Start by collecting your itemized bill, your clinical visit log, and your Medicare Summary Notice. Document the specific date, code, and discrepancy in writing, and submit a dispute to the agency's billing department. If Medicare already paid the claim, call 1-800-MEDICARE to report the discrepancy — you have 120 days from your MSN to file a formal appeal. Our guide on <a href="/guides/dispute-bill/">how to dispute a medical bill</a> walks through the full process.</p>
     </div>
 
     <div class="faq-item">

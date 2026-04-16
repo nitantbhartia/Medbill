@@ -75,12 +75,21 @@
     </div>
 
     {% if total > per_page %}
+    {% set _default_sort = sort == "grade" %}
+    {% set _prev_page = page - 1 %}
+    {% set _next_page = page + 1 %}
+    {% set _prev_params = [] %}
+    {% if not _default_sort %}{% set _ = _prev_params.append("sort=" ~ sort) %}{% endif %}
+    {% if _prev_page > 1 %}{% set _ = _prev_params.append("page=" ~ _prev_page) %}{% endif %}
+    {% set _next_params = [] %}
+    {% if not _default_sort %}{% set _ = _next_params.append("sort=" ~ sort) %}{% endif %}
+    {% set _ = _next_params.append("page=" ~ _next_page) %}
     <div class="mt-4 flex gap-2 text-sm">
         {% if page > 1 %}
-        <a class="underline" href="?sort={{ sort }}&page={{ page - 1 }}">Previous</a>
+        <a class="underline" href="{{ ('?' ~ _prev_params | join('&')) if _prev_params else './' }}" rel="prev">Previous</a>
         {% endif %}
         {% if page * per_page < total %}
-        <a class="underline" href="?sort={{ sort }}&page={{ page + 1 }}">Next</a>
+        <a class="underline" href="?{{ _next_params | join('&') }}" rel="next">Next</a>
         {% endif %}
     </div>
     {% endif %}

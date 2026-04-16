@@ -67,7 +67,7 @@ register("how-to-apply-for-medicaid", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Key point:</strong> You do not need to be unemployed to qualify. Many Medicaid enrollees work &mdash; Medicaid is based on income, not job status. If you have medical bills you can&rsquo;t afford, <a href="/guides/cant-afford-medical-bill">see our guide on options when you can&rsquo;t pay</a>.
+    <strong>Key point:</strong> You do not need to be unemployed to qualify. Many Medicaid enrollees work &mdash; Medicaid is based on income, not job status. If you have medical bills you can&rsquo;t afford, <a href="/guides/cant-afford-medical-bill/">see our guide on options when you can&rsquo;t pay</a>.
 </div>
 
 <h2 id="income-limits">2. Income limits by family size (2026)</h2>
@@ -118,7 +118,7 @@ register("how-to-apply-for-medicaid", {
     </tbody>
 </table>
 
-<p>In non-expansion states, childless adults without a disability often fall into a &ldquo;coverage gap&rdquo; &mdash; they earn too much for traditional Medicaid but too little for Marketplace subsidies. If you are in this situation, check whether your state offers any limited benefit programs or <a href="/guides/uninsured-hospital-bill">see our guide on managing hospital bills without insurance</a>.</p>
+<p>In non-expansion states, childless adults without a disability often fall into a &ldquo;coverage gap&rdquo; &mdash; they earn too much for traditional Medicaid but too little for Marketplace subsidies. If you are in this situation, check whether your state offers any limited benefit programs or <a href="/guides/uninsured-hospital-bill/">see our guide on managing hospital bills without insurance</a>.</p>
 
 <div class="case-study">
     <h3>Case study: Maria in Texas vs. Maria in California</h3>
@@ -270,7 +270,7 @@ register("how-to-apply-for-medicaid", {
     <strong>Don&rsquo;t give up:</strong> According to the Kaiser Family Foundation, a significant number of Medicaid denials are due to procedural issues (missing paperwork, failure to respond) rather than actual ineligibility. Filing an appeal with complete documentation frequently results in approval.
 </div>
 
-<p>If you are dealing with medical bills while waiting for Medicaid approval, ask your hospital about <a href="/guides/cant-afford-medical-bill">financial assistance programs</a> and request that they pause collections until your Medicaid determination is complete. Most hospitals will honor this request.</p>
+<p>If you are dealing with medical bills while waiting for Medicaid approval, ask your hospital about <a href="/guides/cant-afford-medical-bill/">financial assistance programs</a> and request that they pause collections until your Medicaid determination is complete. Most hospitals will honor this request.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

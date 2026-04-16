@@ -132,7 +132,7 @@ register("how-long-to-pay-medical-bill", {
     <li><strong>Check for billing errors first.</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; roughly 1 in 3 hospital bills contain at least one error. Fixing errors can reduce your bill by 10&ndash;30% before you negotiate anything else.</li>
     <li><strong>Apply for financial assistance.</strong> Use our <a href="/charity-care">charity care eligibility checker</a> to see if you qualify. Nonprofit hospitals must accept applications for at least 240 days from the first billing statement. Qualifying can mean 50&ndash;100% of the bill written off.</li>
     <li><strong>Negotiate the total.</strong> Reference <a href="/calculator">Medicare rates</a> for your procedures and offer 150&ndash;200% of Medicare as a fair price. Hospitals routinely accept less than sticker price from patients who negotiate during this window.</li>
-    <li><strong>Set up a payment plan.</strong> Hospital payment plans are almost always 0% interest. See our <a href="/guides/hospital-payment-plans">payment plan guide</a> for negotiation scripts and red flags to watch for.</li>
+    <li><strong>Set up a payment plan.</strong> Hospital payment plans are almost always 0% interest. See our <a href="/guides/hospital-payment-plans/">payment plan guide</a> for negotiation scripts and red flags to watch for.</li>
 </ol>
 
 <h3>Days 90&ndash;120: the pre-collection window</h3>
@@ -146,7 +146,7 @@ register("how-long-to-pay-medical-bill", {
 
 <h3>Days 120+: the collections window</h3>
 
-<p>Once the bill is with a collector, your options change but don&rsquo;t disappear. See <a href="/guides/medical-debt-statute-of-limitations">our full statute of limitations guide</a> for state-specific rules on how long collectors can pursue you.</p>
+<p>Once the bill is with a collector, your options change but don&rsquo;t disappear. See <a href="/guides/medical-debt-statute-of-limitations/">our full statute of limitations guide</a> for state-specific rules on how long collectors can pursue you.</p>
 
 <div class="case-study">
     <h3>Strategic timing: $7,200 ER bill resolved for $1,440</h3>
@@ -206,7 +206,7 @@ register("how-long-to-pay-medical-bill", {
     </tbody>
 </table>
 
-<p><em>This table covers the 15 most commonly searched states. For a complete 50-state breakdown, see our <a href="/guides/medical-debt-statute-of-limitations">full statute of limitations guide</a>.</em></p>
+<p><em>This table covers the 15 most commonly searched states. For a complete 50-state breakdown, see our <a href="/guides/medical-debt-statute-of-limitations/">full statute of limitations guide</a>.</em></p>
 
 <h3>What happens when the SOL expires</h3>
 
@@ -219,7 +219,7 @@ register("how-long-to-pay-medical-bill", {
 
 <h3>Zombie debt warning</h3>
 
-<p>Beware of &ldquo;zombie debt&rdquo; &mdash; old, time-barred debt that collectors purchase for pennies and try to collect by pressuring you into a payment that restarts the SOL. If you receive a collection letter for a debt you don&rsquo;t recognize or that seems very old, do not pay anything. Send a debt validation letter first and check the date against your state&rsquo;s SOL using our <a href="/statute-of-limitations">statute of limitations calculator</a>. Read more in our <a href="/guides/medical-debt-statute-of-limitations">complete SOL guide</a>.</p>
+<p>Beware of &ldquo;zombie debt&rdquo; &mdash; old, time-barred debt that collectors purchase for pennies and try to collect by pressuring you into a payment that restarts the SOL. If you receive a collection letter for a debt you don&rsquo;t recognize or that seems very old, do not pay anything. Send a debt validation letter first and check the date against your state&rsquo;s SOL using our <a href="/statute-of-limitations">statute of limitations calculator</a>. Read more in our <a href="/guides/medical-debt-statute-of-limitations/">complete SOL guide</a>.</p>
 
 <h2 id="action-plan">8. Action plan based on where you are in the timeline</h2>
 
@@ -237,7 +237,7 @@ register("how-long-to-pay-medical-bill", {
         </tr>
         <tr>
             <td><strong>Bill is 30&ndash;90 days old</strong></td>
-            <td>Apply for <a href="/charity-care">financial assistance</a>, negotiate total balance, set up <a href="/guides/hospital-payment-plans">payment plan</a></td>
+            <td>Apply for <a href="/charity-care">financial assistance</a>, negotiate total balance, set up <a href="/guides/hospital-payment-plans/">payment plan</a></td>
             <td>Charity care can reduce 50&ndash;100%. Payment plans are typically 0% interest</td>
         </tr>
         <tr>
@@ -257,7 +257,7 @@ register("how-long-to-pay-medical-bill", {
         </tr>
         <tr>
             <td><strong>Can&rsquo;t afford to pay anything</strong></td>
-            <td>Apply for <a href="/charity-care">charity care</a>, explore <a href="/guides/cant-afford-medical-bill">all 7 options</a> for unaffordable bills</td>
+            <td>Apply for <a href="/charity-care">charity care</a>, explore <a href="/guides/cant-afford-medical-bill/">all 7 options</a> for unaffordable bills</td>
             <td>Patients under 200% FPL often qualify for 100% free care at nonprofit hospitals</td>
         </tr>
     </tbody>
@@ -297,7 +297,7 @@ register("how-long-to-pay-medical-bill", {
 
     <div class="faq-item">
         <h3>Should I pay an old medical bill or wait for it to expire?</h3>
-        <p>It depends on your timeline. If the bill is still with the hospital (under 120 days), act now &mdash; you have the most leverage to negotiate, apply for <a href="/charity-care">financial assistance</a>, or <a href="/guides/hospital-payment-plans">set up a payment plan</a>. If the bill is in collections and the statute of limitations is close to expiring, do not make any payment, as even $1 can reset the clock. If you&rsquo;re unsure, <a href="/guides/cant-afford-medical-bill">review all your options</a> before paying anything.</p>
+        <p>It depends on your timeline. If the bill is still with the hospital (under 120 days), act now &mdash; you have the most leverage to negotiate, apply for <a href="/charity-care">financial assistance</a>, or <a href="/guides/hospital-payment-plans/">set up a payment plan</a>. If the bill is in collections and the statute of limitations is close to expiring, do not make any payment, as even $1 can reset the clock. If you&rsquo;re unsure, <a href="/guides/cant-afford-medical-bill/">review all your options</a> before paying anything.</p>
     </div>
 </div>
 

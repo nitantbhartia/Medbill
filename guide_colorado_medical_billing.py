@@ -63,7 +63,7 @@ register("colorado-medical-billing-laws", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Check your bill for illegal facility fees.</strong> If you visited an off-campus hospital clinic in Colorado and see a &ldquo;facility fee,&rdquo; &ldquo;hospital outpatient department fee,&rdquo; or a charge under Revenue Code 0510&ndash;0529, that charge may violate HB 22-1285. <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag facility fee violations automatically and generate a dispute letter citing Colorado law. Also read our <a href="/guides/hospital-facility-fees-explained">complete guide to hospital facility fees</a> to understand how they work nationwide.
+    <strong>Check your bill for illegal facility fees.</strong> If you visited an off-campus hospital clinic in Colorado and see a &ldquo;facility fee,&rdquo; &ldquo;hospital outpatient department fee,&rdquo; or a charge under Revenue Code 0510&ndash;0529, that charge may violate HB 22-1285. <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag facility fee violations automatically and generate a dispute letter citing Colorado law. Also read our <a href="/guides/hospital-facility-fees-explained/">complete guide to hospital facility fees</a> to understand how they work nationwide.
 </div>
 
 <h2 id="charity-care">2. Charity care and the Hospital Discounted Care Program</h2>
@@ -243,7 +243,7 @@ register("colorado-medical-billing-laws", {
 <p><strong>What to do with each problem on this bill:</strong></p>
 <ul>
     <li><strong>Illegal facility fee ($680):</strong> This off-campus clinic is 3 miles from the hospital campus, making the facility fee a direct violation of HB 22-1285. Write a dispute letter citing the law and demand a full refund. If the hospital refuses, file a complaint with the Colorado Division of Insurance.</li>
-    <li><strong>Upcoded office visit ($420):</strong> Request your visit notes and compare them to the <a href="/guides/hospital-facility-fees-explained">E&amp;M coding requirements</a>. A routine follow-up visit is typically a 99213 ($110 Medicare) or 99214 ($165 Medicare), not a 99215 ($225 Medicare). Dispute the upcode with medical records as evidence.</li>
+    <li><strong>Upcoded office visit ($420):</strong> Request your visit notes and compare them to the <a href="/guides/hospital-facility-fees-explained/">E&amp;M coding requirements</a>. A routine follow-up visit is typically a 99213 ($110 Medicare) or 99214 ($165 Medicare), not a 99215 ($225 Medicare). Dispute the upcode with medical records as evidence.</li>
     <li><strong>Lab charges above Medicare ($240 for CMP):</strong> Medicare pays approximately $14 for a comprehensive metabolic panel (80053). A charge of $240 is a <strong>17&times; markup</strong>. While not illegal, this extreme markup strengthens your case for a charity care discount or negotiated reduction.</li>
 </ul>
 

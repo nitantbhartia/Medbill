@@ -79,7 +79,7 @@ register("how-to-negotiate-medical-bills", {
 <p>Negotiation without data is just begging. Here&rsquo;s what to gather first:</p>
 
 <ol>
-    <li><strong>Your itemized bill with CPT codes.</strong> Not a summary statement. <a href="/guides/how-to-read-your-medical-bill">Here&rsquo;s how to read each line.</a></li>
+    <li><strong>Your itemized bill with CPT codes.</strong> Not a summary statement. <a href="/guides/how-to-read-your-medical-bill/">Here&rsquo;s how to read each line.</a></li>
     <li><strong>Medicare rates for each service.</strong> This is your pricing anchor. Use our <a href="/calculator">cost calculator</a> to look up rates instantly.</li>
     <li><strong>Your hospital&rsquo;s billing grade.</strong> Check our <a href="/hospitals/">hospital directory</a> to see your hospital&rsquo;s average markup and how it compares to others in your area.</li>
     <li><strong>Your financial situation.</strong> If you have a genuine hardship, that&rsquo;s a negotiation lever. Know your household income relative to the federal poverty level.</li>
@@ -159,7 +159,7 @@ register("how-to-negotiate-medical-bills", {
 
 <div class="case-study">
     <h3>The two-step approach</h3>
-    <p><strong>Step 1:</strong> <a href="/guides/how-to-dispute-a-medical-bill">Dispute</a> any clear errors (duplicates, unbundling, services not received). Get these removed first.</p>
+    <p><strong>Step 1:</strong> <a href="/guides/how-to-dispute-a-medical-bill/">Dispute</a> any clear errors (duplicates, unbundling, services not received). Get these removed first.</p>
     <p><strong>Step 2:</strong> Once the corrected bill arrives, negotiate the remaining charges using Strategies 1&ndash;4 above.</p>
     <p>This works because the hospital now sees you as an informed, engaged patient&mdash;which makes them more willing to negotiate on price.</p>
 </div>
@@ -267,7 +267,7 @@ register("how-to-negotiate-medical-bills", {
 
     <div class="faq-item">
         <h3>When should I negotiate vs. dispute a medical bill?</h3>
-        <p><a href="/guides/how-to-dispute-a-medical-bill">Dispute</a> when there&rsquo;s a clear billing error (duplicates, unbundling, upcoding). Negotiate when the charges are technically correct but the prices are unreasonably high compared to Medicare rates.</p>
+        <p><a href="/guides/how-to-dispute-a-medical-bill/">Dispute</a> when there&rsquo;s a clear billing error (duplicates, unbundling, upcoding). Negotiate when the charges are technically correct but the prices are unreasonably high compared to Medicare rates.</p>
     </div>
 
     <div class="faq-item">

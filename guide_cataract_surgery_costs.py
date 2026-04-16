@@ -126,7 +126,7 @@ register("cataract-surgery-cost", {
     </tbody>
 </table>
 
-<p>Over 80% of cataract surgeries are now performed at ASCs. Find one near you: <a href="/surgery-centers/">BillKarma Surgery Center Directory</a>. For more on ASC savings, see our <a href="/guides/surgery-center-vs-hospital-cost">surgery center vs. hospital guide</a>.</p>
+<p>Over 80% of cataract surgeries are now performed at ASCs. Find one near you: <a href="/surgery-centers/">BillKarma Surgery Center Directory</a>. For more on ASC savings, see our <a href="/guides/surgery-center-vs-hospital-cost/">surgery center vs. hospital guide</a>.</p>
 
 <h2 id="insurance">5. Insurance coverage</h2>
 

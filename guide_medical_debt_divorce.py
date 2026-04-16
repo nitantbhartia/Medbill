@@ -161,7 +161,7 @@ register("medical-debt-and-divorce", {
 <p>After the divorce is final, contact each medical creditor and request that your name be removed from accounts assigned to your ex. Not all creditors will agree, but some will. Get any agreements in writing.</p>
 
 <h3>e) Negotiate and settle debts before finalizing the divorce</h3>
-<p>If possible, settle outstanding medical debts before the divorce is final. This eliminates the risk of future creditor disputes. Many medical debts can be <a href="/guides/settle-medical-debt-collections">settled for 30&ndash;60 cents on the dollar</a>, especially if they&rsquo;re already in collections. Use marital assets to pay them off cleanly.</p>
+<p>If possible, settle outstanding medical debts before the divorce is final. This eliminates the risk of future creditor disputes. Many medical debts can be <a href="/guides/settle-medical-debt-collections/">settled for 30&ndash;60 cents on the dollar</a>, especially if they&rsquo;re already in collections. Use marital assets to pay them off cleanly.</p>
 
 <h2 id="creditors">7. What creditors can do after divorce</h2>
 
@@ -179,7 +179,7 @@ register("medical-debt-and-divorce", {
     </tbody>
 </table>
 
-<p>If a medical debt collector contacts you about your ex-spouse&rsquo;s debt, know your rights under the FDCPA. See our <a href="/guides/fdcpa-rights-medical-debt-collectors">FDCPA rights guide</a> and <a href="/guides/medical-bill-collections-rights">collections rights guide</a>.</p>
+<p>If a medical debt collector contacts you about your ex-spouse&rsquo;s debt, know your rights under the FDCPA. See our <a href="/guides/fdcpa-rights-medical-debt-collectors/">FDCPA rights guide</a> and <a href="/guides/medical-bill-collections-rights/">collections rights guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>Bottom line:</strong> A divorce decree is an agreement between you and your ex. Creditors are third parties who can ignore it. The only way to fully protect yourself is to settle debts before the divorce, remove your name from accounts, or include strong indemnification clauses.

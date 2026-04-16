@@ -163,7 +163,7 @@ register("how-much-does-mri-ct-scan-cost", {
     <strong>The facility fee is the hidden cost on every hospital imaging bill.</strong> When you get a scan at a hospital outpatient department, you&rsquo;re paying two charges: the radiologist&rsquo;s reading fee (professional component) and the hospital&rsquo;s facility fee (technical component). At a freestanding center, these are bundled into a single, lower price. Understanding this split is the key to understanding why hospital imaging bills are so high.
 </div>
 
-<p>Not sure how to decode the rest of your bill? Read our full guide on <a href="/guides/how-to-read-your-medical-bill">how to read your medical bill</a>.</p>
+<p>Not sure how to decode the rest of your bill? Read our full guide on <a href="/guides/how-to-read-your-medical-bill/">how to read your medical bill</a>.</p>
 
 <h2 id="pay-less">5. 5 ways to pay less for imaging</h2>
 
@@ -217,7 +217,7 @@ register("how-much-does-mri-ct-scan-cost", {
     <p>A patient received a CT abdomen with contrast (CPT 74178) at a hospital. The bill: <strong>$4,800</strong>&mdash;that&rsquo;s 19x the Medicare rate of $248.</p>
     <p>The patient called the billing department with a clear request: &ldquo;Medicare pays $248 for this scan. I&rsquo;m being charged $4,800. I&rsquo;d like to discuss a reduction to something closer to what insurance companies pay.&rdquo;</p>
     <p>After two calls and a written follow-up citing the Medicare rate, the hospital reduced the bill to <strong>$1,200</strong> (about 5x Medicare).</p>
-    <p><strong>Savings: $3,600.</strong> The patient used our <a href="/calculator">cost calculator</a> to get the Medicare rate and our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a> for the script.</p>
+    <p><strong>Savings: $3,600.</strong> The patient used our <a href="/calculator">cost calculator</a> to get the Medicare rate and our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a> for the script.</p>
 </div>
 
 <div class="case-study">
@@ -253,12 +253,12 @@ register("how-much-does-mri-ct-scan-cost", {
 
     <div class="faq-item">
         <h3>Can I negotiate the price of an MRI or CT scan?</h3>
-        <p>Yes. Call the facility and ask for their cash or self-pay price. Many offer 30&ndash;50% discounts for upfront payment. You can also compare prices across facilities using our <a href="/hospitals/">hospital pricing directory</a> and <a href="/guides/how-to-negotiate-medical-bills">negotiate your bill</a> after the fact using Medicare rates as your anchor.</p>
+        <p>Yes. Call the facility and ask for their cash or self-pay price. Many offer 30&ndash;50% discounts for upfront payment. You can also compare prices across facilities using our <a href="/hospitals/">hospital pricing directory</a> and <a href="/guides/how-to-negotiate-medical-bills/">negotiate your bill</a> after the fact using Medicare rates as your anchor.</p>
     </div>
 
     <div class="faq-item">
         <h3>What should I do if my imaging bill seems too high?</h3>
-        <p>First, request an itemized bill with CPT codes if you don&rsquo;t have one. Then <a href="/calculator">look up what Medicare pays</a> for each code. If any charge exceeds 3x the Medicare rate, you have strong grounds to <a href="/guides/how-to-dispute-a-medical-bill">dispute the bill</a>. You can also <a href="/scan">upload your bill to BillKarma</a> for an instant audit that compares every line item against federal pricing data.</p>
+        <p>First, request an itemized bill with CPT codes if you don&rsquo;t have one. Then <a href="/calculator">look up what Medicare pays</a> for each code. If any charge exceeds 3x the Medicare rate, you have strong grounds to <a href="/guides/how-to-dispute-a-medical-bill/">dispute the bill</a>. You can also <a href="/scan">upload your bill to BillKarma</a> for an instant audit that compares every line item against federal pricing data.</p>
     </div>
 </div>
 

@@ -55,7 +55,7 @@ register("surgery-center-vs-hospital-cost", {
 
 <p>There are over <strong>6,100 Medicare-certified ASCs</strong> in the U.S., performing more than 28 million procedures per year. About two-thirds are physician-owned, and the rest are owned by hospital systems or corporate chains.</p>
 
-<p>By contrast, a <strong>hospital outpatient department (HOPD)</strong> performs the same day-surgery procedures but inside a hospital campus. HOPDs charge a separate facility fee on top of the procedure cost&mdash;a fee that doesn&rsquo;t exist at most ASCs. This facility fee alone can add $1,000&ndash;$5,000 to your bill. See our <a href="/guides/hospital-facility-fees-explained">facility fees guide</a> for details.</p>
+<p>By contrast, a <strong>hospital outpatient department (HOPD)</strong> performs the same day-surgery procedures but inside a hospital campus. HOPDs charge a separate facility fee on top of the procedure cost&mdash;a fee that doesn&rsquo;t exist at most ASCs. This facility fee alone can add $1,000&ndash;$5,000 to your bill. See our <a href="/guides/hospital-facility-fees-explained/">facility fees guide</a> for details.</p>
 
 <h2 id="cost-comparison">2. Cost comparison: 10 common procedures</h2>
 

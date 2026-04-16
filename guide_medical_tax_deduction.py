@@ -157,7 +157,7 @@ register("medical-expenses-tax-deduction", {
 
 <h3>HSA and FSA interaction</h3>
 
-<p>Expenses paid with HSA, FSA, or HRA funds <strong>cannot be deducted</strong> because those accounts already provided a tax benefit. However, if your total medical expenses exceed what your HSA/FSA covers, the out-of-pocket portion may be deductible. For example, if you had $20,000 in medical expenses, paid $4,000 from your HSA, and $16,000 out of pocket, only the $16,000 counts toward the deduction. Learn more about HSA strategy in our <a href="/guides/hsa-fsa-pay-medical-bills">HSA/FSA guide</a>.</p>
+<p>Expenses paid with HSA, FSA, or HRA funds <strong>cannot be deducted</strong> because those accounts already provided a tax benefit. However, if your total medical expenses exceed what your HSA/FSA covers, the out-of-pocket portion may be deductible. For example, if you had $20,000 in medical expenses, paid $4,000 from your HSA, and $16,000 out of pocket, only the $16,000 counts toward the deduction. Learn more about HSA strategy in our <a href="/guides/hsa-fsa-pay-medical-bills/">HSA/FSA guide</a>.</p>
 
 <h3>Health insurance premiums</h3>
 
@@ -266,7 +266,7 @@ register("medical-expenses-tax-deduction", {
 
     <div class="faq-item">
         <h3>Can I deduct medical expenses I paid with my HSA or FSA?</h3>
-        <p>No. Expenses paid with HSA, FSA, or HRA funds cannot be deducted because those accounts already provided a tax benefit. Only the out-of-pocket portion paid with after-tax dollars counts. See our <a href="/guides/hsa-fsa-pay-medical-bills">HSA/FSA guide</a> for more details on using these accounts strategically.</p>
+        <p>No. Expenses paid with HSA, FSA, or HRA funds cannot be deducted because those accounts already provided a tax benefit. Only the out-of-pocket portion paid with after-tax dollars counts. See our <a href="/guides/hsa-fsa-pay-medical-bills/">HSA/FSA guide</a> for more details on using these accounts strategically.</p>
     </div>
 
     <div class="faq-item">

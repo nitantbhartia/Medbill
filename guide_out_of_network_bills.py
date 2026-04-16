@@ -118,7 +118,7 @@ register("out-of-network-medical-bills", {
 
 <h2 id="no-surprises-act">2. No Surprises Act protections (2022+)</h2>
 
-<p>The <a href="/guides/no-surprises-act-explained">No Surprises Act (NSA)</a>, effective January 1, 2022, created the first comprehensive federal protections against unexpected out-of-network charges. Here&rsquo;s what it covers and what it doesn&rsquo;t.</p>
+<p>The <a href="/guides/no-surprises-act-explained/">No Surprises Act (NSA)</a>, effective January 1, 2022, created the first comprehensive federal protections against unexpected out-of-network charges. Here&rsquo;s what it covers and what it doesn&rsquo;t.</p>
 
 <h3>You ARE protected in these situations</h3>
 
@@ -138,7 +138,7 @@ register("out-of-network-medical-bills", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Bottom line:</strong> The No Surprises Act protects you when the out-of-network element was not your choice &mdash; emergencies, and providers you didn&rsquo;t pick at in-network facilities. If you chose to go out-of-network, the protections generally don&rsquo;t apply. For a full breakdown of what&rsquo;s covered, see our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>.
+    <strong>Bottom line:</strong> The No Surprises Act protects you when the out-of-network element was not your choice &mdash; emergencies, and providers you didn&rsquo;t pick at in-network facilities. If you chose to go out-of-network, the protections generally don&rsquo;t apply. For a full breakdown of what&rsquo;s covered, see our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a>.
 </div>
 
 <h2 id="cost-comparison">3. How much more out-of-network costs</h2>
@@ -169,7 +169,7 @@ register("out-of-network-medical-bills", {
 
 <h2 id="balance-billing">4. The &ldquo;balance billing&rdquo; trap</h2>
 
-<p><a href="/guides/balance-billing">Balance billing</a> is what happens when an out-of-network provider bills you for the difference between their full charge and what your insurance paid. It&rsquo;s the single biggest financial risk of out-of-network care.</p>
+<p><a href="/guides/balance-billing/">Balance billing</a> is what happens when an out-of-network provider bills you for the difference between their full charge and what your insurance paid. It&rsquo;s the single biggest financial risk of out-of-network care.</p>
 
 <p><strong>How it works:</strong> A surgeon charges $15,000 for a procedure. Your insurer&rsquo;s out-of-network allowed amount is $5,000. The insurer pays 60% of that ($3,000) and applies the other $2,000 to your coinsurance. The surgeon then sends you a <strong>balance bill</strong> for the remaining $10,000 ($15,000 minus the insurer&rsquo;s $5,000 allowed amount). Your total cost: $12,000 &mdash; the $2,000 coinsurance plus the $10,000 balance bill.</p>
 
@@ -204,7 +204,7 @@ register("out-of-network-medical-bills", {
 <p><strong>Federal vs. state overlap:</strong> When both federal and state protections apply, you get whichever is more favorable. Some state laws cover situations the No Surprises Act doesn&rsquo;t &mdash; like ground ambulance (California, Colorado) or broader definitions of surprise billing. Check your state&rsquo;s insurance commissioner website for the most current rules.</p>
 
 <div class="key-takeaway">
-    <strong>Even if you live in a state without additional protections,</strong> the federal No Surprises Act covers surprise out-of-network bills in emergencies and at in-network facilities. For a deep dive into balance billing law and state-specific protections, see our <a href="/guides/balance-billing">balance billing guide</a>.
+    <strong>Even if you live in a state without additional protections,</strong> the federal No Surprises Act covers surprise out-of-network bills in emergencies and at in-network facilities. For a deep dive into balance billing law and state-specific protections, see our <a href="/guides/balance-billing/">balance billing guide</a>.
 </div>
 
 <h2 id="reimbursement-methods">5. How insurance calculates out-of-network reimbursement</h2>
@@ -255,7 +255,7 @@ register("out-of-network-medical-bills", {
 <p>If you&rsquo;ve received an out-of-network bill that seems unreasonable, don&rsquo;t pay it immediately. Follow these seven steps to reduce or eliminate the charges.</p>
 
 <h3>Step 1: Get an itemized bill</h3>
-<p>Request a detailed itemized bill showing every CPT code, description, and charge. Many out-of-network bills arrive as a single lump sum, which makes it impossible to evaluate whether the charges are reasonable. You have a legal right to an itemized statement. For help reading yours, see our <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill guide</a>.</p>
+<p>Request a detailed itemized bill showing every CPT code, description, and charge. Many out-of-network bills arrive as a single lump sum, which makes it impossible to evaluate whether the charges are reasonable. You have a legal right to an itemized statement. For help reading yours, see our <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill guide</a>.</p>
 
 <h3>Step 2: Compare charges to FAIR Health and Medicare benchmarks</h3>
 <p>Look up each CPT code on <a href="https://www.fairhealthconsumer.org" target="_blank" rel="noopener">FAIR Health Consumer</a> and check the Medicare rate. If the provider&rsquo;s charge is significantly above the 80th percentile of FAIR Health data &mdash; or more than 3x the Medicare rate &mdash; you have strong evidence that the bill is inflated.</p>
@@ -263,10 +263,10 @@ register("out-of-network-medical-bills", {
 <p><a href="/scan">Upload your bill to BillKarma</a> and we&rsquo;ll automatically compare every line item to Medicare and fair-market benchmarks, so you can see exactly where you&rsquo;re being overcharged.</p>
 
 <h3>Step 3: Check if the No Surprises Act applies</h3>
-<p>Was it an emergency? Were you at an in-network facility treated by an out-of-network provider you didn&rsquo;t choose? If yes, the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> likely protects you. Contact your insurer and the provider, cite the NSA, and request the bill be reprocessed at in-network rates.</p>
+<p>Was it an emergency? Were you at an in-network facility treated by an out-of-network provider you didn&rsquo;t choose? If yes, the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> likely protects you. Contact your insurer and the provider, cite the NSA, and request the bill be reprocessed at in-network rates.</p>
 
 <h3>Step 4: File an appeal with your insurance company</h3>
-<p>If your insurer processed the claim at out-of-network rates and you believe it should be in-network (or the allowed amount is unreasonably low), file a formal appeal. Include FAIR Health data, Medicare rates, and any evidence that the charge exceeds reasonable market rates. For a step-by-step walkthrough, see our <a href="/guides/how-to-appeal-insurance-denial-and-win">appeal guide</a>.</p>
+<p>If your insurer processed the claim at out-of-network rates and you believe it should be in-network (or the allowed amount is unreasonably low), file a formal appeal. Include FAIR Health data, Medicare rates, and any evidence that the charge exceeds reasonable market rates. For a step-by-step walkthrough, see our <a href="/guides/how-to-appeal-insurance-denial-and-win/">appeal guide</a>.</p>
 
 <h3>Step 5: Negotiate a cash-pay rate with the provider</h3>
 <p>Call the provider&rsquo;s billing department and ask: &ldquo;What is your cash-pay or self-pay rate for this service?&rdquo; Many providers offer a cash-pay discount of 30&ndash;60% off their chargemaster rate. If the cash-pay rate is lower than what you owe after insurance, it may be cheaper to pay cash and skip insurance entirely.</p>
@@ -349,12 +349,12 @@ register("out-of-network-medical-bills", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>What does out-of-network mean on a medical bill?</h3>
-        <p>It means the provider does not have a contract with your insurance company. Without a contract, the provider charges their full rate and your insurer reimburses only a fraction. You&rsquo;re responsible for the gap between the insurer&rsquo;s payment and the provider&rsquo;s charge &mdash; known as a <a href="/guides/balance-billing">balance bill</a>. In-network providers, by contrast, accept a negotiated rate and cannot bill you beyond your contracted cost-sharing.</p>
+        <p>It means the provider does not have a contract with your insurance company. Without a contract, the provider charges their full rate and your insurer reimburses only a fraction. You&rsquo;re responsible for the gap between the insurer&rsquo;s payment and the provider&rsquo;s charge &mdash; known as a <a href="/guides/balance-billing/">balance bill</a>. In-network providers, by contrast, accept a negotiated rate and cannot bill you beyond your contracted cost-sharing.</p>
     </div>
 
     <div class="faq-item">
         <h3>Am I protected from surprise out-of-network bills?</h3>
-        <p>Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> (effective 2022), you are protected from surprise out-of-network bills for emergency services, care from out-of-network providers at in-network facilities you didn&rsquo;t choose, and air ambulance transport. You are NOT protected for ground ambulance, elective out-of-network care, or post-stabilization care where you gave valid written consent.</p>
+        <p>Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> (effective 2022), you are protected from surprise out-of-network bills for emergency services, care from out-of-network providers at in-network facilities you didn&rsquo;t choose, and air ambulance transport. You are NOT protected for ground ambulance, elective out-of-network care, or post-stabilization care where you gave valid written consent.</p>
     </div>
 
     <div class="faq-item">

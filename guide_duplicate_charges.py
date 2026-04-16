@@ -131,7 +131,7 @@ register("duplicate-charges-hospital-bills", {
 
 <h2 id="how-to-spot">3. How to spot duplicates on your itemized bill</h2>
 
-<p>You don&rsquo;t need a billing degree to find duplicates. You need an <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill with CPT codes</a> and 30 minutes. Here is the step-by-step process:</p>
+<p>You don&rsquo;t need a billing degree to find duplicates. You need an <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill with CPT codes</a> and 30 minutes. Here is the step-by-step process:</p>
 
 <p><strong>Step 1: Get an itemized bill.</strong> Call the billing department and request a <em>line-by-line itemized statement with CPT codes</em>. A summary statement grouping charges by category (Lab, Pharmacy, Room &amp; Board) is not sufficient &mdash; you need individual line items. You have a legal right to this under HIPAA and the No Surprises Act.</p>
 
@@ -279,7 +279,7 @@ register("duplicate-charges-hospital-bills", {
     <li><strong>&ldquo;The charges are correct.&rdquo;</strong> &mdash; Ask for the clinical documentation that justifies each charge. If they can&rsquo;t produce it, escalate to a patient advocate or file a written dispute.</li>
 </ul>
 
-<p><strong>Step 4: Follow up with a written dispute.</strong> If the phone call doesn&rsquo;t resolve it within 10 business days, send a written dispute letter. Include your name, account number, date of service, each disputed line item with CPT code and amount, and a clear statement that you are requesting removal of duplicate charges. Send via certified mail or through the patient portal. For templates, see our <a href="/guides/how-to-dispute-a-medical-bill">complete dispute guide</a>.</p>
+<p><strong>Step 4: Follow up with a written dispute.</strong> If the phone call doesn&rsquo;t resolve it within 10 business days, send a written dispute letter. Include your name, account number, date of service, each disputed line item with CPT code and amount, and a clear statement that you are requesting removal of duplicate charges. Send via certified mail or through the patient portal. For templates, see our <a href="/guides/how-to-dispute-a-medical-bill/">complete dispute guide</a>.</p>
 
 <p><strong>Step 5: Request a corrected bill.</strong> Once duplicates are removed, ask for a corrected itemized bill in writing. Verify that every duplicate you identified has been removed and that the new total is correct. Do not pay until you have the corrected bill in hand.</p>
 
@@ -309,13 +309,13 @@ register("duplicate-charges-hospital-bills", {
 
 <p><strong>Requesting a refund vs. credit:</strong> If you already paid out of pocket for charges that included duplicates, you are owed a refund &mdash; not just a credit on your hospital account. Explicitly request a refund check or a refund to your original payment method. A &ldquo;credit on account&rdquo; only helps if you expect future charges at the same hospital. If the insurance company overpaid, they will typically recoup the overpayment directly from the hospital through a &ldquo;take-back&rdquo; process, and your patient responsibility will be recalculated.</p>
 
-<p>For a full explanation of how EOBs work and how to read them, see our <a href="/guides/how-to-read-your-medical-bill">guide to reading your medical bill</a>.</p>
+<p>For a full explanation of how EOBs work and how to read them, see our <a href="/guides/how-to-read-your-medical-bill/">guide to reading your medical bill</a>.</p>
 
 <h2 id="preventing">8. Preventing duplicates proactively</h2>
 
 <p>The best time to catch duplicates is before you pay. Here are three strategies:</p>
 
-<p><strong>Request an itemized bill before paying anything.</strong> Never pay a summary statement. Always request the full <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill with CPT codes</a> before making any payment. This is your legal right, and it is the only way to see whether charges have been duplicated. Many patients pay the summary amount and never discover the duplicates buried inside.</p>
+<p><strong>Request an itemized bill before paying anything.</strong> Never pay a summary statement. Always request the full <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill with CPT codes</a> before making any payment. This is your legal right, and it is the only way to see whether charges have been duplicated. Many patients pay the summary amount and never discover the duplicates buried inside.</p>
 
 <p><strong>Review charges during your hospital stay.</strong> If you are admitted for a multi-day stay, ask the nursing station for a daily charge summary every morning. Review it while your memory of what services you received is fresh. If you see a charge for a medication you didn&rsquo;t receive or a specialist who didn&rsquo;t visit, flag it immediately. Catching errors in real time is far easier than disputing them weeks later.</p>
 
@@ -324,7 +324,7 @@ register("duplicate-charges-hospital-bills", {
 <p><strong>Use BillKarma&rsquo;s scanner.</strong> <a href="/scan">Upload your itemized bill to BillKarma</a> and our analyzer will automatically detect all eight types of duplicate charges, flag them with the specific line items and dollar amounts, and calculate your total potential savings. It takes less than two minutes and catches duplicates that are easy to miss manually &mdash; especially cross-department duplicates and system re-entries.</p>
 
 <div class="key-takeaway">
-    <strong>Don&rsquo;t pay until you&rsquo;ve checked.</strong> <a href="/scan">Upload your hospital bill to BillKarma</a> before making any payment. Our duplicate detection catches the same errors that professional billing advocates find &mdash; and it&rsquo;s free to scan. Beyond duplicates, we also check for <a href="/guides/common-hospital-billing-errors">upcoding, unbundling, and other common billing errors</a>.
+    <strong>Don&rsquo;t pay until you&rsquo;ve checked.</strong> <a href="/scan">Upload your hospital bill to BillKarma</a> before making any payment. Our duplicate detection catches the same errors that professional billing advocates find &mdash; and it&rsquo;s free to scan. Beyond duplicates, we also check for <a href="/guides/common-hospital-billing-errors/">upcoding, unbundling, and other common billing errors</a>.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>
@@ -357,7 +357,7 @@ register("duplicate-charges-hospital-bills", {
 
     <div class="faq-item">
         <h3>Should I use a medical billing advocate to dispute duplicate charges?</h3>
-        <p>For straightforward duplicates, you generally do not need a billing advocate. Duplicates are objective errors that are easy to identify and hard for hospitals to defend. A phone call referencing specific line items usually resolves them. However, if you have a complex multi-day bill with dozens of line items, a billing advocate can save you significant time and may catch errors beyond just duplicates. See our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> for the full process.</p>
+        <p>For straightforward duplicates, you generally do not need a billing advocate. Duplicates are objective errors that are easy to identify and hard for hospitals to defend. A phone call referencing specific line items usually resolves them. However, if you have a complex multi-day bill with dozens of line items, a billing advocate can save you significant time and may catch errors beyond just duplicates. See our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> for the full process.</p>
     </div>
 </div>
 

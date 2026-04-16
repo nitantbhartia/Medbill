@@ -325,8 +325,8 @@ register("cardiac-billing", {
 </p>
 <p>
   For more detail on how balance billing protections work, see the
-  <a href="/guides/balance-billing-protection">BillKarma guide on balance billing</a> and the
-  <a href="/guides/no-surprises-act">No Surprises Act guide</a>.
+  <a href="/guides/balance-billing-protection/">BillKarma guide on balance billing</a> and the
+  <a href="/guides/no-surprises-act/">No Surprises Act guide</a>.
 </p>
 
 <h2 id="dispute-steps">7. How to Dispute a Cardiac Billing Error &mdash; Step by Step</h2>
@@ -384,10 +384,10 @@ register("cardiac-billing", {
 </p>
 <p>
   For a ready-to-use dispute letter template, see the
-  <a href="/guides/dispute-letter-template">BillKarma dispute letter guide</a>. To understand common
+  <a href="/guides/dispute-letter-template/">BillKarma dispute letter guide</a>. To understand common
   CPT code bundling rules in more depth, see our
-  <a href="/guides/cpt-codes">guide to reading CPT codes</a> and the
-  <a href="/guides/hospital-billing-errors">guide to common hospital billing errors</a>.
+  <a href="/guides/cpt-codes/">guide to reading CPT codes</a> and the
+  <a href="/guides/hospital-billing-errors/">guide to common hospital billing errors</a>.
 </p>
 
 <div class="key-takeaway">

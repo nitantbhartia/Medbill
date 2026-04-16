@@ -168,7 +168,7 @@ register("carpal-tunnel-surgery-cost", {
     <li><strong>Check the global surgical period.</strong> CPT 64721 has a 90-day global period. Office visits billed by the operating surgeon within 90 days of surgery are included in the surgical fee and should not be charged separately.</li>
     <li><strong>Identify duplicate charges</strong> across the hospital bill and surgeon&rsquo;s separate bill. Pre-op visits, post-op visits, and supply charges are the most common duplicates.</li>
     <li><strong>Call the billing department</strong> and cite specific CPT codes: &ldquo;CPT 64721 has a Medicare rate of $650. I&rsquo;m being charged $3,770 for the facility fee alone. I&rsquo;d like to request a reduction to the Medicare rate or your lowest contracted rate.&rdquo;</li>
-    <li><strong>File a written dispute</strong> if the phone call does not resolve the issue. Use our <a href="/guides/dispute-bill">dispute letter template</a>. Include the Medicare rate printout and your itemized bill.</li>
+    <li><strong>File a written dispute</strong> if the phone call does not resolve the issue. Use our <a href="/guides/dispute-bill/">dispute letter template</a>. Include the Medicare rate printout and your itemized bill.</li>
 </ol>
 
 <h2 id="case-study">8. Real-world case study</h2>

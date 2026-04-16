@@ -98,7 +98,7 @@ register("how-much-does-xray-cost", {
 <h2 id="why-prices-vary">3. Why X-ray prices vary so much</h2>
 
 <ul>
-    <li><strong>Facility fees:</strong> Hospitals add $200&ndash;$600 in facility fees on top of the X-ray charge. This covers ER, ICU, and administrative overhead that has nothing to do with your X-ray. See our <a href="/guides/hospital-facility-fees-explained">facility fees guide</a>.</li>
+    <li><strong>Facility fees:</strong> Hospitals add $200&ndash;$600 in facility fees on top of the X-ray charge. This covers ER, ICU, and administrative overhead that has nothing to do with your X-ray. See our <a href="/guides/hospital-facility-fees-explained/">facility fees guide</a>.</li>
     <li><strong>Hospital vs. freestanding:</strong> When a hospital buys an independent imaging center, prices often double overnight&mdash;even though nothing changes about the equipment or staff.</li>
     <li><strong>Insurance negotiated rates:</strong> The same X-ray may be billed at $600 but the insurer&rsquo;s negotiated rate is $150. Cash pay patients can often get the negotiated rate by asking.</li>
     <li><strong>Number of views:</strong> More views = higher cost. A 2-view chest X-ray costs more than a 1-view. Make sure you aren&rsquo;t billed for more views than were taken.</li>
@@ -131,7 +131,7 @@ register("how-much-does-xray-cost", {
     </tbody>
 </table>
 
-<p>For detailed imaging costs, see our <a href="/guides/how-much-does-mri-ct-scan-cost">MRI and CT scan cost guide</a>. Find imaging centers at <a href="/imaging/">BillKarma&rsquo;s imaging directory</a>.</p>
+<p>For detailed imaging costs, see our <a href="/guides/how-much-does-mri-ct-scan-cost/">MRI and CT scan cost guide</a>. Find imaging centers at <a href="/imaging/">BillKarma&rsquo;s imaging directory</a>.</p>
 
 <h2 id="save-money">6. 5 ways to save on X-rays</h2>
 

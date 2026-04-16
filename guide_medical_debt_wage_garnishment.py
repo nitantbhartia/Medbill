@@ -146,7 +146,7 @@ register("medical-debt-wage-garnishment", {
             <td>Hospital billing</td>
             <td>0&ndash;90 days</td>
             <td>Paper bills, phone calls from hospital billing dept.</td>
-            <td>Dispute errors, apply for <a href="/guides/hospital-financial-assistance">financial assistance</a>, negotiate a payment plan</td>
+            <td>Dispute errors, apply for <a href="/guides/hospital-financial-assistance/">financial assistance</a>, negotiate a payment plan</td>
         </tr>
         <tr>
             <td>Sent to collections</td>
@@ -164,7 +164,7 @@ register("medical-debt-wage-garnishment", {
             <td>Lawsuit filed</td>
             <td>6&ndash;12 months</td>
             <td>Summons and complaint delivered to your home</td>
-            <td><strong>File an Answer within 20&ndash;30 days</strong> &mdash; do not ignore. See <a href="/guides/sued-for-medical-debt">how to respond</a></td>
+            <td><strong>File an Answer within 20&ndash;30 days</strong> &mdash; do not ignore. See <a href="/guides/sued-for-medical-debt/">how to respond</a></td>
         </tr>
         <tr>
             <td>Judgment entered</td>
@@ -184,7 +184,7 @@ register("medical-debt-wage-garnishment", {
 <p><strong>The key insight:</strong> Most patients who end up with garnished wages did nothing during the first 6&ndash;12 months. Every stage is a chance to negotiate, dispute, or settle &mdash; often for far less than the full amount. By the time garnishment starts, you have already lost most of your leverage.</p>
 
 <div class="key-takeaway">
-    <strong>Check your statute of limitations.</strong> If the debt is old enough, the collector may not be able to sue at all. Use our <a href="/statute-of-limitations">statute of limitations calculator</a> to see if your debt is time-barred &mdash; and read our full guide on <a href="/guides/medical-debt-statute-of-limitations">medical debt statute of limitations rules</a>.
+    <strong>Check your statute of limitations.</strong> If the debt is old enough, the collector may not be able to sue at all. Use our <a href="/statute-of-limitations">statute of limitations calculator</a> to see if your debt is time-barred &mdash; and read our full guide on <a href="/guides/medical-debt-statute-of-limitations/">medical debt statute of limitations rules</a>.
 </div>
 
 <h2 id="respond-to-lawsuit">5. How to respond to a medical debt lawsuit</h2>
@@ -204,7 +204,7 @@ register("medical-debt-wage-garnishment", {
 <p>Respond to each allegation in the complaint with &ldquo;Admit,&rdquo; &ldquo;Deny,&rdquo; or &ldquo;Lack sufficient knowledge to admit or deny.&rdquo; Then list your affirmative defenses:</p>
 
 <ul>
-    <li>Expired <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> (if applicable)</li>
+    <li>Expired <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> (if applicable)</li>
     <li>Incorrect amount (compare to your original bill and EOB)</li>
     <li>Billing errors in the original charges</li>
     <li>Lack of standing (if a debt buyer cannot prove chain of title)</li>
@@ -215,7 +215,7 @@ register("medical-debt-wage-garnishment", {
 
 <p>File your Answer with the court clerk (filing fees are typically $25&ndash;$75; ask about fee waivers). Send a copy to the plaintiff&rsquo;s attorney by mail. Keep proof of everything.</p>
 
-<p>For a detailed walkthrough with case examples and templates, see our full guide: <a href="/guides/sued-for-medical-debt">Sued for Medical Debt &mdash; How to Respond and Defend Yourself</a>.</p>
+<p>For a detailed walkthrough with case examples and templates, see our full guide: <a href="/guides/sued-for-medical-debt/">Sued for Medical Debt &mdash; How to Respond and Defend Yourself</a>.</p>
 
 <h2 id="prevent-garnishment">6. 5 ways to prevent wage garnishment</h2>
 
@@ -237,7 +237,7 @@ register("medical-debt-wage-garnishment", {
 
 <h3>5. File for bankruptcy (last resort)</h3>
 
-<p>Filing a bankruptcy petition triggers an <strong>automatic stay</strong> that immediately halts all garnishment. Medical debt is fully dischargeable in both Chapter 7 and Chapter 13 bankruptcy. Chapter 7 can eliminate the debt in 4&ndash;6 months. This is a serious step with long-term credit consequences, but it stops garnishment on the day of filing. Read our <a href="/guides/medical-bankruptcy-guide">complete guide to medical bankruptcy</a> before deciding.</p>
+<p>Filing a bankruptcy petition triggers an <strong>automatic stay</strong> that immediately halts all garnishment. Medical debt is fully dischargeable in both Chapter 7 and Chapter 13 bankruptcy. Chapter 7 can eliminate the debt in 4&ndash;6 months. This is a serious step with long-term credit consequences, but it stops garnishment on the day of filing. Read our <a href="/guides/medical-bankruptcy-guide/">complete guide to medical bankruptcy</a> before deciding.</p>
 
 <div class="key-takeaway">
     <strong>Before you negotiate, know what the bill should actually cost.</strong> <a href="/scan">Upload your bill to BillKarma</a> to compare every charge to Medicare rates and identify errors. Armed with this data, you can dispute the amount and negotiate from a position of strength.
@@ -301,7 +301,7 @@ register("medical-debt-wage-garnishment", {
 
 <h3>Consider bankruptcy</h3>
 
-<p>Filing for bankruptcy triggers an automatic stay that immediately stops wage garnishment. In Chapter 7, the underlying medical debt is discharged in 4&ndash;6 months. You may even be able to recover garnished wages taken within 90 days before filing (called a &ldquo;preference payment&rdquo; recovery). See our <a href="/guides/medical-bankruptcy-guide">medical bankruptcy guide</a> for a full analysis of when bankruptcy makes sense.</p>
+<p>Filing for bankruptcy triggers an automatic stay that immediately stops wage garnishment. In Chapter 7, the underlying medical debt is discharged in 4&ndash;6 months. You may even be able to recover garnished wages taken within 90 days before filing (called a &ldquo;preference payment&rdquo; recovery). See our <a href="/guides/medical-bankruptcy-guide/">medical bankruptcy guide</a> for a full analysis of when bankruptcy makes sense.</p>
 
 {_embed(mode="markup", title="Check if your charges exceed Medicare rates", subtitle="Enter a CPT code and amount to see the markup.", height="420")}
 
@@ -310,7 +310,7 @@ register("medical-debt-wage-garnishment", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>Can a hospital garnish my wages without a court judgment?</h3>
-        <p>No. A hospital or collection agency must first file a lawsuit, serve you with a summons, and obtain a court judgment before they can garnish your wages. If you receive a threat of garnishment without a pending lawsuit, that is likely a violation of the <a href="/guides/fdcpa-medical-debt-rights">Fair Debt Collection Practices Act</a>. Never ignore a lawsuit summons &mdash; a default judgment can be entered if you don&rsquo;t respond, giving the creditor the legal authority to garnish.</p>
+        <p>No. A hospital or collection agency must first file a lawsuit, serve you with a summons, and obtain a court judgment before they can garnish your wages. If you receive a threat of garnishment without a pending lawsuit, that is likely a violation of the <a href="/guides/fdcpa-medical-debt-rights/">Fair Debt Collection Practices Act</a>. Never ignore a lawsuit summons &mdash; a default judgment can be entered if you don&rsquo;t respond, giving the creditor the legal authority to garnish.</p>
     </div>
 
     <div class="faq-item">

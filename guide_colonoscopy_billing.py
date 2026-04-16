@@ -206,7 +206,7 @@ register("colonoscopy-billing", {
     <li><strong>Remark codes:</strong> Short codes that explain claim processing decisions. Common codes like &ldquo;CO-97&rdquo; (benefit for this service is included in another service) or &ldquo;CO-4&rdquo; (service is inconsistent with modifier) can reveal how your insurer categorized the claim.</li>
 </ul>
 
-<p>For a full walkthrough of how to read an EOB, see our <a href="/guides/understanding-explanation-of-benefits">EOB guide</a>.</p>
+<p>For a full walkthrough of how to read an EOB, see our <a href="/guides/understanding-explanation-of-benefits/">EOB guide</a>.</p>
 
 <h2 id="bill-example">5. Annotated bill example</h2>
 
@@ -283,7 +283,7 @@ register("colonoscopy-billing", {
 <p>Ask your gastroenterologist to provide written confirmation that the colonoscopy was originally ordered as a preventive screening (not because of symptoms or a prior diagnosis). This documentation supports your claim that the intent was preventive, even though the procedure ultimately involved polyp removal.</p>
 
 <h3>Step 5: File an internal appeal, then an external appeal</h3>
-<p>If your insurer denies your written request, file a formal internal appeal. Under the ACA, insurers must respond to appeals within 30&ndash;60 days. If the internal appeal fails, you have the right to an independent external review by a third-party reviewer. The external reviewer\u2019s decision is binding on the insurer. See our <a href="/guides/how-to-appeal-a-denied-claim">appeal guide</a> for the full process.</p>
+<p>If your insurer denies your written request, file a formal internal appeal. Under the ACA, insurers must respond to appeals within 30&ndash;60 days. If the internal appeal fails, you have the right to an independent external review by a third-party reviewer. The external reviewer\u2019s decision is binding on the insurer. See our <a href="/guides/how-to-appeal-a-denied-claim/">appeal guide</a> for the full process.</p>
 
 <h3>Step 6: File a complaint if needed</h3>
 <p>You can file a complaint with your state insurance commissioner and with the federal Centers for Medicare and Medicaid Services (CMS) at <a href="https://www.cms.gov/CCIIO/Resources/Consumer-Assistance-Grants/" target="_blank" rel="noopener">cms.gov</a>. The CFPB also accepts medical billing complaints at <a href="https://www.consumerfinance.gov/complaint/" target="_blank" rel="noopener">consumerfinance.gov/complaint</a>.</p>
@@ -306,7 +306,7 @@ register("colonoscopy-billing", {
 <p>The pathology bill arrives weeks after the colonoscopy, often from a provider name you don\u2019t recognize. The most common problems:</p>
 
 <h3>Out-of-network pathologist at an in-network facility</h3>
-<p>Your gastroenterologist and the endoscopy center may both be in-network. But the pathology lab they send specimens to may be out-of-network with your insurer. You had no choice in which lab was used &mdash; the physician selected it. Under the No Surprises Act, if the lab is at an in-network facility and you did not choose it, you may only owe in-network cost-sharing for the pathology service. See our <a href="/guides/no-surprises-act">No Surprises Act guide</a> for how to use this protection.</p>
+<p>Your gastroenterologist and the endoscopy center may both be in-network. But the pathology lab they send specimens to may be out-of-network with your insurer. You had no choice in which lab was used &mdash; the physician selected it. Under the No Surprises Act, if the lab is at an in-network facility and you did not choose it, you may only owe in-network cost-sharing for the pathology service. See our <a href="/guides/no-surprises-act/">No Surprises Act guide</a> for how to use this protection.</p>
 
 <h3>Pathology coded at a higher level than warranted</h3>
 <p>CPT 88307 pays roughly 80% more than 88305. If a simple adenomatous polyp is billed at 88307 when 88305 is appropriate, the patient may face higher cost-sharing than warranted. Review your itemized pathology bill and compare the description of the specimen to the code used.</p>

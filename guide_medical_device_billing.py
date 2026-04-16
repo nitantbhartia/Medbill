@@ -201,7 +201,7 @@ register("medical-device-billing", {
     replacement that costs the hospital $6,000 in implant acquisition can appear on a self-pay bill at
     $35,000 for the device alone. Always negotiate before the procedure. Many hospitals will accept 40 to
     60 percent of the chargemaster rate for self-pay patients. For negotiation strategies, see our
-    <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.
+    <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a>.
 </p>
 
 {_embed(mode="markup", title="Check your device charge markup", subtitle="Enter the CPT code from your implant procedure to compare billed charges vs. Medicare rates.", height="420")}
@@ -247,7 +247,7 @@ register("medical-device-billing", {
     <strong>Step 3 &mdash; Write the dispute letter.</strong> Address it to the billing department and
     include: the device catalog number, the manufacturer's published list price, the hospital's billed
     charge, and a request that the charge be reduced to a reasonable markup over list price. For a template,
-    see our <a href="/guides/medical-bill-dispute-letter">dispute letter guide</a>.
+    see our <a href="/guides/medical-bill-dispute-letter/">dispute letter guide</a>.
 </p>
 
 <p>
@@ -412,7 +412,7 @@ register("medical-device-billing", {
 
     <div class="faq-item">
         <h3>How can I dispute an inflated medical device charge?</h3>
-        <p>Request the device catalog number from your operative report. Research the manufacturer's list price. Write a dispute letter citing the published price and requesting a reduction. If the hospital does not respond, escalate to your insurer or state attorney general. See our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> for a full walkthrough.</p>
+        <p>Request the device catalog number from your operative report. Research the manufacturer's list price. Write a dispute letter citing the published price and requesting a reduction. If the hospital does not respond, escalate to your insurer or state attorney general. See our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> for a full walkthrough.</p>
     </div>
 
     <div class="faq-item">

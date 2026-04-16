@@ -63,7 +63,7 @@ register("nursing-home-billing", {
     </tbody>
 </table>
 
-<p><strong>The qualifying inpatient stay requirement</strong> is one of the most common billing traps. To qualify for Medicare SNF coverage, you must have been formally admitted as a hospital inpatient (not under &ldquo;observation status&rdquo;) for at least 3 consecutive days. Patients kept under observation status &mdash; even overnight for multiple nights &mdash; do not qualify. This distinction can cost thousands. Read our guide to <a href="/guides/observation-status">observation status billing</a> to understand the difference.</p>
+<p><strong>The qualifying inpatient stay requirement</strong> is one of the most common billing traps. To qualify for Medicare SNF coverage, you must have been formally admitted as a hospital inpatient (not under &ldquo;observation status&rdquo;) for at least 3 consecutive days. Patients kept under observation status &mdash; even overnight for multiple nights &mdash; do not qualify. This distinction can cost thousands. Read our guide to <a href="/guides/observation-status/">observation status billing</a> to understand the difference.</p>
 
 <div class="key-takeaway">
     <strong>Received a nursing home bill you&rsquo;re not sure about?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we flag therapy upcoding, duplicate charges, and items that should be included in the daily Medicare rate.
@@ -168,7 +168,7 @@ register("nursing-home-billing", {
     <li><strong>Federal Court</strong>: For amounts over $1,870 (2026).</li>
 </ol>
 
-<p>For non-Medicare billing disputes, send a written dispute letter to the facility&rsquo;s billing department with a copy of the itemized statement, your notes on what was and wasn&rsquo;t provided, and a request for a line-by-line review. See our <a href="/guides/dispute-letter-template">dispute letter template</a> for a starting point.</p>
+<p>For non-Medicare billing disputes, send a written dispute letter to the facility&rsquo;s billing department with a copy of the itemized statement, your notes on what was and wasn&rsquo;t provided, and a request for a line-by-line review. See our <a href="/guides/dispute-letter-template/">dispute letter template</a> for a starting point.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
 
@@ -207,7 +207,7 @@ register("nursing-home-billing", {
     </div>
     <div class="faq-item">
         <h3>Can I dispute a nursing home bill after discharge?</h3>
-        <p>Yes. You generally have up to 120 days to file a Medicare redetermination (first level appeal). Request an itemized statement and compare it against your Medicare Summary Notice. Discrepancies between what the facility billed and what Medicare paid are common starting points for disputes. Use our <a href="/guides/dispute-letter-template">dispute letter template</a> to start the process.</p>
+        <p>Yes. You generally have up to 120 days to file a Medicare redetermination (first level appeal). Request an itemized statement and compare it against your Medicare Summary Notice. Discrepancies between what the facility billed and what Medicare paid are common starting points for disputes. Use our <a href="/guides/dispute-letter-template/">dispute letter template</a> to start the process.</p>
     </div>
     <div class="faq-item">
         <h3>What is the difference between skilled nursing and custodial care for Medicare?</h3>

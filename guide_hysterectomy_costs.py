@@ -182,7 +182,7 @@ register("hysterectomy-costs", {
 
 <p><strong>Prior authorization is required by almost all insurers.</strong> The authorization will specify the approved surgical approach and facility. If your surgeon changes the approach on the day of surgery (for example, converting from laparoscopic to open due to complications), the facility should update the authorization retroactively. Failure to do so can result in a partial denial of the claim.</p>
 
-<p>Review your plan&rsquo;s <a href="/guides/inpatient-outpatient">inpatient vs. outpatient</a> coverage differences before your procedure. Some plans have different cost-sharing for inpatient admissions that can significantly raise your out-of-pocket cost.</p>
+<p>Review your plan&rsquo;s <a href="/guides/inpatient-outpatient/">inpatient vs. outpatient</a> coverage differences before your procedure. Some plans have different cost-sharing for inpatient admissions that can significantly raise your out-of-pocket cost.</p>
 
 <div class="key-takeaway">
     <strong>Not sure if your hysterectomy approach was billed correctly?</strong> Request your operative report from the hospital and <a href="/scan">upload it alongside your bill to BillKarma</a> &mdash; we&rsquo;ll check whether the CPT code matches what was actually performed.
@@ -260,7 +260,7 @@ register("hysterectomy-costs", {
     <li>Verify that any add-on procedures (oophorectomy, node dissection) are billed as add-on codes, not as standalone procedures.</li>
     <li>Calculate anesthesia time units from the operative report start and end times. Each 15-minute block = 1 unit.</li>
     <li>If a robotic technology surcharge appears, request documentation that robotic assistance was used and medically indicated. Challenge this fee in writing if your procedure was convertible to standard laparoscopic.</li>
-    <li>Submit all disputes in writing with the operative report attached. See our <a href="/guides/dispute-bill">complete dispute guide</a> for letter templates.</li>
+    <li>Submit all disputes in writing with the operative report attached. See our <a href="/guides/dispute-bill/">complete dispute guide</a> for letter templates.</li>
 </ol>
 
 <p>For <a href="/hospitals/">hospital-specific billing patterns</a>, check BillKarma&rsquo;s hospital comparison tool to see how your facility&rsquo;s charges compare to the national median for each CPT code.</p>

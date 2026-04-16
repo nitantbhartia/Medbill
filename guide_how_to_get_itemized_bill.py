@@ -270,11 +270,11 @@ register("how-to-get-itemized-hospital-bill", {
 
 {_embed(mode="cost", title="Look up any CPT code from your bill", subtitle="See what Medicare pays for this service in your area.")}
 
-<p>For a deeper dive into reading every section of a medical bill, including insurance adjustments and EOB comparisons, see our <a href="/guides/how-to-read-your-medical-bill">complete guide to reading your medical bill</a>.</p>
+<p>For a deeper dive into reading every section of a medical bill, including insurance adjustments and EOB comparisons, see our <a href="/guides/how-to-read-your-medical-bill/">complete guide to reading your medical bill</a>.</p>
 
 <h2 id="red-flags">5. Five red flags to look for on an itemized bill</h2>
 
-<p>Once you have your itemized bill with CPT codes, these are the five most common errors to check for. Each one can add hundreds or thousands of dollars to your bill. For a comprehensive breakdown of all seven major error types, see our <a href="/guides/common-hospital-billing-errors">guide to common hospital billing errors</a>.</p>
+<p>Once you have your itemized bill with CPT codes, these are the five most common errors to check for. Each one can add hundreds or thousands of dollars to your bill. For a comprehensive breakdown of all seven major error types, see our <a href="/guides/common-hospital-billing-errors/">guide to common hospital billing errors</a>.</p>
 
 <h3>Red flag 1: Duplicate charges</h3>
 
@@ -342,7 +342,7 @@ register("how-to-get-itemized-hospital-bill", {
     <li><strong>Follow up in 30 days.</strong> If you haven&rsquo;t received a corrected statement, call again and reference your original dispute date and any case numbers.</li>
 </ol>
 
-<p>For detailed dispute letter templates and phone scripts, see our <a href="/guides/how-to-dispute-a-medical-bill">complete guide to disputing a medical bill</a>.</p>
+<p>For detailed dispute letter templates and phone scripts, see our <a href="/guides/how-to-dispute-a-medical-bill/">complete guide to disputing a medical bill</a>.</p>
 
 <p><strong>Already have your itemized bill?</strong> <a href="/scan">Upload it to BillKarma</a> for a free analysis. We&rsquo;ll compare every charge to Medicare rates, flag potential errors, and generate a personalized dispute letter automatically.</p>
 

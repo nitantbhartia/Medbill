@@ -150,7 +150,7 @@ register("freestanding-er-billing", {
     </tbody>
 </table>
 
-<p>If you received care at a freestanding ER in Texas, the facility was required to post its prices and disclose that it is not an urgent care clinic. If it failed to do so, you may have grounds for a complaint with the Texas Department of Insurance. Learn more about the No Surprises Act protections in our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>.</p>
+<p>If you received care at a freestanding ER in Texas, the facility was required to post its prices and disclose that it is not an urgent care clinic. If it failed to do so, you may have grounds for a complaint with the Texas Department of Insurance. Learn more about the No Surprises Act protections in our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a>.</p>
 
 <h2 id="how-to-dispute">5. How to dispute a freestanding ER bill</h2>
 
@@ -162,7 +162,7 @@ register("freestanding-er-billing", {
 
 <p><strong>Step 3: Challenge facility fees and add-on charges.</strong> Look for trauma activation fees, supply charges, and "miscellaneous" line items. Trauma fees are only appropriate when a trauma protocol is initiated. Supply charges for basic items like bandages and ice packs should be challenged.</p>
 
-<p><strong>Step 4: File a formal dispute.</strong> Write a dispute letter citing the specific overcharges, include Medicare rate comparisons, and request a billing review. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has templates you can use today.</p>
+<p><strong>Step 4: File a formal dispute.</strong> Write a dispute letter citing the specific overcharges, include Medicare rate comparisons, and request a billing review. Our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> has templates you can use today.</p>
 
 <p><strong>Step 5: File an insurance appeal.</strong> If your insurance paid based on ER rates but your condition did not require emergency care, appeal to have the claim reprocessed at urgent care rates.</p>
 
@@ -201,7 +201,7 @@ register("freestanding-er-billing", {
 
 <p><strong>When a freestanding ER makes sense:</strong> It is after hours, your condition could be life-threatening (chest pain, severe bleeding, difficulty breathing, signs of stroke), or you need advanced imaging immediately.</p>
 
-<p><strong>When urgent care is the better choice:</strong> Sprains, minor cuts needing stitches, sore throats, ear infections, UTIs, minor burns, flu symptoms. These conditions do not require ER-level resources, and urgent care handles them at a fraction of the cost. Read our <a href="/guides/urgent-care-billing">urgent care billing guide</a> for a full breakdown of what to expect.</p>
+<p><strong>When urgent care is the better choice:</strong> Sprains, minor cuts needing stitches, sore throats, ear infections, UTIs, minor burns, flu symptoms. These conditions do not require ER-level resources, and urgent care handles them at a fraction of the cost. Read our <a href="/guides/urgent-care-billing/">urgent care billing guide</a> for a full breakdown of what to expect.</p>
 
 <div class="key-takeaway">
     <strong>Rule of thumb:</strong> If you can describe your condition to a friend without the word "emergency," start with urgent care. You can always be transferred to an ER if needed. Look up your hospital in our <a href="/hospitals/">hospital pricing directory</a> to compare facility costs before you go.

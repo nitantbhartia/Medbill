@@ -127,7 +127,7 @@ register("pediatric-billing", {
     <li><strong>Pediatrician examination</strong> (billed separately by the pediatrician)</li>
 </ul>
 
-<p><strong>Critical timeline:</strong> You must add your newborn to your insurance plan within <strong>30 days</strong> of birth (this is a qualifying life event). If you miss this window, your baby may not have coverage retroactive to the birth date, leaving you responsible for the full newborn bill. For families who qualify, Medicaid enrollment for the baby can be applied retroactively to the birth date. For more details on newborn billing, see our <a href="/guides/newborn-hospital-bill-guide">newborn hospital bill guide</a>.</p>
+<p><strong>Critical timeline:</strong> You must add your newborn to your insurance plan within <strong>30 days</strong> of birth (this is a qualifying life event). If you miss this window, your baby may not have coverage retroactive to the birth date, leaving you responsible for the full newborn bill. For families who qualify, Medicaid enrollment for the baby can be applied retroactively to the birth date. For more details on newborn billing, see our <a href="/guides/newborn-hospital-bill-guide/">newborn hospital bill guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>Expecting a baby?</strong> Call your insurance before the due date and ask how to add the newborn. Have the enrollment form ready to submit within days of birth. Then <a href="/scan">upload both the mother&rsquo;s and baby&rsquo;s bills to BillKarma</a> to catch duplicate charges across the two accounts.
@@ -198,7 +198,7 @@ register("pediatric-billing", {
     <li>Lead and tuberculosis screening</li>
 </ul>
 
-<p><strong>If you received a bill for any of these services from an in-network provider, it is likely a billing error.</strong> The most common mistake is the provider billing the vaccine administration under a non-preventive diagnosis code, which causes the insurer&rsquo;s system to apply cost-sharing. Call your insurer and ask them to reprocess the claim under the preventive care benefit. For a full overview, see our <a href="/guides/preventive-care-billing">preventive care billing guide</a>.</p>
+<p><strong>If you received a bill for any of these services from an in-network provider, it is likely a billing error.</strong> The most common mistake is the provider billing the vaccine administration under a non-preventive diagnosis code, which causes the insurer&rsquo;s system to apply cost-sharing. Call your insurer and ask them to reprocess the claim under the preventive care benefit. For a full overview, see our <a href="/guides/preventive-care-billing/">preventive care billing guide</a>.</p>
 
 <div class="case-study">
     <h3>Case study: Family billed $380 for routine vaccines that should have been free</h3>
@@ -243,7 +243,7 @@ register("pediatric-billing", {
 
     <div class="faq-item">
         <h3>Is my newborn billed separately from the mother?</h3>
-        <p>Yes. From the moment of birth, your baby is a separate patient with separate charges for nursery care, screenings, vaccines, and any additional services. You must add the newborn to your insurance within 30 days. For detailed guidance, see our <a href="/guides/newborn-hospital-bill-guide">newborn billing guide</a>.</p>
+        <p>Yes. From the moment of birth, your baby is a separate patient with separate charges for nursery care, screenings, vaccines, and any additional services. You must add the newborn to your insurance within 30 days. For detailed guidance, see our <a href="/guides/newborn-hospital-bill-guide/">newborn billing guide</a>.</p>
     </div>
 
     <div class="faq-item">

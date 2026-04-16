@@ -92,7 +92,7 @@ register("medical-debt-forgiveness-programs", {
 <ul>
     <li>You can apply even after receiving the bill — up to 240 days after the first statement</li>
     <li>You can apply even if you have insurance — charity care covers your out-of-pocket portion</li>
-    <li>You can apply even after the bill went to <a href="/guides/medical-bill-collections-rights">collections</a></li>
+    <li>You can apply even after the bill went to <a href="/guides/medical-bill-collections-rights/">collections</a></li>
     <li>Charity care forgiveness is <strong>not taxable</strong> — it is a discount, not forgiven income</li>
     <li>One application can cover all outstanding accounts at the same hospital</li>
 </ul>
@@ -201,7 +201,7 @@ register("medical-debt-forgiveness-programs", {
     </tbody>
 </table>
 
-<p>These rules don't eliminate the debt itself — collectors can still call and, within the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a>, sue. But they remove the credit damage that made medical debt so devastating. Combined with charity care and settlement options, patients now have a realistic path to resolving medical debt without lasting financial harm.</p>
+<p>These rules don't eliminate the debt itself — collectors can still call and, within the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a>, sue. But they remove the credit damage that made medical debt so devastating. Combined with charity care and settlement options, patients now have a realistic path to resolving medical debt without lasting financial harm.</p>
 
 <h2 id="step-by-step">7. How to get your debt forgiven — step by step</h2>
 
@@ -251,7 +251,7 @@ register("medical-debt-forgiveness-programs", {
 
     <div class="faq-item">
         <h3>How do I get my medical debt forgiven?</h3>
-        <p>The most accessible path: apply for <a href="/guides/hospital-financial-assistance-charity-care">hospital financial assistance</a> (charity care) at the original hospital. If the hospital is nonprofit and your income qualifies, they can forgive 50-100% of the bill. Use our <a href="/charity-care">eligibility checker</a> to see if you qualify. Check for billing errors first with <a href="/scan">BillKarma</a>.</p>
+        <p>The most accessible path: apply for <a href="/guides/hospital-financial-assistance-charity-care/">hospital financial assistance</a> (charity care) at the original hospital. If the hospital is nonprofit and your income qualifies, they can forgive 50-100% of the bill. Use our <a href="/charity-care">eligibility checker</a> to see if you qualify. Check for billing errors first with <a href="/scan">BillKarma</a>.</p>
     </div>
 
     <div class="faq-item">
@@ -271,7 +271,7 @@ register("medical-debt-forgiveness-programs", {
 
     <div class="faq-item">
         <h3>What is the CFPB medical debt rule and how does it help?</h3>
-        <p>The CFPB's 2025 rule removes medical debt from credit reports and prevents it from being used in credit scoring. This doesn't erase the debt itself, but eliminates the credit damage. Combined with charity care and <a href="/guides/settle-medical-debt-collections">settlement options</a>, patients can now resolve medical debt without lasting credit harm.</p>
+        <p>The CFPB's 2025 rule removes medical debt from credit reports and prevents it from being used in credit scoring. This doesn't erase the debt itself, but eliminates the credit damage. Combined with charity care and <a href="/guides/settle-medical-debt-collections/">settlement options</a>, patients can now resolve medical debt without lasting credit harm.</p>
     </div>
 </div>
 

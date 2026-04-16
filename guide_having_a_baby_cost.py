@@ -137,7 +137,7 @@ register("how-much-does-it-cost-to-have-a-baby", {
 <ol>
     <li>Verify your hospital is in-network <em>before</em> your delivery date.</li>
     <li>Ask the hospital who provides anesthesia services and confirm NSA applies.</li>
-    <li>If you receive an unexpected balance bill from the anesthesiologist, dispute it in writing, citing the NSA. Our <a href="/guides/dispute-bill">dispute letter templates</a> cover this scenario.</li>
+    <li>If you receive an unexpected balance bill from the anesthesiologist, dispute it in writing, citing the NSA. Our <a href="/guides/dispute-bill/">dispute letter templates</a> cover this scenario.</li>
     <li>File a complaint with CMS if the provider refuses to comply: <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a>.</li>
 </ol>
 

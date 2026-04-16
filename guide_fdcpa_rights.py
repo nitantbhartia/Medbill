@@ -69,7 +69,7 @@ register("fdcpa-rights-medical-debt-collectors", {
     </tbody>
 </table>
 
-<p>BillKarma data shows that the median time from a hospital sending a bill to it reaching a third-party collector is <strong>127 days</strong>. If you are within that window, you still have time to <a href="/guides/how-to-dispute-a-medical-bill">dispute errors with the hospital directly</a> before collections begins.</p>
+<p>BillKarma data shows that the median time from a hospital sending a bill to it reaching a third-party collector is <strong>127 days</strong>. If you are within that window, you still have time to <a href="/guides/how-to-dispute-a-medical-bill/">dispute errors with the hospital directly</a> before collections begins.</p>
 
 <h2 id="eight-violations">2. 8 things medical debt collectors cannot do</h2>
 
@@ -103,7 +103,7 @@ register("fdcpa-rights-medical-debt-collectors", {
 
 <h3>8. Threaten lawsuits they don't intend to file</h3>
 
-<p>A collector cannot threaten to sue you unless they actually intend to do so and the debt is within the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a>. Threatening to sue on time-barred debt is an FDCPA violation that courts take seriously.</p>
+<p>A collector cannot threaten to sue you unless they actually intend to do so and the debt is within the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a>. Threatening to sue on time-barred debt is an FDCPA violation that courts take seriously.</p>
 
 <table>
     <thead>
@@ -165,7 +165,7 @@ register("fdcpa-rights-medical-debt-collectors", {
 <ul>
     <li>The collection amount is $443 more than the original bill — this may be an unauthorized fee (potential § 1692e violation)</li>
     <li>The threat of wage garnishment requires a court judgment first — if the collector has not filed suit, this is misleading</li>
-    <li>The date of service is over 3 years ago — in many states, this debt is past the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a></li>
+    <li>The date of service is over 3 years ago — in many states, this debt is past the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a></li>
 </ul>
 
 <h2 id="how-to-respond">4. How to respond when a collector breaks the rules</h2>
@@ -225,7 +225,7 @@ register("fdcpa-rights-medical-debt-collectors", {
 
 <ol>
     <li><strong>Send a validation letter within 30 days of first contact.</strong> This is the single most important step. It pauses collection activity and forces the collector to prove their case. Use our <a href="/collection-notice">letter generator</a> to send one via certified mail.</li>
-    <li><strong>Never acknowledge the debt verbally.</strong> Don't say "I know I owe this" or "I can't pay right now." Acknowledgment can be used against you and may reset the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> in some states.</li>
+    <li><strong>Never acknowledge the debt verbally.</strong> Don't say "I know I owe this" or "I can't pay right now." Acknowledgment can be used against you and may reset the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> in some states.</li>
     <li><strong>Request all communication in writing.</strong> This creates a paper trail and reduces opportunities for verbal harassment or misrepresentation.</li>
     <li><strong>Check the original bill for errors.</strong> BillKarma's analysis of bills that ended up in collections found that <strong>38% contained billing errors</strong> — duplicate charges, unbundled codes, or insurance that was never filed. Errors in the original bill mean errors in the collection amount.</li>
     <li><strong>Know your state's statute of limitations.</strong> If the debt is time-barred, the collector cannot sue you. Use our <a href="/statute-of-limitations">statute of limitations calculator</a> to check.</li>
@@ -286,7 +286,7 @@ register("fdcpa-rights-medical-debt-collectors", {
 
     <div class="faq-item">
         <h3>Can a debt collector add interest or fees to my medical bill?</h3>
-        <p>Only if your original agreement with the hospital or a specific state law authorizes it. Most medical debt agreements do not include interest clauses. If a collector inflates your balance with unexplained fees, compare the collection amount to your original bill and <a href="/guides/understanding-explanation-of-benefits">EOB</a>. Any unauthorized additions are an FDCPA violation under § 1692e(2)(A) and § 1692f(1).</p>
+        <p>Only if your original agreement with the hospital or a specific state law authorizes it. Most medical debt agreements do not include interest clauses. If a collector inflates your balance with unexplained fees, compare the collection amount to your original bill and <a href="/guides/understanding-explanation-of-benefits/">EOB</a>. Any unauthorized additions are an FDCPA violation under § 1692e(2)(A) and § 1692f(1).</p>
     </div>
 
     <div class="faq-item">

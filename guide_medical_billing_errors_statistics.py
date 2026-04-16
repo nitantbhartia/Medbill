@@ -202,7 +202,7 @@ register("medical-billing-errors-statistics-2026", {
 
 <h3>Error 3: Unbundling &mdash; hidden overcharges in procedure bills</h3>
 
-<p>Unbundling inflates your bill by breaking a single procedure into its component parts and billing each one separately. CMS publishes over 200,000 NCCI code pairs specifically to prevent this. A common example: a colonoscopy with biopsy should be billed as CPT 45380 (Medicare rate: $198), but unbundling would bill the colonoscopy and biopsy as separate line items with separate charges totaling more than the bundled rate. BillKarma&rsquo;s analyzer checks every bill against the NCCI edit list automatically. Learn more about unbundling and other common hospital billing errors in our <a href="/guides/common-hospital-billing-errors">hospital billing errors guide</a>.</p>
+<p>Unbundling inflates your bill by breaking a single procedure into its component parts and billing each one separately. CMS publishes over 200,000 NCCI code pairs specifically to prevent this. A common example: a colonoscopy with biopsy should be billed as CPT 45380 (Medicare rate: $198), but unbundling would bill the colonoscopy and biopsy as separate line items with separate charges totaling more than the bundled rate. BillKarma&rsquo;s analyzer checks every bill against the NCCI edit list automatically. Learn more about unbundling and other common hospital billing errors in our <a href="/guides/common-hospital-billing-errors/">hospital billing errors guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>See exactly what Medicare pays for any procedure.</strong> Use our <a href="/calculator">Medicare rate calculator</a> to look up the benchmark rate for any CPT code on your bill &mdash; then compare it to what you were charged.
@@ -306,7 +306,7 @@ register("medical-billing-errors-statistics-2026", {
 
 <p>Call the billing department and request an itemized bill with CPT codes. A summary showing only &ldquo;Lab Services: $1,200&rdquo; is not enough. You need every individual charge on its own line with the CPT or HCPCS code, date, description, quantity, and dollar amount.</p>
 
-<div class="key-takeaway"><strong>Federal law gives you the right</strong> to an itemized statement. If the billing department resists, cite the No Surprises Act requirement for good-faith estimates and itemized billing. For a full walkthrough, see our guide on <a href="/guides/how-to-read-your-medical-bill">how to read your medical bill</a>.</div>
+<div class="key-takeaway"><strong>Federal law gives you the right</strong> to an itemized statement. If the billing department resists, cite the No Surprises Act requirement for good-faith estimates and itemized billing. For a full walkthrough, see our guide on <a href="/guides/how-to-read-your-medical-bill/">how to read your medical bill</a>.</div>
 
 <h3>Step 2: Compare to your Explanation of Benefits</h3>
 
@@ -329,7 +329,7 @@ register("medical-billing-errors-statistics-2026", {
 
 <p>If you had a procedure, look for multiple CPT codes from the same clinical area on the same date. These may be component codes that should have been billed as a single bundled code. BillKarma&rsquo;s analyzer checks your bill against the CMS NCCI edit list automatically, or you can search the <a href="https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits" target="_blank" rel="noopener">CMS NCCI tools page</a> directly.</p>
 
-<div class="key-takeaway"><strong>Want to skip the manual work?</strong> <a href="/scan">Upload your bill to BillKarma</a> and our analyzer runs all five checks automatically. You&rsquo;ll get a flagged line-item report showing every potential error with the Medicare rate comparison for each code. For a more detailed walkthrough, see our <a href="/guides/medical-bill-audit-checklist">medical bill audit checklist</a>.</div>
+<div class="key-takeaway"><strong>Want to skip the manual work?</strong> <a href="/scan">Upload your bill to BillKarma</a> and our analyzer runs all five checks automatically. You&rsquo;ll get a flagged line-item report showing every potential error with the Medicare rate comparison for each code. For a more detailed walkthrough, see our <a href="/guides/medical-bill-audit-checklist/">medical bill audit checklist</a>.</div>
 
 <h2 id="dispute-outcomes">7. What happens when you dispute</h2>
 
@@ -376,7 +376,7 @@ register("medical-billing-errors-statistics-2026", {
 
 <p>The key: <strong>do not pay the disputed amount while the dispute is open</strong>. Ask the billing department to place the disputed charges on hold. Most hospitals will not send an account to collections while a formal billing review is pending.</p>
 
-<p>For a step-by-step guide to the dispute process with letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill">complete guide to disputing a medical bill</a>.</p>
+<p>For a step-by-step guide to the dispute process with letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill/">complete guide to disputing a medical bill</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 
@@ -398,7 +398,7 @@ register("medical-billing-errors-statistics-2026", {
 
     <div class="faq-item">
         <h3>What happens if I dispute a billing error?</h3>
-        <p>Patients who dispute succeed roughly 60&ndash;70% of the time. For simple errors like duplicates, the success rate is over 90%. For upcoding disputes, it&rsquo;s 55&ndash;65%. The average savings from a successful dispute is $800 to $3,000. Most disputes are resolved within 30 to 60 days. See our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> for letter templates and step-by-step instructions.</p>
+        <p>Patients who dispute succeed roughly 60&ndash;70% of the time. For simple errors like duplicates, the success rate is over 90%. For upcoding disputes, it&rsquo;s 55&ndash;65%. The average savings from a successful dispute is $800 to $3,000. Most disputes are resolved within 30 to 60 days. See our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> for letter templates and step-by-step instructions.</p>
     </div>
 
     <div class="faq-item">
@@ -408,7 +408,7 @@ register("medical-billing-errors-statistics-2026", {
 
     <div class="faq-item">
         <h3>Which types of bills have the highest error rates?</h3>
-        <p>Emergency room bills lead at 40&ndash;50%, driven primarily by visit-level upcoding. Surgical bills follow at 30&ndash;40%, mainly from unbundling and duplicates. Outpatient, lab, and imaging bills have error rates of 15&ndash;25%. The more complex the care, the more opportunity for billing errors. For a complete checklist, see our <a href="/guides/medical-bill-audit-checklist">audit checklist guide</a>.</p>
+        <p>Emergency room bills lead at 40&ndash;50%, driven primarily by visit-level upcoding. Surgical bills follow at 30&ndash;40%, mainly from unbundling and duplicates. Outpatient, lab, and imaging bills have error rates of 15&ndash;25%. The more complex the care, the more opportunity for billing errors. For a complete checklist, see our <a href="/guides/medical-bill-audit-checklist/">audit checklist guide</a>.</p>
     </div>
 </div>
 

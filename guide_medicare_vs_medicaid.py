@@ -83,7 +83,7 @@ register("medicare-vs-medicaid-explained", {
 <p>Covers doctor visits, outpatient care, preventive services, durable medical equipment, and lab tests. The 2026 premium is <strong>$185/month</strong> (higher for incomes above $106,000). The annual deductible is <strong>$257</strong>, then you pay 20% coinsurance.</p>
 
 <h3>Part C &mdash; Medicare Advantage</h3>
-<p>Private insurance plans that bundle Parts A, B, and usually D. Often include dental, vision, and hearing. May have lower out-of-pocket costs but restrict you to a provider network. About 54% of Medicare beneficiaries now choose Medicare Advantage. See our <a href="/guides/medicare-advantage-billing">Medicare Advantage billing guide</a> for details on how MA plans bill differently.</p>
+<p>Private insurance plans that bundle Parts A, B, and usually D. Often include dental, vision, and hearing. May have lower out-of-pocket costs but restrict you to a provider network. About 54% of Medicare beneficiaries now choose Medicare Advantage. See our <a href="/guides/medicare-advantage-billing/">Medicare Advantage billing guide</a> for details on how MA plans bill differently.</p>
 
 <h3>Part D &mdash; Prescription drugs</h3>
 <p>Covers prescription medications through private plans. Premiums average $35&ndash;55/month. The 2026 out-of-pocket cap is <strong>$2,000/year</strong> thanks to the Inflation Reduction Act.</p>
@@ -115,7 +115,7 @@ register("medicare-vs-medicaid-explained", {
 <h3>What Medicaid covers</h3>
 <p>Federal law requires all state Medicaid programs to cover: hospital stays, doctor visits, lab and X-ray services, nursing facility care, home health, prenatal care, and vaccines for children. Most states also cover dental, vision, prescription drugs, and mental health services.</p>
 
-<p>For a step-by-step walkthrough of the application process, see our <a href="/guides/how-to-apply-for-medicaid">how to apply for Medicaid</a> guide.</p>
+<p>For a step-by-step walkthrough of the application process, see our <a href="/guides/how-to-apply-for-medicaid/">how to apply for Medicaid</a> guide.</p>
 
 <h2 id="dual-eligible">4. Dual eligibility: when you qualify for both</h2>
 
@@ -151,9 +151,9 @@ register("medicare-vs-medicaid-explained", {
 <h2 id="billing-differences">5. How each program handles hospital bills</h2>
 
 <h3>Medicare billing</h3>
-<p>Hospitals bill Medicare using DRG (Diagnosis Related Group) codes for inpatient stays and APC (Ambulatory Payment Classification) codes for outpatient. Medicare sets the rates&mdash;hospitals cannot charge more than the Medicare-approved amount. However, you still owe your deductible and coinsurance. For details on how Medicare hospital billing works, see our <a href="/guides/medicare-billing">Medicare billing guide</a>.</p>
+<p>Hospitals bill Medicare using DRG (Diagnosis Related Group) codes for inpatient stays and APC (Ambulatory Payment Classification) codes for outpatient. Medicare sets the rates&mdash;hospitals cannot charge more than the Medicare-approved amount. However, you still owe your deductible and coinsurance. For details on how Medicare hospital billing works, see our <a href="/guides/medicare-billing/">Medicare billing guide</a>.</p>
 
-<p><strong>The observation status trap:</strong> If a hospital places you under &ldquo;observation status&rdquo; instead of admitting you as an inpatient, your stay is billed under Part B (outpatient) instead of Part A. This can cost you significantly more and disqualify you from Medicare-covered skilled nursing facility care. See our <a href="/guides/observation-status-billing">observation status guide</a>.</p>
+<p><strong>The observation status trap:</strong> If a hospital places you under &ldquo;observation status&rdquo; instead of admitting you as an inpatient, your stay is billed under Part B (outpatient) instead of Part A. This can cost you significantly more and disqualify you from Medicare-covered skilled nursing facility care. See our <a href="/guides/observation-status-billing/">observation status guide</a>.</p>
 
 <h3>Medicaid billing</h3>
 <p>Medicaid reimburses hospitals at the lowest rates of any major payer&mdash;typically <strong>60&ndash;70% of what Medicare pays</strong>. Patients owe little to nothing. However, not all providers accept Medicaid due to the low reimbursement rates. In some areas, finding a Medicaid-accepting specialist can be challenging.</p>
@@ -215,7 +215,7 @@ register("medicare-vs-medicaid-explained", {
     <li><strong>Expansion states:</strong> Income at or below 138% FPL (see table above)</li>
     <li><strong>Non-expansion states:</strong> Typically limited to children, pregnant women, elderly, and disabled individuals</li>
     <li><strong>Check online:</strong> Visit <a href="https://www.healthcare.gov/medicaid-chip/" target="_blank" rel="noopener noreferrer">HealthCare.gov/medicaid-chip</a> or your state Medicaid website</li>
-    <li>For a full walkthrough, see our <a href="/guides/how-to-apply-for-medicaid">Medicaid application guide</a></li>
+    <li>For a full walkthrough, see our <a href="/guides/how-to-apply-for-medicaid/">Medicaid application guide</a></li>
 </ul>
 
 <h3>Medicare Savings Programs (if you have Medicare but limited income)</h3>

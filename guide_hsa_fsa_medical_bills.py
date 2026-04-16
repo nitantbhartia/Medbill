@@ -345,7 +345,7 @@ register(
   <p>
     FSA dollars evaporate if you don&rsquo;t use them. Before your plan year ends, check your FSA balance
     and spend down remaining funds on eligible expenses&mdash;glasses, dental, prescriptions.
-    Read our guide on <a href="/guides/how-to-read-an-eob">how to read your Explanation of Benefits</a>
+    Read our guide on <a href="/guides/how-to-read-an-eob/">how to read your Explanation of Benefits</a>
     to make sure the bills you&rsquo;re paying are actually yours to pay.
   </p>
 </div>

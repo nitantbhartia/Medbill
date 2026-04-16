@@ -65,7 +65,7 @@ register("how-health-insurance-works", {
 </table>
 
 <div class="key-takeaway">
-    <strong>The relationship:</strong> You pay your premium every month. When you get care, you pay the full allowed amount until you hit your deductible. Then you pay coinsurance (your percentage) until you hit your out-of-pocket maximum. After the out-of-pocket max, insurance pays 100%. Preventive care is always free, regardless of deductible status. Learn exactly which services qualify in <a href="/guides/preventive-care-billing">our guide to preventive care billing</a>.
+    <strong>The relationship:</strong> You pay your premium every month. When you get care, you pay the full allowed amount until you hit your deductible. Then you pay coinsurance (your percentage) until you hit your out-of-pocket maximum. After the out-of-pocket max, insurance pays 100%. Preventive care is always free, regardless of deductible status. Learn exactly which services qualify in <a href="/guides/preventive-care-billing/">our guide to preventive care billing</a>.
 </div>
 
 <h2 id="how-costs-flow">2. How costs flow: a visual example</h2>
@@ -125,7 +125,7 @@ register("how-health-insurance-works", {
     <li><strong>Provider submits a claim.</strong> The billing department sends a claim to your insurance company with CPT codes (procedures) and ICD-10 codes (diagnoses). This usually happens within 1&ndash;5 business days.</li>
     <li><strong>Insurance processes the claim (adjudication).</strong> The insurer checks your coverage, applies the allowed amount, calculates your deductible and coinsurance, and determines what they pay vs. what you owe. This takes 15&ndash;45 days.</li>
     <li><strong>You receive an EOB.</strong> Your insurance sends an Explanation of Benefits showing how the claim was processed. This is <strong>not a bill</strong>&mdash;it&rsquo;s a statement from your insurer.</li>
-    <li><strong>Provider sends your bill.</strong> After receiving insurance payment, the provider bills you for your remaining balance (deductible, coinsurance, copay, or any denied amounts). Compare this to your EOB carefully&mdash;see <a href="/guides/understanding-your-eob">our guide to reading your EOB</a> for help.</li>
+    <li><strong>Provider sends your bill.</strong> After receiving insurance payment, the provider bills you for your remaining balance (deductible, coinsurance, copay, or any denied amounts). Compare this to your EOB carefully&mdash;see <a href="/guides/understanding-your-eob/">our guide to reading your EOB</a> for help.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -163,7 +163,7 @@ register("how-health-insurance-works", {
 <p><strong>The math check:</strong> Add up your expected annual costs: (monthly premium &times; 12) + expected deductible + expected coinsurance. Compare this total across plans. The cheapest premium is not always the cheapest plan.</p>
 
 <div class="key-takeaway">
-    <strong>The #1 mistake:</strong> Choosing the lowest-premium plan without calculating total costs. A plan with a $150/month premium and $6,000 deductible costs $1,800/year in premiums alone. If you need a $5,000 procedure, you pay $6,800 total. A $300/month plan with a $1,500 deductible costs $3,600 in premiums plus $1,500 deductible = $5,100 total. The &ldquo;expensive&rdquo; plan saves you $1,700. For a deeper dive on deductibles and out-of-pocket costs, see <a href="/guides/out-of-pocket-maximum-explained">our guide to out-of-pocket maximums</a>.
+    <strong>The #1 mistake:</strong> Choosing the lowest-premium plan without calculating total costs. A plan with a $150/month premium and $6,000 deductible costs $1,800/year in premiums alone. If you need a $5,000 procedure, you pay $6,800 total. A $300/month plan with a $1,500 deductible costs $3,600 in premiums plus $1,500 deductible = $5,100 total. The &ldquo;expensive&rdquo; plan saves you $1,700. For a deeper dive on deductibles and out-of-pocket costs, see <a href="/guides/out-of-pocket-maximum-explained/">our guide to out-of-pocket maximums</a>.
 </div>
 
 <h2 id="open-enrollment">6. Open enrollment and special enrollment</h2>

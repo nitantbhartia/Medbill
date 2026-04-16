@@ -141,7 +141,7 @@ register("stop-medical-debt-collector-calls", {
 <p><strong>Important considerations before sending:</strong></p>
 
 <ol>
-    <li><strong>Send a debt validation letter first.</strong> If you are within the 30-day validation window, send a <a href="/guides/debt-validation-letter-medical-debt">debt validation letter</a> before or alongside the cease-and-desist. The validation letter forces the collector to prove the debt — the cease-and-desist just stops communication.</li>
+    <li><strong>Send a debt validation letter first.</strong> If you are within the 30-day validation window, send a <a href="/guides/debt-validation-letter-medical-debt/">debt validation letter</a> before or alongside the cease-and-desist. The validation letter forces the collector to prove the debt — the cease-and-desist just stops communication.</li>
     <li><strong>A cease-and-desist does not eliminate the debt.</strong> The collector can still sue you (and must be allowed to notify you of that). It only stops the phone calls, letters, and emails.</li>
     <li><strong>Use certified mail with return receipt.</strong> This creates legal proof of delivery.</li>
 </ol>
@@ -214,9 +214,9 @@ register("stop-medical-debt-collector-calls", {
 <ol>
     <li><strong>Check if the bill was correct.</strong> <a href="/scan">Upload your original bill to BillKarma</a> to find billing errors, duplicate charges, or insurance gaps. Errors in the original bill mean the collection amount is wrong.</li>
     <li><strong>Check the statute of limitations.</strong> Use our <a href="/statute-of-limitations">SOL calculator</a> to see if the debt is time-barred in your state. If it is, the collector cannot sue you.</li>
-    <li><strong>Apply for financial assistance.</strong> If the bill is from a nonprofit hospital, you may qualify for <a href="/guides/hospital-financial-assistance-charity-care">charity care</a> that writes off 50-100% of the balance — even after it went to collections.</li>
+    <li><strong>Apply for financial assistance.</strong> If the bill is from a nonprofit hospital, you may qualify for <a href="/guides/hospital-financial-assistance-charity-care/">charity care</a> that writes off 50-100% of the balance — even after it went to collections.</li>
     <li><strong>Negotiate a settlement.</strong> Collectors buy debt for 4-7 cents on the dollar. Offer 25-40% as a lump sum. Use our <a href="/settle-debt">settlement letter tool</a> to draft a protective offer.</li>
-    <li><strong>If sued, respond.</strong> Stopping calls does not prevent a lawsuit. If served with a summons, <a href="/guides/sued-for-medical-debt">respond within the deadline</a> and raise your defenses.</li>
+    <li><strong>If sued, respond.</strong> Stopping calls does not prevent a lawsuit. If served with a summons, <a href="/guides/sued-for-medical-debt/">respond within the deadline</a> and raise your defenses.</li>
 </ol>
 
 <div class="key-takeaway">

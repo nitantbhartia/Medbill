@@ -15,8 +15,70 @@ _DEFAULT_REVIEWED = "2026-04-05"
 # Legacy slug -> canonical slug. Routes 301 to the canonical and internal
 # surfaces (sitemap, related_guides, link map) skip / rewrite these.
 GUIDE_REDIRECTS = {
+    # EOB cluster
     "understanding-explanation-of-benefits": "explanation-of-benefits-eob",
     "explanation-of-benefits-eob-guide": "explanation-of-benefits-eob",
+    "understanding-your-eob": "explanation-of-benefits-eob",
+    "understanding-your-explanation-of-benefits": "explanation-of-benefits-eob",
+    "how-to-read-an-eob": "explanation-of-benefits-eob",
+    "how-to-read-your-eob": "explanation-of-benefits-eob",
+    # Appeal / denial cluster
+    "appeal-denial": "how-to-appeal-insurance-denial",
+    "appeal-insurance-denial": "how-to-appeal-insurance-denial",
+    "how-to-appeal-a-denied-claim": "how-to-appeal-insurance-denial",
+    "how-to-appeal-an-insurance-denial": "how-to-appeal-insurance-denial",
+    "how-to-appeal-health-insurance-denial": "how-to-appeal-insurance-denial",
+    "insurance-denial-appeal": "how-to-appeal-insurance-denial",
+    "insurance-denial-appeal-win": "how-to-appeal-insurance-denial-and-win",
+    "how-to-appeal-a-medical-bill": "how-to-dispute-a-medical-bill",
+    "how-to-appeal-a-medical-bill-denial": "how-to-dispute-a-medical-bill",
+    # Balance billing / NSA cluster
+    "balance-billing-and-surprise-medical-bills": "balance-billing",
+    "balance-billing-protection": "balance-billing",
+    "understanding-balance-billing": "balance-billing",
+    "no-surprises-act": "no-surprises-act-explained",
+    "no-surprises-act-guide": "no-surprises-act-explained",
+    # Financial assistance cluster
+    "charity-care": "hospital-financial-assistance-charity-care",
+    "hospital-charity-care-financial-assistance": "hospital-financial-assistance-charity-care",
+    "hospital-financial-assistance": "hospital-financial-assistance-charity-care",
+    "hospital-financial-assistance-guide": "hospital-financial-assistance-charity-care",
+    # CPT codes cluster
+    "cpt-codes": "what-are-cpt-codes",
+    # Debt / collections cluster
+    "debt-validation-letter-medical-bills": "debt-validation-letter-medical-debt",
+    "medical-bill-collections-rights": "medical-debt-collections-rights",
+    "medical-debt-and-debt-collectors": "settle-medical-debt-collections",
+    "medical-debt-lawsuit-defense": "medical-debt-laws-by-state",
+    # Dispute / itemized cluster
+    "dispute-bill": "how-to-dispute-a-medical-bill",
+    "dispute-letter-template": "medical-bill-dispute-letter",
+    "duplicate-charges": "duplicate-charges-hospital-bills",
+    "hospital-billing-errors": "common-hospital-billing-errors",
+    "how-to-get-itemized-bill": "how-to-get-itemized-hospital-bill",
+    "how-to-negotiate-a-medical-bill": "how-to-negotiate-medical-bills",
+    # Medicare cluster
+    "medicare-billing": "how-medicare-billing-works",
+    "medicare-billing-explained": "how-medicare-billing-works",
+    # Observation status cluster
+    "observation-status": "observation-status-billing",
+    "observation-status-explained": "observation-status-billing",
+    "observation-status-vs-inpatient": "observation-status-billing",
+    # Misc legacy slugs
+    "facility-fees-explained": "hospital-facility-fees-explained",
+    "fdcpa-medical-debt-rights": "fdcpa-rights-medical-debt-collectors",
+    "fdcpa-rights-medical-debt": "fdcpa-rights-medical-debt-collectors",
+    "inpatient-outpatient": "inpatient-vs-outpatient-billing",
+    "medical-billing-advocates": "medical-billing-advocate",
+    "out-of-network-bills": "out-of-network-medical-bills",
+    "out-of-pocket-maximum-explained": "out-of-pocket-maximum",
+    "pe-hospital-billing": "private-equity-hospital-billing",
+    "pediatric-medical-billing": "pediatric-billing",
+    "preventive-care-billing-errors": "preventive-care-billing",
+    "skilled-nursing-billing": "skilled-nursing-facility-billing",
+    "surgery-center-vs-hospital": "surgery-center-vs-hospital-cost",
+    "er-bills": "why-emergency-room-bills-are-so-high",
+    "surgery-costs-billing": "how-much-does-surgery-cost",
 }
 
 

@@ -346,7 +346,7 @@ register("nicu-bills-explained", {
   specifically ask for a &ldquo;line-by-line itemized statement with CPT codes, revenue codes,
   and dates of service.&rdquo; A summary bill is not sufficient for an audit. Under federal law
   and most state laws, you have the right to receive an itemized bill. For a comprehensive walkthrough,
-  read our guide on <a href="/guides/how-to-get-itemized-hospital-bill">how to get an itemized
+  read our guide on <a href="/guides/how-to-get-itemized-hospital-bill/">how to get an itemized
   hospital bill</a>.
 </p>
 
@@ -375,7 +375,7 @@ register("nicu-bills-explained", {
   external review by an independent third party. For NICU claims, the most effective appeal
   strategy is obtaining a letter of medical necessity from the attending neonatologist explaining
   why the denied service was required. Read our full guide on
-  <a href="/guides/appeal-insurance-denial">how to appeal an insurance denial</a> for step-by-step
+  <a href="/guides/appeal-insurance-denial/">how to appeal an insurance denial</a> for step-by-step
   instructions.
 </p>
 <p>
@@ -444,7 +444,7 @@ register("nicu-bills-explained", {
 </p>
 <p>
   If your NICU bill is already in collections or you simply cannot afford to pay, read our guide on
-  <a href="/guides/cant-afford-medical-bill">what to do when you can&rsquo;t afford a medical bill</a>
+  <a href="/guides/cant-afford-medical-bill/">what to do when you can&rsquo;t afford a medical bill</a>
   for additional options including payment plans, hardship programs, and debt negotiation strategies.
 </p>
 
@@ -458,7 +458,7 @@ register("nicu-bills-explained", {
   identify errors or negotiate effectively from a summary bill that shows only a total. Call the
   hospital billing department and request the full itemized statement with CPT codes, revenue codes,
   dates of service, and unit quantities. For more detail, see our guide on
-  <a href="/guides/how-to-get-itemized-hospital-bill">how to get an itemized hospital bill</a>.
+  <a href="/guides/how-to-get-itemized-hospital-bill/">how to get an itemized hospital bill</a>.
 </p>
 <p>
   <strong>Compare the daily rate to Medicare DRG payment:</strong> Medicare publishes what it pays
@@ -537,9 +537,9 @@ register("nicu-bills-explained", {
 </p>
 <p>
   For a complete walkthrough of understanding and auditing all charges related to your baby&rsquo;s
-  hospital stay (not just the NICU portion), see our <a href="/guides/newborn-hospital-bill-guide">guide
+  hospital stay (not just the NICU portion), see our <a href="/guides/newborn-hospital-bill-guide/">guide
   to newborn hospital bills</a>. And for the mother&rsquo;s side of the bill, read our
-  <a href="/guides/maternity-hospital-bill">maternity hospital bill guide</a>.
+  <a href="/guides/maternity-hospital-bill/">maternity hospital bill guide</a>.
 </p>
 <p>
   <a href="/scan">Upload your NICU bill to BillKarma now</a> &mdash; our scanner checks for

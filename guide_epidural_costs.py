@@ -140,7 +140,7 @@ register("epidural-cost-during-labor", {
     </tbody>
 </table>
 
-<p>Even with insurance, you&rsquo;ll owe something out of pocket. If you haven&rsquo;t met your annual deductible, the full epidural cost may apply toward it. If your delivery is early in the plan year, this can be a significant amount. Check your plan&rsquo;s <a href="/guides/copay-vs-coinsurance-vs-deductible">deductible and coinsurance structure</a> before your due date.</p>
+<p>Even with insurance, you&rsquo;ll owe something out of pocket. If you haven&rsquo;t met your annual deductible, the full epidural cost may apply toward it. If your delivery is early in the plan year, this can be a significant amount. Check your plan&rsquo;s <a href="/guides/copay-vs-coinsurance-vs-deductible/">deductible and coinsurance structure</a> before your due date.</p>
 
 <h2 id="surprise-billing">5. Surprise billing risks and No Surprises Act</h2>
 
@@ -152,7 +152,7 @@ register("epidural-cost-during-labor", {
     <li><strong>You can&rsquo;t shop around during labor.</strong> You&rsquo;re in no position to negotiate or choose a different provider when you&rsquo;re in active labor.</li>
 </ul>
 
-<p>The <strong><a href="/guides/no-surprises-act-guide">No Surprises Act</a></strong> (effective since January 2022) directly addresses this problem:</p>
+<p>The <strong><a href="/guides/no-surprises-act-guide/">No Surprises Act</a></strong> (effective since January 2022) directly addresses this problem:</p>
 
 <ul>
     <li><strong>You cannot be balance-billed</strong> by an out-of-network anesthesiologist if you&rsquo;re receiving care at an in-network hospital.</li>
@@ -197,7 +197,7 @@ register("epidural-cost-during-labor", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Request the anesthesia time record.</strong> Every anesthesia provider must maintain a contemporaneous record of start and end times. If your bill seems high, request this document. It&rsquo;s the only way to verify the time units are accurate. <a href="/guides/how-to-get-itemized-hospital-bill">Here&rsquo;s how to request it.</a>
+    <strong>Request the anesthesia time record.</strong> Every anesthesia provider must maintain a contemporaneous record of start and end times. If your bill seems high, request this document. It&rsquo;s the only way to verify the time units are accurate. <a href="/guides/how-to-get-itemized-hospital-bill/">Here&rsquo;s how to request it.</a>
 </div>
 
 <h2 id="billing-errors">8. Common billing errors on epidural bills</h2>
@@ -246,7 +246,7 @@ register("epidural-cost-during-labor", {
     <strong>Audit your bill for free.</strong> <a href="/scan">Upload your delivery bills to BillKarma</a> to automatically check for these errors, compare anesthesia charges to Medicare rates, and flag any No Surprises Act violations. Maternity bills are among the most error-prone&mdash;roughly 1 in 4 contain at least one billing mistake.
 </div>
 
-<p><strong>Related guides:</strong> <a href="/guides/how-much-does-c-section-cost">C-Section Cost Breakdown</a> &middot; <a href="/guides/maternity-hospital-bill">Understanding Your Maternity Hospital Bill</a> &middot; <a href="/guides/anesthesia-billing">Anesthesia Billing Explained</a> &middot; <a href="/guides/no-surprises-act-guide">No Surprises Act Guide</a></p>
+<p><strong>Related guides:</strong> <a href="/guides/how-much-does-c-section-cost/">C-Section Cost Breakdown</a> &middot; <a href="/guides/maternity-hospital-bill/">Understanding Your Maternity Hospital Bill</a> &middot; <a href="/guides/anesthesia-billing/">Anesthesia Billing Explained</a> &middot; <a href="/guides/no-surprises-act-guide/">No Surprises Act Guide</a></p>
 
 <h2 id="faq">Frequently asked questions</h2>
 
@@ -258,12 +258,12 @@ register("epidural-cost-during-labor", {
 
     <div class="faq-item">
         <h3>Does insurance cover an epidural during labor?</h3>
-        <p>Yes. Under the ACA, maternity care is an essential health benefit, and epidurals are covered as standard labor pain management. You&rsquo;ll still owe your deductible, copay, or coinsurance. Medicaid covers epidurals in all states with minimal or no cost-sharing. Even if your anesthesiologist is out-of-network, the <a href="/guides/no-surprises-act-guide">No Surprises Act</a> limits your cost-sharing to in-network rates.</p>
+        <p>Yes. Under the ACA, maternity care is an essential health benefit, and epidurals are covered as standard labor pain management. You&rsquo;ll still owe your deductible, copay, or coinsurance. Medicaid covers epidurals in all states with minimal or no cost-sharing. Even if your anesthesiologist is out-of-network, the <a href="/guides/no-surprises-act-guide/">No Surprises Act</a> limits your cost-sharing to in-network rates.</p>
     </div>
 
     <div class="faq-item">
         <h3>Why is the anesthesiologist bill separate from my hospital bill?</h3>
-        <p>Anesthesiologists are almost always independent practitioners who bill separately from the hospital. You&rsquo;ll typically receive at least three bills after delivery: the hospital facility fee, your OB-GYN&rsquo;s professional fee, and the anesthesiologist&rsquo;s fee. Some hospitals use contracted anesthesia groups that may not be in your insurance network, which is why the <a href="/guides/no-surprises-act-guide">No Surprises Act</a> is so important for delivery-related anesthesia.</p>
+        <p>Anesthesiologists are almost always independent practitioners who bill separately from the hospital. You&rsquo;ll typically receive at least three bills after delivery: the hospital facility fee, your OB-GYN&rsquo;s professional fee, and the anesthesiologist&rsquo;s fee. Some hospitals use contracted anesthesia groups that may not be in your insurance network, which is why the <a href="/guides/no-surprises-act-guide/">No Surprises Act</a> is so important for delivery-related anesthesia.</p>
     </div>
 
     <div class="faq-item">

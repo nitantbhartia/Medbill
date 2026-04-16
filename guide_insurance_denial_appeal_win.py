@@ -65,7 +65,7 @@ register("how-to-appeal-insurance-denial-and-win", {
     </thead>
     <tbody>
         <tr><td>1</td><td>Prior authorization not obtained</td><td>Most common (~25% of denials)</td><td>Retroactive auth request or appeal with clinical documentation</td></tr>
-        <tr><td>2</td><td>Out-of-network provider</td><td>~15&ndash;20%</td><td>Check if <a href="/guides/no-surprises-act-explained">No Surprises Act</a> applies; appeal citing lack of in-network availability</td></tr>
+        <tr><td>2</td><td>Out-of-network provider</td><td>~15&ndash;20%</td><td>Check if <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> applies; appeal citing lack of in-network availability</td></tr>
         <tr><td>3</td><td>Service deemed not medically necessary</td><td>~15&ndash;20%</td><td>Letter of medical necessity from treating physician + clinical guidelines</td></tr>
         <tr><td>4</td><td>Coding error (wrong CPT/ICD-10 code)</td><td>~10&ndash;15%</td><td>Correct code resubmission &mdash; <a href="/scan">upload your bill to check for coding errors</a></td></tr>
         <tr><td>5</td><td>Timely filing limit exceeded</td><td>~8&ndash;10%</td><td>Provider-side issue; demand provider refile or absorb the cost</td></tr>
@@ -112,7 +112,7 @@ register("how-to-appeal-insurance-denial-and-win", {
     </thead>
     <tbody>
         <tr><td>Coding error</td><td>~80%</td><td>Clear-cut fix once the correct code is submitted</td></tr>
-        <tr><td><a href="/guides/prior-authorization">Prior authorization</a> not obtained</td><td>~60%</td><td>Often an administrative failure, not a clinical judgment</td></tr>
+        <tr><td><a href="/guides/prior-authorization/">Prior authorization</a> not obtained</td><td>~60%</td><td>Often an administrative failure, not a clinical judgment</td></tr>
         <tr><td>Not medically necessary</td><td>~50%</td><td>Strong physician letter + clinical guidelines tip the scales</td></tr>
         <tr><td>Out-of-network provider</td><td>~35&ndash;50%</td><td>Depends on whether emergency or NSA protections apply</td></tr>
         <tr><td>Experimental/investigational</td><td>~40%</td><td>External review is especially effective for these</td></tr>
@@ -319,7 +319,7 @@ register("how-to-appeal-insurance-denial-and-win", {
 
 <p><strong>For concurrent review situations</strong> (insurer trying to end authorization during an ongoing hospital stay): You have the right to remain in the hospital while the expedited appeal is processed. The insurer cannot terminate coverage during the appeal without giving you at least 24 hours&rsquo; notice.</p>
 
-<p>For a step-by-step walkthrough of the standard appeal process with additional letter templates, see our companion <a href="/guides/how-to-appeal-insurance-denial">insurance denial appeal guide</a>.</p>
+<p>For a step-by-step walkthrough of the standard appeal process with additional letter templates, see our companion <a href="/guides/how-to-appeal-insurance-denial/">insurance denial appeal guide</a>.</p>
 
 <h2 id="real-wins">7. 5 real appeal wins</h2>
 
@@ -342,7 +342,7 @@ register("how-to-appeal-insurance-denial-and-win", {
 <div class="case-study">
     <h3>Case 3: Out-of-network emergency reversed &mdash; $14,000 ER bill</h3>
     <p>A patient on vacation had a severe asthma attack and was taken by ambulance to the nearest ER, which was out-of-network. The ER visit included CPT 99285 (Level 5 ER visit), a chest X-ray, arterial blood gas, nebulizer treatments, and overnight observation. The insurer processed the entire visit as out-of-network, applying a $5,000 out-of-network deductible and paying only 50% of the &ldquo;reasonable and customary&rdquo; amount. The patient received a bill for $14,000.</p>
-    <p>The patient appealed citing the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, which requires emergency services to be covered at in-network cost-sharing rates regardless of network status. The insurer reprocessed the claim at in-network rates, applying the patient&rsquo;s $1,500 in-network deductible and 80/20 coinsurance.</p>
+    <p>The patient appealed citing the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, which requires emergency services to be covered at in-network cost-sharing rates regardless of network status. The insurer reprocessed the claim at in-network rates, applying the patient&rsquo;s $1,500 in-network deductible and 80/20 coinsurance.</p>
     <p><strong>Original patient responsibility:</strong> $14,000 &rarr; <strong>After appeal:</strong> $2,100 (deductible + coinsurance at in-network rates) &rarr; <strong>Savings: $11,900</strong></p>
 </div>
 
@@ -390,7 +390,7 @@ register("how-to-appeal-insurance-denial-and-win", {
 
 <h3>Hiring a patient advocate</h3>
 
-<p>For high-dollar denials ($10,000+), consider hiring a professional patient advocate or <a href="/guides/medical-billing-advocates">medical billing advocate</a>. They specialize in navigating the appeals process and often work on contingency (taking a percentage of the savings). An advocate is especially valuable when:</p>
+<p>For high-dollar denials ($10,000+), consider hiring a professional patient advocate or <a href="/guides/medical-billing-advocates/">medical billing advocate</a>. They specialize in navigating the appeals process and often work on contingency (taking a percentage of the savings). An advocate is especially valuable when:</p>
 
 <ul>
     <li>The denial involves complex clinical documentation (cancer treatment, specialty drugs, surgical procedures)</li>
@@ -422,7 +422,7 @@ register("how-to-appeal-insurance-denial-and-win", {
 
     <div class="faq-item">
         <h3>Does it cost anything to file an insurance appeal?</h3>
-        <p>No. Both internal appeals and external reviews are free under federal law. Insurance companies are required to provide a fair appeals process at no charge. You may choose to hire a <a href="/guides/medical-billing-advocates">medical billing advocate</a> for help, but this is optional.</p>
+        <p>No. Both internal appeals and external reviews are free under federal law. Insurance companies are required to provide a fair appeals process at no charge. You may choose to hire a <a href="/guides/medical-billing-advocates/">medical billing advocate</a> for help, but this is optional.</p>
     </div>
 
     <div class="faq-item">

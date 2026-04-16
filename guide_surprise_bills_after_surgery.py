@@ -163,7 +163,7 @@ register("surprise-medical-bills-after-surgery", {
 
 <p><strong>The consent exception is critical.</strong> If a provider asked you to sign a form consenting to out-of-network care at least 72 hours before a scheduled procedure, NSA protections may not apply for that specific provider. However, the consent form must identify the specific provider by name, include a good-faith estimate of charges, and inform you that you have the right to refuse and request an in-network alternative. Generic surgical consent forms that mention &ldquo;additional physicians as needed&rdquo; do <em>not</em> meet this standard.</p>
 
-<p>For a complete breakdown of the No Surprises Act, including the independent dispute resolution process, see our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>. If you are uninsured, you have separate protections under the <a href="/guides/good-faith-estimate-rights">Good Faith Estimate</a> provisions of the law.</p>
+<p>For a complete breakdown of the No Surprises Act, including the independent dispute resolution process, see our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a>. If you are uninsured, you have separate protections under the <a href="/guides/good-faith-estimate-rights/">Good Faith Estimate</a> provisions of the law.</p>
 
 {_embed(mode="cost", title="Check your surgical bill against Medicare rates", subtitle="Enter any CPT code from your bill to see what Medicare pays.", height="420")}
 
@@ -185,7 +185,7 @@ register("surprise-medical-bills-after-surgery", {
 <ol>
     <li>Check whether the No Surprises Act applies &mdash; if your facility was in-network, the OON anesthesiologist cannot balance bill you</li>
     <li>Contact your insurer and request the claim be reprocessed at in-network rates</li>
-    <li>Request the anesthesia record and verify the base units, time units, and any qualifying circumstance codes (see our <a href="/guides/anesthesia-billing">complete anesthesia billing guide</a> for details)</li>
+    <li>Request the anesthesia record and verify the base units, time units, and any qualifying circumstance codes (see our <a href="/guides/anesthesia-billing/">complete anesthesia billing guide</a> for details)</li>
     <li>If the NSA does not apply, negotiate using the Medicare rate as a benchmark</li>
 </ol>
 
@@ -209,7 +209,7 @@ register("surprise-medical-bills-after-surgery", {
     <li>What modifier was used? Modifier 80 (physician assistant surgeon), modifier 82 (no resident available), or modifier AS (PA/NP/CNS assistant).</li>
 </ul>
 
-<p>For a detailed breakdown of assistant surgeon billing modifiers, medical necessity indicators, and dispute strategies, see our <a href="/guides/surprise-assistant-surgeon-bills">complete guide to assistant surgeon bills</a>.</p>
+<p>For a detailed breakdown of assistant surgeon billing modifiers, medical necessity indicators, and dispute strategies, see our <a href="/guides/surprise-assistant-surgeon-bills/">complete guide to assistant surgeon bills</a>.</p>
 
 <div class="key-takeaway">
     <strong>Check medical necessity first:</strong> If Medicare does not pay for an assistant surgeon for your procedure code (indicator = 0), you have strong grounds to dispute the entire charge &mdash; not just the out-of-network portion. Common procedures that typically do <em>not</em> require an assistant include laparoscopic gallbladder removal, arthroscopic knee surgery, and many hernia repairs.
@@ -337,10 +337,10 @@ register("surprise-medical-bills-after-surgery", {
 <ol>
     <li><strong>Confirm your surgeon is in-network.</strong> Verify directly with your insurance company &mdash; not just the surgeon&rsquo;s office. Get the confirmation in writing or note the date, time, and representative&rsquo;s name.</li>
     <li><strong>Confirm the facility is in-network.</strong> The hospital or ambulatory surgery center must also be in your network. If the surgeon is in-network but operates at an out-of-network facility, you may lose NSA protections.</li>
-    <li><strong>Ask who the anesthesiologist will be.</strong> Ask the surgeon&rsquo;s office or the facility which anesthesiology group staffs their operating rooms. Call the group and verify they are in-network with your insurer. See our <a href="/guides/anesthesia-billing">anesthesia billing guide</a> for what to ask.</li>
+    <li><strong>Ask who the anesthesiologist will be.</strong> Ask the surgeon&rsquo;s office or the facility which anesthesiology group staffs their operating rooms. Call the group and verify they are in-network with your insurer. See our <a href="/guides/anesthesia-billing/">anesthesia billing guide</a> for what to ask.</li>
     <li><strong>Ask whether an assistant surgeon will be used.</strong> If yes, ask for their name and verify their network status. If the assistant will be out-of-network, ask the surgeon to use an in-network assistant or put in writing that you do not consent to OON assistant surgeon services.</li>
     <li><strong>Ask where lab and pathology specimens will be sent.</strong> If tissue samples will be taken, ask which lab will process them and verify the lab is in-network.</li>
-    <li><strong>Request a <a href="/guides/good-faith-estimate-rights">good faith estimate</a>.</strong> Under the No Surprises Act, you have the right to a written estimate of expected charges. If the final bill exceeds the estimate by $400 or more, you can dispute the difference.</li>
+    <li><strong>Request a <a href="/guides/good-faith-estimate-rights/">good faith estimate</a>.</strong> Under the No Surprises Act, you have the right to a written estimate of expected charges. If the final bill exceeds the estimate by $400 or more, you can dispute the difference.</li>
     <li><strong>Get pre-authorization documentation.</strong> Keep copies of all pre-authorization approvals from your insurer. If your insurer later denies coverage, the pre-authorization documentation is evidence that they approved the procedure in advance.</li>
     <li><strong>Read consent forms carefully.</strong> Do not sign any form that waives your No Surprises Act protections unless you fully understand and accept the out-of-network charges. If you see language consenting to out-of-network care from a specific provider, ask for an in-network alternative before signing.</li>
 </ol>
@@ -362,7 +362,7 @@ register("surprise-medical-bills-after-surgery", {
 
     <div class="faq-item">
         <h3>How do I fight a surprise anesthesia bill after surgery?</h3>
-        <p>Check whether your surgery was at an in-network facility. If so, the No Surprises Act prohibits the anesthesiologist from balance billing you &mdash; contact your insurer and request reprocessing at in-network rates. If the NSA does not apply, request the itemized anesthesia record, verify the base units and time units are correct, and compare the conversion factor to Medicare&rsquo;s rate of approximately $26 per unit. See our <a href="/guides/anesthesia-billing">anesthesia billing guide</a> for detailed steps.</p>
+        <p>Check whether your surgery was at an in-network facility. If so, the No Surprises Act prohibits the anesthesiologist from balance billing you &mdash; contact your insurer and request reprocessing at in-network rates. If the NSA does not apply, request the itemized anesthesia record, verify the base units and time units are correct, and compare the conversion factor to Medicare&rsquo;s rate of approximately $26 per unit. See our <a href="/guides/anesthesia-billing/">anesthesia billing guide</a> for detailed steps.</p>
     </div>
 
     <div class="faq-item">

@@ -58,7 +58,7 @@ register("sued-for-medical-debt", {
     <li><strong>Note the deadline.</strong> The summons will state how many days you have to respond (typically 20-30 days). Mark this date on your calendar. Missing it means automatic loss.</li>
     <li><strong>Read the complaint.</strong> The summons comes with a complaint that states who is suing you, how much they claim you owe, and the legal basis for the lawsuit. Read every page.</li>
     <li><strong>Do not contact the collector to negotiate — yet.</strong> Anything you say can be used in the lawsuit. Respond through the court first.</li>
-    <li><strong>Gather your documents.</strong> Find your original hospital bill, your <a href="/guides/understanding-explanation-of-benefits">Explanation of Benefits</a>, any payment receipts, and any correspondence with the collector.</li>
+    <li><strong>Gather your documents.</strong> Find your original hospital bill, your <a href="/guides/understanding-explanation-of-benefits/">Explanation of Benefits</a>, any payment receipts, and any correspondence with the collector.</li>
 </ol>
 
 <p>The single most important thing you can do is <strong>file a response (called an "Answer") before the deadline</strong>. Even a simple one-page Answer that denies the claims and raises basic defenses is infinitely better than no response at all.</p>
@@ -102,7 +102,7 @@ register("sued-for-medical-debt", {
 <ul>
     <li><strong>Who is suing?</strong> Is it the hospital or a third-party collector/debt buyer? Debt buyers must prove they purchased your specific debt.</li>
     <li><strong>What evidence did they attach?</strong> Many medical debt lawsuits come with minimal documentation — sometimes just an affidavit and a spreadsheet printout. No itemized bill, no signed agreement, no chain of title.</li>
-    <li><strong>Date of service vs. today's date</strong> — Is the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> expired? Use our <a href="/statute-of-limitations">SOL calculator</a> to check.</li>
+    <li><strong>Date of service vs. today's date</strong> — Is the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> expired? Use our <a href="/statute-of-limitations">SOL calculator</a> to check.</li>
     <li><strong>Does the amount match your records?</strong> Compare to your original bill and EOB.</li>
 </ul>
 
@@ -253,7 +253,7 @@ register("sued-for-medical-debt", {
 
     <div class="faq-item">
         <h3>Can I defend myself in a medical debt lawsuit without a lawyer?</h3>
-        <p>Yes. Many consumers successfully handle medical debt lawsuits pro se (without an attorney). The most effective defenses — expired <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a>, lack of standing, and incorrect amount — can be raised in a simple written Answer. Many courthouses have self-help centers with free forms. For debts over $5,000, consulting a consumer attorney (many offer free initial consultations) is recommended.</p>
+        <p>Yes. Many consumers successfully handle medical debt lawsuits pro se (without an attorney). The most effective defenses — expired <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a>, lack of standing, and incorrect amount — can be raised in a simple written Answer. Many courthouses have self-help centers with free forms. For debts over $5,000, consulting a consumer attorney (many offer free initial consultations) is recommended.</p>
     </div>
 
     <div class="faq-item">

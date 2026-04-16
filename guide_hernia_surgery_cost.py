@@ -216,8 +216,8 @@ register("hernia-repair-cost", {
     <li><strong>Find the mesh line item</strong> and ask the billing department for the manufacturer and product number. Compare the billed charge to list price.</li>
     <li><strong>Check anesthesia separately.</strong> Anesthesia is almost always billed by a separate group. Confirm they are in-network. If not, invoke the No Surprises Act.</li>
     <li><strong>Call the billing department</strong> with your findings. Reference specific CPT codes and Medicare rates. Request a reduction or a corrected claim.</li>
-    <li><strong>Submit a written dispute</strong> if the phone call does not resolve the issue. Use our <a href="/guides/dispute-bill">dispute letter template</a>.</li>
-    <li><strong>Ask about financial assistance</strong> if costs remain unmanageable. Nonprofit hospitals must provide charity care. See our guide on <a href="/guides/hospital-financial-assistance">hospital financial assistance programs</a>.</li>
+    <li><strong>Submit a written dispute</strong> if the phone call does not resolve the issue. Use our <a href="/guides/dispute-bill/">dispute letter template</a>.</li>
+    <li><strong>Ask about financial assistance</strong> if costs remain unmanageable. Nonprofit hospitals must provide charity care. See our guide on <a href="/guides/hospital-financial-assistance/">hospital financial assistance programs</a>.</li>
 </ol>
 
 <h2 id="faq">Frequently asked questions</h2>

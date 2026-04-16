@@ -139,7 +139,7 @@ register("medicare-advantage-billing", {
 </div>
 
 <h3>e) Observation status (same risk as Original Medicare)</h3>
-<p>The same observation status trap that affects Original Medicare patients applies to MA enrollees &mdash; but the financial impact may differ depending on your plan&rsquo;s cost-sharing design. If you&rsquo;re hospitalized on an MA plan and expect to need skilled nursing facility care afterward, verify your admission status. See our <a href="/guides/observation-status-billing">observation status guide</a> for the full picture.</p>
+<p>The same observation status trap that affects Original Medicare patients applies to MA enrollees &mdash; but the financial impact may differ depending on your plan&rsquo;s cost-sharing design. If you&rsquo;re hospitalized on an MA plan and expect to need skilled nursing facility care afterward, verify your admission status. See our <a href="/guides/observation-status-billing/">observation status guide</a> for the full picture.</p>
 
 <div class="key-takeaway">
     <strong>Received an unexpected charge on your MA plan?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag billing errors, upcoding, and charges processed at out-of-network rates that should have been covered at in-network cost-sharing.
@@ -266,7 +266,7 @@ register("medicare-advantage-billing", {
 
     <div class="faq-item">
         <h3>What should I do if my Medicare Advantage plan denies a claim or prior authorization?</h3>
-        <p>Request the written denial, then file an internal appeal (Level 1) within 60 days. For urgent situations, request an expedited appeal &mdash; the plan must respond within 72 hours. If denied at Level 1, escalate to the QIC (Level 2). Your strongest appeals cite Original Medicare coverage rules and include physician documentation of medical necessity. See our <a href="/guides/how-to-appeal-an-insurance-denial">appeal guide</a> for a full walkthrough.</p>
+        <p>Request the written denial, then file an internal appeal (Level 1) within 60 days. For urgent situations, request an expedited appeal &mdash; the plan must respond within 72 hours. If denied at Level 1, escalate to the QIC (Level 2). Your strongest appeals cite Original Medicare coverage rules and include physician documentation of medical necessity. See our <a href="/guides/how-to-appeal-an-insurance-denial/">appeal guide</a> for a full walkthrough.</p>
     </div>
 </div>
 

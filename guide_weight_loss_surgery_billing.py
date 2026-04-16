@@ -125,7 +125,7 @@ register("weight-loss-surgery-billing", {
     <li><strong>Supervised diet documentation</strong>&mdash;visit notes for each monthly appointment showing date, weight, diet plan, and physician signature</li>
     <li><strong>Psychological evaluation</strong>&mdash;a mental health assessment confirming the patient understands the procedure, has realistic expectations, and does not have uncontrolled psychiatric conditions that would impair compliance</li>
     <li><strong>Medical clearance</strong>&mdash;cardiac clearance (EKG, sometimes stress test), pulmonary function tests if sleep apnea is present, and lab work including HbA1c for diabetics</li>
-    <li><strong>Sleep study results</strong> if sleep apnea is listed as a comorbidity (see our <a href="/guides/sleep-study-billing">sleep study billing guide</a> for what to expect)</li>
+    <li><strong>Sleep study results</strong> if sleep apnea is listed as a comorbidity (see our <a href="/guides/sleep-study-billing/">sleep study billing guide</a> for what to expect)</li>
 </ol>
 
 <p>Turnaround time for prior authorization is typically 15&ndash;30 business days. Denials are common&mdash;roughly 25&ndash;30% of initial bariatric surgery authorizations are denied, most frequently for incomplete supervised diet documentation or BMI that dropped below the threshold during the diet period.</p>
@@ -200,7 +200,7 @@ register("weight-loss-surgery-billing", {
     <p>On appeal, the patient submitted the sleep study report, the endocrinology records, a 12-month weight history showing consistent BMI above 37, and an updated letter of medical necessity. The insurer approved the surgery within 21 days. The <strong>total surgery cost was $22,400</strong>; the patient&rsquo;s out-of-pocket after insurance was <strong>$3,200</strong> (her remaining deductible plus 20% coinsurance up to her out-of-pocket maximum). Without the successful appeal, she would have owed the full $22,400.</p>
 </div>
 
-<p>For a detailed walkthrough of the insurance appeal process, including letter templates, see our <a href="/guides/how-to-appeal-insurance-denial">guide to appealing insurance denials</a>.</p>
+<p>For a detailed walkthrough of the insurance appeal process, including letter templates, see our <a href="/guides/how-to-appeal-insurance-denial/">guide to appealing insurance denials</a>.</p>
 
 <h2 id="coe-discounts">6. Centers of Excellence and bundled pricing</h2>
 
@@ -245,7 +245,7 @@ register("weight-loss-surgery-billing", {
 
     <div class="faq-item">
         <h3>Can I appeal a bariatric surgery denial?</h3>
-        <p>Yes. About 40&ndash;50% of bariatric surgery denials are overturned on appeal. The strongest appeals include complete supervised diet records, specialist documentation of every comorbidity, updated BMI measurements, and a detailed letter of medical necessity from the surgeon. For step-by-step appeal instructions, see our <a href="/guides/how-to-appeal-insurance-denial">insurance appeal guide</a>.</p>
+        <p>Yes. About 40&ndash;50% of bariatric surgery denials are overturned on appeal. The strongest appeals include complete supervised diet records, specialist documentation of every comorbidity, updated BMI measurements, and a detailed letter of medical necessity from the surgeon. For step-by-step appeal instructions, see our <a href="/guides/how-to-appeal-insurance-denial/">insurance appeal guide</a>.</p>
     </div>
 
     <div class="faq-item">

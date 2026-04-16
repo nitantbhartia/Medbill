@@ -225,7 +225,7 @@ register("pay-for-delete-medical-debt", {
 
     <div class="faq-item">
         <h3>How much should I offer in a pay-for-delete letter?</h3>
-        <p>Start at 25-40% for a lump sum. Collectors buy medical debt for 4-7 cents per dollar, so any payment well above that is profit. For older debts near the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a>, offer 15-25%. Always make payment conditional on a written deletion agreement.</p>
+        <p>Start at 25-40% for a lump sum. Collectors buy medical debt for 4-7 cents per dollar, so any payment well above that is profit. For older debts near the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a>, offer 15-25%. Always make payment conditional on a written deletion agreement.</p>
     </div>
 
     <div class="faq-item">

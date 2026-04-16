@@ -185,7 +185,7 @@ register("why-lab-test-bills-are-so-high", {
     <li><strong>Get the itemized bill.</strong> Call the hospital lab billing department and request a line-item statement with CPT codes, not just a summary total.</li>
     <li><strong>Look up each CPT code.</strong> Use our <a href="/calculator">cost calculator</a> to find the Medicare rate for each code and identify which charges are above 5x the benchmark.</li>
     <li><strong>Check for unbundling.</strong> If you see 4+ individual chemistry codes on the same date, they may have been unbundled from a panel.</li>
-    <li><strong>Write a specific dispute letter.</strong> Reference the CPT code, the billed amount, the Medicare rate, and the NCCI edit if applicable. See our <a href="/guides/how-to-dispute-a-medical-bill">full dispute guide</a> for templates.</li>
+    <li><strong>Write a specific dispute letter.</strong> Reference the CPT code, the billed amount, the Medicare rate, and the NCCI edit if applicable. See our <a href="/guides/how-to-dispute-a-medical-bill/">full dispute guide</a> for templates.</li>
     <li><strong>Escalate if needed.</strong> If the lab doesn't respond, file a complaint with your state insurance commissioner or contact the hospital patient advocate.</li>
 </ol>
 
@@ -198,7 +198,7 @@ register("why-lab-test-bills-are-so-high", {
     <li><strong>Check in-network labs before the draw.</strong> Call your insurer's member services line to confirm the specific lab location is in-network, not just the lab company.</li>
     <li><strong>Review lab pricing before routine tests.</strong> Our <a href="/hospitals/">hospital pricing directory</a> shows what local hospitals charge for common lab tests so you can compare before scheduling.</li>
     <li><strong>Ask about self-pay rates.</strong> If you're uninsured, ask the lab's billing department for their self-pay rate before the draw. It's always lower than Chargemaster.</li>
-    <li><strong>Review your EOB after the visit.</strong> Your Explanation of Benefits will show what your insurer paid and what you owe. Compare this against the bill. See our <a href="/guides/how-to-read-your-eob">EOB guide</a> for help.</li>
+    <li><strong>Review your EOB after the visit.</strong> Your Explanation of Benefits will show what your insurer paid and what you owe. Compare this against the bill. See our <a href="/guides/how-to-read-your-eob/">EOB guide</a> for help.</li>
 </ul>
 
 <div class="key-takeaway">

@@ -191,7 +191,7 @@ register("missouri-medical-billing", {
     <li><strong>Need legal help:</strong> Missouri Legal Aid or Missouri Bar Referral Service (573-636-3635)</li>
 </ul>
 
-<p>Our <a href="/guides/dispute-bill">bill dispute guide</a> has sample letter templates and step-by-step instructions.</p>
+<p>Our <a href="/guides/dispute-bill/">bill dispute guide</a> has sample letter templates and step-by-step instructions.</p>
 
 <h2 id="case-studies">8. Case studies: Missouri patient results</h2>
 

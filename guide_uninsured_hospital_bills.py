@@ -134,7 +134,7 @@ register("uninsured-hospital-bill", {
 
 <h2 id="charity-care">4. Financial assistance for uninsured patients</h2>
 
-<p>Uninsured patients are exactly who hospital <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a> was designed for. If the hospital is nonprofit (about 60% of US hospitals), they must offer charity care under IRS Section 501(r).</p>
+<p>Uninsured patients are exactly who hospital <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a> was designed for. If the hospital is nonprofit (about 60% of US hospitals), they must offer charity care under IRS Section 501(r).</p>
 
 <p>Check your eligibility using our <a href="/charity-care">charity care eligibility checker</a>. You'll need:</p>
 
@@ -153,7 +153,7 @@ register("uninsured-hospital-bill", {
 
 <h2 id="good-faith">5. Your right to a good faith estimate</h2>
 
-<p>Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, uninsured and self-pay patients have the right to a <strong>good faith estimate</strong> of expected charges before any scheduled (non-emergency) service. The provider must give you this estimate when you schedule the service or within 3 business days of your request.</p>
+<p>Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, uninsured and self-pay patients have the right to a <strong>good faith estimate</strong> of expected charges before any scheduled (non-emergency) service. The provider must give you this estimate when you schedule the service or within 3 business days of your request.</p>
 
 <p>If the actual bill exceeds the good faith estimate by <strong>$400 or more</strong>, you can dispute it through the federal patient-provider dispute resolution process. This is a powerful protection that many uninsured patients don't know about.</p>
 
@@ -176,7 +176,7 @@ register("uninsured-hospital-bill", {
     <li><strong>Make an offer.</strong> "I've looked up the Medicare rates for these services, which total $[amount]. I'd like to offer $[150-200% of Medicare] to resolve this bill. I can pay that as a lump sum."</li>
     <li><strong>If they counter high, negotiate.</strong> "The chargemaster rate is what insurance companies negotiate down. As an uninsured patient, I shouldn't pay more than what insurance pays. The Medicare rate is the floor. Let's find a fair middle ground."</li>
     <li><strong>Get the agreement in writing.</strong> Before paying, confirm the negotiated amount in writing.</li>
-    <li><strong>Set up a payment plan if needed.</strong> <a href="/guides/hospital-payment-plans">Hospital payment plans</a> are almost always 0% interest.</li>
+    <li><strong>Set up a payment plan if needed.</strong> <a href="/guides/hospital-payment-plans/">Hospital payment plans</a> are almost always 0% interest.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -199,7 +199,7 @@ register("uninsured-hospital-bill", {
 
 <div class="case-study">
     <h3>Case 3: $3,200 imaging bill — self-pay discount plus payment plan</h3>
-    <p>An uninsured patient's MRI was billed at $3,200. They asked for the self-pay discount (40% at this hospital), reducing the bill to $1,920. They then set up a 12-month, zero-interest <a href="/guides/hospital-payment-plans">payment plan</a> at $160/month.</p>
+    <p>An uninsured patient's MRI was billed at $3,200. They asked for the self-pay discount (40% at this hospital), reducing the bill to $1,920. They then set up a 12-month, zero-interest <a href="/guides/hospital-payment-plans/">payment plan</a> at $160/month.</p>
     <p><strong>Total savings: $1,280 (40%) from self-pay discount alone. Manageable payments on the rest.</strong></p>
 </div>
 
@@ -220,7 +220,7 @@ register("uninsured-hospital-bill", {
 
     <div class="faq-item">
         <h3>Can an uninsured patient apply for hospital charity care?</h3>
-        <p>Yes — uninsured patients are the primary beneficiaries. At nonprofit hospitals, <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a> is legally required under IRS Section 501(r). Many hospitals offer 100% free care for patients under 200% FPL and partial discounts up to 300-400% FPL. Use our <a href="/charity-care">eligibility checker</a> to see what you may qualify for.</p>
+        <p>Yes — uninsured patients are the primary beneficiaries. At nonprofit hospitals, <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a> is legally required under IRS Section 501(r). Many hospitals offer 100% free care for patients under 200% FPL and partial discounts up to 300-400% FPL. Use our <a href="/charity-care">eligibility checker</a> to see what you may qualify for.</p>
     </div>
 
     <div class="faq-item">

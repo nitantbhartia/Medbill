@@ -195,7 +195,7 @@ register("gallbladder-removal-cost", {
     <li><strong>Request your operative note after surgery.</strong> Within 30 days of discharge, request a copy of your operative report from the hospital medical records department. This is your ground truth for verifying every CPT code on your bill.</li>
     <li><strong>Compare your itemized bill line by line against the operative note.</strong> Verify that the CPT codes match the documented procedures, that cholangiography appears on the note if it was billed, and that no assistant surgeon appears on the bill without authorization.</li>
     <li><strong>Check your EOB for duplicate pathology charges.</strong> Look for CPT 88305 appearing twice or appearing on both a hospital bill and a physician bill for the same date of service.</li>
-    <li><strong>Dispute errors in writing with specific documentation.</strong> A written dispute letter citing your operative note, the CPT codes billed, and the specific discrepancy is far more effective than a phone call alone. Our <a href="/guides/dispute-bill">dispute letter guide</a> provides templates.</li>
+    <li><strong>Dispute errors in writing with specific documentation.</strong> A written dispute letter citing your operative note, the CPT codes billed, and the specific discrepancy is far more effective than a phone call alone. Our <a href="/guides/dispute-bill/">dispute letter guide</a> provides templates.</li>
 </ol>
 
 <div class="cta-box" style="background:#f3f4f6;border:1px solid #d1d5db;padding:20px 24px;margin:28px 0;border-radius:6px;">

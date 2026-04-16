@@ -59,7 +59,7 @@ register("how-to-dispute-a-medical-bill", {
 <p>A dispute without evidence is just a complaint. Before you contact the hospital, collect these four things:</p>
 
 <ol>
-    <li><strong>Your itemized bill</strong> &mdash; Not the summary statement. You need a line-by-line breakdown showing CPT codes, descriptions, quantities, and charges. Call billing and request one if you don&rsquo;t have it. <a href="/guides/how-to-read-your-medical-bill">Here&rsquo;s how to read each line.</a></li>
+    <li><strong>Your itemized bill</strong> &mdash; Not the summary statement. You need a line-by-line breakdown showing CPT codes, descriptions, quantities, and charges. Call billing and request one if you don&rsquo;t have it. <a href="/guides/how-to-read-your-medical-bill/">Here&rsquo;s how to read each line.</a></li>
     <li><strong>Medicare rates for each CPT code</strong> &mdash; These are your pricing benchmark. Use our <a href="/calculator">cost calculator</a> to look up the Medicare allowable rate for each service in your area.</li>
     <li><strong>Your Explanation of Benefits (EOB)</strong> &mdash; If you have insurance, your EOB shows what your insurer approved, what they paid, and what they think you owe. Compare this against the hospital&rsquo;s bill&mdash;discrepancies are common.</li>
     <li><strong>Discharge paperwork</strong> &mdash; Your discharge summary lists what services you actually received. This is your proof if the bill includes services you didn&rsquo;t get or quantities that don&rsquo;t match.</li>
@@ -232,7 +232,7 @@ register("how-to-dispute-a-medical-bill", {
 
     <div class="faq-item">
         <h3>Do I need a lawyer to dispute a medical bill?</h3>
-        <p>In most cases, no. The majority of billing errors can be resolved by contacting the hospital billing department directly with documentation of the error. A lawyer is only necessary if the dispute involves potential legal issues like balance billing violations under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> or if the bill has gone to collections and you are being sued.</p>
+        <p>In most cases, no. The majority of billing errors can be resolved by contacting the hospital billing department directly with documentation of the error. A lawyer is only necessary if the dispute involves potential legal issues like balance billing violations under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> or if the bill has gone to collections and you are being sued.</p>
     </div>
 
     <div class="faq-item">

@@ -421,7 +421,7 @@ register("hearing-aids-billing", {
 
     <div class="faq-item">
         <h3>Do any states require insurance to cover hearing aids?</h3>
-        <p>Approximately 23 states mandate hearing aid coverage for children, and about 8 states mandate some adult coverage. Benefits are typically capped at $1,000 to $3,000 per ear every 3 to 5 years. These mandates apply only to fully-insured state-regulated plans. See our <a href="/guides/how-health-insurance-works">insurance guide</a> for more on plan types.</p>
+        <p>Approximately 23 states mandate hearing aid coverage for children, and about 8 states mandate some adult coverage. Benefits are typically capped at $1,000 to $3,000 per ear every 3 to 5 years. These mandates apply only to fully-insured state-regulated plans. See our <a href="/guides/how-health-insurance-works/">insurance guide</a> for more on plan types.</p>
     </div>
 
     <div class="faq-item">
@@ -431,7 +431,7 @@ register("hearing-aids-billing", {
 
     <div class="faq-item">
         <h3>Are Costco hearing aids as good as audiologist hearing aids?</h3>
-        <p>Costco sells the same major brands (Phonak, Rexton) at 30 to 60 percent below audiologist pricing. Independent studies show comparable patient satisfaction. The main difference is that Costco employs hearing instrument specialists rather than doctoral-level audiologists. For straightforward hearing loss, the clinical outcome is comparable. For complex cases, a private audiologist may offer advantages. Check pricing with our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.</p>
+        <p>Costco sells the same major brands (Phonak, Rexton) at 30 to 60 percent below audiologist pricing. Independent studies show comparable patient satisfaction. The main difference is that Costco employs hearing instrument specialists rather than doctoral-level audiologists. For straightforward hearing loss, the clinical outcome is comparable. For complex cases, a private audiologist may offer advantages. Check pricing with our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a>.</p>
     </div>
 </div>
 

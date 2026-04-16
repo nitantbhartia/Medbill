@@ -87,7 +87,7 @@ register("medical-bill-financial-hardship", {
     </tbody>
 </table>
 
-<p>Check your eligibility using our <a href="/charity-care">charity care eligibility checker</a>. You can apply even after receiving the bill — most hospitals accept applications for up to 240 days after the first billing statement. You can apply even if you have insurance (charity care covers the patient-responsibility portion) and even if the bill has already gone to <a href="/guides/medical-bill-collections-rights">collections</a>.</p>
+<p>Check your eligibility using our <a href="/charity-care">charity care eligibility checker</a>. You can apply even after receiving the bill — most hospitals accept applications for up to 240 days after the first billing statement. You can apply even if you have insurance (charity care covers the patient-responsibility portion) and even if the bill has already gone to <a href="/guides/medical-bill-collections-rights/">collections</a>.</p>
 
 <div class="key-takeaway">
     <strong>Not sure if your hospital is nonprofit?</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we identify the facility, check its nonprofit status, and flag billing errors that could reduce your balance before you even apply for assistance.
@@ -265,7 +265,7 @@ register("medical-bill-financial-hardship", {
 
     <div class="faq-item">
         <h3>Do I qualify for financial assistance if I have insurance?</h3>
-        <p>Yes. <a href="/guides/hospital-financial-assistance-charity-care">Hospital financial assistance</a> often covers the patient-responsibility portion — deductibles, coinsurance, and copays. If your insurance leaves you with a large out-of-pocket balance and your income qualifies, apply for assistance on the amount you owe after insurance pays.</p>
+        <p>Yes. <a href="/guides/hospital-financial-assistance-charity-care/">Hospital financial assistance</a> often covers the patient-responsibility portion — deductibles, coinsurance, and copays. If your insurance leaves you with a large out-of-pocket balance and your income qualifies, apply for assistance on the amount you owe after insurance pays.</p>
     </div>
 
     <div class="faq-item">

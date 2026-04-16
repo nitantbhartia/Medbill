@@ -78,7 +78,7 @@ register("what-is-a-superbill", {
 <p>When you see an in-network provider, the provider files the claim directly with your insurer. You never touch the paperwork. When you see an out-of-network provider, you typically pay the full fee upfront, and the provider does <em>not</em> file a claim for you. The superbill is what allows you to file that claim yourself and get reimbursed.</p>
 
 <div class="key-takeaway">
-    <strong>Key distinction:</strong> A superbill is not a bill &mdash; it&rsquo;s a receipt with medical codes. You have already paid the provider. The superbill is what you submit to your insurance company to get a portion of that payment back. <a href="/guides/how-health-insurance-works">Learn how insurance reimbursement works</a>.
+    <strong>Key distinction:</strong> A superbill is not a bill &mdash; it&rsquo;s a receipt with medical codes. You have already paid the provider. The superbill is what you submit to your insurance company to get a portion of that payment back. <a href="/guides/how-health-insurance-works/">Learn how insurance reimbursement works</a>.
 </div>
 
 <h2 id="when-you-need-one">2. When you need a superbill</h2>
@@ -93,7 +93,7 @@ register("what-is-a-superbill", {
     <li><strong>Out-of-area care</strong> &mdash; You received care while traveling and the provider was not in your plan&rsquo;s network.</li>
 </ul>
 
-<p>Before requesting a superbill, verify that your insurance plan has out-of-network benefits. Most PPO plans do. Most HMO plans do <em>not</em> (except for emergencies). Check your plan&rsquo;s Summary of Benefits and Coverage, or call the member services number on the back of your insurance card. For more on how plan types differ, see our <a href="/guides/how-health-insurance-works">guide to how health insurance works</a>.</p>
+<p>Before requesting a superbill, verify that your insurance plan has out-of-network benefits. Most PPO plans do. Most HMO plans do <em>not</em> (except for emergencies). Check your plan&rsquo;s Summary of Benefits and Coverage, or call the member services number on the back of your insurance card. For more on how plan types differ, see our <a href="/guides/how-health-insurance-works/">guide to how health insurance works</a>.</p>
 
 <h2 id="required-information">3. What information a superbill must contain</h2>
 
@@ -148,7 +148,7 @@ register("what-is-a-superbill", {
     <li><strong>Provider&rsquo;s office address and phone number</strong></li>
     <li><strong>Patient&rsquo;s full legal name and date of birth</strong></li>
     <li><strong>Date of service</strong></li>
-    <li><strong>CPT code(s)</strong> &mdash; the specific procedure or service codes. See our <a href="/guides/cpt-codes-explained">CPT codes guide</a> for common codes.</li>
+    <li><strong>CPT code(s)</strong> &mdash; the specific procedure or service codes. See our <a href="/guides/cpt-codes-explained/">CPT codes guide</a> for common codes.</li>
     <li><strong>ICD-10 diagnosis code(s)</strong> &mdash; the medical reason for the visit</li>
     <li><strong>Fee charged per CPT code</strong></li>
     <li><strong>Place of service code</strong> &mdash; a 2-digit code indicating where care was provided (11 = office, 02 = telehealth, etc.)</li>
@@ -231,7 +231,7 @@ register("what-is-a-superbill", {
 <ul>
     <li><strong>UCR (Usual, Customary, and Reasonable) rate</strong> &mdash; The maximum amount your insurer considers fair for a service in your geographic area. Your insurer calculates reimbursement based on this amount, not on what you actually paid. If you paid $250 but the UCR is $180, the insurer only considers $180.</li>
     <li><strong>Out-of-network deductible</strong> &mdash; The amount you must pay out of pocket before your insurer starts reimbursing out-of-network claims. This is separate from (and usually higher than) your in-network deductible. Common amounts: $1,000&ndash;$5,000 per year.</li>
-    <li><strong>Out-of-network coinsurance</strong> &mdash; The percentage your plan pays after the deductible is met. Typical out-of-network coinsurance ranges from 40% to 70%. See our <a href="/guides/copay-vs-coinsurance-vs-deductible">copay vs. coinsurance vs. deductible guide</a> for details.</li>
+    <li><strong>Out-of-network coinsurance</strong> &mdash; The percentage your plan pays after the deductible is met. Typical out-of-network coinsurance ranges from 40% to 70%. See our <a href="/guides/copay-vs-coinsurance-vs-deductible/">copay vs. coinsurance vs. deductible guide</a> for details.</li>
     <li><strong>Out-of-network out-of-pocket maximum</strong> &mdash; The most you&rsquo;ll pay in a year for out-of-network care. After you hit this cap, your plan pays 100%. Not all plans have an out-of-network out-of-pocket maximum &mdash; check your Summary of Benefits.</li>
 </ul>
 
@@ -274,7 +274,7 @@ register("what-is-a-superbill", {
 <p>Some insurers require proof that you paid the provider before they will process the reimbursement. Attach a credit card receipt, bank statement showing the charge, or a receipt from the provider alongside the superbill.</p>
 
 <div class="key-takeaway">
-    <strong>Claim denied?</strong> Don&rsquo;t give up. Out-of-network claim denials are often due to missing information, not ineligibility. Review the denial letter carefully &mdash; it will state the specific reason. Correct the issue and resubmit, or file a formal appeal. Our <a href="/guides/how-to-appeal-insurance-denial-and-win">guide to appealing insurance denials</a> walks you through the full process. You can also <a href="/scan">upload your bill to BillKarma</a> and we&rsquo;ll help identify what went wrong.
+    <strong>Claim denied?</strong> Don&rsquo;t give up. Out-of-network claim denials are often due to missing information, not ineligibility. Review the denial letter carefully &mdash; it will state the specific reason. Correct the issue and resubmit, or file a formal appeal. Our <a href="/guides/how-to-appeal-insurance-denial-and-win/">guide to appealing insurance denials</a> walks you through the full process. You can also <a href="/scan">upload your bill to BillKarma</a> and we&rsquo;ll help identify what went wrong.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>
