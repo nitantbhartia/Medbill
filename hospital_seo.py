@@ -2286,9 +2286,23 @@ def _build_hospital_schema(hospital_d: dict, state_code: str) -> dict:
             "postalCode": hospital_d.get("zip") or "",
             "addressCountry": "US",
         },
+        "medicalSpecialty": "https://schema.org/MedicalSpecialty",
+        "isAcceptingNewPatients": True,
     }
     if hospital_d.get("phone"):
         schema["telephone"] = hospital_d["phone"]
+    # Geo coordinates when available
+    lat = hospital_d.get("lat")
+    lon = hospital_d.get("lon")
+    if lat and lon:
+        schema["geo"] = {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon}
+    # CMS Hospital Compare sameAs link (facility_id is the CMS provider number)
+    facility_id = hospital_d.get("facility_id")
+    if facility_id:
+        schema["sameAs"] = [
+            f"https://www.medicare.gov/care-compare/details/hospital/{facility_id}",
+        ]
+    # CMS star rating
     stars = hospital_d.get("cms_star_rating")
     if stars and isinstance(stars, (int, float)):
         schema["aggregateRating"] = {
