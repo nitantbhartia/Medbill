@@ -125,11 +125,11 @@ register("cant-afford-medical-bill", {
 
 <h3>Option 5: Appeal insurance denials</h3>
 
-<p>If your insurance denied part of the bill, you have the right to <a href="/guides/how-to-appeal-insurance-denial">appeal</a>. First-time appeal success rates range from 40-60% depending on the type of denial. Common denials worth appealing:</p>
+<p>If your insurance denied part of the bill, you have the right to <a href="/guides/how-to-appeal-insurance-denial/">appeal</a>. First-time appeal success rates range from 40-60% depending on the type of denial. Common denials worth appealing:</p>
 
 <ul>
     <li>"Not medically necessary" — your doctor can provide supporting documentation</li>
-    <li>"Out of network" — the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> may protect you</li>
+    <li>"Out of network" — the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> may protect you</li>
     <li>"Prior authorization required" — if it was an emergency, authorization is not required</li>
 </ul>
 
@@ -205,10 +205,10 @@ register("cant-afford-medical-bill", {
     <tbody>
         <tr><td>Income under $64,400 (family of 4)</td><td>Apply for <a href="/charity-care">charity care</a> first</td><td>50-100% of the bill</td></tr>
         <tr><td>You suspect billing errors</td><td><a href="/scan">Scan your bill</a> for errors</td><td>10-30% on average</td></tr>
-        <tr><td>Insurance denied coverage</td><td><a href="/guides/how-to-appeal-insurance-denial">Appeal the denial</a></td><td>Varies — 40-60% appeal success rate</td></tr>
+        <tr><td>Insurance denied coverage</td><td><a href="/guides/how-to-appeal-insurance-denial/">Appeal the denial</a></td><td>Varies — 40-60% appeal success rate</td></tr>
         <tr><td>Can pay something, just not full price</td><td>Negotiate using <a href="/calculator">Medicare rates</a></td><td>30-60% reduction</td></tr>
         <tr><td>Cannot pay anything right now</td><td>Request a zero-interest payment plan</td><td>Spreads cost; avoids collections</td></tr>
-        <tr><td>Already in collections</td><td><a href="/guides/medical-bill-collections-rights">Know your rights</a> and negotiate</td><td>25-40% settlement typical</td></tr>
+        <tr><td>Already in collections</td><td><a href="/guides/medical-bill-collections-rights/">Know your rights</a> and negotiate</td><td>25-40% settlement typical</td></tr>
     </tbody>
 </table>
 
@@ -257,7 +257,7 @@ register("cant-afford-medical-bill", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>What happens if I can't pay my medical bill?</h3>
-        <p>If you take no action, the hospital will send reminder notices, move the account to internal collections, and eventually send it to an external collection agency (typically after 120-180 days). Before that happens, apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a>, negotiate a lower amount, or set up a payment plan. The earlier you act, the more options you have and the more money you save.</p>
+        <p>If you take no action, the hospital will send reminder notices, move the account to internal collections, and eventually send it to an external collection agency (typically after 120-180 days). Before that happens, apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a>, negotiate a lower amount, or set up a payment plan. The earlier you act, the more options you have and the more money you save.</p>
     </div>
 
     <div class="faq-item">
@@ -272,7 +272,7 @@ register("cant-afford-medical-bill", {
 
     <div class="faq-item">
         <h3>Can the hospital sue me if I can't pay?</h3>
-        <p>Hospitals rarely sue patients directly. They are more likely to send the bill to a collection agency. Collection agencies can file lawsuits, but it is uncommon for balances under $5,000. Each state has a <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> on medical debt (3-6 years). Address the bill early through financial assistance, negotiation, or a payment plan to avoid this entirely.</p>
+        <p>Hospitals rarely sue patients directly. They are more likely to send the bill to a collection agency. Collection agencies can file lawsuits, but it is uncommon for balances under $5,000. Each state has a <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> on medical debt (3-6 years). Address the bill early through financial assistance, negotiation, or a payment plan to avoid this entirely.</p>
     </div>
 
     <div class="faq-item">

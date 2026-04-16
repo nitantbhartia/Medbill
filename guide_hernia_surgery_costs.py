@@ -259,7 +259,7 @@ register("hernia-surgery-costs", {
     <li><strong>Duplicate charges:</strong> The same supply or service billed twice under different line item descriptions.</li>
 </ul>
 
-<p>Submit your dispute in writing to the billing department, citing specific line items and attaching supporting documentation (operative report, CMS Medicare rate for the CPT code). Use <a href="/scan">BillKarma&rsquo;s bill scanner</a> for an automated review that flags potential errors before you write a single letter. For step-by-step dispute guidance, see our <a href="/guides/dispute-bill">complete guide to disputing a medical bill</a>.</p>
+<p>Submit your dispute in writing to the billing department, citing specific line items and attaching supporting documentation (operative report, CMS Medicare rate for the CPT code). Use <a href="/scan">BillKarma&rsquo;s bill scanner</a> for an automated review that flags potential errors before you write a single letter. For step-by-step dispute guidance, see our <a href="/guides/dispute-bill/">complete guide to disputing a medical bill</a>.</p>
 
 <div class="key-takeaway">
     <strong>Ready to check your hernia surgery bill for errors?</strong> <a href="/scan">Upload your itemized bill to BillKarma</a> &mdash; our system checks every line item against Medicare rates and flags common billing errors automatically.

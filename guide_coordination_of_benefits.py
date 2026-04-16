@@ -65,7 +65,7 @@ register("coordination-of-benefits-dual-insurance", {
     <li><strong>The patient</strong> owes whatever remains after both plans have paid.</li>
 </ul>
 
-<p>In many cases, dual coverage significantly reduces out-of-pocket costs. But it only works if both plans have the correct COB information on file and claims are submitted in the right order. When that breaks down&mdash;and it breaks down often&mdash;you get denials, delays, and bills for amounts you don&rsquo;t owe. Understanding how <a href="/guides/how-health-insurance-works">health insurance works</a> is the foundation; COB adds a second layer of complexity on top.</p>
+<p>In many cases, dual coverage significantly reduces out-of-pocket costs. But it only works if both plans have the correct COB information on file and claims are submitted in the right order. When that breaks down&mdash;and it breaks down often&mdash;you get denials, delays, and bills for amounts you don&rsquo;t owe. Understanding how <a href="/guides/how-health-insurance-works/">health insurance works</a> is the foundation; COB adds a second layer of complexity on top.</p>
 
 <h2 id="primary-rules">2. How primary insurance is determined</h2>
 
@@ -169,7 +169,7 @@ register("coordination-of-benefits-dual-insurance", {
 
 <p><strong>Without the secondary plan,</strong> the patient would owe $640 (the 20% coinsurance after primary). <strong>With dual coverage properly coordinated,</strong> the secondary plan picks up most of that remainder, leaving the patient with just $64. That&rsquo;s a <strong>$576 savings</strong> on a single claim.</p>
 
-<p>But here&rsquo;s the catch: if the provider never submits the claim to the secondary plan, you pay the full $640. And if the primary plan was billed incorrectly, you might get stuck with the entire $3,200 allowed amount&mdash;or even the full $5,000 billed charge&mdash;while the error gets sorted out. Always check your <a href="/guides/understanding-explanation-of-benefits">Explanation of Benefits</a> from both plans to confirm each insurer paid its share.</p>
+<p>But here&rsquo;s the catch: if the provider never submits the claim to the secondary plan, you pay the full $640. And if the primary plan was billed incorrectly, you might get stuck with the entire $3,200 allowed amount&mdash;or even the full $5,000 billed charge&mdash;while the error gets sorted out. Always check your <a href="/guides/understanding-explanation-of-benefits/">Explanation of Benefits</a> from both plans to confirm each insurer paid its share.</p>
 
 <div class="key-takeaway">
     <strong>The secondary plan does not always cover everything.</strong> Secondary plans pay according to their own rules. Some cover 100% of the primary plan&rsquo;s remaining balance. Others apply their own deductible and coinsurance to the remainder. And the total combined payment from both plans can never exceed the allowed amount. Always verify what your secondary plan covers by reading its COB provisions or calling member services.
@@ -234,7 +234,7 @@ register("coordination-of-benefits-dual-insurance", {
 
 <h3>Step 4: Appeal if the secondary plan denies</h3>
 
-<p>Some secondary plans deny claims if they believe the amount the primary plan paid was sufficient or if they disagree with the COB determination. If this happens, file a formal appeal with the secondary plan. Include the primary plan&rsquo;s EOB showing the remaining balance and a copy of both insurance cards. For guidance on the appeals process, see our <a href="/guides/how-to-appeal-insurance-denial-and-win">guide to appealing insurance denials</a>.</p>
+<p>Some secondary plans deny claims if they believe the amount the primary plan paid was sufficient or if they disagree with the COB determination. If this happens, file a formal appeal with the secondary plan. Include the primary plan&rsquo;s EOB showing the remaining balance and a copy of both insurance cards. For guidance on the appeals process, see our <a href="/guides/how-to-appeal-insurance-denial-and-win/">guide to appealing insurance denials</a>.</p>
 
 <div class="key-takeaway">
     <strong>Don&rsquo;t pay a COB-related bill until both plans have processed.</strong> If you receive a bill while COB issues are being resolved, call the provider and explain that a claim resubmission is in progress. Ask them to put the account on hold and not send it to collections while the insurers sort it out. Most providers will agree to a 60&ndash;90 day hold if you communicate proactively.
@@ -248,12 +248,12 @@ register("coordination-of-benefits-dual-insurance", {
     <li><strong>Update both insurers at open enrollment every year.</strong> Even if nothing changed, confirm your COB information is current. Insurers periodically purge COB data, and a lapse can trigger denials.</li>
     <li><strong>Keep both insurance ID cards current.</strong> If you get a new card from either plan (new group number, new member ID), update the other insurer immediately.</li>
     <li><strong>Inform providers of both plans at every visit.</strong> Don&rsquo;t assume the provider has your secondary insurance on file. Hand them both cards every time, even at providers you see regularly.</li>
-    <li><strong>Check EOBs from both plans after every claim.</strong> Verify the primary plan processed first, the secondary plan processed the remainder, and the patient responsibility matches across both EOBs. Read our <a href="/guides/understanding-explanation-of-benefits">guide to understanding your EOB</a> for help interpreting these documents.</li>
+    <li><strong>Check EOBs from both plans after every claim.</strong> Verify the primary plan processed first, the secondary plan processed the remainder, and the patient responsibility matches across both EOBs. Read our <a href="/guides/understanding-explanation-of-benefits/">guide to understanding your EOB</a> for help interpreting these documents.</li>
     <li><strong>Respond to COB questionnaires immediately.</strong> Insurers periodically mail questionnaires asking about other coverage. If you don&rsquo;t respond, they will pend or deny all claims until you do.</li>
     <li><strong>Report life changes promptly.</strong> Marriage, divorce, new job, job loss, turning 26 (aging off a parent&rsquo;s plan), or turning 65 (Medicare eligibility)&mdash;any of these can change your COB status. Notify both plans within 30 days.</li>
 </ul>
 
-<p>If you suspect a COB error on a bill you&rsquo;ve already received, <a href="/scan">upload it to BillKarma</a> for a free analysis. We flag COB-related issues and show you exactly what to say when you call your insurers. If your bill is higher than expected even after both plans have paid, check our guide on <a href="/guides/why-you-owe-after-insurance-paid">why you still owe money after insurance paid</a>.</p>
+<p>If you suspect a COB error on a bill you&rsquo;ve already received, <a href="/scan">upload it to BillKarma</a> for a free analysis. We flag COB-related issues and show you exactly what to say when you call your insurers. If your bill is higher than expected even after both plans have paid, check our guide on <a href="/guides/why-you-owe-after-insurance-paid/">why you still owe money after insurance paid</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

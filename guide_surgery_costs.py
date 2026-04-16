@@ -74,7 +74,7 @@ register("how-much-does-surgery-cost", {
     <strong>The facility fee is the biggest target for savings.</strong> It makes up over half of most surgery bills and is where hospital-vs.-ASC pricing differences are the most dramatic. A facility fee of $12,000 at a hospital might be $4,000 at an ambulatory surgery center for the same procedure.
 </div>
 
-<p>Each component comes from a different billing source. The surgeon bills separately from the hospital. The anesthesiologist bills separately from both. This means you may receive three or more separate bills for a single surgery&mdash;make sure you <a href="/guides/how-to-read-your-medical-bill">review each one individually</a>.</p>
+<p>Each component comes from a different billing source. The surgeon bills separately from the hospital. The anesthesiologist bills separately from both. This means you may receive three or more separate bills for a single surgery&mdash;make sure you <a href="/guides/how-to-read-your-medical-bill/">review each one individually</a>.</p>
 
 <h2 id="common-surgery-costs">2. Common outpatient surgery costs</h2>
 
@@ -224,7 +224,7 @@ register("how-much-does-surgery-cost", {
 
 <h3>b) Get a good faith estimate</h3>
 
-<p>Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, if you&rsquo;re uninsured or self-pay, healthcare providers must give you a written good faith estimate of expected charges before any scheduled service. If the final bill exceeds the estimate by $400 or more, you can dispute the difference through the federal patient-provider dispute resolution process.</p>
+<p>Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, if you&rsquo;re uninsured or self-pay, healthcare providers must give you a written good faith estimate of expected charges before any scheduled service. If the final bill exceeds the estimate by $400 or more, you can dispute the difference through the federal patient-provider dispute resolution process.</p>
 
 <h3>c) Compare facility prices using price transparency data</h3>
 
@@ -232,11 +232,11 @@ register("how-much-does-surgery-cost", {
 
 <h3>d) Negotiate before the surgery</h3>
 
-<p>It is always easier to <a href="/guides/how-to-negotiate-medical-bills">negotiate before the procedure</a> than after. Once you have a good faith estimate, compare each component to Medicare rates using our <a href="/calculator">cost calculator</a>. Then call the billing department and ask for a self-pay discount or negotiate based on Medicare rates. Get the agreed price in writing before your surgery date.</p>
+<p>It is always easier to <a href="/guides/how-to-negotiate-medical-bills/">negotiate before the procedure</a> than after. Once you have a good faith estimate, compare each component to Medicare rates using our <a href="/calculator">cost calculator</a>. Then call the billing department and ask for a self-pay discount or negotiate based on Medicare rates. Get the agreed price in writing before your surgery date.</p>
 
 <h3>e) Check if you qualify for financial assistance</h3>
 
-<p>All nonprofit hospitals (roughly 60% of US hospitals) are required to have <a href="/guides/hospital-financial-assistance-charity-care">financial assistance programs</a>. If your income is below 200&ndash;400% of the federal poverty level, you may qualify for free or significantly reduced-cost care&mdash;even for elective surgery. Apply before the procedure if possible. Check your hospital&rsquo;s financial assistance policy in our <a href="/hospitals/">hospital directory</a>.</p>
+<p>All nonprofit hospitals (roughly 60% of US hospitals) are required to have <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance programs</a>. If your income is below 200&ndash;400% of the federal poverty level, you may qualify for free or significantly reduced-cost care&mdash;even for elective surgery. Apply before the procedure if possible. Check your hospital&rsquo;s financial assistance policy in our <a href="/hospitals/">hospital directory</a>.</p>
 
 {_embed(mode="cost", title="Compare your surgery cost to Medicare", subtitle="Enter the CPT code from your estimate or bill to see the Medicare rate.", height="380")}
 
@@ -262,7 +262,7 @@ register("how-much-does-surgery-cost", {
     <h3>Case study 2: Hernia repair &mdash; billing errors found</h3>
     <p><strong>Situation:</strong> Patient received a bill for <strong>$28,000</strong> for an inguinal hernia repair (CPT 49505) at a hospital outpatient department.</p>
     <p><strong>Action:</strong> The patient <a href="/scan">uploaded the bill to BillKarma</a>. The analysis found two issues: the facility fee was <strong>8x the Medicare facility rate</strong>, and the anesthesia was billed for 30 minutes more than the operative report supported.</p>
-    <p><strong>Result:</strong> The patient <a href="/guides/how-to-dispute-a-medical-bill">filed a dispute</a> citing the anesthesia time discrepancy and requested a reduction in the facility fee based on Medicare benchmarks. After two rounds of communication, the bill was reduced to <strong>$18,200</strong>.</p>
+    <p><strong>Result:</strong> The patient <a href="/guides/how-to-dispute-a-medical-bill/">filed a dispute</a> citing the anesthesia time discrepancy and requested a reduction in the facility fee based on Medicare benchmarks. After two rounds of communication, the bill was reduced to <strong>$18,200</strong>.</p>
     <p><strong>Savings: $9,800.</strong></p>
 </div>
 
@@ -284,7 +284,7 @@ register("how-much-does-surgery-cost", {
 
     <div class="faq-item">
         <h3>Can I negotiate surgery costs before the procedure?</h3>
-        <p>Yes, and it&rsquo;s much easier to negotiate before surgery than after. Ask for a good faith estimate (required under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> for self-pay patients), compare it to Medicare rates using our <a href="/calculator">calculator</a>, and ask for a self-pay discount or negotiate based on the Medicare benchmark. Many hospitals will offer 30&ndash;60% off the sticker price.</p>
+        <p>Yes, and it&rsquo;s much easier to negotiate before surgery than after. Ask for a good faith estimate (required under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> for self-pay patients), compare it to Medicare rates using our <a href="/calculator">calculator</a>, and ask for a self-pay discount or negotiate based on the Medicare benchmark. Many hospitals will offer 30&ndash;60% off the sticker price.</p>
     </div>
 
     <div class="faq-item">
@@ -299,7 +299,7 @@ register("how-much-does-surgery-cost", {
 
     <div class="faq-item">
         <h3>What if I can&rsquo;t afford my surgery bill?</h3>
-        <p>Start by asking for the self-pay discount (30&ndash;60% off). Next, apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a> at nonprofit hospitals. You can also negotiate a lump-sum settlement at 40&ndash;60% of the bill, or ask for a zero-interest payment plan. Finally, <a href="/scan">upload your bill to BillKarma</a> to identify billing errors and overcharges that can further reduce what you owe.</p>
+        <p>Start by asking for the self-pay discount (30&ndash;60% off). Next, apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a> at nonprofit hospitals. You can also negotiate a lump-sum settlement at 40&ndash;60% of the bill, or ask for a zero-interest payment plan. Finally, <a href="/scan">upload your bill to BillKarma</a> to identify billing errors and overcharges that can further reduce what you owe.</p>
     </div>
 
     <div class="faq-item">

@@ -68,7 +68,7 @@ register("medical-billing-coding-mistakes", {
 <p>The average overcharge per billing error is <strong>$935</strong>, according to data compiled from consumer advocacy organizations and billing audit firms. For hospital stays and surgical procedures, the average overcharge climbs to <strong>$1,300&ndash;$2,500</strong>.</p>
 
 <div class="key-takeaway">
-    <strong>Why errors persist:</strong> Medical billing uses over 80,000 <a href="/guides/what-are-cpt-codes">CPT codes</a> and 72,000 <a href="/guides/icd10-drg-codes">ICD-10 diagnosis codes</a>. Human coders process dozens of charts per day under productivity pressure. Errors are inevitable &mdash; and they almost always favor the provider, not the patient. <a href="/scan">Upload your bill to BillKarma</a> to check for errors in seconds.
+    <strong>Why errors persist:</strong> Medical billing uses over 80,000 <a href="/guides/what-are-cpt-codes/">CPT codes</a> and 72,000 <a href="/guides/icd10-drg-codes/">ICD-10 diagnosis codes</a>. Human coders process dozens of charts per day under productivity pressure. Errors are inevitable &mdash; and they almost always favor the provider, not the patient. <a href="/scan">Upload your bill to BillKarma</a> to check for errors in seconds.
 </div>
 
 <h2 id="upcoding">2. Mistake #1: Upcoding</h2>
@@ -92,7 +92,7 @@ register("medical-billing-coding-mistakes", {
 
 <h3>How to spot upcoding</h3>
 <ul>
-    <li>Request your medical records for the visit and compare the documentation against the <a href="/guides/what-are-cpt-codes">CPT code</a> billed.</li>
+    <li>Request your medical records for the visit and compare the documentation against the <a href="/guides/what-are-cpt-codes/">CPT code</a> billed.</li>
     <li>A Level 4 or 5 visit requires documented medical decision-making of moderate or high complexity. If your visit was routine, a high-level code is suspect.</li>
     <li>Compare the time spent with you (ask front-desk staff or check your patient portal) against the code billed. Level 5 visits typically require 40+ minutes of physician time.</li>
 </ul>
@@ -104,7 +104,7 @@ register("medical-billing-coding-mistakes", {
 
 <h2 id="unbundling">3. Mistake #2: Unbundling</h2>
 
-<p>Unbundling occurs when a provider bills individual components of a procedure separately instead of using a single bundled <a href="/guides/what-are-cpt-codes">CPT code</a> that covers the entire procedure. This inflates the total bill because the sum of individual component codes is always higher than the bundled rate.</p>
+<p>Unbundling occurs when a provider bills individual components of a procedure separately instead of using a single bundled <a href="/guides/what-are-cpt-codes/">CPT code</a> that covers the entire procedure. This inflates the total bill because the sum of individual component codes is always higher than the bundled rate.</p>
 
 <p>The CMS National Correct Coding Initiative (NCCI) maintains a database of code pairs that should never be billed together because one code already includes the other. Common unbundling examples:</p>
 
@@ -142,7 +142,7 @@ register("medical-billing-coding-mistakes", {
 
 <h2 id="wrong-diagnosis">5. Mistake #4: Wrong diagnosis code</h2>
 
-<p>Every medical service is linked to an <a href="/guides/icd10-drg-codes">ICD-10 diagnosis code</a> that explains <em>why</em> the service was provided. A wrong diagnosis code creates two problems: it can cause your insurance to deny the claim (leaving you with the full bill), or it can justify a more expensive treatment pathway than what you actually needed.</p>
+<p>Every medical service is linked to an <a href="/guides/icd10-drg-codes/">ICD-10 diagnosis code</a> that explains <em>why</em> the service was provided. A wrong diagnosis code creates two problems: it can cause your insurance to deny the claim (leaving you with the full bill), or it can justify a more expensive treatment pathway than what you actually needed.</p>
 
 <p>Common diagnosis code errors include:</p>
 <ul>
@@ -153,7 +153,7 @@ register("medical-billing-coding-mistakes", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Diagnosis code errors and insurance denials:</strong> If your insurance denied a claim as &ldquo;not medically necessary,&rdquo; the first thing to check is whether the diagnosis code matches the service. A wrong ICD-10 code is the most common reason for medical necessity denials. Ask the provider to review and correct the diagnosis code, then resubmit the claim. See our <a href="/guides/common-hospital-billing-errors">guide to common billing errors</a> for more denial triggers.
+    <strong>Diagnosis code errors and insurance denials:</strong> If your insurance denied a claim as &ldquo;not medically necessary,&rdquo; the first thing to check is whether the diagnosis code matches the service. A wrong ICD-10 code is the most common reason for medical necessity denials. Ask the provider to review and correct the diagnosis code, then resubmit the claim. See our <a href="/guides/common-hospital-billing-errors/">guide to common billing errors</a> for more denial triggers.
 </div>
 
 <h2 id="modifier-phantom-info">6. Mistakes #5&ndash;7: Modifier errors, phantom charges, wrong patient info</h2>
@@ -204,7 +204,7 @@ register("medical-billing-coding-mistakes", {
 
 <h3>Mistake #10: Balance billing errors</h3>
 
-<p>Balance billing occurs when an out-of-network provider bills you for the difference between their charge and what your insurance paid. Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, balance billing is prohibited for emergency services and for out-of-network providers at in-network facilities. Yet balance billing errors persist because:</p>
+<p>Balance billing occurs when an out-of-network provider bills you for the difference between their charge and what your insurance paid. Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, balance billing is prohibited for emergency services and for out-of-network providers at in-network facilities. Yet balance billing errors persist because:</p>
 <ul>
     <li>Providers may not update their billing systems to reflect No Surprises Act protections.</li>
     <li>Ancillary providers (anesthesiologists, pathologists, radiologists) at in-network hospitals may incorrectly bill out-of-network rates.</li>
@@ -284,7 +284,7 @@ register("medical-billing-coding-mistakes", {
 
 <h2 id="how-to-audit">8. How to audit your own bill for coding mistakes</h2>
 
-<p>You do not need medical billing expertise to catch the most common errors. Follow these five steps using the tools linked below. For a comprehensive checklist, see our <a href="/guides/medical-bill-audit-checklist">medical bill audit checklist</a>.</p>
+<p>You do not need medical billing expertise to catch the most common errors. Follow these five steps using the tools linked below. For a comprehensive checklist, see our <a href="/guides/medical-bill-audit-checklist/">medical bill audit checklist</a>.</p>
 
 <p><strong>Step 1 &mdash; Request an itemized bill.</strong> Call the provider&rsquo;s billing department and ask for a complete itemized statement that includes CPT codes, ICD-10 diagnosis codes, dates of service, and quantities. Do not accept a summary statement that only shows department totals. You have the legal right to an itemized bill under HIPAA.</p>
 
@@ -294,10 +294,10 @@ register("medical-billing-coding-mistakes", {
 
 <p><strong>Step 4 &mdash; Look for unbundled lab tests.</strong> If your bill shows multiple individual lab test codes, check whether they are components of a standard panel (comprehensive metabolic panel CPT 80053, basic metabolic panel CPT 80048, or lipid panel CPT 80061). If so, the panel code should have been used instead.</p>
 
-<p><strong>Step 5 &mdash; Compare against Medicare rates.</strong> Use the <a href="/calculator">BillKarma calculator</a> to look up the Medicare rate for each CPT code on your bill. Any charge exceeding 3x the Medicare rate is worth questioning. For a full walkthrough on <a href="/guides/common-hospital-billing-errors">common hospital billing errors</a> and how to dispute them, see our dedicated guide.</p>
+<p><strong>Step 5 &mdash; Compare against Medicare rates.</strong> Use the <a href="/calculator">BillKarma calculator</a> to look up the Medicare rate for each CPT code on your bill. Any charge exceeding 3x the Medicare rate is worth questioning. For a full walkthrough on <a href="/guides/common-hospital-billing-errors/">common hospital billing errors</a> and how to dispute them, see our dedicated guide.</p>
 
 <div class="key-takeaway">
-    <strong>Don&rsquo;t want to audit manually?</strong> <a href="/scan">Upload your bill to BillKarma</a> and we&rsquo;ll run all five checks automatically. Our system flags upcoding, unbundling, duplicates, diagnosis code mismatches, and pricing outliers &mdash; then generates a dispute letter you can send to the billing department. See also our guides on <a href="/guides/medical-billing-errors-statistics-2026">medical billing error statistics</a> and <a href="/guides/icd10-drg-codes">ICD-10 and DRG codes</a> for additional context.
+    <strong>Don&rsquo;t want to audit manually?</strong> <a href="/scan">Upload your bill to BillKarma</a> and we&rsquo;ll run all five checks automatically. Our system flags upcoding, unbundling, duplicates, diagnosis code mismatches, and pricing outliers &mdash; then generates a dispute letter you can send to the billing department. See also our guides on <a href="/guides/medical-billing-errors-statistics-2026/">medical billing error statistics</a> and <a href="/guides/icd10-drg-codes/">ICD-10 and DRG codes</a> for additional context.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

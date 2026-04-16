@@ -90,7 +90,7 @@ register("hospital-liens-explained", {
 <p><strong>Step 5 &mdash; Resolution.</strong> When the personal injury case settles, the hospital lien is paid from the settlement proceeds. If the lien amount is disputed, the patient&rsquo;s attorney negotiates with the hospital before finalizing the distribution.</p>
 
 <div class="key-takeaway">
-    <strong>Critical filing requirements:</strong> Hospital liens are creatures of statute, meaning the hospital must follow the exact filing procedures required by state law. If the hospital misses a deadline, files in the wrong county, or fails to serve the correct parties, the lien may be void. Always have an attorney review the lien for procedural compliance. For more on reviewing your hospital charges, see our <a href="/guides/how-to-get-itemized-hospital-bill">guide to getting an itemized hospital bill</a>.
+    <strong>Critical filing requirements:</strong> Hospital liens are creatures of statute, meaning the hospital must follow the exact filing procedures required by state law. If the hospital misses a deadline, files in the wrong county, or fails to serve the correct parties, the lien may be void. Always have an attorney review the lien for procedural compliance. For more on reviewing your hospital charges, see our <a href="/guides/how-to-get-itemized-hospital-bill/">guide to getting an itemized hospital bill</a>.
 </div>
 
 <h2 id="when-hospitals-file-liens">3. When hospitals file liens</h2>
@@ -99,7 +99,7 @@ register("hospital-liens-explained", {
 
 <h3>Car accidents</h3>
 
-<p>Car accidents are the most frequent trigger for hospital liens. When you arrive at the ER after a collision, the hospital&rsquo;s billing department identifies the case as a potential third-party liability claim. If the other driver was at fault, the hospital files a lien against your eventual settlement with the at-fault driver&rsquo;s insurer. For a detailed look at how medical bills work after a car crash, see our <a href="/guides/car-accident-medical-bills">guide to car accident medical bills</a>.</p>
+<p>Car accidents are the most frequent trigger for hospital liens. When you arrive at the ER after a collision, the hospital&rsquo;s billing department identifies the case as a potential third-party liability claim. If the other driver was at fault, the hospital files a lien against your eventual settlement with the at-fault driver&rsquo;s insurer. For a detailed look at how medical bills work after a car crash, see our <a href="/guides/car-accident-medical-bills/">guide to car accident medical bills</a>.</p>
 
 <h3>Slip-and-fall and premises liability</h3>
 
@@ -170,7 +170,7 @@ register("hospital-liens-explained", {
 
 <ul>
     <li><strong>Medicare comparison:</strong> Compare each line item on the lien against the Medicare reimbursement rate. If the hospital is charging 5&ndash;10x Medicare, document the gap. Courts and arbitrators increasingly recognize Medicare rates as a benchmark for reasonableness.</li>
-    <li><strong>Itemized bill review:</strong> Request a fully itemized bill and check for duplicate charges, unbundled services, upcoded procedures, and charges for services not actually provided. See our <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill guide</a> for how to request and review one.</li>
+    <li><strong>Itemized bill review:</strong> Request a fully itemized bill and check for duplicate charges, unbundled services, upcoded procedures, and charges for services not actually provided. See our <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill guide</a> for how to request and review one.</li>
     <li><strong>Insurance rate comparison:</strong> If you have health insurance, compare the lien amount against what your insurer would have paid for the same services. The gap between billed charges and negotiated rates is often 50&ndash;80%.</li>
 </ul>
 
@@ -207,7 +207,7 @@ register("hospital-liens-explained", {
 
 <h3>e) Negotiate before the case settles</h3>
 
-<p>The best time to negotiate a hospital lien is <em>before</em> the personal injury case settles. Once a settlement amount is finalized, the hospital knows exactly how much money is available. Negotiate the lien while the case outcome is still uncertain, when the hospital is more motivated to accept a reduced amount. For broader negotiation strategies, see our <a href="/guides/how-to-negotiate-medical-bills">guide to negotiating medical bills</a>.</p>
+<p>The best time to negotiate a hospital lien is <em>before</em> the personal injury case settles. Once a settlement amount is finalized, the hospital knows exactly how much money is available. Negotiate the lien while the case outcome is still uncertain, when the hospital is more motivated to accept a reduced amount. For broader negotiation strategies, see our <a href="/guides/how-to-negotiate-medical-bills/">guide to negotiating medical bills</a>.</p>
 
 <div class="case-study">
     <h3>Case study: lien reduced by 60% using Medicare comparison</h3>

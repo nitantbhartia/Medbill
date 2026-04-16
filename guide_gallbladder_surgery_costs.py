@@ -157,7 +157,7 @@ register("gallbladder-surgery-cost", {
 <p>If your surgery isn&rsquo;t urgent, a same-day outpatient approach saves $5,000&ndash;$15,000 over an inpatient hospital stay.</p>
 
 <h3>b) Review ER charges separately</h3>
-<p>If you went to the ER first, you&rsquo;ll get separate bills for the ER visit and the surgery. Audit both&mdash;ER bills are notoriously error-prone. See our <a href="/guides/why-emergency-room-bills-are-so-high">ER bill guide</a>.</p>
+<p>If you went to the ER first, you&rsquo;ll get separate bills for the ER visit and the surgery. Audit both&mdash;ER bills are notoriously error-prone. See our <a href="/guides/why-emergency-room-bills-are-so-high/">ER bill guide</a>.</p>
 
 <h3>c) Check the DRG coding</h3>
 <p>If you&rsquo;re on Medicare, verify your surgery was coded as DRG 418 (no complications) if your recovery was uneventful. Upcoding to DRG 417 adds $3,000&ndash;$6,000.</p>
@@ -166,7 +166,7 @@ register("gallbladder-surgery-cost", {
 <p>The removed gallbladder is sent to pathology (CPT 88305). Some hospitals charge $500+ for this routine exam. Medicare pays ~$75&ndash;$120. If you&rsquo;re uninsured, negotiate this charge.</p>
 
 <h3>e) Apply for financial assistance</h3>
-<p>Especially relevant if your surgery was emergency&mdash;you couldn&rsquo;t shop around. Nonprofit hospitals must offer charity care. Apply even after the bill arrives. See our <a href="/guides/hospital-financial-assistance-charity-care">financial assistance guide</a>.</p>
+<p>Especially relevant if your surgery was emergency&mdash;you couldn&rsquo;t shop around. Nonprofit hospitals must offer charity care. Apply even after the bill arrives. See our <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance guide</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

@@ -190,7 +190,7 @@ register("hospital-drug-charges", {
 <p>For drugs with a J-code, look up the CMS Average Sales Price (ASP) at the CMS Part B Drug Pricing page. Medicare pays ASP + 6% for physician-administered drugs. Hospital outpatient rates are set by OPPS. If your billed charge is 10x or more the Medicare rate, that&rsquo;s a strong starting point for a dispute.</p>
 
 <h3>Step 4: Call the billing department</h3>
-<p>Use the <a href="/guides/how-to-dispute-a-medical-bill">dispute script from our billing dispute guide</a>. For drug charges specifically, say: &ldquo;I&rsquo;d like to understand the charge for [drug name] on my itemized bill. Can you tell me the acquisition cost and your calculation for the billed amount?&rdquo; Most billing staff will offer a reduction rather than explain the markup in detail. Also <a href="/scan">upload your bill to BillKarma</a> for an automated line-by-line audit.</p>
+<p>Use the <a href="/guides/how-to-dispute-a-medical-bill/">dispute script from our billing dispute guide</a>. For drug charges specifically, say: &ldquo;I&rsquo;d like to understand the charge for [drug name] on my itemized bill. Can you tell me the acquisition cost and your calculation for the billed amount?&rdquo; Most billing staff will offer a reduction rather than explain the markup in detail. Also <a href="/scan">upload your bill to BillKarma</a> for an automated line-by-line audit.</p>
 
 <div class="key-takeaway">
     <strong>Skip the manual math.</strong> <a href="/scan">Scan your bill with BillKarma</a> and we&rsquo;ll identify every inflated drug charge automatically, along with the specific Medicare rate and a ready-to-use dispute script.

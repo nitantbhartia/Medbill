@@ -93,7 +93,7 @@ register("prior-authorization", {
 </table>
 
 <div class="key-takeaway">
-    <strong>75% of appealed PA denials are overturned.</strong> If your PA was denied, appeal it &mdash; especially if the service is genuinely medically necessary. Most initial denials are not final decisions. See our <a href="/guides/how-to-appeal-an-insurance-denial">insurance denial appeal guide</a> for a step-by-step process.
+    <strong>75% of appealed PA denials are overturned.</strong> If your PA was denied, appeal it &mdash; especially if the service is genuinely medically necessary. Most initial denials are not final decisions. See our <a href="/guides/how-to-appeal-an-insurance-denial/">insurance denial appeal guide</a> for a step-by-step process.
 </div>
 
 <p><strong>How to check before you schedule:</strong> Call the member services number on your insurance card and ask: &ldquo;Does procedure code [CPT code] require prior authorization under my plan?&rdquo; Your doctor&rsquo;s office should also check as a routine step, but verifying yourself prevents surprises. Use our <a href="/calculator">calculator</a> to look up CPT codes if you don&rsquo;t have the code handy.</p>
@@ -255,7 +255,7 @@ register("prior-authorization", {
 
     <div class="faq-item">
         <h3>Can I get care without prior authorization in an emergency?</h3>
-        <p>Yes. Federal law requires health plans to cover emergency care without prior authorization. If an insurer tries to retroactively reclassify your ER visit as non-emergency, you can appeal using the &ldquo;prudent layperson&rdquo; standard &mdash; a reasonable person with your symptoms would have sought emergency care. See our <a href="/guides/how-to-appeal-an-insurance-denial">insurance denial appeal guide</a>.</p>
+        <p>Yes. Federal law requires health plans to cover emergency care without prior authorization. If an insurer tries to retroactively reclassify your ER visit as non-emergency, you can appeal using the &ldquo;prudent layperson&rdquo; standard &mdash; a reasonable person with your symptoms would have sought emergency care. See our <a href="/guides/how-to-appeal-an-insurance-denial/">insurance denial appeal guide</a>.</p>
     </div>
 
     <div class="faq-item">

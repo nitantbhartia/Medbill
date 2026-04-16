@@ -131,7 +131,7 @@ register("out-of-pocket-maximum", {
 </table>
 
 <div class="key-takeaway">
-    <strong>The out-of-network trap:</strong> If you have a PPO and go out of network, those costs usually do NOT count toward your in-network OOP max. They accumulate separately toward a higher OON OOP max &mdash; or on some plans, have no cap at all. Always verify whether a provider is in-network before receiving non-emergency care. See <a href="/guides/hmo-ppo-epo-hdhp-plan-types">our plan type comparison guide</a> for network coverage by plan type.
+    <strong>The out-of-network trap:</strong> If you have a PPO and go out of network, those costs usually do NOT count toward your in-network OOP max. They accumulate separately toward a higher OON OOP max &mdash; or on some plans, have no cap at all. Always verify whether a provider is in-network before receiving non-emergency care. See <a href="/guides/hmo-ppo-epo-hdhp-plan-types/">our plan type comparison guide</a> for network coverage by plan type.
 </div>
 
 <h2 id="family-oop">5. Embedded vs. aggregate family OOP maximums</h2>
@@ -179,7 +179,7 @@ register("out-of-pocket-maximum", {
 
 <ol>
     <li><strong>Member portal:</strong> Log in to your insurer&rsquo;s website or app. Look for &ldquo;Deductibles &amp; Out-of-Pocket&rdquo; or &ldquo;Benefits Summary.&rdquo; Your insurer is required to provide this in real time for ACA-compliant plans.</li>
-    <li><strong>Explanation of Benefits (EOB):</strong> Every EOB shows your running year-to-date OOP accumulation. The line typically reads &ldquo;Out-of-pocket maximum applied: $X | Remaining: $Y.&rdquo; See <a href="/guides/explanation-of-benefits-eob">our full guide to reading your EOB</a> for help interpreting each column.</li>
+    <li><strong>Explanation of Benefits (EOB):</strong> Every EOB shows your running year-to-date OOP accumulation. The line typically reads &ldquo;Out-of-pocket maximum applied: $X | Remaining: $Y.&rdquo; See <a href="/guides/explanation-of-benefits-eob/">our full guide to reading your EOB</a> for help interpreting each column.</li>
     <li><strong>Call member services:</strong> The number on the back of your insurance card connects you to a representative who can confirm your current accumulator status.</li>
 </ol>
 

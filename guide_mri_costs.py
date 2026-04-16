@@ -101,7 +101,7 @@ register("mri-costs", {
     </tbody>
 </table>
 
-<p>The MRI machine, the scan protocol, and the radiologist reading your images are often the same at a freestanding center as at the hospital. The price difference comes almost entirely from the hospital&rsquo;s facility fee&mdash;a surcharge that can add $500 to $3,000 to your bill. See our guide on <a href="/guides/facility-fees-explained">facility fees explained</a> for the full breakdown.</p>
+<p>The MRI machine, the scan protocol, and the radiologist reading your images are often the same at a freestanding center as at the hospital. The price difference comes almost entirely from the hospital&rsquo;s facility fee&mdash;a surcharge that can add $500 to $3,000 to your bill. See our guide on <a href="/guides/facility-fees-explained/">facility fees explained</a> for the full breakdown.</p>
 
 <div class="key-takeaway">
     <strong>Before you schedule your MRI, check what your hospital charges.</strong> <a href="/hospitals/">Search BillKarma&rsquo;s hospital pricing directory</a> &mdash; compare MRI prices at every hospital near you to find the most affordable in-network option.
@@ -126,7 +126,7 @@ register("mri-costs", {
     <li><strong>Technical component ($3,240)</strong> &mdash; The hospital&rsquo;s facility fee covering the MRI machine, technologist, and overhead. Medicare pays $344 total for this scan. The hospital is charging 9.4x the Medicare rate. This is the charge with the most room for dispute.</li>
     <li><strong>Professional component ($410)</strong> &mdash; The radiologist&rsquo;s fee for interpreting the images. This is often billed by a separate radiology group. A markup of 1.2x Medicare is more reasonable.</li>
     <li><strong>IV supplies ($185)</strong> &mdash; Contrast dye requires an IV line. One vial of contrast dye costs hospitals about $20&ndash;$40 wholesale. A charge of $185 for &ldquo;sterile water and IV supplies&rdquo; warrants a closer look at the quantity billed.</li>
-    <li><strong>Office visit ($145)</strong> &mdash; If this charge also appears on a separate bill from your physician, this is a duplicate charge&mdash;dispute it immediately. See our guide on <a href="/guides/duplicate-charges">spotting duplicate charges</a>.</li>
+    <li><strong>Office visit ($145)</strong> &mdash; If this charge also appears on a separate bill from your physician, this is a duplicate charge&mdash;dispute it immediately. See our guide on <a href="/guides/duplicate-charges/">spotting duplicate charges</a>.</li>
 </ul>
 
 <h2 id="contrast-markups">4. Contrast vs. non-contrast markups</h2>
@@ -172,7 +172,7 @@ register("mri-costs", {
     <li><strong>After your out-of-pocket max:</strong> Your plan covers 100%. If you expect to hit your max, prioritize getting scans done before year&rsquo;s end.</li>
 </ul>
 
-<p><strong>Prior authorization:</strong> Many plans require prior authorization (PA) before an MRI. If your doctor orders an MRI without getting PA first, the claim may be denied. Always ask your doctor&rsquo;s office to confirm PA was obtained before your scan date. See our guide on <a href="/guides/insurance-denial-appeal">how to appeal an insurance denial</a> if your MRI is denied.</p>
+<p><strong>Prior authorization:</strong> Many plans require prior authorization (PA) before an MRI. If your doctor orders an MRI without getting PA first, the claim may be denied. Always ask your doctor&rsquo;s office to confirm PA was obtained before your scan date. See our guide on <a href="/guides/insurance-denial-appeal/">how to appeal an insurance denial</a> if your MRI is denied.</p>
 
 <h2 id="dispute-charges">8. How to dispute inflated MRI charges</h2>
 
@@ -183,8 +183,8 @@ register("mri-costs", {
     <li><strong>Look up the Medicare rate</strong> for each CPT code using our <a href="/calculator">cost calculator</a>. Note the markup multiple for each line item.</li>
     <li><strong>Check for billing errors.</strong> Look for duplicate charges, charges for services not received (like the office visit example above), and quantities that seem excessive (e.g., 3 contrast doses when you had 1 scan).</li>
     <li><strong>Call the billing department.</strong> State clearly: &ldquo;Medicare pays $[X] for CPT [code]. I&rsquo;m being charged $[Y]&mdash;a markup of [Z]x. I&rsquo;d like to request a reduction to something closer to what other payers pay.&rdquo;</li>
-    <li><strong>Follow up in writing.</strong> Send a dispute letter citing the specific CPT codes, the Medicare rates, and your requested adjustment. Our <a href="/guides/dispute-bill">dispute guide</a> has letter templates you can use.</li>
-    <li><strong>Ask about financial assistance.</strong> Nonprofit hospitals are required to have charity care programs. If your income qualifies, you may be eligible for a significant reduction or even forgiveness. See our guide on <a href="/guides/hospital-financial-assistance">hospital financial assistance</a>.</li>
+    <li><strong>Follow up in writing.</strong> Send a dispute letter citing the specific CPT codes, the Medicare rates, and your requested adjustment. Our <a href="/guides/dispute-bill/">dispute guide</a> has letter templates you can use.</li>
+    <li><strong>Ask about financial assistance.</strong> Nonprofit hospitals are required to have charity care programs. If your income qualifies, you may be eligible for a significant reduction or even forgiveness. See our guide on <a href="/guides/hospital-financial-assistance/">hospital financial assistance</a>.</li>
 </ol>
 
 <h2 id="case-studies">9. Real-world case studies</h2>

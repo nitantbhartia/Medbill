@@ -293,7 +293,7 @@ register("hospital-price-transparency-rules-2026", {
 <p>Filing a complaint takes five minutes and is the single most effective thing individual patients can do to improve compliance. Every complaint triggers a CMS review, and multiple complaints about the same hospital accelerate enforcement action.</p>
 
 <div class="key-takeaway">
-    <strong>Check your hospital&rsquo;s transparency status instantly.</strong> The <a href="/hospitals/">BillKarma hospital directory</a> shows whether we were able to parse a hospital&rsquo;s price file and what grade their pricing earned. An ungraded hospital is a red flag. See our <a href="/guides/hospital-billing-grades-explained">hospital billing grades guide</a> for details on how grades are calculated.
+    <strong>Check your hospital&rsquo;s transparency status instantly.</strong> The <a href="/hospitals/">BillKarma hospital directory</a> shows whether we were able to parse a hospital&rsquo;s price file and what grade their pricing earned. An ungraded hospital is a red flag. See our <a href="/guides/hospital-billing-grades-explained/">hospital billing grades guide</a> for details on how grades are calculated.
 </div>
 
 <h2 id="compare-hospitals">7. Comparing prices across hospitals</h2>
@@ -368,7 +368,7 @@ register("hospital-price-transparency-rules-2026", {
     <li>Medicare rates (via our <a href="/calculator">calculator</a>) provide an objective benchmark for whether any of these rates are reasonable</li>
 </ul>
 
-<p>For the best overview of your hospital&rsquo;s pricing patterns, check the <a href="/hospitals/">BillKarma hospital directory</a> &mdash; we combine hospital transparency data, Medicare benchmarks, and billing pattern analysis into a single profile page. For a deeper understanding of how hospital price transparency works at a structural level, see our companion guide: <a href="/guides/hospital-price-transparency">Hospital Price Transparency: Which Hospitals Post Their Prices &mdash; and Which Still Don&rsquo;t</a>.</p>
+<p>For the best overview of your hospital&rsquo;s pricing patterns, check the <a href="/hospitals/">BillKarma hospital directory</a> &mdash; we combine hospital transparency data, Medicare benchmarks, and billing pattern analysis into a single profile page. For a deeper understanding of how hospital price transparency works at a structural level, see our companion guide: <a href="/guides/hospital-price-transparency/">Hospital Price Transparency: Which Hospitals Post Their Prices &mdash; and Which Still Don&rsquo;t</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

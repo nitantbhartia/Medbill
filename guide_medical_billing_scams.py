@@ -84,7 +84,7 @@ register("medical-billing-scams", {
             <td>2</td>
             <td><strong>No itemized breakdown available</strong></td>
             <td>Legitimate providers must provide an itemized bill upon request. A refusal or inability to produce one is a major red flag.</td>
-            <td>Request an <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill</a> in writing. If they can&rsquo;t produce one, it&rsquo;s likely fake.</td>
+            <td>Request an <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill</a> in writing. If they can&rsquo;t produce one, it&rsquo;s likely fake.</td>
         </tr>
         <tr>
             <td>3</td>
@@ -114,7 +114,7 @@ register("medical-billing-scams", {
             <td>7</td>
             <td><strong>Threats of immediate collections or arrest</strong></td>
             <td>Providers must follow a billing timeline before sending to collections. No one gets arrested for unpaid medical bills.</td>
-            <td>Know your <a href="/guides/medical-bill-collections-rights">collections rights</a>. Threats of arrest for medical debt are illegal.</td>
+            <td>Know your <a href="/guides/medical-bill-collections-rights/">collections rights</a>. Threats of arrest for medical debt are illegal.</td>
         </tr>
         <tr>
             <td>8</td>
@@ -140,7 +140,7 @@ register("medical-billing-scams", {
 <p>Use the phone number from your insurance card, the provider&rsquo;s official website, or a number you&rsquo;ve called before&mdash;<strong>never</strong> the number on the suspicious bill. Ask them to confirm the account number, date of service, and amount owed.</p>
 
 <h3>Step 3: Request an itemized bill</h3>
-<p>Ask for a complete itemized statement with CPT codes, diagnosis codes, and individual charges. Legitimate providers can produce this within days. See our <a href="/guides/how-to-get-itemized-hospital-bill">guide to getting an itemized bill</a> for exact language to use.</p>
+<p>Ask for a complete itemized statement with CPT codes, diagnosis codes, and individual charges. Legitimate providers can produce this within days. See our <a href="/guides/how-to-get-itemized-hospital-bill/">guide to getting an itemized bill</a> for exact language to use.</p>
 
 <h3>Step 4: Verify the provider&rsquo;s credentials</h3>
 <p>Look up the doctor&rsquo;s name and NPI (National Provider Identifier) number at <a href="https://npiregistry.cms.hhs.gov/" target="_blank" rel="noopener noreferrer">NPPES NPI Registry</a>. Every licensed provider in the United States has an NPI number. If the NPI doesn&rsquo;t exist or doesn&rsquo;t match the bill, it&rsquo;s fraudulent.</p>
@@ -162,17 +162,17 @@ register("medical-billing-scams", {
 <p>Someone uses your insurance information to receive care, and you get the bill. This is especially dangerous because the fraudulent visits go on your medical record, potentially affecting your future care. Signs include EOBs for services you don&rsquo;t recognize, unfamiliar providers, or being told you&rsquo;ve reached your insurance maximum when you haven&rsquo;t used your benefits.</p>
 
 <h3>Inflated bills from real providers</h3>
-<p>This straddles the line between scam and <a href="/guides/common-hospital-billing-errors">billing error</a>. A real provider you actually visited bills for more expensive procedures than what was performed (upcoding), adds charges for services that weren&rsquo;t provided, or bills for longer visit times than actually occurred. While sometimes an honest mistake, systematic upcoding is fraud.</p>
+<p>This straddles the line between scam and <a href="/guides/common-hospital-billing-errors/">billing error</a>. A real provider you actually visited bills for more expensive procedures than what was performed (upcoding), adds charges for services that weren&rsquo;t provided, or bills for longer visit times than actually occurred. While sometimes an honest mistake, systematic upcoding is fraud.</p>
 
 <h3>Fake collection calls</h3>
-<p>Scammers call claiming to be a collection agency for an old medical debt. They create urgency by threatening credit damage or legal action. Under the <a href="/guides/medical-bill-collections-rights">FDCPA</a>, you have the right to demand written validation of any debt within 30 days.</p>
+<p>Scammers call claiming to be a collection agency for an old medical debt. They create urgency by threatening credit damage or legal action. Under the <a href="/guides/medical-bill-collections-rights/">FDCPA</a>, you have the right to demand written validation of any debt within 30 days.</p>
 
 <h3>Insurance impersonation scams</h3>
 <p>Callers pose as your insurance company, claiming you owe a balance or need to &ldquo;verify your account&rdquo; by providing your Social Security number or payment. Legitimate insurers communicate billing issues in writing through your member portal.</p>
 
 <h2 id="scam-vs-error">5. Scam vs. billing error: how to tell the difference</h2>
 
-<p>Not every wrong bill is a scam. In fact, <a href="/guides/common-hospital-billing-errors">medical billing errors</a> affect an estimated 80% of hospital bills. Here&rsquo;s how to distinguish the two:</p>
+<p>Not every wrong bill is a scam. In fact, <a href="/guides/common-hospital-billing-errors/">medical billing errors</a> affect an estimated 80% of hospital bills. Here&rsquo;s how to distinguish the two:</p>
 
 <table>
     <thead>
@@ -263,7 +263,7 @@ register("medical-billing-scams", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Stay proactive:</strong> The best defense against medical billing scams is knowing what your bills should look like. <a href="/scan">Upload any bill to BillKarma</a> for a free line-by-line analysis that flags unusual charges, and check our <a href="/guides/common-hospital-billing-errors">guide to common billing errors</a> to learn what real mistakes look like.
+    <strong>Stay proactive:</strong> The best defense against medical billing scams is knowing what your bills should look like. <a href="/scan">Upload any bill to BillKarma</a> for a free line-by-line analysis that flags unusual charges, and check our <a href="/guides/common-hospital-billing-errors/">guide to common billing errors</a> to learn what real mistakes look like.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>
@@ -276,7 +276,7 @@ register("medical-billing-scams", {
 
     <div class="faq-item">
         <h3>What is the difference between a billing scam and a billing error?</h3>
-        <p>A billing error comes from a real provider you actually visited and involves mistakes like duplicate charges, upcoding, or incorrect patient information. A scam involves a fake bill from someone pretending to be a provider, or a bill for services you never received. If the provider is real and you had an appointment, start by requesting an <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill</a> to check for errors.</p>
+        <p>A billing error comes from a real provider you actually visited and involves mistakes like duplicate charges, upcoding, or incorrect patient information. A scam involves a fake bill from someone pretending to be a provider, or a bill for services you never received. If the provider is real and you had an appointment, start by requesting an <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill</a> to check for errors.</p>
     </div>
 
     <div class="faq-item">
@@ -286,7 +286,7 @@ register("medical-billing-scams", {
 
     <div class="faq-item">
         <h3>Can scammers send me to collections for a fake medical bill?</h3>
-        <p>Scammers cannot send legitimate collection actions, but they may impersonate collection agencies to pressure you into paying. Under the FDCPA, you have the right to request <a href="/guides/medical-bill-collections-rights">debt validation</a> within 30 days of first contact. A legitimate collector must provide the original creditor name, amount owed, and your right to dispute.</p>
+        <p>Scammers cannot send legitimate collection actions, but they may impersonate collection agencies to pressure you into paying. Under the FDCPA, you have the right to request <a href="/guides/medical-bill-collections-rights/">debt validation</a> within 30 days of first contact. A legitimate collector must provide the original creditor name, amount owed, and your right to dispute.</p>
     </div>
 
     <div class="faq-item">

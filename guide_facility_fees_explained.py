@@ -178,7 +178,7 @@ register("hospital-facility-fees-explained", {
 
 <h3>d) Request a Good Faith Estimate</h3>
 
-<p>Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, you have the right to request a Good Faith Estimate from any provider before a scheduled service. This estimate must itemize all expected charges, including facility fees. If you are uninsured or plan to self-pay, the provider is required to give you this estimate without you asking. Use it to compare costs between hospital-based and freestanding locations.</p>
+<p>Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, you have the right to request a Good Faith Estimate from any provider before a scheduled service. This estimate must itemize all expected charges, including facility fees. If you are uninsured or plan to self-pay, the provider is required to give you this estimate without you asking. Use it to compare costs between hospital-based and freestanding locations.</p>
 
 <h3>e) Negotiate or request a self-pay rate</h3>
 
@@ -188,7 +188,7 @@ register("hospital-facility-fees-explained", {
 
 <h2 id="no-surprises-act">6. What the No Surprises Act says about facility fees</h2>
 
-<p>The <a href="/guides/no-surprises-act-explained">No Surprises Act</a> (effective January 1, 2022) does not ban facility fees. However, it created two important protections that apply directly to facility fee billing:</p>
+<p>The <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> (effective January 1, 2022) does not ban facility fees. However, it created two important protections that apply directly to facility fee billing:</p>
 
 <h3>Good Faith Estimate requirement</h3>
 
@@ -213,7 +213,7 @@ register("hospital-facility-fees-explained", {
 
 <h2 id="how-to-dispute">7. How to dispute a facility fee</h2>
 
-<p>Disputing a facility fee is straightforward if you follow these four steps. Most successful disputes are resolved at Step 2 or 3 without formal escalation. For a full walkthrough with letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill">guide to disputing a medical bill</a>.</p>
+<p>Disputing a facility fee is straightforward if you follow these four steps. Most successful disputes are resolved at Step 2 or 3 without formal escalation. For a full walkthrough with letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill/">guide to disputing a medical bill</a>.</p>
 
 <p><strong>Step 1 &mdash; Request an itemized bill.</strong> Call the hospital billing department and request a complete itemized statement with CPT codes, dates of service, and a breakdown of each charge. Look specifically for duplicate facility charges (the same CPT code billed once as a professional fee and again as a facility fee, which is expected, but also a <em>third</em> charge for facility overhead on ancillary services like labs or ECGs that may already be included).</p>
 

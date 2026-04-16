@@ -87,7 +87,7 @@ register("medical-records-rights", {
     </tbody>
 </table>
 
-<p>When requesting records for a billing dispute, ask for the <strong>itemized bill, the clinical notes for the date of service, and the operative report</strong> (if a procedure was performed). These three documents together let you verify whether every charge on your bill corresponds to a service that was actually documented. For more on reading your medical bill, see our <a href="/guides/how-to-read-your-medical-bill">guide to reading medical bills</a>.</p>
+<p>When requesting records for a billing dispute, ask for the <strong>itemized bill, the clinical notes for the date of service, and the operative report</strong> (if a procedure was performed). These three documents together let you verify whether every charge on your bill corresponds to a service that was actually documented. For more on reading your medical bill, see our <a href="/guides/how-to-read-your-medical-bill/">guide to reading medical bills</a>.</p>
 
 <p>Here is an example of how medical records expose billing errors. This patient requested their operative report after receiving a bill for a knee arthroscopy:</p>
 
@@ -206,7 +206,7 @@ register("medical-records-rights", {
 </div>
 
 <div class="key-takeaway">
-    <strong>Getting your records is step one of any billing dispute.</strong> Once you have your clinical notes and itemized bill, <a href="/scan">upload both to BillKarma</a> and we will cross-reference the charges against the documented services. For a complete guide to disputing errors, see our <a href="/guides/how-to-dispute-a-medical-bill">bill dispute guide</a>.
+    <strong>Getting your records is step one of any billing dispute.</strong> Once you have your clinical notes and itemized bill, <a href="/scan">upload both to BillKarma</a> and we will cross-reference the charges against the documented services. For a complete guide to disputing errors, see our <a href="/guides/how-to-dispute-a-medical-bill/">bill dispute guide</a>.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

@@ -129,7 +129,7 @@ register("how-to-choose-health-insurance", {
     <li>You need mental health treatment with weekly sessions ($150&ndash;$250 each, hitting deductible slowly)</li>
 </ul>
 
-<p>For more on HSA strategy, see our <a href="/guides/hsa-fsa-pay-medical-bills">HSA and FSA guide</a>.</p>
+<p>For more on HSA strategy, see our <a href="/guides/hsa-fsa-pay-medical-bills/">HSA and FSA guide</a>.</p>
 
 <h2 id="checklist">4. 5-point plan comparison checklist</h2>
 
@@ -148,7 +148,7 @@ register("how-to-choose-health-insurance", {
     </tbody>
 </table>
 
-<p>For help understanding cost-sharing terms, see our <a href="/guides/copay-vs-coinsurance-vs-deductible">copay vs. coinsurance vs. deductible guide</a> and <a href="/guides/out-of-pocket-maximum">out-of-pocket maximum guide</a>.</p>
+<p>For help understanding cost-sharing terms, see our <a href="/guides/copay-vs-coinsurance-vs-deductible/">copay vs. coinsurance vs. deductible guide</a> and <a href="/guides/out-of-pocket-maximum/">out-of-pocket maximum guide</a>.</p>
 
 <h2 id="where-to-get">5. Where to get coverage</h2>
 
@@ -166,7 +166,7 @@ register("how-to-choose-health-insurance", {
     </tbody>
 </table>
 
-<p>For more on how insurance works, see our <a href="/guides/how-health-insurance-works">health insurance basics guide</a>.</p>
+<p>For more on how insurance works, see our <a href="/guides/how-health-insurance-works/">health insurance basics guide</a>.</p>
 
 <h2 id="mistakes">6. 5 costly mistakes to avoid</h2>
 
@@ -174,7 +174,7 @@ register("how-to-choose-health-insurance", {
 <p>The lowest premium plan often costs the most overall. Always calculate total annual cost across multiple scenarios.</p>
 
 <h3>b) Not checking your doctor&rsquo;s network status</h3>
-<p>Switching plans without verifying your doctors are in-network is one of the most common and expensive mistakes. See our <a href="/guides/how-to-check-doctor-in-network">guide to checking network status</a>.</p>
+<p>Switching plans without verifying your doctors are in-network is one of the most common and expensive mistakes. See our <a href="/guides/how-to-check-doctor-in-network/">guide to checking network status</a>.</p>
 
 <h3>c) Ignoring the drug formulary</h3>
 <p>Check that your regular medications are covered and at what tier. A Tier 3 drug might cost $75/month on one plan and $15/month on another.</p>

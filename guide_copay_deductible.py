@@ -148,7 +148,7 @@ register("copay-vs-coinsurance-vs-deductible", {
     </tbody>
 </table>
 
-<p>The &ldquo;out-of-network&rdquo; row is important: most PPO plans have separate — and higher — deductibles and out-of-pocket maximums for out-of-network care. If you see &ldquo;out-of-network&rdquo; on an EOB for a provider you thought was in-network, that&rsquo;s worth disputing immediately. See our <a href="/guides/balance-billing-and-surprise-medical-bills">guide to balance billing</a> for details.</p>
+<p>The &ldquo;out-of-network&rdquo; row is important: most PPO plans have separate — and higher — deductibles and out-of-pocket maximums for out-of-network care. If you see &ldquo;out-of-network&rdquo; on an EOB for a provider you thought was in-network, that&rsquo;s worth disputing immediately. See our <a href="/guides/balance-billing-and-surprise-medical-bills/">guide to balance billing</a> for details.</p>
 
 <h2 id="common-errors">5. Five cost-sharing billing errors to look for</h2>
 
@@ -206,7 +206,7 @@ register("copay-vs-coinsurance-vs-deductible", {
 <div class="case-study">
     <h3>Anesthesiologist billed out-of-network at in-network facility</h3>
     <p>A patient in Georgia had knee surgery at an in-network hospital. His surgeon and facility were in-network. The anesthesiologist was not — and billed separately at out-of-network rates, triggering a $1,800 coinsurance charge instead of the $300 copay he expected.</p>
-    <p>Under the <a href="/guides/balance-billing-and-surprise-medical-bills">No Surprises Act</a>, the anesthesiologist&rsquo;s out-of-network charges were limited to in-network cost-sharing. After filing a complaint, the patient&rsquo;s cost-sharing was corrected. <strong>Savings: $1,500.</strong></p>
+    <p>Under the <a href="/guides/balance-billing-and-surprise-medical-bills/">No Surprises Act</a>, the anesthesiologist&rsquo;s out-of-network charges were limited to in-network cost-sharing. After filing a complaint, the patient&rsquo;s cost-sharing was corrected. <strong>Savings: $1,500.</strong></p>
 </div>
 
 <div class="case-study">

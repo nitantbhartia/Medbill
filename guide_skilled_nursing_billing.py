@@ -86,7 +86,7 @@ register("skilled-nursing-facility-billing", {
 <p>A <strong>benefit period</strong> begins the day you are admitted as an inpatient to a hospital and ends when you have been out of a hospital or SNF for 60 consecutive days. If you are readmitted after 60 days, a new benefit period begins and the 100-day clock resets. This matters because patients who cycle between hospital and SNF within the same benefit period continue using their existing 100 days rather than starting over.</p>
 
 <div class="key-takeaway">
-    <strong>Key point:</strong> The three-day hospital stay requirement means observation status does not count. If your hospital stay was classified as observation rather than inpatient, Medicare will deny your SNF coverage entirely. See our <a href="/guides/observation-status">observation status guide</a> for how to check and appeal your status. If you already have a SNF bill in hand, <a href="/scan">upload it to BillKarma</a> — we will flag coverage issues, coinsurance miscalculations, and line-item errors in minutes.
+    <strong>Key point:</strong> The three-day hospital stay requirement means observation status does not count. If your hospital stay was classified as observation rather than inpatient, Medicare will deny your SNF coverage entirely. See our <a href="/guides/observation-status/">observation status guide</a> for how to check and appeal your status. If you already have a SNF bill in hand, <a href="/scan">upload it to BillKarma</a> — we will flag coverage issues, coinsurance miscalculations, and line-item errors in minutes.
 </div>
 
 <h2 id="qualifying">2. How to qualify for Medicare SNF coverage</h2>
@@ -160,7 +160,7 @@ register("skilled-nursing-facility-billing", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Important:</strong> If your SNF coverage is denied while you are still in the facility, the SNF must give you an Advance Beneficiary Notice (ABN) before charging you privately. Do not sign the ABN without understanding that it means you are agreeing to pay out of pocket. You have the right to appeal the denial before accepting private-pay responsibility. For step-by-step appeal instructions, see our <a href="/guides/how-to-appeal-a-medical-bill-denial">appeal guide</a>.
+    <strong>Important:</strong> If your SNF coverage is denied while you are still in the facility, the SNF must give you an Advance Beneficiary Notice (ABN) before charging you privately. Do not sign the ABN without understanding that it means you are agreeing to pay out of pocket. You have the right to appeal the denial before accepting private-pay responsibility. For step-by-step appeal instructions, see our <a href="/guides/how-to-appeal-a-medical-bill-denial/">appeal guide</a>.
 </div>
 
 <h2 id="appeals">5. How to appeal a Medicare SNF denial</h2>
@@ -195,7 +195,7 @@ register("skilled-nursing-facility-billing", {
     <li><strong>Spousal protections:</strong> If one spouse needs nursing home care, the community spouse (the one still living at home) can keep a portion of the couple's assets — the Community Spouse Resource Allowance, which ranges from approximately $30,000 to $154,000 depending on the state.</li>
 </ul>
 
-<p>Medicaid has a <strong>five-year lookback period</strong> for asset transfers. If you gave away assets within five years of applying for Medicaid, those transfers can trigger a penalty period during which Medicaid will not pay for your care. This is why families should consult an elder law attorney well before a nursing home admission is imminent. Many nonprofit SNFs also offer <a href="/guides/hospital-financial-assistance-guide">financial assistance programs</a> separate from Medicaid — check your facility's charity care policy before assuming you must pay the full private rate.</p>
+<p>Medicaid has a <strong>five-year lookback period</strong> for asset transfers. If you gave away assets within five years of applying for Medicaid, those transfers can trigger a penalty period during which Medicaid will not pay for your care. This is why families should consult an elder law attorney well before a nursing home admission is imminent. Many nonprofit SNFs also offer <a href="/guides/hospital-financial-assistance-guide/">financial assistance programs</a> separate from Medicaid — check your facility's charity care policy before assuming you must pay the full private rate.</p>
 
 <p><strong>The application process</strong> typically takes 45 to 90 days. During the gap between Medicare coverage ending and Medicaid approval, the SNF may require private pay. Many facilities will accept a "Medicaid pending" status, meaning they will bill Medicaid retroactively once the application is approved. However, not all facilities accept Medicaid patients, and Medicaid beds may be limited. Before choosing a SNF, check whether the facility accepts Medicaid and review its billing practices in our <a href="/hospitals/">hospital directory</a>.</p>
 
@@ -221,7 +221,7 @@ register("skilled-nursing-facility-billing", {
 
     <div class="faq-item">
         <h3>What qualifies me for Medicare SNF coverage?</h3>
-        <p>You need three things: a qualifying three-day inpatient hospital stay (observation status does not count), admission to a Medicare-certified SNF within 30 days of discharge, and a physician certification that you need daily skilled nursing or therapy services. See our <a href="/guides/observation-status">observation status guide</a> to verify your hospital stay classification.</p>
+        <p>You need three things: a qualifying three-day inpatient hospital stay (observation status does not count), admission to a Medicare-certified SNF within 30 days of discharge, and a physician certification that you need daily skilled nursing or therapy services. See our <a href="/guides/observation-status/">observation status guide</a> to verify your hospital stay classification.</p>
     </div>
 
     <div class="faq-item">
@@ -231,12 +231,12 @@ register("skilled-nursing-facility-billing", {
 
     <div class="faq-item">
         <h3>Can I appeal a Medicare SNF coverage denial?</h3>
-        <p>Yes, and you should. SNF denials are among the most successfully appealed Medicare decisions. File a Level 1 redetermination within 120 days, then escalate to reconsideration and an ALJ hearing if needed. Include detailed physician documentation of why skilled care remains necessary. Our <a href="/guides/how-to-appeal-a-medical-bill-denial">appeal guide</a> walks through each level.</p>
+        <p>Yes, and you should. SNF denials are among the most successfully appealed Medicare decisions. File a Level 1 redetermination within 120 days, then escalate to reconsideration and an ALJ hearing if needed. Include detailed physician documentation of why skilled care remains necessary. Our <a href="/guides/how-to-appeal-a-medical-bill-denial/">appeal guide</a> walks through each level.</p>
     </div>
 
     <div class="faq-item">
         <h3>Does Medicaid cover skilled nursing facility costs?</h3>
-        <p>Yes, for those who qualify financially. Medicaid is the largest payer of long-term nursing home care in the US. Eligibility requires meeting strict income and asset limits (typically under $2,000 in assets for an individual). Medicaid covers the full daily rate with no coinsurance but has a five-year lookback period for asset transfers. If you do not qualify for Medicaid, you may still be able to <a href="/guides/how-to-negotiate-a-medical-bill">negotiate the private-pay rate</a> directly with the facility.</p>
+        <p>Yes, for those who qualify financially. Medicaid is the largest payer of long-term nursing home care in the US. Eligibility requires meeting strict income and asset limits (typically under $2,000 in assets for an individual). Medicaid covers the full daily rate with no coinsurance but has a five-year lookback period for asset transfers. If you do not qualify for Medicaid, you may still be able to <a href="/guides/how-to-negotiate-a-medical-bill/">negotiate the private-pay rate</a> directly with the facility.</p>
     </div>
 </div>
 

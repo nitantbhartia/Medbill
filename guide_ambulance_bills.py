@@ -156,7 +156,7 @@ register("how-to-fight-an-ambulance-bill", {
 
 <p>In states that <strong>have not</strong> adopted protections, you can still be balance billed the full difference between the ambulance company&rsquo;s charge and what your insurer pays. This is why negotiation (Section 6 below) is critical.</p>
 
-<p>Check your state&rsquo;s status at your state insurance commissioner&rsquo;s website, or see our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a> for details.</p>
+<p>Check your state&rsquo;s status at your state insurance commissioner&rsquo;s website, or see our <a href="/guides/no-surprises-act-explained/">full No Surprises Act guide</a> for details.</p>
 
 <h2 id="appeal-insurance-denial">5. How to appeal an insurance denial</h2>
 

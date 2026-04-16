@@ -110,7 +110,7 @@ register("patient-rights-emergency-room", {
 
 <p>Once you are stabilized, the No Surprises Act protections can end&mdash;but <strong>only if</strong> you give informed consent. The out-of-network provider must give you written notice that they are out of network, provide an estimate of charges, and explain that you have the right to be transferred to an in-network provider. You must sign this consent at least 72 hours before the service (or at the time of scheduling for services scheduled less than 72 hours in advance). If you did not sign a consent form, you are still protected.</p>
 
-<p>For a deeper dive into how the No Surprises Act works across all healthcare settings, see our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a>.</p>
+<p>For a deeper dive into how the No Surprises Act works across all healthcare settings, see our <a href="/guides/no-surprises-act-explained/">full No Surprises Act guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>If you see a balance bill from your ER visit:</strong> Check whether the provider is billing you for the difference between their charge and what your insurance paid. Under the No Surprises Act, this is illegal for emergency services. <a href="/scan">Upload your ER bill to BillKarma</a> &mdash; we&rsquo;ll flag potential No Surprises Act violations, upcoding, duplicate charges, and excessive markups automatically.
@@ -157,7 +157,7 @@ register("patient-rights-emergency-room", {
     <li><strong>Provider name</strong> associated with each charge</li>
 </ul>
 
-<p>If the hospital sends you a one-page summary with a single total, call billing and specifically request an itemized statement with CPT codes. For a step-by-step walkthrough, see our <a href="/guides/how-to-get-itemized-hospital-bill">guide to getting your itemized hospital bill</a>.</p>
+<p>If the hospital sends you a one-page summary with a single total, call billing and specifically request an itemized statement with CPT codes. For a step-by-step walkthrough, see our <a href="/guides/how-to-get-itemized-hospital-bill/">guide to getting your itemized hospital bill</a>.</p>
 
 <h2 id="hospitals-cant-do">5. Things hospitals CAN&rsquo;T do</h2>
 
@@ -250,7 +250,7 @@ register("patient-rights-emergency-room", {
 
 <h3>They CAN charge facility fees</h3>
 
-<p>On top of the physician&rsquo;s fee, the hospital charges a separate facility fee for using the emergency department. This fee covers 24/7 staffing, equipment, and overhead. Facility fees range from $500 to $3,500+ depending on the ER visit level. This is legal&mdash;but the amount can be disputed if it is out of proportion to the services you received. Learn more in our <a href="/guides/hospital-facility-fees-explained">hospital facility fees guide</a>.</p>
+<p>On top of the physician&rsquo;s fee, the hospital charges a separate facility fee for using the emergency department. This fee covers 24/7 staffing, equipment, and overhead. Facility fees range from $500 to $3,500+ depending on the ER visit level. This is legal&mdash;but the amount can be disputed if it is out of proportion to the services you received. Learn more in our <a href="/guides/hospital-facility-fees-explained/">hospital facility fees guide</a>.</p>
 
 <h3>They CAN have you wait</h3>
 
@@ -295,7 +295,7 @@ register("patient-rights-emergency-room", {
 
 <h3>a) Request an itemized bill before you leave</h3>
 
-<p>Ask the billing or registration desk for an itemized statement before you are discharged. Many hospitals won&rsquo;t provide one on the spot, but making the request creates a record. Follow up in writing within 48 hours. You need the itemized bill with CPT codes to identify overcharges, duplicate charges, and upcoding. See our <a href="/guides/how-to-get-itemized-hospital-bill">step-by-step guide to getting your itemized bill</a>.</p>
+<p>Ask the billing or registration desk for an itemized statement before you are discharged. Many hospitals won&rsquo;t provide one on the spot, but making the request creates a record. Follow up in writing within 48 hours. You need the itemized bill with CPT codes to identify overcharges, duplicate charges, and upcoding. See our <a href="/guides/how-to-get-itemized-hospital-bill/">step-by-step guide to getting your itemized bill</a>.</p>
 
 <h3>b) Photograph all paperwork</h3>
 
@@ -307,7 +307,7 @@ register("patient-rights-emergency-room", {
 
 <h3>d) Ask for financial assistance information</h3>
 
-<p>Before you leave the ER, ask for the hospital&rsquo;s financial assistance application. All nonprofit hospitals (about 60% of U.S. hospitals) are required to have a financial assistance policy under IRS Section 501(r). Many patients qualify even with moderate incomes&mdash;thresholds often extend to 300&ndash;400% of the federal poverty level. Don&rsquo;t assume you won&rsquo;t qualify; apply and find out. See our <a href="/guides/hospital-financial-assistance-guide">hospital financial assistance guide</a> for more details.</p>
+<p>Before you leave the ER, ask for the hospital&rsquo;s financial assistance application. All nonprofit hospitals (about 60% of U.S. hospitals) are required to have a financial assistance policy under IRS Section 501(r). Many patients qualify even with moderate incomes&mdash;thresholds often extend to 300&ndash;400% of the federal poverty level. Don&rsquo;t assume you won&rsquo;t qualify; apply and find out. See our <a href="/guides/hospital-financial-assistance-guide/">hospital financial assistance guide</a> for more details.</p>
 
 <h3>e) Don&rsquo;t sign anything you don&rsquo;t understand</h3>
 
@@ -323,7 +323,7 @@ register("patient-rights-emergency-room", {
 
 {_embed(mode="markup", title="Check your ER bill charges", subtitle="Enter a CPT code and billed amount to compare against Medicare benchmarks.", height="420")}
 
-<p>Want to understand why your ER bill is so high in the first place? Our <a href="/guides/why-emergency-room-bills-are-so-high">guide to ER bill costs</a> breaks down the anatomy of an ER bill, explains how visit levels drive charges, and shows you exactly where to focus your dispute.</p>
+<p>Want to understand why your ER bill is so high in the first place? Our <a href="/guides/why-emergency-room-bills-are-so-high/">guide to ER bill costs</a> breaks down the anatomy of an ER bill, explains how visit levels drive charges, and shows you exactly where to focus your dispute.</p>
 
 <p>If you&rsquo;re dealing with medical debt from an ER visit you couldn&rsquo;t afford, our <a href="/fight-debt">debt relief resources</a> can help you understand your options for negotiation, settlement, and financial assistance.</p>
 

@@ -142,7 +142,7 @@ register("mental-health-billing-and-parity-rights", {
     <li><strong>Your cost-sharing</strong> — Compare your copay or coinsurance for mental health against what you pay for primary care or specialist visits. They should be the same within each classification.</li>
 </ol>
 
-<p>See our <a href="/guides/how-to-read-your-eob">complete EOB guide</a> for help reading each section of your explanation of benefits.</p>
+<p>See our <a href="/guides/how-to-read-your-eob/">complete EOB guide</a> for help reading each section of your explanation of benefits.</p>
 
 <h2 id="appeal-a-denial">5. How to appeal a mental health claim denial</h2>
 
@@ -178,7 +178,7 @@ register("mental-health-billing-and-parity-rights", {
     <li><strong>Parity applies to OON benefits too.</strong> If your plan covers 70% of out-of-network surgeon fees, it must cover 70% of out-of-network psychiatrist fees. The coinsurance rate cannot be higher for mental health.</li>
     <li><strong>Submit claims for reimbursement.</strong> Even if your provider doesn't bill insurance directly, you can submit "superbills" (itemized receipts with CPT codes) to your insurer for out-of-network reimbursement.</li>
     <li><strong>Request a network adequacy exception.</strong> If no in-network providers are accepting new patients in your area, you can request that your insurer grant out-of-network coverage at in-network cost-sharing. Document your search attempts first—call at least 5–10 in-network providers and note that they're not accepting new patients or have wait times over 45 days.</li>
-    <li><strong>Check the No Surprises Act.</strong> Some mental health services in hospital settings may be covered by No Surprises Act protections. See our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a> for details.</li>
+    <li><strong>Check the No Surprises Act.</strong> Some mental health services in hospital settings may be covered by No Surprises Act protections. See our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a> for details.</li>
 </ul>
 
 <div class="key-takeaway">

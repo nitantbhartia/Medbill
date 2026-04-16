@@ -71,7 +71,7 @@ register("average-cost-of-childbirth-2026", {
 <p>These figures include the facility charge, professional fees, anesthesia, labs, and standard newborn care. They do not include prenatal care ($2,000&ndash;$4,000 over the pregnancy) or the separate pediatrician bill for the baby&rsquo;s hospital stay. If your baby requires NICU time, costs escalate rapidly &mdash; a single day in the NICU averages $3,500&ndash;$5,000.</p>
 
 <div class="key-takeaway">
-    <strong>Insurance matters enormously.</strong> The difference between an insured and uninsured vaginal delivery can be $15,000 or more. If you&rsquo;re uninsured or on a high-deductible plan, apply for <a href="/guides/hospital-financial-assistance-charity-care">hospital financial assistance (charity care)</a> before delivery. Most hospitals are legally required to offer discounts to patients below 300&ndash;400% of the federal poverty level. You don&rsquo;t need to be broke to qualify.
+    <strong>Insurance matters enormously.</strong> The difference between an insured and uninsured vaginal delivery can be $15,000 or more. If you&rsquo;re uninsured or on a high-deductible plan, apply for <a href="/guides/hospital-financial-assistance-charity-care/">hospital financial assistance (charity care)</a> before delivery. Most hospitals are legally required to offer discounts to patients below 300&ndash;400% of the federal poverty level. You don&rsquo;t need to be broke to qualify.
 </div>
 
 <h2 id="vaginal-vs-csection">2. Vaginal delivery vs. C-section costs</h2>
@@ -212,10 +212,10 @@ register("average-cost-of-childbirth-2026", {
 
 <p>The three flagged charges total <strong>$2,160</strong> &mdash; charges that are commonly disputed and often removed. The discharge management fee is frequently bundled into room and board. The nursery charge doesn&rsquo;t apply if the baby stayed in the mother&rsquo;s room. And the skin-to-skin charge &mdash; yes, some hospitals actually charge for placing your baby on your chest after delivery &mdash; has drawn national criticism and is increasingly waived when challenged.</p>
 
-<p>Remember: you will also receive separate bills from the anesthesiologist, the baby&rsquo;s pediatrician, and any specialists involved. For a detailed guide on reading each line item, see our <a href="/guides/maternity-hospital-bill">maternity hospital bill guide</a>.</p>
+<p>Remember: you will also receive separate bills from the anesthesiologist, the baby&rsquo;s pediatrician, and any specialists involved. For a detailed guide on reading each line item, see our <a href="/guides/maternity-hospital-bill/">maternity hospital bill guide</a>.</p>
 
 <div class="key-takeaway">
-    <strong>Request your itemized bill immediately.</strong> Don&rsquo;t wait for it to arrive. Call the hospital billing department within 48 hours of discharge and request a full itemized statement with CPT and revenue codes. The sooner you review it, the easier it is to dispute errors while the medical records are fresh. See our guide on <a href="/guides/how-to-get-itemized-hospital-bill">how to get an itemized hospital bill</a>.
+    <strong>Request your itemized bill immediately.</strong> Don&rsquo;t wait for it to arrive. Call the hospital billing department within 48 hours of discharge and request a full itemized statement with CPT and revenue codes. The sooner you review it, the easier it is to dispute errors while the medical records are fresh. See our guide on <a href="/guides/how-to-get-itemized-hospital-bill/">how to get an itemized hospital bill</a>.
 </div>
 
 <h2 id="hidden-charges">5. Hidden charges to watch for</h2>
@@ -258,7 +258,7 @@ register("average-cost-of-childbirth-2026", {
 
 <h3>c) Pre-negotiate with your hospital</h3>
 
-<p>You know you&rsquo;re having a baby &mdash; use that lead time. At 30&ndash;32 weeks, call the hospital&rsquo;s billing department and request a Good Faith Estimate for your expected delivery type. If you&rsquo;re uninsured or self-pay, ask about their cash-pay rate and <a href="/guides/hospital-financial-assistance-charity-care">financial assistance program</a>. Many hospitals offer 30&ndash;60% discounts for patients who arrange payment before delivery.</p>
+<p>You know you&rsquo;re having a baby &mdash; use that lead time. At 30&ndash;32 weeks, call the hospital&rsquo;s billing department and request a Good Faith Estimate for your expected delivery type. If you&rsquo;re uninsured or self-pay, ask about their cash-pay rate and <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance program</a>. Many hospitals offer 30&ndash;60% discounts for patients who arrange payment before delivery.</p>
 
 <h3>d) Verify every provider is in-network</h3>
 
@@ -266,11 +266,11 @@ register("average-cost-of-childbirth-2026", {
 
 <h3>e) Apply for financial assistance early</h3>
 
-<p>If your household income is below 300&ndash;400% of the federal poverty level ($93,600 for a family of four in 2026), you may qualify for hospital financial assistance that covers 50&ndash;100% of the bill. Apply before delivery &mdash; most hospitals have dedicated maternity financial counselors. See our <a href="/guides/hospital-financial-assistance-charity-care">charity care guide</a> for eligibility details and application tips.</p>
+<p>If your household income is below 300&ndash;400% of the federal poverty level ($93,600 for a family of four in 2026), you may qualify for hospital financial assistance that covers 50&ndash;100% of the bill. Apply before delivery &mdash; most hospitals have dedicated maternity financial counselors. See our <a href="/guides/hospital-financial-assistance-charity-care/">charity care guide</a> for eligibility details and application tips.</p>
 
 <h3>f) Negotiate after delivery</h3>
 
-<p>Even after the bill arrives, you have leverage. Use our <a href="/calculator">calculator</a> to compare each charge against the Medicare rate. If the hospital is charging 3&ndash;5x the Medicare rate, call billing and ask for a &ldquo;fair rate adjustment&rdquo; or self-pay discount. For specific negotiation scripts and strategies, see our <a href="/guides/how-to-negotiate-medical-bills">guide to negotiating medical bills</a>.</p>
+<p>Even after the bill arrives, you have leverage. Use our <a href="/calculator">calculator</a> to compare each charge against the Medicare rate. If the hospital is charging 3&ndash;5x the Medicare rate, call billing and ask for a &ldquo;fair rate adjustment&rdquo; or self-pay discount. For specific negotiation scripts and strategies, see our <a href="/guides/how-to-negotiate-medical-bills/">guide to negotiating medical bills</a>.</p>
 
 <div class="case-study">
     <h3>Birth center saved $14,200 over hospital delivery</h3>
@@ -284,7 +284,7 @@ register("average-cost-of-childbirth-2026", {
 
 <h2 id="audit-your-bill">7. How to audit your childbirth bill for errors</h2>
 
-<p>Maternity bills have a higher error rate than almost any other hospital bill because they involve multiple providers, separate mother and baby accounts, and dozens of line items across a 24&ndash;96 hour stay. Follow these steps to audit yours. For a comprehensive approach, see our <a href="/guides/how-to-get-itemized-hospital-bill">itemized bill guide</a>.</p>
+<p>Maternity bills have a higher error rate than almost any other hospital bill because they involve multiple providers, separate mother and baby accounts, and dozens of line items across a 24&ndash;96 hour stay. Follow these steps to audit yours. For a comprehensive approach, see our <a href="/guides/how-to-get-itemized-hospital-bill/">itemized bill guide</a>.</p>
 
 <p><strong>Step 1 &mdash; Get all your bills in one place.</strong> You will receive separate bills from: the hospital (facility), your OB or midwife, the anesthesiologist, the baby&rsquo;s pediatrician, the lab, and any specialists. Request itemized statements from each one. Don&rsquo;t start auditing until you have them all.</p>
 
@@ -294,7 +294,7 @@ register("average-cost-of-childbirth-2026", {
 
 <p><strong>Step 4 &mdash; Compare against Medicare rates.</strong> Use the <a href="/calculator">BillKarma calculator</a> to look up the Medicare allowed amount for each CPT code. Any charge exceeding 3x the Medicare rate is worth questioning. Hospital chargemaster prices are often 4&ndash;10x Medicare rates, but that doesn&rsquo;t mean you should pay them.</p>
 
-<p><strong>Step 5 &mdash; Submit disputes in writing.</strong> For each error or inflated charge, write a clear dispute stating the CPT code, the amount charged, the reason for the dispute, and your requested resolution. Send by certified mail. For dispute letter templates, see our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.</p>
+<p><strong>Step 5 &mdash; Submit disputes in writing.</strong> For each error or inflated charge, write a clear dispute stating the CPT code, the amount charged, the reason for the dispute, and your requested resolution. Send by certified mail. For dispute letter templates, see our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>Don&rsquo;t audit alone.</strong> <a href="/scan">Upload your childbirth bill to BillKarma</a> and we&rsquo;ll flag duplicate charges, upcoded procedures, phantom nursery fees, and every line item that exceeds the Medicare benchmark. Our audit catches errors on 58% of maternity bills &mdash; the average finding is $2,400 in disputable charges.

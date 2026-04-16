@@ -286,7 +286,7 @@ register("rehabilitation-billing", {
 <div class="key-takeaway">
     <strong>Important:</strong> If you receive a denial notice, do not ignore it. You have the right to
     appeal, and IRF denials are frequently overturned when supported by detailed therapy documentation.
-    For step-by-step instructions, see our <a href="/guides/how-to-appeal-insurance-denial">appeal guide</a>.
+    For step-by-step instructions, see our <a href="/guides/how-to-appeal-insurance-denial/">appeal guide</a>.
     You can also <a href="/scan">upload your rehab bill to BillKarma</a> to identify line-item errors
     or overcharges that can strengthen your appeal.
 </div>
@@ -322,7 +322,7 @@ register("rehabilitation-billing", {
     discipline, the rehabilitation physician's notes from each face-to-face visit, the initial functional
     assessment and discharge assessment, and a letter from your treating physician explaining why a SNF
     setting would not have been appropriate. For guidance on writing your appeal letter, see our
-    <a href="/guides/medical-bill-dispute-letter">dispute letter template guide</a>.
+    <a href="/guides/medical-bill-dispute-letter/">dispute letter template guide</a>.
 </p>
 
 <div class="bill-example">
@@ -383,7 +383,7 @@ register("rehabilitation-billing", {
     </p>
     <p>
         For more on skilled nursing facility coverage, see our
-        <a href="/guides/skilled-nursing-facility-billing">SNF billing guide</a>.
+        <a href="/guides/skilled-nursing-facility-billing/">SNF billing guide</a>.
     </p>
 </div>
 
@@ -420,7 +420,7 @@ register("rehabilitation-billing", {
 
     <div class="faq-item">
         <h3>What is the difference between an IRF and a SNF?</h3>
-        <p>An IRF provides intensive, hospital-level rehabilitation with 3 hours of daily therapy and frequent physician supervision. A SNF provides lower-intensity rehabilitation with no minimum therapy hours. IRF stays are shorter (12&ndash;16 days) but cost 2&ndash;4 times more than SNF stays (25&ndash;35 days). See our <a href="/guides/skilled-nursing-facility-billing">skilled nursing facility guide</a> for SNF-specific rules.</p>
+        <p>An IRF provides intensive, hospital-level rehabilitation with 3 hours of daily therapy and frequent physician supervision. A SNF provides lower-intensity rehabilitation with no minimum therapy hours. IRF stays are shorter (12&ndash;16 days) but cost 2&ndash;4 times more than SNF stays (25&ndash;35 days). See our <a href="/guides/skilled-nursing-facility-billing/">skilled nursing facility guide</a> for SNF-specific rules.</p>
     </div>
 
     <div class="faq-item">
@@ -430,7 +430,7 @@ register("rehabilitation-billing", {
 
     <div class="faq-item">
         <h3>Can I appeal a denied inpatient rehab claim?</h3>
-        <p>Yes. IRF denials are frequently overturned on appeal, especially at the ALJ hearing level. File a Level 1 redetermination within 120 days and include daily therapy logs, physician documentation of medical necessity, and functional assessment scores. Our <a href="/guides/how-to-appeal-insurance-denial">appeal guide</a> provides a step-by-step walkthrough.</p>
+        <p>Yes. IRF denials are frequently overturned on appeal, especially at the ALJ hearing level. File a Level 1 redetermination within 120 days and include daily therapy logs, physician documentation of medical necessity, and functional assessment scores. Our <a href="/guides/how-to-appeal-insurance-denial/">appeal guide</a> provides a step-by-step walkthrough.</p>
     </div>
 
     <div class="faq-item">

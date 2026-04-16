@@ -114,7 +114,7 @@ register("knee-replacement-surgery-cost", {
 
 <p><strong>Your cost on Original Medicare:</strong> You pay the Part A deductible ($1,676 in 2026) for the hospital stay. Days 1&ndash;60 are fully covered after the deductible. If you have a Medigap supplement, it may cover the deductible too.</p>
 
-<p><strong>Important:</strong> If your surgeon is &ldquo;non-participating&rdquo; with Medicare, they can charge up to 15% above the Medicare-approved amount. Always confirm your surgeon is Medicare-participating before scheduling. See our <a href="/guides/medicare-billing">Medicare billing guide</a> for more.</p>
+<p><strong>Important:</strong> If your surgeon is &ldquo;non-participating&rdquo; with Medicare, they can charge up to 15% above the Medicare-approved amount. Always confirm your surgeon is Medicare-participating before scheduling. See our <a href="/guides/medicare-billing/">Medicare billing guide</a> for more.</p>
 
 <h2 id="partial-vs-total">4. Partial vs. total knee replacement</h2>
 
@@ -182,7 +182,7 @@ register("knee-replacement-surgery-cost", {
 <p>Ask your surgeon whether a standard implant will provide the same outcome as a premium/custom one. Many surgeons have implant preferences based on training rather than clinical evidence. A $6,000 implant may work just as well as a $12,000 one for your situation.</p>
 
 <h3>e) Apply for financial assistance</h3>
-<p>If you&rsquo;re uninsured or underinsured, apply for the hospital&rsquo;s financial assistance program before surgery. Nonprofit hospitals are required to have charity care policies. Many offer 50&ndash;100% discounts for patients below 300&ndash;400% of the federal poverty level. See our <a href="/guides/hospital-financial-assistance-charity-care">financial assistance guide</a>.</p>
+<p>If you&rsquo;re uninsured or underinsured, apply for the hospital&rsquo;s financial assistance program before surgery. Nonprofit hospitals are required to have charity care policies. Many offer 50&ndash;100% discounts for patients below 300&ndash;400% of the federal poverty level. See our <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance guide</a>.</p>
 
 <div class="case-study">
     <h3>$47,000 bill reduced to $14,200</h3>

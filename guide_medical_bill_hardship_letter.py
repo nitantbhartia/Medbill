@@ -53,7 +53,7 @@ register("medical-bill-hardship-letter", {
 
 <h2 id="what-is-hardship-letter">1. What is a medical bill hardship letter?</h2>
 
-<p>A medical bill hardship letter is a formal written request asking a hospital or medical provider to reduce or forgive your bill because you cannot afford to pay it. The letter explains your financial circumstances &mdash; income, household size, monthly expenses, and the event that created the hardship &mdash; and asks the provider to apply their <a href="/guides/hospital-financial-assistance-charity-care">financial assistance or charity care program</a> to your account.</p>
+<p>A medical bill hardship letter is a formal written request asking a hospital or medical provider to reduce or forgive your bill because you cannot afford to pay it. The letter explains your financial circumstances &mdash; income, household size, monthly expenses, and the event that created the hardship &mdash; and asks the provider to apply their <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance or charity care program</a> to your account.</p>
 
 <p>Hardship letters work because most hospitals have financial assistance policies they are required to follow. Under IRS Section 501(r), every nonprofit hospital in the United States must maintain a written financial assistance policy (FAP), publicize it to patients, and process applications before pursuing collections. Over <strong>60% of U.S. hospitals</strong> are nonprofits bound by this rule. Even for-profit hospitals often have discretionary hardship programs, though they are not legally required to offer them.</p>
 
@@ -85,7 +85,7 @@ register("medical-bill-hardship-letter", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Do not wait for a &ldquo;final notice.&rdquo;</strong> Many patients assume they need to exhaust all other options before requesting hardship assistance. The opposite is true. Hospitals prefer to process financial assistance applications early. If you know you <a href="/guides/cant-afford-medical-bill">can&rsquo;t afford your bill</a>, send your hardship letter as soon as possible.
+    <strong>Do not wait for a &ldquo;final notice.&rdquo;</strong> Many patients assume they need to exhaust all other options before requesting hardship assistance. The opposite is true. Hospitals prefer to process financial assistance applications early. If you know you <a href="/guides/cant-afford-medical-bill/">can&rsquo;t afford your bill</a>, send your hardship letter as soon as possible.
 </div>
 
 <h3>Timing red flags</h3>
@@ -274,7 +274,7 @@ Sincerely,
 <ul>
     <li><strong>100% write-off</strong> &mdash; The entire balance is forgiven. You owe nothing.</li>
     <li><strong>Sliding-scale discount</strong> &mdash; Your bill is reduced by 50&ndash;90% based on your income relative to FPL.</li>
-    <li><strong>Reduced balance with payment plan</strong> &mdash; The bill is reduced and the remaining amount is placed on a 0% interest <a href="/guides/cant-afford-medical-bill">payment plan</a>.</li>
+    <li><strong>Reduced balance with payment plan</strong> &mdash; The bill is reduced and the remaining amount is placed on a 0% interest <a href="/guides/cant-afford-medical-bill/">payment plan</a>.</li>
 </ul>
 
 <h3>If you are denied</h3>
@@ -283,7 +283,7 @@ Sincerely,
     <li>Request the denial reason in writing</li>
     <li>Appeal with additional documentation (updated income info, additional hardship circumstances)</li>
     <li>Ask to speak with a patient advocate or financial counselor supervisor</li>
-    <li>Apply for a <a href="/guides/medical-debt-forgiveness-programs">medical debt forgiveness program</a> or negotiate a <a href="/guides/how-to-negotiate-medical-bills">reduced settlement</a> directly</li>
+    <li>Apply for a <a href="/guides/medical-debt-forgiveness-programs/">medical debt forgiveness program</a> or negotiate a <a href="/guides/how-to-negotiate-medical-bills/">reduced settlement</a> directly</li>
 </ul>
 
 <div class="case-study">
@@ -327,7 +327,7 @@ Sincerely,
 
     <div class="faq-item">
         <h3>What happens if my hardship letter is denied?</h3>
-        <p>If your hardship letter is denied, request the denial in writing with the specific reason. Common reasons include missing documents, income above the threshold, or applying past the deadline. You can appeal by submitting additional documentation, requesting a supervisor review, or escalating to the hospital&rsquo;s patient advocate. You can also <a href="/guides/how-to-negotiate-medical-bills">negotiate a payment plan or reduced settlement</a> even after a denial.</p>
+        <p>If your hardship letter is denied, request the denial in writing with the specific reason. Common reasons include missing documents, income above the threshold, or applying past the deadline. You can appeal by submitting additional documentation, requesting a supervisor review, or escalating to the hospital&rsquo;s patient advocate. You can also <a href="/guides/how-to-negotiate-medical-bills/">negotiate a payment plan or reduced settlement</a> even after a denial.</p>
     </div>
 
     <div class="faq-item">

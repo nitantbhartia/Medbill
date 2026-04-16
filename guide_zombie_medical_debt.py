@@ -152,7 +152,7 @@ register("zombie-medical-debt", {
 
 <h3>Step 3: Send a debt validation letter within 30 days</h3>
 
-<p>Even for zombie debt, send a <a href="/guides/debt-validation-letter-medical-debt">validation letter</a> via certified mail within 30 days of the first notice. This forces the collector to prove the debt is yours, the amount is correct, and they own it. Zombie debt buyers rarely have this documentation. Use our <a href="/collection-notice">letter generator</a> to create and mail the letter.</p>
+<p>Even for zombie debt, send a <a href="/guides/debt-validation-letter-medical-debt/">validation letter</a> via certified mail within 30 days of the first notice. This forces the collector to prove the debt is yours, the amount is correct, and they own it. Zombie debt buyers rarely have this documentation. Use our <a href="/collection-notice">letter generator</a> to create and mail the letter.</p>
 
 <h3>Step 4: Verify the original charges</h3>
 
@@ -173,7 +173,7 @@ register("zombie-medical-debt", {
         <tr><td>Acknowledging the debt by phone</td><td>"Yes, I know about that bill" can be used as evidence and may reset the SOL in some states</td><td>Never discuss the debt by phone; demand everything in writing</td></tr>
         <tr><td>Providing your Social Security number</td><td>Zombie collectors may not have verified your identity — giving your SSN confirms it</td><td>Never give personal information to an unverified collector</td></tr>
         <tr><td>Agreeing to a "payment plan" on time-barred debt</td><td>A signed payment agreement creates a new contract and resets the SOL</td><td>If the SOL has expired, you likely owe nothing collectible by lawsuit</td></tr>
-        <tr><td>Ignoring a lawsuit summons</td><td>Even frivolous lawsuits on zombie debt result in default judgments if you don't respond</td><td><a href="/guides/sued-for-medical-debt">File an Answer</a> within the deadline and raise the SOL defense</td></tr>
+        <tr><td>Ignoring a lawsuit summons</td><td>Even frivolous lawsuits on zombie debt result in default judgments if you don't respond</td><td><a href="/guides/sued-for-medical-debt/">File an Answer</a> within the deadline and raise the SOL defense</td></tr>
     </tbody>
 </table>
 
@@ -216,7 +216,7 @@ register("zombie-medical-debt", {
 
     <div class="faq-item">
         <h3>Can a debt collector sue me for zombie medical debt?</h3>
-        <p>If the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> has expired, you can raise it as a defense and the lawsuit should be dismissed. But you must respond — ignoring a lawsuit summons results in a default judgment even on time-barred debt. In some states, threatening to sue on time-barred debt is itself an FDCPA violation. Always <a href="/guides/sued-for-medical-debt">file an Answer</a> within the deadline.</p>
+        <p>If the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> has expired, you can raise it as a defense and the lawsuit should be dismissed. But you must respond — ignoring a lawsuit summons results in a default judgment even on time-barred debt. In some states, threatening to sue on time-barred debt is itself an FDCPA violation. Always <a href="/guides/sued-for-medical-debt/">file an Answer</a> within the deadline.</p>
     </div>
 
     <div class="faq-item">
@@ -231,7 +231,7 @@ register("zombie-medical-debt", {
 
     <div class="faq-item">
         <h3>How do I know if medical debt is a zombie debt?</h3>
-        <p>Warning signs: the collection company is unfamiliar, the debt is 4+ years old, the notice is vague about the original provider or date of service, the amount doesn't match any bill you remember, and the collector pressures immediate payment. Always <a href="/guides/debt-validation-letter-medical-debt">request debt validation</a> in writing before engaging with any collector about old medical debt.</p>
+        <p>Warning signs: the collection company is unfamiliar, the debt is 4+ years old, the notice is vague about the original provider or date of service, the amount doesn't match any bill you remember, and the collector pressures immediate payment. Always <a href="/guides/debt-validation-letter-medical-debt/">request debt validation</a> in writing before engaging with any collector about old medical debt.</p>
     </div>
 </div>
 

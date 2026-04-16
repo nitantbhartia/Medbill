@@ -242,7 +242,7 @@ register("understanding-explanation-of-benefits", {
 
     <div class="faq-item">
         <h3>Is an EOB the same as a medical bill?</h3>
-        <p>No. An EOB is from your insurance company; a bill is from the provider. Always compare them. The &ldquo;patient responsibility&rdquo; on your EOB should match your bill. If the bill is higher, contact the provider&rsquo;s billing department with your EOB. <a href="/guides/how-to-read-your-medical-bill">Learn how to read your medical bill here.</a></p>
+        <p>No. An EOB is from your insurance company; a bill is from the provider. Always compare them. The &ldquo;patient responsibility&rdquo; on your EOB should match your bill. If the bill is higher, contact the provider&rsquo;s billing department with your EOB. <a href="/guides/how-to-read-your-medical-bill/">Learn how to read your medical bill here.</a></p>
     </div>
 
     <div class="faq-item">

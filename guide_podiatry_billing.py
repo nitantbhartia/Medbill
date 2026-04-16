@@ -79,7 +79,7 @@ register("podiatry-billing", {
   If yes, the denial may be incorrect and correctable. If no documented condition exists, you are
   responsible for the bill &mdash; but only if you received an
   <strong>Advance Beneficiary Notice (ABN)</strong> before the service informing you that Medicare
-  might not cover it. See our <a href="/guides/medicare-billing">Medicare billing guide</a> for ABN rules.
+  might not cover it. See our <a href="/guides/medicare-billing/">Medicare billing guide</a> for ABN rules.
 </p>
 
 <h2 id="covered-exceptions">2. When Medicare Does Cover Foot Care</h2>
@@ -275,13 +275,13 @@ register("podiatry-billing", {
   Bunion surgery (CPT 28296) is similar: the physician fee is $1,023 (Medicare rate), but total
   facility and professional costs run $4,000&ndash;$12,000. At a hospital outpatient department,
   costs are typically higher than at an ambulatory surgery center (ASC). See our
-  <a href="/guides/surgery-center-vs-hospital">surgery center vs. hospital guide</a> for cost comparison
+  <a href="/guides/surgery-center-vs-hospital/">surgery center vs. hospital guide</a> for cost comparison
   data.
 </p>
 <p>
   For uninsured patients, surgical costs are the full billed charge &mdash; $3,000&ndash;$12,000
   depending on procedure and facility. Hospitals are required to offer charity care programs to
-  qualifying patients. See our <a href="/guides/charity-care">charity care guide</a> for how to apply.
+  qualifying patients. See our <a href="/guides/charity-care/">charity care guide</a> for how to apply.
 </p>
 
 <div class="key-takeaway">
@@ -377,7 +377,7 @@ register("podiatry-billing", {
   each code and compare it to your insurer&rsquo;s allowed amount. If your insurer paid more than the
   Medicare rate suggests, the overpayment may reflect a contract negotiation difference &mdash; but if
   you were balance-billed above your plan&rsquo;s allowed amount, that is a billing error. Use our
-  <a href="/guides/dispute-letter-template">dispute letter template</a> to file a written complaint.
+  <a href="/guides/dispute-letter-template/">dispute letter template</a> to file a written complaint.
 </p>
 <p>
   <strong>For ABN violations:</strong> If Medicare denied a service and your provider is billing you

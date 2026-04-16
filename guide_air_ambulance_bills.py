@@ -113,7 +113,7 @@ register("air-ambulance-bills", {
 
 <h2 id="no-surprises-act">3. How the No Surprises Act changed air ambulance billing</h2>
 
-<p>The <a href="/guides/no-surprises-act-explained">No Surprises Act</a> (NSA), effective January 1, 2022, fundamentally changed air ambulance billing for insured patients. Here&rsquo;s what it does and does not cover.</p>
+<p>The <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> (NSA), effective January 1, 2022, fundamentally changed air ambulance billing for insured patients. Here&rsquo;s what it does and does not cover.</p>
 
 <h3>What the NSA protects</h3>
 
@@ -127,7 +127,7 @@ register("air-ambulance-bills", {
 
 <ul>
     <li>Uninsured patients (no insurance at all) are not covered by the NSA&rsquo;s air ambulance provisions, though they can request a Good Faith Estimate.</li>
-    <li>Ground ambulance is excluded from the NSA&rsquo;s balance billing protections entirely. See our <a href="/guides/how-to-fight-an-ambulance-bill">ground ambulance guide</a> for details.</li>
+    <li>Ground ambulance is excluded from the NSA&rsquo;s balance billing protections entirely. See our <a href="/guides/how-to-fight-an-ambulance-bill/">ground ambulance guide</a> for details.</li>
     <li>Non-emergency, pre-scheduled air transfers where the patient had time to choose a provider may have different rules.</li>
     <li>Flights before January 1, 2022 are not retroactively covered.</li>
 </ul>
@@ -192,12 +192,12 @@ register("air-ambulance-bills", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Since the No Surprises Act:</strong> Memberships are most valuable for uninsured individuals and for non-emergency inter-facility transfers that may not be covered by the NSA. If you have insurance, verify that the NSA applies to your situation before paying for a membership. For help understanding your coverage, see our guide on <a href="/guides/how-to-negotiate-medical-bills">how to negotiate medical bills</a>.
+    <strong>Since the No Surprises Act:</strong> Memberships are most valuable for uninsured individuals and for non-emergency inter-facility transfers that may not be covered by the NSA. If you have insurance, verify that the NSA applies to your situation before paying for a membership. For help understanding your coverage, see our guide on <a href="/guides/how-to-negotiate-medical-bills/">how to negotiate medical bills</a>.
 </div>
 
 <h2 id="how-to-dispute">6. How to dispute an air ambulance bill</h2>
 
-<p>Disputing an air ambulance bill requires different strategies depending on whether you are insured, uninsured, or dealing with a pre-2022 bill. For a full walkthrough of medical bill disputes, see our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a>.</p>
+<p>Disputing an air ambulance bill requires different strategies depending on whether you are insured, uninsured, or dealing with a pre-2022 bill. For a full walkthrough of medical bill disputes, see our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a>.</p>
 
 <h3>Strategy 1 &mdash; Invoke the No Surprises Act (insured, post-2022)</h3>
 
@@ -209,7 +209,7 @@ register("air-ambulance-bills", {
 
 <h3>Strategy 3 &mdash; Charity care and financial hardship programs</h3>
 
-<p>Most air ambulance companies have financial assistance programs, though they do not always advertise them. Request a financial hardship application. Provide proof of income (pay stubs, tax return). Patients earning below 300&ndash;400% of the federal poverty level often qualify for full write-offs or reductions of 70&ndash;90%. If you <a href="/guides/cant-afford-medical-bill">can&rsquo;t afford your medical bill</a>, this is often the most effective path.</p>
+<p>Most air ambulance companies have financial assistance programs, though they do not always advertise them. Request a financial hardship application. Provide proof of income (pay stubs, tax return). Patients earning below 300&ndash;400% of the federal poverty level often qualify for full write-offs or reductions of 70&ndash;90%. If you <a href="/guides/cant-afford-medical-bill/">can&rsquo;t afford your medical bill</a>, this is often the most effective path.</p>
 
 <h3>Strategy 4 &mdash; State attorney general complaint</h3>
 
@@ -285,7 +285,7 @@ register("air-ambulance-bills", {
 </ol>
 
 <div class="key-takeaway">
-    <strong>Your insurer cannot make you pay more than in-network cost-sharing for emergency air ambulance after January 2022.</strong> If your Explanation of Benefits shows the claim was processed as out-of-network with higher cost-sharing, call your insurer and cite the No Surprises Act. If they refuse to reprocess, file a complaint with your state insurance commissioner and with CMS. For help reading your EOB, see our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>.
+    <strong>Your insurer cannot make you pay more than in-network cost-sharing for emergency air ambulance after January 2022.</strong> If your Explanation of Benefits shows the claim was processed as out-of-network with higher cost-sharing, call your insurer and cite the No Surprises Act. If they refuse to reprocess, file a complaint with your state insurance commissioner and with CMS. For help reading your EOB, see our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a>.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>
@@ -318,7 +318,7 @@ register("air-ambulance-bills", {
 
     <div class="faq-item">
         <h3>What should I do if I get an air ambulance bill I cannot afford?</h3>
-        <p>First, check whether the No Surprises Act applies (insured, post-January 2022). If so, you should only owe in-network cost-sharing. If uninsured, request an itemized bill, compare against Medicare rates, and apply for the provider&rsquo;s charity care or financial hardship program. Many providers write off 70&ndash;100% of bills for patients below 300&ndash;400% of the federal poverty level. See our <a href="/guides/cant-afford-medical-bill">guide on affording medical bills</a> for more options.</p>
+        <p>First, check whether the No Surprises Act applies (insured, post-January 2022). If so, you should only owe in-network cost-sharing. If uninsured, request an itemized bill, compare against Medicare rates, and apply for the provider&rsquo;s charity care or financial hardship program. Many providers write off 70&ndash;100% of bills for patients below 300&ndash;400% of the federal poverty level. See our <a href="/guides/cant-afford-medical-bill/">guide on affording medical bills</a> for more options.</p>
     </div>
 </div>
 

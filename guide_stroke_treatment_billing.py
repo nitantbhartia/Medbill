@@ -69,7 +69,7 @@ register("stroke-treatment-billing", {
   The summary bill you first receive is not the full picture. Always request an <strong>itemized bill</strong>
   &mdash; a line-by-line list of every charge with the CPT or revenue code. This is your legal right,
   and it&rsquo;s the only document that lets you audit for errors. See our guide to
-  <a href="/guides/how-to-get-itemized-bill">getting your itemized hospital bill</a> for the exact steps.
+  <a href="/guides/how-to-get-itemized-bill/">getting your itemized hospital bill</a> for the exact steps.
 </p>
 
 <h2 id="drg-billing">2. DRG Billing and Why It Matters</h2>
@@ -167,7 +167,7 @@ register("stroke-treatment-billing", {
   Other drugs commonly inflated on stroke bills include heparin (anticoagulant), labetalol
   (blood pressure control), and mannitol (brain swelling). Request the pharmacy charge detail
   from your itemized bill and compare each J-code quantity against your medical records. See our
-  <a href="/guides/hospital-drug-charges">hospital drug charges guide</a> for step-by-step instructions.
+  <a href="/guides/hospital-drug-charges/">hospital drug charges guide</a> for step-by-step instructions.
 </p>
 
 <h2 id="icu-billing">4. ICU vs. Step-Down Billing</h2>
@@ -186,7 +186,7 @@ register("stroke-treatment-billing", {
 <p>
   To request your medical records, contact the hospital&rsquo;s Health Information Management (HIM)
   department. Federal law gives you the right to obtain a copy, usually within 30 days of request.
-  Learn more in our <a href="/guides/medical-records-rights">medical records rights guide</a>.
+  Learn more in our <a href="/guides/medical-records-rights/">medical records rights guide</a>.
 </p>
 
 <div class="key-takeaway">
@@ -271,7 +271,7 @@ register("stroke-treatment-billing", {
 <p>
   Each therapy session should appear in your medical records as a dated, signed therapy note. If a
   session appears on your bill but has no corresponding therapy note, that charge is disputable. The
-  <a href="/guides/rehabilitation-billing">rehabilitation billing guide</a> covers this in detail.
+  <a href="/guides/rehabilitation-billing/">rehabilitation billing guide</a> covers this in detail.
 </p>
 
 <div class="key-takeaway">
@@ -361,7 +361,7 @@ register("stroke-treatment-billing", {
   <li><strong>Request your medical records.</strong> Ask for the full inpatient record including physician orders, nursing notes, therapy notes, pharmacy records, and your discharge summary. These are the ground truth against which you check the bill.</li>
   <li><strong>Request your EOB.</strong> Your insurer&rsquo;s Explanation of Benefits (EOB) shows what was billed, what was allowed, and what you owe. Compare it to the itemized bill to find discrepancies.</li>
   <li><strong>Identify specific errors.</strong> Use the error list above. For each potential error, note the date, CPT/revenue code, amount charged, and what your records show instead.</li>
-  <li><strong>Write a dispute letter.</strong> Send a written dispute to the hospital billing department by certified mail, citing each error with the specific code, date, and supporting medical record reference. Use our <a href="/guides/dispute-letter-template">dispute letter template</a>.</li>
+  <li><strong>Write a dispute letter.</strong> Send a written dispute to the hospital billing department by certified mail, citing each error with the specific code, date, and supporting medical record reference. Use our <a href="/guides/dispute-letter-template/">dispute letter template</a>.</li>
   <li><strong>Escalate if needed.</strong> If the hospital doesn&rsquo;t respond within 30 days, contact your state insurance commissioner (for insured claims) or the hospital&rsquo;s patient advocate office. Filing a complaint with CMS is also an option for Medicare patients.</li>
 </ol>
 

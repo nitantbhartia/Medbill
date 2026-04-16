@@ -93,7 +93,7 @@ register("settle-medical-debt-collections", {
 
 <h3>Check 3: Do you qualify for charity care?</h3>
 
-<p>Even after a bill goes to collections, you can apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a> at the original hospital. If approved, the hospital can reduce the bill and notify the collector. A 75% charity care write-off is a better outcome than a 35% settlement. Use our <a href="/charity-care">eligibility checker</a>.</p>
+<p>Even after a bill goes to collections, you can apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a> at the original hospital. If approved, the hospital can reduce the bill and notify the collector. A 75% charity care write-off is a better outcome than a 35% settlement. Use our <a href="/charity-care">eligibility checker</a>.</p>
 
 <div class="key-takeaway">
     <strong>Run these checks before making any offer.</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag billing errors, compare charges to Medicare rates, and identify insurance gaps that could reduce what you actually owe before you settle.
@@ -175,7 +175,7 @@ register("settle-medical-debt-collections", {
 
 <h3>If the collector calls you first</h3>
 
-<p>"I received your notice. Before I discuss anything, please send me written validation of this debt. I want to review the documentation before considering any payment." Then send a <a href="/guides/debt-validation-letter-medical-debt">validation letter</a> via certified mail. Negotiate only after reviewing the validation response.</p>
+<p>"I received your notice. Before I discuss anything, please send me written validation of this debt. I want to review the documentation before considering any payment." Then send a <a href="/guides/debt-validation-letter-medical-debt/">validation letter</a> via certified mail. Negotiate only after reviewing the validation response.</p>
 
 <h3>When making your offer by phone (after validation)</h3>
 
@@ -197,7 +197,7 @@ register("settle-medical-debt-collections", {
     <li><strong>Keep records of everything.</strong> The settlement letter, the agreement, the check copy, the certified mail receipt, and any correspondence.</li>
     <li><strong>Monitor your credit reports.</strong> Check all three bureaus 30 and 60 days after payment. If the tradeline is not removed, send the agreement to each bureau.</li>
     <li><strong>Watch for tax implications.</strong> If forgiven debt exceeds $600, you may receive a 1099-C. If you were insolvent at the time, you can exclude it using IRS Form 982.</li>
-    <li><strong>Do not make partial payments without an agreement.</strong> A partial payment without a settlement agreement can reset the <a href="/guides/medical-debt-statute-of-limitations">statute of limitations</a> in many states, giving the collector more time to sue for the remaining balance.</li>
+    <li><strong>Do not make partial payments without an agreement.</strong> A partial payment without a settlement agreement can reset the <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations</a> in many states, giving the collector more time to sue for the remaining balance.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -220,7 +220,7 @@ register("settle-medical-debt-collections", {
 
 <div class="case-study">
     <h3>Case 3: $8,900 surgery collection — charity care + settlement = $890 total</h3>
-    <p>A $8,900 surgery bill went to collections. The patient applied for <a href="/guides/hospital-financial-assistance-charity-care">charity care</a> at the original nonprofit hospital. With a household income at 240% FPL, they received a 60% write-off, reducing the valid balance to $3,560. They then sent a settlement letter to the collector for the corrected amount, offering $890 (25% of $3,560). The collector accepted.</p>
+    <p>A $8,900 surgery bill went to collections. The patient applied for <a href="/guides/hospital-financial-assistance-charity-care/">charity care</a> at the original nonprofit hospital. With a household income at 240% FPL, they received a 60% write-off, reducing the valid balance to $3,560. They then sent a settlement letter to the collector for the corrected amount, offering $890 (25% of $3,560). The collector accepted.</p>
     <p><strong>Total paid: $890 on an $8,900 original collection. Total savings: $8,010 (90%).</strong></p>
 </div>
 

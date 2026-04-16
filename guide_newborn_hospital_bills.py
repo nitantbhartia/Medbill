@@ -313,7 +313,7 @@ register(
     of delivery. Retroactive coverage can eliminate the baby&rsquo;s hospital bill entirely.
     Apply even if you think you don&rsquo;t qualify&mdash;newborn eligibility rules are more generous
     than adult eligibility in most states. Read our full guide on
-    <a href="/guides/hospital-financial-assistance-guide">hospital financial assistance programs</a>
+    <a href="/guides/hospital-financial-assistance-guide/">hospital financial assistance programs</a>
     to see what else you may qualify for.
   </p>
 </div>

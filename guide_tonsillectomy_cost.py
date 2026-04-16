@@ -194,7 +194,7 @@ register("tonsillectomy-cost", {
     <li><strong>Confirm the anesthesia bill is in-network</strong> or invoke No Surprises Act protections if OON.</li>
     <li><strong>Benchmark facility charges</strong> against Medicare rates. Hospital facility fees for T&amp;A routinely run 3 to 6 times the Medicare ASC rate.</li>
     <li><strong>Call the billing department</strong> with specific CPT codes and Medicare rates. Request a reduction to something closer to market rates.</li>
-    <li><strong>Submit a written dispute</strong> if the phone resolution is insufficient. Use our <a href="/guides/dispute-bill">dispute letter template</a>.</li>
+    <li><strong>Submit a written dispute</strong> if the phone resolution is insufficient. Use our <a href="/guides/dispute-bill/">dispute letter template</a>.</li>
 </ol>
 
 <h2 id="faq">Frequently asked questions</h2>

@@ -62,7 +62,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
     </thead>
     <tbody>
         <tr><td><strong>30 days</strong></td><td>First bill arrives. This is your initial statement, usually showing insurance adjustments and your patient responsibility.</td><td>Review for errors. Request an itemized bill. <a href="/scan">Upload your bill to BillKarma</a> to check for overcharges.</td></tr>
-        <tr><td><strong>60 days</strong></td><td>Second notice arrives, often marked &ldquo;Past Due.&rdquo; Late fees may be added (typically $15&ndash;$50). The provider&rsquo;s billing department begins outbound collection calls.</td><td>Call the billing department. Ask about payment plans, hardship discounts, or <a href="/guides/hospital-financial-assistance-charity-care">charity care programs</a>.</td></tr>
+        <tr><td><strong>60 days</strong></td><td>Second notice arrives, often marked &ldquo;Past Due.&rdquo; Late fees may be added (typically $15&ndash;$50). The provider&rsquo;s billing department begins outbound collection calls.</td><td>Call the billing department. Ask about payment plans, hardship discounts, or <a href="/guides/hospital-financial-assistance-charity-care/">charity care programs</a>.</td></tr>
         <tr><td><strong>90 days</strong></td><td>Final notice before collections. The letter may warn that your account will be &ldquo;referred to a collection agency&rdquo; if not resolved. Internal collection efforts intensify.</td><td>This is your last window to negotiate directly with the provider. Apply for financial assistance now.</td></tr>
         <tr><td><strong>120 days</strong></td><td>Account may be transferred to the hospital&rsquo;s internal collection department or a third-party collection agency. You begin receiving calls and letters from the collector.</td><td>Know your rights under the Fair Debt Collection Practices Act. Request debt validation in writing within 30 days of first contact.</td></tr>
         <tr><td><strong>180 days</strong></td><td>Most providers have now sold or assigned the debt to a third-party collection agency. The original provider may no longer negotiate directly.</td><td>Negotiate with the collection agency. Many will accept 30&ndash;60 cents on the dollar. Get any agreement in writing before paying.</td></tr>
@@ -72,7 +72,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 </table>
 
 <div class="key-takeaway">
-    <strong>The 90-day window is critical.</strong> You have the most negotiating power in the first 90 days, before the debt leaves the provider&rsquo;s hands. After it goes to a third-party collector, you lose the ability to apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care">financial assistance program</a> and the provider has less incentive to negotiate. Act early.
+    <strong>The 90-day window is critical.</strong> You have the most negotiating power in the first 90 days, before the debt leaves the provider&rsquo;s hands. After it goes to a third-party collector, you lose the ability to apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance program</a> and the provider has less incentive to negotiate. Act early.
 </div>
 
 <h2 id="collections">2. When bills go to collections</h2>
@@ -93,7 +93,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Don&rsquo;t ignore collection letters.</strong> The first letter from a collector starts a 30-day clock for you to request debt validation. If you miss that window, you lose an important legal protection. For more on your rights, see our <a href="/guides/medical-bill-collections-rights">guide to medical bill collection rights</a>.
+    <strong>Don&rsquo;t ignore collection letters.</strong> The first letter from a collector starts a 30-day clock for you to request debt validation. If you miss that window, you lose an important legal protection. For more on your rights, see our <a href="/guides/medical-bill-collections-rights/">guide to medical bill collection rights</a>.
 </div>
 
 <h2 id="credit-impact">3. Impact on your credit score (2023&ndash;2025 rules)</h2>
@@ -119,7 +119,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 <p>If your medical debt is under $500, it will not appear on your credit report at all. If it&rsquo;s over $500 and you pay it before it has been in collections for one year, it will never be reported. If it has already been reported and you pay it, the credit bureaus will remove it. This gives you a meaningful window to resolve medical debt without credit damage.</p>
 
 <div class="key-takeaway">
-    <strong>Check your credit report for old medical debt.</strong> If you have medical collections under $500 or paid medical collections still showing on your report, dispute them with the credit bureaus. Under the current rules, they should be removed. For a step-by-step walkthrough, see our <a href="/guides/medical-debt-credit-report-2026">guide to medical debt and your credit report</a>.
+    <strong>Check your credit report for old medical debt.</strong> If you have medical collections under $500 or paid medical collections still showing on your report, dispute them with the credit bureaus. Under the current rules, they should be removed. For a step-by-step walkthrough, see our <a href="/guides/medical-debt-credit-report-2026/">guide to medical debt and your credit report</a>.
 </div>
 
 <h2 id="lawsuits">4. Can you be sued for medical debt?</h2>
@@ -195,7 +195,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
     <li><strong>South Carolina</strong> &mdash; Prohibits wage garnishment for consumer debts including medical bills.</li>
 </ul>
 
-<p>Other states have lower garnishment caps than the federal 25% limit. For example, Massachusetts limits garnishment to 15% of gross wages, and New York protects the first $469.50 per week (as of 2025) from any garnishment. For a full breakdown, see our <a href="/guides/medical-debt-wage-garnishment">guide to medical debt wage garnishment by state</a>.</p>
+<p>Other states have lower garnishment caps than the federal 25% limit. For example, Massachusetts limits garnishment to 15% of gross wages, and New York protects the first $469.50 per week (as of 2025) from any garnishment. For a full breakdown, see our <a href="/guides/medical-debt-wage-garnishment/">guide to medical debt wage garnishment by state</a>.</p>
 
 <div class="key-takeaway">
     <strong>Garnishment is preventable.</strong> Wage garnishment only happens after a lawsuit and court judgment. If you are served with a lawsuit, respond to it &mdash; even if you owe the money. Showing up in court allows you to negotiate a payment plan, raise defenses, and potentially get the amount reduced. Default judgments (when you don&rsquo;t respond) are the number one cause of medical debt wage garnishment.
@@ -220,7 +220,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 
 <p>Approximately 57% of U.S. hospitals are nonprofit and receive tax-exempt status under Section 501(c)(3) of the Internal Revenue Code. In exchange, the IRS requires nonprofit hospitals to:</p>
 <ul>
-    <li>Establish a written <a href="/guides/hospital-financial-assistance-charity-care">financial assistance policy</a> (charity care policy)</li>
+    <li>Establish a written <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance policy</a> (charity care policy)</li>
     <li>Publicize the policy and make it available to patients</li>
     <li>Not engage in &ldquo;extraordinary collection actions&rdquo; (lawsuits, wage garnishment, liens, credit reporting) until they have made reasonable efforts to determine whether the patient qualifies for financial assistance</li>
     <li>Limit charges to financially assisted patients to no more than the amounts generally billed to insured patients</li>
@@ -253,11 +253,11 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 
 <h3>c) Apply for financial assistance or charity care</h3>
 
-<p>Every nonprofit hospital is required to have a financial assistance program. Eligibility varies, but many programs cover patients earning up to 200&ndash;400% of the federal poverty level ($62,400&ndash;$124,800 for a family of four in 2025). Financial assistance can reduce your bill by 50&ndash;100%. See our <a href="/guides/hospital-financial-assistance-charity-care">guide to hospital financial assistance and charity care</a> for eligibility criteria and application steps.</p>
+<p>Every nonprofit hospital is required to have a financial assistance program. Eligibility varies, but many programs cover patients earning up to 200&ndash;400% of the federal poverty level ($62,400&ndash;$124,800 for a family of four in 2025). Financial assistance can reduce your bill by 50&ndash;100%. See our <a href="/guides/hospital-financial-assistance-charity-care/">guide to hospital financial assistance and charity care</a> for eligibility criteria and application steps.</p>
 
 <h3>d) Write a hardship letter</h3>
 
-<p>If your income has dropped, you&rsquo;re facing job loss, or the medical bill represents a significant portion of your annual income, a hardship letter can persuade the billing department to reduce or eliminate the bill. Include documentation of your financial situation, and reference the hospital&rsquo;s financial assistance policy. For templates and step-by-step instructions, see our <a href="/guides/medical-bill-hardship-letter">hardship letter guide</a>.</p>
+<p>If your income has dropped, you&rsquo;re facing job loss, or the medical bill represents a significant portion of your annual income, a hardship letter can persuade the billing department to reduce or eliminate the bill. Include documentation of your financial situation, and reference the hospital&rsquo;s financial assistance policy. For templates and step-by-step instructions, see our <a href="/guides/medical-bill-hardship-letter/">hardship letter guide</a>.</p>
 
 <h3>e) Set up a payment plan</h3>
 
@@ -265,7 +265,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 
 <h3>f) If the bill is already in collections</h3>
 
-<p>You still have options. Request debt validation. Negotiate a settlement (collection agencies routinely accept 30&ndash;60% of the original amount). Get any settlement agreement in writing before making a payment. Confirm that the collector will report the debt as &ldquo;paid in full&rdquo; or request a &ldquo;pay for delete&rdquo; agreement. If you can&rsquo;t afford the bill, read our <a href="/guides/cant-afford-medical-bill">guide on what to do when you can&rsquo;t afford a medical bill</a>.</p>
+<p>You still have options. Request debt validation. Negotiate a settlement (collection agencies routinely accept 30&ndash;60% of the original amount). Get any settlement agreement in writing before making a payment. Confirm that the collector will report the debt as &ldquo;paid in full&rdquo; or request a &ldquo;pay for delete&rdquo; agreement. If you can&rsquo;t afford the bill, read our <a href="/guides/cant-afford-medical-bill/">guide on what to do when you can&rsquo;t afford a medical bill</a>.</p>
 
 <div class="case-study">
     <h3>Case study: $14,200 ER bill reduced to $0 through charity care</h3>
@@ -303,7 +303,7 @@ register("what-happens-if-you-dont-pay-medical-bills", {
 
     <div class="faq-item">
         <h3>Can my wages be garnished for medical debt?</h3>
-        <p>In most states, yes &mdash; but only after a creditor sues you and wins a court judgment. Federal law limits garnishment to 25% of disposable earnings. Four states &mdash; Texas, Pennsylvania, North Carolina, and South Carolina &mdash; prohibit or severely restrict wage garnishment for medical debt. See our <a href="/guides/medical-debt-wage-garnishment">wage garnishment guide</a> for your state&rsquo;s rules.</p>
+        <p>In most states, yes &mdash; but only after a creditor sues you and wins a court judgment. Federal law limits garnishment to 25% of disposable earnings. Four states &mdash; Texas, Pennsylvania, North Carolina, and South Carolina &mdash; prohibit or severely restrict wage garnishment for medical debt. See our <a href="/guides/medical-debt-wage-garnishment/">wage garnishment guide</a> for your state&rsquo;s rules.</p>
     </div>
 
     <div class="faq-item">

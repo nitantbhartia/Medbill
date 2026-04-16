@@ -230,7 +230,7 @@ register("income-based-medical-bill-discounts", {
 
     <div class="faq-item">
         <h3>Can I apply for income-based discounts after I already received the bill?</h3>
-        <p>Yes. Most hospitals accept applications for up to 240 days after the first billing statement. You can apply even after making partial payments or starting a <a href="/guides/hospital-payment-plans">payment plan</a>. Apply before the bill goes to outside collections for the smoothest process — though some hospitals accept applications even after that.</p>
+        <p>Yes. Most hospitals accept applications for up to 240 days after the first billing statement. You can apply even after making partial payments or starting a <a href="/guides/hospital-payment-plans/">payment plan</a>. Apply before the bill goes to outside collections for the smoothest process — though some hospitals accept applications even after that.</p>
     </div>
 </div>
 

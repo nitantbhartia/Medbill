@@ -159,7 +159,7 @@ register("why-you-owe-after-insurance-paid", {
     </div>
 </div>
 
-<p>For a deeper dive into reading every line of your EOB, see our <a href="/guides/understanding-explanation-of-benefits">complete guide to understanding your EOB</a>.</p>
+<p>For a deeper dive into reading every line of your EOB, see our <a href="/guides/understanding-explanation-of-benefits/">complete guide to understanding your EOB</a>.</p>
 
 {_embed(mode="cost", title="Look up the Medicare rate for any service on your bill", subtitle="Enter a CPT code from your bill or EOB to see what Medicare pays.")}
 
@@ -259,7 +259,7 @@ register("why-you-owe-after-insurance-paid", {
 
 <h2 id="illegal-balance-billing">5. When you&rsquo;re being illegally balance billed</h2>
 
-<p>Balance billing is when a provider bills you the gap between their charge and what insurance paid. Under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> (effective January 1, 2022), balance billing is <strong>illegal</strong> in these situations:</p>
+<p>Balance billing is when a provider bills you the gap between their charge and what insurance paid. Under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> (effective January 1, 2022), balance billing is <strong>illegal</strong> in these situations:</p>
 
 <ul>
     <li><strong>Emergency services</strong> &mdash; any emergency room visit, regardless of whether the facility or any provider is in-network</li>
@@ -282,7 +282,7 @@ register("why-you-owe-after-insurance-paid", {
     <li>Include your EOB, the provider&rsquo;s bill, and documentation that the facility was in-network</li>
 </ol>
 
-<p>For a complete breakdown of your rights, see our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a>.</p>
+<p>For a complete breakdown of your rights, see our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a>.</p>
 
 <h2 id="dispute-balance">6. How to dispute the remaining balance</h2>
 
@@ -301,7 +301,7 @@ register("why-you-owe-after-insurance-paid", {
 <p>If the provider insists the bill is correct but it doesn&rsquo;t match the EOB, escalate to your insurance company. Ask the insurer to send a corrected EOB or contact the provider directly to resolve the discrepancy.</p>
 
 <h3>Step 5: File a formal dispute or complaint</h3>
-<p>If neither the provider nor the insurer resolves it, file a written dispute. For No Surprises Act violations, file with CMS. For other billing errors, contact your <a href="https://www.naic.org/state_web_map.htm" target="_blank" rel="noopener">state insurance commissioner</a>. For persistent issues, consider contacting a <a href="/guides/medical-billing-advocate">medical billing advocate</a>.</p>
+<p>If neither the provider nor the insurer resolves it, file a written dispute. For No Surprises Act violations, file with CMS. For other billing errors, contact your <a href="https://www.naic.org/state_web_map.htm" target="_blank" rel="noopener">state insurance commissioner</a>. For persistent issues, consider contacting a <a href="/guides/medical-billing-advocate/">medical billing advocate</a>.</p>
 
 <div class="key-takeaway">
     <strong>Document everything.</strong> Keep a log of every call (date, time, representative name, reference number, what was said). Written disputes carry more weight than phone calls &mdash; follow up every call with an email or letter summarizing what was agreed.
@@ -329,7 +329,7 @@ register("why-you-owe-after-insurance-paid", {
     <p>A single mother in Illinois earning $38,000/year had a $4,800 patient balance after insurance paid for her son&rsquo;s emergency appendectomy. The nonprofit hospital&rsquo;s financial assistance policy covered 100% of the balance for patients under 250% of the federal poverty level. She applied, provided two pay stubs and a tax return, and the entire balance was written off within 3 weeks. <strong>Savings: $4,800.</strong></p>
 </div>
 
-<p>For a deeper guide on each of these options, see our guides on <a href="/guides/hospital-financial-assistance">hospital financial assistance programs</a> and <a href="/guides/copay-vs-coinsurance-vs-deductible">understanding your cost-sharing</a>.</p>
+<p>For a deeper guide on each of these options, see our guides on <a href="/guides/hospital-financial-assistance/">hospital financial assistance programs</a> and <a href="/guides/copay-vs-coinsurance-vs-deductible/">understanding your cost-sharing</a>.</p>
 
 <h2 id="oop-max">8. Checking if you&rsquo;ve hit your out-of-pocket maximum</h2>
 
@@ -349,7 +349,7 @@ register("why-you-owe-after-insurance-paid", {
     <p>A patient in Pennsylvania undergoing chemotherapy hit her $8,000 out-of-pocket maximum in August. In September, she received a $1,400 bill for infusion services. Her insurer&rsquo;s accumulator confirmed the OOP max was met, but the oncology clinic&rsquo;s billing system hadn&rsquo;t synced. She sent the clinic a screenshot of her insurer&rsquo;s accumulator page and the bill was corrected to $0 within two weeks. <strong>Savings: $1,400.</strong></p>
 </div>
 
-<p>For a full breakdown of what counts (and what doesn&rsquo;t) toward your OOP max, see our <a href="/guides/out-of-pocket-maximum">out-of-pocket maximum guide</a>.</p>
+<p>For a full breakdown of what counts (and what doesn&rsquo;t) toward your OOP max, see our <a href="/guides/out-of-pocket-maximum/">out-of-pocket maximum guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>Getting bills for a high-cost treatment year?</strong> Use our <a href="/calculator">free calculator</a> to look up Medicare rates for each CPT code on your bill. If your total cost-sharing across all your bills this year exceeds your plan&rsquo;s OOP max, something is wrong &mdash; and you should dispute every bill after the cap was hit.
@@ -360,7 +360,7 @@ register("why-you-owe-after-insurance-paid", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>Why do I still owe money after my insurance paid?</h3>
-        <p>The most common reasons are: your deductible hasn&rsquo;t been fully met, you owe coinsurance or a copay (your cost-share), an out-of-network provider was involved, the service wasn&rsquo;t covered, there&rsquo;s a billing error, you&rsquo;re being illegally balance billed, or there&rsquo;s a coordination of benefits issue with two insurances. Compare your bill to your <a href="/guides/understanding-explanation-of-benefits">EOB</a> &mdash; if the numbers don&rsquo;t match, you likely have grounds to dispute.</p>
+        <p>The most common reasons are: your deductible hasn&rsquo;t been fully met, you owe coinsurance or a copay (your cost-share), an out-of-network provider was involved, the service wasn&rsquo;t covered, there&rsquo;s a billing error, you&rsquo;re being illegally balance billed, or there&rsquo;s a coordination of benefits issue with two insurances. Compare your bill to your <a href="/guides/understanding-explanation-of-benefits/">EOB</a> &mdash; if the numbers don&rsquo;t match, you likely have grounds to dispute.</p>
     </div>
 
     <div class="faq-item">
@@ -370,7 +370,7 @@ register("why-you-owe-after-insurance-paid", {
 
     <div class="faq-item">
         <h3>Can I dispute the amount I owe after insurance?</h3>
-        <p>Yes. Start by comparing your bill to your EOB. If they don&rsquo;t match, call the provider&rsquo;s billing department with your EOB claim number. If you suspect a coding error, request an itemized bill. If you&rsquo;re being balance billed by an out-of-network provider at an in-network facility, file a complaint under the <a href="/guides/no-surprises-act-explained">No Surprises Act</a>. About 40&ndash;50% of billing disputes result in a reduction.</p>
+        <p>Yes. Start by comparing your bill to your EOB. If they don&rsquo;t match, call the provider&rsquo;s billing department with your EOB claim number. If you suspect a coding error, request an itemized bill. If you&rsquo;re being balance billed by an out-of-network provider at an in-network facility, file a complaint under the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>. About 40&ndash;50% of billing disputes result in a reduction.</p>
     </div>
 
     <div class="faq-item">
@@ -380,12 +380,12 @@ register("why-you-owe-after-insurance-paid", {
 
     <div class="faq-item">
         <h3>What if I can&rsquo;t afford the balance after insurance?</h3>
-        <p>Ask for a 0% interest payment plan, apply for the hospital&rsquo;s financial assistance program (nonprofit hospitals are required to have one), negotiate a lump-sum discount, or request a hardship reduction. Many providers will accept 40&ndash;60% of the bill to avoid sending it to collections. See our <a href="/guides/copay-vs-coinsurance-vs-deductible">cost-sharing guide</a> for details on what you should actually owe.</p>
+        <p>Ask for a 0% interest payment plan, apply for the hospital&rsquo;s financial assistance program (nonprofit hospitals are required to have one), negotiate a lump-sum discount, or request a hardship reduction. Many providers will accept 40&ndash;60% of the bill to avoid sending it to collections. See our <a href="/guides/copay-vs-coinsurance-vs-deductible/">cost-sharing guide</a> for details on what you should actually owe.</p>
     </div>
 
     <div class="faq-item">
         <h3>How do I check if I&rsquo;ve hit my out-of-pocket maximum?</h3>
-        <p>Log into your insurer&rsquo;s member portal and look for your accumulator balance, or call the number on the back of your insurance card. In 2026, the ACA cap is $9,450 for individuals and $18,900 for families. If you&rsquo;ve hit it, you owe $0 for further covered in-network services. See our <a href="/guides/out-of-pocket-maximum">out-of-pocket maximum guide</a> for common billing traps.</p>
+        <p>Log into your insurer&rsquo;s member portal and look for your accumulator balance, or call the number on the back of your insurance card. In 2026, the ACA cap is $9,450 for individuals and $18,900 for families. If you&rsquo;ve hit it, you owe $0 for further covered in-network services. See our <a href="/guides/out-of-pocket-maximum/">out-of-pocket maximum guide</a> for common billing traps.</p>
     </div>
 </div>
 

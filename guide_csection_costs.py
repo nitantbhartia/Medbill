@@ -158,12 +158,12 @@ register("how-much-does-c-section-cost", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Deductible timing matters.</strong> If your plan year resets January 1 and you deliver in early January, your deductible starts at zero&mdash;meaning you&rsquo;ll owe the full deductible before insurance kicks in. If possible, front-load prenatal visits and labs in the prior year to meet that year&rsquo;s deductible, and schedule a planned C-section after meeting the new year&rsquo;s deductible with pre-delivery expenses. Read more in our <a href="/guides/maternity-hospital-bill">maternity billing guide</a>.
+    <strong>Deductible timing matters.</strong> If your plan year resets January 1 and you deliver in early January, your deductible starts at zero&mdash;meaning you&rsquo;ll owe the full deductible before insurance kicks in. If possible, front-load prenatal visits and labs in the prior year to meet that year&rsquo;s deductible, and schedule a planned C-section after meeting the new year&rsquo;s deductible with pre-delivery expenses. Read more in our <a href="/guides/maternity-hospital-bill/">maternity billing guide</a>.
 </div>
 
 <h3>Watch out for separate provider bills</h3>
 
-<p>Your insurance processes each provider&rsquo;s bill separately. The hospital, OB-GYN, anesthesiologist, and pediatrician each submit their own claims. If the anesthesiologist is out-of-network (which happens at ~15% of in-network hospitals), the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> protects you from balance billing&mdash;but you should verify this on your Explanation of Benefits.</p>
+<p>Your insurance processes each provider&rsquo;s bill separately. The hospital, OB-GYN, anesthesiologist, and pediatrician each submit their own claims. If the anesthesiologist is out-of-network (which happens at ~15% of in-network hospitals), the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> protects you from balance billing&mdash;but you should verify this on your Explanation of Benefits.</p>
 
 <h2 id="vaginal-vs-csection">6. Vaginal delivery vs. C-section: cost comparison</h2>
 
@@ -182,7 +182,7 @@ register("how-much-does-c-section-cost", {
     </tbody>
 </table>
 
-<p>The biggest cost drivers are the operating room fee and the longer hospital stay. A vaginal delivery with a 1&ndash;2 night stay simply uses fewer resources than major abdominal surgery with a 3&ndash;4 night recovery. For a detailed breakdown of all childbirth costs, see our <a href="/guides/average-cost-of-childbirth-2026">average cost of childbirth guide</a>.</p>
+<p>The biggest cost drivers are the operating room fee and the longer hospital stay. A vaginal delivery with a 1&ndash;2 night stay simply uses fewer resources than major abdominal surgery with a 3&ndash;4 night recovery. For a detailed breakdown of all childbirth costs, see our <a href="/guides/average-cost-of-childbirth-2026/">average cost of childbirth guide</a>.</p>
 
 <div class="case-study">
     <h3>Same hospital, different delivery method</h3>
@@ -211,11 +211,11 @@ register("how-much-does-c-section-cost", {
 
 <h3>c) Negotiate the balance</h3>
 
-<p>If you owe a large balance after insurance, call the billing department and negotiate. Hospitals routinely accept less than the billed amount. Offer 40&ndash;60% of your balance as a lump-sum payment in exchange for writing off the rest. If you&rsquo;re uninsured, ask for the hospital&rsquo;s self-pay rate, which is typically 40&ndash;60% below chargemaster prices. See our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a> for scripts and strategies.</p>
+<p>If you owe a large balance after insurance, call the billing department and negotiate. Hospitals routinely accept less than the billed amount. Offer 40&ndash;60% of your balance as a lump-sum payment in exchange for writing off the rest. If you&rsquo;re uninsured, ask for the hospital&rsquo;s self-pay rate, which is typically 40&ndash;60% below chargemaster prices. See our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a> for scripts and strategies.</p>
 
 <h3>d) Apply for financial assistance</h3>
 
-<p>All nonprofit hospitals (about 60% of U.S. hospitals) are required by the IRS to offer financial assistance programs. If your household income is below 200&ndash;400% of the federal poverty level ($62,400&ndash;$124,800 for a family of four in 2026), you may qualify for free or reduced-cost care. You can apply even after the bill has been issued. Check your hospital&rsquo;s policy in our <a href="/hospitals/">hospital directory</a> or see our <a href="/guides/hospital-financial-assistance-programs">financial assistance guide</a>.</p>
+<p>All nonprofit hospitals (about 60% of U.S. hospitals) are required by the IRS to offer financial assistance programs. If your household income is below 200&ndash;400% of the federal poverty level ($62,400&ndash;$124,800 for a family of four in 2026), you may qualify for free or reduced-cost care. You can apply even after the bill has been issued. Check your hospital&rsquo;s policy in our <a href="/hospitals/">hospital directory</a> or see our <a href="/guides/hospital-financial-assistance-programs/">financial assistance guide</a>.</p>
 
 <h3>e) Set up a zero-interest payment plan</h3>
 
@@ -230,7 +230,7 @@ register("how-much-does-c-section-cost", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>How much does a C-section cost without insurance in 2026?</h3>
-        <p>Without insurance, a C-section costs $23,000&ndash;$28,000 on average. This includes surgeon, anesthesia, facility, labs, and newborn care. Emergency C-sections run 20&ndash;40% higher. Uninsured patients should ask for the hospital&rsquo;s self-pay rate (typically 40&ndash;60% below chargemaster prices) and apply for <a href="/guides/hospital-financial-assistance-programs">financial assistance</a>.</p>
+        <p>Without insurance, a C-section costs $23,000&ndash;$28,000 on average. This includes surgeon, anesthesia, facility, labs, and newborn care. Emergency C-sections run 20&ndash;40% higher. Uninsured patients should ask for the hospital&rsquo;s self-pay rate (typically 40&ndash;60% below chargemaster prices) and apply for <a href="/guides/hospital-financial-assistance-programs/">financial assistance</a>.</p>
     </div>
 
     <div class="faq-item">

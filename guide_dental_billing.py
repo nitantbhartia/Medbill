@@ -64,7 +64,7 @@ register("understanding-dental-billing", {
     </tbody>
 </table>
 
-<p><strong>When the systems overlap:</strong> Dental work performed in a hospital setting (e.g., oral surgery under general anesthesia) may generate both CDT and CPT codes. The dental procedure is billed under CDT to dental insurance, while the hospital facility fee and anesthesia are billed under CPT to medical insurance. This dual-billing scenario is a common source of confusion and duplicate charges. If you had dental work at a hospital, check the facility&rsquo;s billing track record in our <a href="/hospitals/">hospital pricing directory</a> and learn how to spot errors in <a href="/guides/how-to-read-your-medical-bill">our guide to reading your medical bill</a>.</p>
+<p><strong>When the systems overlap:</strong> Dental work performed in a hospital setting (e.g., oral surgery under general anesthesia) may generate both CDT and CPT codes. The dental procedure is billed under CDT to dental insurance, while the hospital facility fee and anesthesia are billed under CPT to medical insurance. This dual-billing scenario is a common source of confusion and duplicate charges. If you had dental work at a hospital, check the facility&rsquo;s billing track record in our <a href="/hospitals/">hospital pricing directory</a> and learn how to spot errors in <a href="/guides/how-to-read-your-medical-bill/">our guide to reading your medical bill</a>.</p>
 
 <div class="key-takeaway">
     <strong>Always request an itemized dental bill with CDT codes.</strong> Many dental offices only send a summary. The itemized version shows exactly what each code is and what was charged, making it possible to verify you were billed correctly. <a href="/scan">Upload your dental bill to BillKarma</a> and we&rsquo;ll flag charges that don&rsquo;t match fair market rates.
@@ -165,7 +165,7 @@ register("understanding-dental-billing", {
 
 <p><strong>Unnecessary quadrant billing:</strong> Scaling is billed per quadrant (4 quadrants = 4 charges). If your gum disease is localized to one area, you should not be billed for all four quadrants. Request the periodontal charting that shows pocket depths for each quadrant.</p>
 
-<p><strong>Surprise out-of-network charges:</strong> Always verify your dentist is in-network before your visit. Out-of-network dentists can balance bill you for the difference between their fee and the insurance-allowed amount, which can double your costs. For more on this topic, see <a href="/guides/balance-billing">our guide to balance billing</a>.</p>
+<p><strong>Surprise out-of-network charges:</strong> Always verify your dentist is in-network before your visit. Out-of-network dentists can balance bill you for the difference between their fee and the insurance-allowed amount, which can double your costs. For more on this topic, see <a href="/guides/balance-billing/">our guide to balance billing</a>.</p>
 
 <p><strong>Steps to dispute a dental bill:</strong></p>
 <ol>
@@ -173,7 +173,7 @@ register("understanding-dental-billing", {
     <li>Compare charges against the average costs in the table above and your insurance fee schedule. Check how your provider&rsquo;s pricing compares in our <a href="/hospitals/">hospital and provider directory</a>.</li>
     <li>If you suspect unnecessary treatment, get a second opinion from another dentist.</li>
     <li>File a written dispute with the dental office, citing specific CDT codes you are challenging.</li>
-    <li>If the office won&rsquo;t budge, file a complaint with your state dental board. For detailed dispute strategies, see <a href="/guides/how-to-dispute-a-medical-bill">our guide to disputing medical bills</a>.</li>
+    <li>If the office won&rsquo;t budge, file a complaint with your state dental board. For detailed dispute strategies, see <a href="/guides/how-to-dispute-a-medical-bill/">our guide to disputing medical bills</a>.</li>
 </ol>
 
 <h2 id="save-money">6. 5 ways to save on dental care</h2>

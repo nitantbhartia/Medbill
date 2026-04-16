@@ -59,8 +59,8 @@ register("how-to-get-medical-bills-reduced", {
 <ul>
     <li><strong>Deductible:</strong> You pay 100% of costs until you hit your annual deductible, which averages $1,735 for individuals and $3,469 for families in 2026. If your ER visit happens in January before you&rsquo;ve met your deductible, you absorb the full cost up to that threshold.</li>
     <li><strong>Coinsurance:</strong> After meeting your deductible, you typically pay 20&ndash;40% of each bill until you reach your out-of-pocket maximum. On a $12,000 ER bill, 20% coinsurance means $2,400 out of your pocket.</li>
-    <li><strong>Out-of-network charges:</strong> If any provider involved in your care was out of network, your insurer may pay a reduced rate or nothing at all. The <a href="/guides/out-of-network-bills">No Surprises Act</a> covers emergencies and certain situations, but gaps remain.</li>
-    <li><strong>Balance billing:</strong> Some providers bill you for the difference between what they charged and what insurance paid. While the <a href="/guides/how-to-appeal-insurance-denial-and-win">No Surprises Act restricts this in emergencies</a>, it still happens with ground ambulance services and at facilities exempt from the law.</li>
+    <li><strong>Out-of-network charges:</strong> If any provider involved in your care was out of network, your insurer may pay a reduced rate or nothing at all. The <a href="/guides/out-of-network-bills/">No Surprises Act</a> covers emergencies and certain situations, but gaps remain.</li>
+    <li><strong>Balance billing:</strong> Some providers bill you for the difference between what they charged and what insurance paid. While the <a href="/guides/how-to-appeal-insurance-denial-and-win/">No Surprises Act restricts this in emergencies</a>, it still happens with ground ambulance services and at facilities exempt from the law.</li>
 </ul>
 
 <div class="key-takeaway">
@@ -71,7 +71,7 @@ register("how-to-get-medical-bills-reduced", {
 
 <p>The single most important step is requesting an itemized bill. The summary statement hospitals send by default shows a lump-sum total without line-item detail. An itemized bill shows every charge with its CPT code, description, quantity, and price. Research from Medical Billing Advocates of America found that <strong>30&ndash;80% of medical bills contain at least one error</strong>, and errors almost always favor the provider, not the patient.</p>
 
-<p>Call the hospital billing department and say: &ldquo;I&rsquo;d like a fully itemized statement with CPT codes for every charge on my account.&rdquo; They are legally required to provide this. For a detailed walkthrough, see our <a href="/guides/how-to-get-itemized-hospital-bill">guide to getting an itemized hospital bill</a>.</p>
+<p>Call the hospital billing department and say: &ldquo;I&rsquo;d like a fully itemized statement with CPT codes for every charge on my account.&rdquo; They are legally required to provide this. For a detailed walkthrough, see our <a href="/guides/how-to-get-itemized-hospital-bill/">guide to getting an itemized hospital bill</a>.</p>
 
 <h3>Common billing errors to look for</h3>
 
@@ -121,7 +121,7 @@ register("how-to-get-medical-bills-reduced", {
 
 <h2 id="negotiation-script">4. Step 3: Call the billing department with a negotiation script</h2>
 
-<p>Most patients skip this step because they feel intimidated. But hospital billing departments negotiate every day &mdash; with insurance companies, with Medicare, with collection agencies. They expect it. The key is preparation: know your numbers, be polite, and be specific about what you&rsquo;re asking for. For more scripts and strategies, see our <a href="/guides/medical-bill-dispute-phone-scripts">phone script guide</a>.</p>
+<p>Most patients skip this step because they feel intimidated. But hospital billing departments negotiate every day &mdash; with insurance companies, with Medicare, with collection agencies. They expect it. The key is preparation: know your numbers, be polite, and be specific about what you&rsquo;re asking for. For more scripts and strategies, see our <a href="/guides/medical-bill-dispute-phone-scripts/">phone script guide</a>.</p>
 
 <h3>Negotiation script</h3>
 
@@ -152,7 +152,7 @@ register("how-to-get-medical-bills-reduced", {
 </table>
 
 <div class="key-takeaway">
-    <strong>Document everything.</strong> Write down the date, time, name of every person you speak with, and what they said. If they agree to a reduction, ask for written confirmation before paying. Verbal agreements can be forgotten or denied later. For a complete guide to negotiating, see our <a href="/guides/how-to-negotiate-medical-bills">medical bill negotiation guide</a>.
+    <strong>Document everything.</strong> Write down the date, time, name of every person you speak with, and what they said. If they agree to a reduction, ask for written confirmation before paying. Verbal agreements can be forgotten or denied later. For a complete guide to negotiating, see our <a href="/guides/how-to-negotiate-medical-bills/">medical bill negotiation guide</a>.
 </div>
 
 <h2 id="financial-assistance">5. Step 4: Apply for financial assistance and charity care</h2>
@@ -169,7 +169,7 @@ register("how-to-get-medical-bills-reduced", {
 
 <p>To apply, ask the billing department for a financial assistance application. You&rsquo;ll need to provide proof of income (pay stubs, tax return, or a letter from your employer) and sometimes a bank statement. Most hospitals process applications within 30&ndash;45 days.</p>
 
-<p>For a complete walkthrough of financial assistance programs, see our <a href="/guides/hospital-financial-assistance-charity-care">charity care guide</a>. You can also look up your hospital&rsquo;s specific financial assistance policy in our <a href="/hospitals/">hospital directory</a>.</p>
+<p>For a complete walkthrough of financial assistance programs, see our <a href="/guides/hospital-financial-assistance-charity-care/">charity care guide</a>. You can also look up your hospital&rsquo;s specific financial assistance policy in our <a href="/hospitals/">hospital directory</a>.</p>
 
 <div class="key-takeaway">
     <strong>Don&rsquo;t assume you won&rsquo;t qualify.</strong> Many patients with incomes of $50,000&ndash;$80,000 qualify for partial assistance, especially when facing a large bill relative to their income. Hospitals are required to make their financial assistance policies available in writing and cannot send a bill to collections while an application is pending. Apply for <a href="/charity-care">charity care here</a>.
@@ -203,7 +203,7 @@ register("how-to-get-medical-bills-reduced", {
     <li><strong>Coding error by the provider:</strong> An incorrect CPT or diagnosis code can cause a claim to be denied or underpaid. Ask the provider to review and correct the coding.</li>
 </ul>
 
-<p>You have at least 180 days to file an internal appeal with most insurers. If the internal appeal is denied, you can request an external review by an independent third party. For a complete appeal strategy with letter templates, see our <a href="/guides/how-to-appeal-insurance-denial-and-win">insurance denial appeal guide</a>.</p>
+<p>You have at least 180 days to file an internal appeal with most insurers. If the internal appeal is denied, you can request an external review by an independent third party. For a complete appeal strategy with letter templates, see our <a href="/guides/how-to-appeal-insurance-denial-and-win/">insurance denial appeal guide</a>.</p>
 
 <div class="key-takeaway">
     <strong>Always appeal a denial.</strong> Most patients accept insurance denials without questioning them. But nearly half of all appeals result in a reversal. The appeal process is free, and if you win, the insurer pays &mdash; reducing or eliminating your out-of-pocket balance.
@@ -308,7 +308,7 @@ register("how-to-get-medical-bills-reduced", {
 
     <div class="faq-item">
         <h3>What is the best script for negotiating a medical bill?</h3>
-        <p>Start by identifying yourself, referencing your account number, and stating that you have reviewed your itemized bill and compared charges against Medicare rates. Then say: &ldquo;I&rsquo;d like to discuss a reduction. The Medicare rate for [CPT code] is [amount], and I was charged [amount]. I&rsquo;m asking for an adjustment to bring this closer to a fair market rate.&rdquo; If the first representative cannot help, ask for a supervisor or the financial counseling department. See our <a href="/guides/medical-bill-dispute-phone-scripts">complete phone scripts guide</a> for more.</p>
+        <p>Start by identifying yourself, referencing your account number, and stating that you have reviewed your itemized bill and compared charges against Medicare rates. Then say: &ldquo;I&rsquo;d like to discuss a reduction. The Medicare rate for [CPT code] is [amount], and I was charged [amount]. I&rsquo;m asking for an adjustment to bring this closer to a fair market rate.&rdquo; If the first representative cannot help, ask for a supervisor or the financial counseling department. See our <a href="/guides/medical-bill-dispute-phone-scripts/">complete phone scripts guide</a> for more.</p>
     </div>
 
     <div class="faq-item">

@@ -256,7 +256,7 @@ register(
   <p>
     You have 30 days from a debt collector&rsquo;s first contact to request debt validation.
     During this window, they cannot continue collection activity. Use it. Read our full guide on
-    <a href="/guides/how-to-dispute-a-medical-bill">how to dispute a medical bill</a> for templates
+    <a href="/guides/how-to-dispute-a-medical-bill/">how to dispute a medical bill</a> for templates
     and scripts for every step of the process.
   </p>
 </div>

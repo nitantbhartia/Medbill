@@ -106,7 +106,7 @@ register("medical-debt-buying-house", {
     </tbody>
 </table>
 
-<p>The bottom line for 2026 mortgage applicants: paid medical collections are gone from your report. Debts under $500 are gone. But unpaid medical debt over $500 that is more than 12 months old can still appear &mdash; and still hurt your mortgage score &mdash; unless your state has passed additional protections. For the full breakdown of what&rsquo;s currently reportable, see our companion guide on <a href="/guides/medical-debt-credit-report-2026">medical debt and your credit report in 2026</a>.</p>
+<p>The bottom line for 2026 mortgage applicants: paid medical collections are gone from your report. Debts under $500 are gone. But unpaid medical debt over $500 that is more than 12 months old can still appear &mdash; and still hurt your mortgage score &mdash; unless your state has passed additional protections. For the full breakdown of what&rsquo;s currently reportable, see our companion guide on <a href="/guides/medical-debt-credit-report-2026/">medical debt and your credit report in 2026</a>.</p>
 
 <div class="key-takeaway">
     <h3>Key takeaway</h3>
@@ -166,7 +166,7 @@ register("medical-debt-buying-house", {
 
 <p><strong>The FICO 10T transition:</strong> Fannie Mae and Freddie Mac mandated that lenders begin transitioning to FICO 10T in 2025. FICO 10T ignores paid medical collections at the scoring model level (in addition to bureau-level removal) and weighs unpaid medical debt less harshly. However, adoption is uneven &mdash; many lenders still pull legacy FICO 2/4/5 scores. Ask your lender which version they use <em>before</em> you apply.</p>
 
-<p>For a deeper understanding of how these scoring models work, see our guide on <a href="/guides/medical-debt-credit-report-2026">medical debt and credit reports in 2026</a>.</p>
+<p>For a deeper understanding of how these scoring models work, see our guide on <a href="/guides/medical-debt-credit-report-2026/">medical debt and credit reports in 2026</a>.</p>
 
 <h2 id="dti-ratio">3. DTI ratio: the hidden impact of medical debt</h2>
 
@@ -244,9 +244,9 @@ register("medical-debt-buying-house", {
 
 <p><strong>If the debt is under $500:</strong> It is already off your credit report. Paying it will not change your credit score. Do not rush to pay it before a mortgage application &mdash; it is invisible to lenders. Focus your cash on your down payment and closing costs instead.</p>
 
-<p><strong>If the debt is over $500 and unpaid:</strong> Negotiate before paying. Collectors bought the debt for 4&ndash;7 cents on the dollar. Use the strategies in Section 7 to <a href="/guides/settle-medical-debt-collections">settle for 30&ndash;50% of the balance</a>. Once you pay (even a settlement), the bureau policy removes the paid collection from your report. Time your payment at least 45&ndash;60 days before your mortgage application to allow the bureau update to process.</p>
+<p><strong>If the debt is over $500 and unpaid:</strong> Negotiate before paying. Collectors bought the debt for 4&ndash;7 cents on the dollar. Use the strategies in Section 7 to <a href="/guides/settle-medical-debt-collections/">settle for 30&ndash;50% of the balance</a>. Once you pay (even a settlement), the bureau policy removes the paid collection from your report. Time your payment at least 45&ndash;60 days before your mortgage application to allow the bureau update to process.</p>
 
-<p><strong>If the debt is in collections and you want it deleted fast:</strong> Negotiate a <a href="/guides/pay-for-delete-medical-debt">pay-for-delete agreement</a>. While paid medical collections are already removed under bureau policy, a pay-for-delete adds a written guarantee and may speed up removal. Some mortgage lenders can also request a &ldquo;rapid rescore&rdquo; through their credit reporting provider, which updates your score within 3&ndash;5 business days after you provide proof of payment.</p>
+<p><strong>If the debt is in collections and you want it deleted fast:</strong> Negotiate a <a href="/guides/pay-for-delete-medical-debt/">pay-for-delete agreement</a>. While paid medical collections are already removed under bureau policy, a pay-for-delete adds a written guarantee and may speed up removal. Some mortgage lenders can also request a &ldquo;rapid rescore&rdquo; through their credit reporting provider, which updates your score within 3&ndash;5 business days after you provide proof of payment.</p>
 
 <p><strong>If the debt is in a payment plan:</strong> Consider settling the remaining balance with a lump sum before applying. A monthly payment plan counts toward your DTI ratio, but a settled debt does not. If you have $3,000 remaining on a $150/month plan, settling for $1,200 eliminates the $150/month DTI hit &mdash; which could be the difference between approval and denial.</p>
 
@@ -254,7 +254,7 @@ register("medical-debt-buying-house", {
 
 <div class="key-takeaway">
     <h3>Key takeaway</h3>
-    <p>Do not deplete your savings to pay off medical debt before a mortgage application. If the debt is under $500, it is already invisible. If it is over $500, negotiate a settlement at 30&ndash;50% and time the payment 45&ndash;60 days before your application. Preserving cash for your down payment and closing costs is often more important than eliminating a medical collection. Use our <a href="/guides/settle-medical-debt-collections">settlement guide</a> to negotiate the lowest possible amount.</p>
+    <p>Do not deplete your savings to pay off medical debt before a mortgage application. If the debt is under $500, it is already invisible. If it is over $500, negotiate a settlement at 30&ndash;50% and time the payment 45&ndash;60 days before your application. Preserving cash for your down payment and closing costs is often more important than eliminating a medical collection. Use our <a href="/guides/settle-medical-debt-collections/">settlement guide</a> to negotiate the lowest possible amount.</p>
 </div>
 
 <h2 id="explanation-letter">6. Letter of explanation for medical debt</h2>
@@ -288,9 +288,9 @@ register("medical-debt-buying-house", {
 
 <p>If you have medical debt that could affect your mortgage application, the weeks before you apply are the time to act. Here are the strategies that produce the best results for homebuyers.</p>
 
-<p><strong>Strategy 1: Settle collections for less.</strong> Collectors purchased your medical debt for pennies. Offer 30&ndash;40% of the balance as a lump-sum settlement. Once paid, the collection is removed from your credit report under bureau policy. See our full guide on <a href="/guides/settle-medical-debt-collections">settling medical debt in collections</a> for scripts and letter templates.</p>
+<p><strong>Strategy 1: Settle collections for less.</strong> Collectors purchased your medical debt for pennies. Offer 30&ndash;40% of the balance as a lump-sum settlement. Once paid, the collection is removed from your credit report under bureau policy. See our full guide on <a href="/guides/settle-medical-debt-collections/">settling medical debt in collections</a> for scripts and letter templates.</p>
 
-<p><strong>Strategy 2: Get a pay-for-delete agreement.</strong> While paying any medical collection triggers removal under bureau policy, a <a href="/guides/pay-for-delete-medical-debt">written pay-for-delete agreement</a> provides an additional guarantee and may expedite the process. Get the agreement in writing before sending any payment.</p>
+<p><strong>Strategy 2: Get a pay-for-delete agreement.</strong> While paying any medical collection triggers removal under bureau policy, a <a href="/guides/pay-for-delete-medical-debt/">written pay-for-delete agreement</a> provides an additional guarantee and may expedite the process. Get the agreement in writing before sending any payment.</p>
 
 <p><strong>Strategy 3: Dispute inaccurate reporting.</strong> Pull your credit reports from all three bureaus. If any medical collection violates current rules (paid collections still showing, debts under $500, debts less than 12 months old), dispute them immediately. Bureau disputes must be resolved within 30 days. This alone can remove entries that should not be there.</p>
 
@@ -298,7 +298,7 @@ register("medical-debt-buying-house", {
 
 <p><strong>Strategy 5: Request a rapid rescore.</strong> If you pay off or settle a medical collection during the mortgage process, ask your loan officer to request a rapid rescore through their credit reporting provider. A rapid rescore updates your FICO score within 3&ndash;5 business days, compared to the 30&ndash;60 days a normal bureau update takes. This can save weeks in your home-buying timeline.</p>
 
-<p><strong>Strategy 6: Apply for financial assistance.</strong> If the underlying hospital is a nonprofit (60% of US hospitals), you may qualify for charity care or financial assistance that reduces or eliminates the debt entirely. See our guide on <a href="/guides/medical-debt-forgiveness-programs">medical debt forgiveness programs</a> for eligibility details and application steps.</p>
+<p><strong>Strategy 6: Apply for financial assistance.</strong> If the underlying hospital is a nonprofit (60% of US hospitals), you may qualify for charity care or financial assistance that reduces or eliminates the debt entirely. See our guide on <a href="/guides/medical-debt-forgiveness-programs/">medical debt forgiveness programs</a> for eligibility details and application steps.</p>
 
 <h2 id="state-protections">8. State protections that help homebuyers</h2>
 
@@ -326,7 +326,7 @@ register("medical-debt-buying-house", {
     <li><strong>Maryland</strong> (Medical Debt Protection Act, 2024) &mdash; Restricts credit reporting and collection for patients under 300% FPL</li>
 </ul>
 
-<p><strong>What this means for homebuyers:</strong> If you live in California, New York, Washington, or Minnesota, medical debt cannot appear on your credit report under state law &mdash; regardless of the amount. In Colorado or Nevada, debts under $2,500 are protected. If you&rsquo;re buying a home in one of these states and a medical collection appears on your report, dispute it immediately and cite the specific state statute. For detailed state-by-state rules, see our guide on <a href="/guides/medical-debt-credit-report-2026">medical debt and credit reports in 2026</a>.</p>
+<p><strong>What this means for homebuyers:</strong> If you live in California, New York, Washington, or Minnesota, medical debt cannot appear on your credit report under state law &mdash; regardless of the amount. In Colorado or Nevada, debts under $2,500 are protected. If you&rsquo;re buying a home in one of these states and a medical collection appears on your report, dispute it immediately and cite the specific state statute. For detailed state-by-state rules, see our guide on <a href="/guides/medical-debt-credit-report-2026/">medical debt and credit reports in 2026</a>.</p>
 
 <h2 id="faq">Frequently asked questions</h2>
 

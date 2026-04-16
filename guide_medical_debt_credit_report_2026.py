@@ -272,7 +272,7 @@ register("medical-debt-credit-report-2026", {
 
 <div class="key-takeaway">
     <h3>Key takeaway</h3>
-    <p>Ask your lender which FICO version they use <em>before</em> you apply. If they use FICO 9, FICO 10T, or VantageScore 4.0, paid medical collections won&rsquo;t hurt you at all. If they use FICO 8, a paid collection still appears with reduced weight. For deeper analysis of your specific situation, see our companion guide on <a href="/guides/medical-debt-credit-score">medical debt and your credit score</a>.</p>
+    <p>Ask your lender which FICO version they use <em>before</em> you apply. If they use FICO 9, FICO 10T, or VantageScore 4.0, paid medical collections won&rsquo;t hurt you at all. If they use FICO 8, a paid collection still appears with reduced weight. For deeper analysis of your specific situation, see our companion guide on <a href="/guides/medical-debt-credit-score/">medical debt and your credit score</a>.</p>
 </div>
 
 <h2 id="check-report">5. How to check if medical debt is on your report</h2>
@@ -340,7 +340,7 @@ register("medical-debt-credit-report-2026", {
 <p>Send via certified mail with return receipt. The bureau must investigate within 30 days (45 days if you submit additional information). If the collector cannot verify the debt or the entry violates reporting rules, it must be deleted.</p>
 
 <h3>Method 3: Negotiate a pay-for-delete agreement</h3>
-<p>If the debt is valid and over $500, consider a <a href="/guides/pay-for-delete-medical-debt">pay-for-delete negotiation</a>. You offer to pay a portion of the balance in exchange for the collector&rsquo;s written agreement to remove the tradeline from all three bureaus. Typical settlements land at 30&ndash;50% of the balance. Under the 2023 bureau rules, paying a medical collection triggers automatic removal anyway &mdash; so even if the collector won&rsquo;t agree to explicit deletion, paying still gets it off your report.</p>
+<p>If the debt is valid and over $500, consider a <a href="/guides/pay-for-delete-medical-debt/">pay-for-delete negotiation</a>. You offer to pay a portion of the balance in exchange for the collector&rsquo;s written agreement to remove the tradeline from all three bureaus. Typical settlements land at 30&ndash;50% of the balance. Under the 2023 bureau rules, paying a medical collection triggers automatic removal anyway &mdash; so even if the collector won&rsquo;t agree to explicit deletion, paying still gets it off your report.</p>
 
 <p><strong>Before paying any collector</strong>, <a href="/scan">upload your original bill to BillKarma</a> to check for billing errors. If the original bill was wrong, the collection amount is wrong &mdash; and you may owe less than they claim.</p>
 
@@ -381,7 +381,7 @@ register("medical-debt-credit-report-2026", {
 <div class="case-study">
     <h3>Scenario 4: &ldquo;I have medical debt over $500 in a state with no protections&rdquo;</h3>
     <p>A user in Texas had a $3,400 medical collection from a surgery that went to collections in 2024. Texas has no state medical debt credit reporting law, the federal CFPB rule was struck down, and the balance exceeded the $500 voluntary threshold.</p>
-    <p><strong>What he did:</strong> First, he <a href="/scan">uploaded the original bill to BillKarma</a> and found $780 in overcharges (upcoded anesthesia and a duplicate facility fee). He disputed the original bill with the hospital, reducing the balance to $2,620. He then sent a <a href="/guides/pay-for-delete-medical-debt">pay-for-delete letter</a> to the collector offering $900 (34%). The collector accepted $1,050 (40%) with written deletion.</p>
+    <p><strong>What he did:</strong> First, he <a href="/scan">uploaded the original bill to BillKarma</a> and found $780 in overcharges (upcoded anesthesia and a duplicate facility fee). He disputed the original bill with the hospital, reducing the balance to $2,620. He then sent a <a href="/guides/pay-for-delete-medical-debt/">pay-for-delete letter</a> to the collector offering $900 (34%). The collector accepted $1,050 (40%) with written deletion.</p>
     <p><strong>Result:</strong> Saved $2,350 off the original collection. All three tradelines deleted within 45 days. Credit score increased by 47 points.</p>
     <p><strong>Lesson:</strong> Even without state protections, you have options. Check the underlying bill for errors first, then negotiate aggressively. Medical debt collectors purchased the debt for pennies on the dollar and will accept steep discounts.</p>
 </div>
@@ -398,7 +398,7 @@ register("medical-debt-credit-report-2026", {
 
 <p><strong>Step 4: Get everything in writing.</strong> If you establish a payment plan, dispute a charge, or receive financial assistance approval, get written confirmation. If the hospital later sends the account to collections despite your agreement, that documentation is your evidence for a dispute.</p>
 
-<p><strong>Step 5: Monitor your credit.</strong> Set up free monitoring through your bank or at <a href="https://www.annualcreditreport.com" target="_blank" rel="noopener">AnnualCreditReport.com</a>. If a medical collection appears, act immediately &mdash; the sooner you dispute, the less damage it does. Check our guide on <a href="/guides/medical-debt-forgiveness-programs">medical debt forgiveness programs</a> for additional options if you&rsquo;re overwhelmed by bills.</p>
+<p><strong>Step 5: Monitor your credit.</strong> Set up free monitoring through your bank or at <a href="https://www.annualcreditreport.com" target="_blank" rel="noopener">AnnualCreditReport.com</a>. If a medical collection appears, act immediately &mdash; the sooner you dispute, the less damage it does. Check our guide on <a href="/guides/medical-debt-forgiveness-programs/">medical debt forgiveness programs</a> for additional options if you&rsquo;re overwhelmed by bills.</p>
 
 <div class="key-takeaway">
     <h3>Key takeaway</h3>
@@ -430,7 +430,7 @@ register("medical-debt-credit-report-2026", {
 
     <div class="faq-item">
         <h3>How do I remove medical debt from my credit report?</h3>
-        <p>Start by checking whether the debt qualifies for automatic exclusion (paid, under $500, or less than 12 months old). If it should already be gone, file a dispute with each bureau showing the entry. For valid debts over $500, consider a <a href="/guides/pay-for-delete-medical-debt">pay-for-delete negotiation</a> or simply paying the debt (paid medical collections are automatically removed under bureau policy). If your state bans medical debt reporting, cite the specific statute in your dispute.</p>
+        <p>Start by checking whether the debt qualifies for automatic exclusion (paid, under $500, or less than 12 months old). If it should already be gone, file a dispute with each bureau showing the entry. For valid debts over $500, consider a <a href="/guides/pay-for-delete-medical-debt/">pay-for-delete negotiation</a> or simply paying the debt (paid medical collections are automatically removed under bureau policy). If your state bans medical debt reporting, cite the specific statute in your dispute.</p>
     </div>
 
     <div class="faq-item">

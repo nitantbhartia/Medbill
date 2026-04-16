@@ -115,7 +115,7 @@ register("medical-billing-rights-overview", {
     <li><strong>Good faith estimates for uninsured patients:</strong> Providers must give uninsured or self-pay patients a written estimate before scheduled services. If the final bill exceeds the estimate by $400 or more, you can initiate a dispute within 120 days.</li>
 </ul>
 
-<p>The NSA applies to commercial insurance (employer plans, marketplace plans, individual plans). It does not apply to Medicare, Medicaid, TRICARE, or VA — these programs have their own, separate protections. For a deeper look at how these protections work in practice, see our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a>.</p>
+<p>The NSA applies to commercial insurance (employer plans, marketplace plans, individual plans). It does not apply to Medicare, Medicaid, TRICARE, or VA — these programs have their own, separate protections. For a deeper look at how these protections work in practice, see our <a href="/guides/no-surprises-act-explained/">full No Surprises Act guide</a>.</p>
 
 {_embed(mode="markup", title="Check if your bill has surprise charges", subtitle="Enter a CPT code and billed amount to compare against in-network benchmarks.", height="420")}
 
@@ -131,7 +131,7 @@ register("medical-billing-rights-overview", {
     <li><strong>Credit reporting protections.</strong> As of 2023, medical debt under $500 is excluded from credit reports. Paid medical collections are removed entirely. Unpaid medical debt cannot appear on a credit report for at least one year from the date it was sent to collections.</li>
 </ul>
 
-<p>For detailed guidance on handling debt collectors, see our <a href="/guides/fdcpa-rights-medical-debt">FDCPA rights guide</a> and <a href="/guides/debt-validation-letter-medical-bills">debt validation letter template</a>.</p>
+<p>For detailed guidance on handling debt collectors, see our <a href="/guides/fdcpa-rights-medical-debt/">FDCPA rights guide</a> and <a href="/guides/debt-validation-letter-medical-bills/">debt validation letter template</a>.</p>
 
 <h2 id="state-protections">4. State-level billing protections</h2>
 
@@ -195,7 +195,7 @@ register("medical-billing-rights-overview", {
     <li><strong>Statute of limitations:</strong> How long a creditor or collector has to file a lawsuit against you for unpaid medical debt. Once this expires, the debt becomes "time-barred" and cannot be collected through the courts (though the creditor can still attempt voluntary collection). This ranges from 3 to 10 years depending on the state.</li>
 </ul>
 
-<p>If you receive a bill that seems unreasonably old, check both deadlines. A bill that arrives three years after service may violate your state's timely billing requirement even if it falls within the statute of limitations for lawsuits. See our <a href="/guides/medical-debt-statute-of-limitations">statute of limitations guide</a> for state-by-state details.</p>
+<p>If you receive a bill that seems unreasonably old, check both deadlines. A bill that arrives three years after service may violate your state's timely billing requirement even if it falls within the statute of limitations for lawsuits. See our <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations guide</a> for state-by-state details.</p>
 
 <div class="case-study">
     <h3>Case study: $8,400 ER bill arrives 14 months late in California</h3>
@@ -222,11 +222,11 @@ register("medical-billing-rights-overview", {
 <h2 id="action-steps">7. How to exercise your billing rights</h2>
 
 <ol>
-    <li><strong>Always request an itemized bill with CPT codes.</strong> A summary statement is not enough. You need individual line items to identify errors, duplicates, and overcharges. Our <a href="/guides/medical-bill-audit-checklist">12-point audit checklist</a> walks you through exactly what to look for on each line.</li>
+    <li><strong>Always request an itemized bill with CPT codes.</strong> A summary statement is not enough. You need individual line items to identify errors, duplicates, and overcharges. Our <a href="/guides/medical-bill-audit-checklist/">12-point audit checklist</a> walks you through exactly what to look for on each line.</li>
     <li><strong>Compare every bill to your Explanation of Benefits.</strong> Your insurer's EOB shows what was billed, what they paid, and what you owe. If the provider's bill does not match the EOB, one of them is wrong.</li>
     <li><strong>Check for No Surprises Act protections.</strong> If you see out-of-network charges from an ER visit or from a provider you did not choose at an in-network facility, cite the NSA and request reprocessing.</li>
     <li><strong>Request debt validation before paying a collector.</strong> If a medical bill goes to collections, send a written validation request within 30 days. Do not pay until the debt is validated with documentation.</li>
-    <li><strong>Apply for financial assistance at nonprofit hospitals.</strong> Under 501(r), nonprofit hospitals must have a written financial assistance policy and screen patients before pursuing collections. Apply even if you have insurance — many policies cover the patient-responsibility portion. See our <a href="/guides/hospital-financial-assistance-guide">financial assistance guide</a> for a step-by-step walkthrough.</li>
+    <li><strong>Apply for financial assistance at nonprofit hospitals.</strong> Under 501(r), nonprofit hospitals must have a written financial assistance policy and screen patients before pursuing collections. Apply even if you have insurance — many policies cover the patient-responsibility portion. See our <a href="/guides/hospital-financial-assistance-guide/">financial assistance guide</a> for a step-by-step walkthrough.</li>
     <li><strong>Know your state's deadlines.</strong> Check timely billing laws and the statute of limitations for medical debt in your state. An old bill may be uncollectible.</li>
     <li><strong>File complaints when rights are violated.</strong> Report No Surprises Act violations to CMS at cms.gov/nosurprises. Report FDCPA violations to the CFPB at consumerfinance.gov. Report state law violations to your state attorney general.</li>
 </ol>
@@ -241,22 +241,22 @@ register("medical-billing-rights-overview", {
 
     <div class="faq-item">
         <h3>How long does a hospital have to bill me after treatment?</h3>
-        <p>Time limits vary by state. California requires billing within 365 days for insured patients. Texas requires initial billing within the first billing cycle. Many states do not have specific timely billing laws, but all have a statute of limitations on debt collection lawsuits (typically 3 to 10 years). See our <a href="/guides/medical-debt-statute-of-limitations">statute of limitations guide</a> for state-specific deadlines.</p>
+        <p>Time limits vary by state. California requires billing within 365 days for insured patients. Texas requires initial billing within the first billing cycle. Many states do not have specific timely billing laws, but all have a statute of limitations on debt collection lawsuits (typically 3 to 10 years). See our <a href="/guides/medical-debt-statute-of-limitations/">statute of limitations guide</a> for state-specific deadlines.</p>
     </div>
 
     <div class="faq-item">
         <h3>Can a hospital sue me for unpaid medical bills?</h3>
-        <p>Yes, but they must file within your state's statute of limitations. Nonprofit hospitals that sue without first screening for financial assistance may be violating IRS 501(r) requirements. Always respond to a lawsuit within the deadline — ignoring it results in a default judgment. Check whether your hospital is nonprofit in our <a href="/hospitals/">hospital directory</a>, and see our <a href="/guides/medical-debt-lawsuit-defense">lawsuit defense guide</a> for what to do if you are sued.</p>
+        <p>Yes, but they must file within your state's statute of limitations. Nonprofit hospitals that sue without first screening for financial assistance may be violating IRS 501(r) requirements. Always respond to a lawsuit within the deadline — ignoring it results in a default judgment. Check whether your hospital is nonprofit in our <a href="/hospitals/">hospital directory</a>, and see our <a href="/guides/medical-debt-lawsuit-defense/">lawsuit defense guide</a> for what to do if you are sued.</p>
     </div>
 
     <div class="faq-item">
         <h3>What is the No Surprises Act and does it apply to me?</h3>
-        <p>The No Surprises Act protects patients with private insurance from surprise out-of-network bills in emergencies and from providers they did not choose at in-network facilities. It also gives uninsured patients the right to good faith estimates. It does not apply to Medicare, Medicaid, TRICARE, or VA. See our <a href="/guides/no-surprises-act-explained">full No Surprises Act guide</a> for details.</p>
+        <p>The No Surprises Act protects patients with private insurance from surprise out-of-network bills in emergencies and from providers they did not choose at in-network facilities. It also gives uninsured patients the right to good faith estimates. It does not apply to Medicare, Medicaid, TRICARE, or VA. See our <a href="/guides/no-surprises-act-explained/">full No Surprises Act guide</a> for details.</p>
     </div>
 
     <div class="faq-item">
         <h3>Can medical debt appear on my credit report?</h3>
-        <p>Medical debt under $500 is excluded from credit reports. Paid medical collections are removed entirely. Unpaid medical debt cannot appear for at least one year from the date it was sent to collections. Some states like Colorado and New York ban medical debt from credit reports under state law. See our <a href="/guides/medical-debt-credit-score">medical debt and credit guide</a> for full details.</p>
+        <p>Medical debt under $500 is excluded from credit reports. Paid medical collections are removed entirely. Unpaid medical debt cannot appear for at least one year from the date it was sent to collections. Some states like Colorado and New York ban medical debt from credit reports under state law. See our <a href="/guides/medical-debt-credit-score/">medical debt and credit guide</a> for full details.</p>
     </div>
 </div>
 

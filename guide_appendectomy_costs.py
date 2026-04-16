@@ -71,7 +71,7 @@ register("appendectomy-cost", {
 </table>
 
 <div class="key-takeaway">
-    <strong>Why the range is so wide:</strong> Hospital chargemaster prices can be 3&ndash;10x the Medicare rate. The same laparoscopic appendectomy that Medicare reimburses at roughly $7,500 total can generate a $30,000+ bill at chargemaster rates. If you&rsquo;re uninsured, <strong>never pay the chargemaster price</strong>&mdash;ask for the self-pay rate or <a href="/guides/hospital-financial-assistance-charity-care">apply for financial assistance</a>.
+    <strong>Why the range is so wide:</strong> Hospital chargemaster prices can be 3&ndash;10x the Medicare rate. The same laparoscopic appendectomy that Medicare reimburses at roughly $7,500 total can generate a $30,000+ bill at chargemaster rates. If you&rsquo;re uninsured, <strong>never pay the chargemaster price</strong>&mdash;ask for the self-pay rate or <a href="/guides/hospital-financial-assistance-charity-care/">apply for financial assistance</a>.
 </div>
 
 <h2 id="lap-vs-open">2. Laparoscopic vs. open: cost and recovery</h2>
@@ -160,7 +160,7 @@ register("appendectomy-cost", {
 </table>
 
 <div class="key-takeaway">
-    <strong>If you&rsquo;re uninsured:</strong> The chargemaster price is a starting point for negotiation, not what you should pay. Ask for the hospital&rsquo;s self-pay discount (typically 30&ndash;60% off), request a payment plan, and apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a>. Nonprofit hospitals are legally required to have charity care programs.
+    <strong>If you&rsquo;re uninsured:</strong> The chargemaster price is a starting point for negotiation, not what you should pay. Ask for the hospital&rsquo;s self-pay discount (typically 30&ndash;60% off), request a payment plan, and apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a>. Nonprofit hospitals are legally required to have charity care programs.
 </div>
 
 <h2 id="factors">5. Factors that affect your cost</h2>
@@ -169,7 +169,7 @@ register("appendectomy-cost", {
 <p>A ruptured appendix changes everything. A simple appendectomy (DRG 343) has a Medicare payment of roughly $5,200, but a complicated appendectomy with abscess or peritonitis (DRG 342) jumps to $9,000&ndash;$12,000 in Medicare reimbursement&mdash;and $30,000&ndash;$50,000 at chargemaster rates. The hospital stay extends to 3&ndash;7 days, IV antibiotics are added for days, and a drain may be placed. The CPT code changes to 44960 (appendectomy for ruptured appendix with abscess drainage).</p>
 
 <h3>Length of stay</h3>
-<p>Each additional hospital day adds $2,000&ndash;$4,000 to the bill. An uncomplicated laparoscopic appendectomy averages 1 day; an open procedure averages 2&ndash;3 days; a ruptured appendix can mean 5&ndash;7 days. If your stay was extended, check whether each day was coded correctly as inpatient vs. <a href="/guides/observation-status-vs-inpatient">observation status</a>.</p>
+<p>Each additional hospital day adds $2,000&ndash;$4,000 to the bill. An uncomplicated laparoscopic appendectomy averages 1 day; an open procedure averages 2&ndash;3 days; a ruptured appendix can mean 5&ndash;7 days. If your stay was extended, check whether each day was coded correctly as inpatient vs. <a href="/guides/observation-status-vs-inpatient/">observation status</a>.</p>
 
 <h3>Geographic variation</h3>
 <p>Appendectomy costs vary by as much as 200% depending on where you live. Urban academic medical centers in high-cost areas (New York, San Francisco, Boston) can charge $30,000&ndash;$40,000 for the same procedure that costs $12,000&ndash;$16,000 at a community hospital in the Midwest. Medicare adjusts rates by geographic locality, but commercial insurance and chargemaster prices vary even more.</p>
@@ -183,19 +183,19 @@ register("appendectomy-cost", {
 <h2 id="lower-your-bill">6. 5 ways to lower your appendectomy bill</h2>
 
 <h3>1. Get and review your itemized bill</h3>
-<p>Request a full itemized statement with CPT codes and individual charges. Don&rsquo;t accept a summary bill. See our <a href="/guides/how-to-get-itemized-hospital-bill">step-by-step guide to getting an itemized bill</a> for exact language. Once you have it, <a href="/scan">upload it to BillKarma</a> for a free analysis that compares every line item to Medicare rates.</p>
+<p>Request a full itemized statement with CPT codes and individual charges. Don&rsquo;t accept a summary bill. See our <a href="/guides/how-to-get-itemized-hospital-bill/">step-by-step guide to getting an itemized bill</a> for exact language. Once you have it, <a href="/scan">upload it to BillKarma</a> for a free analysis that compares every line item to Medicare rates.</p>
 
 <h3>2. Check for billing errors</h3>
 <p>An estimated 80% of hospital bills contain errors. Common appendectomy billing mistakes include duplicate charges for OR time, unbundled lab panels (billing each test separately instead of as a panel), charges for supplies included in the surgical package, and upcoded ER visit levels. See the <a href="#billing-errors">billing errors section</a> below for specifics.</p>
 
 <h3>3. Apply for financial assistance</h3>
-<p>If you&rsquo;re uninsured or if the bill will cause financial hardship, apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care">financial assistance program</a>. Nonprofit hospitals (about 57% of all U.S. hospitals) are required to have charity care programs. Many cover patients with incomes up to 300&ndash;400% of the federal poverty level, which is $93,600 for a family of four in 2026.</p>
+<p>If you&rsquo;re uninsured or if the bill will cause financial hardship, apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance program</a>. Nonprofit hospitals (about 57% of all U.S. hospitals) are required to have charity care programs. Many cover patients with incomes up to 300&ndash;400% of the federal poverty level, which is $93,600 for a family of four in 2026.</p>
 
 <h3>4. Negotiate the total or request a payment plan</h3>
-<p>If you don&rsquo;t qualify for charity care, negotiate. Ask for the self-pay discount, then ask what Medicare would pay for the same procedure. Many hospitals will settle for 150&ndash;200% of Medicare rates when pushed. Request a 0% interest payment plan&mdash;most hospitals offer 12&ndash;24 month plans with no interest. Read our <a href="/guides/how-to-get-medical-bills-reduced">full negotiation guide</a> for scripts and strategies.</p>
+<p>If you don&rsquo;t qualify for charity care, negotiate. Ask for the self-pay discount, then ask what Medicare would pay for the same procedure. Many hospitals will settle for 150&ndash;200% of Medicare rates when pushed. Request a 0% interest payment plan&mdash;most hospitals offer 12&ndash;24 month plans with no interest. Read our <a href="/guides/how-to-get-medical-bills-reduced/">full negotiation guide</a> for scripts and strategies.</p>
 
 <h3>5. Appeal any out-of-network charges</h3>
-<p>Under the No Surprises Act, emergency services must be covered at in-network cost-sharing levels. If your insurer applied out-of-network rates to any part of your appendectomy, file an appeal citing the No Surprises Act. This includes the surgeon, anesthesiologist, and any other provider involved in your emergency care. Check our <a href="/guides/no-surprises-act-guide">No Surprises Act guide</a> for details.</p>
+<p>Under the No Surprises Act, emergency services must be covered at in-network cost-sharing levels. If your insurer applied out-of-network rates to any part of your appendectomy, file an appeal citing the No Surprises Act. This includes the surgeon, anesthesiologist, and any other provider involved in your emergency care. Check our <a href="/guides/no-surprises-act-guide/">No Surprises Act guide</a> for details.</p>
 
 <div class="case-study">
     <h3>Case study: $28,000 bill reduced to $7,200</h3>
@@ -260,7 +260,7 @@ register("appendectomy-cost", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>How much does an appendectomy cost without insurance?</h3>
-        <p>Without insurance, an appendectomy typically costs $12,000&ndash;$35,000 depending on the type (laparoscopic vs. open), location, and whether complications occur. The national median is about $18,500 for laparoscopic and $23,000 for open. Never pay the chargemaster price&mdash;ask for the self-pay rate and apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a>.</p>
+        <p>Without insurance, an appendectomy typically costs $12,000&ndash;$35,000 depending on the type (laparoscopic vs. open), location, and whether complications occur. The national median is about $18,500 for laparoscopic and $23,000 for open. Never pay the chargemaster price&mdash;ask for the self-pay rate and apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a>.</p>
     </div>
 
     <div class="faq-item">

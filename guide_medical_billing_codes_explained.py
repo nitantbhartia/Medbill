@@ -35,7 +35,7 @@ register("medical-billing-codes-explained", {
         },
     ],
     "body": f"""
-<p class="lead">Every charge on your medical bill is driven by a code &mdash; a short alphanumeric string that tells your insurer what was done, why it was done, and how much to pay. These codes determine whether your claim is approved or denied, whether you owe $50 or $5,000, and whether you&rsquo;ve been overcharged. Yet most patients never see these codes, and fewer still understand them. Medical billing errors appear on an estimated <strong>49&ndash;80% of hospital bills</strong>, and the majority of those errors involve incorrect, duplicated, or inflated codes. Understanding the basics of <a href="/guides/what-are-cpt-codes">CPT</a>, <a href="/guides/icd10-drg-codes">ICD-10, and DRG</a> codes gives you the power to read your bill, spot mistakes, and fight back.</p>
+<p class="lead">Every charge on your medical bill is driven by a code &mdash; a short alphanumeric string that tells your insurer what was done, why it was done, and how much to pay. These codes determine whether your claim is approved or denied, whether you owe $50 or $5,000, and whether you&rsquo;ve been overcharged. Yet most patients never see these codes, and fewer still understand them. Medical billing errors appear on an estimated <strong>49&ndash;80% of hospital bills</strong>, and the majority of those errors involve incorrect, duplicated, or inflated codes. Understanding the basics of <a href="/guides/what-are-cpt-codes/">CPT</a>, <a href="/guides/icd10-drg-codes/">ICD-10, and DRG</a> codes gives you the power to read your bill, spot mistakes, and fight back.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -59,7 +59,7 @@ register("medical-billing-codes-explained", {
 <ul>
     <li><strong>Whether your insurance covers the service.</strong> If the diagnosis code doesn&rsquo;t match the procedure code, or if the code is classified as &ldquo;not medically necessary,&rdquo; your insurer may deny the claim entirely &mdash; leaving you with the full bill.</li>
     <li><strong>How much the provider gets paid.</strong> Each CPT code has a Medicare-assigned dollar value. Hospitals and doctors use this as a baseline, then mark up. A higher-level code means a higher charge.</li>
-    <li><strong>Whether you&rsquo;ve been overcharged.</strong> Upcoding (billing a higher code than warranted), unbundling (billing separately for bundled services), and duplicate codes are the three most common <a href="/guides/common-hospital-billing-errors">billing errors</a>. You can&rsquo;t catch them if you don&rsquo;t know what the codes mean.</li>
+    <li><strong>Whether you&rsquo;ve been overcharged.</strong> Upcoding (billing a higher code than warranted), unbundling (billing separately for bundled services), and duplicate codes are the three most common <a href="/guides/common-hospital-billing-errors/">billing errors</a>. You can&rsquo;t catch them if you don&rsquo;t know what the codes mean.</li>
 </ul>
 
 <div class="key-takeaway">
@@ -98,7 +98,7 @@ register("medical-billing-codes-explained", {
     </tbody>
 </table>
 
-<p>Notice the gap between what hospitals charge and what Medicare pays. A comprehensive metabolic panel (CPT 80053) that Medicare values at $11 can appear on a hospital bill for $400 &mdash; a 3,500% markup. This is why looking up the <a href="/guides/what-are-cpt-codes">CPT code</a> on your bill and comparing it to the Medicare rate is the single most powerful tool you have for spotting overcharges.</p>
+<p>Notice the gap between what hospitals charge and what Medicare pays. A comprehensive metabolic panel (CPT 80053) that Medicare values at $11 can appear on a hospital bill for $400 &mdash; a 3,500% markup. This is why looking up the <a href="/guides/what-are-cpt-codes/">CPT code</a> on your bill and comparing it to the Medicare rate is the single most powerful tool you have for spotting overcharges.</p>
 
 {_embed(mode="cost", cpt="99214", title="Look up any CPT code on your bill", subtitle="Enter a CPT code to see the Medicare rate and compare it to your charge.")}
 
@@ -131,7 +131,7 @@ register("medical-billing-codes-explained", {
 </ul>
 
 <div class="key-takeaway">
-    <strong>Check your diagnosis codes.</strong> Request your claim from your insurer (or look at your Explanation of Benefits) and verify that the ICD-10 codes match your actual diagnosis. If a routine screening was coded as diagnostic, or if the diagnosis code doesn&rsquo;t match what your doctor told you, ask the provider&rsquo;s billing department to correct and resubmit the claim. For a deeper dive, see our <a href="/guides/icd10-drg-codes">ICD-10 and DRG codes guide</a>.
+    <strong>Check your diagnosis codes.</strong> Request your claim from your insurer (or look at your Explanation of Benefits) and verify that the ICD-10 codes match your actual diagnosis. If a routine screening was coded as diagnostic, or if the diagnosis code doesn&rsquo;t match what your doctor told you, ask the provider&rsquo;s billing department to correct and resubmit the claim. For a deeper dive, see our <a href="/guides/icd10-drg-codes/">ICD-10 and DRG codes guide</a>.
 </div>
 
 <h2 id="hcpcs-codes">4. HCPCS codes explained</h2>
@@ -158,7 +158,7 @@ register("medical-billing-codes-explained", {
     </tbody>
 </table>
 
-<p>HCPCS codes are where some of the most extreme markups appear. Drug charges in hospital settings routinely exceed the Medicare rate by 300&ndash;800%. Durable medical equipment (DME) like knee braces and CPAP machines are often billed at several times the rate you could purchase them for retail. Always compare the HCPCS code on your bill against the Medicare fee schedule, and check whether you can obtain supplies or equipment from an independent DME supplier for less. For more on drug charges specifically, see our guide to <a href="/guides/hospital-drug-charges">hospital drug pricing</a>.</p>
+<p>HCPCS codes are where some of the most extreme markups appear. Drug charges in hospital settings routinely exceed the Medicare rate by 300&ndash;800%. Durable medical equipment (DME) like knee braces and CPAP machines are often billed at several times the rate you could purchase them for retail. Always compare the HCPCS code on your bill against the Medicare fee schedule, and check whether you can obtain supplies or equipment from an independent DME supplier for less. For more on drug charges specifically, see our guide to <a href="/guides/hospital-drug-charges/">hospital drug pricing</a>.</p>
 
 <h2 id="drg-codes">5. DRG codes explained</h2>
 
@@ -177,11 +177,11 @@ register("medical-billing-codes-explained", {
 
 <ul>
     <li><strong>DRG upcoding:</strong> Hospitals have a financial incentive to assign a higher-severity DRG because it pays more. A pneumonia stay coded as DRG 194 (with major complication) pays ~$9,500, while DRG 195 (without major complication) pays ~$6,800. If complication codes are added to your chart that don&rsquo;t reflect your actual condition, the hospital collects more &mdash; and your coinsurance may be higher.</li>
-    <li><strong>Observation vs. inpatient:</strong> Whether you&rsquo;re classified as &ldquo;inpatient&rdquo; (and assigned a DRG) or &ldquo;observation&rdquo; status drastically affects your bill. Observation status means the DRG system doesn&rsquo;t apply, and you may be billed for each service individually at outpatient rates &mdash; often costing more. See our <a href="/guides/observation-status-explained">observation status guide</a> for details.</li>
+    <li><strong>Observation vs. inpatient:</strong> Whether you&rsquo;re classified as &ldquo;inpatient&rdquo; (and assigned a DRG) or &ldquo;observation&rdquo; status drastically affects your bill. Observation status means the DRG system doesn&rsquo;t apply, and you may be billed for each service individually at outpatient rates &mdash; often costing more. See our <a href="/guides/observation-status-explained/">observation status guide</a> for details.</li>
 </ul>
 
 <div class="key-takeaway">
-    <strong>After any hospital stay:</strong> Request your discharge summary and medical records, which will include the DRG code. Search the DRG code online to see its description and severity level. If the DRG describes complications you didn&rsquo;t have, or a severity level that doesn&rsquo;t match your experience, contact the hospital&rsquo;s billing department and ask for a review. For a complete breakdown, see our <a href="/guides/icd10-drg-codes">ICD-10 and DRG codes guide</a>.
+    <strong>After any hospital stay:</strong> Request your discharge summary and medical records, which will include the DRG code. Search the DRG code online to see its description and severity level. If the DRG describes complications you didn&rsquo;t have, or a severity level that doesn&rsquo;t match your experience, contact the hospital&rsquo;s billing department and ask for a review. For a complete breakdown, see our <a href="/guides/icd10-drg-codes/">ICD-10 and DRG codes guide</a>.
 </div>
 
 <h2 id="billing-code-errors">6. How billing codes lead to errors</h2>
@@ -192,7 +192,7 @@ register("medical-billing-codes-explained", {
 
 <p>Upcoding occurs when a provider bills a higher-level code than the service delivered. The most common upcoding scenario involves office visit levels. CPT codes 99211 through 99215 represent five levels of office visit complexity, with 99215 being the most complex and expensive. A routine 15-minute follow-up (Level 3, CPT 99213, Medicare rate ~$112) billed as a complex visit (Level 5, CPT 99215, Medicare rate ~$211) nearly doubles the charge.</p>
 
-<p>For more on how often this happens, see our <a href="/guides/medical-billing-errors-statistics-2026">medical billing error statistics</a>.</p>
+<p>For more on how often this happens, see our <a href="/guides/medical-billing-errors-statistics-2026/">medical billing error statistics</a>.</p>
 
 <h3>b) Unbundling</h3>
 

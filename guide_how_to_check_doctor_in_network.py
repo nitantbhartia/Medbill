@@ -74,7 +74,7 @@ register("how-to-check-doctor-in-network", {
 
 <ul>
     <li><strong>No negotiated rate.</strong> In-network providers agree to accept the insurer&rsquo;s contracted rate as payment in full. Out-of-network providers have no such agreement and bill their full chargemaster price, which is often 3&ndash;10x the Medicare rate.</li>
-    <li><strong>Higher cost-sharing.</strong> Most plans apply a separate, higher <a href="/guides/copay-vs-coinsurance-vs-deductible">deductible and coinsurance</a> for out-of-network care. A plan might cover 80% in-network but only 50% out-of-network &mdash; and that 50% is calculated on the insurer&rsquo;s &ldquo;allowed amount,&rdquo; not the provider&rsquo;s full charge.</li>
+    <li><strong>Higher cost-sharing.</strong> Most plans apply a separate, higher <a href="/guides/copay-vs-coinsurance-vs-deductible/">deductible and coinsurance</a> for out-of-network care. A plan might cover 80% in-network but only 50% out-of-network &mdash; and that 50% is calculated on the insurer&rsquo;s &ldquo;allowed amount,&rdquo; not the provider&rsquo;s full charge.</li>
     <li><strong>Balance billing.</strong> Out-of-network providers can &ldquo;balance bill&rdquo; you for the difference between what they charge and what your insurer pays. If a surgeon charges $10,000, your insurer pays $4,000 as the allowed amount, and you owe the remaining $6,000 on top of your coinsurance. The No Surprises Act now restricts this practice in many situations, but not all.</li>
 </ul>
 
@@ -133,7 +133,7 @@ register("how-to-check-doctor-in-network", {
 
 <h3>Trap 2: The facility is in-network, but your doctor is not</h3>
 
-<p>You choose an in-network hospital, but the doctor who treats you there &mdash; an ER physician, hospitalist, or specialist &mdash; is an independent contractor who doesn&rsquo;t participate in your network. Before the No Surprises Act, this was the leading cause of surprise medical bills. The law now protects patients in many of these situations, but gaps remain for scheduled, elective procedures where you chose the out-of-network provider. See our <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a> for details.</p>
+<p>You choose an in-network hospital, but the doctor who treats you there &mdash; an ER physician, hospitalist, or specialist &mdash; is an independent contractor who doesn&rsquo;t participate in your network. Before the No Surprises Act, this was the leading cause of surprise medical bills. The law now protects patients in many of these situations, but gaps remain for scheduled, elective procedures where you chose the out-of-network provider. See our <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a> for details.</p>
 
 <h3>Trap 3: Your doctor moves to a new practice or location</h3>
 
@@ -167,7 +167,7 @@ register("how-to-check-doctor-in-network", {
     <li><strong>Ask your surgeon&rsquo;s office</strong> for the names of the anesthesiology group, pathology group, and any other providers who will be involved. Verify each one&rsquo;s network status with your insurer.</li>
     <li><strong>Ask the facility</strong> which laboratory they send specimens to. If it&rsquo;s out-of-network, request that your samples be sent to an in-network lab instead.</li>
     <li><strong>Request in writing</strong> that only in-network providers be assigned to your case. While this is not always possible (especially in emergencies), making the request creates a paper trail if a surprise bill arises.</li>
-    <li><strong>Know your No Surprises Act protections.</strong> For non-emergency services at an in-network facility, if an out-of-network provider treats you without your advance consent, the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> generally requires that you only pay in-network cost-sharing amounts.</li>
+    <li><strong>Know your No Surprises Act protections.</strong> For non-emergency services at an in-network facility, if an out-of-network provider treats you without your advance consent, the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> generally requires that you only pay in-network cost-sharing amounts.</li>
 </ol>
 
 <div class="case-study">
@@ -201,12 +201,12 @@ register("how-to-check-doctor-in-network", {
 </ol>
 
 <div class="key-takeaway">
-    <strong>Don&rsquo;t panic if your doctor leaves your network.</strong> You have rights. Contact your insurer immediately to request a continuity of care exception. Most states require insurers to honor in-network rates for 60&ndash;120 days for patients in active treatment. For a full breakdown of how insurance networks function, see our <a href="/guides/how-health-insurance-works">guide to how health insurance works</a>.
+    <strong>Don&rsquo;t panic if your doctor leaves your network.</strong> You have rights. Contact your insurer immediately to request a continuity of care exception. Most states require insurers to honor in-network rates for 60&ndash;120 days for patients in active treatment. For a full breakdown of how insurance networks function, see our <a href="/guides/how-health-insurance-works/">guide to how health insurance works</a>.
 </div>
 
 <h2 id="no-surprises-act">6. How the No Surprises Act protects you from surprise out-of-network bills</h2>
 
-<p>The <a href="/guides/no-surprises-act-explained">No Surprises Act</a>, effective January 1, 2022, is the most significant federal protection against unexpected out-of-network bills. Here&rsquo;s what it covers and what it doesn&rsquo;t:</p>
+<p>The <a href="/guides/no-surprises-act-explained/">No Surprises Act</a>, effective January 1, 2022, is the most significant federal protection against unexpected out-of-network bills. Here&rsquo;s what it covers and what it doesn&rsquo;t:</p>
 
 <h3>What the No Surprises Act protects</h3>
 
@@ -225,7 +225,7 @@ register("how-to-check-doctor-in-network", {
     <li>Out-of-network facilities for scheduled, elective procedures</li>
 </ul>
 
-<p>If you believe you received a surprise out-of-network bill that should be covered under the No Surprises Act, you can file a complaint with the federal No Surprises Help Desk at 1-800-985-3059 or through <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a>. For a deeper dive, read our <a href="/guides/no-surprises-act-explained">complete No Surprises Act guide</a>.</p>
+<p>If you believe you received a surprise out-of-network bill that should be covered under the No Surprises Act, you can file a complaint with the federal No Surprises Help Desk at 1-800-985-3059 or through <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener">cms.gov/nosurprises</a>. For a deeper dive, read our <a href="/guides/no-surprises-act-explained/">complete No Surprises Act guide</a>.</p>
 
 <div class="case-study">
     <h3>Case study: emergency room visit with out-of-network ER physician</h3>
@@ -242,7 +242,7 @@ register("how-to-check-doctor-in-network", {
 
 <p><strong>Step 3 &mdash; Negotiate directly with the provider.</strong> Out-of-network providers are often willing to negotiate, especially if the alternative is a lengthy collections process. Ask for a reduction to the Medicare rate or the insurer&rsquo;s allowed amount. Many providers will accept 150&ndash;200% of Medicare as a reasonable rate. Use our <a href="/calculator">calculator</a> to look up the Medicare rate for your service to know your target price.</p>
 
-<p><strong>Step 4 &mdash; File a formal appeal with your insurer.</strong> Submit a written appeal requesting in-network coverage. Include documentation of any directory errors, lack of informed consent, or emergency circumstances. For guidance on writing an effective appeal, see our <a href="/guides/out-of-network-medical-bills">out-of-network bills guide</a>.</p>
+<p><strong>Step 4 &mdash; File a formal appeal with your insurer.</strong> Submit a written appeal requesting in-network coverage. Include documentation of any directory errors, lack of informed consent, or emergency circumstances. For guidance on writing an effective appeal, see our <a href="/guides/out-of-network-medical-bills/">out-of-network bills guide</a>.</p>
 
 <p><strong>Step 5 &mdash; Request an itemized bill.</strong> Before paying anything, request a fully itemized statement with CPT codes and individual charges. Compare each line item against the Medicare rate using our <a href="/calculator">calculator</a>. Out-of-network charges that exceed 300% of the Medicare rate are strong candidates for negotiation.</p>
 

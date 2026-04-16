@@ -193,7 +193,7 @@ register("hospital-cash-pay-self-pay-discount", {
 
 <h3>Ask about charity care at the same time</h3>
 
-<p>If your income is below 400% of the Federal Poverty Level (approximately $62,400 for an individual in 2026), you may qualify for financial assistance on top of any cash discount. All nonprofit hospitals are required to have financial assistance programs under IRS Section 501(r). Ask both questions: &ldquo;What is your discounted cash rate, and what financial assistance programs do you offer?&rdquo; See our full guide to <a href="/guides/hospital-billing-grades-explained">hospital billing grades</a> for context on whether your hospital is likely to have generous financial assistance policies.</p>
+<p>If your income is below 400% of the Federal Poverty Level (approximately $62,400 for an individual in 2026), you may qualify for financial assistance on top of any cash discount. All nonprofit hospitals are required to have financial assistance programs under IRS Section 501(r). Ask both questions: &ldquo;What is your discounted cash rate, and what financial assistance programs do you offer?&rdquo; See our full guide to <a href="/guides/hospital-billing-grades-explained/">hospital billing grades</a> for context on whether your hospital is likely to have generous financial assistance policies.</p>
 
 <h2 id="traps">5. The traps: when cash pricing backfires</h2>
 
@@ -287,7 +287,7 @@ register("hospital-cash-pay-self-pay-discount", {
     </div>
     <div class="faq-item">
         <h3>Can a hospital charge me more than my insurance&rsquo;s negotiated rate if I pay cash?</h3>
-        <p>Yes, this happens. CMS transparency rules require cash prices to be posted, but do not require them to be lower than all negotiated insurance rates. At hospitals with strong commercial contracts, insured patients can sometimes pay less than the posted cash price. BillKarma flags this situation. Always compare both before deciding. See <a href="/guides/hospital-billing-grades-explained">our hospital billing grades guide</a> for context on which types of hospitals tend to price this way.</p>
+        <p>Yes, this happens. CMS transparency rules require cash prices to be posted, but do not require them to be lower than all negotiated insurance rates. At hospitals with strong commercial contracts, insured patients can sometimes pay less than the posted cash price. BillKarma flags this situation. Always compare both before deciding. See <a href="/guides/hospital-billing-grades-explained/">our hospital billing grades guide</a> for context on which types of hospitals tend to price this way.</p>
     </div>
     <div class="faq-item">
         <h3>Can I negotiate the cash price below what the hospital posts?</h3>

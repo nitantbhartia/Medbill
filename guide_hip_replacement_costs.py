@@ -111,7 +111,7 @@ register("hip-replacement-surgery-cost", {
 
 <p><strong>Your cost:</strong> Part A deductible of $1,676, then $0 for days 1&ndash;60. If you have a Medigap plan, it may cover the deductible. For outpatient hip replacement at an ASC, you pay 20% coinsurance under Part B.</p>
 
-<p>For details on how Medicare handles orthopedic billing, see our <a href="/guides/orthopedic-surgery-billing-costs">orthopedic billing guide</a>.</p>
+<p>For details on how Medicare handles orthopedic billing, see our <a href="/guides/orthopedic-surgery-billing-costs/">orthopedic billing guide</a>.</p>
 
 <h2 id="approaches">4. Anterior vs. posterior approach costs</h2>
 
@@ -172,7 +172,7 @@ register("hip-replacement-surgery-cost", {
 <p>Ask whether a standard implant ($5K&ndash;$8K) will perform as well as a premium one ($10K&ndash;$14K) for your specific case. Most patients do well with standard implants.</p>
 
 <h3>e) Apply for financial assistance</h3>
-<p>Nonprofit hospitals must offer charity care. Many cover 50&ndash;100% of costs for patients below 300&ndash;400% of the federal poverty level. Apply <em>before</em> surgery. See our <a href="/guides/hospital-financial-assistance-charity-care">financial assistance guide</a>.</p>
+<p>Nonprofit hospitals must offer charity care. Many cover 50&ndash;100% of costs for patients below 300&ndash;400% of the federal poverty level. Apply <em>before</em> surgery. See our <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance guide</a>.</p>
 
 <div class="case-study">
     <h3>$51,000 bill cut to $16,800</h3>

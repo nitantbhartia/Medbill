@@ -175,7 +175,7 @@ register("urgent-care-billing", {
     <li><strong>Request your medical record</strong> — needed if you suspect upcoding. The documentation must support the E/M level billed.</li>
     <li><strong>Review your EOB</strong> — confirm what your insurer paid and what your cost-sharing responsibility is. Compare to your actual bill.</li>
     <li><strong>Call the billing department</strong> — many errors are corrected over the phone. Be specific: &ldquo;I had a sinus infection visit and was billed 99215 (high complexity). The documentation doesn&rsquo;t support that level. I&rsquo;m requesting a corrected claim at 99213.&rdquo;</li>
-    <li><strong>Write a dispute letter</strong> — if a phone call doesn&rsquo;t resolve it. See our <a href="/guides/medical-bill-dispute-letter">dispute letter template</a>.</li>
+    <li><strong>Write a dispute letter</strong> — if a phone call doesn&rsquo;t resolve it. See our <a href="/guides/medical-bill-dispute-letter/">dispute letter template</a>.</li>
     <li><strong>File with your state insurance commissioner</strong> — if a facility fee was improperly charged or balance billing occurred, a state complaint often moves things quickly.</li>
 </ol>
 

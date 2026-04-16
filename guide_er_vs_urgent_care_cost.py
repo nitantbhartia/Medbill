@@ -221,7 +221,7 @@ register("emergency-room-vs-urgent-care-cost", {
 
     <div class="faq-item">
         <h3>Can the ER bill me if I can&rsquo;t afford to pay?</h3>
-        <p>Yes. EMTALA requires the ER to treat you regardless of ability to pay, but it does not forgive the bill. After treatment, apply for the hospital&rsquo;s financial assistance (charity care) program. Nonprofit hospitals are required to have these programs and must help patients who meet income thresholds. See our <a href="/guides/hospital-financial-assistance-charity-care">financial assistance guide</a>.</p>
+        <p>Yes. EMTALA requires the ER to treat you regardless of ability to pay, but it does not forgive the bill. After treatment, apply for the hospital&rsquo;s financial assistance (charity care) program. Nonprofit hospitals are required to have these programs and must help patients who meet income thresholds. See our <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance guide</a>.</p>
     </div>
 
     <div class="faq-item">

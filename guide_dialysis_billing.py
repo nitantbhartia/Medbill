@@ -96,7 +96,7 @@ register("dialysis-billing", {
 
 <p><strong>Medigap (Medicare Supplement) plans</strong> can cover the 20% Part B coinsurance, potentially reducing your annual dialysis out-of-pocket to near zero. However, if you are under 65 and qualify for Medicare solely through ESRD, Medigap eligibility varies by state&mdash;only about half of states require Medigap insurers to sell plans to under-65 ESRD patients.</p>
 
-<p>Learn how Medicare billing works in our <a href="/guides/medicare-billing-explained">Medicare billing guide</a>. For tips on appealing Medicare claim denials, see our <a href="/guides/how-to-appeal-a-medical-bill-denial">appeal guide</a>.</p>
+<p>Learn how Medicare billing works in our <a href="/guides/medicare-billing-explained/">Medicare billing guide</a>. For tips on appealing Medicare claim denials, see our <a href="/guides/how-to-appeal-a-medical-bill-denial/">appeal guide</a>.</p>
 
 <h2 id="waiting-period">3. The 3-month waiting period and how to avoid it</h2>
 

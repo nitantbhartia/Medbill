@@ -196,7 +196,7 @@ register("allergy-testing-billing", {
     <strong>Prior authorization:</strong> Some plans require prior authorization for blood-based allergy
     panels, especially large panels with 50+ allergens. If the test is performed without authorization, the
     claim may be denied retroactively and you may be responsible for the full lab charge. For more on prior
-    authorization, see our <a href="/guides/prior-authorization">prior authorization guide</a>.
+    authorization, see our <a href="/guides/prior-authorization/">prior authorization guide</a>.
 </p>
 
 <h2 id="out-of-network-labs">4. Out-of-network lab risks</h2>
@@ -220,7 +220,7 @@ register("allergy-testing-billing", {
     the lab is out-of-network, ask whether the sample can be sent to an in-network alternative. Under the
     No Surprises Act, you may have protections against surprise out-of-network lab bills for services
     provided at in-network facilities, but the rules vary by situation. See our
-    <a href="/guides/no-surprises-act-explained">No Surprises Act guide</a> for details.
+    <a href="/guides/no-surprises-act-explained/">No Surprises Act guide</a> for details.
 </p>
 
 <table>
@@ -408,12 +408,12 @@ register("allergy-testing-billing", {
 
     <div class="faq-item">
         <h3>Are food allergy panels covered by insurance?</h3>
-        <p>Usually not, unless you have a documented history of food-related allergic reactions. Large screening panels (50 to 100 foods) without clinical history are routinely denied as medically unnecessary. IgG food sensitivity panels are not covered by any insurer. See our <a href="/guides/why-lab-test-bills-are-so-high">lab test billing guide</a> for more on lab cost disputes.</p>
+        <p>Usually not, unless you have a documented history of food-related allergic reactions. Large screening panels (50 to 100 foods) without clinical history are routinely denied as medically unnecessary. IgG food sensitivity panels are not covered by any insurer. See our <a href="/guides/why-lab-test-bills-are-so-high/">lab test billing guide</a> for more on lab cost disputes.</p>
     </div>
 
     <div class="faq-item">
         <h3>Can I dispute my allergy testing bill?</h3>
-        <p>Yes. Common dispute grounds include: out-of-network lab used without your knowledge, duplicate testing (blood panel after skin prick), excessive panel size, and per-allergen charges exceeding 300 percent of Medicare rates. Request an itemized bill showing each CPT code and allergen count. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> provides step-by-step instructions.</p>
+        <p>Yes. Common dispute grounds include: out-of-network lab used without your knowledge, duplicate testing (blood panel after skin prick), excessive panel size, and per-allergen charges exceeding 300 percent of Medicare rates. Request an itemized bill showing each CPT code and allergen count. Our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> provides step-by-step instructions.</p>
     </div>
 </div>
 

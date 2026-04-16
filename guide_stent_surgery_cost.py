@@ -213,7 +213,7 @@ register("stent-surgery-cost", {
 
     <div class="faq-item">
         <h3>Can I negotiate a stent procedure bill if I&rsquo;m uninsured?</h3>
-        <p>Yes. Hospitals typically reduce chargemaster prices by 40&ndash;60% for uninsured patients who request the self-pay rate. Nonprofit hospitals are required to have financial assistance programs. If you&rsquo;re near or below 300&ndash;400% of the federal poverty level, you may qualify for significant or full charity care. See our <a href="/guides/hospital-financial-assistance-charity-care">financial assistance guide</a>.</p>
+        <p>Yes. Hospitals typically reduce chargemaster prices by 40&ndash;60% for uninsured patients who request the self-pay rate. Nonprofit hospitals are required to have financial assistance programs. If you&rsquo;re near or below 300&ndash;400% of the federal poverty level, you may qualify for significant or full charity care. See our <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance guide</a>.</p>
     </div>
 </div>
 

@@ -308,7 +308,7 @@ register("hospital-price-transparency", {
     </div>
     <div class="faq-item">
         <h3>Are the posted prices what I&rsquo;ll actually pay?</h3>
-        <p>No &mdash; but they are your best starting point. The gross charge is the list price before insurance. The payer-specific negotiated rate is what your insurer actually pays. Your out-of-pocket is then determined by your plan&rsquo;s deductible, coinsurance, and copay on top of that negotiated rate. The discounted cash price is relevant if you&rsquo;re uninsured or paying out of pocket. For help calculating your expected costs, see our <a href="/guides/hospital-billing-grades-explained">hospital billing grades guide</a>.</p>
+        <p>No &mdash; but they are your best starting point. The gross charge is the list price before insurance. The payer-specific negotiated rate is what your insurer actually pays. Your out-of-pocket is then determined by your plan&rsquo;s deductible, coinsurance, and copay on top of that negotiated rate. The discounted cash price is relevant if you&rsquo;re uninsured or paying out of pocket. For help calculating your expected costs, see our <a href="/guides/hospital-billing-grades-explained/">hospital billing grades guide</a>.</p>
     </div>
     <div class="faq-item">
         <h3>How accurate are the posted prices?</h3>

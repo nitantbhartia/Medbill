@@ -540,7 +540,7 @@ costs at facilities near you before committing to a specific clinic.</p>
     been carved out of coverage. Only about 43% of large employers covered Wegovy as of 2024, and that
     number is declining. The drugs contain the same active ingredient but have different NDC codes,
     different FDA indications, and very different coverage outcomes. See our
-    <a href="/guides/prior-authorization">prior authorization guide</a> for more on how indication
+    <a href="/guides/prior-authorization/">prior authorization guide</a> for more on how indication
     affects coverage decisions.</p>
   </div>
 
@@ -552,7 +552,7 @@ costs at facilities near you before committing to a specific clinic.</p>
     letter of medical necessity within your plan&rsquo;s appeal deadline (usually 60&ndash;180 days).
     Ask your doctor to request a peer-to-peer review with the insurer&rsquo;s medical director.
     If the internal appeal fails, request an independent external review. See our full
-    <a href="/guides/appeal-denial">insurance denial appeal guide</a> for a detailed walkthrough.</p>
+    <a href="/guides/appeal-denial/">insurance denial appeal guide</a> for a detailed walkthrough.</p>
   </div>
 
   <div class="faq-item">

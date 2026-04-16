@@ -269,7 +269,7 @@ register("icd10-drg-codes", {
 <p>
     The HHS Office of Inspector General has identified upcoding as a persistent problem, particularly in
     Medicare Advantage plans where risk adjustment payments create additional incentives to code higher
-    severity. See our <a href="/guides/common-hospital-billing-errors">billing errors guide</a> for
+    severity. See our <a href="/guides/common-hospital-billing-errors/">billing errors guide</a> for
     other common mistakes that inflate your bill. Check your hospital's upcoding risk in our
     <a href="/hospitals/">hospital directory</a>.
 </p>
@@ -459,7 +459,7 @@ register("icd10-drg-codes", {
 
     <div class="faq-item">
         <h3>What should I do if I think my bill has the wrong DRG?</h3>
-        <p>Request your medical record and compare documented diagnoses to the ICD-10 codes. Submit a written dispute identifying the specific codes you believe are incorrect. If the hospital does not correct the error, escalate to your insurer. For suspected intentional upcoding, report to the HHS OIG at 1-800-HHS-TIPS. See our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> for detailed instructions.</p>
+        <p>Request your medical record and compare documented diagnoses to the ICD-10 codes. Submit a written dispute identifying the specific codes you believe are incorrect. If the hospital does not correct the error, escalate to your insurer. For suspected intentional upcoding, report to the HHS OIG at 1-800-HHS-TIPS. See our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> for detailed instructions.</p>
     </div>
 </div>
 

@@ -70,7 +70,7 @@ register("how-to-appeal-insurance-denial", {
     <tbody>
         <tr><td>&ldquo;Not medically necessary&rdquo;</td><td>~40% of denials</td><td>~50%</td><td>Yes &mdash; get a letter of medical necessity from your doctor</td></tr>
         <tr><td>&ldquo;Prior authorization required&rdquo;</td><td>~25% of denials</td><td>~60%</td><td>Yes &mdash; often a paperwork error, not a clinical decision</td></tr>
-        <tr><td>&ldquo;Out of network&rdquo;</td><td>~15% of denials</td><td>~35%</td><td>Yes &mdash; check if the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> applies</td></tr>
+        <tr><td>&ldquo;Out of network&rdquo;</td><td>~15% of denials</td><td>~35%</td><td>Yes &mdash; check if the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> applies</td></tr>
         <tr><td>&ldquo;Service not covered&rdquo;</td><td>~10% of denials</td><td>~20%</td><td>Maybe &mdash; lower success, but worth it for expensive services</td></tr>
         <tr><td>&ldquo;Coding error&rdquo;</td><td>~10% of denials</td><td>~80%</td><td>Yes &mdash; very high success when the correct code is resubmitted</td></tr>
     </tbody>
@@ -86,7 +86,7 @@ register("how-to-appeal-insurance-denial", {
 
 <h2 id="understanding-denial">2. Understanding your denial notice</h2>
 
-<p>Every denial comes with a written notice&mdash;either a letter from your insurer or a section on your <a href="/guides/understanding-explanation-of-benefits">Explanation of Benefits (EOB)</a>. This notice contains everything you need to start your appeal. Here&rsquo;s what a typical denial looks like, annotated with the key elements:</p>
+<p>Every denial comes with a written notice&mdash;either a letter from your insurer or a section on your <a href="/guides/understanding-explanation-of-benefits/">Explanation of Benefits (EOB)</a>. This notice contains everything you need to start your appeal. Here&rsquo;s what a typical denial looks like, annotated with the key elements:</p>
 
 <div class="bill-example">
     <div class="bill-header">Explanation of Benefits &mdash; Aetna &mdash; Claim #2026-0215-7743</div>
@@ -331,7 +331,7 @@ register("how-to-appeal-insurance-denial", {
 
     <div class="faq-item">
         <h3>Does it cost anything to appeal an insurance denial?</h3>
-        <p>No. Filing an internal appeal and requesting an external review are both completely free. Insurance companies are required by law to provide a fair appeals process at no cost to you. You may choose to hire a <a href="/guides/how-to-negotiate-medical-bills">medical billing advocate</a>, but this is optional.</p>
+        <p>No. Filing an internal appeal and requesting an external review are both completely free. Insurance companies are required by law to provide a fair appeals process at no cost to you. You may choose to hire a <a href="/guides/how-to-negotiate-medical-bills/">medical billing advocate</a>, but this is optional.</p>
     </div>
 
     <div class="faq-item">
@@ -341,7 +341,7 @@ register("how-to-appeal-insurance-denial", {
 
     <div class="faq-item">
         <h3>Can I appeal an out-of-network denial?</h3>
-        <p>Yes. For emergency care, the <a href="/guides/no-surprises-act-explained">No Surprises Act</a> requires coverage at in-network rates regardless of network status. For non-emergency care, you can appeal if the service wasn&rsquo;t available in-network within a reasonable distance or wait time, or if an in-network provider referred you out of network. Document the lack of in-network availability in your appeal.</p>
+        <p>Yes. For emergency care, the <a href="/guides/no-surprises-act-explained/">No Surprises Act</a> requires coverage at in-network rates regardless of network status. For non-emergency care, you can appeal if the service wasn&rsquo;t available in-network within a reasonable distance or wait time, or if an in-network provider referred you out of network. Document the lack of in-network availability in your appeal.</p>
     </div>
 
     <div class="faq-item">

@@ -76,7 +76,7 @@ register("tennessee-hospital-charity-care", {
 <p>Tennessee hospitals process charity care applications throughout the year, but most require applications within 240 days of the first billing statement. Here&rsquo;s the process:</p>
 
 <ol>
-    <li><strong>Request an itemized bill.</strong> You&rsquo;re entitled to one for free. Don&rsquo;t pay or arrange a payment plan until you&rsquo;ve reviewed it. Learn how to read it using our <a href="/guides/how-to-get-itemized-bill">itemized bill guide</a>.</li>
+    <li><strong>Request an itemized bill.</strong> You&rsquo;re entitled to one for free. Don&rsquo;t pay or arrange a payment plan until you&rsquo;ve reviewed it. Learn how to read it using our <a href="/guides/how-to-get-itemized-bill/">itemized bill guide</a>.</li>
     <li><strong>Contact financial counseling.</strong> Ask for the hospital&rsquo;s Financial Assistance Application (also called Charity Care Application). Every nonprofit hospital must have one.</li>
     <li><strong>Gather documents.</strong> You&rsquo;ll typically need: two most recent pay stubs, most recent tax return (or a statement of no filing), bank statements for past 2&ndash;3 months, and proof of Tennessee residency (utility bill, lease, or state ID).</li>
     <li><strong>Submit and follow up.</strong> Most Tennessee hospitals acknowledge applications within 7&ndash;10 business days. If you haven&rsquo;t heard back in 2 weeks, call the financial counseling office.</li>

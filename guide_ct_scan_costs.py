@@ -125,7 +125,7 @@ register("ct-scan-costs", {
     <li><strong>Technical component ($3,390)</strong> &mdash; The hospital facility fee for the CT scanner, technologist, and overhead. At 12.7x the Medicare rate, this is the primary target for a dispute.</li>
     <li><strong>Professional component ($280)</strong> &mdash; The radiologist&rsquo;s interpretation fee. Often billed by a separate radiology group. At about 1x Medicare, this is reasonable.</li>
     <li><strong>Contrast material ($420)</strong> &mdash; Hospitals must document the volume of contrast used. 120 mL is on the high end for an abdomen/pelvis CT (typical is 80&ndash;100 mL). Request nursing notes to verify the quantity actually administered.</li>
-    <li><strong>ER visit Level 5 ($895)</strong> &mdash; Level 5 is the highest ER evaluation code and should only be applied to the most complex emergency visits. If you were seen as an outpatient (not an ER patient), this code does not belong on this bill. See our guide on <a href="/guides/er-bills">ER billing errors</a> for how to dispute E&amp;M upcoding.</li>
+    <li><strong>ER visit Level 5 ($895)</strong> &mdash; Level 5 is the highest ER evaluation code and should only be applied to the most complex emergency visits. If you were seen as an outpatient (not an ER patient), this code does not belong on this bill. See our guide on <a href="/guides/er-bills/">ER billing errors</a> for how to dispute E&amp;M upcoding.</li>
 </ul>
 
 <h2 id="contrast-charges">4. Contrast dye charges explained</h2>
@@ -160,7 +160,7 @@ register("ct-scan-costs", {
     <li><strong>Higher technical fee baseline</strong> &mdash; ER CT technical fees are set higher than outpatient CT fees even before the E&amp;M and facility charges are added.</li>
 </ol>
 
-<p>If you received a CT scan in the ER and the visit was not a true emergency, <a href="/guides/er-bills">our ER billing guide</a> explains how to dispute the E&amp;M level and facility fee. For future non-emergency imaging needs, an urgent care center or freestanding imaging center will cost a fraction of ER prices.</p>
+<p>If you received a CT scan in the ER and the visit was not a true emergency, <a href="/guides/er-bills/">our ER billing guide</a> explains how to dispute the E&amp;M level and facility fee. For future non-emergency imaging needs, an urgent care center or freestanding imaging center will cost a fraction of ER prices.</p>
 
 <div class="key-takeaway">
     <strong>Got a CT bill from the ER?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we automatically check for upcoded E&amp;M levels, duplicate contrast charges, and facility fees that exceed Medicare benchmarks.
@@ -187,7 +187,7 @@ register("ct-scan-costs", {
     <li><strong>Compare to Medicare rates.</strong> Use our <a href="/calculator">calculator</a> to look up the 2026 Medicare rate for each CPT code. Document the markup multiple for each line item.</li>
     <li><strong>Identify specific errors:</strong> duplicate charges, wrong CPT code (e.g., billed &ldquo;with contrast&rdquo; when no contrast was used), upcoded ER visit level, or contrast quantities that don&rsquo;t match clinical records.</li>
     <li><strong>Call the billing department.</strong> Reference the Medicare rate: &ldquo;Medicare pays $267 for CPT 74177. I am being charged $3,390&mdash;12.7x the Medicare rate. I am requesting a reduction to the 50th percentile of commercial rates for this service.&rdquo;</li>
-    <li><strong>Escalate to patient advocate or financial assistance.</strong> If the billing department won&rsquo;t negotiate, ask to speak with the hospital&rsquo;s patient financial advocate. Nonprofit hospitals must offer charity care and financial assistance programs. Our guide on <a href="/guides/how-to-get-medical-bills-reduced">getting medical bills reduced</a> has the full script.</li>
+    <li><strong>Escalate to patient advocate or financial assistance.</strong> If the billing department won&rsquo;t negotiate, ask to speak with the hospital&rsquo;s patient financial advocate. Nonprofit hospitals must offer charity care and financial assistance programs. Our guide on <a href="/guides/how-to-get-medical-bills-reduced/">getting medical bills reduced</a> has the full script.</li>
 </ol>
 
 <h2 id="case-studies">9. Real-world case studies</h2>
@@ -207,7 +207,7 @@ register("ct-scan-costs", {
 <div class="case-study">
     <h3>CT insurance denial appeal &mdash; prior authorization overturned</h3>
     <p>A 47-year-old man in Illinois had a CT abdomen/pelvis (CPT 74178) ordered after an ER visit. His insurer denied the claim, saying prior authorization had not been obtained. The hospital bill: <strong>$5,400</strong>.</p>
-    <p>Using our <a href="/guides/insurance-denial-appeal">insurance denial appeal guide</a>, he submitted a Level 1 appeal with supporting documentation from his ER physician explaining the urgent nature of the scan. The insurer overturned the denial on appeal, processed the claim, and his final responsibility was his $500 deductible. <strong>Total savings: $4,900.</strong></p>
+    <p>Using our <a href="/guides/insurance-denial-appeal/">insurance denial appeal guide</a>, he submitted a Level 1 appeal with supporting documentation from his ER physician explaining the urgent nature of the scan. The insurer overturned the denial on appeal, processed the claim, and his final responsibility was his $500 deductible. <strong>Total savings: $4,900.</strong></p>
 </div>
 
 <div class="key-takeaway">

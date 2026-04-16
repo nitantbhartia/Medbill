@@ -255,7 +255,7 @@ register("medical-bill-dispute-phone-scripts", {
     </div>
 </div>
 
-<p>For a complete guide to negotiation strategies beyond the self-pay discount, see our <a href="/guides/how-to-negotiate-medical-bills">guide to negotiating medical bills</a>.</p>
+<p>For a complete guide to negotiation strategies beyond the self-pay discount, see our <a href="/guides/how-to-negotiate-medical-bills/">guide to negotiating medical bills</a>.</p>
 
 <h2 id="script-payment-plan">5. Script 4: Requesting a payment plan</h2>
 
@@ -389,7 +389,7 @@ register("medical-bill-dispute-phone-scripts", {
     </div>
 </div>
 
-<p>For a detailed walkthrough of the full appeal process including external review, see our <a href="/guides/how-to-appeal-health-insurance-denial">guide to appealing insurance denials</a>.</p>
+<p>For a detailed walkthrough of the full appeal process including external review, see our <a href="/guides/how-to-appeal-health-insurance-denial/">guide to appealing insurance denials</a>.</p>
 
 <h2 id="script-collection-agency">7. Script 6: Responding to a collection agency</h2>
 
@@ -490,7 +490,7 @@ register("medical-bill-dispute-phone-scripts", {
 
 <h3>Step 2: Follow up in writing</h3>
 
-<p>If the phone dispute is denied, send a formal written dispute letter within 7 days. A written letter creates a legal paper trail and gets routed to compliance staff, not front-line agents. See our <a href="/guides/how-to-dispute-a-medical-bill">guide to disputing medical bills</a> for the full letter template.</p>
+<p>If the phone dispute is denied, send a formal written dispute letter within 7 days. A written letter creates a legal paper trail and gets routed to compliance staff, not front-line agents. See our <a href="/guides/how-to-dispute-a-medical-bill/">guide to disputing medical bills</a> for the full letter template.</p>
 
 <h3>Step 3: File complaints with regulators</h3>
 
@@ -530,7 +530,7 @@ register("medical-bill-dispute-phone-scripts", {
 <div class="faq-section">
     <div class="faq-item">
         <h3>Should I call or write a letter to dispute a medical bill?</h3>
-        <p>Start with a phone call for simple issues&mdash;requesting an itemized bill, asking about a charge, or setting up a payment plan. Follow up in writing for anything involving more than $200, a denied claim, or a billing error that needs documentation. The call gathers information; the <a href="/guides/how-to-dispute-a-medical-bill">written letter</a> creates the legal paper trail.</p>
+        <p>Start with a phone call for simple issues&mdash;requesting an itemized bill, asking about a charge, or setting up a payment plan. Follow up in writing for anything involving more than $200, a denied claim, or a billing error that needs documentation. The call gathers information; the <a href="/guides/how-to-dispute-a-medical-bill/">written letter</a> creates the legal paper trail.</p>
     </div>
 
     <div class="faq-item">
@@ -545,7 +545,7 @@ register("medical-bill-dispute-phone-scripts", {
 
     <div class="faq-item">
         <h3>What if the billing department refuses to adjust my bill?</h3>
-        <p>Escalate step by step: request a supervisor, then send a <a href="/guides/how-to-dispute-a-medical-bill">written dispute letter</a> via certified mail, then file complaints with your state insurance commissioner and the CFPB, and finally request the hospital&rsquo;s patient advocate. Most disputes are resolved at the supervisor or written dispute stage.</p>
+        <p>Escalate step by step: request a supervisor, then send a <a href="/guides/how-to-dispute-a-medical-bill/">written dispute letter</a> via certified mail, then file complaints with your state insurance commissioner and the CFPB, and finally request the hospital&rsquo;s patient advocate. Most disputes are resolved at the supervisor or written dispute stage.</p>
     </div>
 
     <div class="faq-item">

@@ -151,7 +151,7 @@ register("common-hospital-billing-errors", {
 
 <p><strong>How to spot it:</strong> If you are on Medicare and stayed overnight in the hospital, ask in writing: &ldquo;Was I admitted as an inpatient or placed in observation status?&rdquo; You must be notified under the NOTICE Act (the Medicare Outpatient Observation Notice, or MOON), but not all hospitals comply fully.</p>
 
-<p><strong>How to dispute it:</strong> File a written appeal with the hospital and your Medicare Administrative Contractor (MAC). The <a href="/guides/observation-status">observation status guide</a> covers the full appeals process. The stakes are high enough that engaging a patient advocate is worth considering.</p>
+<p><strong>How to dispute it:</strong> File a written appeal with the hospital and your Medicare Administrative Contractor (MAC). The <a href="/guides/observation-status/">observation status guide</a> covers the full appeals process. The stakes are high enough that engaging a patient advocate is worth considering.</p>
 
 <h3 id="error-room-board">Error 7: Inflated room and board charges</h3>
 
@@ -249,12 +249,12 @@ register("common-hospital-billing-errors", {
 
 <p><strong>Step 4: Involve your insurance company.</strong> If the error affected how your claim was processed, call your insurer and ask them to request a corrected claim from the hospital. Insurers have leverage that individual patients don&rsquo;t &mdash; hospitals respond more quickly to insurer requests for corrected claims.</p>
 
-<p><strong>Step 5: Escalate if needed.</strong> If the hospital refuses to correct a clear error, escalate to your state&rsquo;s insurance commissioner (for insurance-related billing disputes) or your state attorney general&rsquo;s consumer protection division. For Medicare patients, contact your Medicare Administrative Contractor (MAC). For detailed dispute letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill">complete dispute guide</a>.</p>
+<p><strong>Step 5: Escalate if needed.</strong> If the hospital refuses to correct a clear error, escalate to your state&rsquo;s insurance commissioner (for insurance-related billing disputes) or your state attorney general&rsquo;s consumer protection division. For Medicare patients, contact your Medicare Administrative Contractor (MAC). For detailed dispute letter templates, see our <a href="/guides/how-to-dispute-a-medical-bill/">complete dispute guide</a>.</p>
 
 <p><strong>Do not pay the disputed amount while the dispute is open.</strong> Ask the hospital to place the disputed items on hold while the review is in progress. Most hospitals will not send an account to collections while a formal billing review is pending.</p>
 
 <div class="key-takeaway">
-    <strong>Need help with the dispute?</strong> Use our <a href="/calculator">Medicare rate calculator</a> to document the benchmark rate for each disputed code, then follow the <a href="/guides/how-to-dispute-a-medical-bill">step-by-step dispute guide</a> with letter templates you can send today.
+    <strong>Need help with the dispute?</strong> Use our <a href="/calculator">Medicare rate calculator</a> to document the benchmark rate for each disputed code, then follow the <a href="/guides/how-to-dispute-a-medical-bill/">step-by-step dispute guide</a> with letter templates you can send today.
 </div>
 
 <h2 id="case-studies">5. Case studies</h2>
@@ -303,12 +303,12 @@ register("common-hospital-billing-errors", {
 
     <div class="faq-item">
         <h3>What is observation status and why does it matter for Medicare patients?</h3>
-        <p>Hospitals can classify a stay as inpatient admission (Medicare Part A) or observation status (outpatient, Medicare Part B). Observation status often costs Medicare patients dramatically more out of pocket and does not qualify them for Medicare-covered skilled nursing facility care afterward. If you are on Medicare and stayed overnight, ask in writing whether you were admitted as inpatient or placed on observation. See our <a href="/guides/observation-status">observation status guide</a> for the full appeals process.</p>
+        <p>Hospitals can classify a stay as inpatient admission (Medicare Part A) or observation status (outpatient, Medicare Part B). Observation status often costs Medicare patients dramatically more out of pocket and does not qualify them for Medicare-covered skilled nursing facility care afterward. If you are on Medicare and stayed overnight, ask in writing whether you were admitted as inpatient or placed on observation. See our <a href="/guides/observation-status/">observation status guide</a> for the full appeals process.</p>
     </div>
 
     <div class="faq-item">
         <h3>Should I pay my hospital bill before disputing it?</h3>
-        <p>No. If you have identified specific errors or are requesting a billing review, ask the hospital to place the disputed items on hold while the review is in progress. Do not pay the disputed amount before the review is resolved. Most hospitals will not send an account to collections while a formal billing review is pending. For a complete dispute process, see our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a>.</p>
+        <p>No. If you have identified specific errors or are requesting a billing review, ask the hospital to place the disputed items on hold while the review is in progress. Do not pay the disputed amount before the review is resolved. Most hospitals will not send an account to collections while a formal billing review is pending. For a complete dispute process, see our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a>.</p>
     </div>
 </div>
 

@@ -250,7 +250,7 @@ register("veterans-medical-bill-rights", {
     <li>File a complaint with your state attorney general if the provider persists.</li>
 </ol>
 
-<p>For general guidance on disputing any medical bill, see our <a href="/guides/how-to-dispute-a-medical-bill">complete guide to disputing medical bills</a> and our <a href="/guides/medical-billing-rights-overview">overview of medical billing rights</a>.</p>
+<p>For general guidance on disputing any medical bill, see our <a href="/guides/how-to-dispute-a-medical-bill/">complete guide to disputing medical bills</a> and our <a href="/guides/medical-billing-rights-overview/">overview of medical billing rights</a>.</p>
 
 <h3>Problem 4: Bill for care you thought was VA-authorized</h3>
 

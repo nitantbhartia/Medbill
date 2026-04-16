@@ -153,13 +153,13 @@ register("aca-subsidy-cliff-2026", {
 
 <h3>Option E: Go uninsured (last resort)</h3>
 
-<p>Going uninsured is a significant financial risk. A single ER visit averages $2,200, a hospital stay averages $13,900, and a major surgery can exceed $100,000. But if you truly cannot afford any coverage, know that you still have important rights and protections. See sections 4&ndash;7 below. Start by understanding your rights as an uninsured patient in our <a href="/guides/uninsured-hospital-bill">guide to handling uninsured hospital bills</a>.</p>
+<p>Going uninsured is a significant financial risk. A single ER visit averages $2,200, a hospital stay averages $13,900, and a major surgery can exceed $100,000. But if you truly cannot afford any coverage, know that you still have important rights and protections. See sections 4&ndash;7 below. Start by understanding your rights as an uninsured patient in our <a href="/guides/uninsured-hospital-bill/">guide to handling uninsured hospital bills</a>.</p>
 
 <h2 id="uninsured-rights">4. If you&rsquo;re now uninsured: your rights</h2>
 
 <p>Losing your ACA plan does not mean losing your rights. Federal and state laws provide meaningful protections for uninsured patients:</p>
 
-<p><strong>Good Faith Estimate requirement.</strong> Under the <a href="/guides/good-faith-estimate-rights">No Surprises Act</a>, uninsured and self-pay patients have the right to a written good faith estimate of expected charges before any scheduled service. If the final bill exceeds the estimate by $400 or more, you can dispute it through the federal patient-provider dispute resolution process.</p>
+<p><strong>Good Faith Estimate requirement.</strong> Under the <a href="/guides/good-faith-estimate-rights/">No Surprises Act</a>, uninsured and self-pay patients have the right to a written good faith estimate of expected charges before any scheduled service. If the final bill exceeds the estimate by $400 or more, you can dispute it through the federal patient-provider dispute resolution process.</p>
 
 <p><strong>Hospital financial assistance.</strong> Nonprofit hospitals (about 60% of all U.S. hospitals) are required by IRS Section 501(r) to offer charity care programs. Many offer 100% free care for patients under 200% FPL and significant discounts up to 300&ndash;400% FPL. <a href="/charity-care">Check if you qualify for hospital financial assistance</a>.</p>
 
@@ -231,7 +231,7 @@ register("aca-subsidy-cliff-2026", {
 
 <p><strong>No Surprises Act &mdash; emergency services.</strong> For emergency care, the No Surprises Act limits what hospitals can charge uninsured patients to a &ldquo;reasonable&rdquo; amount. You cannot be balance billed for emergency services beyond what the hospital would charge an insured patient. This applies to both the hospital facility and any out-of-network physicians who treat you during an emergency.</p>
 
-<p><strong>Good Faith Estimates.</strong> Before any scheduled (non-emergency) service, you have the right to a written estimate. If the final bill exceeds the estimate by $400 or more, you can initiate a dispute through the federal patient-provider dispute resolution process. Learn exactly how to use this protection in our <a href="/guides/good-faith-estimate-rights">Good Faith Estimate rights guide</a>.</p>
+<p><strong>Good Faith Estimates.</strong> Before any scheduled (non-emergency) service, you have the right to a written estimate. If the final bill exceeds the estimate by $400 or more, you can initiate a dispute through the federal patient-provider dispute resolution process. Learn exactly how to use this protection in our <a href="/guides/good-faith-estimate-rights/">Good Faith Estimate rights guide</a>.</p>
 
 <div class="case-study">
     <h3>Case study: Newly uninsured patient uses Good Faith Estimate to save $2,800</h3>
@@ -248,7 +248,7 @@ register("aca-subsidy-cliff-2026", {
 
 <p><strong>CHIP (Children&rsquo;s Health Insurance Program).</strong> Even if you can&rsquo;t afford coverage for yourself, your children may qualify for CHIP. Income limits are typically 200&ndash;300% FPL, and many states cover children up to 400% FPL. Premiums are minimal or zero. Apply at <a href="https://www.insurekidsnow.gov/" target="_blank" rel="noopener">InsureKidsNow.gov</a> or through your state&rsquo;s Medicaid office.</p>
 
-<p><strong>Hospital charity care.</strong> Nonprofit hospitals must offer financial assistance programs. Income thresholds are often generous&mdash;many hospitals provide free care up to 200% FPL and discounted care up to 400% FPL. This is separate from insurance and applies to specific bills. <a href="/charity-care">Check if you qualify for hospital financial assistance</a> and read our <a href="/guides/hospital-financial-assistance-guide">step-by-step guide to applying</a>.</p>
+<p><strong>Hospital charity care.</strong> Nonprofit hospitals must offer financial assistance programs. Income thresholds are often generous&mdash;many hospitals provide free care up to 200% FPL and discounted care up to 400% FPL. This is separate from insurance and applies to specific bills. <a href="/charity-care">Check if you qualify for hospital financial assistance</a> and read our <a href="/guides/hospital-financial-assistance-guide/">step-by-step guide to applying</a>.</p>
 
 <p><strong>State-level programs.</strong> Many states have additional programs for uninsured residents:</p>
 

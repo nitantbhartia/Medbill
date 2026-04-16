@@ -106,7 +106,7 @@ register("what-is-coinsurance", {
 </div>
 
 <div class="key-takeaway">
-    <strong>The coinsurance percentage applies to the allowed amount, not the billed amount.</strong> If a hospital bills $25,000 but the insurance-allowed rate is $10,000, your 20% applies to $10,000 ($2,000), not $25,000 ($5,000). This is why in-network care is significantly cheaper. See <a href="/guides/explanation-of-benefits-eob">our EOB guide</a> to understand how allowed amounts appear on your statement.
+    <strong>The coinsurance percentage applies to the allowed amount, not the billed amount.</strong> If a hospital bills $25,000 but the insurance-allowed rate is $10,000, your 20% applies to $10,000 ($2,000), not $25,000 ($5,000). This is why in-network care is significantly cheaper. See <a href="/guides/explanation-of-benefits-eob/">our EOB guide</a> to understand how allowed amounts appear on your statement.
 </div>
 
 {_embed(mode="markup", title="Check if your charge is reasonable", subtitle="Enter a CPT code and billed amount to compare against Medicare&rsquo;s allowed rate.", height="420")}
@@ -151,7 +151,7 @@ register("what-is-coinsurance", {
     </tbody>
 </table>
 
-<p>Many plans use both. You might have a $35 copay for a primary care visit (no deductible applies) and 20% coinsurance for a hospital stay (applies after deductible). Both count toward your out-of-pocket maximum. For a deeper look at the deductible-coinsurance relationship, see <a href="/guides/what-is-a-deductible">our deductible guide</a>.</p>
+<p>Many plans use both. You might have a $35 copay for a primary care visit (no deductible applies) and 20% coinsurance for a hospital stay (applies after deductible). Both count toward your out-of-pocket maximum. For a deeper look at the deductible-coinsurance relationship, see <a href="/guides/what-is-a-deductible/">our deductible guide</a>.</p>
 
 <h2 id="coinsurance-vs-deductible">3. Coinsurance vs. deductible: the sequence</h2>
 
@@ -163,7 +163,7 @@ register("what-is-coinsurance", {
     <li><strong>Phase 3 &mdash; Out-of-pocket max:</strong> Once your total payments (deductible + copays + coinsurance) reach your OOP max, insurance pays 100% for the rest of the year.</li>
 </ol>
 
-<p>The most common mistake: patients in Phase 1 see a large bill and assume they have insurance coverage because they have insurance. Coverage does not mean the insurer pays immediately &mdash; you must exhaust your deductible first. Understanding which phase you are in determines how to budget for upcoming care. Track your phase status through your insurer&rsquo;s member portal or on each EOB. See <a href="/guides/out-of-pocket-maximum">our out-of-pocket maximum guide</a> for detail on Phase 3.</p>
+<p>The most common mistake: patients in Phase 1 see a large bill and assume they have insurance coverage because they have insurance. Coverage does not mean the insurer pays immediately &mdash; you must exhaust your deductible first. Understanding which phase you are in determines how to budget for upcoming care. Track your phase status through your insurer&rsquo;s member portal or on each EOB. See <a href="/guides/out-of-pocket-maximum/">our out-of-pocket maximum guide</a> for detail on Phase 3.</p>
 
 <h2 id="common-splits">4. Common coinsurance splits: 80/20, 70/30, 60/40</h2>
 
@@ -206,7 +206,7 @@ register("what-is-coinsurance", {
     </tbody>
 </table>
 
-<p>On a PPO plan, going out of network for a $10,000 procedure at 40% coinsurance costs you $4,000 vs. $2,000 in-network &mdash; a $2,000 difference on just one procedure. Additionally, out-of-network providers can balance bill you for the difference between their charge and the insurance allowed amount, a protection you don&rsquo;t have in-network. Always verify network status before receiving care. See <a href="/guides/hmo-ppo-epo-hdhp-plan-types">our plan type comparison</a> for how network types affect your coinsurance exposure.</p>
+<p>On a PPO plan, going out of network for a $10,000 procedure at 40% coinsurance costs you $4,000 vs. $2,000 in-network &mdash; a $2,000 difference on just one procedure. Additionally, out-of-network providers can balance bill you for the difference between their charge and the insurance allowed amount, a protection you don&rsquo;t have in-network. Always verify network status before receiving care. See <a href="/guides/hmo-ppo-epo-hdhp-plan-types/">our plan type comparison</a> for how network types affect your coinsurance exposure.</p>
 
 <h2 id="prescriptions">6. Coinsurance for prescriptions</h2>
 

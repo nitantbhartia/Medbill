@@ -202,9 +202,9 @@ register("dermatology-billing", {
 
 <p><strong>Step 3: Check for facility fees.</strong> If you see a facility fee (G0463 or similar), you were treated at a hospital-affiliated clinic. For future visits, consider switching to an independent dermatologist to avoid this charge entirely.</p>
 
-<p><strong>Step 4: Verify pathology network status.</strong> If you received a separate pathology bill, check whether the lab was in-network. If it was out-of-network and you were not given a choice of lab, dispute the balance billing with your insurer under the No Surprises Act (for certain settings) or state consumer protection laws. Learn more in our <a href="/guides/understanding-balance-billing">balance billing guide</a>.</p>
+<p><strong>Step 4: Verify pathology network status.</strong> If you received a separate pathology bill, check whether the lab was in-network. If it was out-of-network and you were not given a choice of lab, dispute the balance billing with your insurer under the No Surprises Act (for certain settings) or state consumer protection laws. Learn more in our <a href="/guides/understanding-balance-billing/">balance billing guide</a>.</p>
 
-<p><strong>Step 5: File a written dispute.</strong> Cite the specific overcharges with Medicare rate comparisons. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has templates and scripts. For dermatology bills, focus on the facility fee and any unbundled charges, as these are the largest savings opportunities.</p>
+<p><strong>Step 5: File a written dispute.</strong> Cite the specific overcharges with Medicare rate comparisons. Our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> has templates and scripts. For dermatology bills, focus on the facility fee and any unbundled charges, as these are the largest savings opportunities.</p>
 
 {_embed(mode="cost", cpt="17311", title="Look up Mohs surgery costs", subtitle="Enter any dermatology CPT code to see Medicare rates vs. typical charges.")}
 

@@ -141,7 +141,7 @@ register("endoscopy-cost", {
 <p>BillKarma identifies billing errors in 29% of endoscopy claims. The most frequent errors:</p>
 
 <ol>
-    <li><strong>Out-of-network anesthesia at an in-network facility.</strong> The most common error. Dispute under the No Surprises Act if you did not choose the anesthesia provider. See <a href="/guides/balance-billing">our balance billing guide</a> for the dispute process.</li>
+    <li><strong>Out-of-network anesthesia at an in-network facility.</strong> The most common error. Dispute under the No Surprises Act if you did not choose the anesthesia provider. See <a href="/guides/balance-billing/">our balance billing guide</a> for the dispute process.</li>
     <li><strong>Wrong facility CPT code.</strong> Hospital outpatient endoscopy uses facility CPT codes with higher reimbursement than ASC codes. If you had your procedure at an ASC but it was billed using hospital outpatient codes, the facility was overbilled, which inflates your cost-sharing.</li>
     <li><strong>Unbundled biopsy charges.</strong> When a biopsy is taken during an endoscopy, it should typically be bundled with the main procedure code (e.g., 43239 includes biopsy). Some providers bill separately for the biopsy on top of the main procedure code, which is improper. Check for duplicate procedure charges on your EOB.</li>
     <li><strong>Pathology billed twice.</strong> If tissue is sent to pathology, the pathologist bills separately. Occasionally, the pathology is billed by both the pathologist and the facility. Look for duplicate line items on your combined bills.</li>

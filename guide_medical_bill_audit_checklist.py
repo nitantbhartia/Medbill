@@ -257,8 +257,8 @@ register("medical-bill-audit-checklist", {
     <li><strong>Document every flagged item.</strong> For each potential error, note the date, CPT code, charge amount, and which checklist item it failed. Be specific — "CBC billed twice on 02/10, $284 each" is better than "duplicate charge found."</li>
     <li><strong>Call the billing department.</strong> Reference each flagged item by date and CPT code. For simple errors (duplicates, wrong patient info, math errors), a phone call often resolves it on the spot.</li>
     <li><strong>Follow up in writing for anything not resolved in 10 days.</strong> Send a written dispute listing each item. Include your account number, the specific charges in question, and supporting documentation (your EOB, discharge papers, personal notes).</li>
-    <li><strong>Request a formal billing review.</strong> Ask the hospital to conduct a formal coding review for any items involving upcoding, unbundling, or medical necessity questions. This triggers an internal audit process. If the hospital is nonprofit, they are also required to screen you for <a href="/guides/hospital-financial-assistance-guide">financial assistance</a> before pursuing collections.</li>
-    <li><strong>Do not pay disputed amounts.</strong> Ask for the disputed charges to be placed on hold during the review. Pay the undisputed portion if you can, but do not pay charges you are actively disputing. For letter templates and escalation steps, see our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a>.</li>
+    <li><strong>Request a formal billing review.</strong> Ask the hospital to conduct a formal coding review for any items involving upcoding, unbundling, or medical necessity questions. This triggers an internal audit process. If the hospital is nonprofit, they are also required to screen you for <a href="/guides/hospital-financial-assistance-guide/">financial assistance</a> before pursuing collections.</li>
+    <li><strong>Do not pay disputed amounts.</strong> Ask for the disputed charges to be placed on hold during the review. Pay the undisputed portion if you can, but do not pay charges you are actively disputing. For letter templates and escalation steps, see our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a>.</li>
 </ol>
 
 <div class="key-takeaway">
@@ -289,7 +289,7 @@ register("medical-bill-audit-checklist", {
 
     <div class="faq-item">
         <h3>How common are medical billing errors?</h3>
-        <p>Very common. BillKarma flags potential billing issues in approximately 1 in 4 hospital bills reviewed. The HHS OIG finds Medicare improper payment rates around 7% annually. Errors are more common on complex bills — multi-day stays, surgeries, and ER visits. See our <a href="/guides/common-hospital-billing-errors">billing errors guide</a> for the 7 most common types.</p>
+        <p>Very common. BillKarma flags potential billing issues in approximately 1 in 4 hospital bills reviewed. The HHS OIG finds Medicare improper payment rates around 7% annually. Errors are more common on complex bills — multi-day stays, surgeries, and ER visits. See our <a href="/guides/common-hospital-billing-errors/">billing errors guide</a> for the 7 most common types.</p>
     </div>
 
     <div class="faq-item">
@@ -299,12 +299,12 @@ register("medical-bill-audit-checklist", {
 
     <div class="faq-item">
         <h3>What should I do if I find an error on my medical bill?</h3>
-        <p>Contact the billing department and identify the specific error by date, CPT code, and dollar amount. For simple errors, a phone call usually works. For complex disputes, follow up in writing and request a formal billing review. Do not pay disputed amounts during the review. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has letter templates.</p>
+        <p>Contact the billing department and identify the specific error by date, CPT code, and dollar amount. For simple errors, a phone call usually works. For complex disputes, follow up in writing and request a formal billing review. Do not pay disputed amounts during the review. Our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> has letter templates.</p>
     </div>
 
     <div class="faq-item">
         <h3>How long do I have to dispute a medical bill?</h3>
-        <p>Dispute as soon as possible. Most hospitals have internal review timeframes of 30 to 90 days. Insurance appeals are typically allowed within 180 days of the EOB. Medicare appeals must be filed within 120 days of the Medicare Summary Notice. Early disputes are resolved more easily and prevent accounts from going to collections. Know your full <a href="/guides/medical-billing-rights-overview">medical billing rights</a> to strengthen your dispute.</p>
+        <p>Dispute as soon as possible. Most hospitals have internal review timeframes of 30 to 90 days. Insurance appeals are typically allowed within 180 days of the EOB. Medicare appeals must be filed within 120 days of the Medicare Summary Notice. Early disputes are resolved more easily and prevent accounts from going to collections. Know your full <a href="/guides/medical-billing-rights-overview/">medical billing rights</a> to strengthen your dispute.</p>
     </div>
 </div>
 

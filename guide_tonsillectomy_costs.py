@@ -158,7 +158,7 @@ register("tonsillectomy-cost", {
 <h2 id="medicare-medicaid">5. Medicare and Medicaid</h2>
 
 <h3>Medicaid</h3>
-<p>Medicaid covers tonsillectomy for children in all states under the Early and Periodic Screening, Diagnostic, and Treatment (EPSDT) benefit. Cost-sharing is minimal&mdash;usually $0&ndash;$5 in copays. Adult Medicaid coverage varies by state but generally covers tonsillectomy when medically necessary. Wait times for Medicaid-accepting ENT surgeons can be longer in some areas, so ask about availability when scheduling. For more on <a href="/guides/pediatric-medical-billing">pediatric billing</a>, see our dedicated guide.</p>
+<p>Medicaid covers tonsillectomy for children in all states under the Early and Periodic Screening, Diagnostic, and Treatment (EPSDT) benefit. Cost-sharing is minimal&mdash;usually $0&ndash;$5 in copays. Adult Medicaid coverage varies by state but generally covers tonsillectomy when medically necessary. Wait times for Medicaid-accepting ENT surgeons can be longer in some areas, so ask about availability when scheduling. For more on <a href="/guides/pediatric-medical-billing/">pediatric billing</a>, see our dedicated guide.</p>
 
 <h3>Medicare</h3>
 <p>Medicare covers tonsillectomy for beneficiaries when medically necessary. The Medicare-allowed amount for CPT 42826 is approximately $450&ndash;$600 (physician fee), plus facility fees of $1,200&ndash;$2,000 for hospital outpatient or $700&ndash;$1,100 for ASC. Beneficiaries pay the Part B deductible ($257 in 2026) plus 20% coinsurance. Medigap plans may cover the coinsurance.</p>
@@ -175,7 +175,7 @@ register("tonsillectomy-cost", {
 <p>After the procedure, request a full itemized bill with CPT codes. Don&rsquo;t accept a summary statement. Check for the billing errors listed below, and <a href="/scan">upload your bill to BillKarma</a> for an automated audit that compares every line item to Medicare rates.</p>
 
 <h3>4. Apply for financial assistance</h3>
-<p>If you&rsquo;re uninsured or facing financial hardship, apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care">financial assistance (charity care) program</a>. Nonprofit hospitals are required by federal law to offer charity care. Many cover patients with household incomes up to 300&ndash;400% of the federal poverty level ($93,600 for a family of four in 2026). Apply before paying anything.</p>
+<p>If you&rsquo;re uninsured or facing financial hardship, apply for the hospital&rsquo;s <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance (charity care) program</a>. Nonprofit hospitals are required by federal law to offer charity care. Many cover patients with household incomes up to 300&ndash;400% of the federal poverty level ($93,600 for a family of four in 2026). Apply before paying anything.</p>
 
 <h3>5. Negotiate or request a payment plan</h3>
 <p>If you don&rsquo;t qualify for charity care, negotiate the balance. Ask what Medicare pays for the same procedure and offer 150&ndash;200% of that amount as a lump-sum payment. Most hospitals will accept this rather than risk sending the bill to collections. If you can&rsquo;t pay in full, request a 0% interest payment plan&mdash;hospitals typically offer 12&ndash;24 month plans.</p>
@@ -236,14 +236,14 @@ register("tonsillectomy-cost", {
     <strong>Check your bill for free.</strong> <a href="/scan">Upload your tonsillectomy bill to BillKarma</a> to automatically flag these errors and compare every charge to Medicare rates. Tonsillectomy is a straightforward procedure with well-established Medicare benchmarks&mdash;any charge significantly above those benchmarks deserves scrutiny.
 </div>
 
-<p><strong>Related guides:</strong> <a href="/guides/pediatric-medical-billing">Pediatric Medical Billing</a> &middot; <a href="/surgery-centers/">Surgery Center Directory</a> &middot; <a href="/scan">Scan Your Bill</a> &middot; <a href="/guides/hospital-financial-assistance-charity-care">Hospital Financial Assistance &amp; Charity Care</a></p>
+<p><strong>Related guides:</strong> <a href="/guides/pediatric-medical-billing/">Pediatric Medical Billing</a> &middot; <a href="/surgery-centers/">Surgery Center Directory</a> &middot; <a href="/scan">Scan Your Bill</a> &middot; <a href="/guides/hospital-financial-assistance-charity-care/">Hospital Financial Assistance &amp; Charity Care</a></p>
 
 <h2 id="faq">Frequently asked questions</h2>
 
 <div class="faq-section">
     <div class="faq-item">
         <h3>How much does a tonsillectomy cost without insurance?</h3>
-        <p>Without insurance, a tonsillectomy costs $5,000&ndash;$12,000 at a hospital and $2,500&ndash;$5,000 at an ambulatory surgery center. The national median is about $7,500 at a hospital. Never pay the chargemaster price&mdash;ask for the self-pay rate (typically 40&ndash;60% off) and apply for <a href="/guides/hospital-financial-assistance-charity-care">financial assistance</a> at nonprofit hospitals.</p>
+        <p>Without insurance, a tonsillectomy costs $5,000&ndash;$12,000 at a hospital and $2,500&ndash;$5,000 at an ambulatory surgery center. The national median is about $7,500 at a hospital. Never pay the chargemaster price&mdash;ask for the self-pay rate (typically 40&ndash;60% off) and apply for <a href="/guides/hospital-financial-assistance-charity-care/">financial assistance</a> at nonprofit hospitals.</p>
     </div>
 
     <div class="faq-item">

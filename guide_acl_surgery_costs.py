@@ -135,7 +135,7 @@ register("acl-surgery-cost", {
     </tbody>
 </table>
 
-<p><strong>Total PT cost: $3,000&ndash;$8,000</strong> (50&ndash;70 sessions over 6&ndash;9 months). With insurance copays of $30&ndash;$75/visit, expect $1,500&ndash;$4,500 out of pocket for PT alone. See our <a href="/guides/physical-therapy-billing">physical therapy billing guide</a> for tips on reducing PT costs.</p>
+<p><strong>Total PT cost: $3,000&ndash;$8,000</strong> (50&ndash;70 sessions over 6&ndash;9 months). With insurance copays of $30&ndash;$75/visit, expect $1,500&ndash;$4,500 out of pocket for PT alone. See our <a href="/guides/physical-therapy-billing/">physical therapy billing guide</a> for tips on reducing PT costs.</p>
 
 <h2 id="lower-bill">6. 5 ways to lower your ACL surgery bill</h2>
 

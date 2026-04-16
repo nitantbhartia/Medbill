@@ -334,7 +334,7 @@ register("sleep-study-billing", {
 <ol>
     <li>Call the sleep lab and ask for the name and NPI of the physician who interpreted your study.</li>
     <li>Verify that physician&rsquo;s network status with your insurer.</li>
-    <li>If they are out-of-network for a scheduled study at an in-network facility, cite the No Surprises Act and contact your insurer. See <a href="/guides/no-surprises-act">our No Surprises Act guide</a> for step-by-step instructions.</li>
+    <li>If they are out-of-network for a scheduled study at an in-network facility, cite the No Surprises Act and contact your insurer. See <a href="/guides/no-surprises-act/">our No Surprises Act guide</a> for step-by-step instructions.</li>
     <li>If the physician is in-network but the bill seems high, request an itemized statement and compare it to your EOB &mdash; your responsibility should be only your applicable in-network cost-sharing (copay or coinsurance).</li>
 </ol>
 
@@ -344,7 +344,7 @@ register("sleep-study-billing", {
 
 <h3>Step 1: Collect all your bills and your EOB</h3>
 
-<p>Request an itemized statement from every party that billed you: the sleep lab or hospital, the interpreting physician&rsquo;s group, and the DME supplier. Pull your Explanation of Benefits (EOB) from your insurer&rsquo;s member portal for the matching date of service. See <a href="/guides/understanding-your-explanation-of-benefits">our EOB guide</a> for help reading these documents. Your EOB will show the CPT codes the facility submitted, what your insurer allowed, and what your share should be.</p>
+<p>Request an itemized statement from every party that billed you: the sleep lab or hospital, the interpreting physician&rsquo;s group, and the DME supplier. Pull your Explanation of Benefits (EOB) from your insurer&rsquo;s member portal for the matching date of service. See <a href="/guides/understanding-your-explanation-of-benefits/">our EOB guide</a> for help reading these documents. Your EOB will show the CPT codes the facility submitted, what your insurer allowed, and what your share should be.</p>
 
 <h3>Step 2: Verify the CPT code matches what happened</h3>
 
@@ -360,7 +360,7 @@ register("sleep-study-billing", {
 
 <h3>Step 5: Escalate if needed</h3>
 
-<p>If the billing department does not resolve your dispute, you can file an appeal through your insurer&rsquo;s formal appeals process, file a complaint with your state insurance commissioner, or for Medicare beneficiaries, request a Medicare redetermination. See <a href="/guides/dispute-bill">our complete bill dispute guide</a> for templates and escalation steps. Use <a href="/hospitals/">our hospital directory</a> to see other patients&rsquo; billing experiences at your sleep lab.</p>
+<p>If the billing department does not resolve your dispute, you can file an appeal through your insurer&rsquo;s formal appeals process, file a complaint with your state insurance commissioner, or for Medicare beneficiaries, request a Medicare redetermination. See <a href="/guides/dispute-bill/">our complete bill dispute guide</a> for templates and escalation steps. Use <a href="/hospitals/">our hospital directory</a> to see other patients&rsquo; billing experiences at your sleep lab.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
 

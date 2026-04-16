@@ -166,7 +166,7 @@ register("why-emergency-room-bills-are-so-high", {
 
 <div class="case-study">
     <h3>Stitches billed as Level 4</h3>
-    <p>Simple laceration repair (3 stitches, no complications) is a Level 2 or 3 visit. A patient billed at Level 4 (<strong>$2,890</strong>) for 4 stitches on a finger <a href="/guides/how-to-dispute-a-medical-bill">disputed the ER level</a> with the clinical notes showing a 15-minute visit with no imaging or labs. The hospital adjusted to Level 3 (<strong>$1,400</strong>). <strong>Savings: $1,490.</strong></p>
+    <p>Simple laceration repair (3 stitches, no complications) is a Level 2 or 3 visit. A patient billed at Level 4 (<strong>$2,890</strong>) for 4 stitches on a finger <a href="/guides/how-to-dispute-a-medical-bill/">disputed the ER level</a> with the clinical notes showing a 15-minute visit with no imaging or labs. The hospital adjusted to Level 3 (<strong>$1,400</strong>). <strong>Savings: $1,490.</strong></p>
 </div>
 
 <p>Look up the ER visit code from your bill to see what Medicare pays:</p>
@@ -177,7 +177,7 @@ register("why-emergency-room-bills-are-so-high", {
 
 <h3>a) Request an itemized bill and audit it</h3>
 
-<p>This is always step one. Call the billing department and request a line-by-line itemized statement with CPT codes. Then <a href="/guides/how-to-read-your-medical-bill">compare each charge against Medicare rates</a>. You can also <a href="/scan">upload it to BillKarma</a> for an instant audit.</p>
+<p>This is always step one. Call the billing department and request a line-by-line itemized statement with CPT codes. Then <a href="/guides/how-to-read-your-medical-bill/">compare each charge against Medicare rates</a>. You can also <a href="/scan">upload it to BillKarma</a> for an instant audit.</p>
 
 <h3>b) Challenge the ER visit level</h3>
 
@@ -197,7 +197,7 @@ register("why-emergency-room-bills-are-so-high", {
 
 <h3>f) File a formal dispute</h3>
 
-<p>For billing errors, duplicate charges, or excessive markups, file a written dispute with the billing department. Our <a href="/guides/how-to-dispute-a-medical-bill">dispute guide</a> has templates and phone scripts you can use today.</p>
+<p>For billing errors, duplicate charges, or excessive markups, file a written dispute with the billing department. Our <a href="/guides/how-to-dispute-a-medical-bill/">dispute guide</a> has templates and phone scripts you can use today.</p>
 
 <div class="key-takeaway">
     <strong>Already have your ER bill in hand?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we&rsquo;ll flag overbilled line items, supply markups, and coding errors in seconds so you know exactly what to dispute.
@@ -249,7 +249,7 @@ register("why-emergency-room-bills-are-so-high", {
 
     <div class="faq-item">
         <h3>What does ER Level 4 or Level 5 mean on my bill?</h3>
-        <p>ER visits are coded from Level 1 (minor) to Level 5 (life-threatening). Level 4 (CPT 99284) means &ldquo;high severity.&rdquo; The level determines the facility fee and physician charge. If your visit was straightforward and you see Level 4 or 5, you may have been upcoded&mdash;check our <a href="/guides/how-to-read-your-medical-bill">guide to reading your bill</a> for more details.</p>
+        <p>ER visits are coded from Level 1 (minor) to Level 5 (life-threatening). Level 4 (CPT 99284) means &ldquo;high severity.&rdquo; The level determines the facility fee and physician charge. If your visit was straightforward and you see Level 4 or 5, you may have been upcoded&mdash;check our <a href="/guides/how-to-read-your-medical-bill/">guide to reading your bill</a> for more details.</p>
     </div>
 </div>
 

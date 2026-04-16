@@ -340,10 +340,10 @@ register("good-faith-estimate-rights", {
     <li><strong>Consider self-pay</strong> if the cash price is lower than your insured cost after deductible. This triggers the full GFE protection. Use our <a href="/calculator">cost calculator</a> to compare.</li>
 </ol>
 
-<p>For a deeper understanding of how the No Surprises Act protects both insured and uninsured patients, see our <a href="/guides/no-surprises-act-explained">complete No Surprises Act guide</a>.</p>
+<p>For a deeper understanding of how the No Surprises Act protects both insured and uninsured patients, see our <a href="/guides/no-surprises-act-explained/">complete No Surprises Act guide</a>.</p>
 
 <div class="key-takeaway">
-    <strong>Facing a large bill you weren&rsquo;t expecting?</strong> Whether you&rsquo;re insured or self-pay, <a href="/scan">scanning your bill with BillKarma</a> is the fastest way to find overcharges, coding errors, and charges that exceed reasonable benchmarks. Our scanner checks every line against Medicare rates and flags the charges most worth disputing. Need help negotiating? Our <a href="/guides/how-to-negotiate-medical-bills">negotiation guide</a> walks you through the process step by step.
+    <strong>Facing a large bill you weren&rsquo;t expecting?</strong> Whether you&rsquo;re insured or self-pay, <a href="/scan">scanning your bill with BillKarma</a> is the fastest way to find overcharges, coding errors, and charges that exceed reasonable benchmarks. Our scanner checks every line against Medicare rates and flags the charges most worth disputing. Need help negotiating? Our <a href="/guides/how-to-negotiate-medical-bills/">negotiation guide</a> walks you through the process step by step.
 </div>
 
 <h2 id="faq">Frequently asked questions</h2>

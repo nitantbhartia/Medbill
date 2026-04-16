@@ -340,7 +340,7 @@ register("hospital-financial-assistance-charity-care", {
 
     <div class="faq-item">
         <h3>What if my hospital is for-profit?</h3>
-        <p>For-profit hospitals are not legally required to offer financial assistance under IRS Section 501(r), but many still have hardship or discount programs. Call the billing department and ask. You can also <a href="/guides/how-to-negotiate-medical-bills">negotiate your bill directly</a> using Medicare rates as your benchmark, or offer a lump-sum settlement for less than the full amount.</p>
+        <p>For-profit hospitals are not legally required to offer financial assistance under IRS Section 501(r), but many still have hardship or discount programs. Call the billing department and ask. You can also <a href="/guides/how-to-negotiate-medical-bills/">negotiate your bill directly</a> using Medicare rates as your benchmark, or offer a lump-sum settlement for less than the full amount.</p>
     </div>
 
     <div class="faq-item">
@@ -350,7 +350,7 @@ register("hospital-financial-assistance-charity-care", {
 
     <div class="faq-item">
         <h3>What if my application is denied?</h3>
-        <p>Request the denial reason in writing. The most common reasons are incomplete applications or missing documents&mdash;both fixable. Resubmit with the missing information. If denied again, escalate to the hospital patient advocate, or file a complaint with your state attorney general&rsquo;s consumer protection division. You can also <a href="/guides/how-to-dispute-a-medical-bill">dispute specific charges</a> on the bill separately from the financial assistance process.</p>
+        <p>Request the denial reason in writing. The most common reasons are incomplete applications or missing documents&mdash;both fixable. Resubmit with the missing information. If denied again, escalate to the hospital patient advocate, or file a complaint with your state attorney general&rsquo;s consumer protection division. You can also <a href="/guides/how-to-dispute-a-medical-bill/">dispute specific charges</a> on the bill separately from the financial assistance process.</p>
     </div>
 </div>
 

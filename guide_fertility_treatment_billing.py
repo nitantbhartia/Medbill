@@ -227,7 +227,7 @@ register("fertility-treatment-billing", {
 
     <div class="faq-item">
         <h3>Does insurance cover IVF?</h3>
-        <p>Twenty states have fertility mandates, but coverage varies widely. Self-insured employer plans (about 60% of workers) are exempt from state mandates. Call your insurer directly and ask: "Does my plan cover IVF, and what are the limits?" Learn more about insurance basics in our <a href="/guides/how-health-insurance-works">health insurance guide</a>.</p>
+        <p>Twenty states have fertility mandates, but coverage varies widely. Self-insured employer plans (about 60% of workers) are exempt from state mandates. Call your insurer directly and ask: "Does my plan cover IVF, and what are the limits?" Learn more about insurance basics in our <a href="/guides/how-health-insurance-works/">health insurance guide</a>.</p>
     </div>
 
     <div class="faq-item">
@@ -237,7 +237,7 @@ register("fertility-treatment-billing", {
 
     <div class="faq-item">
         <h3>Can I appeal an insurance denial for fertility treatment?</h3>
-        <p>Yes. First-level appeals succeed 40&ndash;50% of the time. Include your diagnosis, treatment history, letter of medical necessity, and state mandate citation. If denied again, request an external review&mdash;your right under the ACA. See our <a href="/guides/how-to-appeal-a-medical-bill-denial">appeal guide</a> for step-by-step instructions.</p>
+        <p>Yes. First-level appeals succeed 40&ndash;50% of the time. Include your diagnosis, treatment history, letter of medical necessity, and state mandate citation. If denied again, request an external review&mdash;your right under the ACA. See our <a href="/guides/how-to-appeal-a-medical-bill-denial/">appeal guide</a> for step-by-step instructions.</p>
     </div>
 
     <div class="faq-item">
