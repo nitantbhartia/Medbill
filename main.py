@@ -5,6 +5,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResponse
+from fastapi.middleware.gzip import GZipMiddleware
 
 import config
 import db
@@ -46,10 +47,23 @@ logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s %(message)s",
 )
 
+
+class _CachedStaticFiles(StaticFiles):
+    async def __call__(self, scope, receive, send):
+        async def send_with_cache(message):
+            if message["type"] == "http.response.start":
+                headers = dict(message.get("headers", []))
+                headers[b"cache-control"] = b"public, max-age=31536000, immutable"
+                message = {**message, "headers": list(headers.items())}
+            await send(message)
+        await super().__call__(scope, receive, send_with_cache)
+
+
 app = FastAPI(title=config.APP_NAME)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
 app.include_router(advocacy_router)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
 
 
 @app.middleware("http")
@@ -726,9 +740,18 @@ async def guide_page_redirect(slug: str):
     return RedirectResponse(url=f"/guides/{slug}/", status_code=301)
 
 
+_GUIDE_REDIRECTS = {
+    # EOB duplicate cluster → canonical
+    "understanding-explanation-of-benefits": "explanation-of-benefits-eob",
+    "explanation-of-benefits-eob-guide": "explanation-of-benefits-eob",
+}
+
+
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
+    if slug in _GUIDE_REDIRECTS:
+        return RedirectResponse(url=f"/guides/{_GUIDE_REDIRECTS[slug]}/", status_code=301)
     import re
     from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
     guide = get_guide(slug)
@@ -2094,7 +2117,7 @@ async def unified_search_page(request: Request, q: str = ""):
             "title": "Search Results | BillKarma",
             "og_title": "Search Medical Procedure and Facility Prices | BillKarma",
             "og_description": "Search procedures, hospitals, surgery centers, and imaging centers with pricing context from Medicare benchmarks.",
-            "meta_robots": "index, follow",
+            "meta_robots": "noindex, follow",
         },
     )
 
@@ -2536,6 +2559,13 @@ async def og_image_svg(slug: str):
   <text x="60" y="570" font-family="system-ui,-apple-system,sans-serif" font-size="24" font-weight="500" fill="rgba(255,255,255,0.65)">billkarma.app/guides/{slug}/</text>
 </svg>"""
     return Response(content=svg, media_type="image/svg+xml", headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/llms.txt")
+async def llms_txt():
+    with open("static/llms.txt") as f:
+        content = f.read()
+    return Response(content=content, media_type="text/plain", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.get("/robots.txt")
