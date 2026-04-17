@@ -3,11 +3,16 @@
 {% block title %}Medical Billing Guides | BillKarma{% endblock %}
 
 {% block head %}
+{% import "_macros.html" as seo with context %}
 <meta name="description" content="{{ og_description }}">
 <link rel="canonical" href="{{ canonical_url }}">
 <meta property="og:title" content="{{ og_title }}">
 <meta property="og:description" content="{{ og_description }}">
 <meta name="robots" content="{{ meta_robots }}">
+{{ seo.breadcrumbs([("Home", "/"), ("Patient Guides", "/guides/")]) }}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"BillKarma Patient Guides","url":"{{ canonical_url }}","description":{{ og_description|tojson }},"isPartOf":{"@type":"WebSite","name":"BillKarma","url":"{{ request.url.scheme }}://{{ request.url.netloc }}/"}}
+</script>
 <style>
     .guides-hero {
         background-color: var(--bk-green);

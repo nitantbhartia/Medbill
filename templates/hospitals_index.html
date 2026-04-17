@@ -3,7 +3,13 @@
 {% block title %}Hospital Billing Report Cards | BillKarma{% endblock %}
 
 {% block head %}
+{% import "_macros.html" as seo with context %}
 <meta name="description" content="Search US hospital billing report cards by state and city. Compare billing grades, markup ratios, and patient experience before paying your bill.">
+<link rel="canonical" href="{{ request.url.scheme }}://{{ request.url.netloc }}/hospitals/">
+{{ seo.breadcrumbs([("Home", "/"), ("Hospitals", "/hospitals/")]) }}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":"US Hospital Billing Report Cards","url":"{{ request.url.scheme }}://{{ request.url.netloc }}/hospitals/","description":"Search US hospital billing report cards by state and city. Compare billing grades, markup ratios, and patient experience.","isPartOf":{"@type":"WebSite","name":"BillKarma","url":"{{ request.url.scheme }}://{{ request.url.netloc }}/"}}
+</script>
 <style>
     .hospital-hero {
         background: var(--bk-green, #00824F);

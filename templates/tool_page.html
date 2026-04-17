@@ -3,8 +3,13 @@
 {% block title %}{{ tool.title }} | BillKarma{% endblock %}
 
 {% block head %}
+{% import "_macros.html" as seo with context %}
 <meta name="description" content="{{ tool.description }}">
 <link rel="canonical" href="{{ canonical_url }}">
+{{ seo.breadcrumbs([("Home", "/"), ("Free Tools", "/tools/"), (tool.title, "/tools/" ~ tool.slug ~ "/")]) }}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":{{ tool.title|tojson }},"applicationCategory":"HealthApplication","operatingSystem":"Web","url":"{{ canonical_url }}","description":{{ tool.description|tojson }},"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"provider":{"@type":"Organization","name":"BillKarma","url":"{{ request.url.scheme }}://{{ request.url.netloc }}/"}}
+</script>
 <style>
     .tool-hero {
         background: var(--bk-green);
