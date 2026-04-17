@@ -1,28 +1,63 @@
 {% extends "base.html" %}
 
-{% block title %}Error - BillKarma{% endblock %}
+{% block title %}Page Not Found - BillKarma{% endblock %}
 
 {% block head %}
-<meta name="robots" content="noindex">
+<meta name="robots" content="noindex, follow">
 {% endblock %}
 
 {% block content %}
-<section class="max-w-md mx-auto px-5 py-20 text-center">
-    <div class="mx-auto mb-5 w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-        </svg>
+<section class="max-w-3xl mx-auto px-5 py-16">
+    <div class="text-center mb-10">
+        <div class="mx-auto mb-5 w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ message | default("Page not found") }}</h1>
+        <p class="text-sm text-gray-500">
+            The page you're looking for doesn't exist &mdash; but these might help.
+        </p>
     </div>
-    <h1 class="text-xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-    <p class="text-sm text-gray-500 mb-8">
-        {{ message | default("An unexpected error occurred. Please try again.") }}
-    </p>
-    <div class="flex items-center justify-center gap-3">
-        <a href="/scan" class="px-5 py-2.5 bg-accent-700 text-white text-sm font-bold rounded-full hover:bg-accent-800 transition-colors">
-            Try again
-        </a>
-        <a href="/" class="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">
-            Go home
+
+    <form action="/find/" method="get" class="max-w-xl mx-auto mb-10">
+        <label for="err-q" class="sr-only">Search</label>
+        <div class="flex gap-2">
+            <input id="err-q" type="search" name="q" placeholder="Search hospitals, procedures, or guides&hellip;"
+                   class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-400 text-sm"
+                   autocomplete="off">
+            <button type="submit" class="px-5 py-3 bg-accent-700 text-white text-sm font-bold rounded-lg hover:bg-accent-800 transition-colors">
+                Search
+            </button>
+        </div>
+    </form>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 p-5">
+            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Popular guides</h2>
+            <ul class="space-y-2 text-sm">
+                <li><a class="text-accent-700 hover:underline" href="/guides/how-to-dispute-a-medical-bill/">How to dispute a medical bill</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/guides/explanation-of-benefits-eob/">Understanding your EOB</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/guides/no-surprises-act-explained/">No Surprises Act explained</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/guides/hospital-financial-assistance-charity-care/">Hospital charity care</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/guides/medical-debt-laws-by-state/">Medical debt laws by state</a></li>
+            </ul>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-5">
+            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Free tools</h2>
+            <ul class="space-y-2 text-sm">
+                <li><a class="text-accent-700 hover:underline" href="/scan">Scan your medical bill for errors</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/estimate">Savings estimator</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/calculator">Medicare rate calculator</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/statute-of-limitations">Statute of limitations lookup</a></li>
+                <li><a class="text-accent-700 hover:underline" href="/charity-care">Charity care qualifier</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="text-center mt-10">
+        <a href="/" class="text-sm font-medium text-gray-600 border border-gray-200 rounded-full px-5 py-2.5 hover:bg-gray-50 transition-colors">
+            Go to homepage
         </a>
     </div>
 </section>

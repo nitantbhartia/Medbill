@@ -574,7 +574,17 @@ async def advocacy_shared_case_page(request: Request, token: str):
 
 @app.get("/scan", response_class=HTMLResponse)
 async def scan_page(request: Request):
-    return templates.TemplateResponse("scan.html", {"request": request, "outcome_stats": get_outcome_stats()})
+    return templates.TemplateResponse(
+        "scan.html",
+        {
+            "request": request,
+            "outcome_stats": get_outcome_stats(),
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
+            "og_title": "Scan Your Medical Bill for Errors | BillKarma",
+            "og_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. 1 in 4 bills has an overcharge — find yours in 60 seconds.",
+            "meta_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. No account needed.",
+        },
+    )
 
 
 @app.get("/confirm/{bill_id}", response_class=HTMLResponse)
@@ -660,6 +670,9 @@ async def calculator_page(request: Request):
         {
             "request": request,
             "canonical_url": canonical_url,
+            "og_title": "Medicare Rate Calculator — What Should Your Procedure Cost? | BillKarma",
+            "og_description": "Look up the 2026 Medicare fair price for any CPT code. Compare your bill against the federal benchmark to spot overcharges.",
+            "meta_description": "Look up the 2026 Medicare fair price for any CPT code. Compare your bill against the federal benchmark to spot overcharges.",
         },
     )
 
@@ -2577,6 +2590,11 @@ async def llms_txt():
     return Response(content=content, media_type="text/plain", headers={"Cache-Control": "public, max-age=86400"})
 
 
+@app.get("/favicon.ico")
+async def favicon():
+    return RedirectResponse(url="/static/img/favicon.svg", status_code=301)
+
+
 @app.get("/robots.txt")
 async def robots_txt():
     body = (
@@ -3071,7 +3089,7 @@ async def rights_state_page(request: Request, state_slug: str):
 
     state = get_state_rights(state_slug)
     if not state:
-        return HTMLResponse(status_code=404, content="State not found")
+        return templates.TemplateResponse("error.html", {"request": request, "message": "State not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/rights/{state_slug}/"
     return templates.TemplateResponse(
         "rights_state.html",

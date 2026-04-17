@@ -829,5 +829,28 @@ def _rewrite_redirected_link_targets():
             _LINK_MAP[i] = (phrase, GUIDE_REDIRECTS[slug])
 
 
+def _normalize_meta_descriptions(max_len: int = 160):
+    """Truncate over-long meta_descriptions to stay within SERP display limit.
+    Cuts at the nearest sentence boundary when possible, else word boundary."""
+    for g in GUIDES.values():
+        md = g.get("meta_description", "") or ""
+        if len(md) <= max_len:
+            continue
+        window = md[:max_len]
+        cut = -1
+        for sep in (". ", "? ", "! "):
+            idx = window.rfind(sep)
+            if idx > max_len * 0.6:
+                cut = idx + 1
+                break
+        if cut == -1:
+            # Fall back to word boundary + ellipsis
+            stem = window.rsplit(" ", 1)[0].rstrip(",.;:-—")
+            g["meta_description"] = stem + "…"
+        else:
+            g["meta_description"] = window[:cut].strip()
+
+
 _extend_link_map_from_guides()
 _rewrite_redirected_link_targets()
+_normalize_meta_descriptions()

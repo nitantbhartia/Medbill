@@ -10,15 +10,17 @@
     <meta property="og:site_name" content="BillKarma">
     <meta property="og:locale" content="en_US">
     <meta property="og:title" content="{{ og_title if og_title else 'BillKarma' }}">
-    <meta property="og:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
+    <meta property="og:description" content="{{ og_description or meta_description or 'Check medical bills against federal pricing benchmarks.' }}">
     <meta property="og:url" content="{{ canonical_url if canonical_url else request.url }}">
     <meta property="og:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ og_title if og_title else 'BillKarma' }}">
-    <meta name="twitter:description" content="{{ og_description if og_description else 'Check medical bills against federal pricing benchmarks.' }}">
+    <meta name="twitter:description" content="{{ og_description or meta_description or 'Check medical bills against federal pricing benchmarks.' }}">
     <meta name="twitter:image" content="{{ og_image if og_image else (request.base_url|string) ~ 'static/img/billkarma-og.svg' }}">
+    <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/img/favicon.svg">
     <!-- Google Search Console: <meta name="google-site-verification" content="YOUR_CODE_HERE"> -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
