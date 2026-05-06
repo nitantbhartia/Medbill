@@ -286,7 +286,7 @@ class TestHospitalSeoPages:
         resp = client.get("/sitemap-hospitals.xml")
         assert resp.status_code == 200
         assert resp.headers["content-type"].startswith("application/xml")
-        assert "<loc>https://billkarma.app/</loc>" in resp.text
+        assert "<sitemapindex" not in resp.text
         assert "/hospitals/fl/" in resp.text
         assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in resp.text
 
@@ -294,7 +294,9 @@ class TestHospitalSeoPages:
         _seed_hospital()
         sitemap = client.get("/sitemap.xml", follow_redirects=True)
         assert sitemap.status_code == 200
-        assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in sitemap.text
+        assert "<sitemapindex" in sitemap.text
+        assert "https://billkarma.app/sitemap-hospitals.xml" in sitemap.text
+        assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" not in sitemap.text
 
         robots = client.get("/robots.txt")
         assert robots.status_code == 200

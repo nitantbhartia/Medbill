@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}BillKarma{% endblock %}</title>
-    <meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">
+    {% block robots_meta %}<meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">{% endblock %}
     <meta name="theme-color" content="#00824F">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="BillKarma">
@@ -40,7 +40,7 @@
     <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks — checking hospital bills against federal pricing data to help patients fight overcharges.","foundingDate":"2024","areaServed":{"@type":"Country","name":"United States"},"knowsAbout":["Medical Billing","Hospital Pricing Transparency","CPT Medical Codes","Patient Rights","Medical Debt Law","Insurance Denials","Surprise Medical Bills"],"sameAs":["https://billkarma.app/about/"]},{"@type":"WebSite","url":"https://billkarma.app","name":"BillKarma","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://billkarma.app/hospitals/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"SiteLinksSearchBox","url":"https://billkarma.app","potentialAction":{"@type":"SearchAction","target":"https://billkarma.app/hospitals/?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ItemList","name":"BillKarma Navigation","itemListElement":[{"@type":"SiteNavigationElement","position":1,"name":"Patient Guides","url":"https://billkarma.app/guides/"},{"@type":"SiteNavigationElement","position":2,"name":"Hospitals","url":"https://billkarma.app/hospitals/"},{"@type":"SiteNavigationElement","position":3,"name":"Procedures","url":"https://billkarma.app/procedures/"},{"@type":"SiteNavigationElement","position":4,"name":"Free Tools","url":"https://billkarma.app/tools/"},{"@type":"SiteNavigationElement","position":5,"name":"Fight Debt","url":"https://billkarma.app/fight-debt"}]}]}
 </script>
-    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}
+    {% block canonical_meta %}{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}{% endblock %}
     <style>
         :root {
             --bk-canvas:    #FFFFFF;

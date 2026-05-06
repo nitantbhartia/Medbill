@@ -4,10 +4,8 @@
 
 {% block head %}
 <meta name="description" content="{{ data.seo.meta_description }}">
-{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
 <meta property="og:title" content="{{ data.content_heading }} | BillKarma">
 <meta property="og:description" content="{{ data.seo.meta_description }}">
-<meta name="robots" content="{{ meta_robots|default('index, follow') }}">
 
 {% if data.faq %}
 <script type="application/ld+json">
