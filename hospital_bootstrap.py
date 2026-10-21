@@ -124,16 +124,23 @@ def _matched_dolthub_duplicates(matches: dict[str, dict]) -> list[str]:
 
 def _delete_hospitals(facility_ids: list[str]) -> int:
     """Delete hospitals and every row any table holds for them."""
+    # Other tables point at these by foreign key, so they are deleted last, in this order.
+    referenced_tables = ("hospital_directory", "facilities", "hospitals")
     with get_db() as db:
         tables = [
             row["name"]
-            for row in db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name != 'hospitals'")
-            if any(col["name"] == "facility_id" for col in db.execute(f"PRAGMA table_info({row['name']})"))
+            for row in db.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+            if row["name"] not in referenced_tables
+            and any(col["name"] == "facility_id" for col in db.execute(f"PRAGMA table_info({row['name']})"))
         ]
         for facility_id in facility_ids:
-            for table in tables:
+            db.execute(
+                "UPDATE facilities SET parent_hospital_id = NULL"
+                " WHERE parent_hospital_id IN (SELECT id FROM facilities WHERE facility_id = ?)",
+                (facility_id,),
+            )
+            for table in tables + list(referenced_tables):
                 db.execute(f"DELETE FROM {table} WHERE facility_id = ?", (facility_id,))
-            db.execute("DELETE FROM hospitals WHERE facility_id = ?", (facility_id,))
     return len(facility_ids)
 
 
