@@ -72,7 +72,7 @@ def test_hospital_detail_has_oop_column_header():
     resp = client.get("/hospitals/il/springfield/test-general-hospital-springfield/")
     assert resp.status_code == 200
     assert "bk-oop-th" in resp.text
-    assert "Your Est. Cost" in resp.text
+    assert "Your est. cost" in resp.text
 
 
 def test_hospital_detail_price_rows_have_data_charge():

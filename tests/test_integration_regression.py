@@ -36,11 +36,10 @@ class TestLandingPageRegression:
         assert resp.status_code == 200
         html = resp.text
 
-        # Core value prop + key interaction controls should stay stable.
-        assert "Search your procedure on BillKarma" in html
-        assert 'id="mobileMenuSearch"' in html
-        assert 'id="mobileMenuResults"' in html
-        assert 'class="stat-strip"' in html
+        # Core value prop + hospital search should stay stable.
+        assert "Start with" in html
+        assert 'action="/hospitals/"' in html
+        assert 'name="q"' in html
 
 
 class TestPageFlowRegression:

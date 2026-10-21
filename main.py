@@ -502,29 +502,17 @@ def startup():
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
-    sample_facilities = _build_home_sample_facilities(6)
-    procedure_cards = _build_home_procedure_cards()
-
     with db.get_db() as conn:
-        graded_facility_count = conn.execute(
-            """
-            SELECT COUNT(DISTINCT facility_id) AS n
-            FROM facility_billing_metrics
-            WHERE facility_type IN ('hospital', 'asc', 'imaging_center')
-              AND billing_grade IS NOT NULL
-            """
-        ).fetchone()["n"]
+        hospital_count = conn.execute("SELECT COUNT(*) AS n FROM hospitals").fetchone()["n"]
 
     return templates.TemplateResponse(
         "landing.html",
         {
             "request": request,
             "canonical_url": canonical_url,
-            "sample_facilities": sample_facilities,
-            "procedure_cards": procedure_cards,
-            "graded_facility_count": graded_facility_count,
-            "og_title": "BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades",
-            "og_description": "Search any medical procedure to see what hospitals, surgery centers, and imaging centers charge vs. Medicare rates. Grade A-F for 6,798+ facilities. Scan your bill to catch overcharges.",
+            "hospital_count": hospital_count,
+            "og_title": "BillKarma — Hospital Billing Help: Phone Numbers, Financial Assistance, Letters",
+            "og_description": "Look up any U.S. hospital's billing phone number, check if you qualify for free or discounted care, and get letters addressed to the right billing office.",
             "meta_robots": "index, follow",
         },
     )
