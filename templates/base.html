@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}BillKarma{% endblock %}</title>
     {% block robots_meta %}<meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">{% endblock %}
-    <meta name="theme-color" content="#00824F">
+    <meta name="theme-color" content="#16181D">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="BillKarma">
     <meta property="og:locale" content="en_US">
@@ -32,11 +32,12 @@
         gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
     </script>
     {% endif %}
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="preload" href="/static/css/tw.css" as="style">
     <link rel="stylesheet" href="/static/css/tw.css">
     <link rel="preload" href="/static/css/app.css" as="style">
     <link rel="stylesheet" href="/static/css/app.css"/>
+    <link rel="stylesheet" href="/static/css/site.css"/>
     <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks — checking hospital bills against federal pricing data to help patients fight overcharges.","foundingDate":"2024","areaServed":{"@type":"Country","name":"United States"},"knowsAbout":["Medical Billing","Hospital Pricing Transparency","CPT Medical Codes","Patient Rights","Medical Debt Law","Insurance Denials","Surprise Medical Bills"],"sameAs":["https://billkarma.app/about/"]},{"@type":"WebSite","url":"https://billkarma.app","name":"BillKarma","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://billkarma.app/hospitals/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"SiteLinksSearchBox","url":"https://billkarma.app","potentialAction":{"@type":"SearchAction","target":"https://billkarma.app/hospitals/?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ItemList","name":"BillKarma Navigation","itemListElement":[{"@type":"SiteNavigationElement","position":1,"name":"Patient Guides","url":"https://billkarma.app/guides/"},{"@type":"SiteNavigationElement","position":2,"name":"Hospitals","url":"https://billkarma.app/hospitals/"},{"@type":"SiteNavigationElement","position":3,"name":"Procedures","url":"https://billkarma.app/procedures/"},{"@type":"SiteNavigationElement","position":4,"name":"Free Tools","url":"https://billkarma.app/tools/"},{"@type":"SiteNavigationElement","position":5,"name":"Fight Debt","url":"https://billkarma.app/fight-debt"}]}]}
 </script>
@@ -45,13 +46,13 @@
         :root {
             --bk-canvas:    #FFFFFF;
             --bk-white:     #FFFFFF;
-            --bk-black:     #1A1A1A;
-            --bk-green:     #00824F;
-            --bk-green-dark:#00663D;
-            --bk-orange:    #EB4C0A;
-            --bk-gray-text: #666666;
-            --bk-gray-border:#E5E5E5;
-            --bk-secondary: #666666;
+            --bk-black:     #16181D;
+            --bk-green:     #1F4FD1;
+            --bk-green-dark:#163A9C;
+            --bk-orange:    #16181D;
+            --bk-gray-text: #565B66;
+            --bk-gray-border:#DADCE0;
+            --bk-secondary: #565B66;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -64,71 +65,20 @@
 
         @media print { body { background: #fff !important; } }
 
-        /* === NAV === */
-        .bk-nav {
-            padding: 16px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 50;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--bk-gray-border);
-        }
-
-        .bk-logo {
-            font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em;
-            display: flex; align-items: center; gap: 10px;
-            text-decoration: none; color: var(--bk-black);
-        }
-        .bk-logo-dot {
-            width: 22px; height: 22px; background: var(--bk-green);
-            border-radius: 50%; flex-shrink: 0;
-        }
-
-        .bk-nav-links { display: flex; align-items: center; gap: 4px; }
-
-        .bk-nav-link {
-            font-size: 0.875rem; font-weight: 500;
-            color: var(--bk-black); text-decoration: none;
-            padding: 8px 16px; border-radius: 8px;
-            transition: background 0.15s;
-        }
-        .bk-nav-link:hover { background: rgba(0,0,0,0.04); }
-
-        .bk-nav-cta {
-            font-size: 0.875rem; font-weight: 600;
-            background: var(--bk-black); color: var(--bk-white);
-            text-decoration: none; padding: 10px 20px;
-            border-radius: 999px; transition: background 0.15s;
-        }
-        .bk-nav-cta:hover { background: #333; color: var(--bk-white); }
-
         /* === CARDS === */
-        .rounded-lg { border-radius: 20px !important; }
-        .rounded-md { border-radius: 14px !important; }
+        .rounded-lg { border-radius: 6px !important; }
+        .rounded-md { border-radius: 4px !important; }
 
-        /* === PRIMARY BUTTONS — pill shape === */
+        /* === PRIMARY BUTTONS === */
         button.bg-accent-700, a.bg-accent-700,
         button.bg-accent-800, a.bg-accent-800 {
-            border-radius: 999px !important;
+            border-radius: 4px !important;
             font-weight: 700 !important;
-            letter-spacing: -0.01em;
         }
 
         /* === HEADINGS === */
         h1 { letter-spacing: -0.025em; }
         h2 { letter-spacing: -0.02em; }
-
-        /* === FOOTER === */
-        .bk-footer {
-            display: flex; flex-direction: column; align-items: center;
-            padding: 24px 0 16px; font-size: 0.78rem;
-            color: var(--bk-secondary); font-weight: 500;
-            border-top: 1px solid var(--bk-gray-border);
-            margin-top: auto;
-        }
-        .bk-footer a { color: var(--bk-secondary); text-decoration: none; }
-        .bk-footer a:hover { text-decoration: underline; }
 
         .bk-map-hospital { height: 300px; }
         .bk-map-compare { height: 320px; }
@@ -165,7 +115,7 @@
             transition: opacity 0.12s;
             z-index: 9999;
             text-align: left;
-            font-family: Inter, sans-serif;
+            font-family: var(--sans);
         }
         .bk-tip::before {
             content: '';
@@ -185,15 +135,6 @@
 
         /* === RESPONSIVE === */
         @media (max-width: 640px) {
-            .bk-nav { padding: 12px 16px; }
-            .bk-nav-link { display: none; }
-            .bk-nav-link.mobile-show { display: inline-flex; }
-            /* Hide secondary CTA on mobile — keep only primary Scan CTA */
-            .bk-nav-cta-secondary { display: none; }
-            /* Compact primary CTA on mobile */
-            .bk-nav-cta { padding: 9px 16px; font-size: .82rem; }
-            .bk-footer > div:first-child { grid-template-columns: 1fr !important; padding: 24px 16px 16px !important; }
-            .bk-footer > div:last-child { padding: 12px 16px 0 !important; }
             .bk-map-hospital { height: 220px; }
             .bk-map-compare { height: 240px; }
         }
@@ -202,24 +143,16 @@
 </head>
 <body class="text-gray-900 min-h-screen flex flex-col antialiased">
 
-    <header>
-        <nav class="bk-nav">
-            <a href="/" class="bk-logo">
-                <div class="bk-logo-dot"></div>
-                BillKarma
-            </a>
-            <div class="bk-nav-links">
-                <a href="/guides/" class="bk-nav-link mobile-show">Guides</a>
-                <a href="/hospitals/" class="bk-nav-link mobile-show">Hospitals</a>
-                <a href="/procedures/" class="bk-nav-link">Procedures</a>
-                <a href="/tools/" class="bk-nav-link">Tools</a>
-                <a href="/compare/" class="bk-nav-link">Compare</a>
-                <a href="/surgery-centers/" class="bk-nav-link">Surgery Centers</a>
-                <a href="/imaging/" class="bk-nav-link">Imaging</a>
-                <a href="/fight-debt" class="bk-nav-cta bk-nav-cta-secondary" style="background:var(--bk-orange);color:#fff;">Fight Debt</a>
-                <a href="/scan" class="bk-nav-cta">Scan My Bill</a>
-            </div>
-        </nav>
+    <header class="bk-header">
+        <div class="bk-wrap bk-header-inner">
+            <a href="/" class="bk-logo">Bill<span class="bk-mark">Karma</span></a>
+            <nav class="bk-nav" aria-label="Main">
+                <a href="/hospitals/">Hospitals</a>
+                <a href="/rights/">Your rights</a>
+                <a href="/guides/">Guides</a>
+                <a href="/scan" class="bk-nav-cta">Check a bill</a>
+            </nav>
+        </div>
     </header>
 
     <main class="flex-1">
@@ -227,79 +160,21 @@
     </main>
 
     <footer class="bk-footer">
-        <div style="display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:32px;width:100%;max-width:1200px;margin:0 auto;padding:24px 40px 16px;text-align:left;">
-            <div>
-                <div style="font-size:1rem;font-weight:800;letter-spacing:-0.01em;color:var(--bk-black);margin-bottom:8px;">BillKarma</div>
-                <p style="font-size:0.8rem;color:var(--bk-gray-text);line-height:1.5;margin:0;">Step-by-step guidance and generated letters to help you fight unfair medical bills.</p>
-            </div>
-            <div>
-                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Platform</div>
-                <a href="/hospitals/" style="display:block;padding:10px 0;">Hospital Directory</a>
-                <a href="/surgery-centers/" style="display:block;padding:10px 0;">Surgery Centers</a>
-                <a href="/imaging/" style="display:block;padding:10px 0;">Imaging Centers</a>
-                <a href="/procedures/" style="display:block;padding:10px 0;">Procedure Costs</a>
-                <a href="/compare/" style="display:block;padding:10px 0;">Compare Hospitals</a>
-                <a href="/tools/" style="display:block;padding:10px 0;">Free Tools</a>
-                <a href="/scan" style="display:block;padding:10px 0;">Scan My Bill</a>
-                <a href="/estimate" style="display:block;padding:10px 0;">Savings Estimator</a>
-                <a href="/quiz" style="display:block;padding:10px 0;">Bill Quiz</a>
-                <a href="/fight-debt" style="display:block;padding:10px 0;">Fight Medical Debt</a>
-                <a href="/my-bills" style="display:block;padding:10px 0;">My Bills</a>
-                <a href="/statute-of-limitations" style="display:block;padding:10px 0;">SOL Calculator</a>
-                <a href="/calculator" style="display:block;padding:10px 0;">Medicare Calculator</a>
-            </div>
-            <div>
-                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">Learn</div>
-                <a href="/guides/hospital-billing-grades-explained/" style="display:block;padding:10px 0;">How Billing Grades Work</a>
-                <a href="/guides/common-hospital-billing-errors/" style="display:block;padding:10px 0;">Common Billing Errors</a>
-                <a href="/guides/private-equity-hospital-billing/" style="display:block;padding:10px 0;">Private Equity Hospitals</a>
-                <a href="/rights/" style="display:block;padding:10px 0;">Your State Rights</a>
-                <a href="/glossary/" style="display:block;padding:10px 0;">Billing Glossary</a>
-                <a href="/cost/mri/" style="display:block;padding:10px 0;">MRI Cost Guide</a>
-                <a href="/cost/colonoscopy/" style="display:block;padding:10px 0;">Colonoscopy Cost</a>
-                <a href="/guides/" style="display:block;padding:10px 0;">All Guides</a>
-            </div>
-            <div>
-                <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--bk-secondary);margin-bottom:10px;">About</div>
-                <a href="/about/" style="display:block;padding:10px 0;">About BillKarma</a>
-                <a href="/guides/hospital-billing-grades-explained/" style="display:block;padding:10px 0;">Our Methodology</a>
-                <a href="/press/" style="display:block;padding:10px 0;">Press &amp; Media</a>
-                <span style="display:block;padding:3px 0;">Data from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a></span>
-                <span style="display:block;padding:3px 0;font-size:0.72rem;color:#9CA3AF;">Not medical, legal, or financial advice.</span>
-            </div>
-        </div>
-        <div style="width:100%;max-width:1200px;margin:0 auto;padding:12px 40px 0;border-top:1px solid rgba(0,0,0,0.06);font-size:0.72rem;">
-            &copy; 2026 BillKarma. Data sourced from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a>. Hospital billing grades are based on publicly available price transparency data.
+        <div class="bk-wrap bk-footer-inner">
+            <p>BillKarma is an independent project that helps patients understand and question hospital bills. It is not a law firm and does not give legal or financial advice. Hospital data comes from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a> and hospitals' own price files.</p>
+            <nav aria-label="Footer">
+                <a href="/hospitals/">Hospitals</a>
+                <a href="/charity-care">Financial assistance</a>
+                <a href="/collection-notice">Collection letters</a>
+                <a href="/rights/">Your rights by state</a>
+                <a href="/guides/">Guides</a>
+                <a href="/glossary/">Glossary</a>
+                <a href="/about/">About</a>
+                <a href="/guides/hospital-billing-grades-explained/">Methodology</a>
+                <a href="/press/">Press</a>
+            </nav>
         </div>
     </footer>
-
-    <!-- Exit-intent popup -->
-    <div id="exit-intent-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;" role="dialog" aria-modal="true" aria-label="Before you go">
-        <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25);">
-            <button onclick="document.getElementById('exit-intent-overlay').style.display='none';sessionStorage.setItem('exitSeen','1');" style="position:absolute;top:8px;right:8px;background:none;border:none;font-size:1.4rem;color:#9CA3AF;cursor:pointer;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;" aria-label="Close">&times;</button>
-            <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
-            <h2 style="font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin:0 0 10px;">Before you go — your bill may have errors</h2>
-            <p style="font-size:.9rem;color:#6B7280;line-height:1.6;margin:0 0 20px;">1 in 4 hospital bills contains at least one overcharge. A 60-second scan can recover hundreds — or thousands.</p>
-            <a href="/scan" onclick="sessionStorage.setItem('exitSeen','1');" style="display:block;background:var(--bk-green,#00824F);color:#fff;border-radius:999px;padding:14px 24px;font-weight:800;font-size:1rem;text-decoration:none;margin-bottom:10px;">Scan My Bill Free — 60 seconds &rarr;</a>
-            <button onclick="document.getElementById('exit-intent-overlay').style.display='none';sessionStorage.setItem('exitSeen','1');" style="background:none;border:none;color:#9CA3AF;font-size:.82rem;cursor:pointer;">No thanks, I'll leave money on the table</button>
-        </div>
-    </div>
-    <script>
-    (function() {
-        if (sessionStorage.getItem('exitSeen')) return;
-        var shown = false;
-        document.addEventListener('mouseleave', function(e) {
-            if (shown || e.clientY > 20) return;
-            shown = true;
-            var overlay = document.getElementById('exit-intent-overlay');
-            if (overlay) overlay.style.display = 'flex';
-        });
-        // Close on overlay click
-        document.getElementById('exit-intent-overlay').addEventListener('click', function(e) {
-            if (e.target === this) { this.style.display = 'none'; sessionStorage.setItem('exitSeen','1'); }
-        });
-    })();
-    </script>
 
     <script src="/static/js/app.js"></script>
     <script>

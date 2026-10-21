@@ -173,14 +173,16 @@ class TestHospitalSeoPages:
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
         assert "Memorial Regional Hospital" in resp.text
-        assert "Billing Profile" in resp.text
-        assert "Common Procedure Prices" in resp.text
-        assert "Billing Grade Position" in resp.text
+        assert "Call billing" in resp.text
+        assert "free or discounted care" in resp.text
+        assert "Send it in writing" in resp.text
+        assert "Prices at a glance" in resp.text
+        assert "Common procedure prices" in resp.text
         assert "Grade legend:" in resp.text
         assert 'data-free-map="hospital"' in resp.text
         assert "Location" in resp.text
         assert "Last updated:" in resp.text
-        assert "Scan My Bill" in resp.text
+        assert "Check my bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
         assert expected in resp.text
 
@@ -434,7 +436,7 @@ class TestHospitalSeoPages:
         clear_comparison_cache()
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
-        assert "Billing Grade Position" in resp.text
+        assert 'class="bk-grade"' in resp.text
         assert "Benchmark samples:" not in resp.text
 
     def test_data_quality_endpoint(self):
