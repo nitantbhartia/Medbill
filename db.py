@@ -1863,4 +1863,88 @@ CREATE TABLE IF NOT EXISTS followup_queue (
 );
 CREATE INDEX IF NOT EXISTS idx_followup_case ON followup_queue(case_id);
 CREATE INDEX IF NOT EXISTS idx_followup_scheduled ON followup_queue(scheduled_for, sent_at);
+
+-- Concierge: denied-claim appeals
+CREATE TABLE IF NOT EXISTS appeal_cases (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'awaiting_payment',
+    patient_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    mailing_address TEXT,
+    insurer_name TEXT NOT NULL,
+    plan_type TEXT,
+    member_id TEXT,
+    claim_number TEXT,
+    provider_name TEXT,
+    service_description TEXT,
+    service_date DATE,
+    denial_date DATE NOT NULL,
+    service_timing TEXT NOT NULL DEFAULT 'post_service',
+    denial_reason TEXT NOT NULL,
+    amount_denied REAL NOT NULL,
+    insurer_appeal_address TEXT,
+    insurer_appeal_fax TEXT,
+    notes TEXT,
+    denial_letter_path TEXT,
+    authorization_name TEXT NOT NULL,
+    price_cents INTEGER NOT NULL,
+    stripe_session_id TEXT,
+    letter_text TEXT,
+    paid_at TIMESTAMP,
+    approved_at TIMESTAMP,
+    sent_at TIMESTAMP,
+    sent_method TEXT,
+    tracking_number TEXT,
+    outcome TEXT,
+    decided_at DATE,
+    amount_recovered REAL,
+    ops_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_appeal_cases_status ON appeal_cases(status);
+CREATE INDEX IF NOT EXISTS idx_appeal_cases_session ON appeal_cases(stripe_session_id);
+
+-- Concierge: household bill plan
+CREATE TABLE IF NOT EXISTS household_members (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id),
+    plan TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    stripe_session_id TEXT,
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_household_members_subscription ON household_members(stripe_subscription_id);
+
+CREATE TABLE IF NOT EXISTS household_documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    doc_type TEXT NOT NULL,
+    provider_name TEXT,
+    service_date DATE,
+    amount_due REAL,
+    amount_paid REAL,
+    patient_responsibility REAL,
+    eob_document_id INTEGER REFERENCES household_documents(id),
+    file_path TEXT NOT NULL,
+    original_filename TEXT,
+    extraction_status TEXT NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_household_documents_user ON household_documents(user_id);
+
+CREATE TABLE IF NOT EXISTS concierge_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    document_id INTEGER REFERENCES household_documents(id),
+    note TEXT,
+    status TEXT NOT NULL DEFAULT 'open',
+    resolution TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_concierge_requests_status ON concierge_requests(status);
 """

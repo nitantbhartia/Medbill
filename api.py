@@ -10,8 +10,10 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+import appeals
 import config
 import email_service
+import household
 import scanner
 import analyzer
 import negotiation
@@ -1472,12 +1474,23 @@ async def stripe_webhook(request: Request):
                     log.error("Lob send failed for debt_letter_id=%s: %s", debt_letter_id, exc)
                     with get_db() as db:
                         _record_debt_send_failure(db, int(debt_letter_id), session_id, 1, str(exc))
+        elif payment_purpose == "appeal_case":
+            case_id = int(metadata.get("appeal_case_id") or 0)
+            if case_id and data.get("payment_status") == "paid" and appeals.mark_paid(case_id):
+                log_audit(action="appeal_paid", resource_type="appeal_case", resource_id=str(case_id),
+                          metadata={"session_id": session_id})
+        elif payment_purpose == "household":
+            if household.activate_from_session(data):
+                log_audit(action="household_activated", resource_type="household_member",
+                          resource_id=str(metadata.get("user_id")), metadata={"session_id": session_id})
         else:
             # Dispute service payment
             bill_id = payment_module.record_payment_success(session_id)
             if bill_id:
                 log_audit(action="payment_completed", resource_type="dispute_payment",
                           resource_id=session_id, metadata={"bill_id": bill_id})
+    elif event_type in ("customer.subscription.updated", "customer.subscription.deleted"):
+        household.sync_subscription(data)
 
     return {"status": "ok"}
 

@@ -14,6 +14,9 @@ import esign as esign_module
 import payment as payment_module
 from api import router as api_router
 from advocacy_api import router as advocacy_router
+from appeal_routes import router as appeal_router
+from household_routes import router as household_router
+from ops_routes import router as ops_router
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -63,6 +66,9 @@ app = FastAPI(title=config.APP_NAME)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
 app.include_router(advocacy_router)
+app.include_router(appeal_router)
+app.include_router(household_router)
+app.include_router(ops_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
 
 

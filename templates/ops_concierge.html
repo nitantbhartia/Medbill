@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Concierge queue | BillKarma ops{% endblock %}
+
+{% block content %}
+{% set fmt = "%b %-d, %Y" %}
+<div class="bk-wrap" style="padding-top: 40px; padding-bottom: 80px">
+    <h1 style="margin: 0; font-size: 36px; letter-spacing: -0.03em; font-weight: 800">Concierge queue</h1>
+    <p class="bk-lede">{{ cases | length }} open appeal{{ "" if cases | length == 1 else "s" }} · {{ help_requests | length }} household request{{ "" if help_requests | length == 1 else "s" }}</p>
+
+    <section style="margin-top: 36px" aria-labelledby="appeals-heading">
+        <h2 id="appeals-heading" class="bk-h2">Appeals</h2>
+        {% if not cases %}<p class="bk-muted">Nothing open.</p>{% endif %}
+        {% for case in cases %}
+        <article class="bk-box" style="margin-top: 16px">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px">
+                <div class="bk-row-title">#{{ case.id }} · {{ case.patient_name }} · {{ case.insurer_name }} · ${{ "{:,.0f}".format(case.amount_denied) }}</div>
+                <div class="bk-mono" style="font-size: 14px">{{ status_labels[case.status] }}</div>
+            </div>
+            <div class="bk-row-sub">
+                {{ case.denial_reason | replace("_", " ") }} · {{ case.plan_type | replace("_", " ") }} · {{ case.service_timing | replace("_", " ") }} · {{ case.email }}{% if case.phone %} · {{ case.phone }}{% endif %}
+            </div>
+            <div class="bk-row-sub">
+                File by <strong>{{ case.dates.file_by.strftime(fmt) if case.dates.file_by else "see letter" }}</strong>
+                {% if case.dates.decision_due %} · decision due <strong>{{ case.dates.decision_due.strftime(fmt) }}</strong>{% endif %}
+                {% if case.denial_letter_path %} · <a href="/ops/concierge/appeals/{{ case.id }}/denial-letter" target="_blank" rel="noopener">denial letter</a>{% endif %}
+                · <a href="/appeal/case/{{ case.token }}" target="_blank" rel="noopener">customer view</a>
+            </div>
+            {% if case.insurer_appeal_address %}<div class="bk-row-sub">Send to: {{ case.insurer_appeal_address }}</div>{% endif %}
+            {% if case.notes %}<div class="bk-row-sub">Customer notes: {{ case.notes }}</div>{% endif %}
+
+            <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+                {% if case.status == "approved" %}
+                {% if lob_ready %}
+                <form method="post" action="/ops/concierge/appeals/{{ case.id }}/mail"><button type="submit" class="bk-btn bk-btn-sm">Mail certified (Lob)</button></form>
+                {% endif %}
+                <form method="post" action="/ops/concierge/appeals/{{ case.id }}/sent" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end">
+                    <div><label class="bk-label" for="method-{{ case.id }}">Sent by</label><select class="bk-input" id="method-{{ case.id }}" name="method" style="height: 44px"><option value="fax">Fax</option><option value="certified_mail">Certified mail</option><option value="portal">Insurer portal</option></select></div>
+                    <div><label class="bk-label" for="track-{{ case.id }}">Confirmation / tracking</label><input class="bk-input" id="track-{{ case.id }}" name="tracking_number" style="height: 44px"></div>
+                    <button type="submit" class="bk-btn-outline bk-btn-sm">Mark sent</button>
+                </form>
+                {% elif case.status == "sent" %}
+                <form method="post" action="/ops/concierge/appeals/{{ case.id }}/outcome" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end">
+                    <div><label class="bk-label" for="outcome-{{ case.id }}">Outcome</label><select class="bk-input" id="outcome-{{ case.id }}" name="outcome" style="height: 44px">{% for key, label in outcomes.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select></div>
+                    <div><label class="bk-label" for="rec-{{ case.id }}">Recovered ($)</label><input class="bk-input" id="rec-{{ case.id }}" name="amount_recovered" inputmode="decimal" style="height: 44px"></div>
+                    <button type="submit" class="bk-btn-outline bk-btn-sm">Record outcome</button>
+                </form>
+                {% else %}
+                <span class="bk-muted" style="font-size: 14px">Waiting for the customer to approve the draft.</span>
+                {% endif %}
+            </div>
+            <form method="post" action="/ops/concierge/appeals/{{ case.id }}/notes" style="margin-top: 12px; display: flex; gap: 8px; align-items: flex-end">
+                <div style="flex: 1 1 auto; min-width: 0"><label class="bk-label" for="notes-{{ case.id }}">Ops notes</label><input class="bk-input" id="notes-{{ case.id }}" name="ops_notes" value="{{ case.ops_notes or '' }}" style="height: 44px"></div>
+                <button type="submit" class="bk-btn-outline bk-btn-sm">Save</button>
+            </form>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section style="margin-top: 48px" aria-labelledby="requests-heading">
+        <h2 id="requests-heading" class="bk-h2">Household requests</h2>
+        {% if not help_requests %}<p class="bk-muted">Nothing open.</p>{% endif %}
+        {% for r in help_requests %}
+        <article class="bk-box" style="margin-top: 16px">
+            <div class="bk-row-title">{{ r.name or r.email }} · {{ r.email }}</div>
+            <div class="bk-row-sub">{{ r.created_at[:16] }}{% if r.document_id %} · <a href="/ops/concierge/documents/{{ r.document_id }}" target="_blank" rel="noopener">{{ r.doc_type }} from {{ r.provider_name or "unknown provider" }}</a>{% endif %}</div>
+            {% if r.note %}<p style="margin: 8px 0 0; font-size: 15px">{{ r.note }}</p>{% endif %}
+            <form method="post" action="/ops/concierge/requests/{{ r.id }}/resolve" style="margin-top: 12px; display: flex; gap: 8px; align-items: flex-end">
+                <div style="flex: 1 1 auto; min-width: 0"><label class="bk-label" for="res-{{ r.id }}">What we did</label><input class="bk-input" id="res-{{ r.id }}" name="resolution" style="height: 44px" required></div>
+                <button type="submit" class="bk-btn-outline bk-btn-sm">Resolve</button>
+            </form>
+        </article>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

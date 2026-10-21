@@ -106,6 +106,51 @@ def create_checkout_session(bill_id: int, email: str, amount_cents: int) -> dict
     return session
 
 
+def create_payment_checkout(
+    product_name: str, amount_cents: int, email: str, metadata: dict, success_url: str, cancel_url: str
+) -> dict:
+    """Create a one-time Stripe Checkout session. Returns the session (id, url)."""
+    params = {
+        "mode": "payment",
+        "customer_email": email,
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][unit_amount]": str(amount_cents),
+        "line_items[0][price_data][product_data][name]": product_name,
+        "line_items[0][quantity]": "1",
+        "success_url": success_url,
+        "cancel_url": cancel_url,
+    }
+    for key, value in metadata.items():
+        params[f"metadata[{key}]"] = str(value)
+    return _stripe_post("checkout/sessions", params)
+
+
+def create_subscription_checkout(
+    product_name: str, amount_cents: int, interval: str, email: str, metadata: dict, success_url: str, cancel_url: str
+) -> dict:
+    """Create a recurring Stripe Checkout session (interval 'month' or 'year'). Returns the session."""
+    params = {
+        "mode": "subscription",
+        "customer_email": email,
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][unit_amount]": str(amount_cents),
+        "line_items[0][price_data][recurring][interval]": interval,
+        "line_items[0][price_data][product_data][name]": product_name,
+        "line_items[0][quantity]": "1",
+        "success_url": success_url,
+        "cancel_url": cancel_url,
+    }
+    for key, value in metadata.items():
+        params[f"metadata[{key}]"] = str(value)
+        params[f"subscription_data[metadata][{key}]"] = str(value)
+    return _stripe_post("checkout/sessions", params)
+
+
+def create_billing_portal_session(customer_id: str, return_url: str) -> dict:
+    """Create a Stripe customer portal session so a subscriber can update or cancel. Returns it (url)."""
+    return _stripe_post("billing_portal/sessions", {"customer": customer_id, "return_url": return_url})
+
+
 def get_session(session_id: str) -> dict:
     """Retrieve a Stripe Checkout session."""
     return _stripe_get(f"checkout/sessions/{session_id}")
