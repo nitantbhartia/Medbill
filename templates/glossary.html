@@ -23,8 +23,8 @@
         {% for term in all_terms %}
         {
             "@type": "DefinedTerm",
-            "name": "{{ term.term }}",
-            "description": "{{ term.definition | replace('&rsquo;', \"'\") | replace('&ndash;', '-') | replace('&mdash;', '-') | replace('&ldquo;', '\"') | replace('&rdquo;', '\"') }}"
+            "name": {{ term.term | tojson }},
+            "description": {{ term.definition | replace('&rsquo;', "'") | replace('&ndash;', '-') | replace('&mdash;', '-') | replace('&ldquo;', '"') | replace('&rdquo;', '"') | tojson }}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     ]
