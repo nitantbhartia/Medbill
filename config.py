@@ -10,6 +10,8 @@ ENV = os.getenv("ENV", "development").lower()
 # Database
 DB_PATH = os.getenv("DB_PATH", "data/app.db")
 AUTO_BOOTSTRAP_HOSPITAL_DATA = os.getenv("AUTO_BOOTSTRAP_HOSPITAL_DATA", "false").lower() == "true"
+CMS_HOSPITAL_GENERAL_CSV_URL = "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0/download?format=csv"
+CMS_HOSPITAL_GENERAL_CSV_PATH = "data/cms/raw/hospital_general_information.csv"
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
