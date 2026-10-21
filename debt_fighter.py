@@ -807,27 +807,49 @@ def send_via_lob(db, debt_letter_id: int, api_key: str) -> dict:
     if row["status"] == "sent":
         return {"lob_id": row["lob_id"], "tracking_number": row["tracking_number"], "already_sent": True}
 
-    user_name = row["user_name"] or ""
-    user_address = row["user_address"] or ""
-    collector_name = row["collector_name"] or ""
-    collector_address = row["collector_address"] or ""
+    result = send_certified_letter(
+        description=f"FDCPA Letter - {row['letter_type']}",
+        from_name=row["user_name"] or "",
+        from_address=row["user_address"] or "",
+        to_name=row["collector_name"] or "",
+        to_address=row["collector_address"] or "",
+        letter_text=row["letter_text"] or "",
+        api_key=api_key,
+    )
+    db.execute(
+        "UPDATE debt_letters SET lob_id = ?, tracking_number = ?, status = 'sent', sent_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (result["lob_id"], result["tracking_number"], debt_letter_id),
+    )
+    return result
 
-    # Build simple HTML version of the letter for Lob
-    letter_html = _letter_text_to_lob_html(row["letter_text"] or "")
 
-    from_addr = _parse_address_for_lob(user_address)
-    to_addr = _parse_address_for_lob(collector_address)
+def send_certified_letter(
+    description: str,
+    from_name: str,
+    from_address: str,
+    to_name: str,
+    to_address: str,
+    letter_text: str,
+    api_key: str,
+) -> dict:
+    """Mail a plain-text letter by Lob certified mail.
+
+    Returns dict with lob_id, tracking_number, expected_delivery_date. Raises RuntimeError on failure.
+    """
+    letter_html = _letter_text_to_lob_html(letter_text)
+    from_addr = _parse_address_for_lob(from_address)
+    to_addr = _parse_address_for_lob(to_address)
 
     # Build multipart form data for Lob /v1/letters
     params = {
-        "description": f"FDCPA Letter - {row['letter_type']}",
-        "to[name]": collector_name,
+        "description": description,
+        "to[name]": to_name,
         "to[address_line1]": to_addr["address_line1"],
         "to[address_city]": to_addr["address_city"],
         "to[address_state]": to_addr["address_state"],
         "to[address_zip]": to_addr["address_zip"],
         "to[address_country]": "US",
-        "from[name]": user_name,
+        "from[name]": from_name,
         "from[address_line1]": from_addr["address_line1"],
         "from[address_city]": from_addr["address_city"],
         "from[address_state]": from_addr["address_state"],
@@ -862,16 +884,11 @@ def send_via_lob(db, debt_letter_id: int, api_key: str) -> dict:
         log.error("Lob error %s: %s", e.code, body_text)
         raise RuntimeError(f"Lob error {e.code}: {body_text}") from e
 
-    lob_id = result.get("id", "")
-    tracking_number = result.get("tracking_number", "")
-    expected_delivery = result.get("expected_delivery_date", "")
-
-    db.execute(
-        "UPDATE debt_letters SET lob_id = ?, tracking_number = ?, status = 'sent', sent_at = CURRENT_TIMESTAMP WHERE id = ?",
-        (lob_id, tracking_number, debt_letter_id),
-    )
-
-    return {"lob_id": lob_id, "tracking_number": tracking_number, "expected_delivery_date": expected_delivery}
+    return {
+        "lob_id": result.get("id", ""),
+        "tracking_number": result.get("tracking_number", ""),
+        "expected_delivery_date": result.get("expected_delivery_date", ""),
+    }
 
 
 def _letter_text_to_lob_html(text: str) -> str:

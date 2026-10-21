@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}BillKarma Household — Every Medical Bill Checked Before You Pay{% endblock %}
+
+{% block head %}
+<meta name="description" content="Upload your family's medical bills and insurance statements. We tell you what you actually owe, catch overbilling, recover overpayments and handle the calls. $199 a year.">
+{% endblock %}
+
+{% block content %}
+<section class="bk-wrap" style="padding-top: 72px; padding-bottom: 56px">
+    <p class="bk-eyebrow">BillKarma Concierge</p>
+    <h1 style="margin: 0; max-width: 860px; font-size: clamp(38px, 5.5vw, 62px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 800">Never pay a medical bill <span class="bk-mark">before it's checked.</span></h1>
+    <p style="margin: 22px 0 0; max-width: 660px; font-size: 19px; line-height: 1.55; color: var(--ink-2)">Upload every bill and insurance statement (EOB) your family gets. We match each bill to what your insurer says you owe, tell you what to pay, and handle it when something's wrong.</p>
+</section>
+
+<section style="background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule)">
+    <div class="bk-wrap" style="padding-top: 56px; padding-bottom: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px">
+        <div>
+            <h2 style="margin: 0; font-size: 21px; font-weight: 700">Pay the right amount</h2>
+            <p style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">Providers often bill before your insurer has paid, or bill more than your EOB says you owe. We flag every mismatch.</p>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 21px; font-weight: 700">Get overpayments back</h2>
+            <p style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">Paid a bill and then your insurer paid too? We spot the credit and ask the provider for your refund.</p>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 21px; font-weight: 700">Hand off the calls</h2>
+            <p style="margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">Tap "Handle this for me" on any bill. We call the billing office, send the letters and report back.</p>
+        </div>
+    </div>
+</section>
+
+<section class="bk-wrap" style="padding-top: 56px; padding-bottom: 80px">
+    <h2 class="bk-h2">Plans</h2>
+    <p class="bk-lede">One plan covers everyone in your household, including a parent whose bills you manage. Cancel anytime.</p>
+    <div style="margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 760px">
+        {% for key, plan in plans.items() %}
+        <div class="bk-box" style="{{ 'border: 2px solid var(--ink)' if key == 'yearly' else '' }}">
+            <div style="font-size: 15px; font-weight: 600" class="bk-muted">{{ "Yearly" if key == "yearly" else "Monthly" }}{% if key == "yearly" %} · saves $41{% endif %}</div>
+            <div class="bk-mono" style="margin-top: 6px; font-size: 28px; font-weight: 500">{{ plan.label }}</div>
+            {% if user %}
+            <form method="post" action="/household/checkout" style="margin-top: 16px">
+                <input type="hidden" name="plan" value="{{ key }}">
+                <button type="submit" class="{{ 'bk-btn' if key == 'yearly' else 'bk-btn-outline' }}">Start {{ "yearly" if key == "yearly" else "monthly" }} plan</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% if not user %}
+    <p style="margin: 24px 0 0; font-size: 16px"><a href="/account" class="bk-btn">Create your account</a> <span class="bk-muted" style="margin-left: 12px">Already a member? <a href="/account?mode=login">Log in</a></span></p>
+    {% endif %}
+    <p class="bk-muted" style="margin: 24px 0 0; max-width: 640px; font-size: 14px; line-height: 1.6">Your documents are stored privately and only used to check your bills. BillKarma is not a law firm or an insurer and doesn't give legal advice. Insurance denials need a separate appeal: <a href="/appeal">appeal a denied claim</a>.</p>
+</section>
+{% endblock %}

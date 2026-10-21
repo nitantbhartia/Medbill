@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Your bills | BillKarma Household{% endblock %}
+
+{% block content %}
+{% set verdict_labels = {"wait": "Don't pay yet", "review": "We're checking", "overpaid": "Refund due", "overbilled": "Overbilled", "ok": "OK to pay"} %}
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 80px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 12px">
+        <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.03em; font-weight: 800">Your household's bills</h1>
+        <div style="display: flex; gap: 16px; font-size: 15px">
+            <form method="post" action="/household/billing"><button type="submit" style="background: none; border: 0; padding: 10px 0; font: inherit; color: var(--action); cursor: pointer; text-decoration: underline">Manage plan</button></form>
+            <form method="post" action="/account/logout"><button type="submit" style="background: none; border: 0; padding: 10px 0; font: inherit; color: var(--action); cursor: pointer; text-decoration: underline">Log out</button></form>
+        </div>
+    </div>
+    {% if membership.status == "past_due" %}<p role="alert" style="margin: 16px 0 0; padding: 12px 16px; border: 2px solid var(--ink); border-radius: 4px">Your last payment didn't go through. Update your card under "Manage plan" to keep your plan.</p>{% endif %}
+    {% if error %}<p role="alert" style="margin: 16px 0 0; padding: 12px 16px; border: 2px solid var(--ink); border-radius: 4px">{{ error }}</p>{% endif %}
+
+    <section class="bk-panel" style="margin-top: 32px" aria-labelledby="upload-heading">
+        <h2 id="upload-heading" class="bk-h2">Add a bill or EOB</h2>
+        <p class="bk-lede">Upload a PDF or photo. Leave the amounts blank and we'll read them from the document.</p>
+        <form method="post" action="/household/documents" enctype="multipart/form-data" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end">
+            <div><label class="bk-label" for="doc_type">This is a</label>
+                <select class="bk-input" id="doc_type" name="doc_type">{% for key, label in doc_types.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="bk-label" for="provider_name">Provider</label><input class="bk-input" id="provider_name" name="provider_name" placeholder="e.g. Inova Fair Oaks Hospital"></div>
+            <div><label class="bk-label" for="service_date">Date of service</label><input class="bk-input" id="service_date" name="service_date" type="date"></div>
+            <div><label class="bk-label" for="amount_due">Bill: amount due ($)</label><input class="bk-input" id="amount_due" name="amount_due" inputmode="decimal"></div>
+            <div><label class="bk-label" for="amount_paid">Bill: already paid ($)</label><input class="bk-input" id="amount_paid" name="amount_paid" inputmode="decimal"></div>
+            <div><label class="bk-label" for="patient_responsibility">EOB: you owe ($)</label><input class="bk-input" id="patient_responsibility" name="patient_responsibility" inputmode="decimal"></div>
+            <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; align-items: center">
+                <label for="document" class="bk-sr-only">Document file</label>
+                <input id="document" name="document" type="file" accept=".pdf,image/*" required style="font: inherit">
+                <button type="submit" class="bk-btn">Upload</button>
+            </div>
+        </form>
+    </section>
+
+    <section style="margin-top: 48px" aria-labelledby="bills-heading">
+        <h2 id="bills-heading" class="bk-h2">Bills</h2>
+        {% if data.bills %}
+        <ul class="bk-rows">
+            {% for bill in data.bills %}
+            <li style="align-items: flex-start">
+                <div style="flex: 1 1 360px; min-width: 0">
+                    <div class="bk-row-title">{{ bill.provider_name or "Unknown provider" }}{% if bill.service_date %} <span class="bk-muted" style="font-weight: 400">· {{ bill.service_date }}</span>{% endif %}</div>
+                    <div style="margin-top: 6px; font-size: 16px"><span class="{{ 'bk-mark' if bill.check.verdict in ('overbilled', 'overpaid') else '' }}" style="font-weight: 700">{{ verdict_labels[bill.check.verdict] }}.</span> {{ bill.check.message }}</div>
+                    <div class="bk-row-sub">
+                        {% if bill.amount_due is not none %}Billed ${{ "{:,.2f}".format(bill.amount_due) }}{% endif %}
+                        {% if bill.amount_paid %} · paid ${{ "{:,.2f}".format(bill.amount_paid) }}{% endif %}
+                    </div>
+                    {% if data.eobs %}
+                    <form method="post" action="/household/documents/{{ bill.id }}/link" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+                        <label for="eob-{{ bill.id }}" style="font-size: 14px" class="bk-muted">Matching EOB</label>
+                        <select id="eob-{{ bill.id }}" name="eob_id" class="bk-input" style="width: auto; height: 40px; font-size: 14px">
+                            <option value="">None</option>
+                            {% for eob in data.eobs %}<option value="{{ eob.id }}"{% if bill.eob_document_id == eob.id %} selected{% endif %}>{{ eob.provider_name or "EOB" }} {{ eob.service_date or "" }}{% if eob.patient_responsibility is not none %} (you owe ${{ "{:,.2f}".format(eob.patient_responsibility) }}){% endif %}</option>{% endfor %}
+                        </select>
+                        <button type="submit" class="bk-btn-outline bk-btn-sm" style="min-height: 40px">Save</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if bill.help_requested %}
+                <span class="bk-muted" style="font-size: 15px; padding: 12px 0">We're on it</span>
+                {% else %}
+                <form method="post" action="/household/requests">
+                    <input type="hidden" name="document_id" value="{{ bill.id }}">
+                    <input type="hidden" name="note" value="{{ bill.check.message }}">
+                    <button type="submit" class="bk-btn-outline bk-btn-sm">Handle this for me</button>
+                </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="bk-muted" style="margin: 12px 0 0">No bills yet. Upload your first one above.</p>
+        {% endif %}
+    </section>
+
+    <section style="margin-top: 48px" aria-labelledby="eobs-heading">
+        <h2 id="eobs-heading" class="bk-h2">EOBs from your insurer</h2>
+        {% if data.eobs %}
+        <ul class="bk-rows">
+            {% for eob in data.eobs %}
+            <li><div><div class="bk-row-title">{{ eob.provider_name or "EOB" }}{% if eob.service_date %} <span class="bk-muted" style="font-weight: 400">· {{ eob.service_date }}</span>{% endif %}</div>
+                <div class="bk-row-sub">{% if eob.patient_responsibility is not none %}You owe ${{ "{:,.2f}".format(eob.patient_responsibility) }}{% else %}We're reading this one{% endif %}</div></div></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="bk-muted" style="margin: 12px 0 0">No EOBs yet. Your insurer posts them in its app or website after each claim.</p>
+        {% endif %}
+    </section>
+
+    <section class="bk-box" style="margin-top: 48px" aria-labelledby="ask-heading">
+        <h2 id="ask-heading" style="margin: 0; font-size: 20px; font-weight: 800">Something else?</h2>
+        <form method="post" action="/household/requests" style="margin-top: 12px">
+            <label for="note" class="bk-label">Tell us what you need</label>
+            <textarea id="note" name="note" class="bk-input" rows="3" style="height: auto; padding: 12px" required></textarea>
+            <button type="submit" class="bk-btn" style="margin-top: 12px">Send to BillKarma</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

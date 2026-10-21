@@ -53,6 +53,29 @@ DISPUTE_FEE_TIERS = [
 DISPUTE_FOLLOWUP_DAYS = [7, 14, 30, 45]
 DISPUTE_MAX_DAYS = 45
 
+# Concierge: denied-claim appeals (flat fee by amount denied)
+APPEAL_PRICE_CENTS = 14900  # $149
+APPEAL_PRICE_LARGE_CENTS = 29900  # $299
+APPEAL_LARGE_CLAIM_THRESHOLD = 5000  # dollars denied at or above this pay the large price
+# Days to file an internal appeal after the denial: 180 under ACA / ERISA rules (employer and
+# individual plans), 65 for a Medicare Advantage reconsideration. Medicaid and other plans vary,
+# so their deadline comes from the denial letter. Insurers decide in 30 days (pre-service),
+# 60 days (post-service) or 72 hours (urgent); external review must be requested within
+# 4 months of a final denial.
+APPEAL_FILING_DAYS = {"employer": 180, "individual": 180, "medicare_advantage": 65}
+APPEAL_DECISION_DAYS = {"pre_service": 30, "post_service": 60, "urgent": 3}
+APPEAL_EXTERNAL_REVIEW_DAYS = 120
+APPEAL_REMINDER_WINDOW_DAYS = 7
+
+# Concierge: household bill plan (Stripe subscription)
+HOUSEHOLD_PRICE_YEARLY_CENTS = 19900  # $199/year
+HOUSEHOLD_PRICE_MONTHLY_CENTS = 2000  # $20/month
+HOUSEHOLD_MATCH_TOLERANCE = 1.00  # dollars of rounding allowed between a bill and its EOB
+
+# Concierge shared
+OPS_NOTIFY_EMAIL = os.getenv("OPS_NOTIFY_EMAIL", "")
+PRIVATE_UPLOAD_DIR = os.getenv("PRIVATE_UPLOAD_DIR", os.path.join(os.path.dirname(DB_PATH) or "data", "private_uploads"))
+
 # Lob (for certified mail — debt validation letters)
 LOB_API_KEY = os.getenv("LOB_API_KEY", "")
 FDCPA_LETTER_PRICE_CENTS = 1900  # $19
