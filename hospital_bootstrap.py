@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import urllib.parse
 import urllib.request
 
+import config
 from cms_loader import download_cms_2026, load_transformed_cms_2026, transform_cms_2026
 from db import get_db
-from hospital_etl import load_medicare_rates
+from hospital_etl import load_cms_general, load_medicare_rates
 from hospital_seo import (
     generate_and_save_hospital_content,
     get_state_index_stats,
@@ -79,13 +81,32 @@ def _seed_hospitals_from_dolthub() -> int:
     return created
 
 
-def ensure_hospital_data_bootstrap() -> None:
+def _cms_directory_loaded() -> bool:
     with get_db() as db:
-        hospital_count = db.execute("SELECT COUNT(*) AS c FROM hospitals").fetchone()["c"]
-    if hospital_count > 0:
+        row = db.execute(
+            "SELECT 1 FROM data_refresh_log WHERE source = 'cms_general' AND status = 'success' LIMIT 1"
+        ).fetchone()
+    return row is not None
+
+
+def _load_cms_directory() -> int:
+    """Download CMS Hospital General Information (~5,400 hospitals) and upsert it into hospitals."""
+    os.makedirs(os.path.dirname(config.CMS_HOSPITAL_GENERAL_CSV_PATH), exist_ok=True)
+    try:
+        urllib.request.urlretrieve(config.CMS_HOSPITAL_GENERAL_CSV_URL, config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+    except OSError as exc:
+        log.error("CMS hospital directory download failed from %s: %s", config.CMS_HOSPITAL_GENERAL_CSV_URL, exc)
+        return 0
+    return load_cms_general(config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+
+
+def ensure_hospital_data_bootstrap() -> None:
+    if _cms_directory_loaded():
         return
 
-    log.warning("Hospital DB empty, running bootstrap load.")
+    log.warning("CMS hospital directory not loaded, running bootstrap load.")
+    loaded_cms = _load_cms_directory()
+    log.warning("Loaded %s hospitals from CMS directory", loaded_cms)
     seeded = _seed_hospitals_from_dolthub()
     log.warning("Seeded/updated %s hospitals from DoltHub", seeded)
 
