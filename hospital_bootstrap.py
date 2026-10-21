@@ -16,6 +16,7 @@ from hospital_etl import load_cms_general, load_medicare_rates
 from hospital_seo import (
     generate_and_save_hospital_content,
     get_state_index_stats,
+    log_refresh,
     recompute_benchmarks,
     recompute_billing_metrics,
     upsert_hospital_row,
@@ -26,6 +27,8 @@ from scripts.load_pricing_from_dolthub import load_prices_for_matches, match_hos
 log = logging.getLogger(__name__)
 
 API_BASE = "https://www.dolthub.com/api/v1alpha1/dolthub/hospital-price-transparency/master"
+# Bump this to rerun the full bootstrap on the next deploy.
+BOOTSTRAP_SOURCE = "hospital_bootstrap_v2"
 
 
 def _api_query(sql: str) -> list[dict]:
@@ -81,12 +84,57 @@ def _seed_hospitals_from_dolthub() -> int:
     return created
 
 
-def _cms_directory_loaded() -> bool:
+def _bootstrap_done() -> bool:
     with get_db() as db:
         row = db.execute(
-            "SELECT 1 FROM data_refresh_log WHERE source = 'cms_general' AND status = 'success' LIMIT 1"
+            "SELECT 1 FROM data_refresh_log WHERE source = ? AND status = 'success' LIMIT 1",
+            (BOOTSTRAP_SOURCE,),
         ).fetchone()
     return row is not None
+
+
+def _is_cms_facility_id(facility_id: str) -> bool:
+    # CMS ids are 6-character CCNs; DoltHub-seeded rows use 10-digit NPIs.
+    return len(facility_id) < 10
+
+
+def _exact_dolthub_duplicates() -> list[str]:
+    """DoltHub-seeded hospitals with the same name, city and state as a CMS hospital."""
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT DISTINCT d.facility_id
+            FROM hospitals d
+            JOIN hospitals c
+              ON UPPER(c.name) = UPPER(d.name) AND UPPER(c.city) = UPPER(d.city) AND c.state = d.state
+            WHERE LENGTH(d.facility_id) = 10 AND d.facility_id NOT GLOB '*[^0-9]*'
+              AND LENGTH(c.facility_id) < 10
+            """
+        ).fetchall()
+    return [row["facility_id"] for row in rows]
+
+
+def _matched_dolthub_duplicates(matches: dict[str, dict]) -> list[str]:
+    """DoltHub-seeded hospitals whose NPI a CMS hospital was matched to, even under a different name."""
+    npis = {m["npi"] for fid, m in matches.items() if _is_cms_facility_id(fid)}
+    with get_db() as db:
+        existing = {row["facility_id"] for row in db.execute("SELECT facility_id FROM hospitals")}
+    return sorted(npis & existing)
+
+
+def _delete_hospitals(facility_ids: list[str]) -> int:
+    """Delete hospitals and every row any table holds for them."""
+    with get_db() as db:
+        tables = [
+            row["name"]
+            for row in db.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name != 'hospitals'")
+            if any(col["name"] == "facility_id" for col in db.execute(f"PRAGMA table_info({row['name']})"))
+        ]
+        for facility_id in facility_ids:
+            for table in tables:
+                db.execute(f"DELETE FROM {table} WHERE facility_id = ?", (facility_id,))
+            db.execute("DELETE FROM hospitals WHERE facility_id = ?", (facility_id,))
+    return len(facility_ids)
 
 
 def _load_cms_directory() -> int:
@@ -101,14 +149,17 @@ def _load_cms_directory() -> int:
 
 
 def ensure_hospital_data_bootstrap() -> None:
-    if _cms_directory_loaded():
+    if _bootstrap_done():
         return
 
-    log.warning("CMS hospital directory not loaded, running bootstrap load.")
+    log.warning("Hospital bootstrap %s not done, running it.", BOOTSTRAP_SOURCE)
+    removed = _delete_hospitals(_exact_dolthub_duplicates())
+    log.warning("Removed %s DoltHub hospitals with the same name as a CMS hospital", removed)
     loaded_cms = _load_cms_directory()
     log.warning("Loaded %s hospitals from CMS directory", loaded_cms)
-    seeded = _seed_hospitals_from_dolthub()
-    log.warning("Seeded/updated %s hospitals from DoltHub", seeded)
+    if loaded_cms == 0:
+        seeded = _seed_hospitals_from_dolthub()
+        log.warning("CMS directory unavailable, seeded %s hospitals from DoltHub instead", seeded)
 
     try:
         download_cms_2026("data/cms/raw")
@@ -123,10 +174,20 @@ def ensure_hospital_data_bootstrap() -> None:
             pass
 
     matches, _ = match_hospitals(limit=10000)
+    matched_duplicates = _matched_dolthub_duplicates(matches) if loaded_cms > 0 else []
+    if matched_duplicates:
+        _delete_hospitals(matched_duplicates)
+        # Reload so CMS hospitals take back the plain slugs the deleted rows held.
+        load_cms_general(config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+        log.warning("Removed %s DoltHub hospitals matched to a CMS hospital", len(matched_duplicates))
+    deleted = set(matched_duplicates)
+    matches = {fid: m for fid, m in matches.items() if fid not in deleted}
     loaded = load_prices_for_matches(matches, year=2026)
     recompute_benchmarks()
     recompute_billing_metrics()
     generate_and_save_hospital_content()
+    if loaded_cms > 0:
+        log_refresh(BOOTSTRAP_SOURCE, loaded_cms, "success")
     log.warning(
         "Hospital bootstrap complete. states=%s matched=%s loaded_facilities=%s rows=%s",
         len(get_state_index_stats()),

@@ -1426,6 +1426,17 @@ def resolve_hospital_slug(state_slug: str, city_slug: str, hospital_slug: str) -
         if exact:
             return exact["slug"]
 
+        # A duplicate's URL carried its facility id (e.g. "-100093" or an NPI); send it to the
+        # hospital's plain slug once the duplicate is gone.
+        unsuffixed = re.sub(r"-[0-9][0-9a-z]{5,9}$", "", target)
+        if unsuffixed != target:
+            plain = db.execute(
+                "SELECT slug FROM hospitals WHERE state_slug = ? AND city_slug = ? AND slug = ? LIMIT 1",
+                (state_slug, city_slug, unsuffixed),
+            ).fetchone()
+            if plain:
+                return plain["slug"]
+
         fallback = db.execute(
             """
             SELECT slug

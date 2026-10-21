@@ -539,3 +539,44 @@ class TestHospitalSeoPages:
         # D grade band maps to 0.2..0.4 by product scale (5x-8x Medicare).
         assert p is not None
         assert 0.2 <= p <= 0.4
+
+
+class TestDoltHubDuplicates:
+    def _seed_pensacola_pair(self):
+        # DoltHub row (NPI) loaded first takes the plain slug; the CMS row (CCN) gets an id suffix.
+        upsert_hospital_row({"facility_id": "1700979465", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "slug": "baptist-hospital-pensacola"})
+        upsert_hospital_row({"facility_id": "100093", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "phone": "(850) 434-4011", "slug": "baptist-hospital-pensacola"})
+        upsert_hospital_row({"facility_id": "1942538012", "name": "WEST FLORIDA HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "slug": "west-florida-hospital-pensacola"})
+
+    def test_exact_duplicate_removed_and_suffixed_url_redirects(self):
+        import hospital_bootstrap
+
+        self._seed_pensacola_pair()
+        with get_db() as db:
+            suffixed = db.execute("SELECT slug FROM hospitals WHERE facility_id = '100093'").fetchone()["slug"]
+        assert suffixed == "baptist-hospital-pensacola-100093"
+
+        removed = hospital_bootstrap._delete_hospitals(hospital_bootstrap._exact_dolthub_duplicates())
+        assert removed == 1
+        upsert_hospital_row({"facility_id": "100093", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "phone": "(850) 434-4011", "slug": "baptist-hospital-pensacola"})
+
+        resp = client.get(f"/hospitals/fl/pensacola/{suffixed}/", follow_redirects=False)
+        assert resp.status_code == 301
+        assert resp.headers["location"] == "/hospitals/fl/pensacola/baptist-hospital-pensacola/"
+        page = client.get("/hospitals/fl/pensacola/baptist-hospital-pensacola/")
+        assert "(850) 434-4011" in page.text
+
+    def test_matched_duplicate_found_by_npi(self):
+        import hospital_bootstrap
+
+        self._seed_pensacola_pair()
+        matches = {
+            "100093": {"npi": "1700979465"},
+            "1942538012": {"npi": "1942538012"},
+            "100231": {"npi": "1942538012"},
+        }
+        assert hospital_bootstrap._matched_dolthub_duplicates(matches) == ["1700979465", "1942538012"]
