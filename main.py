@@ -490,7 +490,11 @@ def startup():
     db.init_db()
     if config.AUTO_BOOTSTRAP_HOSPITAL_DATA:
         from hospital_bootstrap import ensure_hospital_data_bootstrap
-        ensure_hospital_data_bootstrap()
+        try:
+            ensure_hospital_data_bootstrap()
+        except Exception:
+            # Serve the site with the data it already has; the bootstrap retries on the next deploy.
+            logging.exception("Hospital data bootstrap failed; starting without it")
     # Seed data if database is empty
     from seed_data import seed_if_empty
     seed_if_empty()
