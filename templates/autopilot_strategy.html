@@ -1,153 +1,69 @@
 {% extends "base.html" %}
-{% block title %}AI Dispute Strategy &mdash; {{ strategy.provider }} | BillKarma{% endblock %}
-{% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block head %}
-<style>
-    .strat-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:48px 24px 44px; }
-    .strat-hero-inner { max-width:672px; margin:0 auto; }
-    .strat-hero h1 { color:#fff; font-size:2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:6px; line-height:1.1; }
-    .strat-hero p { color:rgba(255,255,255,0.75); font-weight:500; font-size:0.9rem; }
-    @media(max-width:640px){ .strat-hero{padding:36px 18px 32px;border-radius:0 0 24px 24px;} .strat-hero h1{font-size:1.6rem;} }
-
-    .phase-card { position:relative; padding-left:36px; padding-bottom:24px; }
-    .phase-card::before { content:''; position:absolute; left:15px; top:28px; bottom:0; width:2px; background:#D6E0DB; }
-    .phase-card:last-child::before { display:none; }
-    .phase-num { position:absolute; left:0; top:0; width:32px; height:32px; border-radius:50%; background:#0C6B55; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; }
-</style>
-{% endblock %}
-
+{% block title %}Your dispute plan | BillKarma{% endblock %}
 {% block content %}
-<section class="strat-hero">
-    <div class="strat-hero-inner">
-        <p style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.55);margin-bottom:10px;">
-            <a href="/results/{{ strategy.bill_id }}" style="color:rgba(255,255,255,0.55);text-decoration:none;">&larr; Back to results</a>
+{% set st = strategy %}
+<section class="bk-results-head">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/results/{{ st.bill_id }}">Results</a> / Dispute plan</p>
+        <h1>Here&rsquo;s exactly what we&rsquo;ll do for ${{ fee_dollars }}</h1>
+        <p class="bk-results-meta">
+            <span>{{ st.provider }}</span>
+            {% if st.total_savings %}<span>Up to ${{ "{:,.0f}".format(st.total_savings) }} in flagged charges</span>{% endif %}
         </p>
-        <h1>Your AI Dispute Strategy</h1>
-        <p>Here&rsquo;s how our AI agent will fight your bill from {{ strategy.provider }}.</p>
     </div>
 </section>
 
-<div class="max-w-2xl mx-auto px-5 py-8">
-
-    <!-- Savings headline -->
-    {% if strategy.total_savings > 0 %}
-    <div class="bg-green-50 border border-green-200 rounded-2xl p-8 mb-8 text-center">
-        <p class="text-sm font-semibold text-green-700 mb-1">Potential savings identified</p>
-        <p class="text-4xl font-extrabold text-green-800 tracking-tight">${{ "{:,.0f}".format(strategy.total_savings) }}</p>
-        <p class="text-sm text-green-600 mt-2">across {{ strategy.finding_count }} issue{{ "s" if strategy.finding_count != 1 else "" }} &middot; {{ strategy.win_probability }}% estimated win probability</p>
-    </div>
-    {% endif %}
-
-    <!-- Strategy Summary -->
-    {% if strategy.strategy_summary %}
-    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
-        <h2 class="font-bold text-gray-900 mb-2">AI Strategy Assessment</h2>
-        <p class="text-sm text-gray-700 leading-relaxed">{{ strategy.strategy_summary }}</p>
-    </div>
-    {% endif %}
-
-    <!-- Key facts -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        <div class="border border-gray-200 rounded-xl p-3 text-center">
-            <p class="text-lg font-bold text-gray-900">{{ strategy.finding_count }}</p>
-            <p class="text-xs text-gray-500">Issues</p>
+<div class="bk-wrap bk-results">
+    <div class="bk-results-main">
+        {% if st.strategy_summary %}
+        <div class="bk-card" style="margin-bottom: 28px">
+            <h2 class="bk-h3" style="margin-bottom: 8px">What stands out on this bill</h2>
+            <p style="margin: 0; color: var(--ink-2)">{{ st.strategy_summary }}</p>
         </div>
-        <div class="border border-gray-200 rounded-xl p-3 text-center">
-            <p class="text-lg font-bold text-gray-900">{{ strategy.high_severity_count }}</p>
-            <p class="text-xs text-gray-500">High severity</p>
-        </div>
-        <div class="border border-gray-200 rounded-xl p-3 text-center">
-            <p class="text-lg font-bold text-gray-900">{{ strategy.timeline_days }} days</p>
-            <p class="text-xs text-gray-500">Timeline</p>
-        </div>
-        <div class="border border-gray-200 rounded-xl p-3 text-center">
-            <p class="text-lg font-bold text-gray-900">{% if strategy.is_nonprofit %}Nonprofit{% else %}For-profit{% endif %}</p>
-            <p class="text-xs text-gray-500">Hospital type</p>
-        </div>
-    </div>
+        {% endif %}
 
-    <!-- Phases -->
-    <div class="mb-8">
-        <h2 class="font-bold text-gray-900 mb-5">The plan: 5 phases over 45 days</h2>
-        {% for phase in strategy.phases %}
-        <div class="phase-card">
-            <div class="phase-num">{{ loop.index }}</div>
-            <div class="bg-white border border-gray-200 rounded-xl p-5">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-semibold text-gray-900">{{ phase.name }}</h3>
-                    <span class="text-xs text-gray-400">Day {{ phase.day }}{% if phase.duration_days %}&ndash;{{ phase.day + phase.duration_days }}{% endif %}</span>
-                </div>
-                <ul class="space-y-2 mb-3">
-                    {% for action in phase.actions %}
-                    <li class="flex gap-2 text-sm text-gray-700">
-                        {% if action.auto %}
-                        <span class="text-green-600 font-bold shrink-0">&check;</span>
-                        {% else %}
-                        <span class="text-gray-400 font-bold shrink-0">&bull;</span>
-                        {% endif %}
-                        <span>{{ action.description }}{% if action.auto %} <span class="text-xs text-green-600 font-medium">(automatic)</span>{% endif %}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <p class="text-xs text-gray-400">Expected: {{ phase.expected_outcome }}</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+        <h2 class="bk-h3" style="margin: 0 0 14px">The next {{ config.DISPUTE_MAX_DAYS }} days</h2>
+        <ol class="bk-timeline">
+            <li class="done"><strong>Today: we email the dispute letter</strong><span>To {{ st.provider }}&rsquo;s billing office, naming each flagged charge and what Medicare pays for it. You&rsquo;ll see the letter on your dispute page.</span></li>
+            {% for day in config.DISPUTE_FOLLOWUP_DAYS %}
+            <li><strong>Day {{ day }}: follow-up {{ loop.index }}</strong><span>If billing hasn&rsquo;t answered in writing, we email again and ask for a written response within 7 business days.</span></li>
+            {% endfor %}
+            <li class="guarantee"><strong>Day {{ config.DISPUTE_MAX_DAYS }}: refund guarantee</strong><span>If the bill hasn&rsquo;t been reduced, you get the ${{ fee_dollars }} back in full.</span></li>
+        </ol>
 
-    <!-- What's included -->
-    <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8">
-        <h3 class="font-bold text-gray-900 mb-3">What&rsquo;s included</h3>
-        <div class="grid sm:grid-cols-2 gap-3">
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>AI-generated dispute letter sent to hospital</span>
+        <div class="bk-findings" style="grid-template-columns: 1fr 1fr; margin-top: 40px">
+            <div>
+                <h3>What you do</h3>
+                <p>Forward any reply from the hospital, and tell us on your dispute page when they answer. Keep paying anything you don&rsquo;t dispute.</p>
             </div>
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>Automated follow-ups (day 7, 14, 30, 45)</span>
+            <div>
+                <h3>What we don&rsquo;t do</h3>
+                <p>Phone calls, insurance appeals or legal action. Everything is in writing, so you keep a dated record.</p>
             </div>
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>AI response classification &amp; strategy</span>
-            </div>
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>Real-time dashboard tracking</span>
-            </div>
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>AI Bill Advisor chat (unlimited)</span>
-            </div>
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>Full refund if unresolved in 45 days</span>
-            </div>
-            {% if strategy.is_nonprofit %}
-            <div class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-600 font-bold">&check;</span>
-                <span>501(r) financial assistance application</span>
+            {% if st.is_nonprofit %}
+            <div style="grid-column: 1 / -1">
+                <h3>{{ st.provider }} is a nonprofit</h3>
+                <p>It must offer financial assistance under IRS 501(r). Applying can lower the bill on top of the dispute. <a href="/charity-care">Check if you qualify</a></p>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- CTA -->
-    <div class="bg-green-50 border-2 border-green-600 rounded-2xl p-8 text-center">
-        <p class="text-lg font-bold text-gray-900 mb-2">Ready to let AI fight this bill?</p>
-        <p class="text-sm text-gray-600 mb-4">
-            ${{ "{:,.0f}".format(strategy.total_savings) }} potential savings identified.
-            No savings within 45 days? <strong>Full refund guaranteed.</strong>
-        </p>
-        <a href="/dispute/activate/{{ strategy.bill_id }}"
-           class="inline-block px-8 py-3.5 bg-green-600 text-white font-bold text-base rounded-full hover:bg-green-700 transition">
-            Activate Autopilot &mdash; ${{ fee_dollars }}
-        </a>
-        <p class="text-xs text-gray-400 mt-3">One-time fee. Covers 45 days of automated dispute management.</p>
-    </div>
-
-    <p class="text-xs text-gray-400 mt-10 text-center">
-        Not legal advice. AI-driven strategy based on billing data and Medicare benchmarks. Past results do not guarantee future outcomes.
-    </p>
+    <aside class="bk-results-side">
+        <div class="bk-decide bk-decide-main">
+            <p class="bk-decide-label">We dispute it for you</p>
+            <p class="bk-decide-price"><strong>${{ fee_dollars }}</strong> flat</p>
+            <ul class="bk-checks">
+                <li>Letter emailed to billing today</li>
+                <li>{{ config.DISPUTE_FOLLOWUP_DAYS | length }} follow-ups over {{ config.DISPUTE_MAX_DAYS }} days</li>
+                <li>A page tracking every step</li>
+                <li>Full refund if the bill isn&rsquo;t reduced</li>
+            </ul>
+            <a href="/dispute/activate/{{ st.bill_id }}" class="bk-btn bk-btn-block">Continue to sign and pay</a>
+            <p class="bk-decide-note">Next: authorize us to write on your behalf, then pay. Takes about two minutes.</p>
+        </div>
+        <a href="/results/{{ st.bill_id }}#manual-toolkit" class="bk-btn-outline bk-btn-block">Do it myself for free</a>
+    </aside>
 </div>
+<div style="height: 72px"></div>
 {% endblock %}

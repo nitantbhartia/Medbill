@@ -1,337 +1,233 @@
 {% extends "base.html" %}
-{% block title %}Dispute Dashboard — BillKarma{% endblock %}
+{% block title %}Your dispute | BillKarma{% endblock %}
 {% block content %}
-<section class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
-
-    {% if not summary.has_case %}
-    <div class="text-center py-16">
-        <h1 class="text-xl font-bold text-gray-900 mb-3">No active dispute found</h1>
-        <p class="text-sm text-gray-500 mb-6">Start by uploading your bill and fighting it.</p>
-        <a href="/scan" class="inline-flex px-6 py-3 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors">
-            Upload My Bill
-        </a>
+{% set s = summary %}
+{% if not s.has_case %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>No dispute found</h1>
+        <p class="bk-lede">Open the link from your confirmation email, or start by checking a bill.</p>
+        <div class="bk-home-actions"><a href="/scan" class="bk-btn">Check a bill</a><a href="/my-bills" class="bk-btn-outline">My bills</a></div>
     </div>
-    {% else %}
-
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-2 mb-1">
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Dispute Dashboard</h1>
-            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold
-                {% if summary.status == 'resolved' %}bg-green-100 text-green-800
-                {% elif summary.status == 'refunded' %}bg-blue-100 text-blue-800
-                {% elif summary.status == 'refund_pending' %}bg-amber-100 text-amber-800
-                {% else %}bg-gray-100 text-gray-700{% endif %}">
-                {{ summary.status|replace('_', ' ')|title }}
-            </span>
-        </div>
-        <p class="text-sm text-gray-500">Case #{{ summary.case_id }} · {{ summary.hospital_name or 'Provider' }}</p>
-    </div>
-
-    <!-- Outcome banner (if resolved) -->
-    {% if summary.status == 'resolved' and summary.outcome %}
-    <div class="mb-6 rounded-xl p-5 {% if summary.outcome in ('reduced', 'forgiven') %}bg-green-50 border border-green-200{% else %}bg-gray-50 border border-gray-200{% endif %}">
-        {% if summary.outcome in ('reduced', 'forgiven') %}
-        <p class="text-sm font-semibold text-green-800 mb-1">Dispute successful!</p>
-        {% if summary.actual_savings %}
-        <p class="text-2xl font-bold text-green-700">${{ "{:,.2f}".format(summary.actual_savings) }} saved</p>
-        {% else %}
-        <p class="text-sm text-green-700">Bill reduced or forgiven.</p>
-        {% endif %}
-        {% else %}
-        <p class="text-sm font-semibold text-gray-800 mb-1">Outcome: {{ summary.outcome|replace('_', ' ')|title }}</p>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    <!-- Refunded banner -->
-    {% if summary.status == 'refunded' %}
-    <div class="mb-6 rounded-xl p-5 bg-blue-50 border border-blue-200">
-        <p class="text-sm font-semibold text-blue-800 mb-1">Refund issued</p>
-        <p class="text-xs text-blue-700">
-            We were unable to resolve your dispute via written channels.
-            A full refund has been issued to your original payment method.
-            It may take 5–10 business days to appear.
-        </p>
-    </div>
-    {% endif %}
-
-    <!-- Timeline -->
-    <div class="mb-8">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Timeline</h2>
-        <div class="space-y-3">
-
-            <!-- Created -->
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-                <div>
-                    <p class="text-sm font-medium text-gray-900">Dispute paid and activated</p>
-                    <p class="text-xs text-gray-400">{{ summary.created_at[:10] if summary.created_at else '' }}</p>
-                </div>
-            </div>
-
-            <!-- Initial sent -->
-            {% if summary.initial_sent_at %}
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-                <div>
-                    <p class="text-sm font-medium text-gray-900">Dispute letter sent to billing department</p>
-                    <p class="text-xs text-gray-400">{{ summary.initial_sent_at[:10] }}</p>
-                </div>
-            </div>
-            {% else %}
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-gray-300"></div>
-                <div>
-                    <p class="text-sm text-gray-500">Sending initial dispute letter…</p>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Follow-ups -->
-            {% for fu in summary.followups %}
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full {{ 'bg-green-500' if fu.sent_at else 'bg-gray-200' }}"></div>
-                <div>
-                    <p class="text-sm {{ 'font-medium text-gray-900' if fu.sent_at else 'text-gray-400' }}">
-                        Follow-up #{{ fu.followup_number }}
-                    </p>
-                    <p class="text-xs text-gray-400">
-                        {% if fu.sent_at %}Sent {{ fu.sent_at[:10] }}{% else %}Scheduled {{ fu.scheduled_for }}{% endif %}
-                    </p>
-                </div>
-            </div>
-            {% endfor %}
-
-            <!-- Resolved / Refunded -->
-            {% if summary.status == 'resolved' %}
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-                <div>
-                    <p class="text-sm font-medium text-gray-900">Resolved — {{ summary.outcome|replace('_', ' ')|title }}</p>
-                    {% if summary.resolved_at %}<p class="text-xs text-gray-400">{{ summary.resolved_at[:10] }}</p>{% endif %}
-                </div>
-            </div>
-            {% elif summary.status == 'refunded' %}
-            <div class="flex gap-3 items-start">
-                <div class="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
-                <div>
-                    <p class="text-sm font-medium text-gray-900">Refund issued</p>
-                    {% if summary.refunded_at %}<p class="text-xs text-gray-400">{{ summary.refunded_at[:10] }}</p>{% endif %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Strategy Notes -->
-    {% if summary.strategy_notes %}
-    <div class="mb-8">
-        <h2 class="text-sm font-semibold text-gray-900 mb-3">AI Strategy Notes</h2>
-        <div class="space-y-2">
-            {% for note in summary.strategy_notes %}
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                <p class="text-xs text-gray-400 mb-0.5">{{ note.date }}</p>
-                <p class="text-sm text-gray-700">{{ note.text }}</p>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Pause / Escalate (for active disputes) -->
-    {% if summary.status in ('active', 'sent') %}
-    <div class="mb-6 flex gap-3">
-        <button id="pause-btn"
-                class="text-sm px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            Pause Follow-ups
-        </button>
-        <button id="escalate-btn"
-                class="text-sm px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors">
-            Escalate
-        </button>
-    </div>
-    <div id="pause-done" class="hidden mb-4 text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-        Follow-ups paused. You can resume by contacting support.
-    </div>
-    <div id="escalate-done" class="hidden mb-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-lg p-3">
-        Case escalated. Consider filing a complaint with your state insurance commissioner if the hospital remains unresponsive.
-    </div>
-    {% endif %}
-
-    <!-- Financial assistance note for nonprofit hospitals -->
-    {% if summary.is_nonprofit %}
-    <div class="mb-6 border border-green-200 rounded-xl p-4 bg-green-50">
-        <p class="text-xs font-semibold text-green-800 uppercase tracking-wide mb-1">Nonprofit Hospital</p>
-        <p class="text-sm text-green-700">
-            This hospital is a nonprofit. We've also submitted a financial assistance application
-            on your behalf — nonprofit hospitals are required by law to offer charity care to
-            patients who qualify (IRS 501(r) rules).
-        </p>
-    </div>
-    {% endif %}
-
-    <!-- Record outcome (for active disputes) -->
-    {% if summary.status in ('active', 'sent') %}
-    <div class="mb-6 border border-gray-200 rounded-xl p-5">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Did you hear from the hospital?</h2>
-        <p class="text-xs text-gray-500 mb-4">Record the outcome here so we can stop follow-ups and calculate your savings.</p>
-
-        <div class="space-y-2" id="outcome-buttons">
-            <button class="outcome-btn w-full text-left text-sm px-4 py-3 rounded-lg border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-colors" data-outcome="reduced">
-                💰 Bill was reduced — enter savings amount
-            </button>
-            <button class="outcome-btn w-full text-left text-sm px-4 py-3 rounded-lg border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-colors" data-outcome="forgiven">
-                ✓ Bill was forgiven / charity care approved
-            </button>
-            <button class="outcome-btn w-full text-left text-sm px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" data-outcome="payment_plan">
-                📋 Payment plan was arranged
-            </button>
-            <button class="outcome-btn w-full text-left text-sm px-4 py-3 rounded-lg border border-gray-200 hover:bg-red-50 hover:border-red-300 transition-colors" data-outcome="denied">
-                ✗ Hospital denied the dispute
-            </button>
-        </div>
-
-        <div id="savings-input" class="hidden mt-4">
-            <label class="block text-xs font-medium text-gray-700 mb-1">Amount saved ($)</label>
-            <div class="flex gap-2">
-                <input id="savings-amount" type="number" min="0" step="0.01" placeholder="0.00"
-                       class="w-32 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-400"/>
-                <button type="button" id="record-outcome-btn"
-                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors">
-                    Record
-                </button>
-            </div>
-        </div>
-
-        <div id="outcome-saved" class="hidden mt-3 text-sm text-green-700 font-medium">Outcome recorded. Thank you!</div>
-        <div id="outcome-error" class="hidden mt-3 text-sm text-red-600"></div>
-    </div>
-
-    <!-- Request refund -->
-    <div class="mb-6 border border-gray-200 rounded-xl p-5">
-        <h2 class="text-sm font-semibold text-gray-900 mb-1">Need a refund?</h2>
-        <p class="text-xs text-gray-500 mb-3">
-            If the hospital requires a phone call to resolve your dispute, we'll issue a full refund.
-        </p>
-        <button type="button" id="request-refund-btn"
-                class="text-xs px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-            Request refund
-        </button>
-        <div id="refund-confirm" class="hidden mt-3 text-xs text-gray-600">
-            <p class="mb-2">Are you sure? This will cancel your dispute and issue a full refund.</p>
-            <div class="flex gap-2">
-                <button id="refund-yes" class="px-3 py-1.5 bg-red-600 text-white text-xs rounded-md hover:bg-red-700">Yes, refund me</button>
-                <button id="refund-no" class="px-3 py-1.5 border border-gray-300 text-xs rounded-md hover:bg-gray-50">Cancel</button>
-            </div>
-        </div>
-        <div id="refund-done" class="hidden mt-3 text-sm text-blue-700">Refund initiated. You'll receive a confirmation email.</div>
-    </div>
-    {% endif %}
-
-    {% endif %}
 </section>
+{% else %}
+{% set fee = (s.amount_cents or 0) / 100 %}
+{% set active = s.status in ('active', 'sent') %}
+{% set hospital = s.hospital_name or 'the hospital' %}
+
+<section class="bk-results-head">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/my-bills">My bills</a> / Dispute #{{ s.case_id }}</p>
+        <h1>
+            {%- if s.status == 'needs_delivery' -%}Your letter is ready to send
+            {%- elif s.status == 'resolved' and s.outcome == 'reduced' and s.actual_savings -%}{{ hospital }} took ${{ "{:,.0f}".format(s.actual_savings) }} off your bill
+            {%- elif s.status == 'resolved' and s.outcome == 'forgiven' -%}Your bill was forgiven
+            {%- elif s.status == 'resolved' and s.outcome == 'payment_plan' -%}You have a payment plan
+            {%- elif s.status == 'resolved' and s.outcome == 'denied' -%}{{ hospital }} denied the dispute
+            {%- elif s.status == 'resolved' -%}Your dispute is closed
+            {%- elif s.status == 'refund_pending' -%}Your refund is on its way
+            {%- elif s.status == 'refunded' -%}Your ${{ "{:,.0f}".format(fee) }} fee was refunded
+            {%- elif s.status == 'paused' -%}Follow-ups are paused
+            {%- elif s.status == 'escalated' -%}Your dispute is escalated
+            {%- else -%}Your dispute is with {{ hospital }}
+            {%- endif -%}
+        </h1>
+        <p class="bk-results-meta">
+            <span>{{ hospital }}</span>
+            {% if s.account_number %}<span>Account {{ s.account_number }}</span>{% endif %}
+            {% if fee %}<span>Paid ${{ "{:,.0f}".format(fee) }} on {{ s.created_at[:10] }}</span>{% endif %}
+        </p>
+    </div>
+</section>
+
+<div class="bk-wrap bk-results">
+    <div class="bk-results-main">
+
+        {% if s.status == 'needs_delivery' %}
+        <form class="bk-card bk-deliver" id="deliver-form">
+            <h2 class="bk-h3">Where should we send it?</h2>
+            <p>We need the email address of {{ hospital }}&rsquo;s billing office. It&rsquo;s often printed on the bill. If not, call the main line and ask for the email billing uses for written disputes.</p>
+            <label class="bk-label" for="hospital-email">Billing office email</label>
+            <div class="bk-search">
+                <input id="hospital-email" class="bk-input" type="email" placeholder="billing@hospital.org" autocomplete="off" required>
+                <button type="submit" class="bk-btn">Send my letter</button>
+            </div>
+            <p class="bk-ib-error" id="deliver-error" hidden></p>
+            <p class="bk-muted" style="margin: 12px 0 0; font-size: 14.5px">Follow-ups start counting from the day it&rsquo;s sent. You can also send the letter below yourself.</p>
+        </form>
+        {% endif %}
+
+        <h2 class="bk-h3" style="margin: 8px 0 14px">Timeline</h2>
+        <ol class="bk-timeline">
+            <li class="done"><strong>Paid and dispute opened</strong><span>{{ s.created_at[:10] if s.created_at }}</span></li>
+            {% if s.initial_sent_at %}
+            <li class="done"><strong>Letter emailed to the billing office</strong><span>{{ s.initial_sent_at[:10] }}{% if s.hospital_billing_email %}, to {{ s.hospital_billing_email }}{% endif %}</span></li>
+            {% else %}
+            <li class="waiting"><strong>Letter not sent yet</strong><span>Waiting for the billing office&rsquo;s email</span></li>
+            {% endif %}
+            {% for fu in s.followups %}
+            <li class="{{ 'done' if fu.sent_at else 'next' if fu.scheduled_for == s.next_followup and s.initial_sent_at else '' }}">
+                <strong>Follow-up {{ fu.followup_number }}</strong>
+                <span>{% if fu.sent_at %}Emailed {{ fu.sent_at[:10] }}{% elif s.initial_sent_at %}Scheduled for {{ fu.scheduled_for }}{% else %}Starts after the letter is sent{% endif %}</span>
+            </li>
+            {% endfor %}
+            {% if s.status == 'resolved' %}
+            <li class="done"><strong>Closed: {{ (s.outcome or 'resolved') | replace('_', ' ') }}</strong><span>{{ s.resolved_at[:10] if s.resolved_at }}</span></li>
+            {% elif s.status == 'refunded' %}
+            <li class="done"><strong>Refund issued</strong><span>{{ s.refunded_at[:10] if s.refunded_at }}. It can take 5&ndash;10 business days to show up.</span></li>
+            {% else %}
+            <li class="guarantee"><strong>Refund guarantee</strong><span>If the bill isn&rsquo;t reduced by {{ s.refund_eligible_on }}, you get the ${{ "{:,.0f}".format(fee) }} back.</span></li>
+            {% endif %}
+        </ol>
+
+        {% if s.strategy_notes %}
+        <h2 class="bk-h3" style="margin: 36px 0 10px">Activity</h2>
+        <ul class="bk-rows" style="margin-top: 0">
+            {% for note in s.strategy_notes | reverse %}
+            <li><div><div class="bk-row-sub" style="margin: 0">{{ note.date }}</div><div>{{ note.text }}</div></div></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if s.letter %}
+        <details class="bk-letter-fold" {% if s.status == 'needs_delivery' %}open{% endif %}>
+            <summary>{% if s.initial_sent_at %}The letter we sent{% else %}Your dispute letter{% endif %}</summary>
+            <div class="bk-ib-actions"><button type="button" class="bk-btn-outline bk-btn-sm" id="copy-letter">Copy letter</button></div>
+            <pre class="bk-ib-letter" id="letter-text">{{ s.letter }}</pre>
+        </details>
+        {% endif %}
+    </div>
+
+    <aside class="bk-results-side">
+        {% if active %}
+        <div class="bk-decide">
+            <p class="bk-decide-label">Heard from the hospital?</p>
+            <p class="bk-decide-copy">Tell us what happened so we stop the follow-ups.</p>
+            <div class="bk-outcomes" id="outcome-buttons">
+                <button class="outcome-btn" data-outcome="reduced">They lowered the bill</button>
+                <button class="outcome-btn" data-outcome="forgiven">They forgave it or approved assistance</button>
+                <button class="outcome-btn" data-outcome="payment_plan">We agreed a payment plan</button>
+                <button class="outcome-btn" data-outcome="denied">They said no</button>
+            </div>
+            <div id="savings-input" class="hidden" style="margin-top: 14px">
+                <label class="bk-label" for="savings-amount">How much did they take off?</label>
+                <div class="bk-search">
+                    <input id="savings-amount" class="bk-input" type="number" min="0" step="0.01" placeholder="0.00">
+                    <button type="button" id="record-outcome-btn" class="bk-btn">Save</button>
+                </div>
+            </div>
+            <p id="outcome-saved" class="hidden bk-ib-done">Saved. Follow-ups are stopped.</p>
+            <p id="outcome-error" class="hidden bk-ib-error" style="margin-top: 12px"></p>
+        </div>
+        {% endif %}
+
+        {% if s.status in ('active', 'sent', 'needs_delivery', 'paused', 'escalated') %}
+        <div class="bk-decide">
+            <p class="bk-decide-label">Refund guarantee</p>
+            <p class="bk-decide-copy">If the bill isn&rsquo;t reduced by <strong>{{ s.refund_eligible_on }}</strong>, you get the full ${{ "{:,.0f}".format(fee) }} back.</p>
+            <button type="button" id="request-refund-btn" class="bk-btn-outline bk-btn-sm bk-btn-block">Request a refund</button>
+            <div id="refund-confirm" class="hidden" style="margin-top: 12px">
+                <p class="bk-decide-copy" style="margin-top: 0">This cancels the dispute and refunds your fee.</p>
+                <div class="bk-ib-actions" style="margin: 0">
+                    <button id="refund-yes" class="bk-btn bk-btn-sm">Yes, refund me</button>
+                    <button id="refund-no" class="bk-btn-outline bk-btn-sm">Keep the dispute</button>
+                </div>
+            </div>
+            <p id="refund-done" class="hidden bk-ib-done">Refund started. We&rsquo;ll email you when it&rsquo;s issued.</p>
+        </div>
+        {% endif %}
+
+        {% if s.is_nonprofit %}
+        <div class="bk-note">
+            <strong>{{ hospital }} is a nonprofit.</strong> It must offer financial assistance under IRS 501(r), often to households well above the poverty line. Applying can lower the bill on top of the dispute. <a href="/charity-care">Check if you qualify</a>
+        </div>
+        {% endif %}
+
+        {% if active %}
+        <details class="bk-manage">
+            <summary>Manage follow-ups</summary>
+            <div class="bk-ib-actions" style="margin: 12px 0 0">
+                <button id="pause-btn" class="bk-btn-outline bk-btn-sm">Pause follow-ups</button>
+                <button id="escalate-btn" class="bk-btn-outline bk-btn-sm">Escalate</button>
+            </div>
+            <p id="pause-done" class="hidden bk-decide-copy">Follow-ups paused. Reply to your confirmation email to restart them.</p>
+            <p id="escalate-done" class="hidden bk-decide-copy">Escalated. If the hospital stays silent, you can also complain to your state attorney general&rsquo;s consumer office.</p>
+        </details>
+        {% endif %}
+    </aside>
+</div>
+<div style="height: 72px"></div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
-{% if summary.has_case and summary.status in ('active', 'sent') %}
+{% if summary.has_case %}
 <script>
-const CASE_ID = {{ summary.case_id }};
+(function () {
+    var CASE_ID = {{ summary.case_id }};
+    var $ = function (id) { return document.getElementById(id); };
+    function post(url, opts) { return fetch(url, Object.assign({ method: 'POST' }, opts || {})); }
 
-// Pause follow-ups
-var pauseBtn = document.getElementById('pause-btn');
-if (pauseBtn) {
-    pauseBtn.addEventListener('click', async function() {
-        pauseBtn.disabled = true;
-        pauseBtn.textContent = 'Pausing…';
-        var resp = await fetch('/api/dispute/' + CASE_ID + '/pause', { method: 'POST' });
-        if (resp.ok) {
-            document.getElementById('pause-done').classList.remove('hidden');
-            pauseBtn.classList.add('hidden');
-            var escBtn = document.getElementById('escalate-btn');
-            if (escBtn) escBtn.classList.add('hidden');
-        } else {
-            pauseBtn.disabled = false;
-            pauseBtn.textContent = 'Pause Follow-ups';
-        }
+    var copy = $('copy-letter');
+    if (copy) copy.addEventListener('click', function () {
+        navigator.clipboard.writeText($('letter-text').textContent).then(function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy letter'; }, 2000); });
     });
-}
 
-// Escalate case
-var escalateBtn = document.getElementById('escalate-btn');
-if (escalateBtn) {
-    escalateBtn.addEventListener('click', async function() {
-        escalateBtn.disabled = true;
-        escalateBtn.textContent = 'Escalating…';
-        var resp = await fetch('/api/dispute/' + CASE_ID + '/escalate', { method: 'POST' });
-        if (resp.ok) {
-            document.getElementById('escalate-done').classList.remove('hidden');
-            escalateBtn.classList.add('hidden');
-            var pBtn = document.getElementById('pause-btn');
-            if (pBtn) pBtn.classList.add('hidden');
-        } else {
-            escalateBtn.disabled = false;
-            escalateBtn.textContent = 'Escalate';
-        }
+    var deliver = $('deliver-form');
+    if (deliver) deliver.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = $('deliver-error'); err.hidden = true;
+        var btn = deliver.querySelector('button'); btn.disabled = true; btn.textContent = 'Sending…';
+        post('/api/dispute/' + CASE_ID + '/delivery', { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hospital_billing_email: $('hospital-email').value.trim() }) })
+            .then(function (r) { return r.json().then(function (b) { if (!r.ok) throw new Error(b.detail || 'Something went wrong.'); }); })
+            .then(function () { window.location.reload(); })
+            .catch(function (ex) { err.textContent = ex.message; err.hidden = false; btn.disabled = false; btn.textContent = 'Send my letter'; });
     });
-}
 
-let selectedOutcome = null;
-
-document.querySelectorAll('.outcome-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        selectedOutcome = btn.dataset.outcome;
-        document.querySelectorAll('.outcome-btn').forEach(b => b.classList.remove('bg-green-50', 'border-green-300'));
-        btn.classList.add('bg-green-50', 'border-green-300');
-
-        if (selectedOutcome === 'reduced') {
-            document.getElementById('savings-input').classList.remove('hidden');
-        } else {
-            document.getElementById('savings-input').classList.add('hidden');
-            recordOutcome(0);
-        }
-    });
-});
-
-document.getElementById('record-outcome-btn').addEventListener('click', () => {
-    const savings = parseFloat(document.getElementById('savings-amount').value) || 0;
-    recordOutcome(savings);
-});
-
-async function recordOutcome(savings) {
-    const fd = new FormData();
-    fd.append('outcome', selectedOutcome);
-    fd.append('actual_savings', savings);
-
-    const resp = await fetch(`/api/dispute/resolve/${CASE_ID}`, { method: 'POST', body: fd });
-    if (resp.ok) {
-        document.getElementById('outcome-saved').classList.remove('hidden');
-        document.getElementById('outcome-buttons').classList.add('hidden');
-        document.getElementById('savings-input').classList.add('hidden');
-    } else {
-        const err = await resp.json().catch(() => ({}));
-        document.getElementById('outcome-error').textContent = err.detail || 'Error recording outcome.';
-        document.getElementById('outcome-error').classList.remove('hidden');
+    function wire(id, url, doneId) {
+        var btn = $(id); if (!btn) return;
+        btn.addEventListener('click', function () {
+            btn.disabled = true;
+            post(url).then(function (r) {
+                if (!r.ok) { btn.disabled = false; return; }
+                $(doneId).classList.remove('hidden');
+                ['pause-btn', 'escalate-btn'].forEach(function (b) { if ($(b)) $(b).classList.add('hidden'); });
+            });
+        });
     }
-}
+    wire('pause-btn', '/api/dispute/' + CASE_ID + '/pause', 'pause-done');
+    wire('escalate-btn', '/api/dispute/' + CASE_ID + '/escalate', 'escalate-done');
 
-document.getElementById('request-refund-btn').addEventListener('click', () => {
-    document.getElementById('refund-confirm').classList.remove('hidden');
-    document.getElementById('request-refund-btn').classList.add('hidden');
-});
+    var selected = null;
+    document.querySelectorAll('.outcome-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            selected = btn.dataset.outcome;
+            document.querySelectorAll('.outcome-btn').forEach(function (b) { b.classList.remove('picked'); });
+            btn.classList.add('picked');
+            if (selected === 'reduced') { $('savings-input').classList.remove('hidden'); $('savings-amount').focus(); }
+            else { $('savings-input').classList.add('hidden'); record(0); }
+        });
+    });
+    if ($('record-outcome-btn')) $('record-outcome-btn').addEventListener('click', function () { record(parseFloat($('savings-amount').value) || 0); });
 
-document.getElementById('refund-no').addEventListener('click', () => {
-    document.getElementById('refund-confirm').classList.add('hidden');
-    document.getElementById('request-refund-btn').classList.remove('hidden');
-});
-
-document.getElementById('refund-yes').addEventListener('click', async () => {
-    const resp = await fetch(`/api/dispute/refund/${CASE_ID}`, { method: 'POST' });
-    if (resp.ok) {
-        document.getElementById('refund-confirm').classList.add('hidden');
-        document.getElementById('refund-done').classList.remove('hidden');
+    function record(savings) {
+        var fd = new FormData(); fd.append('outcome', selected); fd.append('actual_savings', savings);
+        post('/api/dispute/resolve/' + CASE_ID, { body: fd }).then(function (r) {
+            if (r.ok) { window.location.reload(); return; }
+            r.json().catch(function () { return {}; }).then(function (b) { $('outcome-error').textContent = b.detail || 'Could not save that. Try again.'; $('outcome-error').classList.remove('hidden'); });
+        });
     }
-});
+
+    if ($('request-refund-btn')) {
+        $('request-refund-btn').addEventListener('click', function () { $('refund-confirm').classList.remove('hidden'); this.classList.add('hidden'); });
+        $('refund-no').addEventListener('click', function () { $('refund-confirm').classList.add('hidden'); $('request-refund-btn').classList.remove('hidden'); });
+        $('refund-yes').addEventListener('click', function () {
+            post('/api/dispute/refund/' + CASE_ID).then(function (r) {
+                if (r.ok) { $('refund-confirm').classList.add('hidden'); $('refund-done').classList.remove('hidden'); }
+            });
+        });
+    }
+})();
 </script>
 {% endif %}
 {% endblock %}

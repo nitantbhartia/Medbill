@@ -1697,6 +1697,21 @@ async def request_refund(request: Request, case_id: int):
     return {"status": "ok", "data": {"refunded": refunded}}
 
 
+@router.post("/dispute/{case_id}/delivery")
+async def deliver_dispute(request: Request, case_id: int):
+    """Send a waiting dispute letter once the patient gives us the billing office email."""
+    require_case_access(request, case_id)
+    payload = await _parse_json_object(request)
+    try:
+        sent = dispute_service.deliver_dispute(case_id, payload.get("hospital_billing_email", ""))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    if not sent:
+        raise HTTPException(502, "We couldn't send the letter to that address. Check it and try again.")
+    log_audit(action="dispute_delivered", resource_type="dispute_case", resource_id=str(case_id))
+    return {"status": "ok", "data": {"case_id": case_id, "new_status": "sent"}}
+
+
 @router.post("/dispute/{case_id}/pause")
 async def pause_dispute(request: Request, case_id: int):
     """Pause follow-ups for a dispute case."""
