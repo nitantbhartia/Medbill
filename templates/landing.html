@@ -31,7 +31,7 @@
                     <span class="code">{{ line.code }}</span>
                     <span class="desc">{{ line.desc }}</span>
                     <span class="amt">${{ "{:,.2f}".format(line.amount) }}</span>
-                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} for this code.{% endif %}</span>{% endif %}
+                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} in total for this code.{% endif %}</span>{% endif %}
                 </li>
                 {% endfor %}
             </ol>

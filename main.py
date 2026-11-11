@@ -505,6 +505,16 @@ def startup():
     # Seed data if database is empty
     from seed_data import seed_if_empty
     seed_if_empty()
+    # One-time regrade against Medicare's hospital rate; in the background so startup stays fast
+    import threading
+    from hospital_bootstrap import apply_opps_benchmark_once
+    def _regrade():
+        try:
+            apply_opps_benchmark_once()
+        except Exception:
+            logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
+    if config.ENV == "production":
+        threading.Thread(target=_regrade, daemon=True).start()
 
 
 # --- Page routes ---
@@ -527,7 +537,7 @@ def _dispute_tier_labels() -> list[dict]:
 
 def _homepage_example_bill() -> dict:
     """The illustrative statement on the homepage, with the Medicare rate for the flagged visit."""
-    from validators.pricing import get_medicare_rate
+    from validators.pricing import get_medicare_rate, get_opps_rate
     lines = [dict(line) for line in config.HOMEPAGE_EXAMPLE_BILL]
     total = sum(line["amount"] for line in lines)
     clear_errors = sum(
@@ -540,7 +550,7 @@ def _homepage_example_bill() -> dict:
         "total": total,
         "clear_errors": clear_errors,
         "visit_amount": visit["amount"],
-        "visit_medicare": get_medicare_rate(visit["code"]),
+        "visit_medicare": (get_medicare_rate(visit["code"]) or 0) + (get_opps_rate(visit["code"]) or 0) or None,
     }
 
 

@@ -417,17 +417,41 @@ def resolve_benchmark_for_row(facility_id: str, facility_type: str, row: dict) -
             return "opps", opps
         return "pfs", get_medicare_rate_for_facility(facility_id, cpt)
 
-    opps = get_latest_opps_rate(cpt)
-    if opps is not None:
-        return "opps", opps
-    return "pfs", get_medicare_rate_for_facility(facility_id, cpt)
+    return "opps", get_latest_opps_rate(cpt)
+
+
+def rebenchmark_hospital_prices() -> int:
+    """Recompute every stored hospital markup against Medicare's OPPS rate. Returns rows changed."""
+    with get_db() as db:
+        opps = {
+            row["cpt_code"]: float(row["rate"])
+            for row in db.execute(
+                """
+                SELECT cpt_code, national_payment_rate AS rate FROM hospital_opps_rates o
+                WHERE effective_year = (SELECT MAX(effective_year) FROM hospital_opps_rates p WHERE p.cpt_code = o.cpt_code)
+                  AND national_payment_rate > 0
+                """
+            ).fetchall()
+        }
+        rows = db.execute("SELECT id, cpt_code, gross_charge FROM hospital_prices").fetchall()
+        for row in rows:
+            rate = opps.get(row["cpt_code"])
+            markup = (row["gross_charge"] / rate) if rate and row["gross_charge"] else None
+            db.execute(
+                "UPDATE hospital_prices SET medicare_rate = ?, markup_vs_medicare = ? WHERE id = ?",
+                (rate, markup, row["id"]),
+            )
+    return len(rows)
 
 
 def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = None) -> None:
     facility_id = normalize_facility_id(facility_id)
     if not facility_id:
         return
-    medicare = get_medicare_rate_for_facility(facility_id, row["cpt_code"])
+    # A hospital's list price is a facility charge, so compare it with Medicare's hospital
+    # outpatient (OPPS) payment. Codes without one (labs, inpatient-only surgery) get no markup
+    # rather than a comparison with the physician fee, which would overstate it several-fold.
+    medicare = get_latest_opps_rate(row["cpt_code"])
     gross = _sanitize_price_value(parse_float(row.get("gross_charge")))
     cash = _sanitize_price_value(parse_float(row.get("cash_price")))
     min_negotiated = _sanitize_price_value(parse_float(row.get("min_negotiated_rate")))

@@ -19,11 +19,11 @@ Subject: Hospital list prices in {state_name} run a median {median:.1f}x what Me
 
 Hi [first name],
 
-I compared {ranked_count} {state_name} hospitals' published prices with what Medicare pays for the same procedures. The median hospital's list prices run {median:.1f}x Medicare. The highest is {top_name} in {top_city} at {top_markup:.1f}x; the lowest of the ranked hospitals is {low_name} in {low_city} at {low_markup:.1f}x.
+I compared {ranked_count} {state_name} hospitals' published prices with what Medicare pays hospitals for the same outpatient services. The median hospital's list prices run {median:.1f}x Medicare. The highest is {top_name} in {top_city} at {top_markup:.1f}x; the lowest of the ranked hospitals is {low_name} in {low_city} at {low_markup:.1f}x.
 
 The full ranking, with each hospital's figure, is here: {url}
 
-The method: each hospital's price for the same set of procedures (at least {min_procedures} per hospital) divided by the Medicare rate for the same billing code, averaged. List prices are not what insured patients pay, and the page says so. The data is from hospitals' own price files and CMS, as of {as_of}.
+The method: each hospital's list price for the same set of outpatient services (at least {min_procedures} per hospital) divided by Medicare's hospital outpatient (OPPS) payment for the same billing code, averaged. List prices are not what insured patients pay, and the page says so. The data is from hospitals' own price files and CMS, as of {as_of}.
 
 I'm happy to send the underlying numbers or a county-level cut for your coverage area.
 

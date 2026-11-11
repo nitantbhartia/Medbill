@@ -21,7 +21,6 @@ STATE_COMPARISON_MIN_SAMPLE_SIZE = 25
 NEARBY_RADIUS_MILES = 50.0
 # Highest-search-volume procedures for FAQ Q2, checked in priority order
 FAQ_PRIORITY_CPTS = ("27447", "70553", "45378", "27130", "74178", "71045")
-NATIONAL_AVG_MARKUP = 3.4  # approximate for FAQ answers
 _EARTH_RADIUS_MILES = 3958.8
 # ~1 degree lat ≈ 69 miles; padding for lon variation at different latitudes
 _LAT_DEGREE_MILES = 69.0
@@ -1888,7 +1887,7 @@ def generate_intro_paragraph(
 
     parts = [
         f"{name} {location} receives a BillKarma billing grade of {grade} "
-        f"based on an average markup of {markup_txt} Medicare rates{proc_txt}."
+        f"based on list prices averaging {markup_txt} Medicare's hospital rates{proc_txt}."
     ]
 
     # State rank sentence
@@ -2186,6 +2185,15 @@ def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
     return cut[: cut.rfind(" ")] + "..."
 
 
+def national_median_markup() -> float | None:
+    """Median of graded hospitals' average markup over Medicare's hospital rate."""
+    with get_db() as db:
+        values = [r[0] for r in db.execute(
+            "SELECT avg_markup_vs_medicare FROM billing_metrics WHERE avg_markup_vs_medicare IS NOT NULL ORDER BY 1"
+        ).fetchall()]
+    return round(values[len(values) // 2], 1) if values else None
+
+
 def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict) -> dict:
     name = hospital_d.get("name", "This hospital")
     grade = hospital_d.get("billing_grade") or "N/A"
@@ -2197,16 +2205,13 @@ def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict
     # Q1: billing grade
     q1_answer = (
         f"BillKarma gives {name} a billing grade of {grade}. "
-        f"This grade is based on an average markup of {markup_txt} Medicare rates "
-        f"across {procedures} procedures in their CMS-published price transparency file."
+        f"Its list prices average {markup_txt} what Medicare pays hospitals for the same services, "
+        f"across {procedures} procedures in its CMS-required price transparency file."
     )
-    if grade in ("F", "D"):
-        q1_answer += f" This is above the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare."
-    elif grade in ("A", "B"):
-        q1_answer += (
-            f" This is below the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare, "
-            "making it one of the more fairly priced hospitals in the area."
-        )
+    median = national_median_markup()
+    if median and isinstance(markup, (int, float)):
+        relation = "above" if markup > median else "below" if markup < median else "at"
+        q1_answer += f" That's {relation} the median of {median}x across the hospitals we grade."
 
     # Q2: procedure price — first priority CPT found in hospital data
     prices_by_cpt = {p["cpt_code"]: p for p in prices_d if p.get("cpt_code")}
