@@ -1446,6 +1446,27 @@ async def chargemaster_page(request: Request):
     })
 
 
+@app.get("/itemized-bill", response_class=HTMLResponse)
+async def itemized_bill_page(request: Request, facility: str = "", provider: str = ""):
+    """Write a request for an itemized hospital bill, optionally prefilled with a hospital."""
+    from itemized_request import get_billing_contact
+    return templates.TemplateResponse(
+        "itemized_bill.html",
+        {
+            "request": request,
+            "hospital": get_billing_contact(facility) if facility else None,
+            "provider": provider.strip()[:120],
+            "response_days": config.ITEMIZED_RESPONSE_DAYS,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/itemized-bill",
+            "page_title": "Request Your Itemized Hospital Bill: Free Letter | BillKarma",
+            "og_title": "Request your itemized hospital bill",
+            "meta_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code. Hospitals have 30 days to respond.",
+            "og_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
 @app.get("/tools/{slug}/", response_class=HTMLResponse)
 async def tool_detail(request: Request, slug: str):
     tool = get_tool(slug)
@@ -2343,6 +2364,7 @@ async def core_sitemap():
     core_urls = [
         (f"{base}/", "2026-02-01", "1.0"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
+        (f"{base}/itemized-bill", "2026-11-11", "0.9"),
         (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/fight-debt", "2026-02-24", "0.9"),
         (f"{base}/savings", "2026-02-25", "0.8"),

@@ -210,3 +210,7 @@ HOMEPAGE_EXAMPLE_BILL = (
     {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": "Billed twice for one draw."},
 )
 HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
+
+# Itemized-bill requests: HIPAA right of access gives the hospital 30 days (45 CFR 164.524(b)(2))
+ITEMIZED_RESPONSE_DAYS = 30
+ITEMIZED_LOOKUP_LIMIT = 8

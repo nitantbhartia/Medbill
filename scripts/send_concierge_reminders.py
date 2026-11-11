@@ -2,6 +2,7 @@
 
 - Emails ops a digest of appeals whose filing deadline or insurer decision date is near or past.
 - Reminds customers whose appeal draft has waited 3 or 7 days for their approval.
+- Tells patients when a hospital's 30 days to send their itemized bill are up.
 """
 
 import os
@@ -14,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import appeals  # noqa: E402
 import config  # noqa: E402
 import email_service  # noqa: E402
+import itemized_request  # noqa: E402
 
 DRAFT_NUDGE_DAYS = (3, 7)  # days after payment to remind about an unapproved draft
 
@@ -40,6 +42,31 @@ def stale_drafts(cases: list[dict], today: date) -> list[dict]:
     ]
 
 
+def itemized_reminder_email(hospital_name: str) -> tuple[str, str]:
+    """Subject and body for the day a hospital's response to an itemized-bill request is due."""
+    base = config.APP_URL.rstrip("/")
+    name = escape(hospital_name)
+    body = (
+        f"<p>It's been {config.ITEMIZED_RESPONSE_DAYS} days since you asked {name} for your itemized bill.</p>"
+        f"<p><strong>If it arrived:</strong> <a href=\"{base}/scan\">upload it</a> and we'll check every line "
+        "against what Medicare pays for the same code. Free.</p>"
+        "<p><strong>If it didn't:</strong> call the billing office, say your HIPAA right-of-access request is past "
+        "its 30-day deadline, and ask when it will be sent. They can extend once, by 30 days, but must tell you in "
+        "writing.</p>"
+    )
+    return f"Your itemized bill from {hospital_name} is due", body
+
+
+def send_itemized_reminders(today: date) -> int:
+    sent = 0
+    for request in itemized_request.due_reminders(today):
+        subject, body = itemized_reminder_email(request["hospital_name"])
+        if email_service.send_email(request["email"], subject, body):
+            itemized_request.mark_reminded(request["id"])
+            sent += 1
+    return sent
+
+
 def main() -> None:
     today = date.today()
     cases = appeals.list_open_cases()
@@ -55,7 +82,8 @@ def main() -> None:
             "BillKarma: your appeal is waiting for your approval",
             f"<p>Your appeal letter is ready. Approve it so we can send it before your deadline.</p><p><a href=\"{link}\">Review your appeal</a></p>",
         )
-    print(f"digest lines={len(digest)} draft reminders={len(drafts)}")
+    itemized = send_itemized_reminders(today)
+    print(f"digest lines={len(digest)} draft reminders={len(drafts)} itemized reminders={itemized}")
 
 
 if __name__ == "__main__":
