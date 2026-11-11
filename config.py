@@ -167,3 +167,7 @@ GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "G-QHRP0ZQD8K")
 # Free geocoder backfill
 GEOCODER_FALLBACK_ENABLED = os.getenv("GEOCODER_FALLBACK_ENABLED", "true").lower() == "true"
 GEOCODER_REQUEST_DELAY_MS = int(os.getenv("GEOCODER_REQUEST_DELAY_MS", "1000"))
+
+# Search snippet limits (characters) for page titles and meta descriptions
+SEO_TITLE_MAX_CHARS = 60
+SEO_META_MAX_CHARS = 155

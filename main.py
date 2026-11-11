@@ -752,6 +752,7 @@ async def guide_page(request: Request, slug: str):
         return RedirectResponse(url=f"/guides/{final_slug}/", status_code=301)
     import re
     from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
+    from guide_seo import seo_title, seo_description
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
@@ -765,9 +766,10 @@ async def guide_page(request: Request, slug: str):
             "request": request,
             "guide": {**guide, "body": linked_body},
             "canonical_url": canonical_url,
-            "og_title": guide["title"] + " | BillKarma",
-            "og_description": guide["meta_description"],
-            "meta_description": guide["meta_description"],
+            "page_title": seo_title(guide),
+            "og_title": seo_title(guide),
+            "og_description": seo_description(guide),
+            "meta_description": seo_description(guide),
             "meta_robots": "index, follow",
             "related_guides": get_related_guides(slug),
             "reading_time": reading_time,
