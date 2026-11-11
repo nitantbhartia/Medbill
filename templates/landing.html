@@ -56,7 +56,7 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
         <div>
             <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">One flat fee. Refunded if nothing changes.</h2>
-            <p class="bk-lede" style="margin-top: 12px">Bill negotiators usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. We charge a flat fee based on the size of the bill. You only pay if, after the free check, you choose to send a dispute.</p>
+            <p class="bk-lede" style="margin-top: 12px"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. We charge a flat fee based on the size of the bill. You only pay if, after the free check, you choose to send a dispute.</p>
             <ul class="bk-rows">
                 {% for tier in dispute_tiers %}
                 <li style="padding: 14px 0"><span>{{ tier.label }}</span><span class="bk-mono" style="font-weight: 600">${{ tier.fee }}</span></li>

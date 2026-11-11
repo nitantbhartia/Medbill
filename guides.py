@@ -837,6 +837,8 @@ import guide_state_debt_laws  # noqa: F401
 # Pillar guides (hub pages for programmatic spoke clusters)
 import guide_pillar_cpt_codes  # noqa: F401
 import guide_pillar_state_debt_laws  # noqa: F401
+import guide_negotiation_service_cost  # noqa: F401
+import guide_billkarma_vs_resolve  # noqa: F401
 
 
 def _extend_link_map_from_guides():

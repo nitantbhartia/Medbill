@@ -89,6 +89,8 @@ register("medical-billing-advocate", {
 
 <h2 id="cost">3. How advocates charge: contingency, hourly, flat fee</h2>
 
+<p>For named services and their current prices side by side, see <a href="/guides/medical-bill-negotiation-service-cost/">what medical bill negotiation services cost</a> and <a href="/guides/billkarma-vs-resolve-medical-bills/">BillKarma vs Resolve</a>.</p>
+
 <p>There are three common fee structures:</p>
 
 <p><strong>Contingency (percentage of savings):</strong> The advocate takes 25&ndash;35% of the amount they save you. You pay nothing if they save nothing. This is the most common structure for bill reduction work. Example: Your $20,000 hospital bill is reduced to $12,000 ($8,000 saved). At 30%, the advocate earns $2,400. You keep $5,600 in savings.</p>
