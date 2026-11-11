@@ -6,118 +6,43 @@
 <meta name="description" content="{{ og_description }}">
 <meta property="og:title" content="{{ og_title }}">
 <meta property="og:description" content="{{ og_description }}">
-<style>
-    .guides-hero {
-        background-color: var(--bk-green);
-        border-radius: 0 0 40px 40px;
-        padding: 64px 24px 56px;
-        margin-bottom: 40px;
-    }
-    .guides-hero-inner {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    .guides-hero h1 {
-        font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em;
-        color: #fff; margin-bottom: 12px;
-    }
-    .guides-hero .subtitle {
-        font-size: 1.1rem; color: rgba(255,255,255,0.8);
-        font-weight: 500; max-width: 50ch;
-    }
-
-    .guides-content {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 0 24px 80px;
-    }
-
-    .guide-card {
-        background: #fff;
-        border: 1px solid var(--bk-gray-border);
-        border-radius: 20px;
-        padding: 32px;
-        margin-bottom: 16px;
-        text-decoration: none;
-        color: var(--bk-black);
-        display: block;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .guide-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-
-    .guide-card-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-    .guide-card-category {
-        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-        background: #E6F4EA; color: var(--bk-green); padding: 4px 10px; border-radius: 100px;
-    }
-    .guide-card-date { font-size: 0.82rem; color: var(--bk-secondary); font-weight: 600; }
-    .guide-card h2 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .guide-card p { font-size: 0.98rem; color: var(--bk-secondary); font-weight: 500; line-height: 1.55; }
-
-    .empty-state { text-align: center; padding: 60px 0; color: var(--bk-secondary); font-size: 1.1rem; }
-
-    @media (max-width: 768px) {
-        .guides-hero { padding: 40px 18px 36px; border-radius: 0 0 24px 24px; }
-        .guides-hero h1 { font-size: 1.8rem; }
-        .guides-content { padding: 0 18px 56px; }
-        .guide-card { padding: 22px 18px; }
-        .guide-card h2 { font-size: 1.15rem; }
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="guides-hero">
-    <div class="guides-hero-inner">
-        <h1>Free Medical Billing Guides</h1>
-        <p class="subtitle">Plain-English guides on how to read, dispute, and reduce your hospital bills — backed by federal Medicare data.</p>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:24px;flex-wrap:wrap;">
-            <a href="/scan" style="background:#fff;color:var(--bk-green);border-radius:999px;padding:12px 24px;font-weight:800;font-size:.95rem;text-decoration:none;">Scan My Bill Free &rarr;</a>
-            <span style="font-size:.82rem;color:rgba(255,255,255,.6);">1 in 4 hospital bills contains an error</span>
-        </div>
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <p class="bk-eyebrow">{{ guide_count }} guides</p>
+        <h1>Medical billing guides</h1>
+        <p class="bk-lede">Plain-English guides on reading, disputing and paying hospital bills, with the sources listed at the bottom of each one.</p>
     </div>
-</div>
-<div style="background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:16px 24px;">
-    <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-        <div style="font-size:.88rem;color:#374151;font-weight:500;">
-            <strong style="color:#111827;">Not sure where to start?</strong>
-            Most readers begin with:
-            <a href="/guides/how-to-get-itemized-hospital-bill/" style="color:var(--bk-green);font-weight:600;">Get an itemized bill</a> &rarr;
-            <a href="/guides/hospital-billing-errors/" style="color:var(--bk-green);font-weight:600;margin-left:8px;">Check for errors</a> &rarr;
-            <a href="/guides/dispute-bill/" style="color:var(--bk-green);font-weight:600;margin-left:8px;">Dispute it</a>
-        </div>
-        <a href="/scan" style="background:var(--bk-green);color:#fff;border-radius:999px;padding:9px 20px;font-weight:700;font-size:.85rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Scan a Bill &rarr;</a>
-    </div>
+</section>
+
+<div class="bk-wrap bk-section">
+    <h2 class="bk-h2">Start here</h2>
+    <ul class="bk-rows">
+        {% for g in featured %}
+        <li>
+            <a class="bk-row-link" href="/guides/{{ g.slug }}/">
+                <span class="bk-row-title">{{ g.title }}</span>
+                <span class="bk-row-sub">{{ g.meta_description }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 
-<div class="guides-content">
-    {% if all_categories %}
-    <nav style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;" aria-label="Guide categories">
-        <a href="/guides/" style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;padding:6px 14px;border-radius:100px;text-decoration:none;border:1.5px solid var(--bk-green);color:var(--bk-green);background:#E6F4EA;">All</a>
-        {% for cat in all_categories %}
-        <a href="/guides/category/{{ cat.slug }}/" style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;padding:6px 14px;border-radius:100px;text-decoration:none;border:1.5px solid var(--bk-gray-border);color:var(--bk-secondary);transition:border-color 0.15s,color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.color='var(--bk-green)';this.style.background='#E6F4EA'" onmouseout="this.style.borderColor='var(--bk-gray-border)';this.style.color='var(--bk-secondary)';this.style.background='transparent'">
-            {{ cat.name }} <span style="opacity:0.6;font-weight:500;">({{ cat.count }})</span>
-        </a>
-        {% endfor %}
-    </nav>
-    {% endif %}
-    {% if guides %}
-        {% for g in guides %}
-        <a href="/guides/{{ g.slug }}/" class="guide-card">
-            <div class="guide-card-meta">
-                {% if g.category %}
-                <span class="guide-card-category">{{ g.category }}</span>
-                {% endif %}
-                {% if g.published %}
-                <span class="guide-card-date">{{ g.published }}</span>
-                {% endif %}
-            </div>
-            <h2>{{ g.title }}</h2>
-            <p>{{ g.meta_description }}</p>
-        </a>
-        {% endfor %}
-    {% else %}
-        <div class="empty-state">Guides coming soon.</div>
-    {% endif %}
+<div class="bk-wrap bk-section">
+    <h2 class="bk-h2">All guides by topic</h2>
+    {% for group in groups %}
+    <details class="bk-fold">
+        <summary><span>{{ group.name }}</span> <span class="bk-muted">{{ group.count }}</span></summary>
+        <ul class="bk-link-list">
+            {% for g in group.guides %}
+            <li><a href="/guides/{{ g.slug }}/">{{ g.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <a class="bk-fold-all" href="/guides/category/{{ group.slug }}/">See {{ group.name }} with summaries &rarr;</a>
+    </details>
+    {% endfor %}
 </div>
 {% endblock %}

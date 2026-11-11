@@ -876,15 +876,21 @@ async def guide_page(request: Request, slug: str):
 
 @app.get("/guides/", response_class=HTMLResponse)
 async def guides_index(request: Request):
-    """List all published guides."""
-    from guides import list_guides, get_all_categories
+    """Start-here guides, then every guide grouped by category."""
+    from guides import GUIDES, get_all_categories, get_guides_by_category
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/"
+    featured = [GUIDES[slug] for slug in config.FEATURED_GUIDE_SLUGS if slug in GUIDES]
+    groups = [
+        {**category, "guides": get_guides_by_category(category["slug"])}
+        for category in get_all_categories()
+    ]
     return templates.TemplateResponse(
         "guides_index.html",
         {
             "request": request,
-            "guides": list_guides(),
-            "all_categories": get_all_categories(),
+            "featured": featured,
+            "groups": groups,
+            "guide_count": len(GUIDES),
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Guides | BillKarma",
             "og_description": "Free guides on how to read, dispute, and reduce medical bills.",

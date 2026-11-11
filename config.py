@@ -180,3 +180,13 @@ RANKING_MIN_PROCEDURES = 5   # a hospital needs this many priced procedures to b
 RANKING_MIN_HOSPITALS = 5    # a state needs this many ranked hospitals to get a page
 RANKING_TOP_COUNT = 25       # hospitals shown in the most-expensive list
 RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list
+
+# Guides shown first on /guides/ ("Start here"), in order
+FEATURED_GUIDE_SLUGS = (
+    "how-to-get-itemized-hospital-bill",
+    "common-hospital-billing-errors",
+    "how-to-dispute-a-medical-bill",
+    "hospital-financial-assistance-charity-care",
+    "medical-debt-collections-rights",
+    "medical-bill-negotiation-service-cost",
+)
