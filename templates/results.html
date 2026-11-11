@@ -2,13 +2,13 @@
 {% block title %}Results - BillKarma{% endblock %}
 {% block head %}
 <style>
-    .results-bar { background:#1F4FD1; padding:20px 24px; border-radius:0 0 24px 24px; }
+    .results-bar { background:var(--paper-2); border-bottom:1px solid var(--rule); padding:20px 24px; }
     .results-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .results-bar .rb-crumb { font-size:0.75rem; color:rgba(255,255,255,0.5); }
-    .results-bar .rb-crumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
-    .results-bar .rb-crumb a:hover { color:rgba(255,255,255,0.8); }
-    .results-bar .rb-crumb .rb-active { color:#fff; font-weight:600; }
-    .results-bar .rb-title { color:#fff; font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
+    .results-bar .rb-crumb { font-size:0.75rem; color:var(--muted); }
+    .results-bar .rb-crumb a { color:var(--muted); text-decoration:none; }
+    .results-bar .rb-crumb a:hover { color:var(--ink); }
+    .results-bar .rb-crumb .rb-active { color:var(--ink); font-weight:600; }
+    .results-bar .rb-title { color:var(--ink); font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
     @media(max-width:640px){ .results-bar{padding:16px 16px;} .results-bar-inner{flex-direction:column;align-items:flex-start;gap:4px;} }
 </style>
 {% endblock %}
