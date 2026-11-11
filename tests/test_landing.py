@@ -25,3 +25,10 @@ def test_landing_states_what_we_dont_do():
     r = client.get("/")
     assert "What we don&rsquo;t do" in r.text
     assert 'href="/household"' not in r.text.split("<footer")[0]
+
+
+def test_search_console_tag_renders_only_when_configured(monkeypatch):
+    import config
+    assert "google-site-verification" not in client.get("/").text
+    monkeypatch.setattr(config, "GOOGLE_SITE_VERIFICATION", "abc123")
+    assert '<meta name="google-site-verification" content="abc123">' in client.get("/").text

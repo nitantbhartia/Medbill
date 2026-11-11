@@ -60,6 +60,6 @@ Fees as published by each company, checked 2026-11-11.
 
 ## Data sources
 
-- Search Console: **not connected.** Unlocks real positions, clicks and the page-2 list. The verification tag in `templates/base.html` is still a placeholder.
+- Search Console: **not connected.** Unlocks real positions, clicks and the page-2 list. Verification tag reads `GOOGLE_SITE_VERIFICATION` from the environment.
 - Rank/volume tool (Ahrefs or similar): **not connected.** Unlocks keyword volume and difficulty in `keyword-map.csv`.
 - Analytics: not found in the repo.
