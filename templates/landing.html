@@ -1,37 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}BillKarma — Hospital Billing Help: Phone Numbers, Financial Assistance, Letters{% endblock %}
+{% block title %}Hospital Bill Too High? Check It Free, We Dispute It | BillKarma{% endblock %}
 
 {% block head %}
-<meta name="description" content="Look up any U.S. hospital's billing phone number, check if you qualify for free or discounted care, and get letters addressed to the right billing office. Free, no account.">
+<meta name="description" content="Upload a hospital bill. We compare every charge to what Medicare pays, flag errors, then send a written dispute to billing and follow up. Checking is free.">
 {% endblock %}
 
 {% block content %}
 <section class="bk-wrap" style="padding-top: 88px; padding-bottom: 72px">
-    <p class="bk-eyebrow">{{ "{:,}".format(hospital_count) }} U.S. hospitals · From CMS data</p>
-    <h1 style="margin: 0; max-width: 820px; font-size: clamp(40px, 6vw, 68px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 800">Got a hospital bill? Start with <span class="bk-mark">the hospital.</span></h1>
-    <p style="margin: 24px 0 0; max-width: 620px; font-size: 20px; line-height: 1.5; color: var(--ink-2)">Look up who to call in billing, whether you qualify for free or discounted care, and get letters addressed to the right office. Free. No account.</p>
+    <p class="bk-eyebrow">Hospital bills only &middot; {{ "{:,}".format(hospital_count) }} U.S. hospitals &middot; CMS data</p>
+    <h1 style="margin: 0; max-width: 860px; font-size: clamp(40px, 6vw, 68px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 800">Hospital bill look wrong? <span class="bk-mark">We&rsquo;ll dispute it in writing.</span></h1>
+    <p style="margin: 24px 0 0; max-width: 640px; font-size: 20px; line-height: 1.5; color: var(--ink-2)">Upload your bill. We check every charge against what Medicare pays for the same code and flag duplicates. If something&rsquo;s off, we send a dispute letter to the billing office and follow up until they answer. Checking is free.</p>
+    <div style="margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px">
+        <a href="/scan" class="bk-btn">Check my bill free</a>
+        <a href="#pricing" class="bk-btn-outline">See the flat fee</a>
+    </div>
 
-    <form action="/hospitals/" method="get" style="margin: 40px 0 0; max-width: 760px">
-        <label for="hospital-search" class="bk-label">Hospital name or city</label>
+    <form action="/hospitals/" method="get" style="margin: 48px 0 0; max-width: 760px">
+        <label for="hospital-search" class="bk-label">Or look up a hospital&rsquo;s billing office</label>
         <div class="bk-search">
             <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="e.g. Inova Fair Oaks, or Fairfax VA" autocomplete="off">
-            <button type="submit" class="bk-btn">Find hospital</button>
+            <button type="submit" class="bk-btn-outline">Find hospital</button>
         </div>
     </form>
-    <p style="margin: 16px 0 0; font-size: 15px; line-height: 1.7" class="bk-muted">
-        Often searched:
-        <a href="/hospitals/va/fairfax/inova-fair-oaks-hospital-fairfax/">Inova Fair Oaks Hospital</a> ·
-        <a href="/hospitals/fl/pensacola/sacred-heart-hospital-pensacola/">Sacred Heart Hospital, Pensacola</a> ·
-        <a href="/hospitals/ct/new-haven/yale-new-haven-hospital-new-haven/">Yale-New Haven Hospital</a> ·
-        <a href="/hospitals/ky/elizabethtown/baptist-health-hardin-elizabethtown/">Baptist Health Hardin</a>
-    </p>
 </section>
 
 <section style="background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule)">
     <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
-        <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">Before you pay, do these three things</h2>
-        <p class="bk-lede" style="max-width: 640px; margin-top: 12px">They work at almost any hospital, take less than an hour, and you can do them even after a bill has gone to collections.</p>
+        <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">How it works</h2>
+        <p class="bk-lede" style="max-width: 640px; margin-top: 12px">Do the first two yourself for free. Hand us the third if you&rsquo;d rather not write letters and chase replies.</p>
         <ol style="margin: 40px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); border-top: 2px solid var(--ink)">
             <li style="padding: 28px 28px 32px 0; border-bottom: 1px solid var(--rule)">
                 <div class="bk-mono bk-muted" style="font-size: 15px">01</div>
@@ -47,23 +44,47 @@
             </li>
             <li style="padding: 28px 0 32px 0; border-bottom: 1px solid var(--rule)">
                 <div class="bk-mono bk-muted" style="font-size: 15px">03</div>
-                <h3 style="margin: 12px 0 8px; font-size: 21px; font-weight: 700">Check the charges</h3>
-                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">Look for duplicate lines and prices far above what Medicare pays for the same code. Then dispute them in writing.</p>
-                <a href="/scan" style="display: inline-block; margin-top: 16px; font-weight: 600; padding: 10px 0">Upload your bill</a>
+                <h3 style="margin: 12px 0 8px; font-size: 21px; font-weight: 700">We dispute it in writing</h3>
+                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">After the free check, we write a dispute letter for the charges we flagged, send it to billing and follow up until they answer.</p>
+                <a href="/scan" style="display: inline-block; margin-top: 16px; font-weight: 600; padding: 10px 0">Start with the free check</a>
             </li>
         </ol>
     </div>
 </section>
 
-<section class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
+<section id="pricing" class="bk-wrap" style="padding-top: 72px; padding-bottom: 24px">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
         <div>
-            <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">Rather we handle it?</h2>
-            <p class="bk-lede" style="margin-top: 12px">Insurance denied a claim? We write the appeal, send it and track the deadlines, for a flat fee. Or let us check every bill your family gets against your insurer's statement.</p>
-            <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px">
-                <a href="/appeal" class="bk-btn">Appeal a denial</a>
-                <a href="/household" class="bk-btn-outline">Household plan</a>
-            </div>
+            <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">One flat fee. No cut of your savings.</h2>
+            <p class="bk-lede" style="margin-top: 12px">Bill negotiators usually take 10&ndash;35% of what they save you, and some won&rsquo;t take bills under $5,000. We charge a flat fee based on the size of the bill. You only pay if, after the free check, you choose to send a dispute.</p>
+            <ul class="bk-rows">
+                {% for tier in dispute_tiers %}
+                <li style="padding: 14px 0"><span>{{ tier.label }}</span><span class="bk-mono" style="font-weight: 600">${{ tier.fee }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h2 style="margin: 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 800">What the fee covers</h2>
+            <ul style="margin: 16px 0 0; padding-left: 20px; font-size: 17px; line-height: 1.7; color: var(--ink-2)">
+                <li>A dispute letter written for your bill and the charges we flagged</li>
+                <li>Sent to the hospital&rsquo;s billing office for you</li>
+                <li>Follow-ups on days {{ followup_days | join(", ") }} if they don&rsquo;t answer</li>
+                <li>One place to track replies and next steps</li>
+            </ul>
+            <p class="bk-muted" style="margin-top: 16px; font-size: 15px; line-height: 1.6">We can&rsquo;t promise the hospital will lower your bill. That decision is theirs. What you do get is a clear, dated request in writing thatWhat we can promise is a clear, documented request they have to respond to.rsquo;s hard to ignore.</p>
+        </div>
+    </div>
+</section>
+
+<section class="bk-wrap" style="padding-top: 48px; padding-bottom: 72px">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
+        <div>
+            <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">What we don&rsquo;t do</h2>
+            <ul style="margin: 16px 0 0; padding-left: 20px; font-size: 16px; line-height: 1.7; color: var(--ink-2)">
+                <li><strong>Phone negotiation.</strong> Everything is in writing, so you keep a dated record.</li>
+                <li><strong>Insurance denials.</strong> That&rsquo;s a fight with your insurer, not the hospital. Start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>.</li>
+                <li><strong>Legal help.</strong> Sued or facing wage garnishment? Contact local legal aid or a consumer attorney.</li>
+            </ul>
         </div>
         <div>
             <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">Already in collections?</h2>

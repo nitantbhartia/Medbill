@@ -8,7 +8,7 @@ import re
 import time
 from collections import defaultdict
 
-from config import APP_URL, ENABLE_FREE_MAPS
+from config import APP_URL, ENABLE_FREE_MAPS, SEO_META_MAX_CHARS, SEO_TITLE_MAX_CHARS
 from db import get_db
 
 GRADE_THRESHOLDS = (
@@ -2141,30 +2141,47 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
         return None
 
 
-def _build_page_title(name: str) -> str:
-    full_suffix = " Billing: Phone, Pay Online & Financial Help | BillKarma"
-    short_suffix = " Billing & Financial Help | BillKarma"
-    title = name + full_suffix
-    if len(title) > 60:
-        title = name + short_suffix
-    if len(title) > 60:
-        title = _truncate_name(name, 60 - len(short_suffix)) + short_suffix
-    return title
+_TITLE_MAX = SEO_TITLE_MAX_CHARS
+_META_MAX = SEO_META_MAX_CHARS
+
+
+def _markup_text(hospital_d: dict) -> str | None:
+    markup = hospital_d.get("avg_markup_vs_medicare")
+    if isinstance(markup, (int, float)) and markup > 0:
+        return f"{markup:.1f}x Medicare"
+    return None
+
+
+def _build_page_title(hospital_d: dict) -> str:
+    """Lead with what searchers want (billing), then our unique number (the markup)."""
+    name = hospital_d.get("name", "")
+    markup = _markup_text(hospital_d)
+    options = [f"{name} Billing Phone: Prices {markup}", f"{name} Billing: Prices {markup}"] if markup else []
+    options += [f"{name} Billing: Phone & Financial Help", f"{name} Billing Phone & Prices"]
+    for title in options:
+        if len(title) <= _TITLE_MAX:
+            return title
+    suffix = " Billing Phone & Prices"
+    return _truncate_name(name, _TITLE_MAX - len(suffix)) + suffix
 
 
 def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
-    name = hospital_d.get("name", "")
-    desc = (
-        f"Contact {name} billing department. "
-        f"Find the billing phone number, pay your bill online, "
-        f"request an itemized statement, or apply for financial assistance."
-    )
-    if len(desc) <= 155:
+    """Answer the search in the snippet, then give a reason to click."""
+    parts = []
+    if hospital_d.get("phone"):
+        parts.append(f"Main line: {hospital_d['phone']}.")
+    markup = _markup_text(hospital_d)
+    grade = hospital_d.get("billing_grade")
+    if markup and grade:
+        parts.append(f"List prices average {markup} (grade {grade}).")
+    elif markup:
+        parts.append(f"List prices average {markup}.")
+    parts.append("Free itemized-bill letter, financial assistance check and bill review.")
+    desc = " ".join(parts)
+    if len(desc) <= _META_MAX:
         return desc
-    # Truncate at last word boundary before 152 chars, append ellipsis
-    cut = desc[:152]
-    last_space = cut.rfind(" ")
-    return (cut[:last_space] if last_space > 100 else cut) + "..."
+    cut = desc[: _META_MAX - 3]
+    return cut[: cut.rfind(" ")] + "..."
 
 
 def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict) -> dict:
@@ -2339,7 +2356,7 @@ def generate_seo_elements(
     # Stash raw state code for meta description builder
     hospital_d["_state_code"] = state_code
 
-    page_title = _build_page_title(hospital_d.get("name", ""))
+    page_title = _build_page_title(hospital_d)
     meta_description = _build_meta_description(hospital_d, prices_d)
     faq_schema = _build_faq_schema(hospital_d, prices_d, financials_d)
     breadcrumb_schema = _build_breadcrumb_schema(hospital_d, state_slug, city_slug)
