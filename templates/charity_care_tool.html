@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% block head %}
 <style>
-.tool-hero { background:linear-gradient(135deg,#1F4FD1 0%,#163A9C 100%); color:#fff; padding:48px 24px 36px; text-align:center; }
+.tool-hero { background:linear-gradient(135deg,#0C6B55 0%,#08503F 100%); color:#fff; padding:48px 24px 36px; text-align:center; }
 .tool-hero h1 { font-size:2rem; font-weight:800; margin:0 0 12px; }
 .tool-hero p { font-size:1.05rem; opacity:.9; max-width:600px; margin:0 auto; }
-.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; max-width:720px; margin:-28px auto 32px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.tool-card { background:#fff; border:1px solid #D6E0DB; border-radius:16px; padding:32px; max-width:720px; margin:-28px auto 32px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
 @media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
-.tool-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6B7280; margin-bottom:6px; }
-.tool-select, .tool-input { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #E5E7EB; border-radius:10px; background:#F9FAFB; box-sizing:border-box; }
-.tool-select:focus, .tool-input:focus { outline:none; border-color:#1F4FD1; }
+.tool-label { font-size:.8rem; font-weight:700;   color:#5E6F69; margin-bottom:6px; }
+.tool-select, .tool-input { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #D6E0DB; border-radius:10px; background:#F4F7F5; box-sizing:border-box; }
+.tool-select:focus, .tool-input:focus { outline:none; border-color:#0C6B55; }
 .cc-result { display:none; margin-top:8px; border-radius:12px; padding:20px 24px; }
 .cc-result.show { display:block; }
-.cc-free { background:#EAF0FD; border:2px solid #1F4FD1; }
-.cc-reduced { background:#EAF0FD; border:2px solid #34D399; }
+.cc-free { background:#E1F0EA; border:2px solid #0C6B55; }
+.cc-reduced { background:#E1F0EA; border:2px solid #34D399; }
 .cc-partial { background:#FEF3C7; border:2px solid #F59E0B; }
-.cc-standard { background:#F9FAFB; border:2px solid #E5E7EB; }
+.cc-standard { background:#F4F7F5; border:2px solid #D6E0DB; }
 .cc-pct { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
-.cc-desc { font-size:.92rem; line-height:1.55; color:#374151; margin-top:6px; }
-.fpl-display { font-size:.82rem; color:#6B7280; margin-top:10px; }
+.cc-desc { font-size:.92rem; line-height:1.55; color:#374842; margin-top:6px; }
+.fpl-display { font-size:.82rem; color:#5E6F69; margin-top:10px; }
 .container { max-width:860px; margin:0 auto; padding:0 24px 48px; }
 .state-table { width:100%; border-collapse:collapse; font-size:.88rem; margin-top:8px; }
-.state-table th { background:#F9FAFB; padding:9px 14px; text-align:left; font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; }
+.state-table th { background:#F4F7F5; padding:9px 14px; text-align:left; font-weight:700; font-size:.75rem;   color:#5E6F69; border-bottom:2px solid #D6E0DB; }
 .state-table td { padding:8px 14px; border-bottom:1px solid #F3F4F6; }
-.cta-box { background:linear-gradient(135deg,#1F4FD1,#163A9C); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
+.cta-box { background:linear-gradient(135deg,#0C6B55,#08503F); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
 .cta-box h3 { margin:0 0 8px; font-size:1.3rem; }
 .cta-box p { margin:0 0 16px; opacity:.9; font-size:.95rem; }
-.cta-btn { background:#fff; color:#1F4FD1; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
+.cta-btn { background:#fff; color:#0C6B55; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
 </style>
 {% endblock %}
 {% block content %}
@@ -65,7 +65,7 @@
     </div>
 
     <h2 style="font-size:1.2rem;font-weight:700;margin:8px 0 6px;">How the 2026 Federal Poverty Level works</h2>
-    <p style="color:#6B7280;font-size:.92rem;line-height:1.6;margin-bottom:24px;">
+    <p style="color:#5E6F69;font-size:.92rem;line-height:1.6;margin-bottom:24px;">
         The FPL for a household of 1 is <strong>${{ "{:,}".format(fpl_base) }}</strong> in 2026.
         Each additional household member adds <strong>${{ "{:,}".format(fpl_add) }}</strong>.
         Hospitals use your FPL percentage to determine eligibility — most nonprofits must offer

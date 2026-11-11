@@ -3,23 +3,23 @@
 {% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block head %}
 <style>
-    .ap-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:36px 24px 32px; }
+    .ap-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:36px 24px 32px; }
     .ap-hero-inner { max-width:672px; margin:0 auto; }
     .ap-hero h1 { color:#fff; font-size:1.8rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; }
     .ap-hero p { color:rgba(255,255,255,0.75); font-weight:500; font-size:0.85rem; }
     @media(max-width:640px){ .ap-hero{padding:28px 18px 24px;border-radius:0 0 24px 24px;} .ap-hero h1{font-size:1.5rem;} }
 
     .phase-bar { display:flex; gap:2px; margin-bottom:8px; }
-    .phase-segment { flex:1; height:8px; border-radius:4px; background:#E5E7EB; transition:background 0.3s; }
-    .phase-segment.active { background:#1F4FD1; }
+    .phase-segment { flex:1; height:8px; border-radius:4px; background:#D6E0DB; transition:background 0.3s; }
+    .phase-segment.active { background:#0C6B55; }
     .phase-segment.complete { background:#22C55E; }
 
     .timeline-line { position:relative; padding-left:28px; }
-    .timeline-line::before { content:''; position:absolute; left:9px; top:0; bottom:0; width:2px; background:#E5E7EB; }
+    .timeline-line::before { content:''; position:absolute; left:9px; top:0; bottom:0; width:2px; background:#D6E0DB; }
     .tl-item { position:relative; padding-bottom:20px; }
     .tl-item:last-child { padding-bottom:0; }
     .tl-dot { position:absolute; left:-28px; top:2px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
-    .tl-dot.milestone { background:#1F4FD1; }
+    .tl-dot.milestone { background:#0C6B55; }
     .tl-dot.action { background:#3B82F6; }
     .tl-dot.note { background:#F59E0B; }
     .tl-dot svg { width:10px; height:10px; }
@@ -32,7 +32,7 @@
 {% block content %}
 <section class="ap-hero">
     <div class="ap-hero-inner">
-        <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">
+        <p style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.55);margin-bottom:8px;">
             <a href="/results/{{ data.bill_id }}" style="color:rgba(255,255,255,0.55);text-decoration:none;">&larr; Back to results</a>
             <span style="margin:0 6px;">&middot;</span>
             Case #{{ data.case_id }}

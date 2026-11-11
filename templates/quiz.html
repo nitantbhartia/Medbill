@@ -3,21 +3,21 @@
 {% block head %}
 <meta name="description" content="Answer 4 quick questions and get a personalized action plan for your medical bill. Free quiz from BillKarma.">
 <style>
-    .qz-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .qz-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
     .qz-hero-inner { max-width:672px; margin:0 auto; }
     .qz-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
     .qz-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
     @media(max-width:640px){ .qz-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .qz-hero h1{font-size:1.8rem;} }
     .qz-option {
         display:block; width:100%; text-align:left; padding:16px 20px;
-        background:#fff; border:2px solid #E5E5E5; border-radius:14px;
-        font-size:0.95rem; font-weight:600; color:#1A1A1A; cursor:pointer;
+        background:#fff; border:2px solid #D6E0DB; border-radius:14px;
+        font-size:0.95rem; font-weight:600; color:#16302A; cursor:pointer;
         transition: border-color 0.15s, background 0.15s;
     }
-    .qz-option:hover { border-color:#1F4FD1; background:#EAF0FD; }
-    .qz-option.selected { border-color:#1F4FD1; background:#DCFCE7; }
-    .qz-progress { height:4px; background:#E5E5E5; border-radius:999px; overflow:hidden; }
-    .qz-progress-bar { height:100%; background:#1F4FD1; border-radius:999px; transition: width 0.3s ease; }
+    .qz-option:hover { border-color:#0C6B55; background:#E1F0EA; }
+    .qz-option.selected { border-color:#0C6B55; background:#DCFCE7; }
+    .qz-progress { height:4px; background:#D6E0DB; border-radius:999px; overflow:hidden; }
+    .qz-progress-bar { height:100%; background:#0C6B55; border-radius:999px; transition: width 0.3s ease; }
     .impact-high { background:#DCFCE7; color:#166534; }
     .impact-medium { background:#FEF3C7; color:#92400E; }
 </style>
@@ -26,7 +26,7 @@
 {% block content %}
 <section class="qz-hero">
     <div class="qz-hero-inner">
-        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">30-second quiz</p>
+        <p style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:14px;">30-second quiz</p>
         <h1>What should I do<br>about my bill?</h1>
         <p>Answer 4 quick questions and get a personalized action plan with the exact next steps for your situation.</p>
     </div>
@@ -168,7 +168,7 @@
         html += '<div class="bg-gray-50 rounded-xl p-5 mb-6">';
         html += '<p class="font-semibold text-gray-900 mb-1">Know your rights</p>';
         html += '<p class="text-sm text-gray-600">Your state has specific protections for medical billing, debt collection, and charity care.</p>';
-        html += '<a href="/rights/" class="inline-block mt-2 text-sm font-semibold text-accent-500 hover:underline">Check your state rights &rarr;</a>';
+        html += '<a href="/rights/" class="inline-block mt-2 text-sm font-semibold text-accent-500 hover:underline">Check your state rights</a>';
         html += '</div>';
 
         // Retake

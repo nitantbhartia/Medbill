@@ -13,48 +13,48 @@
 ]}
 </script>
 <style>
-.tool-hero { background: linear-gradient(135deg,#1F4FD1 0%,#163A9C 100%); color:#fff; padding:52px 24px 40px; text-align:center; border-radius:0 0 40px 40px; }
+.tool-hero { background: linear-gradient(135deg,#0C6B55 0%,#08503F 100%); color:#fff; padding:52px 24px 40px; text-align:center; border-radius:0 0 40px 40px; }
 .tool-hero h1 { font-size:2rem; font-weight:800; margin:0 0 12px; }
 .tool-hero p { font-size:1.05rem; opacity:.9; max-width:600px; margin:0 auto; }
 .container { max-width:900px; margin:0 auto; padding:0 24px 64px; }
-.tool-card { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:32px; margin:-28px auto 40px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
-.tool-card .intro-text { font-size:.95rem; color:#374151; line-height:1.6; margin-bottom:20px; background:#EAF0FD; border-left:3px solid #1F4FD1; padding:12px 16px; border-radius:0 8px 8px 0; }
-.tool-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6B7280; margin-bottom:6px; }
-.tool-select { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #E5E7EB; border-radius:10px; background:#F9FAFB; appearance:none; cursor:pointer; }
-.tool-select:focus { outline:none; border-color:#1F4FD1; }
-.sol-result { display:none; margin-top:20px; background:#EAF0FD; border:2px solid #1F4FD1; border-radius:12px; padding:20px 24px; }
+.tool-card { background:#fff; border:1px solid #D6E0DB; border-radius:16px; padding:32px; margin:-28px auto 40px; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+.tool-card .intro-text { font-size:.95rem; color:#374842; line-height:1.6; margin-bottom:20px; background:#E1F0EA; border-left:3px solid #0C6B55; padding:12px 16px; border-radius:0 8px 8px 0; }
+.tool-label { font-size:.8rem; font-weight:700;   color:#5E6F69; margin-bottom:6px; }
+.tool-select { width:100%; padding:12px 16px; font-size:1rem; border:2px solid #D6E0DB; border-radius:10px; background:#F4F7F5; appearance:none; cursor:pointer; }
+.tool-select:focus { outline:none; border-color:#0C6B55; }
+.sol-result { display:none; margin-top:20px; background:#E1F0EA; border:2px solid #0C6B55; border-radius:12px; padding:20px 24px; }
 .sol-result.show { display:block; }
 .sol-top { display:flex; align-items:baseline; gap:12px; margin-bottom:4px; }
-.sol-years { font-size:2.8rem; font-weight:800; color:#1F4FD1; line-height:1; }
-.sol-unit { font-size:1rem; font-weight:600; color:#1F4FD1; }
-.sol-state-name { font-size:1.2rem; font-weight:700; color:#111827; }
+.sol-years { font-size:2.8rem; font-weight:800; color:#0C6B55; line-height:1; }
+.sol-unit { font-size:1rem; font-weight:600; color:#0C6B55; }
+.sol-state-name { font-size:1.2rem; font-weight:700; color:#16302A; }
 .sol-statute { font-size:.82rem; color:#9CA3AF; margin:4px 0 12px; font-style:italic; }
 .sol-warning { background:#FEF3C7; border:1px solid #F59E0B; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:.88rem; color:#92400E; }
 .sol-details-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
-.detail-item { background:#fff; border:1px solid #EAF0FD; border-radius:8px; padding:10px 14px; }
-.detail-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#6B7280; margin-bottom:3px; }
-.detail-value { font-size:.88rem; font-weight:700; color:#111827; line-height:1.4; }
+.detail-item { background:#fff; border:1px solid #E1F0EA; border-radius:8px; padding:10px 14px; }
+.detail-label { font-size:.72rem; font-weight:700;   color:#5E6F69; margin-bottom:3px; }
+.detail-value { font-size:.88rem; font-weight:700; color:#16302A; line-height:1.4; }
 .sol-share-row { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
-.share-btn { background:#1F4FD1; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:.85rem; font-weight:700; cursor:pointer; }
-.share-btn:hover { background:#163A9C; }
-.share-btn.secondary { background:#EAF0FD; color:#1F4FD1; border:1px solid #1F4FD1; }
+.share-btn { background:#0C6B55; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:.85rem; font-weight:700; cursor:pointer; }
+.share-btn:hover { background:#08503F; }
+.share-btn.secondary { background:#E1F0EA; color:#0C6B55; border:1px solid #0C6B55; }
 .badge { display:inline-block; padding:2px 8px; border-radius:100px; font-size:.72rem; font-weight:700; }
 .badge-short { background:#FEE2E2; color:#991B1B; }
-.badge-long { background:#EAF0FD; color:#163A9C; }
+.badge-long { background:#E1F0EA; color:#08503F; }
 .badge-mid { background:#E0F2FE; color:#0369A1; }
 .sol-table-wrap { overflow-x:auto; margin-top:8px; }
 .sol-table { width:100%; border-collapse:collapse; font-size:.875rem; }
-.sol-table th { background:#F9FAFB; padding:10px 14px; text-align:left; font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; border-bottom:2px solid #E5E7EB; white-space:nowrap; }
+.sol-table th { background:#F4F7F5; padding:10px 14px; text-align:left; font-weight:700; font-size:.75rem;   color:#5E6F69; border-bottom:2px solid #D6E0DB; white-space:nowrap; }
 .sol-table td { padding:9px 14px; border-bottom:1px solid #F3F4F6; vertical-align:top; }
-.sol-table tr:hover td { background:#F9FAFB; }
-.check-yes { color:#1F4FD1; font-weight:700; }
+.sol-table tr:hover td { background:#F4F7F5; }
+.check-yes { color:#0C6B55; font-weight:700; }
 .check-no { color:#DC2626; font-weight:700; }
-.garnish-good { color:#1F4FD1; font-size:.82rem; }
+.garnish-good { color:#0C6B55; font-size:.82rem; }
 .garnish-warn { color:#D97706; font-size:.82rem; }
-.cta-box { background:linear-gradient(135deg,#1F4FD1,#163A9C); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
+.cta-box { background:linear-gradient(135deg,#0C6B55,#08503F); color:#fff; border-radius:16px; padding:28px 32px; margin:32px 0; text-align:center; }
 .cta-box h3 { margin:0 0 8px; font-size:1.3rem; }
 .cta-box p { margin:0 0 16px; opacity:.9; font-size:.95rem; }
-.cta-btn { background:#fff; color:#1F4FD1; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
+.cta-btn { background:#fff; color:#0C6B55; font-weight:700; padding:12px 28px; border-radius:10px; text-decoration:none; display:inline-block; }
 @media (max-width:640px) {
   .sol-details-grid { grid-template-columns:1fr; }
   .tool-hero h1 { font-size:1.6rem; }
@@ -120,12 +120,12 @@
       <div class="sol-share-row">
         <button class="share-btn" onclick="shareState()">📤 Share</button>
         <button class="share-btn secondary" onclick="copyLink()">🔗 Copy link</button>
-        <a class="share-btn secondary" href="/fight-debt" style="text-decoration:none;">Fight your bill →</a>
+        <a class="share-btn secondary" href="/fight-debt" style="text-decoration:none;">Fight your bill</a>
       </div>
     </div>
   </div>
 
-  <h2 style="font-size:1.3rem;font-weight:800;color:#111827;margin:0 0 16px;">All 50 States + D.C.</h2>
+  <h2 style="font-size:1.3rem;font-weight:800;color:#16302A;margin:0 0 16px;">All 50 States + D.C.</h2>
   <div class="sol-table-wrap">
     <table class="sol-table">
       <thead>
@@ -195,7 +195,7 @@ function showResult() {
   document.getElementById('solCharity').textContent = 'Up to ' + row.charity_fpl + ' FPL';
   const med = document.getElementById('solMedicaid');
   med.textContent = row.medicaid ? '✓ Yes — Medicaid expanded' : '✗ No expansion';
-  med.style.color = row.medicaid ? '#1F4FD1' : '#DC2626';
+  med.style.color = row.medicaid ? '#0C6B55' : '#DC2626';
   document.getElementById('solResult').classList.add('show');
   // Update URL without reload
   const url = new URL(window.location);

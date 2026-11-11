@@ -183,14 +183,30 @@ RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list
 
 # Guides shown first on /guides/ ("Start here"), in order
 FEATURED_GUIDE_SLUGS = (
-    "how-to-get-itemized-hospital-bill",
-    "common-hospital-billing-errors",
-    "how-to-dispute-a-medical-bill",
-    "hospital-financial-assistance-charity-care",
-    "medical-debt-collections-rights",
-    "medical-bill-negotiation-service-cost",
+    ("how-to-get-itemized-hospital-bill", "Step 1"),
+    ("common-hospital-billing-errors", "Step 2"),
+    ("how-to-dispute-a-medical-bill", "Step 3"),
+    ("hospital-financial-assistance-charity-care", "If you can't afford it"),
+    ("medical-debt-collections-rights", "If it's in collections"),
+    ("medical-bill-negotiation-service-cost", "If you're hiring help"),
 )
+# Guides shown per topic on /guides/ before "Show all"
+GUIDES_PER_TOPIC = 6
 
 # Press pitch drafts: how many states to write (highest median markup first)
 PITCH_STATE_COUNT = 5
 PITCH_OUTPUT_DIR = "seo/outreach"
+
+# Appended to CSS/JS URLs so a deploy never serves stale styles from browser caches
+ASSET_VERSION = (os.getenv("RAILWAY_GIT_COMMIT_SHA") or os.getenv("ASSET_VERSION") or "dev")[:8]
+
+# Example itemized bill on the homepage (illustrative charges; Medicare rates are looked up live)
+HOMEPAGE_EXAMPLE_BILL = (
+    {"code": "99285", "desc": "Emergency visit, level 5", "amount": 4500.00, "flag": "Level 5 is for life-threatening problems. This visit ended with a splint."},
+    {"code": "73610", "desc": "X-ray, ankle, 3 views", "amount": 610.00, "flag": ""},
+    {"code": "80053", "desc": "Comprehensive metabolic panel", "amount": 198.00, "flag": ""},
+    {"code": "80048", "desc": "Basic metabolic panel", "amount": 142.00, "flag": "Already included in the comprehensive panel."},
+    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": ""},
+    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": "Billed twice for one draw."},
+)
+HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")

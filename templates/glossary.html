@@ -3,13 +3,13 @@
 {% block head %}
 <meta name="description" content="Plain-English definitions for every medical billing term: CPT codes, EOB, deductible, chargemaster, upcoding, balance billing, FDCPA, and more.">
 <style>
-    .gl-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .gl-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
     .gl-hero-inner { max-width:720px; margin:0 auto; }
     .gl-hero h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:10px; line-height:1.1; }
     .gl-hero p { color:rgba(255,255,255,0.8); font-weight:500; max-width:55ch; }
     @media(max-width:640px){ .gl-hero{padding:40px 18px 36px;border-radius:0 0 24px 24px;} .gl-hero h1{font-size:1.8rem;} }
-    .gl-search { width:100%; border:2px solid #E5E5E5; border-radius:999px; padding:14px 22px; font-size:1rem; outline:none; transition: border-color 0.15s; }
-    .gl-search:focus { border-color:#1F4FD1; }
+    .gl-search { width:100%; border:2px solid #D6E0DB; border-radius:999px; padding:14px 22px; font-size:1rem; outline:none; transition: border-color 0.15s; }
+    .gl-search:focus { border-color:#0C6B55; }
     .gl-term { scroll-margin-top: 80px; }
 </style>
 <script type="application/ld+json">
@@ -35,7 +35,7 @@
 {% block content %}
 <section class="gl-hero">
     <div class="gl-hero-inner">
-        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:14px;">Reference</p>
+        <p style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:14px;">Reference</p>
         <h1>Medical billing<br>glossary</h1>
         <p>Plain-English definitions for every term on your medical bill, insurance statement, and collection notice.</p>
     </div>
@@ -66,7 +66,7 @@
                 <h3 class="font-bold text-gray-900 text-base mb-2">{{ t.term }}</h3>
                 <p class="text-sm text-gray-700 leading-relaxed">{{ t.definition }}</p>
                 {% if t.cta_url %}
-                <a href="{{ t.cta_url }}" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">{{ t.cta_label }} &rarr;</a>
+                <a href="{{ t.cta_url }}" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">{{ t.cta_label }}</a>
                 {% endif %}
             </div>
             {% endfor %}

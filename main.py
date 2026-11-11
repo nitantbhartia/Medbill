@@ -525,6 +525,25 @@ def _dispute_tier_labels() -> list[dict]:
     return rows
 
 
+def _homepage_example_bill() -> dict:
+    """The illustrative statement on the homepage, with the Medicare rate for the flagged visit."""
+    from validators.pricing import get_medicare_rate
+    lines = [dict(line) for line in config.HOMEPAGE_EXAMPLE_BILL]
+    total = sum(line["amount"] for line in lines)
+    clear_errors = sum(
+        line["amount"] for line in lines
+        if line["flag"] and line["code"] in config.HOMEPAGE_EXAMPLE_CLEAR_ERRORS
+    )
+    visit = lines[0]
+    return {
+        "lines": lines,
+        "total": total,
+        "clear_errors": clear_errors,
+        "visit_amount": visit["amount"],
+        "visit_medicare": get_medicare_rate(visit["code"]),
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
@@ -539,6 +558,7 @@ async def landing(request: Request):
             "hospital_count": hospital_count,
             "dispute_tiers": _dispute_tier_labels(),
             "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
+            "example": _homepage_example_bill(),
             "og_title": "Hospital bill too high? Check it free, we dispute it | BillKarma",
             "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
             "meta_robots": "index, follow",
@@ -847,7 +867,7 @@ async def guide_page(request: Request, slug: str):
     if final_slug:
         return RedirectResponse(url=f"/guides/{final_slug}/", status_code=301)
     import re
-    from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
+    from guides import _category_slug, get_guide, get_related_guides, inject_internal_links, inject_scan_cta
     from guide_seo import seo_title, seo_description
     guide = get_guide(slug)
     if not guide:
@@ -861,6 +881,7 @@ async def guide_page(request: Request, slug: str):
         {
             "request": request,
             "guide": {**guide, "body": linked_body},
+            "category_slug": _category_slug(guide.get("category", "")),
             "canonical_url": canonical_url,
             "page_title": seo_title(guide),
             "og_title": seo_title(guide),
@@ -879,7 +900,7 @@ async def guides_index(request: Request):
     """Start-here guides, then every guide grouped by category."""
     from guides import GUIDES, get_all_categories, get_guides_by_category
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/"
-    featured = [GUIDES[slug] for slug in config.FEATURED_GUIDE_SLUGS if slug in GUIDES]
+    featured = [{**GUIDES[slug], "label": label} for slug, label in config.FEATURED_GUIDE_SLUGS if slug in GUIDES]
     groups = [
         {**category, "guides": get_guides_by_category(category["slug"])}
         for category in get_all_categories()

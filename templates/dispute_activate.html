@@ -15,7 +15,7 @@
         <p class="text-sm font-semibold text-green-700 uppercase tracking-wide mb-1">We found a problem</p>
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight mb-2">
             You may be owed
-            <span class="text-green-600">${{ "%.0f"|format(potential_savings) }}</span>
+            <span class="text-green-600">${{ "{:,.0f}".format(potential_savings) }}</span>
         </h1>
         <p class="text-sm text-gray-600">
             {{ finding_count }} billing issue{{ 's' if finding_count != 1 else '' }} found at
@@ -61,7 +61,7 @@
             <p class="text-xs text-gray-500 mt-0.5">No savings? Full refund. No contingency fees.</p>
         </div>
         <div class="text-right">
-            <p class="text-2xl font-bold text-gray-900">${{ "%.0f"|format(fee_dollars) }}</p>
+            <p class="text-2xl font-bold text-gray-900">${{ "{:,.0f}".format(fee_dollars) }}</p>
             <p class="text-xs text-gray-500">one-time</p>
         </div>
     </div>
@@ -228,7 +228,7 @@
             <button type="button" id="proceed-to-pay"
                     class="w-full py-3.5 bg-green-600 text-white font-semibold text-base rounded-xl hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled>
-                Pay ${{ "%.0f"|format(fee_dollars) }} and Fight This Bill →
+                Pay ${{ "{:,.0f}".format(fee_dollars) }} and Fight This Bill
             </button>
             <p class="text-xs text-gray-400 text-center mt-2">
                 No savings in 45 days? Full refund. Secure payment via Stripe.
@@ -413,7 +413,7 @@ document.getElementById('proceed-to-pay').addEventListener('click', async () => 
         document.getElementById('pay-error').textContent = data.detail || 'Payment setup failed. Please try again.';
         document.getElementById('pay-error').classList.remove('hidden');
         btn.disabled = false;
-        btn.textContent = `Pay $${FEE_DOLLARS} and Fight This Bill →`;
+        btn.textContent = `Pay $${FEE_DOLLARS} and Fight This Bill`;
     }
 });
 

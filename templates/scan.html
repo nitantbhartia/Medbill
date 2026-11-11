@@ -31,7 +31,7 @@
 </script>
 <style>
     .scan-hero {
-        background-color: #1F4FD1;
+        background-color: #0C6B55;
         color: #fff;
         padding: 52px 0 56px;
         border-radius: 0 0 40px 40px;
@@ -41,7 +41,7 @@
     .scan-hero-blob {
         position: absolute;
         border-radius: 50%;
-        background: #163A9C;
+        background: #08503F;
         pointer-events: none;
     }
     .scan-hero h1 {
@@ -64,8 +64,8 @@
         flex-wrap: wrap;
         gap: 12px 0;
         padding: 18px 12px;
-        border-bottom: 1px solid #E5E5E5;
-        background: #F9F9F9;
+        border-bottom: 1px solid #D6E0DB;
+        background: #F4F7F5;
     }
     .scan-stat-item {
         display: flex;
@@ -79,7 +79,7 @@
         font-size: 1.25rem;
         font-weight: 700;
         letter-spacing: -0.02em;
-        color: #1A1A1A;
+        color: #16302A;
     }
     .scan-stat-label {
         font-size: 0.82rem;
@@ -94,7 +94,7 @@
     }
     .scan-form-card {
         background: #fff;
-        border: 1px solid #E5E5E5;
+        border: 1px solid #D6E0DB;
         border-radius: 20px;
         padding: 32px;
         box-shadow: 0 4px 24px rgba(0,0,0,0.06);
@@ -109,15 +109,15 @@
         align-items: flex-start;
         gap: 10px;
         padding: 14px 16px;
-        border: 1px solid #E5E5E5;
+        border: 1px solid #D6E0DB;
         border-radius: 14px;
-        background: #FAFAFA;
+        background: #F4F7F5;
     }
     .scan-check-icon {
         width: 32px;
         height: 32px;
         border-radius: 8px;
-        background: #EAF0FD;
+        background: #E1F0EA;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -142,38 +142,19 @@
 
 {% block content %}
 <!-- Hero -->
-<section class="scan-hero">
-    <div class="scan-hero-blob" style="width:400px;height:400px;bottom:-120px;right:-40px;opacity:0.45;"></div>
-    <div class="scan-hero-blob" style="width:200px;height:200px;top:-60px;right:200px;opacity:0.35;"></div>
-    <div class="max-w-3xl mx-auto px-5">
-        <p style="font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:16px;">Free AI bill audit</p>
-        <h1>Find the overcharges<br>hiding in your bill.</h1>
-        <p class="scan-hero-sub">Upload a photo of your medical bill. We compare every line item against Medicare rates, flag billing errors, and calculate your potential savings.</p>
+<section class="bk-hero">
+    <div class="bk-wrap" style="max-width: 816px">
+        <h1>Check your hospital bill</h1>
+        <p class="bk-lede">Upload a photo or PDF of your itemized bill. We read every line, compare it with what Medicare pays for the same code and flag duplicates and overlapping charges.</p>
+        <ul class="bk-promise">
+            <li>Free, no account</li>
+            <li>Nothing is sent to the hospital unless you choose to</li>
+        </ul>
         {% if outcome_stats and outcome_stats.show_stat %}
-        <p style="margin-top:18px;font-size:0.88rem;color:rgba(255,255,255,0.75);">BillKarma users recover a median of <strong style="color:#fff;">${{ "%.0f"|format(outcome_stats.median_recovered) }}</strong> per dispute &mdash; based on {{ outcome_stats.total_disputes }} verified outcomes.</p>
+        <p class="bk-muted" style="margin: 16px 0 0; font-size: 15px">BillKarma users recover a median of <strong>${{ "{:,.0f}".format(outcome_stats.median_recovered) }}</strong> per dispute, based on {{ outcome_stats.total_disputes }} verified outcomes.</p>
         {% endif %}
     </div>
 </section>
-
-<!-- Stat strip -->
-<div class="scan-stat-strip">
-    <div class="max-w-3xl mx-auto px-5 flex items-center justify-center w-full" style="gap:0;">
-        <div class="scan-stat-item">
-            <span class="scan-stat-num">1 in 4</span>
-            <span class="scan-stat-label">medical bills contain errors</span>
-        </div>
-        <div class="scan-stat-divider"></div>
-        <div class="scan-stat-item">
-            <span class="scan-stat-num">3.4&times;</span>
-            <span class="scan-stat-label">avg hospital markup over Medicare</span>
-        </div>
-        <div class="scan-stat-divider"></div>
-        <div class="scan-stat-item">
-            <span class="scan-stat-num">&lt; 60s</span>
-            <span class="scan-stat-label">to get your full report</span>
-        </div>
-    </div>
-</div>
 
 <!-- Main content: form + what we check -->
 <section class="max-w-3xl mx-auto px-5 py-8 sm:py-12">

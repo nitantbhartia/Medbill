@@ -11,38 +11,90 @@
 {% block content %}
 <section class="bk-hero">
     <div class="bk-wrap">
-        <p class="bk-eyebrow">{{ guide_count }} guides</p>
-        <h1>Medical billing guides</h1>
-        <p class="bk-lede">Plain-English guides on reading, disputing and paying hospital bills, with the sources listed at the bottom of each one.</p>
+        <h1>Guides to reading, disputing and paying hospital bills</h1>
+        <p class="bk-lede">{{ guide_count }} plain-English guides, each with its sources listed at the bottom.</p>
+        <div class="bk-filter">
+            <label for="guide-filter" class="bk-sr-only">Find a guide</label>
+            <input id="guide-filter" type="search" placeholder="Find a guide, e.g. ambulance, itemized, collections" autocomplete="off">
+        </div>
     </div>
 </section>
 
-<div class="bk-wrap bk-section">
+<div class="bk-wrap" style="padding-top: 48px" id="start-here">
     <h2 class="bk-h2">Start here</h2>
-    <ul class="bk-rows">
+    <ol class="bk-path">
         {% for g in featured %}
         <li>
-            <a class="bk-row-link" href="/guides/{{ g.slug }}/">
-                <span class="bk-row-title">{{ g.title }}</span>
-                <span class="bk-row-sub">{{ g.meta_description }}</span>
+            <a href="/guides/{{ g.slug }}/" data-label="{{ g.label }}">
+                <span class="t">{{ g.title }}</span>
+                <span class="s">{{ g.meta_description | truncate(120, True, '…') }}</span>
             </a>
         </li>
         {% endfor %}
-    </ul>
+    </ol>
 </div>
 
-<div class="bk-wrap bk-section">
-    <h2 class="bk-h2">All guides by topic</h2>
-    {% for group in groups %}
-    <details class="bk-fold">
-        <summary><span>{{ group.name }}</span> <span class="bk-muted">{{ group.count }}</span></summary>
-        <ul class="bk-link-list">
-            {% for g in group.guides %}
-            <li><a href="/guides/{{ g.slug }}/">{{ g.title }}</a></li>
-            {% endfor %}
-        </ul>
-        <a class="bk-fold-all" href="/guides/category/{{ group.slug }}/">See {{ group.name }} with summaries &rarr;</a>
-    </details>
-    {% endfor %}
+<div class="bk-wrap" style="padding-top: 64px; padding-bottom: 88px">
+    <h2 class="bk-h2" id="topics-heading">All guides by topic</h2>
+    <div class="bk-topics">
+        {% for group in groups %}
+        <section class="bk-topic" aria-labelledby="topic-{{ group.slug }}">
+            <div class="bk-topic-head">
+                <h3 id="topic-{{ group.slug }}">{{ group.name }}</h3>
+                <a href="/guides/category/{{ group.slug }}/">{{ group.count }} guides</a>
+            </div>
+            <ul class="bk-guide-list">
+                {% for g in group.guides %}
+                <li{% if loop.index > config.GUIDES_PER_TOPIC %} class="bk-more"{% endif %}><a href="/guides/{{ g.slug }}/">{{ g.title }}<span class="bk-chev"></span></a></li>
+                {% endfor %}
+            </ul>
+            {% if group.count > config.GUIDES_PER_TOPIC %}
+            <button type="button" class="bk-topic-toggle" aria-expanded="false">Show all {{ group.count }}</button>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </div>
+    <p class="bk-empty" id="guide-empty" hidden>No guide matches that. Try a shorter word, or <a href="/scan">check your bill</a> and we&rsquo;ll tell you what applies.</p>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var input = document.getElementById('guide-filter');
+    var topics = Array.prototype.slice.call(document.querySelectorAll('.bk-topic'));
+    var start = document.getElementById('start-here');
+    var empty = document.getElementById('guide-empty');
+
+    topics.forEach(function (topic) {
+        var button = topic.querySelector('.bk-topic-toggle');
+        if (!button) return;
+        var label = button.textContent;
+        button.addEventListener('click', function () {
+            var open = topic.classList.toggle('open');
+            button.setAttribute('aria-expanded', open);
+            button.textContent = open ? 'Show fewer' : label;
+        });
+    });
+
+    input.addEventListener('input', function () {
+        var q = input.value.trim().toLowerCase();
+        var shown = 0;
+        start.hidden = q.length > 0;
+        topics.forEach(function (topic) {
+            var hits = 0;
+            topic.querySelectorAll('.bk-guide-list li').forEach(function (li) {
+                var match = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+                li.style.display = q ? (match ? 'list-item' : 'none') : '';
+                if (match) hits++;
+            });
+            topic.hidden = q && hits === 0;
+            var button = topic.querySelector('.bk-topic-toggle');
+            if (button) button.hidden = q.length > 0;
+            shown += hits;
+        });
+        empty.hidden = !q || shown > 0;
+    });
+})();
+</script>
 {% endblock %}

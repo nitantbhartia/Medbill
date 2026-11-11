@@ -66,7 +66,7 @@
 
     .answer-box {
         border-left: 4px solid var(--bk-green);
-        background: #EAF0FD;
+        background: #E1F0EA;
         padding: 20px 24px;
         border-radius: 0 12px 12px 0;
         margin-bottom: 28px;
@@ -82,7 +82,7 @@
         border-radius: 12px;
         padding: 18px 20px;
     }
-    .stat-card .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--bk-secondary); margin-bottom: 6px; }
+    .stat-card .label { font-size: 0.72rem;   color: var(--bk-secondary); margin-bottom: 6px; }
     .stat-card .value { font-size: 1.6rem; font-weight: 800; color: var(--bk-black); line-height: 1; }
     .stat-card .sub { font-size: 0.75rem; color: var(--bk-secondary); margin-top: 4px; }
 
@@ -96,10 +96,10 @@
     .provider-card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--bk-gray-border); }
     .provider-card-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--bk-black); margin: 0; }
     .provider-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .provider-table th { text-align: left; padding: 10px 16px; background: #F9FAFB; color: var(--bk-secondary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--bk-gray-border); }
+    .provider-table th { text-align: left; padding: 10px 16px; background: #F4F7F5; color: var(--bk-secondary); font-size: 0.72rem;   border-bottom: 1px solid var(--bk-gray-border); }
     .provider-table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
     .provider-table tr:last-child td { border-bottom: none; }
-    .provider-table tbody tr:hover { background: #F9FAFB; }
+    .provider-table tbody tr:hover { background: #F4F7F5; }
     .provider-table .provider-name { font-weight: 600; color: var(--bk-black); text-decoration: none; }
     .provider-table .provider-name:hover { color: var(--bk-green); }
     .provider-table .provider-city { color: var(--bk-secondary); font-size: 0.82rem; }
@@ -111,10 +111,10 @@
         font-size: 0.78rem;
         font-weight: 600;
     }
-    .ratio-green { background: #EAF0FD; color: #163A9C; }
+    .ratio-green { background: #E1F0EA; color: #08503F; }
     .ratio-yellow { background: #FEF3C7; color: #92400E; }
     .ratio-red { background: #FEE2E2; color: #991B1B; }
-    .ratio-gray { background: #F3F4F6; color: #6B7280; }
+    .ratio-gray { background: #F3F4F6; color: #5E6F69; }
 
     .pills-section { margin-bottom: 28px; }
     .pills-section h2 { font-size: 1rem; font-weight: 700; color: var(--bk-black); margin-bottom: 12px; }
@@ -130,7 +130,7 @@
         background: #fff;
         transition: background 0.15s, border-color 0.15s;
     }
-    .pill:hover { background: #EAF0FD; border-color: var(--bk-green); color: var(--bk-green); }
+    .pill:hover { background: #E1F0EA; border-color: var(--bk-green); color: var(--bk-green); }
 
     .cta-banner {
         background: var(--bk-green);
@@ -151,7 +151,7 @@
         text-decoration: none;
         font-size: 0.95rem;
     }
-    .cta-btn:hover { background: #EAF0FD; }
+    .cta-btn:hover { background: #E1F0EA; }
 
     .empty-state { padding: 32px 24px; text-align: center; color: var(--bk-secondary); font-size: 0.9rem; }
 
@@ -313,10 +313,10 @@
 
     {# CTA banner #}
     <div class="cta-banner">
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);margin-bottom:8px;">Free · No Account Needed</div>
+        <div style="font-size:.7rem;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:8px;">Free · No Account Needed</div>
         <h2>Got a bill for {{ procedure.name }}?</h2>
         <p>Upload it and we'll compare every charge against the Medicare rate{% if profile.medicare_rate %} of <strong style="color:#fff;">${{ "{:,.0f}".format(profile.medicare_rate) }}</strong>{% endif %} — flagging overcharges instantly.</p>
-        <a href="/scan" class="cta-btn">Scan My Bill Free &rarr;</a>
+        <a href="/scan" class="cta-btn">Scan My Bill Free</a>
         <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:12px;">Takes 60 seconds &middot; Results are instant</div>
     </div>
 
