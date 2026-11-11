@@ -39,3 +39,8 @@ def test_duplicate_slug_registration_is_rejected():
     except ValueError:
         return
     raise AssertionError("duplicate registration should raise")
+
+
+def test_data_guides_are_not_shadowed_by_the_guide_slug_route():
+    assert client.get("/guides/most-expensive-states-healthcare-2026/").status_code == 200
+    assert client.get("/guides/cheapest-cities-knee-replacement-2026/").status_code == 200
