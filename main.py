@@ -1254,9 +1254,28 @@ async def procedures_index(request: Request):
         "procedures": procs,
         "canonical_url": canonical_url,
         "og_title": "Hospital Procedure Cost Guide | BillKarma",
-        "meta_description": "Compare what hospitals charge vs Medicare rates for 16 common procedures. Free data for every major US city.",
+        "meta_description": "Estimated hospital charges for 16 common procedures by state and city, next to what Medicare pays the surgeon. Check your own bill free.",
         "meta_robots": "index, follow",
     })
+
+
+@app.get("/procedures/{slug}-cost/", response_class=HTMLResponse)
+async def procedure_content_page(request: Request, slug: str):
+    data = get_content_page_data(f"{slug}-cost")
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"}, status_code=404)
+    return templates.TemplateResponse(
+        "procedure_cost_guide.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/procedures/{slug}-cost/",
+            "meta_description": data["seo"]["meta_description"],
+            "og_title": data["content_heading"] + " | BillKarma",
+            "og_description": data["seo"]["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/procedures/{slug}/", response_class=HTMLResponse)
@@ -1308,8 +1327,8 @@ async def procedure_hub(request: Request, slug: str):
     medicare_rate = ref.get("medicare_rate", 0)
     canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{slug}/"
     meta_description = (
-        f"{proc['name']} cost: national average ${national_avg:,}, Medicare rate ${medicare_rate:,}. "
-        f"Compare prices by city and state. Find fair prices with BillKarma."
+        f"{proc['name']} cost: estimated U.S. hospital charge ${national_avg:,}, by state and city. "
+        f"Medicare pays the surgeon ${medicare_rate:,}. Check your own bill free."
     )
     related_procedures = [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != slug]
     return templates.TemplateResponse("procedure_hub.html", {
@@ -1320,7 +1339,7 @@ async def procedure_hub(request: Request, slug: str):
         "state_costs": state_costs,
         "related_procedures": related_procedures,
         "canonical_url": canonical_url,
-        "og_title": f"{proc['name']} Cost: What Hospitals Charge vs Medicare | BillKarma",
+        "og_title": f"{proc['name']} Cost by State and City (Estimates) | BillKarma",
         "meta_description": meta_description,
     })
 
@@ -1344,8 +1363,9 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
         medicare_rate = profile.get("medicare_rate") if profile else None
         avg_str = f"${avg_charge:,.0f}" if avg_charge else "varies"
         meta_description = (
-            f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
-            f"Compare prices vs Medicare rate ${medicare_rate:,.0f}. Find fair prices with BillKarma."
+            f"{proc['name']} cost in {city['name']}, {city['state']}: {avg_str} "
+            f"{'estimated' if (profile or {}).get('data_source') == 'cms_static' else 'average list price'}. "
+            f"Medicare pays the surgeon ${medicare_rate:,.0f}. Check your own bill free."
             if medicare_rate else
             f"{proc['name']} cost in {city['name']}, {city['state']}. Compare hospital prices with BillKarma."
         )
@@ -1378,8 +1398,8 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
     ]
     canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{location_slug}/"
     meta_description = (
-        f"{proc['name']} cost in {state['name']}: average ${state_avg:,} vs Medicare rate ${medicare_rate:,}. "
-        f"Compare prices across {len(city_costs)} cities. Find fair prices with BillKarma."
+        f"{proc['name']} cost in {state['name']}: estimated hospital charge ${state_avg:,}. "
+        f"Medicare pays the surgeon ${medicare_rate:,}. See cities and check your own bill free."
     )
     return templates.TemplateResponse("procedure_state.html", {
         "request": request,
@@ -1401,12 +1421,14 @@ async def press_page(request: Request):
     from guides import list_guides
     canonical_url = f"{config.APP_URL.rstrip('/')}/press/"
     guide_count = len(list_guides())
+    import research_report
+    coverage = research_report.coverage()
     stats = {
-        "hospitals_tracked": 6000,
+        "hospitals_tracked": coverage["hospitals"],
+        "hospitals_with_prices": coverage["hospitals_with_prices"],
         "guides_published": guide_count,
-        "avg_markup": 4.2,
-        "states_covered": 51,
-        "data_year": "2026",
+        "states_covered": coverage["states"],
+        "data_year": coverage["data_year"] or "",
     }
     return templates.TemplateResponse(
         "press.html",
@@ -1709,12 +1731,21 @@ async def state_protections_map(request: Request):
 
 @app.get("/research/2026-medical-billing-report/", response_class=HTMLResponse)
 async def annual_report_2026(request: Request):
+    """Hospital list-price report built live from hospitals' own price files."""
+    import research_report
     canonical_url = f"{config.APP_URL.rstrip('/')}/research/2026-medical-billing-report/"
+    spreads = research_report.procedure_spreads()
+    widest = max(spreads, key=lambda s: s["spread"] or 0) if spreads else None
     return templates.TemplateResponse("annual_report_2026.html", {
         "request": request,
         "canonical_url": canonical_url,
-        "og_title": "2026 Medical Billing Errors Report | BillKarma Research",
-        "meta_description": "BillKarma analyzed thousands of medical bills in 2026. Key findings: 1 in 3 bills contain errors, average overcharge $1,300, cardiac bills have highest error rate.",
+        "spreads": spreads,
+        "widest": widest,
+        "states": research_report.state_medians(),
+        "state_code": config.REPORT_STATE_CODE,
+        "coverage": research_report.coverage(),
+        "og_title": "2026 Hospital Price Report: Same Procedure, Different Price | BillKarma",
+        "meta_description": "What U.S. hospitals list for the same procedure in their own price files, how far prices spread between hospitals, and how states compare. Free to cite.",
         "meta_robots": "index, follow",
     })
 
@@ -2083,25 +2114,6 @@ async def imaging_detail(request: Request, state_slug: str, city_slug: str, slug
             "canonical_url": f"{config.APP_URL.rstrip('/')}/imaging/{state_slug}/{city_slug}/{slug}/",
             "meta_description": data["seo"]["meta_description"],
             "og_title": data["seo"]["page_title"],
-            "og_description": data["seo"]["meta_description"],
-            "meta_robots": "index, follow",
-        },
-    )
-
-
-@app.get("/procedures/{slug}-cost/", response_class=HTMLResponse)
-async def procedure_content_page(request: Request, slug: str):
-    data = get_content_page_data(f"{slug}-cost")
-    if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"}, status_code=404)
-    return templates.TemplateResponse(
-        "procedure_cost_guide.html",
-        {
-            "request": request,
-            "data": data,
-            "canonical_url": f"{config.APP_URL.rstrip('/')}/procedures/{slug}-cost/",
-            "meta_description": data["seo"]["meta_description"],
-            "og_title": data["content_heading"] + " | BillKarma",
             "og_description": data["seo"]["meta_description"],
             "meta_robots": "index, follow",
         },

@@ -14,188 +14,60 @@
   ]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Dataset",
-  "name": "{{ procedure.name }} Cost by City — BillKarma 2026",
-  "description": "Hospital chargemaster prices vs CMS Medicare rates for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) across {{ city_costs|length }} US cities.",
-  "keywords": ["{{ procedure.name }}", "CPT {{ procedure.cpt_code }}", "hospital costs", "Medicare rates", "medical pricing"],
-  "creator": {"@type": "Organization", "name": "BillKarma", "url": "{{ request.url.scheme }}://{{ request.url.netloc }}/"},
-  "license": "https://creativecommons.org/licenses/by/4.0/",
-  "variableMeasured": ["Average Hospital Charge", "Medicare Reference Rate", "Charge-to-Medicare Markup Ratio"],
-  "spatialCoverage": {"@type": "Place", "name": "United States"},
-  "temporalCoverage": "2026",
-  "isBasedOn": {"@type": "CreativeWork", "name": "CMS Physician Fee Schedule 2026", "url": "https://www.cms.gov/medicare/payment/fee-schedules/physician"}
-}
-</script>
-{% if ref.medicare_rate %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How much does {{ procedure.name }} cost?",
-      "acceptedAnswer": {"@type": "Answer", "text": "The national average hospital charge for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) is ${{ "{:,}".format(ref.avg_charge) }}. The Medicare reference rate is ${{ "{:,}".format(ref.medicare_rate) }}, meaning hospitals charge about {{ "%.1f"|format(ref.avg_charge / ref.medicare_rate) }}x the Medicare rate on average."}
-    },
-    {
-      "@type": "Question",
-      "name": "What does Medicare pay for {{ procedure.name }}?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Medicare pays ${{ "{:,}".format(ref.medicare_rate) }} for {{ procedure.name }} (CPT {{ procedure.cpt_code }}). This is the federal benchmark rate and the best reference point for determining whether a hospital is charging a fair price."}
-    },
-    {
-      "@type": "Question",
-      "name": "Which city has the cheapest {{ procedure.name }}?",
-      "acceptedAnswer": {"@type": "Answer", "text": "{% if city_costs %}Among major US cities, {{ city_costs[0].name }}, {{ city_costs[0].state }} has the lowest average charge at ${{ "{:,}".format(city_costs[0].avg_charge) }} for {{ procedure.name }}.{% endif %}"}
-    }
-  ]
-}
-</script>
-{% endif %}
-<style>
-  .hub-hero { background: linear-gradient(135deg, #0C6B55 0%, #08503F 100%); color: #fff; padding: 64px 24px 72px; border-radius: 0 0 40px 40px; }
-  .hub-hero-inner { max-width: 860px; margin: 0 auto; }
-  .hub-hero-crumb { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: 12px; }
-  .hub-hero-crumb a { color: rgba(255,255,255,.85); text-decoration: underline; }
-  .hub-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: #fff; margin: 0 0 20px; }
-  .hub-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
-  .hub-stat { background: rgba(255,255,255,.15); border-radius: 12px; padding: 14px 20px; min-width: 140px; }
-  .hub-stat-label { font-size: .72rem; font-weight: 700;   color: rgba(255,255,255,.7); margin-bottom: 4px; }
-  .hub-stat-value { font-size: 1.5rem; font-weight: 800; color: #fff; }
-
-  .hub-body { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
-  .answer-box { background: #E1F0EA; border-left: 4px solid #0C6B55; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 32px; font-size: 1rem; line-height: 1.6; }
-  .answer-box strong { display: block; font-size: .72rem; font-weight: 700;   color: #0C6B55; margin-bottom: 6px; }
-
-  .hub-table-wrap { overflow-x: auto; margin-bottom: 40px; }
-  .hub-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-  .hub-table thead th { background: #F4F7F5; text-align: left; padding: 10px 14px; font-size: .75rem; font-weight: 700;   color: #5E6F69; border-bottom: 2px solid #D6E0DB; }
-  .hub-table tbody td { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; }
-  .hub-table tbody tr:hover { background: #F4F7F5; }
-  .hub-table a { color: #0C6B55; font-weight: 600; text-decoration: none; }
-  .hub-table a:hover { text-decoration: underline; }
-  .markup-low { color: #0C6B55; font-weight: 700; }
-  .markup-med { color: #D97706; font-weight: 700; }
-  .markup-high { color: #DC2626; font-weight: 700; }
-
-  .hub-section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; margin: 40px 0 16px; }
-  .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 40px; }
-  .state-card { background: #fff; border: 1px solid #D6E0DB; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #16302A; font-size: .88rem; transition: border-color .15s; }
-  .state-card:hover { border-color: #0C6B55; }
-  .state-card strong { display: block; font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
-  .state-card span { color: #5E6F69; font-size: .8rem; }
-  .proc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
-  .proc-pill { background: #F3F4F6; border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 600; text-decoration: none; color: #374842; }
-  .proc-pill:hover { background: #E1F0EA; color: #0C6B55; }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="hub-hero">
-  <div class="hub-hero-inner">
-    <div class="hub-hero-crumb">
-      <a href="/procedures/">Procedure Costs</a> &rsaquo; {{ procedure.name }}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/procedures/">Procedure costs</a> / {{ procedure.name }}</p>
+        <h1>{{ procedure.name }} cost</h1>
+        <p class="bk-lede">An estimated U.S. hospital charge for {{ procedure.name | lower }} (code {{ procedure.cpt_code }}), by state and city, and what Medicare pays the surgeon for it.</p>
+        <div class="bk-proc-figures">
+            {% if ref.avg_charge %}<div><strong>${{ "{:,}".format(ref.avg_charge) }}</strong><span>Estimated U.S. charge</span></div>{% endif %}
+            {% if city_costs %}<div><strong>${{ "{:,}".format(city_costs[0].avg_charge) }}&ndash;${{ "{:,}".format(city_costs[-1].avg_charge) }}</strong><span>Estimated range across {{ city_costs | length }} cities</span></div>{% endif %}
+            {% if ref.medicare_rate %}<div><strong>${{ "{:,}".format(ref.medicare_rate) }}</strong><span>Medicare surgeon fee</span></div>{% endif %}
+        </div>
     </div>
-    <h1>{{ procedure.name }} Cost: What Hospitals Charge vs Medicare</h1>
-    <div class="hub-stats">
-      {% if ref.avg_charge %}
-      <div class="hub-stat">
-        <div class="hub-stat-label">National Avg Charge</div>
-        <div class="hub-stat-value">${{ "{:,}".format(ref.avg_charge) }}</div>
-      </div>
-      {% endif %}
-      {% if ref.medicare_rate %}
-      <div class="hub-stat">
-        <div class="hub-stat-label">Medicare Rate</div>
-        <div class="hub-stat-value">${{ "{:,}".format(ref.medicare_rate) }}</div>
-      </div>
-      {% endif %}
-      {% if ref.avg_charge and ref.medicare_rate %}
-      <div class="hub-stat">
-        <div class="hub-stat-label">Avg Markup</div>
-        <div class="hub-stat-value">{{ "%.1f"|format(ref.avg_charge / ref.medicare_rate) }}x</div>
-      </div>
-      {% endif %}
-      <div class="hub-stat">
-        <div class="hub-stat-label">CPT Code</div>
-        <div class="hub-stat-value">{{ procedure.cpt_code }}</div>
-      </div>
+</section>
+
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 88px">
+    <div class="bk-category-layout">
+        <div>
+            <h2 class="bk-h3">By state</h2>
+            <ul class="bk-chips">
+                {% for st in state_costs %}
+                <li><a href="/costs/{{ procedure.slug }}/{{ st.state_slug }}/">{{ st.state_name }} <span class="bk-est">${{ "{:,}".format(st.avg_charge) }}</span></a></li>
+                {% endfor %}
+            </ul>
+
+            <h2 class="bk-h3" style="margin-top: 40px">By city, lowest first</h2>
+            <div class="bk-table-box">
+                <table class="bk-table">
+                    <thead><tr><th>City</th><th>Estimated charge</th></tr></thead>
+                    <tbody>
+                        {% for c in city_costs %}
+                        <tr><td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}, {{ c.state }}</a></td><td class="bk-num">${{ "{:,}".format(c.avg_charge) }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% include "_estimate_note.html" %}
+        </div>
+        <aside>
+            <div class="bk-side-card">
+                <h2>Billed for {{ procedure.name | lower }}?</h2>
+                <p>Upload your itemized bill to see each line next to what Medicare pays for the same code. Free.</p>
+                <a href="/scan" class="bk-btn bk-btn-block">Check my bill free</a>
+            </div>
+            <nav class="bk-side-card" style="margin-top: 14px" aria-label="Other procedures">
+                <h2>Other procedures</h2>
+                <ul class="bk-guide-list">
+                    {% for p in related_procedures %}
+                    <li><a href="/procedures/{{ p.slug }}/">{{ p.name }}<span class="bk-chev"></span></a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </aside>
     </div>
-  </div>
-</div>
-
-<div class="hub-body">
-  {% if ref.avg_charge and ref.medicare_rate %}
-  <div class="answer-box">
-    <strong>Quick Answer</strong>
-    The national average hospital charge for {{ procedure.name }} is <strong>${{ "{:,}".format(ref.avg_charge) }}</strong>,
-    compared to the Medicare reference rate of <strong>${{ "{:,}".format(ref.medicare_rate) }}</strong> — a
-    <strong>{{ "%.1f"|format(ref.avg_charge / ref.medicare_rate) }}x</strong> markup.
-    Costs vary significantly by location: the cheapest major city averages ${{ "{:,}".format(city_costs[0].avg_charge) if city_costs else "N/A" }}
-    and the most expensive averages ${{ "{:,}".format(city_costs[-1].avg_charge) if city_costs else "N/A" }}.
-  </div>
-  {% endif %}
-
-  <h2 class="hub-section-title">{{ procedure.name }} Cost by City ({{ city_costs|length }} Cities)</h2>
-  <div class="hub-table-wrap">
-    <table class="hub-table">
-      <thead>
-        <tr>
-          <th>City</th>
-          <th>State</th>
-          <th>Avg Hospital Charge</th>
-          <th>Medicare Rate</th>
-          <th>Markup</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in city_costs %}
-        <tr>
-          <td><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}</a></td>
-          <td>{{ c.state }}</td>
-          <td>${{ "{:,}".format(c.avg_charge) }}</td>
-          <td>${{ "{:,}".format(c.medicare_rate) }}</td>
-          <td class="{% if c.markup_ratio <= 5 %}markup-low{% elif c.markup_ratio <= 10 %}markup-med{% else %}markup-high{% endif %}">
-            {{ "%.1f"|format(c.markup_ratio) }}x
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div style="background:#16302A;border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
-    <div style="text-align:left;">
-      <div style="font-size:.7rem;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:6px;">Free Analysis</div>
-      <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:4px;">Got a bill for {{ procedure.name }}?</div>
-      <div style="font-size:.85rem;color:rgba(255,255,255,.65);">Compare every charge against the ${{ "{:,}".format(ref.medicare_rate) if ref.medicare_rate else "Medicare" }} benchmark. Free, instant.</div>
-    </div>
-    <a href="/scan" style="background:var(--bk-green,#0C6B55);color:#fff;border-radius:999px;padding:13px 28px;font-weight:800;font-size:.95rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Scan My Bill Free</a>
-  </div>
-
-  <h2 class="hub-section-title">{{ procedure.name }} Cost by State</h2>
-  <div class="state-grid">
-    {% for s in state_costs %}
-    <a href="/costs/{{ procedure.slug }}/{{ s.state_slug }}/" class="state-card">
-      <strong>{{ s.state_name }}</strong>
-      <span>${{ "{:,}".format(s.avg_charge) }} avg &middot; {{ s.state }}</span>
-    </a>
-    {% endfor %}
-  </div>
-
-  <h2 class="hub-section-title">Other Procedure Costs</h2>
-  <div class="proc-pills">
-    {% for p in related_procedures %}
-    <a href="/procedures/{{ p.slug }}/" class="proc-pill">{{ p.name }}</a>
-    {% endfor %}
-  </div>
-
-  <p style="font-size:.78rem;color:#9CA3AF;margin-top:32px;">
-    Cost estimates based on CMS Medicare fee schedule and national hospital chargemaster averages adjusted by state cost indices.
-    Actual charges vary by facility and insurance. Not medical or financial advice.
-    <a href="/guides/how-to-get-itemized-hospital-bill/" style="color:#0C6B55;">Learn how to read your bill</a>
-  </p>
 </div>
 {% endblock %}

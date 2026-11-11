@@ -13,53 +13,32 @@
   ]
 }
 </script>
-<style>
-  .proc-hero { background: linear-gradient(135deg, #0C6B55 0%, #08503F 100%); color: #fff; padding: 64px 24px 72px; border-radius: 0 0 40px 40px; text-align: center; }
-  .proc-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 14px; color: #fff; }
-  .proc-hero p { font-size: 1.1rem; color: rgba(255,255,255,0.85); max-width: 560px; margin: 0 auto; }
-  .proc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1100px; margin: 48px auto; padding: 0 24px; }
-  .proc-card { background: #fff; border: 1px solid #D6E0DB; border-radius: 14px; padding: 22px 24px; text-decoration: none; color: #16302A; transition: border-color .15s, box-shadow .15s; display: block; }
-  .proc-card:hover { border-color: #0C6B55; box-shadow: 0 4px 16px rgba(5,150,105,.1); }
-  .proc-card-cpt { font-size: .7rem; font-weight: 700;   color: #0C6B55; margin-bottom: 6px; }
-  .proc-card h2 { font-size: 1.05rem; font-weight: 700; margin: 0 0 10px; }
-  .proc-card-stats { display: flex; gap: 14px; flex-wrap: wrap; font-size: .82rem; color: #5E6F69; }
-  .proc-card-stat strong { display: block; font-size: .95rem; font-weight: 700; color: #16302A; }
-  .proc-intro { max-width: 760px; margin: 0 auto 8px; padding: 32px 24px 0; text-align: center; font-size: 1rem; color: #4B5563; line-height: 1.7; }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="proc-hero">
-  <h1>Procedure Cost Directory</h1>
-  <p>Compare what hospitals charge vs Medicare reference rates for 16 common procedures — by city and by state.</p>
-</div>
-
-<p class="proc-intro">
-  Select a procedure to see what hospitals charge versus the Medicare benchmark rate across 50 major US cities.
-  Hospitals typically charge <strong>4–18x Medicare rates</strong> on their list price — but the actual range varies widely by location.
-</p>
-
-<div class="proc-grid">
-  {% for p in procedures %}
-  <a href="/procedures/{{ p.slug }}/" class="proc-card">
-    <div class="proc-card-cpt">CPT {{ p.cpt }}</div>
-    <h2>{{ p.name }}</h2>
-    <div class="proc-card-stats">
-      {% if p.avg_charge %}
-      <div class="proc-card-stat"><strong>${{ "{:,}".format(p.avg_charge) }}</strong>Avg Charge</div>
-      {% endif %}
-      {% if p.medicare_rate %}
-      <div class="proc-card-stat"><strong>${{ "{:,}".format(p.medicare_rate) }}</strong>Medicare Rate</div>
-      {% endif %}
-      {% if p.avg_charge and p.medicare_rate %}
-      <div class="proc-card-stat"><strong>{{ "%.1f"|format(p.avg_charge / p.medicare_rate) }}x</strong>Markup</div>
-      {% endif %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>What common procedures cost</h1>
+        <p class="bk-lede">Estimated hospital charges for {{ procedures | length }} common procedures, by state and city, next to what Medicare pays the surgeon.</p>
     </div>
-  </a>
-  {% endfor %}
-</div>
+</section>
 
-<div style="max-width:760px;margin:0 auto 48px;padding:0 24px;text-align:center;font-size:.82rem;color:#9CA3AF;">
-  Prices based on CMS Medicare fee schedule and national hospital chargemaster averages. Actual charges vary by facility. Not medical or financial advice.
+<div class="bk-wrap" style="padding-top: 40px; padding-bottom: 88px">
+    <div class="bk-table-box" style="margin-top: 0">
+        <table class="bk-table bk-proc-table">
+            <thead><tr><th>Procedure</th><th>Code</th><th>Estimated charge</th><th>Medicare surgeon fee</th></tr></thead>
+            <tbody>
+                {% for p in procedures %}
+                <tr>
+                    <td><a href="/procedures/{{ p.slug }}/"><strong>{{ p.name }}</strong></a></td>
+                    <td class="bk-num">{{ p.cpt }}</td>
+                    <td class="bk-num">{% if p.avg_charge %}${{ "{:,}".format(p.avg_charge) }}{% endif %}</td>
+                    <td class="bk-num">{% if p.medicare_rate %}${{ "{:,}".format(p.medicare_rate) }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "_estimate_note.html" %}
 </div>
 {% endblock %}
