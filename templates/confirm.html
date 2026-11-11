@@ -34,6 +34,15 @@
         </p>
     </div>
 
+    {% set coded_items = data.line_items | selectattr('cpt_code') | list %}
+    {% if data.bill and not coded_items %}
+    <div class="bk-note bk-summary-bill">
+        <h2 class="bk-h3">This looks like a summary bill</h2>
+        <p>We couldn&rsquo;t find billing codes on it, and the check needs them to compare each charge with Medicare. Ask the hospital for the itemized version; you have a right to it, and we&rsquo;ll write the request.</p>
+        <a class="bk-btn" href="/itemized-bill?provider={{ (data.bill.provider_name or '') | urlencode }}">Request the itemized bill</a>
+    </div>
+    {% endif %}
+
     {% if data.bill %}
     {% set sums = namespace(charged=0, patient=0, has_patient=false) %}
     {% for item in data.line_items %}

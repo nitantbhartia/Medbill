@@ -30,6 +30,8 @@ register("how-to-get-itemized-hospital-bill", {
 
 <p class="lead">Your hospital probably didn&rsquo;t give you an itemized bill. They sent you a summary: a single page showing a total charge of $18,400 or $52,000 or whatever the number is. That summary is nearly useless for catching errors. The itemized bill&mdash;the one showing every single charge, line by line, with procedure codes&mdash;is the document you need. Here is how to get it and what to do with it.</p>
 
+<div class="key-takeaway"><strong>Skip the template.</strong> <a href="/itemized-bill">Find your hospital and we&rsquo;ll write the request</a> with its billing address filled in, ready to copy, print or email. Free.</div>
+
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>

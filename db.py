@@ -1864,6 +1864,17 @@ CREATE TABLE IF NOT EXISTS followup_queue (
 CREATE INDEX IF NOT EXISTS idx_followup_case ON followup_queue(case_id);
 CREATE INDEX IF NOT EXISTS idx_followup_scheduled ON followup_queue(scheduled_for, sent_at);
 
+-- Itemized-bill requests: only what the reminder needs, never the letter itself
+CREATE TABLE IF NOT EXISTS itemized_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    hospital_name TEXT NOT NULL,
+    remind_on DATE NOT NULL,
+    reminded_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_itemized_requests_remind ON itemized_requests(remind_on, reminded_at);
+
 -- Concierge: denied-claim appeals
 CREATE TABLE IF NOT EXISTS appeal_cases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

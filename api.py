@@ -2520,3 +2520,40 @@ async def autopilot_activate_api(request: Request):
     )
 
     return {"status": "ok", "case_id": result.get("case_id")}
+
+
+# ── Itemized-bill requests ───────────────────────────────────────────────────
+
+@router.get("/billing-contacts")
+async def billing_contacts(q: str = ""):
+    """Hospitals matching a name or city, with the billing address and phone."""
+    from itemized_request import find_billing_contacts
+    return {"status": "ok", "data": find_billing_contacts(q)}
+
+
+@router.post("/itemized-bill/letter")
+async def itemized_bill_letter(request: Request):
+    """Write an itemized-bill request letter. Nothing typed here is stored."""
+    from itemized_request import build_request_letter, validate_letter_request
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        raise HTTPException(429, "Too many requests. Try again in a little while.")
+    payload = await _parse_json_object(request)
+    _assert_payload_size(payload, config.MAX_TOOL_PAYLOAD_BYTES, "That's more text than a request letter needs.")
+    problems = validate_letter_request(payload)
+    if problems:
+        raise HTTPException(400, " ".join(problems))
+    return {"status": "ok", "data": build_request_letter(payload)}
+
+
+@router.post("/itemized-bill/reminder")
+async def itemized_bill_reminder(request: Request):
+    """Email the patient when the hospital's 30 days are up."""
+    from itemized_request import save_reminder
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        raise HTTPException(429, "Too many requests. Try again in a little while.")
+    payload = await _parse_json_object(request)
+    try:
+        remind_on = save_reminder(payload.get("email", ""), payload.get("hospital_name", ""))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return {"status": "ok", "data": {"remind_on": remind_on}}
