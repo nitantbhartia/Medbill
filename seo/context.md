@@ -52,7 +52,7 @@ Fees as published by each company, checked 2026-11-11.
 
 | Name | Model | Source |
 | --- | --- | --- |
-| Resolve | Human advocates, 10–25% of savings, refundable deposit, $5,000 minimum bill | [CareRoute comparison](https://www.careroute.ai/bill-defense/compare-medical-bill-negotiation-services) |
+| Resolve | Human advocates; $250/$499 refundable deposit; 25% of savings (min fee $1,000, at most 50% of savings) under $15k, 10% (min $2,500) at $15k+ | [Resolve pricing FAQ](https://resolvemedicalbills.com/faqs/how-much-does-it-cost-to-work-with-resolve) |
 | Goodbill | Software + experts, 20% of savings | [Goodbill help](https://help.goodbill.com/en/articles/254209) |
 | CareRoute | 18–25% of savings, $1,000 cap | [CareRoute](https://www.careroute.ai/bill-defense) |
 | MyCareCost | Self-serve data and scripts, $0–18 per search | [MyCareCost](https://mycarecost.net/compare/fairmedbill) |
