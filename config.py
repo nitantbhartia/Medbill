@@ -174,3 +174,9 @@ SEO_META_MAX_CHARS = 155
 
 # Google Search Console HTML-tag verification code (the content="..." value only)
 GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
+
+# State "most expensive hospitals" ranking pages
+RANKING_MIN_PROCEDURES = 5   # a hospital needs this many priced procedures to be ranked
+RANKING_MIN_HOSPITALS = 5    # a state needs this many ranked hospitals to get a page
+RANKING_TOP_COUNT = 25       # hospitals shown in the most-expensive list
+RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list

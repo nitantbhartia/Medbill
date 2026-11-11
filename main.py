@@ -42,6 +42,7 @@ from procedure_pages import (
     get_top_cpt_codes,
 )
 from procedure_content import get_content_page_data
+from hospital_rankings import get_ranked_state_slugs, get_state_ranking, ranking_description, ranking_title
 from tools_catalog import list_tools, get_tool
 from access_control import require_bill_access, require_case_access
 
@@ -1718,6 +1719,7 @@ async def hospital_state_page(
             "state_name": state_name,
             "state_slug": state_slug,
             "cities": cities,
+            "has_ranking": state_slug in get_ranked_state_slugs(),
             "sort": sort,
             "ownership": ownership,
             "page": page,
@@ -1732,6 +1734,31 @@ async def hospital_state_page(
     if has_params:
         resp.headers["X-Robots-Tag"] = "noindex, follow"
     return resp
+
+
+@app.get("/hospitals/{state_slug}/most-expensive/", response_class=HTMLResponse)
+async def hospital_state_ranking(request: Request, state_slug: str):
+    """Registered before the city route, which would otherwise match 'most-expensive'."""
+    ranking = get_state_ranking(state_slug)
+    if not ranking:
+        return templates.TemplateResponse(
+            "error.html", {"request": request, "message": "Not enough hospital price data for this state yet."}, status_code=404
+        )
+    title = ranking_title(ranking)
+    description = ranking_description(ranking)
+    return templates.TemplateResponse(
+        "hospitals_ranking.html",
+        {
+            "request": request,
+            "r": ranking,
+            "page_title": title,
+            "meta_description": description,
+            "og_title": title,
+            "og_description": description,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/most-expensive/",
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/hospitals/{state_slug}/{city_slug}/", response_class=HTMLResponse)
