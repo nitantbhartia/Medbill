@@ -506,6 +506,28 @@ input, select, textarea { font: inherit; min-width: 0; max-width: 100%; }
 .bk-ai-asks li { background: var(--paper); border: 1px solid var(--rule); border-radius: 16px 16px 16px 4px; padding: 16px 18px; font-size: 16.5px; }
 @media (max-width: 820px) { .bk-ai-grid, .bk-ai-asks { grid-template-columns: 1fr; } }
 
+/* ---------- Dispute dashboard ---------- */
+.bk-deliver { border: 2px solid var(--action); margin-bottom: 28px; }
+.bk-deliver p { color: var(--ink-2); margin: 8px 0 16px; }
+.bk-timeline { list-style: none; margin: 0; padding: 0 0 0 4px; }
+.bk-timeline li { position: relative; display: grid; gap: 2px; padding: 0 0 20px 28px; border-left: 2px solid var(--rule); }
+.bk-timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.bk-timeline li::before { content: ""; position: absolute; left: -8px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--rule-strong); }
+.bk-timeline li.done::before { background: var(--action); border-color: var(--action); }
+.bk-timeline li.next::before { border-color: var(--action); box-shadow: 0 0 0 4px var(--action-soft); }
+.bk-timeline li.waiting::before { background: var(--mark); border-color: #D9B800; }
+.bk-timeline li.guarantee::before { border-style: dashed; }
+.bk-timeline strong { font-size: 16px; }
+.bk-timeline span { font-size: 14.5px; color: var(--muted); }
+.bk-letter-fold { margin-top: 32px; }
+.bk-letter-fold summary { cursor: pointer; font-family: var(--display); font-size: 19px; font-weight: 650; padding: 8px 0; }
+.bk-outcomes { display: grid; gap: 8px; }
+.bk-outcomes button { text-align: left; padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: var(--r-control); background: var(--paper); font: inherit; font-size: 15px; cursor: pointer; color: var(--ink); }
+.bk-outcomes button:hover { border-color: var(--ink); }
+.bk-outcomes button.picked { border-color: var(--action); background: var(--action-soft); }
+.bk-manage summary { cursor: pointer; font-size: 15px; font-weight: 600; color: var(--muted); padding: 6px 0; }
+.bk-results-side .bk-note { font-size: 15px; }
+
 /* ---------- Footer ---------- */
 .bk-footer { margin-top: auto; background: var(--ink); color: #B9CBC3; font-size: 15px; line-height: 1.6; }
 .bk-footer a { color: #E8F0EC; text-decoration: none; }

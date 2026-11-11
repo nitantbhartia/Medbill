@@ -54,7 +54,7 @@ def generate_strategy(bill_id: int) -> dict:
     if not findings:
         return _no_findings_strategy(bill, hospital)
 
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    total_savings = _total_savings(findings, bill)
     high_findings = [f for f in findings if f.get("severity") == "high"]
     is_nonprofit = bool(hospital and hospital.get("is_nonprofit"))
 
@@ -228,10 +228,17 @@ def _no_findings_strategy(bill: dict, hospital: dict | None) -> dict:
     }
 
 
+def _total_savings(findings: list, bill: dict | None = None) -> float:
+    """Savings with each charge counted once and capped at what the patient owes."""
+    from charge_summary import group_findings_by_charge
+    owed = float((bill or {}).get("total_patient_owes") or (bill or {}).get("total_charged") or 0)
+    return group_findings_by_charge(findings, owed or None)["total_savings"]
+
+
 def _recommend_channels(hospital: dict | None, findings: list) -> list[str]:
     """Recommend dispute communication channels based on hospital and findings."""
     channels = ["email"]
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    total_savings = _total_savings(findings)
     if total_savings > 2000:
         channels.append("certified_mail")
     if total_savings > 5000:
@@ -246,7 +253,7 @@ def _ai_strategy_summary(
     state_code: str | None,
 ) -> str:
     """Use Gemini to generate a plain-English strategy summary."""
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    total_savings = _total_savings(findings, bill)
     high_count = sum(1 for f in findings if f.get("severity") == "high")
     finding_types = set(f.get("finding_type", "") for f in findings)
 

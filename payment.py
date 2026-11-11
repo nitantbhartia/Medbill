@@ -57,6 +57,11 @@ def _stripe_get(path: str) -> dict:
         raise RuntimeError(f"Stripe error {e.code}: {body_text}") from e
 
 
+def fee_cents_for_bill(bill: dict) -> int:
+    """The dispute fee for a bill: priced on what the patient owes, else the total charged."""
+    return calculate_fee(float(bill.get("total_patient_owes") or bill.get("total_charged") or 0))
+
+
 def calculate_fee(bill_total: float) -> int:
     """Return the dispute fee in cents based on bill total.
 

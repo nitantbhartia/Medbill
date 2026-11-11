@@ -2857,8 +2857,10 @@ async def dispute_activate_page(request: Request, bill_id: int):
 
     bill = results.get("bill") or {}
     findings = results.get("findings") or []
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
+    from charge_summary import group_findings_by_charge
+    charges = group_findings_by_charge(findings, bill_total or None)
+    total_savings = charges["total_savings"]
     fee_cents = payment_module.calculate_fee(bill_total)
 
     return templates.TemplateResponse(
@@ -2868,7 +2870,7 @@ async def dispute_activate_page(request: Request, bill_id: int):
             "bill_id": bill_id,
             "provider_name": bill.get("provider_name") or "",
             "potential_savings": total_savings,
-            "finding_count": len(findings),
+            "finding_count": len(charges["charges"]),
             "fee_dollars": fee_cents / 100,
             "hipaa_text": esign_module.get_hipaa_text(
                 patient_name="[Your Name]",
@@ -3330,8 +3332,7 @@ async def autopilot_strategy_page(request: Request, bill_id: int):
     if strategy.get("error"):
         return templates.TemplateResponse("error.html", {"request": request, "message": strategy["error"]}, status_code=404)
 
-    bill_total = float(strategy.get("total_charged") or 0)
-    fee_cents = payment_module.calculate_fee(bill_total)
+    fee_cents = payment_module.fee_cents_for_bill((get_bill_results(bill_id) or {}).get("bill") or {})
 
     return templates.TemplateResponse(
         "autopilot_strategy.html",
@@ -3377,7 +3378,10 @@ async def advisor_page(request: Request, bill_id: int):
 
     bill = results["bill"]
     findings = results.get("findings") or []
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    from charge_summary import group_findings_by_charge
+    total_savings = group_findings_by_charge(
+        findings, float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
+    )["total_savings"]
 
     return templates.TemplateResponse(
         "advisor.html",
