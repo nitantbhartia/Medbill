@@ -171,3 +171,6 @@ GEOCODER_REQUEST_DELAY_MS = int(os.getenv("GEOCODER_REQUEST_DELAY_MS", "1000"))
 # Search snippet limits (characters) for page titles and meta descriptions
 SEO_TITLE_MAX_CHARS = 60
 SEO_META_MAX_CHARS = 155
+
+# Google Search Console HTML-tag verification code (the content="..." value only)
+GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")

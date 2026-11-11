@@ -2,7 +2,7 @@
 
 Ordered by expected disputes per hour of work. Top item ships next.
 
-1. **Connect Search Console** (owner). Replace the placeholder verification tag in `templates/base.html`, then share access. Every item below that says "by impressions" depends on it.
+1. **Connect Search Console** (owner). Set `GOOGLE_SITE_VERIFICATION` in Railway (or verify the domain by DNS), then connect a Search Console data source. Every item below that says "by impressions" depends on it.
 2. **Check the 22 consolidated guides** (needs item 1). For each redirect added on 2026-11-11 in `GUIDE_REDIRECTS`, compare clicks between the two old URLs. If the redirected page had more, swap the direction.
 3. **Page 2 to page 1 for the core guides** (needs item 1). Queries in positions 8–20 from `keyword-map.csv`: answer in the first two sentences, add the missing sections the top three have, link from the hospital pages.
 4. **"Most overpriced hospitals in [state]" data pages.** Query: `most expensive hospitals [state]`. Build from billing grades in `hospital_seo.py`, one page per state, with method and as-of date. Doubles as the press asset from the strategy doc.
