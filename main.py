@@ -509,6 +509,21 @@ def startup():
 # --- Page routes ---
 
 
+def _dispute_tier_labels() -> list[dict]:
+    """Turn config.DISPUTE_FEE_TIERS into display rows, e.g. 'Bills under $1,000' -> 29."""
+    rows, lower = [], 0
+    for upper, fee_cents in config.DISPUTE_FEE_TIERS:
+        if lower == 0:
+            label = f"Bills under ${upper:,.0f}"
+        elif upper == float("inf"):
+            label = f"Bills over ${lower:,.0f}"
+        else:
+            label = f"${lower:,.0f} to ${upper:,.0f}"
+        rows.append({"label": label, "fee": fee_cents // 100})
+        lower = upper
+    return rows
+
+
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
@@ -521,8 +536,10 @@ async def landing(request: Request):
             "request": request,
             "canonical_url": canonical_url,
             "hospital_count": hospital_count,
-            "og_title": "BillKarma — Hospital Billing Help: Phone Numbers, Financial Assistance, Letters",
-            "og_description": "Look up any U.S. hospital's billing phone number, check if you qualify for free or discounted care, and get letters addressed to the right billing office.",
+            "dispute_tiers": _dispute_tier_labels(),
+            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
+            "og_title": "Hospital bill too high? Check it free, we dispute it | BillKarma",
+            "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
             "meta_robots": "index, follow",
         },
     )
