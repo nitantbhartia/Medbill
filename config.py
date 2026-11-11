@@ -214,3 +214,8 @@ HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
 # Itemized-bill requests: HIPAA right of access gives the hospital 30 days (45 CFR 164.524(b)(2))
 ITEMIZED_RESPONSE_DAYS = 30
 ITEMIZED_LOOKUP_LIMIT = 8
+
+# MCP endpoint (/mcp) for AI assistants such as ChatGPT and Claude
+MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
+MCP_SERVER_VERSION = "1.0.0"
+MCP_LINK_TAG = "utm_source=ai_assistant&utm_medium=mcp"

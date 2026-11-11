@@ -1450,6 +1450,50 @@ async def chargemaster_page(request: Request):
     })
 
 
+@app.get("/ai", response_class=HTMLResponse)
+async def ai_assistants_page(request: Request):
+    """How to add BillKarma to ChatGPT, Claude and other MCP clients."""
+    from mcp_server import TOOLS
+    return templates.TemplateResponse(
+        "ai_assistants.html",
+        {
+            "request": request,
+            "mcp_url": f"{config.APP_URL.rstrip('/')}/mcp",
+            "tools": [{"name": name, "description": spec["description"]} for name, spec in TOOLS.items()],
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/ai",
+            "page_title": "Use BillKarma in ChatGPT or Claude | BillKarma",
+            "og_title": "Use BillKarma in ChatGPT or Claude",
+            "meta_description": "Add BillKarma to ChatGPT or Claude and ask whether a hospital charge is too high, find a billing office, or write an itemized-bill request.",
+            "og_description": "Ask your AI assistant whether a hospital charge is too high, using BillKarma's Medicare data.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.post("/mcp")
+async def mcp_endpoint(request: Request):
+    """MCP over stateless Streamable HTTP for AI assistants. One JSON-RPC message per POST."""
+    import json as _json
+    from api import _check_tools_rate_limit, _request_client_key
+    from mcp_server import PARSE_ERROR, handle_message
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        return JSONResponse({"jsonrpc": "2.0", "id": None, "error": {"code": -32000, "message": "Too many requests"}}, status_code=429)
+    try:
+        message = _json.loads(await request.body())
+    except (ValueError, UnicodeDecodeError):
+        return JSONResponse({"jsonrpc": "2.0", "id": None, "error": {"code": PARSE_ERROR, "message": "Invalid JSON"}}, status_code=400)
+    reply = handle_message(message)
+    if reply is None:
+        return Response(status_code=202)
+    return JSONResponse(reply)
+
+
+@app.get("/mcp")
+async def mcp_endpoint_get():
+    """No server-to-client stream; this server only answers POSTs."""
+    return Response(status_code=405, headers={"Allow": "POST"})
+
+
 @app.get("/itemized-bill", response_class=HTMLResponse)
 async def itemized_bill_page(request: Request, facility: str = "", provider: str = ""):
     """Write a request for an itemized hospital bill, optionally prefilled with a hospital."""
@@ -2369,6 +2413,7 @@ async def core_sitemap():
         (f"{base}/", "2026-02-01", "1.0"),
         (f"{base}/guides/", "2026-02-01", "0.8"),
         (f"{base}/itemized-bill", "2026-11-11", "0.9"),
+        (f"{base}/ai", "2026-11-11", "0.7"),
         (f"{base}/tools/", "2026-02-01", "0.8"),
         (f"{base}/fight-debt", "2026-02-24", "0.9"),
         (f"{base}/savings", "2026-02-25", "0.8"),

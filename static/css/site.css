@@ -495,6 +495,17 @@ input, select, textarea { font: inherit; min-width: 0; max-width: 100%; }
     .bk-charge-head { flex-direction: column; gap: 4px; }
 }
 
+/* ---------- AI assistants page ---------- */
+.bk-ai-url { margin-top: 28px; max-width: 620px; }
+.bk-ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.bk-ai-grid section { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r-card); padding: 26px; }
+.bk-ai-steps { margin: 18px 0 14px; padding-left: 22px; list-style: decimal; display: grid; gap: 10px; color: var(--ink-2); }
+.bk-ai-steps li::marker { color: var(--action); font-weight: 700; }
+.bk-ai-steps code, .bk-ai-grid code { font-size: 13px; background: var(--ground); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+.bk-ai-asks { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bk-ai-asks li { background: var(--paper); border: 1px solid var(--rule); border-radius: 16px 16px 16px 4px; padding: 16px 18px; font-size: 16.5px; }
+@media (max-width: 820px) { .bk-ai-grid, .bk-ai-asks { grid-template-columns: 1fr; } }
+
 /* ---------- Footer ---------- */
 .bk-footer { margin-top: auto; background: var(--ink); color: #B9CBC3; font-size: 15px; line-height: 1.6; }
 .bk-footer a { color: #E8F0EC; text-decoration: none; }
