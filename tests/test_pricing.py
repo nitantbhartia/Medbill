@@ -52,11 +52,11 @@ class TestCheckPricing:
         assert result["potential_savings"] > 0
 
     def test_moderate_markup_flagged(self):
-        # 98 * 3.5 = 343 — between 3x and 5x for 99283
+        # (98 physician + 297 hospital) * 3.5 = 1,382.50: between 3x and 5x for 99283
         item = {
             "cpt_code": "99283",
             "description": "ER visit level 3",
-            "charged_amount": 343.00,
+            "charged_amount": 1382.50,
         }
         result = check_pricing(item, "0000000")
         assert result is not None
@@ -115,3 +115,8 @@ class TestGetMedicareLocality:
     def test_provider_zip_preferred(self):
         locality = get_medicare_locality("99999", "3501 Johnson St, Hollywood, FL 33021")
         assert locality == "0000000"
+
+
+def test_hospital_charge_is_compared_with_physician_plus_hospital_rate():
+    # $343 for a level 3 ER visit is below the $395 Medicare pays in total (98 + 297)
+    assert check_pricing({"cpt_code": "99283", "description": "ER visit level 3", "charged_amount": 343.00}, "0000000") is None

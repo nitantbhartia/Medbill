@@ -129,8 +129,14 @@ def check_pricing(
     )
     if not medicare_rate:
         return None
+    # A hospital line is mostly the facility charge. When Medicare has a hospital outpatient
+    # (OPPS) rate for the code, compare against the physician fee plus that rate: the most
+    # Medicare pays in total for the service. Comparing with the physician fee alone would
+    # overstate the markup several-fold.
+    opps_rate = get_opps_rate(item["cpt_code"], item.get("date_of_service"))
+    benchmark = medicare_rate + (opps_rate or 0)
 
-    markup = item["charged_amount"] / medicare_rate
+    markup = item["charged_amount"] / benchmark
 
     markup_threshold = (
         config.MEDICARE_MARKUP_THRESHOLD if markup_threshold is None else markup_threshold
@@ -146,31 +152,27 @@ def check_pricing(
     else:
         return None
 
-    savings = item["charged_amount"] - (medicare_rate * markup_threshold)
-
-    opps_rate = get_opps_rate(item["cpt_code"], item.get("date_of_service"))
+    savings = item["charged_amount"] - (benchmark * markup_threshold)
 
     patient_resp = item.get("patient_responsibility")
-
     description = item.get("description") or "this service"
+    paid_for = (
+        f"${benchmark:,.2f} in total (${medicare_rate:,.2f} to the doctor and ${opps_rate:,.2f} to the hospital)"
+        if opps_rate else f"${medicare_rate:,.2f}"
+    )
 
     if patient_resp is not None:
         message = (
             f"You owe ${patient_resp:,.2f} for {description}, "
             f"but the total charge of ${item['charged_amount']:,.2f} is "
-            f"{markup:.1f}x what Medicare pays (${medicare_rate:,.2f}). "
+            f"{markup:.1f}x what Medicare pays: {paid_for}. "
             f"The overcharge may be inflating your share."
         )
     else:
         message = (
             f"You were charged ${item['charged_amount']:,.2f} for {description}. "
-            f"Medicare pays ${medicare_rate:,.2f} for this in your area. "
-            f"That's a {markup:.1f}x markup."
-        )
-    if opps_rate:
-        total_medicare = medicare_rate + opps_rate
-        message += (
-            f" (Medicare total with hospital fee: ${total_medicare:,.2f})"
+            f"Medicare pays {paid_for} for this in your area. "
+            f"That's {markup:.1f}x Medicare."
         )
 
     result = {
@@ -178,7 +180,8 @@ def check_pricing(
         "severity": severity,
         "line_item": item,
         "charged": item["charged_amount"],
-        "medicare_rate": medicare_rate,
+        "medicare_rate": round(benchmark, 2),
+        "physician_rate": medicare_rate,
         "markup_multiple": round(markup, 1),
         "potential_savings": max(0, round(savings, 2)),
         "message": message,
@@ -187,6 +190,6 @@ def check_pricing(
         result["patient_responsibility"] = patient_resp
     if opps_rate:
         result["opps_rate"] = opps_rate
-        result["total_medicare"] = round(medicare_rate + opps_rate, 2)
+        result["total_medicare"] = round(benchmark, 2)
 
     return result

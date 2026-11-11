@@ -68,7 +68,7 @@
         </div>
         <div id="method">
             <h2 class="bk-h2">How this is calculated</h2>
-            <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">For each hospital we compare the gross charges in its federally required price transparency file to the Medicare rate for the same billing code, then average across procedures. Hospitals need at least {{ config.RANKING_MIN_PROCEDURES }} priced procedures to be ranked. <a href="/guides/hospital-billing-grades-explained/">Full method and grading scale</a>.</p>
+            <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">For each hospital we compare the gross charges in its federally required price transparency file with what Medicare pays hospitals for the same billing code (the outpatient OPPS rate), then average across procedures. Codes Medicare doesn&rsquo;t pay that way, such as lab tests and inpatient surgery, are left out. Hospitals need at least {{ config.RANKING_MIN_PROCEDURES }} priced procedures to be ranked. <a href="/guides/hospital-billing-grades-explained/">Full method and grading scale</a>.</p>
         </div>
     </div>
 </section>

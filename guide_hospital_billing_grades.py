@@ -35,7 +35,7 @@ register("hospital-billing-grades-explained", {
         },
     ],
     "body": f"""
-<p class="lead">Your hospital has a billing grade — A through F — based on how much it charges compared to what Medicare pays for the same procedures. According to BillKarma&rsquo;s analysis of 6,000+ hospital price transparency files, the average U.S. hospital charges <strong>3.4 times</strong> the Medicare rate, which puts most hospitals in the C range. An A-grade hospital charges 2x Medicare or less. An F-grade hospital charges more than 8x &mdash; that&rsquo;s a $12,800 bill for a procedure Medicare values at $1,600.</p>
+<p class="lead">Your hospital has a billing grade, A through F, based on how its list prices compare with what Medicare pays hospitals for the same services. An A-grade hospital lists prices under 2 times Medicare&rsquo;s hospital rate. An F-grade hospital lists prices more than 8 times that rate &mdash; a $6,400 list price for a service Medicare pays the hospital $800 for.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -55,9 +55,9 @@ register("hospital-billing-grades-explained", {
 
 <h2 id="what-grade-measures">1. What the billing grade measures</h2>
 
-<p>Every U.S. hospital must publish a machine-readable price file listing what it charges for hundreds of procedures. BillKarma downloads and parses these files, then compares each hospital&rsquo;s gross charge (the list price before any discounts or insurance) to the Medicare facility rate for the same CPT code.</p>
+<p>Every U.S. hospital must publish a machine-readable price file listing what it charges for hundreds of procedures. BillKarma downloads and parses these files, then compares each hospital&rsquo;s gross charge (the list price before any discounts or insurance) to what Medicare pays hospitals for the same CPT code under its Outpatient Prospective Payment System (OPPS). That&rsquo;s the payment for the hospital&rsquo;s part of the service, which is what a hospital list price covers. Codes Medicare doesn&rsquo;t pay hospitals that way, such as lab tests and inpatient-only surgery, are left out of the grade rather than compared with a different rate.</p>
 
-<p>The result is a <strong>markup ratio</strong>: how many times the Medicare rate the hospital charges. A 3.0x markup means the hospital charges three times what Medicare pays. BillKarma averages this ratio across all procedures in the hospital&rsquo;s file and converts it to a letter grade.</p>
+<p>The result is a <strong>markup ratio</strong>: how many times the Medicare rate the hospital charges. A 3.0x markup means the hospital lists three times what Medicare pays it. BillKarma averages this ratio across the comparable procedures in the hospital&rsquo;s file, after removing extreme outliers, and needs at least five to give a grade.</p>
 
 <div class="key-takeaway">
     <strong>The grade is based on gross charges, not what you actually pay.</strong> Insurance companies negotiate discounts off the gross charge. But your deductible, coinsurance, and any uninsured bill are often calculated as a percentage of that gross charge &mdash; so a high-markup hospital still costs you more, even with insurance.

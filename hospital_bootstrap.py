@@ -202,3 +202,27 @@ def ensure_hospital_data_bootstrap() -> None:
         loaded.get("facilities", 0),
         loaded.get("rows", 0),
     )
+
+
+OPPS_BENCHMARK_SOURCE = "opps_benchmark_v1"
+
+
+def apply_opps_benchmark_once() -> bool:
+    """One-time regrade after switching hospital markups from the physician fee to OPPS.
+    Recorded in data_refresh_log so it runs on one deploy only. Returns True if it ran."""
+    from hospital_etl import rebenchmark_hospital_prices
+    with get_db() as db:
+        done = db.execute(
+            "SELECT 1 FROM data_refresh_log WHERE source = ? AND status = 'success' LIMIT 1",
+            (OPPS_BENCHMARK_SOURCE,),
+        ).fetchone()
+    if done:
+        return False
+    rows = rebenchmark_hospital_prices()
+    recompute_benchmarks()
+    graded = recompute_billing_metrics()
+    generate_and_save_hospital_content()
+    log_refresh(OPPS_BENCHMARK_SOURCE, rows, "success", f"hospitals regraded={graded}")
+    log.warning("Hospital markups re-benchmarked to OPPS: rows=%s hospitals=%s", rows, graded)
+    return True
+
