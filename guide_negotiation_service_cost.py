@@ -37,7 +37,7 @@ register("medical-bill-negotiation-service-cost", {
     "body": f"""
 <p class="lead">Medical bill negotiation services usually keep <strong>10% to 25% of what they save you</strong>, and several add a cap or a minimum fee of about <strong>$1,000</strong> (prices published by <a href="https://help.goodbill.com/en/articles/254209" target="_blank" rel="noopener">Goodbill</a> and <a href="https://resolvemedicalbills.com/faqs/how-much-does-it-cost-to-work-with-resolve" target="_blank" rel="noopener">Resolve</a>, checked November 2026). On a large bill that can be a fair trade. On a $2,000 bill, a minimum fee can take half of what you save.</p>
 
-<p>This guide lays out what each type of service charges, works the math on three real-world bill sizes, and shows when to use a service, when to use a free option and when to do it yourself.</p>
+<p>This guide lays out what each type of service charges, works the math on three real-world bill sizes, and shows when to use a service, when to use a free option and when to do it yourself. Head-to-head: <a href="/guides/billkarma-vs-resolve-medical-bills/">BillKarma vs Resolve</a> and <a href="/guides/billkarma-vs-goodbill-medical-bills/">BillKarma vs Goodbill</a>.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>

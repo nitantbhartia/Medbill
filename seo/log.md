@@ -8,3 +8,9 @@
 - 2026-11-11: Fixed a garbled homepage sentence; the pricing note now states the 45-day refund shown at checkout. (PR #133)
 - 2026-11-11: New guides: /guides/medical-bill-negotiation-service-cost/ and /guides/billkarma-vs-resolve-medical-bills/, linked from the homepage and two guides.
 - 2026-11-11: New /hospitals/{state}/most-expensive/ ranking pages (states with 5+ ranked hospitals), in the hospital sitemap and linked from each state page.
+
+## 2026-11-11 (later)
+- UI overhaul merged (PR #135): one header, page-header band, blue palette; /guides/ no longer lists all guides as cards.
+- New guides: billkarma-vs-goodbill-medical-bills, upcoding-unbundling-hospital-bills, hospital-revenue-codes-explained. Auto-link table now points upcoding/unbundling/revenue code/UB-04 at them.
+- Removed 'Medically reviewed' claims from guide pages. `_DEFAULT_REVIEWED` in guides.py still stamps a review date used in schema dateModified; replace with real dates when guides are actually reviewed.
+
