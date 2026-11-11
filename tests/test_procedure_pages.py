@@ -233,7 +233,7 @@ def test_procedure_index_page_renders():
     _seed()
     resp = client.get("/procedures/")
     assert resp.status_code == 200
-    assert "Procedure Cost Directory" in resp.text
+    assert "What common procedures cost" in resp.text
 
 
 def test_procedure_index_shows_cpt_codes():

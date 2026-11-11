@@ -219,3 +219,9 @@ ITEMIZED_LOOKUP_LIMIT = 8
 MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
 MCP_SERVER_VERSION = "1.0.0"
 MCP_LINK_TAG = "utm_source=ai_assistant&utm_medium=mcp"
+
+# Research report: procedures shown and the minimum hospitals behind any published figure
+REPORT_CODES = ("99283", "99284", "99285", "71046", "74177", "70551", "73721", "77067", "80053", "85025", "45378", "93000")
+REPORT_MIN_HOSPITALS = 20
+REPORT_STATE_CODE = "99284"
+REPORT_MIN_STATE_HOSPITALS = 5

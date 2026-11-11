@@ -16,316 +16,75 @@
   ]
 }
 </script>
+{% set estimate = profile.data_source == 'cms_static' %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How much does {{ procedure.name }} cost in {{ city.name }}?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "{% if profile.avg_charge %}The average cost of {{ procedure.name }} in {{ city.name }}, {{ city.state }} is approximately ${{ "{:,.0f}".format(profile.avg_charge) }}{% if profile.data_source == 'cms_static' %} based on CMS national averages adjusted for {{ city.state }} costs{% endif %}. Hospitals charge this as the list price before insurance negotiation.{% else %}Cost data for {{ procedure.name }} in {{ city.name }}, {{ city.state }} is not currently available. Use BillKarma to compare providers and negotiate your bill.{% endif %}"
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is Medicare's rate for {{ procedure.name }}?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "{% if profile.medicare_rate %}Medicare pays ${{ "{:,.0f}".format(profile.medicare_rate) }} for {{ procedure.name }} (CPT {{ procedure.cpt_code }}). This is the federal benchmark rate. Hospitals typically charge {% if profile.markup_ratio %}{{ "%.1f"|format(profile.markup_ratio) }}x{% else %}several times{% endif %} this amount on their list price.{% else %}Medicare rate data for {{ procedure.name }} (CPT {{ procedure.cpt_code }}) is not currently available in our database.{% endif %}"
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How can I reduce my {{ procedure.name }} bill?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "You have the right to negotiate any medical bill. Start by requesting an itemized bill and comparing each charge to the Medicare rate. Hospitals must accept lower amounts — especially if you're uninsured or underinsured. BillKarma can review your bill line-by-line, identify overcharges, and generate a professional negotiation letter at no cost."
-      }
-    }
+    {"@type": "Question", "name": "How much does {{ procedure.name | lower }} cost in {{ city.name }}?",
+     "acceptedAnswer": {"@type": "Answer", "text": "{% if profile.avg_charge %}{% if estimate %}BillKarma estimates a typical hospital charge of about ${{ "{:,.0f}".format(profile.avg_charge) }} in {{ city.name }}, {{ city.state }}: a U.S. typical list price adjusted by a state cost index.{% else %}Hospitals near {{ city.name }} list an average of ${{ "{:,.0f}".format(profile.avg_charge) }} for CPT {{ procedure.cpt_code }} in their published price files.{% endif %} Your hospital's charge can be higher or lower.{% else %}Local prices aren't available yet. Ask the hospital for a good faith estimate or your itemized bill.{% endif %}"}},
+    {"@type": "Question", "name": "What does Medicare pay for {{ procedure.name | lower }}?",
+     "acceptedAnswer": {"@type": "Answer", "text": "{% if profile.medicare_rate %}Medicare pays the surgeon about ${{ "{:,.0f}".format(profile.medicare_rate) }} for CPT {{ procedure.cpt_code }} under its physician fee schedule, and pays the hospital separately for the facility.{% else %}Medicare's rate for this code isn't available here.{% endif %}"}},
+    {"@type": "Question", "name": "How can I lower a {{ procedure.name | lower }} bill?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Ask for an itemized bill with billing codes, check it for duplicates and charges far above Medicare's rate, and dispute those in writing. If money is tight, ask whether you qualify for the hospital's financial assistance."}}
   ]
 }
 </script>
-<style>
-    .pc-hero {
-        background-color: var(--bk-green);
-        border-radius: 0 0 40px 40px;
-        padding: 48px 24px 40px;
-        margin-bottom: 32px;
-    }
-    .pc-hero-inner { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; }
-    .pc-hero .breadcrumb { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; }
-    .pc-hero .breadcrumb a { color: rgba(255,255,255,0.8); text-decoration: underline; }
-    .pc-hero .breadcrumb a:hover { color: #fff; }
-    .pc-hero h1 { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.025em; margin-bottom: 8px; line-height: 1.2; }
-    .pc-hero .subtitle { font-size: 0.95rem; color: rgba(255,255,255,0.8); }
-
-    .pc-content { max-width: 900px; margin: 0 auto; padding: 0 1.25rem 60px; }
-
-    .answer-box {
-        border-left: 4px solid var(--bk-green);
-        background: #E1F0EA;
-        padding: 20px 24px;
-        border-radius: 0 12px 12px 0;
-        margin-bottom: 28px;
-    }
-    .answer-box p { margin: 0; color: var(--bk-black); line-height: 1.6; font-size: 0.97rem; }
-    .answer-box strong { color: var(--bk-green); }
-
-    .stat-row { display: flex; gap: 16px; margin-bottom: 32px; }
-    .stat-card {
-        flex: 1;
-        background: #fff;
-        border: 1px solid var(--bk-gray-border);
-        border-radius: 12px;
-        padding: 18px 20px;
-    }
-    .stat-card .label { font-size: 0.72rem;   color: var(--bk-secondary); margin-bottom: 6px; }
-    .stat-card .value { font-size: 1.6rem; font-weight: 800; color: var(--bk-black); line-height: 1; }
-    .stat-card .sub { font-size: 0.75rem; color: var(--bk-secondary); margin-top: 4px; }
-
-    .provider-card {
-        background: #fff;
-        border: 1px solid var(--bk-gray-border);
-        border-radius: 16px;
-        overflow: hidden;
-        margin-bottom: 32px;
-    }
-    .provider-card-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--bk-gray-border); }
-    .provider-card-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--bk-black); margin: 0; }
-    .provider-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .provider-table th { text-align: left; padding: 10px 16px; background: #F4F7F5; color: var(--bk-secondary); font-size: 0.72rem;   border-bottom: 1px solid var(--bk-gray-border); }
-    .provider-table td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
-    .provider-table tr:last-child td { border-bottom: none; }
-    .provider-table tbody tr:hover { background: #F4F7F5; }
-    .provider-table .provider-name { font-weight: 600; color: var(--bk-black); text-decoration: none; }
-    .provider-table .provider-name:hover { color: var(--bk-green); }
-    .provider-table .provider-city { color: var(--bk-secondary); font-size: 0.82rem; }
-
-    .ratio-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 600;
-    }
-    .ratio-green { background: #E1F0EA; color: #08503F; }
-    .ratio-yellow { background: #FEF3C7; color: #92400E; }
-    .ratio-red { background: #FEE2E2; color: #991B1B; }
-    .ratio-gray { background: #F3F4F6; color: #5E6F69; }
-
-    .pills-section { margin-bottom: 28px; }
-    .pills-section h2 { font-size: 1rem; font-weight: 700; color: var(--bk-black); margin-bottom: 12px; }
-    .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill {
-        display: inline-block;
-        padding: 6px 14px;
-        border: 1px solid var(--bk-gray-border);
-        border-radius: 999px;
-        font-size: 0.82rem;
-        color: var(--bk-black);
-        text-decoration: none;
-        background: #fff;
-        transition: background 0.15s, border-color 0.15s;
-    }
-    .pill:hover { background: #E1F0EA; border-color: var(--bk-green); color: var(--bk-green); }
-
-    .cta-banner {
-        background: var(--bk-green);
-        border-radius: 16px;
-        padding: 32px 28px;
-        text-align: center;
-        margin-top: 12px;
-    }
-    .cta-banner h2 { color: #fff; font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
-    .cta-banner p { color: rgba(255,255,255,0.85); font-size: 0.9rem; margin-bottom: 20px; }
-    .cta-btn {
-        display: inline-block;
-        background: #fff;
-        color: var(--bk-green);
-        font-weight: 700;
-        padding: 12px 28px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 0.95rem;
-    }
-    .cta-btn:hover { background: #E1F0EA; }
-
-    .empty-state { padding: 32px 24px; text-align: center; color: var(--bk-secondary); font-size: 0.9rem; }
-
-    @media (max-width: 640px) {
-        .pc-hero { padding: 32px 16px 28px; border-radius: 0 0 24px 24px; }
-        .pc-hero h1 { font-size: 1.45rem; }
-        .stat-row { flex-direction: column; gap: 10px; }
-        .provider-table th:nth-child(3),
-        .provider-table td:nth-child(3) { display: none; }
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="pc-hero">
-    <div class="pc-hero-inner">
-        <div class="breadcrumb">
-            <a href="/">Home</a> &rsaquo;
-            <a href="/costs/">Costs</a> &rsaquo;
-            <a href="/costs/{{ procedure.slug }}/">{{ procedure.name }}</a> &rsaquo;
-            {{ city.name }}, {{ city.state }}
+{% set estimate = profile.data_source == 'cms_static' %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/procedures/">Procedure costs</a> / <a href="/procedures/{{ procedure.slug }}/">{{ procedure.name }}</a> / {{ city.name }}, {{ city.state }}</p>
+        <h1>{{ procedure.name }} cost in {{ city.name }}, {{ city.state }}</h1>
+        <p class="bk-lede">{% if estimate %}An estimated hospital charge for {{ city.name }}{% else %}What hospitals near {{ city.name }} list in their own price files{% endif %}, and what Medicare pays the surgeon for code {{ procedure.cpt_code }}.</p>
+        <div class="bk-proc-figures">
+            {% if profile.avg_charge %}<div><strong>${{ "{:,.0f}".format(profile.avg_charge) }}</strong><span>{% if estimate %}Estimated charge{% else %}Average list price, {{ profile.hospital_count or hospitals | length }} hospitals{% endif %}</span></div>{% endif %}
+            {% if profile.medicare_rate %}<div><strong>${{ "{:,.0f}".format(profile.medicare_rate) }}</strong><span>Medicare surgeon fee</span></div>{% endif %}
         </div>
-        <h1>{{ procedure.name }} Cost in {{ city.name }}, {{ city.state }}</h1>
-        <p class="subtitle">
-            {% if hospitals %}{{ hospitals | length }} provider{{ 's' if hospitals | length != 1 else '' }} found near {{ city.zip }}{% else %}Showing data for {{ city.name }}, {{ city.state }}{% endif %}
-            &nbsp;&middot;&nbsp; CPT {{ procedure.cpt_code }}
-        </p>
     </div>
-</div>
+</section>
 
-<div class="pc-content">
-
-    {# Answer box #}
-    <div class="answer-box">
-        <p>
-        {% if profile.avg_charge and profile.medicare_rate and profile.markup_ratio %}
-            The average cost of {{ procedure.name }} in {{ city.name }} is
-            <strong>${{ "{:,.0f}".format(profile.avg_charge) }}</strong>,
-            compared to the Medicare rate of
-            <strong>${{ "{:,.0f}".format(profile.medicare_rate) }}</strong>.
-            That's a <strong>{{ "%.1f"|format(profile.markup_ratio) }}x</strong> markup.
-            Use BillKarma to negotiate before you pay.
-        {% elif profile.avg_charge %}
-            The average cost of {{ procedure.name }} in {{ city.name }} is
-            <strong>${{ "{:,.0f}".format(profile.avg_charge) }}</strong>.
-            Medicare rate data is not available for this procedure.
-            Use BillKarma to review your bill and negotiate a fair price.
-        {% elif profile.medicare_rate %}
-            Medicare pays <strong>${{ "{:,.0f}".format(profile.medicare_rate) }}</strong>
-            for {{ procedure.name }} (CPT {{ procedure.cpt_code }}).
-            Local average charge data is not yet available for {{ city.name }}.
-            Use BillKarma to compare your bill against the Medicare benchmark.
-        {% else %}
-            Pricing data for {{ procedure.name }} in {{ city.name }}, {{ city.state }} is not currently available.
-            Use BillKarma to upload your bill and get a free analysis against federal pricing benchmarks.
-        {% endif %}
-        </p>
-    </div>
-
-    {# Key stats row #}
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="label">Avg Charge</div>
-            <div class="value">
-                {% if profile.avg_charge %}${{ "{:,.0f}".format(profile.avg_charge) }}{% else %}N/A{% endif %}
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 88px">
+    <div class="bk-category-layout">
+        <div>
+            <h2 class="bk-h3">Hospitals near {{ city.name }}</h2>
+            {% if hospitals %}
+            <p class="bk-muted" style="margin: 6px 0 0; font-size: 15px">List prices from each hospital&rsquo;s published price file. What you pay depends on your insurance.</p>
+            <div class="bk-table-box">
+                <table class="bk-table">
+                    <thead><tr><th>Hospital</th><th>List price</th></tr></thead>
+                    <tbody>
+                        {% for h in hospitals %}
+                        {% if h.facility_type and 'surgery' in h.facility_type | lower %}{% set provider_url = "/surgery-centers/" ~ h.state_slug ~ "/" ~ h.city_slug ~ "/" ~ h.slug ~ "/" %}{% else %}{% set provider_url = "/hospitals/" ~ h.state_slug ~ "/" ~ h.city_slug ~ "/" ~ h.slug ~ "/" %}{% endif %}
+                        <tr><td><a href="{{ provider_url }}">{{ h.name }}</a><div class="bk-est">{{ h.city }}, {{ h.state }}</div></td><td class="bk-num">${{ "{:,.0f}".format(h.gross_charge) }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="sub">Hospital list price</div>
+            {% else %}
+            <p class="bk-empty" style="margin-top: 14px">We don&rsquo;t have hospital price files for this procedure near {{ city.name }} yet. <a href="/hospitals/">Find a hospital&rsquo;s billing office</a> to ask for a good faith estimate.</p>
+            {% endif %}
+
+            {% if nearby_procedures %}
+            <h2 class="bk-h3" style="margin-top: 40px">Other procedures in {{ city.name }}</h2>
+            <ul class="bk-chips">{% for p in nearby_procedures %}<li><a href="/costs/{{ p.slug }}/{{ city.slug }}/">{{ p.name }}</a></li>{% endfor %}</ul>
+            {% endif %}
+            {% if nearby_cities %}
+            <h2 class="bk-h3" style="margin-top: 32px">{{ procedure.name }} in other cities</h2>
+            <ul class="bk-chips">{% for c in nearby_cities %}<li><a href="/costs/{{ procedure.slug }}/{{ c.slug }}/">{{ c.name }}, {{ c.state }}</a></li>{% endfor %}</ul>
+            {% endif %}
+            {% include "_estimate_note.html" %}
         </div>
-        <div class="stat-card">
-            <div class="label">Medicare Rate</div>
-            <div class="value">
-                {% if profile.medicare_rate %}${{ "{:,.0f}".format(profile.medicare_rate) }}{% else %}N/A{% endif %}
+        <aside>
+            <div class="bk-side-card">
+                <h2>Billed for {{ procedure.name | lower }}?</h2>
+                <p>Upload your itemized bill to see each line next to what Medicare pays for the same code. Free.</p>
+                <a href="/scan" class="bk-btn bk-btn-block">Check my bill free</a>
             </div>
-            <div class="sub">Federal benchmark</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Providers</div>
-            <div class="value">{{ profile.hospital_count or (hospitals | length) }}</div>
-            <div class="sub">Near {{ city.name }}</div>
-        </div>
+        </aside>
     </div>
-
-    {# Provider table #}
-    <div class="provider-card">
-        <div class="provider-card-header">
-            <h2>Hospitals &amp; Surgery Centers Near {{ city.name }}</h2>
-        </div>
-        {% if hospitals %}
-        <table class="provider-table">
-            <thead>
-                <tr>
-                    <th>Provider</th>
-                    <th>City</th>
-                    <th>Type</th>
-                    <th>List Price</th>
-                    <th>vs Medicare</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for h in hospitals %}
-                {% set ratio = (h.gross_charge / profile.medicare_rate) if profile.medicare_rate and profile.medicare_rate > 0 else None %}
-                {% if h.facility_type and 'surgery' in h.facility_type | lower %}
-                    {% set provider_url = "/surgery-centers/" ~ h.state_slug ~ "/" ~ h.city_slug ~ "/" ~ h.slug ~ "/" %}
-                {% else %}
-                    {% set provider_url = "/hospitals/" ~ h.state_slug ~ "/" ~ h.city_slug ~ "/" ~ h.slug ~ "/" %}
-                {% endif %}
-                <tr>
-                    <td>
-                        <a href="{{ provider_url }}" class="provider-name">{{ h.name }}</a>
-                    </td>
-                    <td class="provider-city">{{ h.city }}, {{ h.state }}</td>
-                    <td class="provider-city">{{ h.facility_type or "Hospital" }}</td>
-                    <td style="font-weight:600;">${{ "{:,.0f}".format(h.gross_charge) }}</td>
-                    <td>
-                        {% if ratio is not none %}
-                            {% if ratio < 2 %}
-                                <span class="ratio-badge ratio-green">{{ "%.1f"|format(ratio) }}x</span>
-                            {% elif ratio <= 3 %}
-                                <span class="ratio-badge ratio-yellow">{{ "%.1f"|format(ratio) }}x</span>
-                            {% else %}
-                                <span class="ratio-badge ratio-red">{{ "%.1f"|format(ratio) }}x</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="ratio-badge ratio-gray">N/A</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">No providers found near {{ city.name }} for this procedure.</div>
-        {% endif %}
-    </div>
-
-    {# Nearby procedures #}
-    {% if nearby_procedures %}
-    <div class="pills-section">
-        <h2>Related Procedures in {{ city.name }}</h2>
-        <div class="pills">
-            {% for p in nearby_procedures %}
-            <a href="/costs/{{ p.slug }}/{{ city.slug }}/" class="pill">{{ p.name }}</a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {# Nearby cities #}
-    {% if nearby_cities %}
-    <div class="pills-section">
-        <h2>{{ procedure.name }} Cost in Nearby Cities</h2>
-        <div class="pills">
-            {% for c in nearby_cities %}
-            <a href="/costs/{{ procedure.slug }}/{{ c.slug }}/" class="pill">{{ c.name }}, {{ c.state }}</a>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {# CTA banner #}
-    <div class="cta-banner">
-        <div style="font-size:.7rem;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:8px;">Free · No Account Needed</div>
-        <h2>Got a bill for {{ procedure.name }}?</h2>
-        <p>Upload it and we'll compare every charge against the Medicare rate{% if profile.medicare_rate %} of <strong style="color:#fff;">${{ "{:,.0f}".format(profile.medicare_rate) }}</strong>{% endif %} — flagging overcharges instantly.</p>
-        <a href="/scan" class="cta-btn">Scan My Bill Free</a>
-        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:12px;">Takes 60 seconds &middot; Results are instant</div>
-    </div>
-
-    {% if profile.data_source == "cms_static" %}
-    <p style="font-size:.78rem;color:#9CA3AF;text-align:center;margin-top:24px;">
-        Pricing estimates based on CMS Medicare fee schedule and national hospital chargemaster averages.
-        Actual charges vary by facility. Not medical or financial advice.
-    </p>
-    {% endif %}
-
 </div>
 {% endblock %}
