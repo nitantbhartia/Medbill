@@ -28,7 +28,7 @@
             <a href="/scan">Upload</a> <span>&rsaquo;</span> <a href="/confirm/{{ data.bill.id }}">Confirm</a> <span>&rsaquo;</span> <span class="rb-active">Results</span>
         </div>
         <div class="rb-title">
-            {% if issue_count > 0 %}{{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} &middot; ${{ "%.0f" | format(total_savings) }} potential savings{% else %}Bill Analysis{% endif %}
+            {% if issue_count > 0 %}{{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} &middot; ${{ "{:,.0f}".format(total_savings) }} potential savings{% else %}Bill Analysis{% endif %}
         </div>
     </div>
 </div>
@@ -36,30 +36,14 @@
 <section class="max-w-2xl mx-auto px-5 py-8 sm:py-10">
 
     {% if issue_count > 0 %}
-    <!-- Case Summary Cards -->
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-4">
-            {{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} found
-        </h1>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="border border-gray-200 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-green-700 tabular-nums">${{ "%.0f" | format(case_summary.potential_savings) }}</p>
-                <p class="text-xs text-gray-500 mt-1">Potential savings</p>
-            </div>
-            <div class="border border-gray-200 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ case_summary.issue_count }}</p>
-                <p class="text-xs text-gray-500 mt-1">Issues found</p>
-            </div>
-            <div class="border border-gray-200 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-accent-700">{{ case_summary.win_probability }}%</p>
-                <p class="text-xs text-gray-500 mt-1">Win probability</p>
-            </div>
-            <div class="border border-gray-200 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-gray-900">{{ case_summary.confidence_score }}%</p>
-                <p class="text-xs text-gray-500 mt-1">Confidence</p>
-            </div>
+    <!-- Case summary -->
+    <div class="bk-result-summary">
+        <h1>{{ issue_count }} charge{{ 's' if issue_count != 1 else '' }} on this bill look{{ '' if issue_count != 1 else 's' }} wrong</h1>
+        <div class="bk-result-figures">
+            <div><span class="bk-result-num save">${{ "{:,.0f}".format(case_summary.potential_savings) }}</span><span>potential savings</span></div>
+            <div><span class="bk-result-num">{{ case_summary.issue_count }}</span><span>issue{{ 's' if case_summary.issue_count != 1 else '' }} flagged</span></div>
         </div>
-        <p class="text-[10px] text-gray-400 mt-2">Based on finding severity and evidence strength. Not a guarantee of outcome.</p>
+        <p class="bk-muted" style="margin: 14px 0 0; font-size: 14px">Estimated from Medicare rates for the same codes. The hospital decides what it will change.</p>
     </div>
 
     <!-- Severity breakdown bar -->
@@ -88,9 +72,9 @@
 
     {% if patient_balance > 0 %}
     <div class="mb-8 text-sm text-gray-600">
-        <p><span class="text-gray-500">Your balance:</span> <span class="font-semibold text-gray-900 tabular-nums">${{ "%.2f" | format(patient_balance) }}</span></p>
+        <p><span class="text-gray-500">Your balance:</span> <span class="font-semibold text-gray-900 tabular-nums">${{ "{:,.2f}".format(patient_balance) }}</span></p>
         {% if total_gross > total_savings %}
-        <p class="text-xs text-gray-400 mt-1">Total billing errors: ${{ "%.2f" | format(total_gross) }} — savings capped to your share.</p>
+        <p class="text-xs text-gray-400 mt-1">Total billing errors: ${{ "{:,.2f}".format(total_gross) }} — savings capped to your share.</p>
         {% endif %}
     </div>
     {% endif %}
@@ -152,7 +136,7 @@
         {% if h.slug and h.state_slug and h.city_slug %}
         <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/"
            class="mt-3 inline-block text-xs text-accent-700 hover:text-accent-800 font-medium">
-            View full hospital profile →
+            View full hospital profile
         </a>
         {% endif %}
     </div>
@@ -184,8 +168,8 @@
                         {% if finding.cpt_code %}
                         <div class="mt-2 flex flex-wrap gap-1.5 text-xs text-gray-500 font-mono">
                             <span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">{{ finding.cpt_code }}</span>
-                            {% if finding.billed_amount is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "%.2f" | format(finding.billed_amount) }} billed</span>{% endif %}
-                            {% if finding.medicare_rate is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "%.2f" | format(finding.medicare_rate) }} Medicare</span>{% endif %}
+                            {% if finding.billed_amount is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "{:,.2f}".format(finding.billed_amount) }} billed</span>{% endif %}
+                            {% if finding.medicare_rate is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "{:,.2f}".format(finding.medicare_rate) }} Medicare</span>{% endif %}
                         </div>
                         {% endif %}
                         <!-- Evidence chips -->
@@ -205,7 +189,7 @@
                     </div>
                     {% if finding.potential_savings %}
                     <div class="flex-shrink-0 text-right tabular-nums">
-                        <div class="text-sm font-semibold {% if finding.severity == 'high' %}text-red-700{% elif finding.severity == 'medium' %}text-amber-700{% else %}text-blue-700{% endif %}">${{ "%.2f" | format(finding.potential_savings) }}</div>
+                        <div class="text-sm font-semibold {% if finding.severity == 'high' %}text-red-700{% elif finding.severity == 'medium' %}text-amber-700{% else %}text-blue-700{% endif %}">${{ "{:,.2f}".format(finding.potential_savings) }}</div>
                         <div class="text-xs text-gray-400">{% if has_patient_data %}your savings{% else %}overcharge{% endif %}</div>
                     </div>
                     {% endif %}
@@ -241,7 +225,7 @@
                 </div>
                 <a href="/autopilot/strategy/{{ data.bill.id }}"
                    class="block text-center px-4 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                    Fight This Bill on Autopilot &mdash; ${{ dispute_fee_dollars|default(29) }} &rarr;
+                    Fight This Bill on Autopilot &mdash; ${{ dispute_fee_dollars|default(29) }}
                 </a>
             </div>
             <!-- Manual toolkit -->
@@ -262,7 +246,7 @@
                 </div>
                 <a href="#manual-toolkit"
                    class="block w-full text-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                    Open Toolkit — Free →
+                    Open Toolkit — Free
                 </a>
             </div>
         </div>
@@ -304,7 +288,7 @@
             </div>
             <a href="/advisor/{{ data.bill.id }}"
                class="shrink-0 px-5 py-2.5 bg-accent-500 text-white text-sm font-bold rounded-full hover:bg-accent-600 transition whitespace-nowrap">
-                Ask AI &rarr;
+                Ask AI
             </a>
         </div>
     </div>

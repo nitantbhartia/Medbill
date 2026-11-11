@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}BillKarma{% endblock %}</title>
     {% block robots_meta %}<meta name="robots" content="{{ meta_robots if meta_robots else 'index, follow' }}">{% endblock %}
-    <meta name="theme-color" content="#16181D">
+    <meta name="theme-color" content="#EEF3F0">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="BillKarma">
     <meta property="og:locale" content="en_US">
@@ -32,33 +32,21 @@
         gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
     </script>
     {% endif %}
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="preload" href="/static/css/tw.css" as="style">
-    <link rel="stylesheet" href="/static/css/tw.css">
-    <link rel="preload" href="/static/css/app.css" as="style">
-    <link rel="stylesheet" href="/static/css/app.css"/>
-    <link rel="stylesheet" href="/static/css/site.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <link rel="preload" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}" as="style">
+    <link rel="stylesheet" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}">
+    <link rel="preload" href="/static/css/app.css?v={{ config.ASSET_VERSION }}" as="style">
+    <link rel="stylesheet" href="/static/css/app.css?v={{ config.ASSET_VERSION }}"/>
+    <link rel="stylesheet" href="/static/css/site.css?v={{ config.ASSET_VERSION }}"/>
     <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"BillKarma","url":"https://billkarma.app","logo":"https://billkarma.app/static/img/billkarma-og.svg","description":"Free medical bill analysis against Medicare benchmarks — checking hospital bills against federal pricing data to help patients fight overcharges.","foundingDate":"2024","areaServed":{"@type":"Country","name":"United States"},"knowsAbout":["Medical Billing","Hospital Pricing Transparency","CPT Medical Codes","Patient Rights","Medical Debt Law","Insurance Denials","Surprise Medical Bills"],"sameAs":["https://billkarma.app/about/"]},{"@type":"WebSite","url":"https://billkarma.app","name":"BillKarma","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://billkarma.app/hospitals/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"SiteLinksSearchBox","url":"https://billkarma.app","potentialAction":{"@type":"SearchAction","target":"https://billkarma.app/hospitals/?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"ItemList","name":"BillKarma Navigation","itemListElement":[{"@type":"SiteNavigationElement","position":1,"name":"Patient Guides","url":"https://billkarma.app/guides/"},{"@type":"SiteNavigationElement","position":2,"name":"Hospitals","url":"https://billkarma.app/hospitals/"},{"@type":"SiteNavigationElement","position":3,"name":"Procedures","url":"https://billkarma.app/procedures/"},{"@type":"SiteNavigationElement","position":4,"name":"Free Tools","url":"https://billkarma.app/tools/"},{"@type":"SiteNavigationElement","position":5,"name":"Fight Debt","url":"https://billkarma.app/fight-debt"}]}]}
 </script>
     {% block canonical_meta %}{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"/>{% endif %}{% endblock %}
     <style>
-        :root {
-            --bk-canvas:    #FFFFFF;
-            --bk-white:     #FFFFFF;
-            --bk-black:     #16181D;
-            --bk-green:     #1F4FD1;
-            --bk-green-dark:#163A9C;
-            --bk-orange:    #16181D;
-            --bk-gray-text: #565B66;
-            --bk-gray-border:#DADCE0;
-            --bk-secondary: #565B66;
-        }
-
         *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            background-color: var(--bk-canvas) !important;
+            
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -94,7 +82,7 @@
             flex-shrink: 0;
         }
         .bk-tip svg { width: 14px; height: 14px; color: #9CA3AF; transition: color 0.1s; }
-        .bk-tip:hover svg, .bk-tip.tip-open svg { color: #6B7280; }
+        .bk-tip:hover svg, .bk-tip.tip-open svg { color: #5E6F69; }
         .bk-tip::after {
             content: attr(data-tip);
             position: absolute;
@@ -103,7 +91,7 @@
             transform: translateX(-50%);
             width: 230px;
             padding: 7px 10px;
-            background: #1A1A1A;
+            background: #16302A;
             color: #fff;
             font-size: 11.5px;
             font-weight: 400;
@@ -124,7 +112,7 @@
             left: 50%;
             transform: translateX(-50%);
             border: 5px solid transparent;
-            border-top-color: #1A1A1A;
+            border-top-color: #16302A;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.12s;
@@ -143,56 +131,77 @@
 </head>
 <body class="text-gray-900 min-h-screen flex flex-col antialiased">
 
+    <a href="#main" class="bk-sr-only">Skip to content</a>
     <header class="bk-header">
         <div class="bk-wrap bk-header-inner">
-            <a href="/" class="bk-logo">Bill<span class="bk-mark">Karma</span></a>
+            <a href="/" class="bk-logo" aria-label="BillKarma home"><svg class="bk-logo-mark" viewBox="0 0 26 30" aria-hidden="true"><path d="M2 1.5h22v25l-3.7-2.4-3.6 2.4-3.7-2.4-3.7 2.4-3.6-2.4L2 26.5z" fill="#fff" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5.5" y="9" width="15" height="4.5" rx="1" fill="#FFE45C"/><path d="M6.5 11.2h13M6.5 17.5h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>BillKarma</a>
             <nav class="bk-nav" aria-label="Main">
+                <a href="/#how">How it works</a>
+                <a href="/#pricing">Pricing</a>
+                <a href="/guides/">Guides</a>
                 <a href="/hospitals/">Hospitals</a>
                 <a href="/rights/">Your rights</a>
-                <a href="/guides/">Guides</a>
-                <a href="/tools/">Tools</a>
             </nav>
             <a href="/scan" class="bk-btn bk-btn-sm bk-header-cta">Check a bill</a>
             <details class="bk-menu">
                 <summary aria-label="Menu"><span class="bk-menu-icon"></span></summary>
                 <nav class="bk-menu-panel" aria-label="Mobile">
-                    <a href="/hospitals/">Hospitals</a>
-                    <a href="/rights/">Your rights by state</a>
-                    <a href="/guides/">Guides</a>
-                    <a href="/tools/">Free tools</a>
-                    <a href="/charity-care">Financial assistance</a>
-                    <a href="/fight-debt">Fight a collection letter</a>
-                    <a href="/glossary/">Glossary</a>
-                    <a href="/about/">About</a>
+                    <a href="/#how">How it works<span class="bk-chev"></span></a>
+                    <a href="/#pricing">Pricing<span class="bk-chev"></span></a>
+                    <a href="/guides/">Guides<span class="bk-chev"></span></a>
+                    <a href="/hospitals/">Hospitals<span class="bk-chev"></span></a>
+                    <a href="/rights/">Your rights by state<span class="bk-chev"></span></a>
+                    <a href="/charity-care">Financial assistance<span class="bk-chev"></span></a>
+                    <a href="/collection-notice">Collection letters<span class="bk-chev"></span></a>
+                    <a href="/tools/">Free tools<span class="bk-chev"></span></a>
+                    <a href="/scan" class="bk-btn">Check my bill free</a>
                 </nav>
             </details>
         </div>
     </header>
 
-    <main class="flex-1">
+    <main class="flex-1" id="main">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="bk-footer">
         <div class="bk-wrap bk-footer-inner">
-            <p>BillKarma is an independent project that helps patients understand and question hospital bills. It is not a law firm and does not give legal or financial advice. Hospital data comes from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a> and hospitals' own price files.</p>
-            <nav aria-label="Footer">
-                <a href="/hospitals/">Hospitals</a>
-                <a href="/charity-care">Financial assistance</a>
-                <a href="/collection-notice">Collection letters</a>
-                <a href="/appeal">Appeal a denied claim</a>
-                <a href="/household">Household plan</a>
-                <a href="/rights/">Your rights by state</a>
-                <a href="/guides/">Guides</a>
-                <a href="/glossary/">Glossary</a>
-                <a href="/about/">About</a>
-                <a href="/guides/hospital-billing-grades-explained/">Methodology</a>
-                <a href="/press/">Press</a>
-            </nav>
+            <div class="bk-footer-about">
+                <a href="/" class="bk-logo" aria-label="BillKarma home"><svg class="bk-logo-mark" viewBox="0 0 26 30" aria-hidden="true"><path d="M2 1.5h22v25l-3.7-2.4-3.6 2.4-3.7-2.4-3.7 2.4-3.6-2.4L2 26.5z" fill="#fff" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5.5" y="9" width="15" height="4.5" rx="1" fill="#FFE45C"/><path d="M6.5 11.2h13M6.5 17.5h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>BillKarma</a>
+                <p>We check hospital bills against what Medicare pays and send written disputes for the charges that look wrong. Not a law firm; nothing here is legal or financial advice.</p>
+            </div>
+            <div>
+                <h2>Your bill</h2>
+                <ul>
+                    <li><a href="/scan">Check a bill</a></li>
+                    <li><a href="/charity-care">Financial assistance</a></li>
+                    <li><a href="/collection-notice">Collection letters</a></li>
+                    <li><a href="/appeal">Appeal a denied claim</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Look things up</h2>
+                <ul>
+                    <li><a href="/hospitals/">Hospitals</a></li>
+                    <li><a href="/rights/">Your rights by state</a></li>
+                    <li><a href="/guides/">Guides</a></li>
+                    <li><a href="/glossary/">Glossary</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>BillKarma</h2>
+                <ul>
+                    <li><a href="/about/">About</a></li>
+                    <li><a href="/guides/hospital-billing-grades-explained/">Methodology</a></li>
+                    <li><a href="/press/">Press</a></li>
+                    <li><a href="/household">Household plan</a></li>
+                </ul>
+            </div>
         </div>
+        <div class="bk-wrap bk-footer-base">Hospital data from <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a> and hospitals&rsquo; own price files.</div>
     </footer>
 
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v={{ config.ASSET_VERSION }}"></script>
     <script>
         window.BILLKARMA_MAP_TILE_URL = {{ config.MAP_TILE_URL | tojson if config is defined else '"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"' }};
         window.BILLKARMA_MAP_ATTRIBUTION = {{ config.MAP_TILE_ATTRIBUTION | tojson if config is defined else '"&copy; <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors"' }};
@@ -210,6 +219,8 @@
     <script>
         // Mobile tap-to-toggle for .bk-tip tooltips
         document.addEventListener('DOMContentLoaded', function() {
+            var menu = document.querySelector('.bk-menu');
+            if (menu) menu.addEventListener('click', function(e) { if (e.target.closest('a')) menu.removeAttribute('open'); });
             document.querySelectorAll('.bk-tip').forEach(function(el) {
                 el.addEventListener('click', function(e) {
                     e.stopPropagation();

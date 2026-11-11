@@ -37,7 +37,7 @@ class TestLandingPageRegression:
         html = resp.text
 
         # Core value prop + hospital search should stay stable.
-        assert "Start with" in html
+        assert "Check my bill free" in html
         assert 'action="/hospitals/"' in html
         assert 'name="q"' in html
 

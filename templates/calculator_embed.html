@@ -7,16 +7,16 @@
     <style>
         :root {
             --card-white: #FFFFFF;
-            --text-black: #1A1A1A;
+            --text-black: #16302A;
             --accent-lime: #D2F635;
             --accent-grey: #F4F5F7;
-            --text-secondary: #6B7280;
+            --text-secondary: #5E6F69;
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --radius-md: 18px;
             --radius-sm: 100px;
             --red-bg: #FEE2E2; --red-text: #991B1B;
             --amber-bg: #FEF3C7; --amber-text: #92400E;
-            --green-bg: #EAF0FD; --green-text: #163A9C;
+            --green-bg: #E1F0EA; --green-text: #08503F;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         body { background: transparent; font-family: var(--font-main); color: var(--text-black); }
@@ -25,7 +25,7 @@
             background: var(--card-white);
             border-radius: var(--radius-md);
             padding: 28px;
-            border: 1px solid #E5E7EB;
+            border: 1px solid #D6E0DB;
         }
 
         .embed-card h3 {
@@ -38,7 +38,7 @@
 
         .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
         .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 110px; }
-        .field label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+        .field label { font-size: 0.75rem; font-weight: 700;   color: var(--text-secondary); }
         .field input {
             padding: 10px 14px;
             border: 2px solid #D1D5DB;
@@ -76,7 +76,7 @@
         }
 
         .result-tile { background: var(--accent-grey); border-radius: 14px; padding: 16px; }
-        .tile-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 4px; }
+        .tile-label { font-size: 0.72rem; font-weight: 700;   color: var(--text-secondary); margin-bottom: 4px; }
         .tile-value { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
         .tile-detail { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
 
@@ -136,7 +136,7 @@
         <div class="results-area" id="eResults">
             <p class="result-desc" id="eDesc"></p>
             <div class="result-grid" id="eGrid"></div>
-            <a class="cta-link" href="{{ cta_url or '/scan' }}" target="_top">{{ cta_text or "Upload your full bill for a complete audit" }} &rarr;</a>
+            <a class="cta-link" href="{{ cta_url or '/scan' }}" target="_top">{{ cta_text or "Upload your full bill for a complete audit" }}</a>
             <p class="embed-note">Source: CMS Medicare Physician Fee Schedule & OPPS (2026). Hospital benchmarks from claims data.</p>
         </div>
     </div>

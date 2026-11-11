@@ -7,100 +7,181 @@
 {% endblock %}
 
 {% block content %}
-<section class="bk-wrap" style="padding-top: 88px; padding-bottom: 72px">
-    <p class="bk-eyebrow">Hospital bills only &middot; {{ "{:,}".format(hospital_count) }} U.S. hospitals &middot; CMS data</p>
-    <h1 style="margin: 0; max-width: 860px; font-size: clamp(40px, 6vw, 68px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 800">Hospital bill look wrong? <span class="bk-mark">We&rsquo;ll dispute it in writing.</span></h1>
-    <p style="margin: 24px 0 0; max-width: 640px; font-size: 20px; line-height: 1.5; color: var(--ink-2)">Upload your bill. We check every charge against what Medicare pays for the same code and flag duplicates. If something&rsquo;s off, we send a dispute letter to the billing office and follow up until they answer. Checking is free.</p>
-    <div style="margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px">
-        <a href="/scan" class="bk-btn">Check my bill free</a>
-        <a href="#pricing" class="bk-btn-outline">See the flat fee</a>
+<section class="bk-wrap bk-home-hero">
+    <div>
+        <h1>Find the mistakes on your hospital bill. <span class="bk-mark">We&rsquo;ll dispute it in writing.</span></h1>
+        <p class="bk-lede">Upload your itemized bill and see every charge next to what Medicare pays for the same code, plus duplicates and tests billed twice. Checking is free. If something&rsquo;s wrong, we send the dispute to the billing office and follow up for one flat fee.</p>
+        <div class="bk-home-actions">
+            <a href="/scan" class="bk-btn">Check my bill free</a>
+            <a href="#pricing" class="bk-btn-outline">See pricing</a>
+        </div>
+        <ul class="bk-promise">
+            <li>Free check, no account</li>
+            <li>Disputes from ${{ dispute_tiers[0].fee }}</li>
+            <li>Refund if not reduced in {{ config.DISPUTE_MAX_DAYS }} days</li>
+        </ul>
     </div>
 
-    <form action="/hospitals/" method="get" style="margin: 48px 0 0; max-width: 760px">
-        <label for="hospital-search" class="bk-label">Or look up a hospital&rsquo;s billing office</label>
-        <div class="bk-search">
-            <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="e.g. Inova Fair Oaks, or Fairfax VA" autocomplete="off">
-            <button type="submit" class="bk-btn-outline">Find hospital</button>
+    <figure style="margin: 0">
+        <div class="bk-statement" aria-label="Example itemized hospital bill with flagged charges">
+            <div class="bk-statement-head"><strong>Itemized statement</strong><span>Emergency visit, sprained ankle</span></div>
+            <ol>
+                {% for line in example.lines %}
+                <li class="{{ 'flag' if line.flag }}">
+                    <span class="code">{{ line.code }}</span>
+                    <span class="desc">{{ line.desc }}</span>
+                    <span class="amt">${{ "{:,.2f}".format(line.amount) }}</span>
+                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} for this code.{% endif %}</span>{% endif %}
+                </li>
+                {% endfor %}
+            </ol>
+            <div class="bk-statement-foot">
+                <span>Billed</span><span class="amt">${{ "{:,.2f}".format(example.total) }}</span>
+                <span class="save">Errors to remove</span><span class="amt save">&minus;${{ "{:,.2f}".format(example.clear_errors) }}</span>
+                <span>Visit level sent for coding review</span><span class="amt">${{ "{:,.2f}".format(example.visit_amount) }}</span>
+            </div>
         </div>
-    </form>
+        <figcaption class="bk-statement-caption">An example of what the free check shows. Charges are illustrative; the Medicare rate is from our CMS data.</figcaption>
+    </figure>
 </section>
 
-<section style="background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule)">
+<section id="how" class="bk-band">
     <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
-        <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">How it works</h2>
-        <p class="bk-lede" style="max-width: 640px; margin-top: 12px">Do the first two yourself for free. Hand us the third if you&rsquo;d rather not write letters and chase replies.</p>
-        <ol style="margin: 40px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); border-top: 2px solid var(--ink)">
-            <li style="padding: 28px 28px 32px 0; border-bottom: 1px solid var(--rule)">
-                <div class="bk-mono bk-muted" style="font-size: 15px">01</div>
-                <h3 style="margin: 12px 0 8px; font-size: 21px; font-weight: 700">Ask for an itemized bill</h3>
-                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">A summary bill hides the line items. You have a right to see every charge and its billing code.</p>
-                <a href="/guides/how-to-get-itemized-hospital-bill/" style="display: inline-block; margin-top: 16px; font-weight: 600; padding: 10px 0">Get the request letter</a>
+        <h2 class="bk-h2">How it works</h2>
+        <p class="bk-lede">The first two steps are free. The third is optional.</p>
+        <ol class="bk-steps">
+            <li>
+                <h3>Upload your itemized bill</h3>
+                <p>A photo or PDF. If you only have a summary, <a href="/guides/how-to-get-itemized-hospital-bill/">ask for the itemized version</a>; you have a right to it.</p>
             </li>
-            <li style="padding: 28px 28px 32px 0; border-bottom: 1px solid var(--rule)">
-                <div class="bk-mono bk-muted" style="font-size: 15px">02</div>
-                <h3 style="margin: 12px 0 8px; font-size: 21px; font-weight: 700">Ask about financial assistance</h3>
-                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">Nonprofit hospitals must publish a financial assistance policy. Depending on income, the bill can be reduced or forgiven.</p>
-                <a href="/charity-care" style="display: inline-block; margin-top: 16px; font-weight: 600; padding: 10px 0">Check if you qualify</a>
+            <li>
+                <h3>See what looks wrong</h3>
+                <p>Every line with a billing code is compared with Medicare&rsquo;s rate. Duplicates, overlapping tests and high visit levels are flagged.</p>
             </li>
-            <li style="padding: 28px 0 32px 0; border-bottom: 1px solid var(--rule)">
-                <div class="bk-mono bk-muted" style="font-size: 15px">03</div>
-                <h3 style="margin: 12px 0 8px; font-size: 21px; font-weight: 700">We dispute it in writing</h3>
-                <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2)">After the free check, we write a dispute letter for the charges we flagged, send it to billing and follow up until they answer.</p>
-                <a href="/scan" style="display: inline-block; margin-top: 16px; font-weight: 600; padding: 10px 0">Start with the free check</a>
+            <li>
+                <h3>We dispute it for you</h3>
+                <p>We write the letter for the flagged charges, send it to billing and follow up on days {{ followup_days | join(", ") }} until they answer.</p>
             </li>
         </ol>
     </div>
 </section>
 
-<section id="pricing" class="bk-wrap" style="padding-top: 72px; padding-bottom: 24px">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
+<section class="bk-wrap" style="padding-top: 72px">
+    <h2 class="bk-h2">What the check looks for</h2>
+    <div class="bk-findings">
         <div>
-            <h2 style="margin: 0; font-size: 32px; letter-spacing: -0.02em; font-weight: 800">One flat fee. Refunded if nothing changes.</h2>
-            <p class="bk-lede" style="margin-top: 12px"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. We charge a flat fee based on the size of the bill. You only pay if, after the free check, you choose to send a dispute.</p>
-            <ul class="bk-rows">
-                {% for tier in dispute_tiers %}
-                <li style="padding: 14px 0"><span>{{ tier.label }}</span><span class="bk-mono" style="font-weight: 600">${{ tier.fee }}</span></li>
-                {% endfor %}
-            </ul>
+            <h3>Charges billed twice</h3>
+            <p>The same code on the same day, or one blood draw billed as two. <a href="/guides/duplicate-charges-hospital-bills/">Duplicate charges</a></p>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 800">What the fee covers</h2>
-            <ul style="margin: 16px 0 0; padding-left: 20px; font-size: 17px; line-height: 1.7; color: var(--ink-2)">
-                <li>A dispute letter written for your bill and the charges we flagged</li>
-                <li>Sent to the hospital&rsquo;s billing office for you</li>
-                <li>Follow-ups on days {{ followup_days | join(", ") }} if they don&rsquo;t answer</li>
-                <li>One place to track replies and next steps</li>
-            </ul>
-            <p class="bk-muted" style="margin-top: 16px; font-size: 15px; line-height: 1.6">We can&rsquo;t promise the hospital will lower your bill; that decision is theirs. If it isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, you get the fee back in full.</p>
+            <h3>Prices far above Medicare</h3>
+            <p>How many times Medicare&rsquo;s rate each line costs, so you know which numbers to question. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
+        </div>
+        <div>
+            <h3>Visits billed at a higher level</h3>
+            <p>Level 4 and 5 emergency visits, the most common place for upcoding. <a href="/guides/upcoding-unbundling-hospital-bills/">Upcoding</a></p>
+        </div>
+        <div>
+            <h3>Tests that overlap</h3>
+            <p>A basic panel billed next to the comprehensive one that already includes it. <a href="/guides/upcoding-unbundling-hospital-bills/">Unbundling</a></p>
         </div>
     </div>
 </section>
 
-<section class="bk-wrap" style="padding-top: 48px; padding-bottom: 72px">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
+<section id="pricing" class="bk-wrap" style="padding-top: 88px">
+    <div class="bk-price">
         <div>
-            <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">What we don&rsquo;t do</h2>
-            <ul style="margin: 16px 0 0; padding-left: 20px; font-size: 16px; line-height: 1.7; color: var(--ink-2)">
-                <li><strong>Phone negotiation.</strong> Everything is in writing, so you keep a dated record.</li>
-                <li><strong>Insurance denials.</strong> That&rsquo;s a fight with your insurer, not the hospital. Start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>.</li>
-                <li><strong>Legal help.</strong> Sued or facing wage garnishment? Contact local legal aid or a consumer attorney.</li>
+            <h2 class="bk-h2">One flat fee. Refunded if nothing changes.</h2>
+            <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. Our fee depends only on the size of the bill, and you pay it only if you choose to send a dispute.</p>
+            <ul class="bk-checks">
+                <li>A dispute letter written for your bill and the charges we flagged</li>
+                <li>Sent to the hospital&rsquo;s billing office for you</li>
+                <li>Follow-ups on days {{ followup_days | join(", ") }} if they don&rsquo;t answer</li>
+                <li>One page to track replies and next steps</li>
             </ul>
+            <p class="bk-muted" style="margin-top: 16px; font-size: 15px">The hospital decides whether to lower the bill. If it isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, you get the fee back in full.</p>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">Already in collections?</h2>
-            <p class="bk-lede" style="margin-top: 12px">You can ask the collector to prove the debt is yours and the amount is right. Send a validation letter within 30 days of their first notice.</p>
-            <a href="/collection-notice" class="bk-btn-outline" style="margin-top: 20px">Write a validation letter</a>
+            <div class="bk-price-table">
+                {% for tier in dispute_tiers %}
+                <div><span>{{ tier.label }}</span><strong>${{ tier.fee }}</strong></div>
+                {% endfor %}
+            </div>
+            <div class="bk-table-box">
+                <table class="bk-table bk-compare">
+                    <thead><tr><th>$2,400 bill, $900 saved</th><th>Fee</th><th>You keep</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>BillKarma</strong></td><td class="bk-num">$49</td><td class="bk-num">$851</td></tr>
+                        <tr><td><a href="/guides/billkarma-vs-goodbill-medical-bills/">Goodbill</a> (20%)</td><td class="bk-num">$180</td><td class="bk-num">$720</td></tr>
+                        <tr><td><a href="/guides/billkarma-vs-resolve-medical-bills/">Resolve</a></td><td colspan="2">Takes bills of $5,000 or more</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bk-wrap" style="padding-top: 88px">
+    <div class="bk-findings" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 0">
+        <div>
+            <h3>What we don&rsquo;t do</h3>
+            <p>No phone negotiation; everything is in writing so you keep a dated record. No insurance denials; start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>. No legal help; if you&rsquo;re sued, contact local legal aid.</p>
         </div>
         <div>
-            <h2 style="margin: 0; font-size: 28px; letter-spacing: -0.02em; font-weight: 800">Where this comes from</h2>
-            <ul class="bk-rows" style="margin-top: 16px">
-                <li style="padding: 12px 0"><span>Hospital addresses and phone numbers</span><span class="bk-mono bk-muted" style="font-size: 14px">CMS</span></li>
-                <li style="padding: 12px 0"><span>Prices hospitals charge</span><span class="bk-mono bk-muted" style="font-size: 14px">Price transparency files</span></li>
-                <li style="padding: 12px 0"><span>What Medicare pays</span><span class="bk-mono bk-muted" style="font-size: 14px">CMS fee schedules</span></li>
-                <li style="padding: 12px 0"><span>Financial assistance rules</span><span class="bk-mono bk-muted" style="font-size: 14px">IRS 501(r)</span></li>
-            </ul>
-            <a href="/guides/hospital-billing-grades-explained/" style="display: inline-block; margin-top: 12px; font-size: 15px; font-weight: 600; padding: 10px 0">How we grade hospitals</a>
+            <h3>Already in collections?</h3>
+            <p>Ask the collector to prove the debt and the amount. Send a validation letter within 30 days of their first notice. <a href="/collection-notice">Write a validation letter</a></p>
         </div>
+        <div>
+            <h3>Can&rsquo;t afford it at all?</h3>
+            <p>Nonprofit hospitals must offer financial assistance, and many cover households well above the poverty line. <a href="/charity-care">Check if you qualify</a></p>
+        </div>
+    </div>
+</section>
+
+<section class="bk-wrap" style="padding-top: 88px"><div class="bk-narrow">
+    <h2 class="bk-h2">Questions</h2>
+    <div class="bk-faq" style="margin-top: 20px; border-top: 1.5px solid var(--ink)">
+        <details>
+            <summary>Do I need my itemized bill?</summary>
+            <p>Yes. A summary bill shows totals, not the billing codes we compare. Hospitals must give you the itemized version on request; <a href="/guides/how-to-get-itemized-hospital-bill/">here&rsquo;s how to ask</a>.</p>
+        </details>
+        <details>
+            <summary>Why compare with Medicare?</summary>
+            <p>Medicare publishes what it pays for each billing code, so it&rsquo;s a public, consistent yardstick. Hospitals aren&rsquo;t required to charge Medicare rates, but a charge many times higher is worth questioning.</p>
+        </details>
+        <details>
+            <summary>What happens after I pay for a dispute?</summary>
+            <p>We send the letter to the hospital&rsquo;s billing office, follow up on days {{ followup_days | join(", ") }} and show every reply on your dispute page. If the bill isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, we refund the fee.</p>
+        </details>
+        <details>
+            <summary>Does this work if I have insurance?</summary>
+            <p>Yes, for what the hospital billed you. If your insurer denied the claim, that&rsquo;s an appeal to the insurer, which we don&rsquo;t handle; see <a href="/appeal">appeal a denied claim</a>.</p>
+        </details>
+        <details>
+            <summary>Where does the data come from?</summary>
+            <p>Medicare rates from CMS fee schedules, hospital prices from hospitals&rsquo; own price transparency files, and hospital contact details from CMS. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></p>
+        </details>
+    </div>
+</div></section>
+
+<section class="bk-wrap" style="padding-top: 88px">
+    <form action="/hospitals/" method="get" class="bk-panel" style="display: grid; gap: 14px">
+        <label for="hospital-search" class="bk-h3">Look up a hospital&rsquo;s billing office</label>
+        <p class="bk-muted" style="margin: -6px 0 4px">Phone number, financial assistance policy and how its prices compare with Medicare, for {{ "{:,}".format(hospital_count) }} U.S. hospitals.</p>
+        <div class="bk-search">
+            <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
+            <button type="submit" class="bk-btn-outline">Find hospital</button>
+        </div>
+    </form>
+</section>
+
+<section class="bk-wrap" style="padding-top: 32px; padding-bottom: 88px">
+    <div class="bk-cta-band">
+        <div>
+            <h2>See what&rsquo;s wrong with your bill before you pay it.</h2>
+            <p>Free, and you decide what happens next.</p>
+        </div>
+        <a href="/scan" class="bk-btn">Check my bill free</a>
     </div>
 </section>
 {% endblock %}

@@ -32,8 +32,8 @@
     padding: 4px 14px;
     font-size: 0.72rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    
+    
     margin-bottom: 20px;
 }
 .cm-stats {
@@ -61,10 +61,10 @@
     max-width: 500px;
     padding: 14px 18px;
     font-size: 1rem;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #D6E0DB;
     border-radius: 12px;
     margin-top: 20px;
-    color: #111827;
+    color: #16302A;
     outline: none;
     transition: border-color 0.15s;
 }
@@ -83,9 +83,9 @@
     border-radius: 100px;
     font-size: 0.85rem;
     font-weight: 600;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #D6E0DB;
     background: #fff;
-    color: #374151;
+    color: #374842;
     cursor: pointer;
     transition: all 0.15s;
 }
@@ -96,18 +96,18 @@
     color: #fff;
 }
 
-.cm-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid #E5E7EB; }
+.cm-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid #D6E0DB; }
 .cm-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .cm-table th {
-    background: #F9FAFB;
+    background: #F4F7F5;
     padding: 11px 14px;
     text-align: left;
     font-size: 0.75rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6B7280;
-    border-bottom: 2px solid #E5E7EB;
+    
+    
+    color: #5E6F69;
+    border-bottom: 2px solid #D6E0DB;
     white-space: nowrap;
 }
 .cm-table td {
@@ -116,11 +116,11 @@
     vertical-align: middle;
 }
 .cm-table tr:last-child td { border-bottom: none; }
-.cm-table tr:hover td { background: #F9FAFB; }
-.cm-item-name { font-weight: 600; color: #111827; }
+.cm-table tr:hover td { background: #F4F7F5; }
+.cm-item-name { font-weight: 600; color: #16302A; }
 .cm-cat { display: inline-block; background: #F3F4F6; color: #4B5563; border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; }
-.cm-charge { font-weight: 700; color: #111827; white-space: nowrap; }
-.cm-cost { color: #6B7280; white-space: nowrap; }
+.cm-charge { font-weight: 700; color: #16302A; white-space: nowrap; }
+.cm-cost { color: #5E6F69; white-space: nowrap; }
 .markup-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -131,7 +131,7 @@
 }
 .markup-red { background: #FEE2E2; color: #991B1B; }
 .markup-yellow { background: #FEF3C7; color: #92400E; }
-.markup-green { background: #EAF0FD; color: #163A9C; }
+.markup-green { background: #E1F0EA; color: #08503F; }
 .cm-see-link { color: var(--bk-green); font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .cm-see-link:hover { text-decoration: underline; }
 
@@ -151,8 +151,8 @@
 .fight-back h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.02em; }
 .fight-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .fight-step {
-    background: #F9FAFB;
-    border: 1px solid #E5E7EB;
+    background: #F4F7F5;
+    border: 1px solid #D6E0DB;
     border-radius: 12px;
     padding: 20px;
 }
@@ -167,7 +167,7 @@
     margin-bottom: 12px;
 }
 .fight-step h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 6px; }
-.fight-step p { font-size: 0.85rem; color: #6B7280; margin: 0; line-height: 1.5; }
+.fight-step p { font-size: 0.85rem; color: #5E6F69; margin: 0; line-height: 1.5; }
 
 .cm-cta {
     background: linear-gradient(135deg, #0F172A 0%, #1a3a5c 100%);
@@ -333,7 +333,7 @@ const ITEMS = [
     <div class="cm-cta">
         <h2>Is your hospital overcharging?</h2>
         <p>Search 6,800+ hospitals and compare their prices to federal Medicare benchmarks — for free.</p>
-        <a href="/hospitals/">Check Your Hospital &rarr;</a>
+        <a href="/hospitals/">Check Your Hospital</a>
     </div>
 </div>
 
@@ -390,7 +390,7 @@ function renderTable() {
             <td class="cm-charge">${fmt(item.low)} – ${fmt(item.high)}</td>
             <td class="cm-cost">${fmt(item.cost)}</td>
             <td><span class="markup-badge ${cls}">${markup}×</span></td>
-            <td><a class="cm-see-link" href="/hospitals/?q=${itemSlug}">See hospitals &rarr;</a></td>
+            <td><a class="cm-see-link" href="/hospitals/?q=${itemSlug}">See hospitals</a></td>
         </tr>`;
     }).join('');
 }

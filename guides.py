@@ -364,9 +364,9 @@ _LINK_MAP: list[tuple[str, str]] = [
 
 _SCAN_CTA_BLOCK = (
     '<div class="guide-cta-inline">'
-    '<h3>Got a bill for this? Check it free.</h3>'
-    '<p>Upload your medical bill and we\'ll compare every line against Medicare rates — flagging overcharges in 30 seconds. 1 in 4 bills has an error.</p>'
-    '<a href="/scan">Scan My Bill Free &rarr;</a>'
+    '<h3>Have a bill like this? Check it free.</h3>'
+    '<p>Upload it and see every charge next to what Medicare pays for the same code, with duplicates and overlapping tests flagged.</p>'
+    '<a href="/scan">Check my bill free</a>'
     '</div>'
 )
 
@@ -447,7 +447,7 @@ def _embed(mode="cost", cpt="", title="", subtitle="", height="380"):
         params += f"&subtitle={subtitle.replace('&', '%26')}"
     return (
         f'<iframe src="/calculator/embed?{params}" '
-        f'width="100%" height="{height}" style="border:none; border-radius:18px;" '
+        f'width="100%" height="{height}" style="border:none;" '
         f'loading="lazy" title="{title or "Calculator"}"></iframe>'
     )
 

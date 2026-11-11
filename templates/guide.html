@@ -98,381 +98,87 @@
 }
 </script>
 {% endif %}
-<style>
-    .article-container {
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 0 24px 80px;
-    }
-
-    .guide-note { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: var(--muted); }
-    .article-hero {
-        background-color: var(--bk-green);
-        border-radius: 0 0 40px 40px;
-        padding: 64px 24px 56px;
-        margin-bottom: 40px;
-    }
-    .article-hero-inner {
-        max-width: 760px;
-        margin: 0 auto;
-    }
-
-    .article-meta {
-        display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
-        margin-bottom: 24px;
-    }
-    .meta-category { font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-    .meta-date { font-size: 14px; color: var(--muted); }
-
-    .article-hero h1 {
-        font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
-        color: #fff;
-    }
-
-    /* Article body styles */
-    .article-body p { font-size: 1.08rem; line-height: 1.75; margin-bottom: 20px; color: #374151; }
-    .article-body p.lead { font-size: 1.2rem; color: var(--bk-black); font-weight: 500; line-height: 1.65; border-left: 4px solid var(--bk-green); padding-left: 20px; margin-bottom: 32px; }
-    .article-body h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-top: 48px; margin-bottom: 16px; }
-    .article-body h3 { font-size: 1.15rem; font-weight: 700; margin-top: 28px; margin-bottom: 10px; }
-    .article-body ul, .article-body ol { margin-bottom: 20px; padding-left: 24px; }
-    .article-body li { font-size: 1.05rem; line-height: 1.7; margin-bottom: 8px; color: #374151; }
-    .article-body a { color: var(--bk-green); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-    .article-body a:hover { color: var(--bk-green-dark); }
-    .article-body strong { font-weight: 700; color: var(--bk-black); }
-    .article-body em { font-style: italic; }
-
-    .article-body table {
-        width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 0.95rem;
-        background: #fff; border-radius: 14px; overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .article-body th { background: #F4F5F7; text-align: left; padding: 12px 16px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; }
-    .article-body td { padding: 12px 16px; border-top: 1px solid #F3F4F6; }
-
-    .article-body iframe { display: block; margin: 28px 0; max-width: 100%; }
-
-    .article-body .toc {
-        background: #fff; border-radius: 18px; padding: 24px 28px;
-        margin-bottom: 36px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-        border: 1px solid var(--bk-gray-border);
-    }
-    .article-body .toc h2 { font-size: 1rem; margin-top: 0; margin-bottom: 12px; }
-    .article-body .toc ol { padding-left: 20px; margin-bottom: 0; }
-    .article-body .toc li { font-size: 0.95rem; margin-bottom: 4px; }
-
-    .article-body .sources-list { list-style: none; padding-left: 0; }
-    .article-body .sources-list li { padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 0.95rem; }
-    .article-body .sources-list li:last-child { border-bottom: none; }
-
-    .article-body .case-study {
-        background: #fff; border-radius: 18px; padding: 28px 32px;
-        margin: 32px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        border-left: 5px solid var(--bk-green);
-    }
-    .article-body .case-study h3 { margin-top: 0; font-size: 1.1rem; }
-    .article-body .case-study p:last-child { margin-bottom: 0; }
-
-    .article-body .bill-example {
-        background: #FAFAFA; border: 1px solid #E5E7EB; border-radius: 14px;
-        padding: 24px; margin: 24px 0; font-family: 'Courier New', Courier, monospace;
-        font-size: 0.88rem; line-height: 1.65; overflow-x: auto;
-    }
-    .article-body .bill-example .bill-header {
-        font-weight: 700; margin-bottom: 12px; font-size: 0.82rem;
-        text-transform: uppercase; letter-spacing: 0.05em; color: var(--bk-gray-text);
-        border-bottom: 2px solid #D1D5DB; padding-bottom: 8px;
-    }
-    .article-body .bill-example .line-item {
-        display: flex; justify-content: space-between; padding: 6px 0;
-        border-bottom: 1px dotted #D1D5DB; flex-wrap: wrap; gap: 4px;
-    }
-    .article-body .bill-example .line-item:last-child { border-bottom: none; }
-    .article-body .bill-example .line-item.flagged { background: #FEF3C7; margin: 0 -12px; padding: 6px 12px; border-radius: 6px; }
-    .article-body .bill-example .line-item.error { background: #FEE2E2; margin: 0 -12px; padding: 6px 12px; border-radius: 6px; }
-    .article-body .bill-example .line-total {
-        font-weight: 700; border-top: 2px solid #1A1A1A; margin-top: 8px; padding-top: 8px;
-        display: flex; justify-content: space-between;
-    }
-
-    .article-body .key-takeaway {
-        background: #EAF0FD; border-radius: 14px; padding: 20px 24px;
-        margin: 24px 0; font-size: 1rem; font-weight: 600; line-height: 1.6;
-        color: #163A9C;
-    }
-    .article-body .key-takeaway strong { font-weight: 800; }
-
-    .sources-box {
-        background: #FAFAFA; border: 1px solid var(--bk-gray-border); border-radius: 14px;
-        padding: 24px 28px; margin: 40px 0 32px;
-    }
-    .sources-title {
-        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 0.08em; color: var(--bk-gray-text); margin-bottom: 14px;
-    }
-    .sources-box ul { list-style: none; padding: 0; margin: 0 0 14px; }
-    .sources-box li {
-        padding: 7px 0; border-bottom: 1px solid #F3F4F6;
-        font-size: 0.9rem; color: #374151; line-height: 1.5;
-    }
-    .sources-box li:last-child { border-bottom: none; }
-    .sources-box a { color: var(--bk-green); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
-    .sources-box a:hover { color: var(--bk-green-dark); }
-    .sources-note { font-size: 0.82rem; color: var(--bk-gray-text); margin: 0; line-height: 1.6; }
-
-    .article-body .faq-section { margin-top: 48px; }
-    .article-body .faq-item {
-        background: #fff; border-radius: 14px; padding: 22px 26px;
-        margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        border: 1px solid var(--bk-gray-border);
-    }
-    .article-body .faq-item h3 { margin-top: 0; font-size: 1.08rem; margin-bottom: 8px; }
-    .article-body .faq-item p { margin-bottom: 0; font-size: 1rem; }
-
-    .article-body .guide-cta-inline {
-        background: linear-gradient(135deg, #163A9C 0%, #163A9C 100%);
-        border-radius: 20px;
-        padding: 26px 24px;
-        margin: 28px 0;
-        color: #fff;
-        text-align: left;
-    }
-    .article-body .guide-cta-inline h3 {
-        color: #fff;
-        margin: 0 0 8px;
-        font-size: 1.3rem;
-        line-height: 1.25;
-    }
-    .article-body .guide-cta-inline p {
-        color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 14px;
-    }
-    .article-body .guide-cta-inline a {
-        display: inline-block;
-        background: #fff;
-        color: #163A9C;
-        border-radius: 999px;
-        padding: 12px 22px;
-        text-decoration: none;
-        font-weight: 800;
-    }
-    .article-body .guide-cta-inline a:hover {
-        background: #f3f4f6;
-        color: #163A9C;
-    }
-
-    /* CTA at bottom */
-    .article-cta {
-        background: var(--bk-green); border-radius: 24px; padding: 36px;
-        text-align: center; margin-top: 48px;
-    }
-    .article-cta h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: #fff; }
-    .article-cta p { font-size: 1rem; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
-    .article-cta a {
-        display: inline-block; background: #fff; color: var(--bk-green);
-        padding: 14px 28px; border-radius: 999px; font-weight: 700;
-        font-size: 1rem; text-decoration: none;
-    }
-    .article-cta a:hover { background: #f0f0f0; }
-
-    .answer-box {
-        background: #EAF0FD;
-        border-left: 4px solid #1F4FD1;
-        border-radius: 0 12px 12px 0;
-        padding: 16px 20px;
-        margin: 0 0 28px 0;
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-    .answer-box strong {
-        display: block;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #1F4FD1;
-        margin-bottom: 6px;
-    }
-
-    @media (max-width: 768px) {
-        .article-hero { padding: 40px 18px 36px; border-radius: 0 0 24px 24px; }
-        .article-hero h1 { font-size: 1.8rem; }
-        .article-body h2 { font-size: 1.3rem; }
-        .article-body p, .article-body li { font-size: 1rem; }
-        .article-cta { padding: 24px 18px; }
-    }
-
-    /* === STICKY SCAN BAR === */
-    .sticky-scan-bar {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        z-index: 200;
-        background: #1A1A1A;
-        color: #fff;
-        padding: 13px 24px;
-        display: flex; align-items: center; justify-content: center; gap: 16px;
-        transform: translateY(100%);
-        transition: transform 0.35s cubic-bezier(.4,0,.2,1);
-        box-shadow: 0 -2px 20px rgba(0,0,0,.22);
-    }
-    .sticky-scan-bar.shown { transform: translateY(0); }
-    .sticky-scan-bar-text { font-size: .88rem; color: rgba(255,255,255,.72); }
-    .sticky-scan-bar-btn {
-        background: var(--bk-green); color: #fff;
-        padding: 9px 22px; border-radius: 999px;
-        font-weight: 700; font-size: .875rem;
-        text-decoration: none; white-space: nowrap; flex-shrink: 0;
-    }
-    .sticky-scan-bar-btn:hover { background: var(--bk-green-dark); color: #fff; }
-    .sticky-scan-bar-proof { font-size: .72rem; color: rgba(255,255,255,.4); border-left: 1px solid rgba(255,255,255,.15); padding-left: 14px; line-height: 1.4; }
-
-    /* === READING PROGRESS BAR === */
-    .reading-progress {
-        position: fixed; top: 60px; left: 0; right: 0;
-        height: 3px; background: transparent; z-index: 49; pointer-events: none;
-    }
-    .reading-progress-fill {
-        height: 100%; background: var(--bk-green);
-        width: 0%; transition: width 0.12s linear;
-    }
-
-    /* === EMAIL CAPTURE === */
-    .email-capture {
-        background: #F9FAFB; border: 1px solid var(--bk-gray-border);
-        border-radius: 16px; padding: 22px 24px;
-        margin: 32px 0; display: flex; align-items: center;
-        gap: 16px; flex-wrap: wrap;
-    }
-    .email-capture-label { flex: 1; min-width: 180px; }
-    .email-capture-label strong { display: block; font-size: .95rem; font-weight: 700; margin-bottom: 3px; color: #111827; }
-    .email-capture-label span { font-size: .82rem; color: #6B7280; }
-    .email-capture-form { display: flex; gap: 8px; flex-wrap: wrap; }
-    .email-capture-form input[type="email"] {
-        padding: 9px 14px; border: 1.5px solid #D1D5DB; border-radius: 8px;
-        font-size: .875rem; outline: none; min-width: 200px;
-        transition: border-color .15s;
-    }
-    .email-capture-form input[type="email"]:focus { border-color: var(--bk-green); }
-    .email-capture-form button {
-        background: var(--bk-green); color: #fff; border: none;
-        padding: 9px 18px; border-radius: 8px; font-weight: 700;
-        font-size: .875rem; cursor: pointer; white-space: nowrap;
-    }
-    .email-capture-form button:hover { background: var(--bk-green-dark); }
-    .sticky-scan-bar-close {
-        background: none; border: none; color: rgba(255,255,255,.45);
-        font-size: 1.4rem; line-height: 1; cursor: pointer;
-        padding: 0 4px; flex-shrink: 0;
-    }
-    .sticky-scan-bar-close:hover { color: #fff; }
-
-    /* === ABOVE-FOLD MICRO CTA === */
-    .guide-micro-cta {
-        display: flex; align-items: center; justify-content: space-between;
-        background: #EAF0FD; border-radius: 10px; padding: 11px 16px;
-        margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
-    }
-    .guide-micro-cta-text { font-size: .88rem; color: #163A9C; font-weight: 500; }
-    .guide-micro-cta-btn {
-        background: var(--bk-green); color: #fff; border-radius: 999px;
-        padding: 7px 16px; font-weight: 700; font-size: .82rem;
-        text-decoration: none; white-space: nowrap; flex-shrink: 0;
-    }
-    .guide-micro-cta-btn:hover { background: var(--bk-green-dark); color: #fff; }
-
-    @media (max-width: 640px) {
-        .sticky-scan-bar { padding: 12px 16px; gap: 10px; }
-        .sticky-scan-bar-text { display: none; }
-        .guide-micro-cta { flex-direction: column; gap: 8px; align-items: flex-start; }
-    }
-</style>
 {% endblock %}
 
 {% block content %}
 <div class="reading-progress" aria-hidden="true"><div class="reading-progress-fill" id="reading-progress-fill"></div></div>
-<div class="article-hero">
-    <div class="article-hero-inner">
-        <div class="article-meta">
-            {% if guide.category %}
-            <span class="meta-category">{{ guide.category }}</span>
-            {% endif %}
-            {% if guide.published %}
-            <span class="meta-date">Published {{ guide.published }}</span>
-            {% endif %}
-            {% if reading_time %}
-            <span class="meta-date">{{ reading_time }} min read</span>
-            {% endif %}
-        </div>
+<header class="bk-article-head">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/guides/">Guides</a>{% if guide.category %} / <a href="/guides/category/{{ category_slug }}/">{{ guide.category }}</a>{% endif %}</p>
         <h1>{{ guide.title }}</h1>
+        <p class="bk-article-meta">
+            {% if guide.published %}<span>Published {{ guide.published }}</span>{% endif %}
+            {% if reading_time %}<span>{{ reading_time }} minute read</span>{% endif %}
+            <span>Sources listed at the end</span>
+        </p>
     </div>
+</header>
+
+<div class="bk-article-layout bk-wrap">
+    <article class="bk-article">
+        <div class="answer-box">
+            <strong>Short answer</strong>
+            {% if meta_description %}{{ meta_description }}{% else %}{{ guide.body | striptags | truncate(160, True, '…') }}{% endif %}
+        </div>
+        <div class="article-body">
+            {{ guide.body | safe }}
+        </div>
+
+        <aside class="bk-article-about">
+            <h2>About this guide</h2>
+            <p>{% if guide.reviewer %}Reviewed by {{ guide.reviewer.name }}{% if guide.reviewer.credential %}, {{ guide.reviewer.credential }}{% endif %}. {% endif %}Written by BillKarma from CMS data and the sources above. It&rsquo;s general information, not legal or medical advice. Found a mistake? Email <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.</p>
+        </aside>
+
+        {% if related_guides %}
+        <section class="bk-related">
+            <h2>Related guides</h2>
+            <ul class="bk-guide-list">
+                {% for rg in related_guides %}
+                <li><a href="/guides/{{ rg.slug }}/">{{ rg.title }}<span class="bk-chev"></span></a></li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <div class="email-capture">
+            <div class="email-capture-label">
+                <strong>Get the 7-step bill checklist</strong>
+                <span>The order we check a hospital bill in, by email. One message, no newsletter.</span>
+            </div>
+            <form class="email-capture-form" action="/newsletter/subscribe" method="post">
+                <input type="hidden" name="source" value="guide-{{ guide.slug }}">
+                <label class="bk-sr-only" for="capture-email">Email</label>
+                <input id="capture-email" type="email" name="email" placeholder="you@example.com" required>
+                <button type="submit" class="bk-btn">Send the checklist</button>
+            </form>
+        </div>
+    </article>
+
+    <aside class="bk-article-side">
+        <div class="bk-side-card">
+            <h2>Have a bill like this?</h2>
+            <p>Upload it and see each charge next to what Medicare pays. Free, no account.</p>
+            <a href="/scan" class="bk-btn bk-btn-block">Check my bill free</a>
+            <p class="bk-side-small">Want us to dispute it? Flat fee from $29, refunded if the bill isn&rsquo;t reduced.</p>
+        </div>
+    </aside>
 </div>
 
-<article class="article-container">
-    <p class="guide-note">
-        {% if guide.reviewer %}Reviewed by {{ guide.reviewer.name }}{% if guide.reviewer.credential %}, {{ guide.reviewer.credential }}{% endif %}. {% endif %}Written by BillKarma from CMS data and the sources listed at the bottom. General information, not legal or medical advice.
-    </p>
-    <div class="guide-micro-cta">
-        <span class="guide-micro-cta-text">Got a bill related to this topic?</span>
-        <a href="/scan" class="guide-micro-cta-btn">Check for errors — free, 60 sec &rarr;</a>
-    </div>
-    <div class="answer-box">
-        <strong>Quick Answer</strong>
-        {% if meta_description %}{{ meta_description }}{% else %}{{ guide.body | striptags | truncate(160, True, '…') }}{% endif %}
-    </div>
-    <div class="article-body">
-        {{ guide.body | safe }}
-    </div>
-
-    <div class="sources-box">
-        <div class="sources-title">Sources &amp; References</div>
-        <ul>
-            <li><a href="https://www.cms.gov" rel="nofollow noopener" target="_blank">Centers for Medicare &amp; Medicaid Services (CMS)</a> — Medicare rates and billing rules</li>
-            <li><a href="https://www.kff.org" rel="nofollow noopener" target="_blank">KFF (Kaiser Family Foundation)</a> — Health insurance research and data</li>
-            <li><a href="https://www.ama-assn.org/practice-management/cpt" rel="nofollow noopener" target="_blank">American Medical Association CPT</a> — Procedure code definitions</li>
-        </ul>
-        <p class="sources-note">BillKarma guides are reviewed for accuracy against federal sources. Found an error? Email <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.</p>
-    </div>
-
-    {% if related_guides %}
-    <div class="mt-10 pt-8 border-t border-gray-200">
-        <h2 style="font-size:1.15rem;font-weight:800;margin-bottom:16px;">Related Guides</h2>
-        <div style="display:grid;gap:12px;">
-            {% for rg in related_guides %}
-            <a href="/guides/{{ rg.slug }}/" style="display:block;padding:16px;border-radius:14px;border:1px solid #E5E7EB;text-decoration:none;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.background='#EAF0FD'" onmouseout="this.style.borderColor='#E5E7EB';this.style.background='transparent'">
-                <div style="font-weight:600;color:#1A1A1A;">{{ rg.title }}</div>
-                <div style="font-size:0.82rem;color:#6B7280;margin-top:4px;">{{ rg.category }}</div>
-            </a>
-            {% endfor %}
+{% if not guide.hide_default_cta %}
+<section class="bk-wrap" style="padding-top: 24px; padding-bottom: 88px">
+    <div class="bk-cta-band">
+        <div>
+            <h2>See what&rsquo;s wrong with your bill before you pay it.</h2>
+            <p>Every charge compared with Medicare&rsquo;s rate. Free, and you decide what happens next.</p>
         </div>
+        <a href="/scan" class="bk-btn">Check my bill free</a>
     </div>
-    {% endif %}
+</section>
+{% endif %}
 
-    <div class="email-capture">
-        <div class="email-capture-label">
-            <strong>Free: 7-Step Medical Bill Checklist</strong>
-            <span>Get our step-by-step guide to auditing any hospital bill.</span>
-        </div>
-        <form class="email-capture-form" action="/newsletter/subscribe" method="post">
-            <input type="hidden" name="source" value="guide-{{ guide.slug }}">
-            <input type="email" name="email" placeholder="your@email.com" required>
-            <button type="submit">Send it free &rarr;</button>
-        </form>
-    </div>
-
-    {% if not guide.hide_default_cta %}
-    <div class="article-cta">
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:10px;">Free Bill Analysis</div>
-        <h3>Stop overpaying. Find out exactly what you should have been charged.</h3>
-        <p>We'll flag every overcharge, duplicate, and upcoded line item against the federal Medicare benchmark — instantly.</p>
-        <a href="/scan">Upload My Bill — It's Free &rarr;</a>
-        <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:14px;">1 in 4 hospital bills contains an error &middot; Takes 60 seconds &middot; No account needed</div>
-    </div>
-    {% endif %}
-</article>
-
-<div id="sticky-scan-bar" class="sticky-scan-bar" role="complementary" aria-label="Scan your bill">
-    <span class="sticky-scan-bar-text">Your bill may have errors — check it against Medicare rates.</span>
-    <a href="/scan" class="sticky-scan-bar-btn">Scan My Bill Free &rarr;</a>
-    <span class="sticky-scan-bar-proof">1 in 4 bills<br>has an error</span>
+<div id="sticky-scan-bar" class="sticky-scan-bar" role="complementary" aria-label="Check your bill">
+    <span class="sticky-scan-bar-text">Check your bill against Medicare rates, free.</span>
+    <a href="/scan" class="sticky-scan-bar-btn">Check my bill</a>
     <button class="sticky-scan-bar-close" onclick="this.closest('.sticky-scan-bar').remove()" aria-label="Dismiss">&times;</button>
 </div>
 {% endblock %}
@@ -503,7 +209,7 @@
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'email=' + encodeURIComponent(email) + '&source=' + encodeURIComponent(form.querySelector('[name=source]').value)
             }).then(function() {
-                form.closest('.email-capture').innerHTML = '<div style="text-align:center;padding:8px 0;color:#163A9C;font-weight:700;">&#10003; Checklist sent! Check your inbox.</div>';
+                form.closest('.email-capture').innerHTML = '<p class="bk-capture-done">Sent. Check your inbox for the checklist.</p>';//r inbox.</div>';
             }).catch(function() {
                 form.querySelector('button').textContent = 'Try again';
             });

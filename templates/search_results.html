@@ -5,7 +5,7 @@
 {% block head %}
 <meta name="description" content="{{ og_description if og_description else 'Search procedures and facilities on BillKarma.' }}">
 <style>
-  .sr-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:48px 24px 44px; }
+  .sr-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:48px 24px 44px; }
   .sr-hero-inner { max-width:1100px; margin:0 auto; }
   .sr-hero h1 { color:#fff; font-size:2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:6px; }
   .sr-hero p { color:rgba(255,255,255,0.75); font-weight:500; }
@@ -13,14 +13,14 @@
 
   .search-wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
   .search-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .result-col { border: 1px solid #e5e7eb; border-radius: 16px; background: #fff; }
-  .result-col h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
-  .result-item { display: block; text-decoration: none; color: #111827; padding: 12px 16px; border-top: 1px solid #f8fafc; }
-  .result-item:hover { background: #f9fafb; }
+  .result-col { border: 1px solid #D6E0DB; border-radius: 16px; background: #fff; }
+  .result-col h2 { font-size: 0.85rem; font-weight: 700;   color: #5E6F69; padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+  .result-item { display: block; text-decoration: none; color: #16302A; padding: 12px 16px; border-top: 1px solid #f8fafc; }
+  .result-item:hover { background: #F4F7F5; }
   .result-name { font-weight: 700; }
-  .result-sub { font-size: 0.83rem; color: #6b7280; margin-top: 4px; }
-  .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; margin-right: 6px; background: #f3f4f6; color: #374151; }
-  .empty { padding: 16px; color: #6b7280; font-size: 0.9rem; }
+  .result-sub { font-size: 0.83rem; color: #5E6F69; margin-top: 4px; }
+  .pill { display: inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; margin-right: 6px; background: #f3f4f6; color: #374842; }
+  .empty { padding: 16px; color: #5E6F69; font-size: 0.9rem; }
   @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
@@ -36,7 +36,7 @@
 <div class="search-wrap">
   <div>
     {% if query %}
-    <p style="color:#6b7280;margin-bottom:18px;">Showing matches across procedures and facilities</p>
+    <p style="color:#5E6F69;margin-bottom:18px;">Showing matches across procedures and facilities</p>
     {% else %}
     <p>Enter a procedure, hospital, surgery center, or imaging center.</p>
     {% endif %}

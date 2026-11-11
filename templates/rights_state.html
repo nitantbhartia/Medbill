@@ -3,7 +3,7 @@
 {% block head %}
 <meta name="description" content="Medical billing rights in {{ state.name }}: {{ state.sol_years }}-year statute of limitations, balance billing protections, charity care rules, and debt collection laws.">
 <style>
-    .rs-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
+    .rs-hero { background:#0C6B55; border-radius:0 0 40px 40px; padding:56px 24px 52px; }
     .rs-hero-inner { max-width:672px; margin:0 auto; }
     .rs-hero h1 { color:#fff; font-size:2.2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px; line-height:1.1; }
     .rs-hero p { color:rgba(255,255,255,0.8); font-weight:500; }
@@ -46,7 +46,7 @@
 {% block content %}
 <section class="rs-hero">
     <div class="rs-hero-inner">
-        <p style="font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">
+        <p style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.55);margin-bottom:12px;">
             <a href="/rights/" style="color:rgba(255,255,255,0.55);text-decoration:none;">All states</a> &rsaquo; {{ state.code }}
         </p>
         <h1>{{ state.name }} medical<br>billing rights</h1>
@@ -89,7 +89,7 @@
                 Do not pay or acknowledge the debt without checking first.
             </p>
         </div>
-        <a href="/statute-of-limitations" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your specific debt &rarr;</a>
+        <a href="/statute-of-limitations" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your specific debt</a>
     </div>
 
     <!-- Balance Billing -->
@@ -109,7 +109,7 @@
             and for services at in-network facilities where the provider is out-of-network.
         </p>
         {% endif %}
-        <a href="/tools/surprise-bill-checker/" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check if your bill is protected &rarr;</a>
+        <a href="/tools/surprise-bill-checker/" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check if your bill is protected</a>
     </div>
 
     <!-- Charity Care -->
@@ -127,7 +127,7 @@
             This typically covers patients with income below 200&ndash;400% of the Federal Poverty Level.
         </p>
         {% endif %}
-        <a href="/charity-care" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your eligibility &rarr;</a>
+        <a href="/charity-care" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Check your eligibility</a>
     </div>
 
     <!-- Collection Protections -->
@@ -148,7 +148,7 @@
             <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Medical debt under $500 cannot appear on your credit report</li>
             <li class="flex gap-2"><span class="text-green-600 font-bold">&check;</span> Medical debt cannot appear on credit reports for at least 12 months</li>
         </ul>
-        <a href="/collection-notice" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Generate a debt validation letter &rarr;</a>
+        <a href="/collection-notice" class="inline-block mt-3 text-sm font-semibold text-accent-500 hover:underline">Generate a debt validation letter</a>
     </div>
 
     <!-- Federal Rights -->
