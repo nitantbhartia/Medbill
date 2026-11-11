@@ -190,3 +190,7 @@ FEATURED_GUIDE_SLUGS = (
     "medical-debt-collections-rights",
     "medical-bill-negotiation-service-cost",
 )
+
+# Press pitch drafts: how many states to write (highest median markup first)
+PITCH_STATE_COUNT = 5
+PITCH_OUTPUT_DIR = "seo/outreach"
