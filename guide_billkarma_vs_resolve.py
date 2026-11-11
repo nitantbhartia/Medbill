@@ -88,7 +88,7 @@ register("billkarma-vs-resolve-medical-bills", {
     </tbody>
 </table>
 
-<p>The fee gap is large. The real question is whether a human advocate would win a bigger reduction than a written dispute. On a big, messy bill, often yes. On a bill with a clear duplicate or an obvious overcharge, usually not. For every major service's prices, see <a href="/guides/medical-bill-negotiation-service-cost/">what medical bill negotiation services cost</a>.</p>
+<p>The fee gap is large. The real question is whether a human advocate would win a bigger reduction than a written dispute. On a big, messy bill, often yes. On a bill with a clear duplicate or an obvious overcharge, usually not. For every major service's prices, see <a href="/guides/medical-bill-negotiation-service-cost/">what medical bill negotiation services cost</a>. Weighing Goodbill instead? Read <a href="/guides/billkarma-vs-goodbill-medical-bills/">BillKarma vs Goodbill</a>.</p>
 
 {_embed(mode="markup", title="How far above Medicare is your charge?", subtitle="Enter a billing code and the amount charged.", height="420")}
 

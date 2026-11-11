@@ -259,8 +259,11 @@ _LINK_MAP: list[tuple[str, str]] = [
     ("billing errors", "common-hospital-billing-errors"),
     ("duplicate charge", "duplicate-charges-hospital-bills"),
     ("duplicate charges", "duplicate-charges-hospital-bills"),
-    ("upcoding", "common-hospital-billing-errors"),
-    ("unbundling", "common-hospital-billing-errors"),
+    ("upcoding", "upcoding-unbundling-hospital-bills"),
+    ("unbundling", "upcoding-unbundling-hospital-bills"),
+    ("revenue code", "hospital-revenue-codes-explained"),
+    ("revenue codes", "hospital-revenue-codes-explained"),
+    ("UB-04", "hospital-revenue-codes-explained"),
     # Overcharges & pricing
     ("Medicare rate", "average-hospital-markup-over-medicare"),
     ("Medicare benchmark", "average-hospital-markup-over-medicare"),
@@ -839,6 +842,9 @@ import guide_pillar_cpt_codes  # noqa: F401
 import guide_pillar_state_debt_laws  # noqa: F401
 import guide_negotiation_service_cost  # noqa: F401
 import guide_billkarma_vs_resolve  # noqa: F401
+import guide_billkarma_vs_goodbill  # noqa: F401
+import guide_upcoding_unbundling_hospital_bills  # noqa: F401
+import guide_hospital_revenue_codes_explained  # noqa: F401
 
 
 def _extend_link_map_from_guides():
