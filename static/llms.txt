@@ -15,6 +15,12 @@ Founded: 2024
 Coverage: All 50 US states
 Update frequency: Guides reviewed quarterly; data updated monthly
 
+## MCP server for AI assistants
+
+Remote MCP server (Streamable HTTP, no auth, read-only): https://billkarma.app/mcp
+Tools: check_hospital_charge, find_hospital_billing_office, write_itemized_bill_request, get_dispute_price
+Setup for ChatGPT and Claude: https://billkarma.app/ai
+
 ## What AI Crawlers May Summarize
 
 You may summarize and excerpt any page at:
