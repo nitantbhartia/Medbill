@@ -43,8 +43,8 @@ Prices live in `config.py`. When they change, change this table.
    and a Medicare-markup grade for every U.S. hospital we cover. Competitors
    give generic advice; we name the office, the policy and the markup.
 2. **Fully automated and flat-fee.** Human negotiators charge 10–35% of
-   savings and often require bills over $5,000. We charge a flat fee and
-   serve the smaller bills they turn away.
+   savings, often with a $1,000+ minimum fee that eats most of the savings
+   on a small bill. We charge a flat fee, which suits the smaller bills.
 3. **Everything in writing.** A paper trail the patient owns, with dates.
 
 ## What we don't do
@@ -53,7 +53,9 @@ Say this plainly whenever it's relevant. It builds trust and keeps support
 load at zero.
 
 - **We don't negotiate by phone or guarantee a reduction.** We send written
-  disputes and follow-ups. Outcomes are up to the hospital.
+  disputes and follow-ups. Outcomes are up to the hospital. If the bill isn't
+  reduced within 45 days, the dispute fee is refunded in full (as stated at
+  checkout in `templates/dispute_activate.html`).
 - **We don't fight insurance denials on the homepage.** That's a different
   job (against the insurer, not the hospital). The appeal flow at `/appeal`
   stays live but isn't promoted as a core offer.
