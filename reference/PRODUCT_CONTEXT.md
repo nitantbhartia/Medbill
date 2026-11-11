@@ -19,8 +19,9 @@ emails, social posts, etc.).
   potential savings, and what to do next.
 - Generates a ready-to-use phone script patients can read when calling
   the hospital billing department to dispute a charge.
-- Optionally negotiates directly with hospital billing on the patient's
-  behalf via email, charging a percentage of documented savings (capped).
+- For a flat fee, sends a written dispute to the hospital billing office on
+  the patient's behalf and follows up on a fixed schedule until it answers.
+  (See `POSITIONING.md` for the niche, prices and what we don't do.)
 - Grades hospitals on pricing transparency, billing accuracy, and
   responsiveness to disputes.
 - Publishes educational content to help patients understand medical

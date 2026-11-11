@@ -738,16 +738,18 @@ def _extract_howto_schema(guide: dict) -> str | None:
 
 @app.get("/guides/{slug}", response_class=RedirectResponse)
 async def guide_page_redirect(slug: str):
-    """Redirect no-slash guide URLs to canonical trailing-slash version."""
-    return RedirectResponse(url=f"/guides/{slug}/", status_code=301)
+    """Redirect no-slash guide URLs straight to the final canonical URL (one hop)."""
+    from guides import resolve_redirect
+    return RedirectResponse(url=f"/guides/{resolve_redirect(slug) or slug}/", status_code=301)
 
 
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    from guides import GUIDE_REDIRECTS
-    if slug in GUIDE_REDIRECTS:
-        return RedirectResponse(url=f"/guides/{GUIDE_REDIRECTS[slug]}/", status_code=301)
+    from guides import resolve_redirect
+    final_slug = resolve_redirect(slug)
+    if final_slug:
+        return RedirectResponse(url=f"/guides/{final_slug}/", status_code=301)
     import re
     from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
     guide = get_guide(slug)

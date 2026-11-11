@@ -6,6 +6,8 @@ body (HTML string). Calculators are embedded inline via iframes.
 
 from __future__ import annotations
 
+import re
+
 GUIDES = {}
 
 
@@ -79,13 +81,63 @@ GUIDE_REDIRECTS = {
     "surgery-center-vs-hospital": "surgery-center-vs-hospital-cost",
     "er-bills": "why-emergency-room-bills-are-so-high",
     "surgery-costs-billing": "how-much-does-surgery-cost",
+    # Duplicate-intent consolidation (Nov 2026). Each pair answered the same
+    # search; the weaker or thinner page now 301s to the stronger one.
+    "colonoscopy-billing": "colonoscopy-cost",
+    "sleep-study-billing": "sleep-study-cost",
+    "genetic-testing-billing": "genetic-testing-cost",
+    "dialysis-billing": "dialysis-cost",
+    "allergy-testing-billing": "allergy-testing-cost",
+    "endoscopy-billing": "endoscopy-cost",
+    "stroke-treatment-billing": "stroke-treatment-cost",
+    "hearing-aids-billing": "hearing-aid-cost",
+    "ultrasound-costs": "ultrasound-cost",
+    "hernia-surgery-costs": "hernia-repair-cost",
+    "hip-replacement-surgery-cost": "hip-replacement-cost",
+    "gallbladder-surgery-cost": "gallbladder-removal-cost",
+    "medical-debt-laws-north-carolina": "north-carolina-medical-debt-laws",
+    "medigap-medicare-supplement-guide": "medigap-medicare-supplement",
+    "preventive-care-billing": "what-preventive-care-is-free",
+    "hospital-vs-asc-cost": "surgery-center-vs-hospital-cost",
+    "medical-debt-bankruptcy": "medical-bankruptcy-guide",
+    "how-to-fight-balance-billing": "balance-billing",
+    "when-medical-debt-expires-statute-of-limitations": "medical-debt-statute-of-limitations",
+    "health-insurance-denial-appeal-guide": "how-to-appeal-insurance-denial",
+    "how-to-fight-an-ambulance-bill": "ambulance-bill",
+    "hospital-observation-status": "observation-status-billing",
 }
 
 
+def resolve_redirect(slug: str) -> str | None:
+    """Follow GUIDE_REDIRECTS to the final slug, so every redirect is one hop."""
+    if slug not in GUIDE_REDIRECTS:
+        return None
+    seen = {slug}
+    while slug in GUIDE_REDIRECTS:
+        slug = GUIDE_REDIRECTS[slug]
+        if slug in seen:
+            raise ValueError(f"Redirect loop in GUIDE_REDIRECTS at {slug}")
+        seen.add(slug)
+    return slug
+
+
 def register(slug: str, guide: dict):
-    published = guide.get("published")
+    if slug in GUIDES:
+        raise ValueError(f"Guide slug registered twice: {slug}")
     reviewed_on = guide.get("reviewed_on") or _DEFAULT_REVIEWED
-    GUIDES[slug] = {**guide, "slug": slug, "reviewed_on": reviewed_on}
+    body = rewrite_redirected_links(guide.get("body", ""))
+    GUIDES[slug] = {**guide, "body": body, "slug": slug, "reviewed_on": reviewed_on}
+
+
+_GUIDE_HREF = re.compile(r'(href="(?:https://billkarma\.app)?/guides/)([a-z0-9-]+)(/?")')
+
+
+def rewrite_redirected_links(html: str) -> str:
+    """Point links at redirected guides straight to the final URL (no internal 301 hops)."""
+    def _swap(m: re.Match) -> str:
+        final = resolve_redirect(m.group(2))
+        return f"{m.group(1)}{final}/\"" if final else m.group(0)
+    return _GUIDE_HREF.sub(_swap, html)
 
 
 def get_guide(slug: str) -> dict | None:
@@ -513,7 +565,6 @@ import guide_good_faith_estimate
 import guide_medical_debt_wage_garnishment
 import guide_bill_after_insurance
 import guide_medical_billing_errors_statistics
-import guide_how_to_get_itemized_bill
 import guide_hospital_price_transparency_2026
 import guide_medical_debt_credit_report_2026
 import guide_aca_subsidy_cliff_2026
@@ -556,7 +607,6 @@ import guide_csection_costs
 import guide_medical_tax_deduction
 import guide_how_to_apply_for_medicaid
 import guide_medical_billing_scams
-import guide_appendectomy_costs
 import guide_veterans_medical_bills
 import guide_medicare_vs_medicaid
 import guide_knee_replacement_costs
@@ -564,11 +614,8 @@ import guide_surgery_center_vs_hospital
 import guide_medical_debt_divorce
 # Batch 7: procedure cost guides
 import guide_hip_replacement_costs
-import guide_spinal_fusion_costs
 import guide_blood_test_costs
 import guide_epidural_costs
-import guide_tonsillectomy_costs
-import guide_cataract_surgery_costs
 import guide_acl_surgery_costs
 import guide_gallbladder_surgery_costs
 import guide_xray_costs
@@ -826,7 +873,7 @@ def _rewrite_redirected_link_targets():
     """Retarget any _LINK_MAP entry that points at a redirected slug."""
     for i, (phrase, slug) in enumerate(_LINK_MAP):
         if slug in GUIDE_REDIRECTS:
-            _LINK_MAP[i] = (phrase, GUIDE_REDIRECTS[slug])
+            _LINK_MAP[i] = (phrase, resolve_redirect(slug))
 
 
 _extend_link_map_from_guides()
