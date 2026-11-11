@@ -1,257 +1,123 @@
 {% extends "base.html" %}
 {% block title %}Results - BillKarma{% endblock %}
-{% block head %}
-<style>
-    .results-bar { background:var(--paper-2); border-bottom:1px solid var(--rule); padding:20px 24px; }
-    .results-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .results-bar .rb-crumb { font-size:0.75rem; color:var(--muted); }
-    .results-bar .rb-crumb a { color:var(--muted); text-decoration:none; }
-    .results-bar .rb-crumb a:hover { color:var(--ink); }
-    .results-bar .rb-crumb .rb-active { color:var(--ink); font-weight:600; }
-    .results-bar .rb-title { color:var(--ink); font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
-    @media(max-width:640px){ .results-bar{padding:16px 16px;} .results-bar-inner{flex-direction:column;align-items:flex-start;gap:4px;} }
-</style>
-{% endblock %}
+{% block head %}{% endblock %}
 
 {% block content %}
-{% set total_savings = data.findings | sum(attribute='potential_savings') if data.findings else 0 %}
-{% set total_gross = data.total_gross_potential_savings if data.total_gross_potential_savings is defined else total_savings %}
-{% set issue_count = data.findings | length if data.findings else 0 %}
-{% set high_conf_findings = data.findings | selectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
-{% set review_conf_findings = data.findings | rejectattr('confidence', 'equalto', 'high') | list if data.findings else [] %}
-{% set has_patient_data = data.has_patient_data if data.has_patient_data is defined else false %}
+{% set cs = charge_summary %}
+{% set issue_count = cs.charges | length %}
+{% set total_savings = cs.total_savings %}
 {% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
+{% set has_patient_data = data.has_patient_data if data.has_patient_data is defined else false %}
+{% set fee = dispute_fee_dollars | default(29) %}
 
-<div class="results-bar">
-    <div class="results-bar-inner">
-        <div class="rb-crumb">
-            <a href="/scan">Upload</a> <span>&rsaquo;</span> <a href="/confirm/{{ data.bill.id }}">Confirm</a> <span>&rsaquo;</span> <span class="rb-active">Results</span>
-        </div>
-        <div class="rb-title">
-            {% if issue_count > 0 %}{{ issue_count }} issue{{ 's' if issue_count != 1 else '' }} &middot; ${{ "{:,.0f}".format(total_savings) }} potential savings{% else %}Bill Analysis{% endif %}
-        </div>
+<section class="bk-results-head">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/scan">Upload</a> / <a href="/confirm/{{ data.bill.id }}">Confirm</a> / Results</p>
+        {% if issue_count %}
+        <h1>{% if cs.strong_count %}{{ cs.strong_count }} charge{{ 's' if cs.strong_count != 1 }} on this bill look{{ 's' if cs.strong_count == 1 }} wrong{% else %}{{ issue_count }} charge{{ 's' if issue_count != 1 }} worth questioning{% endif %}</h1>
+        {% else %}
+        <h1>Your bill looks clean</h1>
+        {% endif %}
+        <p class="bk-results-meta">
+            {% if data.bill.provider_name %}<span>{{ data.bill.provider_name }}</span>{% endif %}
+            {% if data.bill.bill_date %}<span>Billed {{ data.bill.bill_date }}</span>{% endif %}
+            {% if patient_balance %}<span>You owe ${{ "{:,.2f}".format(patient_balance) }}</span>{% elif data.bill.total_charged %}<span>Total ${{ "{:,.2f}".format(data.bill.total_charged) }}</span>{% endif %}
+        </p>
     </div>
+</section>
+
+<div class="bk-wrap bk-results">
+    <div class="bk-results-main">
+        {% if issue_count %}
+        <div class="bk-result-summary">
+            <div class="bk-result-figures">
+                <div><span class="bk-result-num save">${{ "{:,.0f}".format(total_savings) }}</span><span>you could save, at most</span></div>
+                <div><span class="bk-result-num">{{ issue_count }}</span><span>charge{{ 's' if issue_count != 1 }} flagged</span></div>
+            </div>
+            <div class="bk-summary-cta">
+                <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Dispute these for ${{ "{:,.0f}".format(fee) }}</a>
+                <a href="#decide">Compare with doing it yourself</a>
+            </div>
+            <p class="bk-muted" style="margin: 14px 0 0; font-size: 14.5px">Each charge is counted once, at its largest estimate{% if patient_balance %}, and the total never exceeds what you owe{% endif %}. The hospital decides what it will change.</p>
+        </div>
+
+        <h2 class="bk-h3" style="margin: 36px 0 12px">Charges we flagged</h2>
+        <ol class="bk-charges">
+            {% for c in cs.charges %}
+            <li class="bk-charge {{ 'strong' if c.strong }}">
+                <div class="bk-charge-head">
+                    <div class="bk-charge-what">
+                        {% if c.code %}<span class="bk-charge-code">{{ c.code }}</span>{% endif %}
+                        <strong>{{ c.description }}</strong>
+                        {% if c.date %}<span class="bk-charge-date">{{ c.date }}</span>{% endif %}
+                    </div>
+                    {% if c.charged %}<span class="bk-charge-amt">${{ "{:,.2f}".format(c.charged) }}</span>{% endif %}
+                </div>
+                {% if c.medicare_rate %}
+                <p class="bk-charge-compare">Medicare pays ${{ "{:,.2f}".format(c.medicare_rate) }} for this code{% if c.markup %}. This charge is {{ "%.1f" | format(c.markup) }}&times; that{% endif %}.</p>
+                {% endif %}
+                {% set first = c.reasons[0] %}
+                <p class="bk-charge-reason"><strong>{{ first.label }}.</strong> {{ first.message }}</p>
+                {% if c.reasons | length > 1 %}
+                <details class="bk-charge-more">
+                    <summary>{{ c.reasons | length - 1 }} more reason{{ 's' if c.reasons | length > 2 }}: {{ c.reasons[1:] | map(attribute='label') | join('; ') }}</summary>
+                    {% for r in c.reasons[1:] %}
+                    <p class="bk-charge-reason"><strong>{{ r.label }}.</strong> {{ r.message }}</p>
+                    {% endfor %}
+                </details>
+                {% endif %}
+                <div class="bk-charge-foot">
+                    <label><input class="finding-selector" type="checkbox" data-ids="{{ c.finding_ids | join(',') }}" checked> Include in the dispute</label>
+                    {% if c.savings %}<span class="bk-charge-save">Up to ${{ "{:,.0f}".format(c.savings) }} {{ 'off your share' if has_patient_data else 'off' }}</span>{% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+        {% else %}
+        <div class="bk-result-summary">
+            <p style="margin: 0; font-size: 17px">We didn&rsquo;t find duplicates or charges far above Medicare rates. If the total still seems wrong, check whether you qualify for <a href="/charity-care">financial assistance</a> or ask about a <a href="/guides/hospital-payment-plans/">payment plan</a>.</p>
+        </div>
+        {% endif %}
+
+        {% set h = data.hospital_match %}
+        {% if h %}
+        <div class="bk-card bk-results-hospital">
+            <div>
+                <strong>{% if h.slug and h.state_slug and h.city_slug %}<a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/">{{ h.name }}</a>{% else %}{{ h.name }}{% endif %}</strong>
+                <span>{{ h.city }}, {{ h.state }}{% if h.phone %}. Billing {{ h.phone }}{% endif %}</span>
+                {% if h.avg_markup_vs_medicare %}<span>List prices average {{ "%.1f" | format(h.avg_markup_vs_medicare) }}&times; Medicare{% if h.billing_grade %} (grade {{ h.billing_grade }}){% endif %}.</span>{% endif %}
+                {% if h.has_financial_assistance and h.fa_application_url %}<span>This hospital has a financial assistance program. <a href="{{ h.fa_application_url }}" target="_blank" rel="noopener">Apply</a></span>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if issue_count %}
+    <aside class="bk-results-side" id="decide">
+        <h2 class="bk-h3">Choose how to proceed</h2>
+        <div class="bk-decide bk-decide-main">
+            <p class="bk-decide-label">We dispute it for you</p>
+            <p class="bk-decide-price"><strong>${{ "{:,.0f}".format(fee) }}</strong> flat</p>
+            <ul class="bk-checks">
+                <li>Letter written for the charges you selected</li>
+                <li>Sent to the billing office for you</li>
+                <li>Follow-ups on days {{ followup_days | join(", ") }}</li>
+                <li>Full refund if the bill isn&rsquo;t reduced in 45 days</li>
+            </ul>
+            <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Fight This Bill for ${{ "{:,.0f}".format(fee) }}</a>
+            {% if total_savings > fee %}<p class="bk-decide-note">You keep everything the hospital takes off. No percentage of your savings.</p>{% endif %}
+        </div>
+        <div class="bk-decide">
+            <p class="bk-decide-label">Do it yourself</p>
+            <p class="bk-decide-copy">Free dispute letter, phone script and evidence bundle for these charges. You send it and follow up.</p>
+            <a href="#manual-toolkit" class="bk-btn-outline bk-btn-block">Open the free toolkit</a>
+        </div>
+    </aside>
+    {% endif %}
 </div>
 
-<section class="max-w-2xl mx-auto px-5 py-8 sm:py-10">
-
-    {% if issue_count > 0 %}
-    <!-- Case summary -->
-    <div class="bk-result-summary">
-        <h1>{{ issue_count }} charge{{ 's' if issue_count != 1 else '' }} on this bill look{{ '' if issue_count != 1 else 's' }} wrong</h1>
-        <div class="bk-result-figures">
-            <div><span class="bk-result-num save">${{ "{:,.0f}".format(case_summary.potential_savings) }}</span><span>potential savings</span></div>
-            <div><span class="bk-result-num">{{ case_summary.issue_count }}</span><span>issue{{ 's' if case_summary.issue_count != 1 else '' }} flagged</span></div>
-        </div>
-        <p class="bk-muted" style="margin: 14px 0 0; font-size: 14px">Estimated from Medicare rates for the same codes. The hospital decides what it will change.</p>
-    </div>
-
-    <!-- Severity breakdown bar -->
-    {% if case_summary.issue_count > 0 %}
-    <div class="mb-4">
-        <div class="h-2 rounded-full overflow-hidden flex">
-            {% if case_summary.severity_breakdown.high %}<div class="bg-red-500" style="width:{{ (case_summary.severity_breakdown.high / case_summary.issue_count * 100)|round }}%"></div>{% endif %}
-            {% if case_summary.severity_breakdown.medium %}<div class="bg-amber-400" style="width:{{ (case_summary.severity_breakdown.medium / case_summary.issue_count * 100)|round }}%"></div>{% endif %}
-            {% if case_summary.severity_breakdown.low %}<div class="bg-blue-300" style="width:{{ (case_summary.severity_breakdown.low / case_summary.issue_count * 100)|round }}%"></div>{% endif %}
-            {% if case_summary.severity_breakdown.informational %}<div class="bg-gray-300" style="width:{{ (case_summary.severity_breakdown.informational / case_summary.issue_count * 100)|round }}%"></div>{% endif %}
-        </div>
-        <div class="flex gap-4 mt-1.5 text-[10px] text-gray-500">
-            {% if case_summary.severity_breakdown.high %}<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span>High ({{ case_summary.severity_breakdown.high }})</span>{% endif %}
-            {% if case_summary.severity_breakdown.medium %}<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Medium ({{ case_summary.severity_breakdown.medium }})</span>{% endif %}
-            {% if case_summary.severity_breakdown.low %}<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-300"></span>Low ({{ case_summary.severity_breakdown.low }})</span>{% endif %}
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- "Why this matters" block -->
-    {% if case_summary.summary_text %}
-    <div class="mb-8 bg-gray-50 border border-gray-200 rounded-xl p-5">
-        <p class="text-sm text-gray-700">{{ case_summary.summary_text }}</p>
-    </div>
-    {% endif %}
-
-    {% if patient_balance > 0 %}
-    <div class="mb-8 text-sm text-gray-600">
-        <p><span class="text-gray-500">Your balance:</span> <span class="font-semibold text-gray-900 tabular-nums">${{ "{:,.2f}".format(patient_balance) }}</span></p>
-        {% if total_gross > total_savings %}
-        <p class="text-xs text-gray-400 mt-1">Total billing errors: ${{ "{:,.2f}".format(total_gross) }} — savings capped to your share.</p>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    {% else %}
-    <div class="mb-10">
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">Your bill looks clean</h1>
-        <p class="text-sm text-gray-500">We didn't find significant overcharges compared to Medicare rates.</p>
-    </div>
-    {% endif %}
-
-    <!-- Hospital context -->
-    {% set h = data.hospital_match %}
-    {% if h %}
-    {% set grade = h.billing_grade or '' %}
-    {% set grade_color = 'text-green-700 bg-green-50 border-green-200' if grade in ['A','B'] else 'text-amber-700 bg-amber-50 border-amber-200' if grade == 'C' else 'text-red-700 bg-red-50 border-red-200' if grade in ['D','F'] else 'text-gray-600 bg-gray-50 border-gray-200' %}
-    <div class="mb-8 border border-gray-200 rounded-md p-4">
-        <div class="flex items-start justify-between gap-3 mb-3">
-            <div class="min-w-0">
-                {% if h.slug and h.state_slug and h.city_slug %}
-                <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/"
-                   class="text-sm font-semibold text-gray-900 hover:underline">{{ h.name }}</a>
-                {% else %}
-                <span class="text-sm font-semibold text-gray-900">{{ h.name }}</span>
-                {% endif %}
-                <p class="text-xs text-gray-500 mt-0.5">{{ h.city }}, {{ h.state }}{% if h.phone %} &middot; {{ h.phone }}{% endif %}</p>
-            </div>
-            <div class="flex flex-shrink-0 items-center gap-2">
-                {% if grade %}
-                <span class="text-xs font-bold px-2 py-0.5 rounded border {{ grade_color }}">Grade {{ grade }}</span>
-                {% endif %}
-                {% if h.is_pe_owned %}
-                <span class="text-xs px-2 py-0.5 rounded border text-red-700 bg-red-50 border-red-200">PE-Owned</span>
-                {% elif h.is_nonprofit %}
-                <span class="text-xs px-2 py-0.5 rounded border text-blue-700 bg-blue-50 border-blue-200">Nonprofit</span>
-                {% endif %}
-            </div>
-        </div>
-        <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-600">
-            {% if h.avg_markup_vs_medicare %}
-            <span><span class="font-medium text-gray-900">{{ "%.1f" | format(h.avg_markup_vs_medicare) }}x</span> avg markup vs Medicare</span>
-            {% endif %}
-            {% if h.hospital_type %}
-            <span class="text-gray-400">{{ h.hospital_type }}</span>
-            {% endif %}
-            {% if h.bed_count %}
-            <span class="text-gray-400">{{ h.bed_count }} beds</span>
-            {% endif %}
-            {% if h.cms_star_rating %}
-            <span class="text-gray-400">{{ h.cms_star_rating }}★ CMS rating</span>
-            {% endif %}
-        </div>
-        {% if h.has_financial_assistance and h.fa_application_url %}
-        <p class="mt-2 text-xs text-blue-700">
-            This hospital has a financial assistance program —
-            <a href="{{ h.fa_application_url }}" target="_blank" rel="noopener" class="underline">apply here</a>.
-        </p>
-        {% endif %}
-        {% if h.slug and h.state_slug and h.city_slug %}
-        <a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/"
-           class="mt-3 inline-block text-xs text-accent-700 hover:text-accent-800 font-medium">
-            View full hospital profile
-        </a>
-        {% endif %}
-    </div>
-    {% elif data.bill.provider_name %}
-    <div class="mb-8 border border-gray-200 rounded-md p-4">
-        <p class="text-xs text-gray-500 mb-0.5">Provider on your bill</p>
-        <p class="text-sm font-semibold text-gray-900">{{ data.bill.provider_name }}</p>
-    </div>
-    {% endif %}
-
-    {% if data.findings and data.findings | length > 0 %}
-    <!-- Evidence-Linked Findings -->
-    <div class="mb-10">
-        <h2 class="text-xs uppercase tracking-wide text-gray-400 font-medium mb-4">Findings</h2>
-        <div class="space-y-3">
-            {% for finding in data.findings %}
-            <div class="border border-gray-200 rounded-md p-4">
-                <div class="flex flex-wrap sm:flex-nowrap items-start gap-3">
-                    <span class="flex-shrink-0 mt-0.5 text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded
-                        {% if finding.severity == 'high' %}text-red-700 bg-red-50 border border-red-200
-                        {% elif finding.severity == 'medium' %}text-amber-700 bg-amber-50 border border-amber-200
-                        {% else %}text-blue-700 bg-blue-50 border border-blue-200{% endif %}">{{ finding.severity }}</span>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm text-gray-900">{{ finding.message }}</p>
-                        <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                            {% if finding.confidence %}<span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 uppercase tracking-wide">confidence: {{ finding.confidence }}</span>{% endif %}
-                            {% if finding.rule_id %}<span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-mono">{{ finding.rule_id }}</span>{% endif %}
-                        </div>
-                        {% if finding.cpt_code %}
-                        <div class="mt-2 flex flex-wrap gap-1.5 text-xs text-gray-500 font-mono">
-                            <span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">{{ finding.cpt_code }}</span>
-                            {% if finding.billed_amount is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "{:,.2f}".format(finding.billed_amount) }} billed</span>{% endif %}
-                            {% if finding.medicare_rate is defined %}<span class="bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded">${{ "{:,.2f}".format(finding.medicare_rate) }} Medicare</span>{% endif %}
-                        </div>
-                        {% endif %}
-                        <!-- Evidence chips -->
-                        {% if finding.evidence_chips %}
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                            {% for chip in finding.evidence_chips %}
-                            <button type="button" class="evidence-chip text-xs px-2 py-0.5 rounded-full border cursor-pointer hover:opacity-80 transition-opacity
-                                {% if chip.type == 'bill' %}bg-blue-50 border-blue-200 text-blue-700
-                                {% elif chip.type == 'eob' %}bg-purple-50 border-purple-200 text-purple-700
-                                {% else %}bg-amber-50 border-amber-200 text-amber-700{% endif %}"
-                                data-snippet="{{ chip.snippet|e }}">
-                                {{ chip.label }}
-                            </button>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% if finding.potential_savings %}
-                    <div class="flex-shrink-0 text-right tabular-nums">
-                        <div class="text-sm font-semibold {% if finding.severity == 'high' %}text-red-700{% elif finding.severity == 'medium' %}text-amber-700{% else %}text-blue-700{% endif %}">${{ "{:,.2f}".format(finding.potential_savings) }}</div>
-                        <div class="text-xs text-gray-400">{% if has_patient_data %}your savings{% else %}overcharge{% endif %}</div>
-                    </div>
-                    {% endif %}
-                </div>
-                <label class="mt-3 flex items-center gap-2 text-xs text-gray-600">
-                    <input class="finding-selector rounded border-gray-300" type="checkbox" value="{{ finding.id }}" checked />
-                    Include in dispute letter
-                </label>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Action Choice Gate -->
-    <div class="mb-10">
-        <p class="text-xs text-gray-400 uppercase tracking-wide font-medium mb-4">Choose how to proceed</p>
-        <div class="grid sm:grid-cols-2 gap-4">
-            <!-- Autopilot -->
-            <div class="rounded-xl border-2 border-green-600 bg-green-50 p-5 flex flex-col">
-                <p class="text-xs font-semibold uppercase tracking-wide text-green-700 mb-1">Recommended</p>
-                <h3 class="text-base font-bold text-gray-900 mb-1">Let AI handle follow-ups</h3>
-                <p class="text-xs text-gray-600 mb-3 flex-1">BillKarma sends the dispute letter and follows up automatically for 45 days. No savings? Full refund.</p>
-                <div class="space-y-1 mb-4">
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-green-600 font-bold">✓</span> Formal dispute letter — sent for you
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-green-600 font-bold">✓</span> Follow-ups at day 7, 14, 30, 45
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-green-600 font-bold">✓</span> Full refund if unresolved
-                    </div>
-                </div>
-                <a href="/autopilot/strategy/{{ data.bill.id }}"
-                   class="block text-center px-4 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                    Fight This Bill on Autopilot &mdash; ${{ dispute_fee_dollars|default(29) }}
-                </a>
-            </div>
-            <!-- Manual toolkit -->
-            <div class="rounded-xl border border-gray-200 bg-white p-5 flex flex-col">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Free</p>
-                <h3 class="text-base font-bold text-gray-900 mb-1">I'll do it myself</h3>
-                <p class="text-xs text-gray-600 mb-3 flex-1">Download your dispute letter, phone script, and evidence bundle. Send it yourself.</p>
-                <div class="space-y-1 mb-4">
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-gray-400 font-bold">✓</span> Dispute letter
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-gray-400 font-bold">✓</span> Phone script
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600">
-                        <span class="text-gray-400 font-bold">✓</span> Insurance appeal template
-                    </div>
-                </div>
-                <a href="#manual-toolkit"
-                   class="block w-full text-center px-4 py-2.5 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                    Open Toolkit — Free
-                </a>
-            </div>
-        </div>
-    </div>
-
+<div class="bk-wrap bk-results-more">
+    {% if issue_count %}
     <!-- Email Report -->
     <div class="mb-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
         <div id="email-form-section">
@@ -380,7 +246,7 @@
             Upload another bill
         </a>
     </div>
-</section>
+</div>
 
 <!-- Evidence chip popover -->
 <div id="chip-popover" class="hidden fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-w-xs">
@@ -395,7 +261,8 @@
 
     function selectedFindingIds() {
         return Array.from(document.querySelectorAll('.finding-selector:checked'))
-            .map(function(el) { return parseInt(el.value, 10); })
+            .reduce(function(ids, el) { return ids.concat((el.dataset.ids || '').split(',')); }, [])
+            .map(function(id) { return parseInt(id, 10); })
             .filter(Number.isFinite);
     }
 

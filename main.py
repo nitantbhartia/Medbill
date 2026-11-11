@@ -651,6 +651,8 @@ async def results_page(request: Request, bill_id: int):
     # Case summary with win probability + confidence
     findings = results.get("findings") or []
     case_summary = compute_case_summary(findings, has_eob=has_eob, has_portal=has_portal)
+    from charge_summary import group_findings_by_charge
+    charge_summary = group_findings_by_charge(findings, bill_total or None)
 
     # Build evidence chips for each finding
     import json as _json
@@ -683,6 +685,8 @@ async def results_page(request: Request, bill_id: int):
             "outcome_stats": outcome_stats,
             "dispute_fee_dollars": fee_cents / 100,
             "case_summary": case_summary,
+            "charge_summary": charge_summary,
+            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
             "meta_robots": "noindex, nofollow",
         },
     )
