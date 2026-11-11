@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+{% set top = r.most_expensive[0] %}
+<section class="bk-wrap" style="padding-top: 64px; padding-bottom: 32px">
+    <p class="bk-eyebrow"><a href="/hospitals/">Hospitals</a> &rsaquo; <a href="/hospitals/{{ r.state_slug }}/">{{ r.state_name }}</a> &rsaquo; Most expensive</p>
+    <h1 style="margin: 0; max-width: 860px; font-size: clamp(32px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 800">Most expensive hospitals in {{ r.state_name }}</h1>
+    <p class="bk-lede" style="margin-top: 20px; max-width: 700px"><strong>{{ top.name }}</strong> in {{ top.city }} has the highest list prices in {{ r.state_name }}: on average <strong>{{ "%.1f"|format(top.markup) }}x</strong> what Medicare pays for the same services. The median across {{ r.ranked_count }} ranked {{ r.state_name }} hospitals is {{ "%.1f"|format(r.median_markup) }}x.</p>
+    <p class="bk-muted" style="margin-top: 12px; font-size: 15px">Data as of {{ r.as_of or "the latest refresh" }} &middot; <a href="#method">How this is calculated</a></p>
+</section>
+
+<section class="bk-wrap" style="padding-bottom: 48px">
+    <h2 class="bk-h2">Highest prices compared to Medicare</h2>
+    <div class="bk-table-box">
+        <table class="bk-table">
+            <thead>
+                <tr><th>#</th><th>Hospital</th><th>City</th><th>Prices vs Medicare</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+                {% for h in r.most_expensive %}
+                <tr>
+                    <td class="bk-mono">{{ h.rank }}</td>
+                    <td><a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/">{{ h.name }}</a></td>
+                    <td>{{ h.city }}</td>
+                    <td class="bk-mono">{{ "%.1f"|format(h.markup) }}x</td>
+                    <td class="bk-mono">{{ h.grade or "&ndash;"|safe }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if r.least_expensive %}
+    <h2 class="bk-h2" style="margin-top: 48px">Lowest prices compared to Medicare</h2>
+    <div class="bk-table-box">
+        <table class="bk-table">
+            <thead>
+                <tr><th>#</th><th>Hospital</th><th>City</th><th>Prices vs Medicare</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+                {% for h in r.least_expensive %}
+                <tr>
+                    <td class="bk-mono">{{ h.rank }}</td>
+                    <td><a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/">{{ h.name }}</a></td>
+                    <td>{{ h.city }}</td>
+                    <td class="bk-mono">{{ "%.1f"|format(h.markup) }}x</td>
+                    <td class="bk-mono">{{ h.grade or "&ndash;"|safe }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</section>
+
+<section style="background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule)">
+    <div class="bk-wrap" style="padding-top: 56px; padding-bottom: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px">
+        <div>
+            <h2 class="bk-h2">What this means for your bill</h2>
+            <p class="bk-lede" style="margin-top: 12px">List prices are a starting point, not what insurers pay. But uninsured patients and people paying a deductible are often billed from them. A high multiple is a strong reason to ask for an itemized bill and question the charges.</p>
+            <a href="/scan" class="bk-btn" style="margin-top: 20px">Check my bill free</a>
+        </div>
+        <div id="method">
+            <h2 class="bk-h2">How this is calculated</h2>
+            <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">For each hospital we compare the gross charges in its federally required price transparency file to the Medicare rate for the same billing code, then average across procedures. Hospitals need at least {{ config.RANKING_MIN_PROCEDURES }} priced procedures to be ranked. <a href="/guides/hospital-billing-grades-explained/">Full method and grading scale</a>.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -30,6 +30,7 @@
         <div class="breadcrumb"><a href="/hospitals/">Hospitals</a> &rsaquo; {{ state_name }}</div>
         <h1>{{ state_name }} Hospital Billing Report Cards</h1>
         <p>{{ total }} hospitals indexed in this state.</p>
+        {% if has_ranking %}<p style="margin-top: 8px"><a href="/hospitals/{{ state_slug }}/most-expensive/" style="color: #fff; text-decoration: underline; font-weight: 600">See the most expensive hospitals in {{ state_name }} &rarr;</a></p>{% endif %}
     </div>
 </div>
 

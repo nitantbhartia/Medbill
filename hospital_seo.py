@@ -2101,6 +2101,8 @@ def get_hospital_sitemap_paths() -> list[str]:
 
     paths = ["/hospitals/"]
     paths.extend([f"/hospitals/{r['state_slug']}/" for r in states])
+    from hospital_rankings import get_ranked_state_slugs
+    paths.extend([f"/hospitals/{slug}/most-expensive/" for slug in get_ranked_state_slugs()])
     paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/" for r in cities])
     paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/{r['slug']}/" for r in hospitals])
     return paths
