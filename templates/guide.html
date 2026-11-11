@@ -105,6 +105,7 @@
         padding: 0 24px 80px;
     }
 
+    .guide-note { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: var(--muted); }
     .article-hero {
         background-color: var(--bk-green);
         border-radius: 0 0 40px 40px;
@@ -120,16 +121,8 @@
         display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
         margin-bottom: 24px;
     }
-    .meta-category {
-        font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-        background: rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 100px;
-    }
-    .meta-date { font-size: 0.88rem; color: rgba(255,255,255,0.8); font-weight: 600; }
-    .meta-reviewed {
-        display: flex; align-items: center; gap: 6px;
-        font-size: 0.82rem; color: rgba(255,255,255,0.75); font-weight: 500;
-    }
-    .meta-reviewed svg { flex-shrink: 0; }
+    .meta-category { font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .meta-date { font-size: 14px; color: var(--muted); }
 
     .article-hero h1 {
         font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
@@ -202,31 +195,11 @@
     }
 
     .article-body .key-takeaway {
-        background: #E6F4EA; border-radius: 14px; padding: 20px 24px;
+        background: #EAF0FD; border-radius: 14px; padding: 20px 24px;
         margin: 24px 0; font-size: 1rem; font-weight: 600; line-height: 1.6;
-        color: #065F46;
+        color: #163A9C;
     }
     .article-body .key-takeaway strong { font-weight: 800; }
-
-    .eeat-bar {
-        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 14px;
-        padding: 16px 20px; margin-bottom: 32px;
-        display: flex; align-items: flex-start; gap: 14px;
-        font-size: 0.88rem; line-height: 1.5; color: #4B5563;
-    }
-    .eeat-bar-icon { flex-shrink: 0; margin-top: 2px; }
-    .eeat-bar strong { color: #1A1A1A; display: block; margin-bottom: 2px; }
-
-    .eeat-bar-meta {
-        background: #fff; border: 1px solid var(--bk-gray-border); border-radius: 14px;
-        padding: 12px 20px; margin-bottom: 28px;
-        display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-        font-size: 0.84rem; color: #4B5563;
-    }
-    .eeat-item {
-        display: inline-flex; align-items: center; gap: 5px;
-        font-weight: 500; white-space: nowrap;
-    }
 
     .sources-box {
         background: #FAFAFA; border: 1px solid var(--bk-gray-border); border-radius: 14px;
@@ -256,7 +229,7 @@
     .article-body .faq-item p { margin-bottom: 0; font-size: 1rem; }
 
     .article-body .guide-cta-inline {
-        background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+        background: linear-gradient(135deg, #163A9C 0%, #163A9C 100%);
         border-radius: 20px;
         padding: 26px 24px;
         margin: 28px 0;
@@ -276,7 +249,7 @@
     .article-body .guide-cta-inline a {
         display: inline-block;
         background: #fff;
-        color: #065f46;
+        color: #163A9C;
         border-radius: 999px;
         padding: 12px 22px;
         text-decoration: none;
@@ -284,7 +257,7 @@
     }
     .article-body .guide-cta-inline a:hover {
         background: #f3f4f6;
-        color: #065f46;
+        color: #163A9C;
     }
 
     /* CTA at bottom */
@@ -303,7 +276,7 @@
 
     .answer-box {
         background: #F0FDF4;
-        border-left: 4px solid #059669;
+        border-left: 4px solid #1F4FD1;
         border-radius: 0 12px 12px 0;
         padding: 16px 20px;
         margin: 0 0 28px 0;
@@ -316,7 +289,7 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #059669;
+        color: #1F4FD1;
         margin-bottom: 6px;
     }
 
@@ -395,10 +368,10 @@
     /* === ABOVE-FOLD MICRO CTA === */
     .guide-micro-cta {
         display: flex; align-items: center; justify-content: space-between;
-        background: #E6F4EA; border-radius: 10px; padding: 11px 16px;
+        background: #EAF0FD; border-radius: 10px; padding: 11px 16px;
         margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
     }
-    .guide-micro-cta-text { font-size: .88rem; color: #065F46; font-weight: 500; }
+    .guide-micro-cta-text { font-size: .88rem; color: #163A9C; font-weight: 500; }
     .guide-micro-cta-btn {
         background: var(--bk-green); color: #fff; border-radius: 999px;
         padding: 7px 16px; font-weight: 700; font-size: .82rem;
@@ -425,40 +398,18 @@
             {% if guide.published %}
             <span class="meta-date">Published {{ guide.published }}</span>
             {% endif %}
-            {% if guide.reviewed_on %}
-            <span class="meta-date">Reviewed {{ guide.reviewed_on }}</span>
-            {% endif %}
             {% if reading_time %}
             <span class="meta-date">{{ reading_time }} min read</span>
             {% endif %}
-            <span class="meta-reviewed">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="rgba(255,255,255,0.7)"/><path d="M4 7l2 2 4-4" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                Reviewed by BillKarma Team
-            </span>
         </div>
         <h1>{{ guide.title }}</h1>
     </div>
 </div>
 
 <article class="article-container">
-    <div class="eeat-bar-meta">
-        <span class="eeat-item">&#10003; Medically reviewed</span>
-        {% if guide.published %}<span class="eeat-item">&#128197; Updated {{ guide.published }}</span>{% endif %}
-        {% if reading_time %}<span class="eeat-item">&#9201; {{ reading_time }} min read</span>{% endif %}
-        {% if guide.category %}<span class="eeat-item">&#128194; {{ guide.category }}</span>{% endif %}
-    </div>
-    <div class="eeat-bar">
-        <svg class="eeat-bar-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9.5" stroke="#059669"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div>
-            {% if guide.reviewer %}
-            <strong>Reviewed by {{ guide.reviewer.name }}{% if guide.reviewer.credential %}, {{ guide.reviewer.credential }}{% endif %}</strong>
-            {% else %}
-            <strong>Fact-checked &amp; reviewed by the BillKarma Team</strong>
-            {% endif %}
-            BillKarma researchers verify every guide against federal Medicare data, state law, and hospital chargemaster records. We update guides when laws change.
-            {% if guide.reviewed_on %}<span style="margin-left:6px;color:#6B7280;">Last reviewed {{ guide.reviewed_on }}.</span>{% endif %}
-        </div>
-    </div>
+    <p class="guide-note">
+        {% if guide.reviewer %}Reviewed by {{ guide.reviewer.name }}{% if guide.reviewer.credential %}, {{ guide.reviewer.credential }}{% endif %}. {% endif %}Written by BillKarma from CMS data and the sources listed at the bottom. General information, not legal or medical advice.
+    </p>
     <div class="guide-micro-cta">
         <span class="guide-micro-cta-text">Got a bill related to this topic?</span>
         <a href="/scan" class="guide-micro-cta-btn">Check for errors — free, 60 sec &rarr;</a>
@@ -486,7 +437,7 @@
         <h2 style="font-size:1.15rem;font-weight:800;margin-bottom:16px;">Related Guides</h2>
         <div style="display:grid;gap:12px;">
             {% for rg in related_guides %}
-            <a href="/guides/{{ rg.slug }}/" style="display:block;padding:16px;border-radius:14px;border:1px solid #E5E7EB;text-decoration:none;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.background='#E6F4EA'" onmouseout="this.style.borderColor='#E5E7EB';this.style.background='transparent'">
+            <a href="/guides/{{ rg.slug }}/" style="display:block;padding:16px;border-radius:14px;border:1px solid #E5E7EB;text-decoration:none;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='var(--bk-green)';this.style.background='#EAF0FD'" onmouseout="this.style.borderColor='#E5E7EB';this.style.background='transparent'">
                 <div style="font-weight:600;color:#1A1A1A;">{{ rg.title }}</div>
                 <div style="font-size:0.82rem;color:#6B7280;margin-top:4px;">{{ rg.category }}</div>
             </a>
@@ -552,7 +503,7 @@
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'email=' + encodeURIComponent(email) + '&source=' + encodeURIComponent(form.querySelector('[name=source]').value)
             }).then(function() {
-                form.closest('.email-capture').innerHTML = '<div style="text-align:center;padding:8px 0;color:#065F46;font-weight:700;">&#10003; Checklist sent! Check your inbox.</div>';
+                form.closest('.email-capture').innerHTML = '<div style="text-align:center;padding:8px 0;color:#163A9C;font-weight:700;">&#10003; Checklist sent! Check your inbox.</div>';
             }).catch(function() {
                 form.querySelector('button').textContent = 'Try again';
             });

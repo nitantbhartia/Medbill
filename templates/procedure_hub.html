@@ -55,7 +55,7 @@
 </script>
 {% endif %}
 <style>
-  .hub-hero { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; padding: 64px 24px 72px; border-radius: 0 0 40px 40px; }
+  .hub-hero { background: linear-gradient(135deg, #1F4FD1 0%, #163A9C 100%); color: #fff; padding: 64px 24px 72px; border-radius: 0 0 40px 40px; }
   .hub-hero-inner { max-width: 860px; margin: 0 auto; }
   .hub-hero-crumb { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: 12px; }
   .hub-hero-crumb a { color: rgba(255,255,255,.85); text-decoration: underline; }
@@ -66,29 +66,29 @@
   .hub-stat-value { font-size: 1.5rem; font-weight: 800; color: #fff; }
 
   .hub-body { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
-  .answer-box { background: #F0FDF4; border-left: 4px solid #059669; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 32px; font-size: 1rem; line-height: 1.6; }
-  .answer-box strong { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #059669; margin-bottom: 6px; }
+  .answer-box { background: #F0FDF4; border-left: 4px solid #1F4FD1; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 32px; font-size: 1rem; line-height: 1.6; }
+  .answer-box strong { display: block; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #1F4FD1; margin-bottom: 6px; }
 
   .hub-table-wrap { overflow-x: auto; margin-bottom: 40px; }
   .hub-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
   .hub-table thead th { background: #F9FAFB; text-align: left; padding: 10px 14px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #6B7280; border-bottom: 2px solid #E5E7EB; }
   .hub-table tbody td { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; }
   .hub-table tbody tr:hover { background: #F9FAFB; }
-  .hub-table a { color: #059669; font-weight: 600; text-decoration: none; }
+  .hub-table a { color: #1F4FD1; font-weight: 600; text-decoration: none; }
   .hub-table a:hover { text-decoration: underline; }
-  .markup-low { color: #059669; font-weight: 700; }
+  .markup-low { color: #1F4FD1; font-weight: 700; }
   .markup-med { color: #D97706; font-weight: 700; }
   .markup-high { color: #DC2626; font-weight: 700; }
 
   .hub-section-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; margin: 40px 0 16px; }
   .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 40px; }
   .state-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: #111827; font-size: .88rem; transition: border-color .15s; }
-  .state-card:hover { border-color: #059669; }
+  .state-card:hover { border-color: #1F4FD1; }
   .state-card strong { display: block; font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
   .state-card span { color: #6B7280; font-size: .8rem; }
   .proc-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
   .proc-pill { background: #F3F4F6; border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 600; text-decoration: none; color: #374151; }
-  .proc-pill:hover { background: #E6F4EA; color: #059669; }
+  .proc-pill:hover { background: #EAF0FD; color: #1F4FD1; }
 </style>
 {% endblock %}
 
@@ -172,7 +172,7 @@
       <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:4px;">Got a bill for {{ procedure.name }}?</div>
       <div style="font-size:.85rem;color:rgba(255,255,255,.65);">Compare every charge against the ${{ "{:,}".format(ref.medicare_rate) if ref.medicare_rate else "Medicare" }} benchmark. Free, instant.</div>
     </div>
-    <a href="/scan" style="background:var(--bk-green,#059669);color:#fff;border-radius:999px;padding:13px 28px;font-weight:800;font-size:.95rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Scan My Bill Free &rarr;</a>
+    <a href="/scan" style="background:var(--bk-green,#1F4FD1);color:#fff;border-radius:999px;padding:13px 28px;font-weight:800;font-size:.95rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Scan My Bill Free &rarr;</a>
   </div>
 
   <h2 class="hub-section-title">{{ procedure.name }} Cost by State</h2>
@@ -195,7 +195,7 @@
   <p style="font-size:.78rem;color:#9CA3AF;margin-top:32px;">
     Cost estimates based on CMS Medicare fee schedule and national hospital chargemaster averages adjusted by state cost indices.
     Actual charges vary by facility and insurance. Not medical or financial advice.
-    <a href="/guides/how-to-get-itemized-hospital-bill/" style="color:#059669;">Learn how to read your bill &rarr;</a>
+    <a href="/guides/how-to-get-itemized-hospital-bill/" style="color:#1F4FD1;">Learn how to read your bill &rarr;</a>
   </p>
 </div>
 {% endblock %}

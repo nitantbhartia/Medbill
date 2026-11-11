@@ -2,7 +2,7 @@
 {% block title %}Bill Health Score: {{ score.score }}/100 | BillKarma{% endblock %}
 {% block head %}
 <style>
-    .bs-hero { background:#00824F; border-radius:0 0 40px 40px; padding:48px 24px 44px; text-align:center; }
+    .bs-hero { background:#1F4FD1; border-radius:0 0 40px 40px; padding:48px 24px 44px; text-align:center; }
     .bs-hero h1 { color:#fff; font-size:2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:6px; }
     .bs-hero p { color:rgba(255,255,255,0.75); font-weight:500; font-size:0.95rem; }
     @media(max-width:640px){ .bs-hero{padding:36px 18px 32px;border-radius:0 0 24px 24px;} .bs-hero h1{font-size:1.6rem;} }
@@ -23,7 +23,7 @@
             <svg viewBox="0 0 200 200" width="200" height="200" class="mx-auto">
                 <circle cx="100" cy="100" r="85" fill="none" stroke="#E5E5E5" stroke-width="12"/>
                 <circle cx="100" cy="100" r="85" fill="none"
-                    stroke="{% if score.grade == 'A' %}#00824F{% elif score.grade == 'B' %}#38A169{% elif score.grade == 'C' %}#D69E2E{% elif score.grade == 'D' %}#DD6B20{% else %}#E53E3E{% endif %}"
+                    stroke="{% if score.grade == 'A' %}#1F4FD1{% elif score.grade == 'B' %}#38A169{% elif score.grade == 'C' %}#D69E2E{% elif score.grade == 'D' %}#DD6B20{% else %}#E53E3E{% endif %}"
                     stroke-width="12" stroke-linecap="round"
                     stroke-dasharray="{{ (score.score / 100) * 534 }} 534"
                     transform="rotate(-90 100 100)"

@@ -27,14 +27,32 @@ a:hover { color: var(--action-hover); }
 .bk-h2 { margin: 0; font-size: 26px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 800; }
 
 /* Header */
-.bk-header { border-bottom: 1px solid var(--rule); background: var(--paper); }
-.bk-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding-top: 14px; padding-bottom: 14px; }
-.bk-logo { color: var(--ink); text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+.bk-header { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--rule); background: var(--paper); }
+.bk-header-inner { display: flex; align-items: center; gap: 12px 28px; height: 64px; }
+.bk-logo { color: var(--ink); text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; margin-right: auto; }
 .bk-logo:hover { color: var(--ink); }
-.bk-nav { display: flex; flex-wrap: wrap; gap: 0 24px; font-size: 15px; font-weight: 500; }
-.bk-nav a { color: var(--ink); text-decoration: none; padding: 12px 0; }
+.bk-nav { display: flex; gap: 0 28px; font-size: 15px; font-weight: 500; }
+.bk-nav a { color: var(--ink); text-decoration: none; padding: 8px 0; }
 .bk-nav a:hover { text-decoration: underline; }
-.bk-nav a.bk-nav-cta { color: var(--action); font-weight: 600; }
+.bk-header-cta { min-height: 40px; padding: 0 16px; font-size: 15px; }
+.bk-menu { display: none; position: relative; }
+.bk-menu summary { list-style: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -10px; cursor: pointer; }
+.bk-menu summary::-webkit-details-marker { display: none; }
+.bk-menu-icon, .bk-menu-icon::before, .bk-menu-icon::after { display: block; width: 20px; height: 2px; background: var(--ink); content: ""; position: relative; }
+.bk-menu-icon::before { position: absolute; top: -6px; }
+.bk-menu-icon::after { position: absolute; top: 6px; }
+.bk-menu[open] .bk-menu-icon { background: transparent; }
+.bk-menu[open] .bk-menu-icon::before { top: 0; transform: rotate(45deg); }
+.bk-menu[open] .bk-menu-icon::after { top: 0; transform: rotate(-45deg); }
+.bk-menu-panel { position: fixed; top: 64px; left: 0; right: 0; bottom: 0; overflow-y: auto; background: var(--paper); padding: 8px 24px 32px; }
+.bk-menu-panel a { display: block; padding: 16px 0; border-bottom: 1px solid var(--rule); color: var(--ink); text-decoration: none; font-size: 18px; font-weight: 600; }
+@media (max-width: 760px) {
+    .bk-header-inner { height: 56px; gap: 8px; }
+    .bk-menu-panel { top: 56px; }
+    .bk-nav { display: none; }
+    .bk-menu { display: block; }
+    .bk-header-cta { min-height: 36px; padding: 0 14px; font-size: 14px; }
+}
 
 /* Buttons */
 .bk-btn, .bk-btn-outline, .bk-btn-ink {
@@ -72,6 +90,25 @@ a:hover { color: var(--action-hover); }
 .bk-tags li { font-size: 14px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 3px; }
 .bk-tags li.bk-tag-strong { font-weight: 600; border-color: var(--ink); }
 
+/* Sections, row links, folds */
+.bk-hero { background: var(--paper-2); border-bottom: 1px solid var(--rule); padding: 44px 0 40px; }
+.bk-hero h1 { margin: 0; font-size: clamp(1.75rem, 6.2vw, 2.6rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.12; }
+.bk-hero .bk-eyebrow { margin-bottom: 12px; }
+.bk-section { padding-top: 40px; padding-bottom: 8px; }
+.bk-row-link { display: block; color: var(--ink); text-decoration: none; width: 100%; }
+.bk-row-link:hover .bk-row-title { text-decoration: underline; }
+.bk-row-link .bk-row-title, .bk-row-link .bk-row-sub { display: block; }
+.bk-fold { border-bottom: 1px solid var(--rule); }
+.bk-fold:first-of-type { border-top: 1px solid var(--rule); margin-top: 20px; }
+.bk-fold summary { display: flex; justify-content: space-between; align-items: center; min-height: 56px; cursor: pointer; font-size: 17px; font-weight: 700; list-style: none; }
+.bk-fold summary::-webkit-details-marker { display: none; }
+.bk-fold summary::after { content: "+"; font-family: var(--mono); font-size: 20px; margin-left: 12px; }
+.bk-fold[open] summary::after { content: "\2212"; }
+.bk-fold summary span:first-child { flex: 1; }
+.bk-link-list { margin: 0; padding: 0 0 8px; list-style: none; }
+.bk-link-list a { display: block; padding: 10px 0; font-size: 16px; line-height: 1.4; }
+.bk-fold-all { display: inline-block; padding: 4px 0 18px; font-weight: 600; }
+
 /* Facts list (label / value) */
 .bk-facts { margin: 18px 0 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 16px; font-size: 15px; }
 .bk-facts dt { color: var(--ink-2); }
@@ -91,6 +128,57 @@ a:hover { color: var(--action-hover); }
 .bk-footer p { margin: 0; max-width: 520px; }
 .bk-footer nav { display: flex; flex-wrap: wrap; gap: 0 20px; max-width: 520px; }
 .bk-footer nav a { color: var(--ink-2); padding: 8px 0; }
+@media (max-width: 760px) {
+    .bk-footer-inner { padding-top: 28px; padding-bottom: 40px; gap: 20px; }
+    .bk-footer nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; max-width: none; width: 100%; }
+    .bk-footer nav a { padding: 10px 0; }
+}
+
+/* ==========================================================================
+   Shared page layer: every page header, card and button follows the same rules,
+   whatever its own inline <style> says. Keep page-specific CSS to layout only.
+   ========================================================================== */
+html { overflow-x: clip; scroll-padding-top: 72px; }
+main img, main video, main svg { max-width: 100%; height: auto; }
+main table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+main pre { overflow-x: auto; max-width: 100%; }
+main h1, main h2, main h3 { overflow-wrap: break-word; }
+
+/* Page header band */
+[class$="-hero"], [class*="-hero "] {
+    background: var(--paper-2) !important; background-image: none !important; color: var(--ink) !important;
+    border-radius: 0 !important; border-bottom: 1px solid var(--rule); box-shadow: none !important;
+    padding-top: 44px !important; padding-bottom: 40px !important;
+}
+[class$="-hero"] [class*="blob"], [class*="-hero "] [class*="blob"] { display: none !important; }
+:is([class$="-hero"], [class*="-hero "]) :is(h1, h2, h3, p, li, span, strong, label, small, div) { color: var(--ink) !important; text-shadow: none !important; }
+:is([class$="-hero"], [class*="-hero "]) :is(p, li, .subtitle, [class*="sub"]) { color: var(--ink-2) !important; }
+:is([class$="-hero"], [class*="-hero "]) h1 { font-size: clamp(1.75rem, 6.2vw, 2.6rem) !important; font-weight: 800 !important; letter-spacing: -0.025em !important; line-height: 1.12 !important; }
+:is([class$="-hero"], [class*="-hero "]) a:not([class*="btn"]):not([style*="background"]) { color: var(--action) !important; }
+:is([class$="-hero"], [class*="-hero "]) a[style*="background"] { background: var(--action) !important; color: #FFFFFF !important; border-radius: 4px !important; }
+:is([class$="-hero"], [class*="-hero "]) [class*="badge"], :is([class$="-hero"], [class*="-hero "]) [class*="pill"] { background: var(--paper) !important; border: 1px solid var(--rule) !important; border-radius: 3px !important; }
+
+/* Cards, buttons, shadows: one radius, no drop shadows */
+[class$="-card"], [class*="-card "] { border-radius: 6px !important; box-shadow: none !important; }
+.rounded-xl, .rounded-2xl, .rounded-3xl { border-radius: 6px !important; }
+a.rounded-full, button.rounded-full { border-radius: 4px !important; }
+a[style*="border-radius:999px"], a[style*="border-radius: 999px"], a[style*="border-radius:100px"] { border-radius: 4px !important; }
+.shadow, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl { box-shadow: none !important; }
+
+/* Scan page stat strip: wraps instead of scrolling sideways */
+.scan-stat-strip { flex-wrap: wrap; gap: 12px 0; padding: 16px 12px; }
+.scan-stat-item { white-space: normal; flex: 1 1 140px; padding: 0 12px; }
+.scan-stat-divider { display: none; }
+
+@media (max-width: 640px) {
+    .bk-wrap { padding-left: 20px; padding-right: 20px; }
+    [class$="-hero"], [class*="-hero "] { padding-top: 28px !important; padding-bottom: 28px !important; }
+    input, select, textarea { font-size: 16px; }
+    .bk-h2 { font-size: 22px; }
+    .scan-stat-item { flex-basis: 45%; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+    .scan-form-card { padding: 20px; }
+    .scan-checks-grid { grid-template-columns: 1fr; }
+}
 
 @media print {
     .bk-header, .bk-footer { display: none; }
