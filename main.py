@@ -753,6 +753,84 @@ def _extract_howto_schema(guide: dict) -> str | None:
     return json.dumps(schema)
 
 
+# Data guides must be registered before /guides/{slug}/, which would otherwise match them first.
+@app.get("/guides/cheapest-cities-{proc_slug}-2026/", response_class=HTMLResponse)
+async def cheapest_cities_guide(request: Request, proc_slug: str):
+    """Data-driven guide: cheapest and most expensive cities for a given procedure."""
+    proc = _PROCEDURE_SLUGS.get(proc_slug)
+    if not proc:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
+    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
+    city_costs = _procedure_city_costs(proc["cpt"])  # already sorted cheapest→most expensive
+    cheapest = city_costs[:10]
+    most_expensive = list(reversed(city_costs[-10:]))
+    savings = most_expensive[0]["avg_charge"] - cheapest[0]["avg_charge"] if city_costs else 0
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/cheapest-cities-{proc_slug}-2026/"
+    title = f"Cheapest Cities for {proc['name']} in 2026"
+    meta_description = (
+        f"The cheapest city for {proc['name']} averages ${cheapest[0]['avg_charge']:,} vs ${most_expensive[0]['avg_charge']:,} "
+        f"in the most expensive — a ${savings:,} difference. See all 50 cities ranked by cost."
+    ) if city_costs else f"Compare {proc['name']} costs across 50 US cities."
+    return templates.TemplateResponse("cheapest_cities_guide.html", {
+        "request": request,
+        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
+        "ref": ref,
+        "cheapest": cheapest,
+        "most_expensive": most_expensive,
+        "all_cities": city_costs,
+        "savings": savings,
+        "canonical_url": canonical_url,
+        "og_title": f"{title} | BillKarma",
+        "meta_description": meta_description,
+        "other_procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug],
+    })
+
+
+@app.get("/guides/most-expensive-states-healthcare-2026/", response_class=HTMLResponse)
+async def state_cost_comparison_guide(request: Request):
+    """Data journalism: all US states ranked by healthcare cost index."""
+    # Build state rankings using average multiplier across all tracked procedures
+    # Use knee replacement (27447) as representative anchor — largest ticket item
+    anchor_cpt = "27447"
+    anchor_ref = _CPT_STATIC_RATES.get(anchor_cpt, {})
+    anchor_nat = anchor_ref.get("avg_charge", 30500)
+    states = []
+    for abbr, mult in sorted(_STATE_COST_MULTIPLIER.items(), key=lambda x: -x[1]):
+        # Find state name from _STATE_DATA
+        state_name = next(
+            (v["name"] for v in _STATE_DATA.values() if v["abbr"] == abbr),
+            abbr
+        )
+        state_slug = next(
+            (k for k, v in _STATE_DATA.items() if v["abbr"] == abbr),
+            abbr.lower()
+        )
+        states.append({
+            "abbr": abbr,
+            "name": state_name,
+            "slug": state_slug,
+            "multiplier": mult,
+            "knee_avg": round(anchor_nat * mult),
+            "vs_national_pct": round((mult - 1.0) * 100),
+        })
+    national_avg = anchor_nat
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/most-expensive-states-healthcare-2026/"
+    meta_description = (
+        f"DC, NY, CA, and MA have the highest hospital costs — up to 28% above the national average. "
+        f"MS and WV are the cheapest, 13% below average. Full state-by-state ranking for 2026."
+    )
+    return templates.TemplateResponse("state_cost_comparison.html", {
+        "request": request,
+        "states": states,
+        "national_avg": national_avg,
+        "anchor_procedure": "Knee Replacement",
+        "canonical_url": canonical_url,
+        "og_title": "Most Expensive States for Healthcare in 2026 | BillKarma",
+        "meta_description": meta_description,
+        "procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items()],
+    })
+
+
 @app.get("/guides/{slug}", response_class=RedirectResponse)
 async def guide_page_redirect(slug: str):
     """Redirect no-slash guide URLs straight to the final canonical URL (one hop)."""
@@ -1282,83 +1360,6 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
         "og_title": f"{proc['name']} Cost in {state['name']} | BillKarma",
         "meta_description": meta_description, "meta_robots": "index, follow",
         "nearby_procedures": [{"name": v["name"], "slug": k} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug][:8],
-    })
-
-
-@app.get("/guides/cheapest-cities-{proc_slug}-2026/", response_class=HTMLResponse)
-async def cheapest_cities_guide(request: Request, proc_slug: str):
-    """Data-driven guide: cheapest and most expensive cities for a given procedure."""
-    proc = _PROCEDURE_SLUGS.get(proc_slug)
-    if not proc:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
-    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
-    city_costs = _procedure_city_costs(proc["cpt"])  # already sorted cheapest→most expensive
-    cheapest = city_costs[:10]
-    most_expensive = list(reversed(city_costs[-10:]))
-    savings = most_expensive[0]["avg_charge"] - cheapest[0]["avg_charge"] if city_costs else 0
-    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/cheapest-cities-{proc_slug}-2026/"
-    title = f"Cheapest Cities for {proc['name']} in 2026"
-    meta_description = (
-        f"The cheapest city for {proc['name']} averages ${cheapest[0]['avg_charge']:,} vs ${most_expensive[0]['avg_charge']:,} "
-        f"in the most expensive — a ${savings:,} difference. See all 50 cities ranked by cost."
-    ) if city_costs else f"Compare {proc['name']} costs across 50 US cities."
-    return templates.TemplateResponse("cheapest_cities_guide.html", {
-        "request": request,
-        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
-        "ref": ref,
-        "cheapest": cheapest,
-        "most_expensive": most_expensive,
-        "all_cities": city_costs,
-        "savings": savings,
-        "canonical_url": canonical_url,
-        "og_title": f"{title} | BillKarma",
-        "meta_description": meta_description,
-        "other_procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug],
-    })
-
-
-@app.get("/guides/most-expensive-states-healthcare-2026/", response_class=HTMLResponse)
-async def state_cost_comparison_guide(request: Request):
-    """Data journalism: all US states ranked by healthcare cost index."""
-    # Build state rankings using average multiplier across all tracked procedures
-    # Use knee replacement (27447) as representative anchor — largest ticket item
-    anchor_cpt = "27447"
-    anchor_ref = _CPT_STATIC_RATES.get(anchor_cpt, {})
-    anchor_nat = anchor_ref.get("avg_charge", 30500)
-    states = []
-    for abbr, mult in sorted(_STATE_COST_MULTIPLIER.items(), key=lambda x: -x[1]):
-        # Find state name from _STATE_DATA
-        state_name = next(
-            (v["name"] for v in _STATE_DATA.values() if v["abbr"] == abbr),
-            abbr
-        )
-        state_slug = next(
-            (k for k, v in _STATE_DATA.items() if v["abbr"] == abbr),
-            abbr.lower()
-        )
-        states.append({
-            "abbr": abbr,
-            "name": state_name,
-            "slug": state_slug,
-            "multiplier": mult,
-            "knee_avg": round(anchor_nat * mult),
-            "vs_national_pct": round((mult - 1.0) * 100),
-        })
-    national_avg = anchor_nat
-    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/most-expensive-states-healthcare-2026/"
-    meta_description = (
-        f"DC, NY, CA, and MA have the highest hospital costs — up to 28% above the national average. "
-        f"MS and WV are the cheapest, 13% below average. Full state-by-state ranking for 2026."
-    )
-    return templates.TemplateResponse("state_cost_comparison.html", {
-        "request": request,
-        "states": states,
-        "national_avg": national_avg,
-        "anchor_procedure": "Knee Replacement",
-        "canonical_url": canonical_url,
-        "og_title": "Most Expensive States for Healthcare in 2026 | BillKarma",
-        "meta_description": meta_description,
-        "procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items()],
     })
 
 
