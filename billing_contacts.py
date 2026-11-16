@@ -168,11 +168,12 @@ def find_billing_address(page: Page) -> str | None:
 
 
 def find_link(page: Page, pattern: re.Pattern, page_url: str) -> str | None:
+    """First link to a different page whose wording matches. A link back to this page says nothing useful."""
     for href, anchor_text in page.links:
         if not pattern.search(f"{anchor_text} {href}"):
             continue
-        absolute = urljoin(page_url, href)
-        if urlparse(absolute).scheme in ("http", "https"):
+        absolute = urljoin(page_url, href).split("#")[0]
+        if urlparse(absolute).scheme in ("http", "https") and absolute != page_url.split("#")[0]:
             return absolute
     return None
 
@@ -225,6 +226,8 @@ def candidate_urls(root: str, home: Page) -> list[str]:
         parsed = urlparse(absolute)
         if NAV_LINK_RE.search(anchor_text) and parsed.netloc == host and parsed.scheme in ("http", "https"):
             nav_urls.append(absolute)
+    # Shallowest first: a general billing page beats a single clinic's payment page reached from the same nav.
+    nav_urls.sort(key=lambda url: urlparse(url).path.count("/"))
     fixed_urls = [urljoin(root, path) for path in BILLING_PATHS]
     urls = list(dict.fromkeys(nav_urls[: config.BILLING_CONTACT_MAX_NAV_LINKS] + fixed_urls))
     return [url for url in urls if url != root]
