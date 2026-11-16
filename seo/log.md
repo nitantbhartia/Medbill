@@ -35,3 +35,14 @@
 - Homepage title now leads with brand plus category ("BillKarma: Free Medical Bill Checker and Dispute Service"); schema gets `alternateName` and loses the self-referencing `sameAs` and the retired SiteLinksSearchBox node; About page states it isn't affiliated with Credit Karma or any finance app.
 - Search Console: homepage last crawled Oct 27 as 404, `sitemap-guides.xml` has 1 error. Owner steps in backlog 1b.
 - Sitemap audit: sitemap-guides, tools, rights, procedures all return 200 for every URL (429, 16, 50, 17 URLs, no duplicates). Core and cost sitemaps could not be audited locally without the production database.
+
+## 2026-11-16 (full audit, `/seo audit`)
+Scores from eight read-only agents on the live site (estimates, not Lighthouse): technical 68, content 34, schema 55, AI-search readiness 49, performance 82 (lab proxies), sitemap 69. Real measurements: mobile LCP about 1.0 to 1.1 s, CLS under 0.02, 33 to 40 KB per page. Not measured: Lighthouse score, INP, CrUX (no API key).
+Fixed in code after checking each claim against the repo or primary sources:
+- Hospital schema: removed the CMS star rating published as a review rating with count 1, and the placeholder medicalSpecialty; the hospital FAQ no longer says "grade N/A across 0 procedures" for ungraded hospitals.
+- /scan was 424px wide on a 390px phone (tooltip bubbles took layout space while hidden).
+- Sitemaps: cost pages that would 404 are no longer listed; the five duplicate cost URLs in sitemap-core are gone; sitemap-core.xml is now in robots.txt.
+- Trailing-slash redirects are 301, not 307, for GET and HEAD.
+- Compare page titles keep full hospital names where they fit instead of cutting each to 18 characters.
+- Accuracy: Texas guide said wages can be garnished for medical debt (they cannot: Tex. Const. art. XVI, sec. 28); No Surprises Act guide had the Good Faith Estimate timing wrong, called grandfathered plans exempt (they are covered; short-term plans are not), and omitted that consent waivers do not apply to anesthesiologists, radiologists and similar providers at in-network facilities.
+Not fixed, needs a person (details in the audit report): unsourced statistics and "real" case studies that look invented (Valley Health System, Regional Anesthesia Partners) with arithmetic that does not add up; anesthesia unit price, revenue code 0360 for ER and A6216 as gloves in sample bills; the state medical-debt law table; Alabama "most expensive" ranking benchmark; no named author or reviewer on any guide; no privacy statement on /scan. llms.txt claims inline citations and quarterly review that the guides do not have.

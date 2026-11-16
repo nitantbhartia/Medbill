@@ -97,6 +97,15 @@ async def referral_cookie(request: Request, call_next):
 
 
 @app.middleware("http")
+async def permanent_slash_redirects(request: Request, call_next):
+    """Starlette redirects /path to /path/ with a temporary 307. For pages (GET and HEAD) make it permanent."""
+    response = await call_next(request)
+    if response.status_code == 307 and request.method in ("GET", "HEAD"):
+        response.status_code = 301
+    return response
+
+
+@app.middleware("http")
 async def security_headers(request: Request, call_next):
     # Force HTTPS — proxy (Railway/Render) sets X-Forwarded-Proto
     if not config.DEBUG:
@@ -2520,11 +2529,6 @@ async def core_sitemap():
         (f"{base}/rights/", "0.8"),
         (f"{base}/quiz", "0.9"),
         (f"{base}/glossary/", "0.8"),
-        (f"{base}/cost/mri/", "0.8"),
-        (f"{base}/cost/colonoscopy/", "0.8"),
-        (f"{base}/cost/ct-scan/", "0.8"),
-        (f"{base}/cost/knee-replacement/", "0.8"),
-        (f"{base}/cost/er-visit/", "0.8"),
         (f"{base}/about/", "0.7"),
         (f"{base}/press/", "0.7"),
         (f"{base}/partners/", "0.7"),
@@ -2868,6 +2872,7 @@ async def robots_txt():
         "User-agent: *\n"
         "Allow: /\n\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-core.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-tools.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-rights.xml\n"

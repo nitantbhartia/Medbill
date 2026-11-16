@@ -6,7 +6,7 @@ from datetime import date
 import json
 import math
 
-from config import APP_URL, ENABLE_FREE_MAPS
+from config import APP_URL, ENABLE_FREE_MAPS, SEO_TITLE_MAX_CHARS
 from db import get_db
 from hospital_seo import (
     FRIENDLY_CPT_DESCRIPTIONS,
@@ -198,6 +198,9 @@ def get_comparison_data(fid_a: str, fid_b: str) -> dict | None:
     }
 
 
+TITLE_MAX_BEFORE_SHORTENING = 65
+
+
 def _truncate_name(name: str, max_len: int) -> str:
     txt = (name or "").strip()
     if len(txt) <= max_len:
@@ -212,10 +215,11 @@ def build_comparison_seo(h_a: dict, h_b: dict, common: list[dict], distance_mile
     state = h_a.get("state") if h_a.get("state") == h_b.get("state") else None
     locality = f" in {city}, {state}" if city and state else ""
     title = f"{name_a} vs {name_b}: Which Costs Less{locality}? | BillKarma"
-    if len(title) > 65:
-        title = (
-            f"{_truncate_name(name_a, 18)} vs {_truncate_name(name_b, 18)}: Cost Compare | BillKarma"
-        )
+    if len(title) > TITLE_MAX_BEFORE_SHORTENING:
+        title = f"{name_a} vs {name_b}: Price Comparison"
+    if len(title) > SEO_TITLE_MAX_CHARS:
+        half = (SEO_TITLE_MAX_CHARS - len(" vs : Prices")) // 2
+        title = f"{_truncate_name(name_a, half)} vs {_truncate_name(name_b, half)}: Prices"
 
     top_proc = common[0] if common else None
     proc_clause = ""

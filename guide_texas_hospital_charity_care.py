@@ -19,7 +19,7 @@ register("texas-hospital-charity-care", {
         },
         {
             "q": "Can Texas hospitals garnish my wages for medical debt?",
-            "a": "Yes, Texas hospitals can garnish wages for medical debt — but only after obtaining a court judgment. Texas allows garnishment of up to 25% of disposable earnings for most debts. However, Texas has a significant protection for heads of household: under the Texas Constitution and state property law, the earnings of a head of a family who provides for dependents are exempt from garnishment in most circumstances. If you support dependents, consult a Texas consumer attorney about this exemption before responding to a garnishment action.",
+            "a": "Generally no. The Texas Constitution (Art. XVI, Sec. 28) protects current wages from garnishment, and that covers consumer debts such as medical bills. The exceptions are court-ordered child support and spousal maintenance, and debts collected under federal law, such as unpaid federal taxes and federal student loans. A hospital or collector that wins a judgment can still try to collect from other assets, such as a bank account or property that is not exempt. If you are sued, answer by the deadline on the summons, because a default judgment removes most defenses, and talk to a Texas legal aid office or consumer attorney.",
         },
         {
             "q": "What is Texas's statute of limitations on medical debt?",
@@ -31,7 +31,7 @@ register("texas-hospital-charity-care", {
         },
     ],
     "body": f"""
-<p class="lead">Texas has <strong>5.1 million uninsured residents</strong> &mdash; the highest total of any state &mdash; yet the state did not expand Medicaid under the ACA and has no state law mandating charity care income thresholds. What Texas does have: powerful federal rules that require every nonprofit hospital to provide financial assistance, and a significant head-of-household wage garnishment exemption. BillKarma&rsquo;s analysis of 900+ Texas hospitals shows the 10 largest health systems in the state mark up procedures a median of 4.8&times; over Medicare &mdash; but the same systems collectively reported $4.2 billion in charity care that went underutilized in 2024. This guide shows you how to claim your share.</p>
+<p class="lead">Texas has <strong>5.1 million uninsured residents</strong> &mdash; the highest total of any state &mdash; yet the state did not expand Medicaid under the ACA and has no state law mandating charity care income thresholds. What Texas does have: powerful federal rules that require every nonprofit hospital to provide financial assistance, and a constitutional ban on garnishing wages for consumer debts such as medical bills. BillKarma&rsquo;s analysis of 900+ Texas hospitals shows the 10 largest health systems in the state mark up procedures a median of 4.8&times; over Medicare &mdash; but the same systems collectively reported $4.2 billion in charity care that went underutilized in 2024. This guide shows you how to claim your share.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -42,7 +42,7 @@ register("texas-hospital-charity-care", {
         <li><a href="#bill-example">Annotated Texas ER bill</a></li>
         <li><a href="#collections-rights">Your rights before and during collections</a></li>
         <li><a href="#statute-of-limitations">Texas statute of limitations: 4 years</a></li>
-        <li><a href="#wage-garnishment">Wage garnishment and the head-of-household exemption</a></li>
+        <li><a href="#wage-garnishment">Wage garnishment in Texas</a></li>
         <li><a href="#case-studies">Real patient results</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
@@ -199,13 +199,11 @@ register("texas-hospital-charity-care", {
 
 <p>What resets the Texas 4-year clock: any payment on the debt, a written promise to pay, or a written acknowledgment of the debt. Do not make any payment on old medical debt without first verifying the date of last activity and comparing it to the 4-year limit.</p>
 
-<h2 id="wage-garnishment">7. Wage garnishment and the head-of-household exemption</h2>
+<h2 id="wage-garnishment">7. Wage garnishment in Texas</h2>
 
-<p>Texas allows wage garnishment for medical debt after a creditor obtains a court judgment. The standard limit is 25% of disposable earnings. However, Texas has a significant protection:</p>
+<p>Texas does not allow a hospital or collection agency to garnish your <strong>current wages</strong> for medical debt. The Texas Constitution (Art. XVI, Sec. 28) protects wages from garnishment except to enforce court-ordered child support and spousal maintenance. Debts collected under federal law, such as unpaid federal taxes and federal student loans, follow federal rules instead.</p>
 
-<p>Under the Texas Constitution and the Texas Property Code, the <strong>current wages of a head of a family</strong> (a person who provides for a spouse, child, or other dependent) are exempt from garnishment in Texas in most circumstances. This is one of the broadest wage protections in the nation for heads of household.</p>
-
-<p>If you support dependents and a collections agency or hospital seeks to garnish your wages, consult a Texas consumer attorney. Asserting the head-of-household exemption must typically be done in a court filing &mdash; it is not automatic.</p>
+<p>That does not make the debt disappear. A creditor that sues and wins a judgment can try to collect from other assets, such as a bank account or property that Texas law does not exempt. Never ignore a lawsuit summons: a default judgment removes most of your defenses. A Texas legal aid office or consumer attorney can tell you which of your assets are protected.</p>
 
 <div class="key-takeaway">
     <strong>Ready to audit your Texas hospital bill?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we flag every charge above Medicare rates, identify E&M upcoding, supply charge inflation, and balance billing violations, and generate a dispute letter ready to send to the Texas Department of Insurance or the hospital billing department.
@@ -257,7 +255,7 @@ register("texas-hospital-charity-care", {
 
     <div class="faq-item">
         <h3>Can Texas hospitals garnish my wages for medical debt?</h3>
-        <p>Texas allows wage garnishment after a court judgment, up to 25% of disposable earnings. However, Texas&rsquo;s head-of-household exemption protects the current wages of a person who supports dependents from garnishment in most cases. If you have dependents, consult a Texas consumer attorney before responding to any garnishment action. Never ignore a lawsuit summons &mdash; a default judgment removes most defenses.</p>
+        <p>Generally no. The Texas Constitution protects current wages from garnishment for consumer debts such as medical bills. The exceptions are court-ordered child support and spousal maintenance, and federal debts such as unpaid federal taxes and student loans. A creditor with a judgment can still try to collect from a bank account or other non-exempt property, so never ignore a lawsuit summons.</p>
     </div>
 
     <div class="faq-item">

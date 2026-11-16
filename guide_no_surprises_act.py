@@ -68,7 +68,7 @@ register("no-surprises-act-explained", {
 <p>For all of these providers, you pay only your in-network cost-sharing. The provider and your insurer resolve their payment dispute directly, without involving you in the financial gap.</p>
 
 <h3>Air ambulance</h3>
-<p>Air ambulance (helicopter and fixed-wing aircraft) is fully protected under the NSA. Regardless of whether the air ambulance company is in your insurance network, you pay only your in-network cost-sharing. This protection applies to all non-grandfathered group and individual health plans.</p>
+<p>Air ambulance (helicopter and fixed-wing aircraft) is fully protected under the NSA. Regardless of whether the air ambulance company is in your insurance network, you pay only your in-network cost-sharing. This protection applies to group and individual health plans, including grandfathered plans.</p>
 
 {_embed(mode="cost", cpt="A0431", title="Air ambulance Medicare rates", subtitle="See what Medicare pays for helicopter ambulance transport.")}
 
@@ -83,13 +83,13 @@ register("no-surprises-act-explained", {
 <p>If you chose an out-of-network hospital or facility for a non-emergency procedure&mdash;and you received and signed a proper consent form acknowledging the out-of-network status at least 72 hours before the service&mdash;the NSA does not protect you from balance billing by that facility. The individual out-of-network providers at that facility may still be protected if you didn&rsquo;t specifically choose them.</p>
 
 <h3>Out-of-network providers when you had a genuine choice</h3>
-<p>If the facility offered you an in-network provider as an alternative and you voluntarily chose an out-of-network provider instead, you can be balance billed for that provider&rsquo;s services. The key legal question is whether you received and signed valid consent in writing at least 72 hours before the service&mdash;a provider who fails to get proper written consent cannot balance bill you.</p>
+<p>If the facility offered you an in-network provider as an alternative and you voluntarily chose an out-of-network provider instead, you can be balance billed for that provider&rsquo;s services. The key legal question is whether you received and signed valid consent in writing at least 72 hours before the service&mdash;a provider who fails to get proper written consent cannot balance bill you. Even valid consent cannot waive your protection for certain providers at an in-network facility, such as anesthesiologists, radiologists, pathologists, assistant surgeons and hospitalists, or when no in-network provider was available at the facility.</p>
 
 <h3>Dental-only and vision-only plans</h3>
 <p>Standalone dental and vision plans are not subject to the NSA. Behavioral health services have complex coverage rules that depend on your specific plan type. If you have a standalone dental or vision plan, the NSA does not apply to those bills.</p>
 
-<h3>Short-term health plans and grandfathered plans</h3>
-<p>Short-term limited duration health insurance plans and grandfathered health plans (plans that predated the ACA and have not made significant changes) are generally exempt from the NSA. If you have one of these plan types, review your plan documents carefully or contact your state insurance commissioner to understand your protections.</p>
+<h3>Plans the NSA does not cover</h3>
+<p>The NSA's billing protections apply to most private health plans, including employer plans and grandfathered plans (plans that predate the ACA and have not changed significantly). They do not apply to short-term limited duration plans, and Medicare, Medicaid, TRICARE and VA coverage follow their own rules. If you have a short-term plan, CMS treats you as uninsured for the Good Faith Estimate and the patient-provider dispute process. Check your plan documents, and your state insurance department, because state surprise billing laws may reach plans the federal law does not.</p>
 
 <h2 id="cost-sharing-rules">How cost-sharing works under the NSA</h2>
 
@@ -118,7 +118,7 @@ register("no-surprises-act-explained", {
 
 <h2 id="good-faith-estimates">Good Faith Estimates for self-pay patients</h2>
 
-<p>The NSA created a separate protection for uninsured and self-pay patients through the Good Faith Estimate (GFE) requirement. Any provider scheduling a non-emergency service for an uninsured or self-pay patient must provide a written GFE at least one business day before the service. The GFE must include:</p>
+<p>The NSA created a separate protection for uninsured and self-pay patients through the Good Faith Estimate (GFE) requirement. Any provider scheduling a non-emergency service for an uninsured or self-pay patient must provide a written GFE. The deadline depends on how far ahead the service was scheduled: if it is scheduled 3 to 9 business days ahead, the GFE is due within 1 business day of scheduling; if it is scheduled 10 or more business days ahead, within 3 business days of scheduling. A GFE is also due within 3 business days of a request, even if no service is scheduled. No GFE is required when a service is scheduled fewer than 3 business days ahead. The GFE must include:</p>
 
 <ul>
     <li>Expected charges for the primary service and all anticipated ancillary services (labs, anesthesia, assistant surgeons)</li>
