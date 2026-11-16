@@ -896,6 +896,9 @@ def send_certified_letter(
         body_text = e.read().decode(errors="replace")
         log.error("Lob error %s: %s", e.code, body_text)
         raise RuntimeError(f"Lob error {e.code}: {body_text}") from e
+    except (OSError, ValueError) as e:
+        log.error("Could not reach Lob: %s", e)
+        raise RuntimeError(f"Could not reach Lob: {e}") from e
 
     return {
         "lob_id": result.get("id", ""),

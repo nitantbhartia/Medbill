@@ -140,11 +140,13 @@ def mark_paid(case_id: int) -> bool:
 def approve(case: dict, letter_text: str) -> None:
     """The customer approves the letter, with any edits they made."""
     with get_db() as db:
-        db.execute(
+        updated = db.execute(
             "UPDATE appeal_cases SET status = 'approved', letter_text = ?, approved_at = CURRENT_TIMESTAMP"
             " WHERE id = ? AND status = 'drafted'",
             (letter_text.strip(), case["id"]),
-        )
+        ).rowcount
+    if updated != 1:  # already approved by a concurrent request: don't mail twice
+        return
     approved = get_case(case["id"])
     try:
         if config.LOB_API_KEY and approved["insurer_appeal_address"] and approved["mailing_address"]:

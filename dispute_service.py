@@ -44,6 +44,9 @@ def activate_dispute(
 
     Returns the new case_id.
     """
+    if not (0 < household_income <= config.HOUSEHOLD_INCOME_MAX_USD and 1 <= household_size <= config.HOUSEHOLD_SIZE_MAX):
+        household_income = household_size = 0  # unusable input: skip the financial assistance request
+
     with get_db() as db:
         # Check if dispute case already exists for this bill
         existing = db.execute(
@@ -99,7 +102,7 @@ def activate_dispute(
         _file_financial_assistance(case_id)
 
     if delivered:
-        add_strategy_note(case_id, "Dispute letter emailed to the billing department.")
+        add_strategy_note(case_id, "Dispute letter sent to the hospital's billing department.")
     else:
         add_strategy_note(case_id, "Dispute letter written. Waiting for the billing department's email address to send it.")
 
@@ -126,11 +129,19 @@ def _hospital_mailing_address(provider_name: str) -> str:
     if not provider_name:
         return ""
     with get_db() as db:
-        row = db.execute(
-            "SELECT address, city, state, zip FROM hospital_directory WHERE name LIKE ? LIMIT 1",
-            (f"%{provider_name[:20]}%",),
-        ).fetchone()
-    if not row or not (row["address"] and row["city"] and row["state"] and row["zip"]):
+        rows = db.execute(
+            "SELECT address, city, state, zip FROM hospital_directory WHERE name = ? COLLATE NOCASE",
+            (provider_name,),
+        ).fetchall()
+        if not rows:
+            rows = db.execute(
+                "SELECT address, city, state, zip FROM hospital_directory WHERE name LIKE ? LIMIT 2",
+                (f"%{provider_name[:20]}%",),
+            ).fetchall()
+    if len(rows) != 1:  # several hospitals share the name: do not guess where to mail patient details
+        return ""
+    row = rows[0]
+    if not (row["address"] and row["city"] and row["state"] and row["zip"]):
         return ""
     return f"{row['address']}, {row['city']}, {row['state']} {row['zip']}"
 
@@ -164,7 +175,9 @@ def _mail_certified(
 
 def _fill_letter(letter: str, case, hospital_address: str) -> str:
     """Replace the template placeholders in a dispute letter with the case's real details."""
-    reply_to = f"{config.EMAIL_FROM_ADDRESS}, referencing case #{case['id']}, or by mail to {case['patient_address']}"
+    reply_to = f"{config.EMAIL_FROM_ADDRESS}, referencing case #{case['id']}"
+    if case["patient_address"]:
+        reply_to += f", or by mail to {case['patient_address']}"
     return (
         letter.replace("[Your Address]", case["patient_address"] or "")
         .replace("[Your Email / Phone]", case["patient_email"])
@@ -510,7 +523,9 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
         except Exception as exc:
             log.error("Failed to send follow-up email for case %d: %s", case_id, exc)
     body = followup_body(patient_name, account_number, followup_number, case_id)
-    mailed = _mail_certified(case, provider, body, f"Dispute follow-up {followup_number}, case {case_id}")
+    mailed = ""
+    if followup_number in config.CERTIFIED_MAIL_FOLLOWUP_NUMBERS:
+        mailed = _mail_certified(case, provider, body, f"Dispute follow-up {followup_number}, case {case_id}")
     faxed = _fax_hospital(case, body)
     if not (sent or mailed or faxed):
         log.error("Follow-up %d for case %d not sent; will retry on the next run", followup_number, case_id)
@@ -556,7 +571,7 @@ def mark_resolved(case_id: int, outcome: str, actual_savings: float | None = Non
             UPDATE dispute_cases
             SET status = 'resolved', outcome = ?, actual_savings = ?,
                 resolved_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            WHERE id = ? AND status != 'refunded'
             """,
             (outcome, actual_savings, case_id),
         )
