@@ -55,6 +55,10 @@ DISPUTE_FEE_TIERS = [
     (float("inf"), 14900),
 ]
 DISPUTE_FOLLOWUP_DAYS = [7, 14, 30, 45]
+# Certified mail costs several dollars a letter: send it with the initial letter and the final follow-up only.
+CERTIFIED_MAIL_FOLLOWUP_NUMBERS = (len(DISPUTE_FOLLOWUP_DAYS),)
+HOUSEHOLD_INCOME_MAX_USD = 5_000_000
+HOUSEHOLD_SIZE_MAX = 20
 DISPUTE_MAX_DAYS = 45
 
 # Concierge: denied-claim appeals (flat fee by amount denied)

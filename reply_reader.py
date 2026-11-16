@@ -5,6 +5,7 @@ import logging
 import re
 import sqlite3
 import urllib.request
+from email.utils import parseaddr
 from html import escape
 
 from google import genai
@@ -19,6 +20,7 @@ log = logging.getLogger(__name__)
 
 RESEND_RECEIVING_URL = "https://api.resend.com/emails/receiving/"
 CASE_ID_PATTERN = re.compile(r"case\s*#?\s*(\d+)", re.IGNORECASE)
+OPEN_CASE_STATUSES = ("active", "sent")
 OUTCOMES = ("reduced", "forgiven", "payment_plan", "denied", "needs_info", "acknowledged", "unclear")
 MAX_REPLY_CHARS = 8000
 
@@ -64,7 +66,7 @@ def classify_reply(body: str) -> dict:
             config=types.GenerateContentConfig(response_mime_type="application/json"),
         )
         result = json.loads(response.text)
-    except (ValueError, OSError, genai.errors.APIError) as exc:
+    except (ValueError, TypeError, OSError, genai.errors.APIError) as exc:
         log.error("Could not classify hospital reply: %s", exc)
         return unclear
     if result.get("outcome") not in OUTCOMES:
@@ -72,7 +74,7 @@ def classify_reply(body: str) -> dict:
     new_balance = result.get("new_balance")
     return {
         "outcome": result["outcome"],
-        "new_balance": float(new_balance) if isinstance(new_balance, (int, float)) else None,
+        "new_balance": float(new_balance) if isinstance(new_balance, (int, float)) and not isinstance(new_balance, bool) else None,
         "summary": str(result.get("summary") or unclear["summary"])[:500],
     }
 
@@ -92,6 +94,13 @@ def _savings(case_id: int, outcome: str, new_balance: float | None) -> float | N
     if new_balance is not None and 0 <= new_balance < owes:
         return round(owes - new_balance, 2)
     return None
+
+
+def _from_hospital(sender: str, hospital_email: str | None) -> bool:
+    """True if the sender's address is on the same domain as the hospital billing email on the case."""
+    sender_domain = parseaddr(sender)[1].rpartition("@")[2].lower()
+    hospital_domain = (hospital_email or "").rpartition("@")[2].lower()
+    return bool(sender_domain) and sender_domain == hospital_domain
 
 
 def process_reply(inbound_email_id: str) -> str:
@@ -117,8 +126,11 @@ def process_reply(inbound_email_id: str) -> str:
 
     dispute_service.add_strategy_note(case_id, f"Hospital replied: {result['summary']}")
     savings = _savings(case_id, result["outcome"], result["new_balance"])
-    if result["outcome"] in ("reduced", "forgiven") and savings:
+    can_resolve = case["status"] in OPEN_CASE_STATUSES and _from_hospital(email["sender"], case["hospital_billing_email"])
+    if result["outcome"] in ("reduced", "forgiven") and savings and can_resolve:
         dispute_service.mark_resolved(case_id, result["outcome"], savings)
+    elif result["outcome"] in ("reduced", "forgiven"):
+        dispute_service.add_strategy_note(case_id, "Reply not applied automatically: sender is not the hospital billing office or the case is closed.")
     _notify_patient(case, result)
     return result["outcome"]
 

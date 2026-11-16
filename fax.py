@@ -43,8 +43,11 @@ def send_fax(to_number: str, text: str) -> str:
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             result = json.loads(resp.read())
+        return str(result["data"]["id"])
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode(errors="replace")
         log.error("Phaxio error %s sending fax to %s: %s", exc.code, to, detail)
         raise RuntimeError(f"Phaxio error {exc.code}: {detail}") from exc
-    return str(result["data"]["id"])
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        log.error("Could not send fax to %s: %s", to, exc)
+        raise RuntimeError(f"Could not send fax: {exc}") from exc
