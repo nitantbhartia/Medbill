@@ -1854,6 +1854,19 @@ CREATE INDEX IF NOT EXISTS idx_dispute_cases_bill ON dispute_cases(bill_id);
 CREATE INDEX IF NOT EXISTS idx_dispute_cases_status ON dispute_cases(status);
 CREATE INDEX IF NOT EXISTS idx_dispute_cases_followup ON dispute_cases(next_followup_at);
 
+CREATE TABLE IF NOT EXISTS dispute_replies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL REFERENCES dispute_cases(id),
+    inbound_email_id TEXT NOT NULL UNIQUE,
+    sender TEXT,
+    subject TEXT,
+    body TEXT,
+    outcome TEXT NOT NULL,
+    summary TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_dispute_replies_case ON dispute_replies(case_id);
+
 CREATE TABLE IF NOT EXISTS followup_queue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     case_id INTEGER NOT NULL REFERENCES dispute_cases(id),

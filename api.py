@@ -1,6 +1,7 @@
 import collections
 from html import escape as _he
 import json
+import secrets
 import logging
 import re
 import sqlite3
@@ -19,6 +20,7 @@ import analyzer
 import negotiation
 import payment as payment_module
 import dispute_service
+import reply_reader
 import esign as esign_module
 from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
 from db import get_db
@@ -1420,6 +1422,25 @@ async def create_dispute_checkout(
         raise HTTPException(500, str(exc))
 
     return {"status": "ok", "data": {"checkout_url": session["url"], "session_id": session["id"], "fee_cents": fee_cents}}
+
+
+@router.post("/webhooks/inbound-email")
+async def inbound_email_webhook(request: Request, token: str = ""):
+    """Resend 'email.received' webhook: read the hospital's reply to a dispute."""
+    if not config.INBOUND_WEBHOOK_SECRET:
+        raise HTTPException(503, "Inbound email webhook is not configured")
+    if not secrets.compare_digest(token, config.INBOUND_WEBHOOK_SECRET):
+        raise HTTPException(403, "Invalid token")
+    event = await request.json()
+    email_id = (event.get("data") or {}).get("email_id")
+    if event.get("type") != "email.received" or not email_id:
+        return {"status": "ok", "data": {"outcome": "ignored"}}
+    try:
+        outcome = reply_reader.process_reply(email_id)
+    except RuntimeError as exc:
+        log.error("Inbound email %s failed: %s", email_id, exc)
+        raise HTTPException(502, "Could not read the email")
+    return {"status": "ok", "data": {"outcome": outcome}}
 
 
 @router.post("/stripe/webhook")

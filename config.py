@@ -37,6 +37,7 @@ MAX_NEGOTIATION_DAYS = 45
 EMAIL_FROM_NAME = "BillKarma Patient Advocacy"
 EMAIL_FROM_ADDRESS = os.getenv("EMAIL_FROM", "disputes@billkarma.app")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+INBOUND_WEBHOOK_SECRET = os.getenv("INBOUND_WEBHOOK_SECRET", "")
 
 # Stripe
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
