@@ -9,4 +9,4 @@ Ordered by expected disputes per hour of work. Top item ships next.
 5. **Pitch the state rankings to press.** Run `python scripts/build_press_pitches.py` against the live database (Railway shell). It writes one draft per top-median-markup state to `seo/outreach/` with that state's real numbers. Add a reporter name and send by hand; track replies in `log.md`.
 6. **State guide overlap.** Each state has up to three pages (`{state}-medical-billing`, `medical-debt-laws-{state}`, `/rights/{state}/`). Pick one primary query per page; merge where two chase the same query.
 7. **Trim off-niche guide growth.** Insurance-shopping and elective-procedure guides (LASIK, Invisalign, tummy tuck coverage) don't lead to a hospital-bill dispute. No new pages there; refresh only if they already earn clicks.
-8. **Hospital page internal links.** Link each core guide from the matching hospital page section (itemized bill, financial assistance, dispute).
+8. ~~Hospital page internal links.~~ Shipped 2026-11-16.
