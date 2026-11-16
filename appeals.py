@@ -144,6 +144,13 @@ def approve(case: dict, letter_text: str) -> None:
             " WHERE id = ? AND status = 'drafted'",
             (letter_text.strip(), case["id"]),
         )
+    approved = get_case(case["id"])
+    try:
+        if config.LOB_API_KEY and approved["insurer_appeal_address"] and approved["mailing_address"]:
+            mail_by_lob(approved)
+            return
+    except (RuntimeError, ValueError) as exc:
+        log.error("Automatic mailing of appeal #%s failed, left for ops: %s", case["id"], exc)
     _notify_ops(f"Appeal #{case['id']} approved by the customer and ready to send")
 
 
