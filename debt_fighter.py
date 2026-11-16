@@ -219,7 +219,7 @@ FDCPA_RIGHTS = [
     },
     {
         "right": "Right to Sue for Violations",
-        "detail": "If a collector violates the FDCPA, you can sue for up to $1,000 in statutory damages per violation, plus actual damages and attorney fees.",
+        "detail": "If a collector violates the FDCPA, you can sue for up to $1,000 in statutory damages per lawsuit, plus actual damages and attorney fees.",
     },
     {
         "right": "Protection Against False Reporting",
@@ -466,7 +466,7 @@ Under the FDCPA, after receiving this letter you may only contact me to:
 - Confirm that you are ceasing collection efforts, or
 - Notify me of a specific legal action you intend to take
 
-Any communication beyond these exceptions will constitute a violation of federal law, for which I may seek statutory damages of up to $1,000 per violation, plus actual damages and attorney fees.
+Any communication beyond these exceptions will constitute a violation of federal law, for which I may seek statutory damages of up to $1,000 per lawsuit, plus actual damages and attorney fees.
 
 This letter does not constitute an acknowledgment that I owe this debt."""
 
