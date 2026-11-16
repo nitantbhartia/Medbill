@@ -124,5 +124,5 @@ class TestGuidePages:
 
     def test_guide_not_found(self):
         r = client.get("/guides/nonexistent-guide")
-        assert r.status_code == 200
+        assert r.status_code == 404
         assert "not found" in r.text.lower()

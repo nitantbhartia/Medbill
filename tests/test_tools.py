@@ -45,12 +45,12 @@ def test_tool_detail_renders():
 
 def test_tool_detail_404():
     resp = client.get("/tools/not-a-tool/")
-    assert resp.status_code == 200
+    assert resp.status_code == 404
     assert "Tool not found" in resp.text
 
 
 def test_tools_in_sitemap():
-    resp = client.get("/sitemap-hospitals.xml")
+    resp = client.get("/sitemap-tools.xml")
     assert resp.status_code == 200
     text = resp.text
     assert "/tools/" in text

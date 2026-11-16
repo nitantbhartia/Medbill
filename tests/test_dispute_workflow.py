@@ -455,5 +455,5 @@ class TestResultsPageRendering:
 
     def test_results_page_404_for_missing_bill(self):
         resp = client.get("/results/9999")
-        assert resp.status_code == 200
+        assert resp.status_code == 404
         assert "not found" in resp.text.lower()
