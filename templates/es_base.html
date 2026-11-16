@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block skip_label %}Saltar al contenido{% endblock %}
+
+{% block site_nav %}
+<nav class="bk-nav" aria-label="Principal">
+    <a href="/es/">Inicio</a>
+    <a href="/es/#guias">Gu&iacute;as</a>
+    <a href="{{ en_url }}" lang="en" hreflang="en">English</a>
+</nav>
+<a href="/es/escanear/" class="bk-btn bk-btn-sm bk-header-cta">Revisar mi factura</a>
+<details class="bk-menu">
+    <summary aria-label="Men&uacute;"><span class="bk-menu-icon"></span></summary>
+    <nav class="bk-menu-panel" aria-label="M&oacute;vil">
+        <a href="/es/">Inicio<span class="bk-chev"></span></a>
+        <a href="/es/#guias">Gu&iacute;as<span class="bk-chev"></span></a>
+        <a href="{{ en_url }}" lang="en" hreflang="en">English<span class="bk-chev"></span></a>
+        <a href="/es/escanear/" class="bk-btn">Revisar mi factura gratis</a>
+    </nav>
+</details>
+{% endblock %}
+
+{% block site_footer %}
+<footer class="bk-footer">
+    <div class="bk-wrap bk-footer-inner">
+        <div class="bk-footer-about">
+            <a href="/" class="bk-logo" aria-label="BillKarma"><svg class="bk-logo-mark" viewBox="0 0 26 30" aria-hidden="true"><path d="M2 1.5h22v25l-3.7-2.4-3.6 2.4-3.7-2.4-3.7 2.4-3.6-2.4L2 26.5z" fill="#fff" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="5.5" y="9" width="15" height="4.5" rx="1" fill="#FFE45C"/><path d="M6.5 11.2h13M6.5 17.5h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>BillKarma</a>
+            <p>Revisamos facturas de hospital con lo que paga Medicare y enviamos disputas por escrito por los cargos que parecen incorrectos. No somos un bufete de abogados; nada aqu&iacute; es asesor&iacute;a legal ni financiera.</p>
+        </div>
+        <div>
+            <h2>Su factura</h2>
+            <ul>
+                <li><a href="/es/escanear/">Revisar mi factura</a></li>
+                <li><a href="/es/guias/como-obtener-factura-detallada-hospital/">Factura detallada</a></li>
+                <li><a href="/es/guias/asistencia-financiera-hospital/">Asistencia financiera</a></li>
+            </ul>
+        </div>
+        <div>
+            <h2>BillKarma</h2>
+            <ul>
+                <li><a href="{{ en_url }}" lang="en" hreflang="en">English</a></li>
+                <li><a href="/about/" lang="en">About (en ingl&eacute;s)</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="bk-wrap bk-footer-base">Datos de hospitales de <a href="https://www.cms.gov" target="_blank" rel="noopener noreferrer">CMS.gov</a> y de los archivos de precios de los propios hospitales.</div>
+</footer>
+{% endblock %}

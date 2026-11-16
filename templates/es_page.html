@@ -1,0 +1,32 @@
+{% extends "es_base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ page.description }}">
+{% endblock %}
+
+{% block content %}
+<header class="bk-article-head">
+    <div class="bk-wrap">
+        <h1>{{ page.h1 }}</h1>
+        <p class="bk-lede">{{ page.lede }}</p>
+        <p><a href="{{ page.cta_url }}" class="bk-btn">{{ page.cta_text }}</a></p>
+    </div>
+</header>
+
+<div class="bk-wrap" style="padding-bottom: 72px">
+    <div class="article-body">
+        {{ page.body | safe }}
+
+        {% if guides %}
+        <h2 id="guias">Gu&iacute;as en espa&ntilde;ol</h2>
+        <ul class="bk-guide-list">
+            {% for g in guides %}
+            <li><a href="/es/guias/{{ g.slug }}/">{{ g.title }}<span class="bk-chev"></span></a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -19,6 +19,7 @@ from household_routes import router as household_router
 from ops_routes import router as ops_router
 from data_routes import router as data_router
 from hospital_downloads import build_embed_snippet
+from es_pages import router as es_router, hreflang_links_for_english
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -74,6 +75,7 @@ app.include_router(appeal_router)
 app.include_router(household_router)
 app.include_router(ops_router)
 app.include_router(data_router)
+app.include_router(es_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
 
 
@@ -586,6 +588,7 @@ async def landing(request: Request):
         {
             "request": request,
             "canonical_url": canonical_url,
+            "hreflang_links": hreflang_links_for_english("/"),
             "hospital_count": hospital_count,
             "dispute_tiers": _dispute_tier_labels(),
             "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
@@ -647,6 +650,7 @@ async def scan_page(request: Request):
             "request": request,
             "outcome_stats": get_outcome_stats(),
             "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
+            "hreflang_links": hreflang_links_for_english("/scan"),
             "og_title": "Scan Your Medical Bill for Errors | BillKarma",
             "og_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. Find overcharges in about 60 seconds.",
             "meta_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. No account needed.",
@@ -931,6 +935,7 @@ async def guide_page(request: Request, slug: str):
             "guide": {**guide, "body": linked_body},
             "category_slug": _category_slug(guide.get("category", "")),
             "canonical_url": canonical_url,
+            "hreflang_links": hreflang_links_for_english(f"/guides/{slug}/"),
             "page_title": seo_title(guide),
             "og_title": seo_title(guide),
             "og_description": seo_description(guide),
@@ -2482,6 +2487,7 @@ async def sitemap_index():
         f"{base}/sitemap-facilities.xml",
         f"{base}/sitemap-compare.xml",
         f"{base}/sitemap-data-guides.xml",
+        f"{base}/sitemap-es.xml",
     ]
     entries = "".join(
         f"<sitemap><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod></sitemap>"
@@ -2872,6 +2878,7 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-compare.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-data-guides.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-es.xml\n"
     )
     return Response(content=body, media_type="text/plain")
 

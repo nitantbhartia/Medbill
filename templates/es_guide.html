@@ -1,0 +1,62 @@
+{% extends "es_base.html" %}
+
+{% block title %}{{ guide.title }} | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ guide.description }}">
+<meta property="og:type" content="article">
+<script type="application/ld+json">{{ article_json | safe }}</script>
+<script type="application/ld+json">{{ faq_json | safe }}</script>
+{% endblock %}
+
+{% block content %}
+<header class="bk-article-head">
+    <div class="bk-wrap">
+        <p class="bk-crumbs"><a href="/es/">Inicio</a> / <a href="/es/#guias">Gu&iacute;as</a></p>
+        <h1>{{ guide.title }}</h1>
+        <p class="bk-article-meta"><span>Publicado {{ published }}</span><span>Traducido de nuestra gu&iacute;a en ingl&eacute;s</span></p>
+    </div>
+</header>
+
+<div class="bk-article-layout bk-wrap">
+    <article class="bk-article">
+        <div class="answer-box">
+            <strong>Respuesta corta</strong>
+            {{ guide.answer }}
+        </div>
+        <div class="article-body">
+            {{ guide.body | safe }}
+
+            <h2 id="preguntas">Preguntas frecuentes</h2>
+            <div class="faq-section">
+                {% for q, a in guide.faqs %}
+                <div class="faq-item">
+                    <h3>{{ q }}</h3>
+                    <p>{{ a }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h2 id="fuentes">Fuentes (en ingl&eacute;s)</h2>
+            <ul class="sources-list">
+                {% for name, url in guide.sources %}
+                <li><a href="{{ url }}" target="_blank" rel="noopener" lang="en">{{ name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <aside class="bk-article-about">
+            <h2>Sobre esta gu&iacute;a</h2>
+            <p>Escrita por BillKarma a partir de datos de CMS y de las fuentes citadas arriba. Es informaci&oacute;n general, no asesor&iacute;a legal ni m&eacute;dica. Esta es una traducci&oacute;n de <a href="{{ en_url }}" lang="en" hreflang="en">la gu&iacute;a original en ingl&eacute;s</a>; si hay alguna diferencia, vale la versi&oacute;n en ingl&eacute;s. &iquest;Encontr&oacute; un error? Escriba a <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.</p>
+        </aside>
+    </article>
+
+    <aside class="bk-article-side">
+        <div class="bk-side-card">
+            <h2>&iquest;Tiene una factura como esta?</h2>
+            <p>Suba su factura y vea cada cargo junto a lo que paga Medicare. Es gratis y no necesita cuenta. La revisi&oacute;n est&aacute; en ingl&eacute;s.</p>
+            <a href="/es/escanear/" class="bk-btn bk-btn-block">Revisar mi factura gratis</a>
+        </div>
+    </aside>
+</div>
+{% endblock %}
