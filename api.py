@@ -1618,6 +1618,8 @@ async def activate_dispute(
     account_number: str = Form(""),
     hospital_billing_email: str = Form(""),
     hospital_billing_fax: str = Form(""),
+    household_income: float = Form(0),
+    household_size: int = Form(0),
     preferred_channels: str = Form("email"),
 ):
     """Activate a paid dispute case after payment and e-sign completion."""
@@ -1652,6 +1654,8 @@ async def activate_dispute(
             account_number=account_number,
             hospital_billing_email=hospital_billing_email,
             hospital_billing_fax=hospital_billing_fax,
+            household_income=household_income,
+            household_size=household_size,
             preferred_channels=preferred_channels,
         )
     except Exception as exc:
