@@ -12,6 +12,7 @@ from email_service import followup_body
 import payment as payment_module
 from db import get_db
 from debt_fighter import send_certified_letter
+from fax import fax_configured, send_fax
 from dispute_workflow import build_dispute_letter
 
 log = logging.getLogger(__name__)
@@ -155,6 +156,17 @@ def _mail_certified(case, provider_name: str, letter_text: str, description: str
     return result["tracking_number"]
 
 
+def _fax_hospital(case, letter_text: str) -> str:
+    """Fax the letter to the hospital billing office. Returns the fax id, or '' if not faxed."""
+    if not fax_configured() or not case["hospital_billing_fax"]:
+        return ""
+    try:
+        return send_fax(case["hospital_billing_fax"], letter_text)
+    except (ValueError, RuntimeError) as exc:
+        log.error("Fax failed for case %d: %s", case["id"], exc)
+        return ""
+
+
 def _send_dispute(case_id: int, patient_name: str, account_number: str, hospital_email: str) -> bool:
     """Email the dispute letter to the billing department. Marks the case sent only if it went out;
     otherwise the case waits in 'needs_delivery' until the patient gives us an address."""
@@ -196,7 +208,8 @@ def _send_dispute(case_id: int, patient_name: str, account_number: str, hospital
     if tracking:
         with get_db() as db:
             db.execute("UPDATE dispute_cases SET certified_tracking = ? WHERE id = ?", (tracking, case_id))
-    if not (sent or tracking):
+    faxed = _fax_hospital(case, letter_data["letter"])
+    if not (sent or tracking or faxed):
         with get_db() as db:
             db.execute("UPDATE dispute_cases SET status = 'needs_delivery' WHERE id = ?", (case_id,))
         return False
@@ -422,7 +435,8 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
             log.error("Failed to send follow-up email for case %d: %s", case_id, exc)
     body = followup_body(patient_name, account_number, followup_number, case_id)
     mailed = _mail_certified(case, provider, body, f"Dispute follow-up {followup_number}, case {case_id}")
-    if not (sent or mailed):
+    faxed = _fax_hospital(case, body)
+    if not (sent or mailed or faxed):
         log.error("Follow-up %d for case %d not sent; will retry on the next run", followup_number, case_id)
         return
 
