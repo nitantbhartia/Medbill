@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Is your bill higher than your Good Faith Estimate?</h1>
+        <p class="bk-lede">If you were uninsured or paid without insurance, and a provider billed you ${{ threshold }} or more above its estimate, you can ask CMS for an independent review. Enter the totals and we&rsquo;ll check, work out your {{ deadline_days }}-day deadline, and prepare a letter and checklist.</p>
+    </div>
+</section>
+
+<div class="bk-wrap bk-ib" id="gfe-app">
+    <form id="gfe-form" class="bk-ib-form" novalidate>
+        <fieldset class="bk-ib-step">
+            <legend><span class="bk-ib-n">1</span>Provider and totals</legend>
+            <label class="bk-label" for="gfe-provider">Provider or facility name</label>
+            <input id="gfe-provider" class="bk-input" type="text" maxlength="200" required>
+            <p class="bk-ib-hint" style="margin-top: 10px">Use the estimate and bill from the same provider or facility. The ${{ threshold }} test is applied to each one separately.</p>
+            <div class="bk-ib-row">
+                <div>
+                    <label class="bk-label" for="gfe-estimate">Total on the Good Faith Estimate ($)</label>
+                    <input id="gfe-estimate" class="bk-input" type="text" inputmode="decimal" placeholder="1,850.00" required>
+                </div>
+                <div>
+                    <label class="bk-label" for="gfe-bill">Total on the bill ($)</label>
+                    <input id="gfe-bill" class="bk-input" type="text" inputmode="decimal" placeholder="2,640.00" required>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="bk-ib-step">
+            <legend><span class="bk-ib-n">2</span>Dates and insurance</legend>
+            <label class="bk-label" for="gfe-date">Date printed on the bill</label>
+            <input id="gfe-date" class="bk-input" type="date" required>
+            <p class="bk-label" style="margin-top: 14px">Were you uninsured, or did you pay without using insurance?</p>
+            <label><input type="radio" name="gfe-selfpay" value="yes"> Yes, uninsured or self-pay</label><br>
+            <label><input type="radio" name="gfe-selfpay" value="no"> No, I used insurance</label>
+        </fieldset>
+
+        <p class="bk-ib-error" id="gfe-error" role="alert" hidden></p>
+        <button type="submit" class="bk-btn bk-btn-block" id="gfe-submit">Check my bill</button>
+        <p class="bk-ib-privacy">We don&rsquo;t save what you type here.</p>
+    </form>
+
+    <aside class="bk-ib-side" id="gfe-side">
+        <div class="bk-side-card">
+            <h2>What to know</h2>
+            <p>BillKarma does not file anything with CMS and does not decide your case. You file the dispute yourself on the <a href="{{ info_url }}" target="_blank" rel="noopener">CMS website</a>.</p>
+            <p style="margin-bottom: 0">A reviewer may leave the bill as it is, for example when the extra charges could not reasonably have been known in advance. CMS says your costs won&rsquo;t increase because you disputed. This is general information, not legal advice.</p>
+        </div>
+    </aside>
+
+    <section class="bk-ib-result" id="gfe-result" hidden aria-live="polite">
+        <h2 class="bk-h2" id="gfe-headline"></h2>
+        <p id="gfe-detail"></p>
+        <p id="gfe-deadline"></p>
+
+        <div id="gfe-sheet-block" hidden>
+            <div class="bk-ib-actions">
+                <button type="button" class="bk-btn" id="gfe-copy">Copy sheet</button>
+                <button type="button" class="bk-btn-outline" id="gfe-print">Print or save as PDF</button>
+            </div>
+            <pre class="bk-ib-letter" id="gfe-sheet"></pre>
+            <p id="gfe-filing" hidden>
+                <strong>Filing is up to you.</strong> BillKarma does not file with CMS. When you are ready, start your dispute on the
+                <a id="gfe-filing-link" target="_blank" rel="noopener">official CMS page</a>.
+            </p>
+        </div>
+
+        <button type="button" class="bk-ib-manual" id="gfe-edit" style="margin-top: 28px">Edit the details</button>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var form = $('gfe-form'), result = $('gfe-result'), side = $('gfe-side');
+    var money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+    function longDate(iso) {
+        return new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function sheetText(d) {
+        var text = d.letter || '';
+        if (d.checklist) {
+            text += '\n\n\nBEFORE YOU FILE WITH CMS: WHAT TO HAVE READY\n\n' +
+                d.checklist.map(function (item) { return '[ ] ' + item; }).join('\n') +
+                '\n\nDeadline to start: ' + longDate(d.deadline) + '.\nFile at: ' + d.info_url;
+        }
+        return text;
+    }
+
+    function show(d) {
+        var over = d.difference > 0 ? money.format(d.difference) + ' above' : money.format(-d.difference) + ' below';
+        var headline = d.difference === 0 ? 'Your bill matches your estimate.' : 'Your bill is ' + over + ' your estimate.';
+        var detail, open = true;
+        if (!d.self_pay) {
+            detail = 'This federal dispute process is for people who were uninsured or paid without using insurance, so it does not apply if you used insurance. The CMS page has other options for your situation.';
+            open = false;
+        } else if (d.meets_threshold) {
+            detail = 'That is at least the ' + money.format(d.threshold) + ' difference CMS requires, so you may be eligible to start a patient-provider dispute. Eligibility also depends on having received the estimate before your care, having told the provider you were not using insurance, and care on or after January 1, 2022.';
+        } else {
+            detail = 'That is below the ' + money.format(d.threshold) + ' difference CMS requires to start a dispute. You can still send the letter below and ask the provider to correct the bill.';
+        }
+        $('gfe-headline').textContent = headline;
+        $('gfe-detail').textContent = detail;
+        var line = '';
+        if (d.self_pay && d.meets_threshold) {
+            line = d.days_left >= 0
+                ? 'Start by ' + longDate(d.deadline) + ' (' + d.days_left + ' days left). That is the deadline CMS gives: within 120 calendar days of the date on the bill.'
+                : 'The 120-day window from the bill date ended on ' + longDate(d.deadline) + '. Check the CMS page to see whether anything applies to your bill.';
+        }
+        $('gfe-deadline').textContent = line;
+        $('gfe-deadline').hidden = !line;
+        var text = sheetText(d);
+        $('gfe-sheet').textContent = text;
+        $('gfe-sheet-block').hidden = !text;
+        $('gfe-filing').hidden = !(d.self_pay && d.meets_threshold);
+        $('gfe-filing-link').href = d.info_url;
+        form.hidden = true; side.hidden = true; result.hidden = false;
+        window.scrollTo({ top: $('gfe-app').offsetTop - 80 });
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = $('gfe-error'); err.hidden = true;
+        var choice = document.querySelector('input[name="gfe-selfpay"]:checked');
+        $('gfe-submit').disabled = true;
+        fetch('/api/good-faith-estimate/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                provider_name: $('gfe-provider').value, estimate_total: $('gfe-estimate').value,
+                bill_total: $('gfe-bill').value, bill_date: $('gfe-date').value,
+                self_pay: choice ? choice.value === 'yes' : null
+            })
+        })
+            .then(function (r) { return r.json().then(function (b) { if (!r.ok) throw new Error(b.detail || 'Something went wrong. Try again.'); return b.data; }); })
+            .then(show)
+            .catch(function (ex) { err.textContent = ex.message; err.hidden = false; })
+            .finally(function () { $('gfe-submit').disabled = false; });
+    });
+
+    $('gfe-copy').addEventListener('click', function () {
+        var btn = this;
+        navigator.clipboard.writeText($('gfe-sheet').textContent).then(function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy sheet'; }, 2000); });
+    });
+    $('gfe-print').addEventListener('click', function () { window.print(); });
+    $('gfe-edit').addEventListener('click', function () { result.hidden = true; form.hidden = false; side.hidden = false; });
+})();
+</script>
+{% endblock %}

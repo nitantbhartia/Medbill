@@ -58,6 +58,8 @@ def _run_migrations(db):
         },
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
+    ensure_columns("bills", {"referral_code": "TEXT"})
+    db.execute("CREATE INDEX IF NOT EXISTS idx_bills_referral ON bills(referral_code, created_at)")
     ensure_columns(
         "billing_metrics",
         {

@@ -17,6 +17,9 @@ from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
 from ops_routes import router as ops_router
+from data_routes import router as data_router
+from hospital_downloads import build_embed_snippet
+from es_pages import router as es_router, hreflang_links_for_english
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -45,6 +48,7 @@ from procedure_content import get_content_page_data
 from hospital_rankings import get_ranked_state_slugs, get_state_ranking, ranking_description, ranking_title
 from tools_catalog import list_tools, get_tool
 from access_control import require_bill_access, require_case_access
+from referrals import valid_referral
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -70,7 +74,26 @@ app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)
 app.include_router(ops_router)
+app.include_router(data_router)
+app.include_router(es_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def referral_cookie(request: Request, call_next):
+    response = await call_next(request)
+    ref = valid_referral(request.query_params.get("ref"))
+    if ref:
+        response.set_cookie(
+            config.REFERRAL_COOKIE_NAME,
+            ref,
+            max_age=config.REFERRAL_COOKIE_MAX_AGE_SECONDS,
+            httponly=True,
+            secure=not config.DEBUG,
+            samesite="lax",
+            path="/",
+        )
+    return response
 
 
 @app.middleware("http")
@@ -565,6 +588,7 @@ async def landing(request: Request):
         {
             "request": request,
             "canonical_url": canonical_url,
+            "hreflang_links": hreflang_links_for_english("/"),
             "hospital_count": hospital_count,
             "dispute_tiers": _dispute_tier_labels(),
             "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
@@ -626,6 +650,7 @@ async def scan_page(request: Request):
             "request": request,
             "outcome_stats": get_outcome_stats(),
             "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
+            "hreflang_links": hreflang_links_for_english("/scan"),
             "og_title": "Scan Your Medical Bill for Errors | BillKarma",
             "og_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. Find overcharges in about 60 seconds.",
             "meta_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. No account needed.",
@@ -910,6 +935,7 @@ async def guide_page(request: Request, slug: str):
             "guide": {**guide, "body": linked_body},
             "category_slug": _category_slug(guide.get("category", "")),
             "canonical_url": canonical_url,
+            "hreflang_links": hreflang_links_for_english(f"/guides/{slug}/"),
             "page_title": seo_title(guide),
             "og_title": seo_title(guide),
             "og_description": seo_description(guide),
@@ -1438,6 +1464,19 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
     })
 
 
+@app.get("/partners/", response_class=HTMLResponse)
+async def partners_page(request: Request):
+    return templates.TemplateResponse(
+        "partners.html",
+        {
+            "request": request,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/partners/",
+            "og_title": "Partners | BillKarma",
+            "meta_description": "A free scan link for medical-debt nonprofits, legal-aid groups, credit unions, employer benefits teams and patient navigators.",
+        },
+    )
+
+
 @app.get("/press/", response_class=HTMLResponse)
 async def press_page(request: Request):
     """Press and media kit page."""
@@ -1555,6 +1594,25 @@ async def itemized_bill_page(request: Request, facility: str = "", provider: str
             "og_title": "Request your itemized hospital bill",
             "meta_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code. Hospitals have 30 days to respond.",
             "og_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.get("/good-faith-estimate/check", response_class=HTMLResponse)
+async def good_faith_estimate_check_page(request: Request):
+    """Compare a bill to the Good Faith Estimate and prepare the paperwork for a CMS dispute."""
+    return templates.TemplateResponse(
+        "gfe_check.html",
+        {
+            "request": request,
+            "threshold": config.GFE_DISPUTE_THRESHOLD_USD,
+            "deadline_days": config.GFE_DISPUTE_DEADLINE_DAYS,
+            "fee": config.GFE_DISPUTE_FEE_USD,
+            "info_url": config.GFE_DISPUTE_INFO_URL,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/good-faith-estimate/check",
+            "page_title": "Good Faith Estimate vs Bill Checker: Free | BillKarma",
+            "meta_description": f"Check whether your bill is ${config.GFE_DISPUTE_THRESHOLD_USD} or more above your Good Faith Estimate, see your {config.GFE_DISPUTE_DEADLINE_DAYS}-day deadline, and print a letter and checklist.",
             "meta_robots": "index, follow",
         },
     )
@@ -1989,6 +2047,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
             "affiliate_url": config.AFFILIATE_URL,
             "enable_hospital_claim": config.ENABLE_HOSPITAL_CLAIM,
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
+            "embed_snippet": build_embed_snippet(profile["hospital"]),
         },
     )
 
@@ -2429,6 +2488,8 @@ async def sitemap_index():
         f"{base}/sitemap-compare.xml",
         f"{base}/sitemap-data-guides.xml",
     ]
+    if config.ES_PAGES_ENABLED:
+        sitemap_urls.append(f"{base}/sitemap-es.xml")
     entries = "".join(
         f"<sitemap><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod></sitemap>"
         for loc in sitemap_urls
@@ -2448,6 +2509,7 @@ async def core_sitemap():
         (f"{base}/", "1.0"),
         (f"{base}/guides/", "0.8"),
         (f"{base}/itemized-bill", "0.9"),
+        (f"{base}/good-faith-estimate/check", "0.9"),
         (f"{base}/ai", "0.7"),
         (f"{base}/tools/", "0.8"),
         (f"{base}/fight-debt", "0.9"),
@@ -2465,9 +2527,11 @@ async def core_sitemap():
         (f"{base}/cost/er-visit/", "0.8"),
         (f"{base}/about/", "0.7"),
         (f"{base}/press/", "0.7"),
+        (f"{base}/partners/", "0.7"),
         (f"{base}/chargemaster/", "0.9"),
         (f"{base}/procedures/", "0.9"),
         (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),
+        (f"{base}/data/", "0.7"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>{priority}</priority></url>"
@@ -2816,6 +2880,8 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-compare.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-data-guides.xml\n"
     )
+    if config.ES_PAGES_ENABLED:
+        body += f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-es.xml\n"
     return Response(content=body, media_type="text/plain")
 
 

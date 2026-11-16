@@ -23,7 +23,7 @@ register("good-faith-estimate-rights", {
         },
         {
             "q": "What can I do if my bill exceeds the Good Faith Estimate by $400 or more?",
-            "a": "You can initiate the patient-provider dispute resolution process through HHS. File a dispute within 120 calendar days of receiving the bill. An independent reviewer will examine the GFE and the final bill. If the reviewer sides with you, the provider must accept the payment amount determined by the reviewer. There is a $25 administrative fee to file, which may be refunded if you win.",
+            "a": "You can initiate the patient-provider dispute resolution process through HHS. Start the dispute within 120 calendar days of the date on the bill. An independent reviewer will examine the GFE and the final bill. If the reviewer sides with you, the provider must accept the payment amount determined by the reviewer. There is a $25 non-refundable administrative fee to file; if the dispute is decided in your favor, it is deducted from what you owe the provider.",
         },
         {
             "q": "Can a hospital refuse to give me a Good Faith Estimate?",
@@ -64,7 +64,7 @@ register("good-faith-estimate-rights", {
 <p>Before the GFE requirement, patients who asked &ldquo;how much will this cost?&rdquo; were routinely told &ldquo;we can&rsquo;t tell you until we see the final claim.&rdquo; The GFE changes that. It creates a <strong>legally binding cost commitment</strong> &mdash; not a vague range, but a specific itemized estimate. If the provider exceeds that estimate by $400 or more, the patient has a federal right to challenge the bill through an independent dispute resolution process.</p>
 
 <div class="key-takeaway">
-    <strong>The $400 rule:</strong> If your final bill is <strong>$400 or more</strong> above the Good Faith Estimate, you can dispute the entire bill &mdash; not just the overage &mdash; through the HHS patient-provider dispute resolution process. You have <strong>120 calendar days</strong> from receiving the bill to file.
+    <strong>The $400 rule:</strong> If your final bill is <strong>$400 or more</strong> above the Good Faith Estimate, you can dispute the entire bill &mdash; not just the overage &mdash; through the HHS patient-provider dispute resolution process. You have <strong>120 calendar days</strong> from the date on the bill to start the dispute. <a href="/good-faith-estimate/check">Check your bill against your estimate</a> and get your deadline.
 </div>
 
 <h2 id="who-qualifies">2. Who qualifies for a GFE</h2>
@@ -228,7 +228,7 @@ register("good-faith-estimate-rights", {
 <p>Compare your final bill to the GFE. Add up every charge that was not on the GFE, plus any charge that increased from the estimated amount. If the total difference is $400 or more, you qualify for the dispute process. Use the <a href="/calculator">BillKarma calculator</a> to verify each line item&rsquo;s reasonableness as additional evidence.</p>
 
 <h3>Step 2: File within 120 calendar days</h3>
-<p>You have <strong>120 calendar days</strong> from the date you received the bill (not the date of service) to initiate a dispute. Don&rsquo;t wait &mdash; gather your documents and file as soon as you confirm the discrepancy.</p>
+<p>You have <strong>120 calendar days</strong> from the date on the initial bill (not the date of service) to initiate a dispute. Our <a href="/good-faith-estimate/check">free estimate-vs-bill checker</a> works out the date and prepares a letter and checklist. Don&rsquo;t wait &mdash; gather your documents and file as soon as you confirm the discrepancy.</p>
 
 <h3>Step 3: Submit your dispute to HHS</h3>
 <p>File through the CMS dispute portal at <a href="https://www.cms.gov/nosurprises/consumers/uninsured-or-self-pay-patients" target="_blank" rel="noopener">cms.gov/nosurprises</a> or call <strong>1-800-985-3059</strong>. You will need to provide:</p>
@@ -238,7 +238,7 @@ register("good-faith-estimate-rights", {
     <li>A copy of the final bill</li>
     <li>Your contact information</li>
     <li>A brief description of the discrepancy</li>
-    <li>A $25 administrative fee (may be refunded if you prevail)</li>
+    <li>A $25 non-refundable administrative fee (deducted from what you owe if the dispute is decided in your favor)</li>
 </ul>
 
 <h3>Step 4: The provider responds</h3>
@@ -366,7 +366,7 @@ register("good-faith-estimate-rights", {
 
     <div class="faq-item">
         <h3>What can I do if my bill exceeds the Good Faith Estimate by $400 or more?</h3>
-        <p>File a dispute through the HHS patient-provider dispute resolution process at <a href="https://www.cms.gov/nosurprises/consumers/uninsured-or-self-pay-patients" target="_blank" rel="noopener">cms.gov/nosurprises</a> or call 1-800-985-3059. You have 120 calendar days from the date you received the bill. An independent reviewer will examine both documents and issue a binding determination. The filing fee is $25.</p>
+        <p>File a dispute through the HHS patient-provider dispute resolution process at <a href="https://www.cms.gov/nosurprises/consumers/uninsured-or-self-pay-patients" target="_blank" rel="noopener">cms.gov/nosurprises</a> or call 1-800-985-3059. You have 120 calendar days from the date on the bill. An independent reviewer will examine both documents and issue a binding determination. The filing fee is $25.</p>
     </div>
 
     <div class="faq-item">

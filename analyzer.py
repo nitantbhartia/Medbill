@@ -628,7 +628,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     }
 
 
-def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict, zip_code: str = "") -> int:
+def save_bill_and_findings(
+    user_id: int | None, extracted: dict, analysis: dict, zip_code: str = "", referral_code: str | None = None
+) -> int:
     """Persist a scanned bill, its line items, and findings to the database."""
     global _stats_cache_ts
     _stats_cache_ts = 0.0  # invalidate stats cache so next call reflects new data
@@ -636,8 +638,8 @@ def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict,
     with get_db() as db:
         cursor = db.execute(
             "INSERT INTO bills (user_id, provider_name, provider_address, bill_date, zip_code, "
-            "total_charged, total_patient_owes, total_findings, total_potential_savings, status) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'analyzed')",
+            "total_charged, total_patient_owes, total_findings, total_potential_savings, status, referral_code) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'analyzed', ?)",
             (
                 user_id,
                 extracted.get("provider_name"),
@@ -648,6 +650,7 @@ def save_bill_and_findings(user_id: int | None, extracted: dict, analysis: dict,
                 extracted.get("total_patient_owes"),
                 analysis["total_findings"],
                 analysis["total_potential_savings"],
+                referral_code,
             ),
         )
         bill_id = cursor.lastrowid

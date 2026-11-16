@@ -19,7 +19,7 @@ register("cant-afford-medical-bill", {
         },
         {
             "q": "Does medical debt affect your credit score?",
-            "a": "Medical debt under $500 no longer appears on credit reports. Paid medical collections are removed entirely. Unpaid medical debt over $500 cannot appear until after a 12-month waiting period. The CFPB's 2025 rule further restricts medical debt from credit reports. This gives you time to resolve the bill through financial assistance, negotiation, or payment plans before any credit impact.",
+            "a": "Medical debt under $500 no longer appears on credit reports. Paid medical collections are removed entirely. Unpaid medical debt over $500 cannot appear until after a 12-month waiting period. These are the credit bureaus' own policies and some state laws: a 2025 federal rule that would have gone further was struck down in court. This gives you time to resolve the bill through financial assistance, negotiation, or payment plans before any credit impact.",
         },
         {
             "q": "Can the hospital sue me if I can't pay?",
@@ -267,7 +267,7 @@ register("cant-afford-medical-bill", {
 
     <div class="faq-item">
         <h3>Does medical debt affect your credit score?</h3>
-        <p>Medical debt under $500 no longer appears on credit reports. Paid medical collections are removed entirely. Unpaid debt over $500 cannot appear until 12 months after going to collections — giving you a full year to resolve it. The CFPB's 2025 rule further restricts medical debt from credit reports. Act within the first year to avoid any credit impact.</p>
+        <p>Medical debt under $500 no longer appears on credit reports. Paid medical collections are removed entirely. Unpaid debt over $500 cannot appear until 12 months after going to collections — giving you a full year to resolve it. These are the credit bureaus' own policies and some state laws: a 2025 federal rule that would have gone further was struck down in court. Act within the first year to avoid any credit impact.</p>
     </div>
 
     <div class="faq-item">

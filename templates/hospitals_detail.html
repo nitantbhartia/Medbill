@@ -334,6 +334,14 @@
                 <a href="{{ affiliate_url }}?utm_source=billkarma&utm_medium=hospital_page&utm_campaign={{ h.facility_id|clean_fid }}" target="_blank" rel="nofollow noopener noreferrer" style="display: inline-block; margin-top: 8px; font-size: 15px; font-weight: 600; padding: 10px 0">Find an independent patient advocate</a>
             </div>
             {% endif %}
+
+            {% if embed_snippet %}
+            <details style="margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 20px">
+                <summary style="font-size: 18px; font-weight: 800; cursor: pointer">Embed this grade</summary>
+                <p style="margin: 8px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-2)">Copy this HTML to show {{ h.name }}&rsquo;s billing grade on your site. The badge links back to this page.</p>
+                <textarea readonly rows="4" style="width: 100%; margin-top: 12px; font-family: monospace; font-size: 13px">{{ embed_snippet }}</textarea>
+            </details>
+            {% endif %}
         </aside>
     </div>
 </div>

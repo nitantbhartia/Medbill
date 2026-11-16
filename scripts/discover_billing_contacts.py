@@ -38,6 +38,7 @@ from billing_contacts import (  # noqa: E402
     homepage_names_hospital,
     parse_page,
     root_from_stored_urls,
+    site_root,
 )
 
 log = logging.getLogger("billing_contacts")
@@ -58,7 +59,8 @@ class PoliteFetcher:
         self._failures: Counter[str] = Counter()
         self._robots: dict[str, RobotFileParser] = {}
 
-    def get_page(self, url: str) -> str | None:
+    def get_page(self, url: str) -> tuple[str, str] | None:
+        """Return (final_url_after_redirects, html) or None."""
         host = urlparse(url).netloc
         if self._failures[host] >= config.BILLING_CONTACT_MAX_HOST_FAILURES:
             return None
@@ -75,18 +77,19 @@ class PoliteFetcher:
 
     def _load_robots(self, root: str) -> RobotFileParser:
         parser = RobotFileParser()
-        body = self._request(f"{root}/robots.txt") or ""
-        parser.parse(body.splitlines())
+        fetched = self._request(f"{root}/robots.txt")
+        parser.parse(fetched[1].splitlines() if fetched else [])
         return parser
 
-    def _request(self, url: str) -> str | None:
+    def _request(self, url: str) -> tuple[str, str] | None:
         self._wait_for_slot()
         request = Request(url, headers={"User-Agent": config.BILLING_CONTACT_USER_AGENT})
         try:
             with urlopen(request, timeout=config.BILLING_CONTACT_TIMEOUT_SECONDS) as response:
                 if response.headers.get_content_maintype() != "text":
                     return None
-                return response.read().decode("utf-8", "ignore")
+                body = response.read().decode("utf-8", "ignore")
+                return response.geturl(), body
         except HTTPError as exc:
             if exc.code >= 500:
                 self._record_failure(url, exc)
@@ -109,19 +112,22 @@ class PoliteFetcher:
 
 
 def find_contact(hospital: Hospital, fetcher: PoliteFetcher) -> BillingContact | None:
-    home_html = fetcher.get_page(hospital.root)
-    if home_html is None:
+    fetched = fetcher.get_page(hospital.root)
+    if fetched is None:
         return None
+    home_url, home_html = fetched
     home = parse_page(home_html)
     if not homepage_names_hospital(home, hospital.name):
-        log.info("skip %s: homepage does not mention the hospital name", hospital.root)
+        log.info("skip %s: homepage does not mention the hospital name", home_url)
         return None
+    root = site_root(home_url)
     contacts = []
-    for url in candidate_urls(hospital.root, home)[: config.BILLING_CONTACT_MAX_PAGES - 1]:
-        page_html = fetcher.get_page(url)
-        if page_html is None:
+    for url in candidate_urls(root, home)[: config.BILLING_CONTACT_MAX_PAGES - 1]:
+        fetched_page = fetcher.get_page(url)
+        if fetched_page is None:
             continue
-        contact = extract_contact(parse_page(page_html), url)
+        page_url, page_html = fetched_page
+        contact = extract_contact(parse_page(page_html), page_url)
         if contact.has_data():
             contacts.append(contact)
     with_phone = [c for c in contacts if c.billing_phone]

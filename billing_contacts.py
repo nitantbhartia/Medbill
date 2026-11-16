@@ -1,6 +1,7 @@
 """Billing contact extraction rules: parse a hospital page and find its billing phone, address and links.
 
-A phone or address counts only when it sits within a few hundred characters of a billing keyword.
+Rules are strict on purpose: a wrong billing number is worse than none. A phone or address is
+returned only when exactly one distinct candidate on the page qualifies.
 """
 
 from __future__ import annotations
@@ -23,15 +24,25 @@ BILLING_PATHS = (
 )
 NAV_LINK_RE = re.compile(r"bill|pay|financial assistance", re.I)
 FINANCIAL_LINK_RE = re.compile(r"financial assistance|charity care", re.I)
-PAYMENT_LINK_RE = re.compile(r"pay[- ](your[- ])?bill|pay[- ]online|make a payment|pay[- ]now|bill[- ]pay", re.I)
+PAYMENT_LINK_RE = re.compile(
+    r"pay (your|my|a) bill( online)?|pay online|online bill pay|bill pay|make a payment|pay now", re.I
+)
 BILLING_KEYWORD_RE = re.compile(
     r"billing|patient financial services|business office|pay your bill|account questions", re.I
 )
+CALL_CUE_RE = re.compile(r"\b(call|phone|telephone|dial|tel)\b", re.I)
+MAIL_CUE_RE = re.compile(r"\b(mail|mailed|mailing|send|remit|payable)\b", re.I)
+SENTENCE_BREAK_RE = re.compile(r"[.!?]\s+[A-Z]")
 PHONE_RE = re.compile(r"(?<!\d)(?:\+?1[-.\s]?)?\(?([2-9]\d{2})\)?[-.\s]?([2-9]\d{2})[-.\s]?(\d{4})(?!\d)")
+STREET_SUFFIX = (
+    r"Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Way|Parkway|Pkwy|Lane|Ln|"
+    r"Highway|Hwy|Place|Pl|Court|Ct"
+)
 ADDRESS_RE = re.compile(
-    r"(?:P\.?\s?O\.?\s?Box\s+\d+|\d{1,6}\s+[A-Za-z0-9.'\- ]{2,50}?)"
+    rf"(?:(?i:P\.?\s?O\.?\s?Box)\s+\d+|\d{{1,6}}\s+(?:[A-Za-z0-9'\-]+\.?\s+){{0,4}}?(?:{STREET_SUFFIX})\.?)"
     r"\s*,?\s*[A-Za-z .'-]{2,40}?,?\s+[A-Z]{2}\s+\d{5}(?:-\d{4})?"
 )
+PO_BOX_RE = re.compile(r"P\.?\s?O\.?\s?Box", re.I)
 # Hosts that serve files for many organizations; a domain from them says nothing about one hospital.
 SHARED_HOST_SUFFIXES = (
     "cms.gov", "medicare.gov", "irs.gov", "amazonaws.com", "cloudfront.net", "googleapis.com",
@@ -47,7 +58,6 @@ GENERIC_NAME_WORDS = frozenset({
 @dataclass
 class Page:
     text: str
-    tel_numbers: set[str]
     links: list[tuple[str, str]]
 
 
@@ -67,7 +77,6 @@ class _PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.text_parts: list[str] = []
-        self.tel_numbers: set[str] = set()
         self.links: list[tuple[str, str]] = []
         self._hidden_depth = 0
         self._href: str | None = None
@@ -77,12 +86,7 @@ class _PageParser(HTMLParser):
         if tag in ("script", "style"):
             self._hidden_depth += 1
         elif tag == "a":
-            href = (dict(attrs).get("href") or "").strip()
-            if href.lower().startswith("tel:"):
-                number = _ten_digits(href[4:])
-                if number:
-                    self.tel_numbers.add(number)
-            self._href = href
+            self._href = (dict(attrs).get("href") or "").strip()
             self._anchor_parts = []
 
     def handle_endtag(self, tag):
@@ -105,72 +109,75 @@ def parse_page(html_text: str) -> Page:
     parser.feed(html_text)
     parser.close()
     text = re.sub(r"\s+", " ", " ".join(parser.text_parts)).strip()
-    return Page(text=text, tel_numbers=parser.tel_numbers, links=parser.links)
-
-
-def _ten_digits(raw: str) -> str | None:
-    digits = re.sub(r"\D", "", raw)
-    if len(digits) == 11 and digits.startswith("1"):
-        digits = digits[1:]
-    return digits if len(digits) == 10 else None
+    return Page(text=text, links=parser.links)
 
 
 def _format_phone(digits: str) -> str:
     return f"({digits[:3]}) {digits[3:6]}-{digits[6:]}"
 
 
-def _gap_to_keyword(span: tuple[int, int], keyword_spans: list[tuple[int, int]]) -> int | None:
-    start, end = span
-    gaps = [max(0, k_start - end, start - k_end) for k_start, k_end in keyword_spans]
-    return min(gaps, default=None)
-
-
-def _chars_after_keyword(span: tuple[int, int], keyword_spans: list[tuple[int, int]]) -> int | None:
-    start = span[0]
-    gaps = [start - k_end for _, k_end in keyword_spans if k_end <= start]
-    return min(gaps, default=None)
-
-
 def _keyword_spans(text: str) -> list[tuple[int, int]]:
     return [m.span() for m in BILLING_KEYWORD_RE.finditer(text)]
 
 
-def _near_billing_keyword(span: tuple[int, int], keywords: list[tuple[int, int]]) -> bool:
-    gap = _gap_to_keyword(span, keywords)
-    return gap is not None and gap <= config.BILLING_CONTACT_KEYWORD_WINDOW_CHARS
+def _nearest_keyword_before(start: int, keywords: list[tuple[int, int]]) -> tuple[int, int] | None:
+    before = [span for span in keywords if span[1] <= start]
+    return max(before, key=lambda span: span[1], default=None)
+
+
+def _is_billing_phone(text: str, start: int, keywords: list[tuple[int, int]]) -> bool:
+    nearest = _nearest_keyword_before(start, keywords)
+    if nearest is None:
+        return False
+    keyword_start, keyword_end = nearest
+    if start - keyword_end > config.BILLING_CONTACT_KEYWORD_WINDOW_CHARS:
+        return False
+    if SENTENCE_BREAK_RE.search(text[keyword_end:start]):
+        return False
+    cue_zone = text[max(0, keyword_start - config.BILLING_CONTACT_CALL_CUE_CHARS):start]
+    return CALL_CUE_RE.search(cue_zone) is not None
 
 
 def find_billing_phone(page: Page) -> str | None:
     keywords = _keyword_spans(page.text)
-    candidates = []
-    for match in PHONE_RE.finditer(page.text):
-        # Billing numbers follow their label ("call billing at ..."); a number just before the label belongs to another line.
-        gap = _chars_after_keyword(match.span(), keywords)
-        if gap is None or gap > config.BILLING_CONTACT_KEYWORD_WINDOW_CHARS:
-            continue
-        number = "".join(match.groups())
-        # Closest after a keyword wins; a tel: link only breaks an exact tie.
-        candidates.append((gap, number not in page.tel_numbers, number))
-    if not candidates:
-        return None
-    return _format_phone(min(candidates)[2])
+    numbers = {
+        "".join(match.groups())
+        for match in PHONE_RE.finditer(page.text)
+        if _is_billing_phone(page.text, match.start(), keywords)
+    }
+    return _format_phone(numbers.pop()) if len(numbers) == 1 else None
+
+
+def _is_mailing_address(text: str, match: re.Match, keywords: list[tuple[int, int]]) -> bool:
+    start, end = match.span()
+    window = config.BILLING_CONTACT_KEYWORD_WINDOW_CHARS
+    if not any(max(0, k_start - end, start - k_end) <= window for k_start, k_end in keywords):
+        return False
+    if PO_BOX_RE.match(match.group(0)):
+        return True
+    cue_zone = text[max(0, start - config.BILLING_CONTACT_MAIL_CUE_CHARS):start]
+    return MAIL_CUE_RE.search(cue_zone) is not None
 
 
 def find_billing_address(page: Page) -> str | None:
     keywords = _keyword_spans(page.text)
-    candidates = []
-    for match in ADDRESS_RE.finditer(page.text):
-        if _near_billing_keyword(match.span(), keywords):
-            candidates.append((_gap_to_keyword(match.span(), keywords), match.group(0)))
-    return min(candidates)[1] if candidates else None
+    addresses = {
+        match.group(0)
+        for match in ADDRESS_RE.finditer(page.text)
+        if _is_mailing_address(page.text, match, keywords)
+    }
+    return addresses.pop() if len(addresses) == 1 else None
 
 
-def find_link(page: Page, pattern: re.Pattern, page_url: str) -> str | None:
+def find_link(page: Page, pattern: re.Pattern, page_url: str, whole_text: bool = False) -> str | None:
+    """First link to a different page whose wording matches. A link back to this page says nothing useful."""
     for href, anchor_text in page.links:
-        if not pattern.search(f"{anchor_text} {href}"):
+        text = anchor_text.strip()
+        matched = pattern.fullmatch(text) if whole_text else pattern.search(text)
+        if not matched:
             continue
-        absolute = urljoin(page_url, href)
-        if urlparse(absolute).scheme in ("http", "https"):
+        absolute = urljoin(page_url, href).split("#")[0]
+        if urlparse(absolute).scheme in ("http", "https") and absolute != page_url.split("#")[0]:
             return absolute
     return None
 
@@ -181,12 +188,17 @@ def extract_contact(page: Page, page_url: str) -> BillingContact:
         billing_phone=find_billing_phone(page),
         billing_address=find_billing_address(page),
         financial_assistance_url=find_link(page, FINANCIAL_LINK_RE, page_url),
-        payment_url=find_link(page, PAYMENT_LINK_RE, page_url),
+        payment_url=find_link(page, PAYMENT_LINK_RE, page_url, whole_text=True),
     )
 
 
 def _is_shared_host(host: str) -> bool:
     return any(host == suffix or host.endswith("." + suffix) for suffix in SHARED_HOST_SUFFIXES)
+
+
+def site_root(url: str) -> str:
+    parsed = urlparse(url)
+    return f"{parsed.scheme}://{parsed.netloc}/"
 
 
 def root_from_stored_urls(urls: list[str | None]) -> str | None:
@@ -195,7 +207,7 @@ def root_from_stored_urls(urls: list[str | None]) -> str | None:
         host = parsed.hostname or ""
         if parsed.scheme not in ("http", "https") or not host or _is_shared_host(host):
             continue
-        return f"{parsed.scheme}://{parsed.netloc}/"
+        return site_root(url)
     return None
 
 
@@ -218,6 +230,8 @@ def candidate_urls(root: str, home: Page) -> list[str]:
         parsed = urlparse(absolute)
         if NAV_LINK_RE.search(anchor_text) and parsed.netloc == host and parsed.scheme in ("http", "https"):
             nav_urls.append(absolute)
+    # Shallowest first: a general billing page beats a single clinic's payment page reached from the same nav.
+    nav_urls.sort(key=lambda url: urlparse(url).path.count("/"))
     fixed_urls = [urljoin(root, path) for path in BILLING_PATHS]
     urls = list(dict.fromkeys(nav_urls[: config.BILLING_CONTACT_MAX_NAV_LINKS] + fixed_urls))
     return [url for url in urls if url != root]

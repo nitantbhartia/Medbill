@@ -191,6 +191,16 @@ RANKING_MIN_HOSPITALS = 5    # a state needs this many ranked hospitals to get a
 RANKING_TOP_COUNT = 25       # hospitals shown in the most-expensive list
 RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list
 
+GRADED_LETTERS = ("A", "B", "C", "D", "F")  # billing grades; "N/A" means ungraded
+CSV_MARKUP_DECIMALS = 2                     # markup precision in the grades CSV
+BADGE_MARKUP_DECIMALS = 1                   # markup precision on the SVG badge, as shown on pages
+BADGE_NAME_MAX_CHARS = 44                   # hospital name length on the badge before truncation
+BADGE_CACHE_MAX_AGE_SECONDS = 86400         # badges change only when grades are recalculated
+BADGE_WIDTH = 420
+BADGE_HEIGHT = 72
+BADGE_ACCENT_WIDTH = 6                      # colored bar on the badge's left edge
+BADGE_TEXT_X = 20
+
 # Guides shown first on /guides/ ("Start here"), in order
 FEATURED_GUIDE_SLUGS = (
     ("how-to-get-itemized-hospital-bill", "Step 1"),
@@ -225,6 +235,23 @@ HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
 ITEMIZED_RESPONSE_DAYS = 30
 ITEMIZED_LOOKUP_LIMIT = 8
 
+# Good Faith Estimate vs bill check (patient-provider dispute resolution, PPDR).
+# Source: https://www.cms.gov/initiatives/your-patient-rights/medical-bill-rights/get-help/dispute-bill
+# (page last modified 10/02/2026 per CMS; read 2026-11-16) and CMS's PPDR guidance PDF
+# https://www.cms.gov/cciio/resources/regulations-and-guidance/downloads/good-faith-estimate-patient-provider-dispute-resolution-process-for-uninsured-or-self-pay-individuals.pdf
+# Eligible: no insurance, or insurance not used and the provider was told so; care on or after 2022-01-01.
+# The bill must be at least GFE_DISPUTE_THRESHOLD_USD above the estimate from the same provider or facility.
+# Start within GFE_DISPUTE_DEADLINE_DAYS calendar days of the date on the initial bill.
+# The fee is non-refundable and is deducted from what is owed if the dispute is decided for the patient.
+# A reviewer can leave the bill as-is when the extra charges could not reasonably have been anticipated.
+GFE_DISPUTE_THRESHOLD_USD = 400
+GFE_DISPUTE_DEADLINE_DAYS = 120
+GFE_DISPUTE_FEE_USD = 25
+GFE_DISPUTE_INFO_URL = "https://www.cms.gov/initiatives/your-patient-rights/medical-bill-rights/get-help/dispute-bill"
+GFE_DISPUTE_FILING_URL = "https://nsa-idr.cms.gov/billdisputes/s/"
+GFE_MAX_AMOUNT_USD = 10_000_000
+GFE_FIELD_MAX_CHARS = 200
+
 # MCP endpoint (/mcp) for AI assistants such as ChatGPT and Claude
 MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
 MCP_SERVER_VERSION = "1.0.0"
@@ -245,3 +272,15 @@ BILLING_CONTACT_MAX_NAV_LINKS = 2
 BILLING_CONTACT_MAX_HOST_FAILURES = 3
 BILLING_CONTACT_KEYWORD_WINDOW_CHARS = 200
 BILLING_CONTACT_NAME_MIN_TOKEN_CHARS = 4
+BILLING_CONTACT_CALL_CUE_CHARS = 40
+BILLING_CONTACT_MAIL_CUE_CHARS = 80
+
+# Spanish section (/es/). Machine-drafted: leave off until a native speaker has reviewed it.
+ES_PAGES_ENABLED = os.getenv("ES_PAGES_ENABLED", "false").lower() == "true"
+
+# Partner referral links (/scan?ref=partner-slug)
+REFERRAL_COOKIE_NAME = "bk_ref"
+REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
+REFERRAL_CODE_PATTERN = r"[a-z0-9-]{1,40}"
+PARTNER_REPORT_DAYS = 90
+PARTNER_CONTACT_EMAIL = os.getenv("PARTNER_CONTACT_EMAIL", "support@billkarma.app")
