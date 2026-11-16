@@ -4,11 +4,15 @@ from guides import register, _embed
 
 register("hospital-drug-charges", {
     "title": "Hospital Drug Markups: What a $30 Tylenol Really Costs",
-    "meta_description": "Hospitals mark up common drugs by 1,000% or more. See real chargemaster prices, understand why, and learn how to dispute inflated pharmacy charges.",
+    "meta_description": "A hospital bills $15–$50 for one Tylenol tablet and $180+ for an IV dose, up to 2,500x its cost. See chargemaster prices and how to dispute them.",
     "published": "2026-02-19",
     "author": "BillKarma Team",
     "category": "Billing Basics",
     "faqs": [
+        {
+            "q": "How much does IV Tylenol cost in a hospital?",
+            "a": "On the itemized bill annotated in this guide, one dose of IV acetaminophen (Tylenol) was billed at $182, against a hospital cost of about $1-$3. An oral 500mg tablet is usually billed at $15-$50 against a cost of $0.02-$0.10. Prices vary widely by hospital: look up yours in its price transparency file, then ask billing for the itemized bill and how each drug charge was calculated.",
+        },
         {
             "q": "Why did the hospital charge $40 for a Tylenol?",
             "a": "Hospitals set drug prices using an internal 'chargemaster' that bears little relation to actual drug cost. A single acetaminophen (Tylenol) tablet costs the hospital approximately $0.02-$0.10 but may be billed at $15-$50. The markup covers pharmacy staff, storage, dispensing systems, and general hospital overhead — but the ratio is often 100x or more. You can dispute individual drug charges by requesting an itemized bill and asking the billing department for the acquisition cost.",
