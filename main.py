@@ -2487,8 +2487,9 @@ async def sitemap_index():
         f"{base}/sitemap-facilities.xml",
         f"{base}/sitemap-compare.xml",
         f"{base}/sitemap-data-guides.xml",
-        f"{base}/sitemap-es.xml",
     ]
+    if config.ES_PAGES_ENABLED:
+        sitemap_urls.append(f"{base}/sitemap-es.xml")
     entries = "".join(
         f"<sitemap><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod></sitemap>"
         for loc in sitemap_urls
@@ -2878,8 +2879,9 @@ async def robots_txt():
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-compare.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-data-guides.xml\n"
-        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-es.xml\n"
     )
+    if config.ES_PAGES_ENABLED:
+        body += f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-es.xml\n"
     return Response(content=body, media_type="text/plain")
 
 

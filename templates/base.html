@@ -146,7 +146,7 @@
                 <a href="/guides/">Guides</a>
                 <a href="/hospitals/">Hospitals</a>
                 <a href="/rights/">Your rights</a>
-                <a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol</a>
+                {% if config.ES_PAGES_ENABLED %}<a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol</a>{% endif %}
             </nav>
             <a href="/scan" class="bk-btn bk-btn-sm bk-header-cta">Check a bill</a>
             <details class="bk-menu">
@@ -161,7 +161,7 @@
                     <a href="/charity-care">Financial assistance<span class="bk-chev"></span></a>
                     <a href="/collection-notice">Collection letters<span class="bk-chev"></span></a>
                     <a href="/tools/">Free tools<span class="bk-chev"></span></a>
-                    <a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol<span class="bk-chev"></span></a>
+                    {% if config.ES_PAGES_ENABLED %}<a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol<span class="bk-chev"></span></a>{% endif %}
                     <a href="/scan" class="bk-btn">Check my bill free</a>
                 </nav>
             </details>
@@ -209,7 +209,7 @@
                     <li><a href="/press/">Press</a></li>
                     <li><a href="/partners/">Partners</a></li>
                     <li><a href="/household">Household plan</a></li>
-                    <li><a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol</a></li>
+                    {% if config.ES_PAGES_ENABLED %}<li><a href="/es/" lang="es" hreflang="es">Espa&ntilde;ol</a></li>{% endif %}
                 </ul>
             </div>
         </div>

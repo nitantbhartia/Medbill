@@ -24,7 +24,9 @@ BILLING_PATHS = (
 )
 NAV_LINK_RE = re.compile(r"bill|pay|financial assistance", re.I)
 FINANCIAL_LINK_RE = re.compile(r"financial assistance|charity care", re.I)
-PAYMENT_LINK_RE = re.compile(r"pay[- ](your[- ])?bill|pay[- ]online|make a payment|pay[- ]now|bill[- ]pay", re.I)
+PAYMENT_LINK_RE = re.compile(
+    r"pay (your|my|a) bill( online)?|pay online|online bill pay|bill pay|make a payment|pay now", re.I
+)
 BILLING_KEYWORD_RE = re.compile(
     r"billing|patient financial services|business office|pay your bill|account questions", re.I
 )
@@ -167,10 +169,12 @@ def find_billing_address(page: Page) -> str | None:
     return addresses.pop() if len(addresses) == 1 else None
 
 
-def find_link(page: Page, pattern: re.Pattern, page_url: str) -> str | None:
+def find_link(page: Page, pattern: re.Pattern, page_url: str, whole_text: bool = False) -> str | None:
     """First link to a different page whose wording matches. A link back to this page says nothing useful."""
     for href, anchor_text in page.links:
-        if not pattern.search(f"{anchor_text} {href}"):
+        text = anchor_text.strip()
+        matched = pattern.fullmatch(text) if whole_text else pattern.search(text)
+        if not matched:
             continue
         absolute = urljoin(page_url, href).split("#")[0]
         if urlparse(absolute).scheme in ("http", "https") and absolute != page_url.split("#")[0]:
@@ -184,7 +188,7 @@ def extract_contact(page: Page, page_url: str) -> BillingContact:
         billing_phone=find_billing_phone(page),
         billing_address=find_billing_address(page),
         financial_assistance_url=find_link(page, FINANCIAL_LINK_RE, page_url),
-        payment_url=find_link(page, PAYMENT_LINK_RE, page_url),
+        payment_url=find_link(page, PAYMENT_LINK_RE, page_url, whole_text=True),
     )
 
 

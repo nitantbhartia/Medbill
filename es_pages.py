@@ -2,7 +2,7 @@
 
 import json
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 
@@ -11,7 +11,14 @@ from es_content import HOME, SCAN
 from es_guides_bills import GUIDES as BILL_GUIDES
 from es_guides_debt import GUIDES as DEBT_GUIDES
 
-router = APIRouter()
+
+
+def _require_enabled() -> None:
+    if not config.ES_PAGES_ENABLED:
+        raise HTTPException(404)
+
+
+router = APIRouter(dependencies=[Depends(_require_enabled)])
 templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
 
@@ -32,7 +39,7 @@ def _absolute(path: str) -> str:
 def hreflang_links_for_english(en_path: str) -> list[tuple[str, str]]:
     """Alternate links for an English page that has a Spanish counterpart; [] if it has none."""
     es_path = ES_PATH_FOR_EN_PATH.get(en_path)
-    if not es_path:
+    if not config.ES_PAGES_ENABLED or not es_path:
         return []
     return [("en", _absolute(en_path)), ("es", _absolute(es_path)), ("x-default", _absolute(en_path))]
 

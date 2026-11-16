@@ -275,6 +275,9 @@ BILLING_CONTACT_NAME_MIN_TOKEN_CHARS = 4
 BILLING_CONTACT_CALL_CUE_CHARS = 40
 BILLING_CONTACT_MAIL_CUE_CHARS = 80
 
+# Spanish section (/es/). Machine-drafted: leave off until a native speaker has reviewed it.
+ES_PAGES_ENABLED = os.getenv("ES_PAGES_ENABLED", "false").lower() == "true"
+
 # Partner referral links (/scan?ref=partner-slug)
 REFERRAL_COOKIE_NAME = "bk_ref"
 REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
