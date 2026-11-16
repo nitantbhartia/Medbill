@@ -11,6 +11,7 @@ import email_service
 from email_service import followup_body
 import payment as payment_module
 from db import get_db
+from complaints import build_complaint_letter, file_attorney_general_complaint
 from debt_fighter import send_certified_letter
 from fax import fax_configured, send_fax
 from dispute_workflow import build_dispute_letter
@@ -156,6 +157,53 @@ def _mail_certified(case, provider_name: str, letter_text: str, description: str
     return result["tracking_number"]
 
 
+def _fill_letter(letter: str, case, hospital_address: str) -> str:
+    """Replace the template placeholders in a dispute letter with the case's real details."""
+    reply_to = f"{config.EMAIL_FROM_ADDRESS}, referencing case #{case['id']}, or by mail to {case['patient_address']}"
+    return (
+        letter.replace("[Your Address]", case["patient_address"] or "")
+        .replace("[Your Email / Phone]", case["patient_email"])
+        .replace("[Hospital Address]", hospital_address)
+        .replace("[Your Email / Mailing Address]", reply_to)
+        .replace("[Your Signature]", case["patient_name"])
+    )
+
+
+def _complaint_authorized(bill_id: int) -> bool:
+    """True if the patient signed a representative designation that covers filing complaints."""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT 1 FROM esign_records WHERE bill_id = ? AND rep_signed_at >= ?",
+            (bill_id, config.COMPLAINT_AUTHORIZATION_START),
+        ).fetchone()
+    return bool(row)
+
+
+def _file_complaint(case, provider_name: str) -> None:
+    """After the last follow-up, file a complaint with the hospital's state Attorney General."""
+    hospital_address = _hospital_mailing_address(provider_name)
+    if not hospital_address or not case["patient_address"] or not _complaint_authorized(case["bill_id"]):
+        return
+    state = hospital_address.rsplit(",", 1)[1].split()[0]
+    dispute = build_dispute_letter(
+        case["bill_id"], requestor_name=case["patient_name"], account_number=case["account_number"] or "[Account Number]"
+    )
+    if not dispute:
+        return
+    dispute["letter"] = _fill_letter(dispute["letter"], case, hospital_address)
+    letter = build_complaint_letter(
+        case["patient_name"], case["patient_address"], provider_name, case["account_number"],
+        case["initial_sent_at"] or "an earlier date", len(config.DISPUTE_FOLLOWUP_DAYS),
+        dispute["letter"],
+    )
+    tracking = file_attorney_general_complaint(state, case["patient_name"], case["patient_address"], letter, case["id"])
+    if not tracking:
+        return
+    with get_db() as db:
+        db.execute("UPDATE dispute_cases SET complaint_tracking = ? WHERE id = ?", (tracking, case["id"]))
+    add_strategy_note(case["id"], f"Complaint filed with the {state} Attorney General by certified mail.")
+
+
 def _fax_hospital(case, letter_text: str) -> str:
     """Fax the letter to the hospital billing office. Returns the fax id, or '' if not faxed."""
     if not fax_configured() or not case["hospital_billing_fax"]:
@@ -191,6 +239,7 @@ def _send_dispute(case_id: int, patient_name: str, account_number: str, hospital
         return False
 
     provider = bill["provider_name"] or "the billing department"
+    letter_data["letter"] = _fill_letter(letter_data["letter"], case, _hospital_mailing_address(provider))
     subject = f"Formal Billing Dispute — Account {account_number or 'N/A'} — {patient_name}"
 
     sent = False
@@ -454,6 +503,7 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
 
     # If this is the last follow-up, check if we should auto-refund
     if followup_number >= len(config.DISPUTE_FOLLOWUP_DAYS):
+        _file_complaint(case, provider)
         _check_auto_refund(case_id)
 
 

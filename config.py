@@ -86,6 +86,11 @@ FDCPA_LETTER_PRICE_CENTS = 1900  # $19
 CHARITY_CARE_APP_PRICE_CENTS = 900  # $9
 SETTLEMENT_LETTER_PRICE_CENTS = 900  # $9
 
+# Complaints to state Attorney Generals. Off until complaints.STATE_ATTORNEY_GENERAL addresses are verified.
+AUTO_FILE_COMPLAINTS = os.getenv("AUTO_FILE_COMPLAINTS", "false").lower() == "true"
+# Representative designations signed before this date don't authorize complaints.
+COMPLAINT_AUTHORIZATION_START = "2026-11-16"
+
 # Phaxio (fax sending). Twilio shut down its fax API in 2021.
 PHAXIO_API_KEY = os.getenv("PHAXIO_API_KEY", "")
 PHAXIO_API_SECRET = os.getenv("PHAXIO_API_SECRET", "")

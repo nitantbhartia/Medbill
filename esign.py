@@ -157,7 +157,10 @@ I, {patient_name}, hereby designate BillKarma, Inc. as my Authorized Representat
    (b) Requesting billing corrections or adjustments;
    (c) Applying for financial assistance programs (including 501(r) charity care programs,
        if applicable);
-   (d) Conducting all written correspondence with {provider_name} regarding my account.
+   (d) Conducting all written correspondence with {provider_name} regarding my account;
+   (e) If {provider_name} does not resolve my dispute, filing a complaint about this bill with my
+       state Attorney General's consumer protection office, which will include my name, address
+       and the account details in my dispute letter.
 
 This designation is limited to billing matters and does not grant authority to make medical
 decisions on my behalf.
