@@ -75,11 +75,11 @@ register("hospital-billing-grades-explained", {
         </tr>
     </thead>
     <tbody>
-        <tr><td><strong>A</strong></td><td>2.0x or less</td><td>Fair pricing &mdash; charges close to Medicare&rsquo;s resource-based rate</td><td>Critical access hospitals, safety-net hospitals, some rural hospitals</td></tr>
-        <tr><td><strong>B</strong></td><td>2.1x&ndash;3.0x</td><td>Reasonable &mdash; in line with the national median for community hospitals</td><td>Community hospitals, some academic medical centers</td></tr>
-        <tr><td><strong>C</strong></td><td>3.1x&ndash;5.0x</td><td>Elevated &mdash; notably above Medicare, common among large regional systems</td><td>Regional health systems, suburban hospitals</td></tr>
-        <tr><td><strong>D</strong></td><td>5.1x&ndash;8.0x</td><td>High &mdash; aggressive pricing that warrants scrutiny of every line item</td><td>Large for-profit systems, high-cost urban markets</td></tr>
-        <tr><td><strong>F</strong></td><td>More than 8.0x</td><td>Very aggressive &mdash; markups far above the national norm</td><td>Some large for-profit chains, specialty hospitals in low-competition markets</td></tr>
+        <tr><td><strong>A</strong></td><td>Under 2.0x</td><td>Fair pricing &mdash; charges close to Medicare&rsquo;s resource-based rate</td><td>Critical access hospitals, safety-net hospitals, some rural hospitals</td></tr>
+        <tr><td><strong>B</strong></td><td>2.0x to under 3.0x</td><td>Reasonable &mdash; in line with the national median for community hospitals</td><td>Community hospitals, some academic medical centers</td></tr>
+        <tr><td><strong>C</strong></td><td>3.0x to under 5.0x</td><td>Elevated &mdash; notably above Medicare, common among large regional systems</td><td>Regional health systems, suburban hospitals</td></tr>
+        <tr><td><strong>D</strong></td><td>5.0x to under 8.0x</td><td>High &mdash; aggressive pricing that warrants scrutiny of every line item</td><td>Large for-profit systems, high-cost urban markets</td></tr>
+        <tr><td><strong>F</strong></td><td>8.0x or more</td><td>Very aggressive &mdash; markups far above the national norm</td><td>Some large for-profit chains, specialty hospitals in low-competition markets</td></tr>
     </tbody>
 </table>
 
