@@ -145,7 +145,8 @@ def _finding_paragraph(
         )
 
     if finding_type == "upcoding":
-        expected = detail.get("expected_code") or "[appropriate lower-level code]"
+        expected = detail.get("expected_code")
+        expected_phrase = f"(e.g., CPT {expected})" if expected else "(a lower-level code)"
         return (
             f"UPCODING CONCERN — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
@@ -153,7 +154,7 @@ def _finding_paragraph(
             f"with the documented service level. I am requesting review of the supporting "
             f"clinical documentation to confirm the correct complexity level was assigned. "
             f"If the documentation does not support this code, the charge should be revised "
-            f"to the appropriate level (e.g., CPT {expected})."
+            f"to the appropriate level {expected_phrase}."
         )
 
     # Default: pricing markup
