@@ -117,3 +117,44 @@ def test_strategy_and_checkout_quote_the_same_fee():
     activate = client.get(f"/dispute/activate/{bill_id}").text
     assert "for $49" in strategy and "$49" in activate
     assert "$99" not in strategy
+
+
+def _add_hospital():
+    with get_db() as db:
+        db.execute(
+            "INSERT OR REPLACE INTO hospital_directory (facility_id, name, address, city, state, zip)"
+            " VALUES ('100001', ?, '3501 Johnson St', 'Hollywood', 'FL', '33021')",
+            (SAMPLE_BILL["provider_name"],),
+        )
+
+
+@patch("dispute_service.send_certified_letter", return_value={"lob_id": "ltr_1", "tracking_number": "9407TRACK"})
+@patch("dispute_service.email_service")
+def test_dispute_is_also_mailed_certified_when_addresses_known(mock_email, mock_lob, monkeypatch):
+    monkeypatch.setattr(config, "LOB_API_KEY", "test_key")
+    _add_hospital()
+    case = _case(_activate("billing@memorialregional.org"))
+    assert case["status"] == "sent"
+    assert case["certified_tracking"] == "9407TRACK"
+    kwargs = mock_lob.call_args.kwargs
+    assert kwargs["to_address"] == "3501 Johnson St, Hollywood, FL 33021"
+    assert kwargs["from_address"] == "812 Hollywood Blvd, Hollywood, FL 33021"
+
+
+@patch("dispute_service.send_certified_letter", side_effect=RuntimeError("Lob error 422"))
+@patch("dispute_service.email_service")
+def test_lob_failure_does_not_block_the_email(mock_email, mock_lob, monkeypatch):
+    monkeypatch.setattr(config, "LOB_API_KEY", "test_key")
+    _add_hospital()
+    case = _case(_activate("billing@memorialregional.org"))
+    assert case["status"] == "sent"
+    assert case["certified_tracking"] is None
+
+
+@patch("dispute_service.send_certified_letter")
+@patch("dispute_service.email_service")
+def test_no_lob_key_means_no_mail(mock_email, mock_lob, monkeypatch):
+    monkeypatch.setattr(config, "LOB_API_KEY", "")
+    _add_hospital()
+    _activate("billing@memorialregional.org")
+    mock_lob.assert_not_called()

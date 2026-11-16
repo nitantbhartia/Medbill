@@ -1009,6 +1009,7 @@ def _run_migrations(db):
         {
             "preferred_channels": "TEXT DEFAULT 'email'",
             "strategy_notes": "TEXT DEFAULT '[]'",
+            "certified_tracking": "TEXT",
         },
     )
 

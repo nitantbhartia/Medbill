@@ -105,6 +105,21 @@ def send_dispute_confirmation(
     return send_email(to=to, subject=subject, html_body=html)
 
 
+def followup_body(patient_name: str, account_number: str, followup_number: int, case_id: int) -> str:
+    return (
+        f"This is follow-up #{followup_number} regarding the formal billing dispute "
+        f"submitted on behalf of patient {patient_name} (Account: {account_number}).\n\n"
+        f"We have not received a written response to our dispute letter sent on behalf of "
+        f"our client. We respectfully request a written acknowledgment and resolution "
+        f"within 7 business days.\n\n"
+        f"Under CMS billing guidelines and applicable state law, patients have the right "
+        f"to receive a written response to billing disputes. If we do not receive a response, "
+        f"we will proceed with filing a complaint with the appropriate regulatory authorities.\n\n"
+        f"Please respond in writing to disputes@billkarma.app, referencing case #{case_id}.\n\n"
+        f"BillKarma Patient Advocacy\ndisputes@billkarma.app"
+    )
+
+
 def send_followup_to_hospital(
     to: str,
     subject: str,
@@ -115,18 +130,7 @@ def send_followup_to_hospital(
     case_id: int,
 ) -> bool:
     """Send a follow-up message to the hospital billing department."""
-    body = (
-        f"This is follow-up #{followup_number} regarding the formal billing dispute "
-        f"submitted on behalf of patient {patient_name} (Account: {account_number}).\n\n"  # plain-text, not rendered as HTML
-        f"We have not received a written response to our dispute letter sent on behalf of "
-        f"our client. We respectfully request a written acknowledgment and resolution "
-        f"within 7 business days.\n\n"
-        f"Under CMS billing guidelines and applicable state law, patients have the right "
-        f"to receive a written response to billing disputes. If we do not receive a response, "
-        f"we will proceed with filing a complaint with the appropriate regulatory authorities.\n\n"
-        f"Please respond in writing to disputes@billkarma.app, referencing case #{case_id}.\n\n"
-        f"BillKarma Patient Advocacy\ndisputes@billkarma.app"
-    )
+    body = followup_body(patient_name, account_number, followup_number, case_id)
     html = f"<pre style='font-family:monospace;white-space:pre-wrap;'>{_he(body)}</pre>"
     return send_email(to=to, subject=subject, html_body=html, text_body=body)
 

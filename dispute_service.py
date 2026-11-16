@@ -8,8 +8,10 @@ from datetime import date, timedelta
 
 import config
 import email_service
+from email_service import followup_body
 import payment as payment_module
 from db import get_db
+from debt_fighter import send_certified_letter
 from dispute_workflow import build_dispute_letter
 
 log = logging.getLogger(__name__)
@@ -114,6 +116,45 @@ def _check_nonprofit(db, provider_name: str) -> bool:
     return bool(row and row["nonprofit_status"])
 
 
+def _hospital_mailing_address(provider_name: str) -> str:
+    """Return 'Street, City, ST 12345' for the hospital from our directory, or '' if unknown."""
+    if not provider_name:
+        return ""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT address, city, state, zip FROM hospital_directory WHERE name LIKE ? LIMIT 1",
+            (f"%{provider_name[:20]}%",),
+        ).fetchone()
+    if not row or not (row["address"] and row["city"] and row["state"] and row["zip"]):
+        return ""
+    return f"{row['address']}, {row['city']}, {row['state']} {row['zip']}"
+
+
+def _mail_certified(case, provider_name: str, letter_text: str, description: str) -> str:
+    """Mail the letter to the hospital by Lob certified mail. Returns the tracking number,
+    or '' if it was not mailed (no Lob key, or no address for either side)."""
+    if not config.LOB_API_KEY or not case["patient_address"]:
+        return ""
+    hospital_address = _hospital_mailing_address(provider_name)
+    if not hospital_address:
+        log.warning("No mailing address for %r; case %d not mailed", provider_name, case["id"])
+        return ""
+    try:
+        result = send_certified_letter(
+            description=description,
+            from_name=case["patient_name"],
+            from_address=case["patient_address"],
+            to_name=f"{provider_name} Billing Department",
+            to_address=hospital_address,
+            letter_text=letter_text,
+            api_key=config.LOB_API_KEY,
+        )
+    except RuntimeError as exc:
+        log.error("Certified mail failed for case %d: %s", case["id"], exc)
+        return ""
+    return result["tracking_number"]
+
+
 def _send_dispute(case_id: int, patient_name: str, account_number: str, hospital_email: str) -> bool:
     """Email the dispute letter to the billing department. Marks the case sent only if it went out;
     otherwise the case waits in 'needs_delivery' until the patient gives us an address."""
@@ -151,12 +192,16 @@ def _send_dispute(case_id: int, patient_name: str, account_number: str, hospital
             ))
         except Exception as exc:
             log.error("Failed to send dispute for case %d to %s: %s", case_id, hospital_email, exc)
-    if not sent:
+    tracking = _mail_certified(case, provider, letter_data["letter"], f"Billing dispute, case {case_id}")
+    if tracking:
+        with get_db() as db:
+            db.execute("UPDATE dispute_cases SET certified_tracking = ? WHERE id = ?", (tracking, case_id))
+    if not (sent or tracking):
         with get_db() as db:
             db.execute("UPDATE dispute_cases SET status = 'needs_delivery' WHERE id = ?", (case_id,))
         return False
 
-    log.info("Dispute letter sent to %s for case %d", hospital_email, case_id)
+    log.info("Dispute letter sent for case %d (email=%s, certified=%s)", case_id, sent, bool(tracking))
     today = date.today().isoformat()
     with get_db() as db:
         db.execute(
@@ -375,7 +420,9 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
             ))
         except Exception as exc:
             log.error("Failed to send follow-up email for case %d: %s", case_id, exc)
-    if not sent:
+    body = followup_body(patient_name, account_number, followup_number, case_id)
+    mailed = _mail_certified(case, provider, body, f"Dispute follow-up {followup_number}, case {case_id}")
+    if not (sent or mailed):
         log.error("Follow-up %d for case %d not sent; will retry on the next run", followup_number, case_id)
         return
 
