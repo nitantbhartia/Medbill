@@ -1,0 +1,12 @@
+{# Shared Jinja macros for schema.org markup.
+   Import "with context" so request is visible inside the macro. #}
+
+{% macro breadcrumbs(items) -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{%- for name, path in items -%}
+{"@type":"ListItem","position":{{ loop.index }},"name":{{ name|tojson }}{% if not loop.last %},"item":"{{ request.url.scheme }}://{{ request.url.netloc }}{{ path }}"{% endif %}}{% if not loop.last %},{% endif %}
+{%- endfor -%}
+]}
+</script>
+{%- endmacro %}

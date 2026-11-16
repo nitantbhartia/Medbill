@@ -3,7 +3,9 @@
 {% block title %}{{ city_name }}, {{ state_name }} Hospital Billing Comparison | BillKarma{% endblock %}
 
 {% block head %}
+{% import "_macros.html" as seo with context %}
 <meta name="description" content="Compare hospital billing grades and markup ratios in {{ city_name }}, {{ state_name }}.">
+{{ seo.breadcrumbs([("Home", "/"), ("Hospitals", "/hospitals/"), (state_name, "/hospitals/" ~ state_slug ~ "/"), (city_name, "/hospitals/" ~ state_slug ~ "/" ~ city_slug ~ "/")]) }}
 <style>
     .city-hero {
         background-color: var(--bk-green);
