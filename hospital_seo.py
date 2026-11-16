@@ -905,6 +905,10 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
             "SELECT * FROM hospital_financials WHERE facility_id = ?",
             (hospital["facility_id"],),
         ).fetchone()
+        billing = db.execute(
+            "SELECT * FROM hospital_billing_contacts WHERE facility_id = ?",
+            (hospital["facility_id"],),
+        ).fetchone()
         transparency = db.execute(
             "SELECT * FROM transparency_files WHERE facility_id = ?",
             (hospital["facility_id"],),
@@ -945,6 +949,8 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         hospital_d["ownership"] = hospital_d.get("ownership_fallback")
     quality_d = dict(quality) if quality else {}
     financials_d = dict(financials) if financials else {}
+    billing_d = dict(billing) if billing else {}
+    hospital_d["billing_phone"] = billing_d.get("billing_phone")
     transparency_d = dict(transparency) if transparency else {}
     comparison_d = _comparison_averages_for_state(state_code)
     hospital_d["name"] = _display_name(hospital_d.get("name"), hospital_d.get("facility_id"))
@@ -1079,6 +1085,7 @@ def get_hospital_profile(state_slug: str, city_slug: str, hospital_slug: str) ->
         "hospital": hospital_d,
         "quality": quality_d,
         "financials": financials_d,
+        "billing": billing_d,
         "transparency": transparency_d,
         "comparison": comparison_d,
         "grade_gauge_pct": hospital_gauge_pct,
@@ -2169,7 +2176,9 @@ def _build_page_title(hospital_d: dict) -> str:
 def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
     """Answer the search in the snippet, then give a reason to click."""
     parts = []
-    if hospital_d.get("phone"):
+    if hospital_d.get("billing_phone"):
+        parts.append(f"Billing office: {hospital_d['billing_phone']}.")
+    elif hospital_d.get("phone"):
         parts.append(f"Main line: {hospital_d['phone']}.")
     markup = _markup_text(hospital_d)
     grade = hospital_d.get("billing_grade")
