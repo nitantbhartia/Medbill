@@ -91,6 +91,8 @@ AUTO_FILE_COMPLAINTS = os.getenv("AUTO_FILE_COMPLAINTS", "false").lower() == "tr
 # Representative designations signed before this date don't authorize complaints.
 COMPLAINT_AUTHORIZATION_START = "2026-11-16"
 
+OPS_QUEUE_REPLY_LIMIT = 50
+
 # Phaxio (fax sending). Twilio shut down its fax API in 2021.
 PHAXIO_API_KEY = os.getenv("PHAXIO_API_KEY", "")
 PHAXIO_API_SECRET = os.getenv("PHAXIO_API_SECRET", "")
