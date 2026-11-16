@@ -3,6 +3,9 @@ import os
 # App
 APP_NAME = "BillKarma"
 APP_URL = os.getenv("APP_URL", "https://billkarma.app")
+# Sitemap <lastmod> for every page. Bump it when a deploy changes pages site-wide,
+# so Google recrawls them. 2026-11-11: relaunch, redesign and hospital regrade.
+SITE_UPDATED = "2026-11-11"
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 ENV = os.getenv("ENV", "development").lower()
