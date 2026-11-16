@@ -14,7 +14,8 @@
 {% set own_display = h.ownership_type or h.ownership %}
 {% set is_nonprofit = h.is_nonprofit or ("Nonprofit" in (h.ownership_type or "")) %}
 {% set tel = (h.phone or "") | select("in", "0123456789") | join %}
-{% set fa_url = data.financials.fa_application_url or data.financials.financial_assistance_url if data.financials else none %}
+{% set billing_tel = (data.billing.billing_phone or "") | select("in", "0123456789") | join %}
+{% set fa_url = (data.financials.fa_application_url or data.financials.financial_assistance_url if data.financials else none) or data.billing.financial_assistance_url %}
 
 <div class="bk-wrap" style="padding-top: 32px; padding-bottom: 80px"
      data-primary-charge="{{ data.prices[0].gross_charge if data.prices else '' }}">
@@ -46,14 +47,25 @@
             <section aria-labelledby="call-billing">
                 <h2 id="call-billing" class="bk-h2">1. Call billing</h2>
                 <p class="bk-lede">Have your account number ready. Ask for an itemized bill and ask whether you can apply for financial assistance.</p>
-                {% if h.phone %}
+                {% if data.billing.billing_phone %}
                 <div class="bk-box" style="margin-top: 20px; max-width: 420px">
+                    <div style="font-size: 14px; font-weight: 600" class="bk-muted">Billing office</div>
+                    <div class="bk-mono" style="margin-top: 6px; font-size: 24px; font-weight: 500">{{ data.billing.billing_phone }}</div>
+                    {% if data.billing.billing_address %}
+                    <div style="margin-top: 6px; font-size: 14px" class="bk-muted">Mailing address: {{ data.billing.billing_address }}</div>
+                    {% endif %}
+                    <a href="tel:+1{{ billing_tel }}" class="bk-btn" style="margin-top: 16px">Call {{ data.billing.billing_phone }}</a>
+                    <div style="margin-top: 10px; font-size: 13px" class="bk-muted">Source: <a href="{{ data.billing.source_url }}" target="_blank" rel="nofollow noopener">hospital website</a></div>
+                </div>
+                {% endif %}
+                {% if h.phone %}
+                <div class="bk-box" style="margin-top: {{ '16px' if data.billing.billing_phone else '20px' }}; max-width: 420px">
                     <div style="font-size: 14px; font-weight: 600" class="bk-muted">Main hospital line</div>
-                    <div class="bk-mono" style="margin-top: 6px; font-size: 24px; font-weight: 500">{{ h.phone }}</div>
+                    <div class="bk-mono" style="margin-top: 6px; font-size: {{ '18px' if data.billing.billing_phone else '24px' }}; font-weight: 500">{{ h.phone }}</div>
                     <div style="margin-top: 6px; font-size: 14px" class="bk-muted">Ask for patient billing or patient financial services.</div>
                     <a href="tel:+1{{ tel }}" class="bk-btn" style="margin-top: 16px">Call {{ h.phone }}</a>
                 </div>
-                {% else %}
+                {% elif not data.billing.billing_phone %}
                 <p class="bk-muted" style="margin: 16px 0 0; font-size: 15px">We don't have a phone number for this hospital yet. The billing office number is printed on your bill.</p>
                 {% endif %}
                 <p class="bk-muted" style="margin: 16px 0 0; font-size: 15px">Not sure what to say? <a href="/guides/medical-bill-negotiation-script/">Read a word-for-word call script</a>.</p>

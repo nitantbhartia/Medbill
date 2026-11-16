@@ -1606,6 +1606,16 @@ CREATE TABLE IF NOT EXISTS hospital_financials (
     updated_at DATE
 );
 
+CREATE TABLE IF NOT EXISTS hospital_billing_contacts (
+    facility_id TEXT PRIMARY KEY REFERENCES hospital_directory(facility_id),
+    billing_phone TEXT,
+    billing_address TEXT,
+    financial_assistance_url TEXT,
+    payment_url TEXT,
+    source_url TEXT NOT NULL,
+    fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS hospital_procedure_prices (
     facility_id TEXT REFERENCES hospital_directory(facility_id),
     cpt_code TEXT,
