@@ -2403,22 +2403,22 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 async def sitemap_index():
     base = config.APP_URL.rstrip("/")
     sitemap_urls = [
-        (f"{base}/sitemap-core.xml", "2026-04-10"),
-        (f"{base}/sitemap-guides.xml", "2026-04-16"),
-        (f"{base}/sitemap-tools.xml", "2026-02-01"),
-        (f"{base}/sitemap-rights.xml", "2026-03-01"),
-        (f"{base}/sitemap-procedures.xml", "2026-04-10"),
-        (f"{base}/sitemap-cpt-pages.xml", "2026-03-01"),
-        (f"{base}/sitemap-costs.xml", "2026-04-10"),
-        (f"{base}/sitemap-legacy-cost-pages.xml", "2026-03-01"),
-        (f"{base}/sitemap-hospitals.xml", "2026-02-24"),
-        (f"{base}/sitemap-facilities.xml", "2026-03-01"),
-        (f"{base}/sitemap-compare.xml", "2026-03-03"),
-        (f"{base}/sitemap-data-guides.xml", "2026-04-10"),
+        f"{base}/sitemap-core.xml",
+        f"{base}/sitemap-guides.xml",
+        f"{base}/sitemap-tools.xml",
+        f"{base}/sitemap-rights.xml",
+        f"{base}/sitemap-procedures.xml",
+        f"{base}/sitemap-cpt-pages.xml",
+        f"{base}/sitemap-costs.xml",
+        f"{base}/sitemap-legacy-cost-pages.xml",
+        f"{base}/sitemap-hospitals.xml",
+        f"{base}/sitemap-facilities.xml",
+        f"{base}/sitemap-compare.xml",
+        f"{base}/sitemap-data-guides.xml",
     ]
     entries = "".join(
-        f"<sitemap><loc>{loc}</loc><lastmod>{lastmod}</lastmod></sitemap>"
-        for loc, lastmod in sitemap_urls
+        f"<sitemap><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod></sitemap>"
+        for loc in sitemap_urls
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -2432,33 +2432,33 @@ async def sitemap_index():
 async def core_sitemap():
     base = config.APP_URL.rstrip("/")
     core_urls = [
-        (f"{base}/", "2026-02-01", "1.0"),
-        (f"{base}/guides/", "2026-02-01", "0.8"),
-        (f"{base}/itemized-bill", "2026-11-11", "0.9"),
-        (f"{base}/ai", "2026-11-11", "0.7"),
-        (f"{base}/tools/", "2026-02-01", "0.8"),
-        (f"{base}/fight-debt", "2026-02-24", "0.9"),
-        (f"{base}/savings", "2026-02-25", "0.8"),
-        (f"{base}/shop", "2026-02-25", "0.8"),
-        (f"{base}/watch", "2026-02-25", "0.7"),
-        (f"{base}/estimate", "2026-03-01", "0.9"),
-        (f"{base}/rights/", "2026-03-01", "0.8"),
-        (f"{base}/quiz", "2026-03-01", "0.9"),
-        (f"{base}/glossary/", "2026-03-01", "0.8"),
-        (f"{base}/cost/mri/", "2026-03-01", "0.8"),
-        (f"{base}/cost/colonoscopy/", "2026-03-01", "0.8"),
-        (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
-        (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
-        (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
-        (f"{base}/about/", "2026-04-10", "0.7"),
-        (f"{base}/press/", "2026-04-01", "0.7"),
-        (f"{base}/chargemaster/", "2026-04-01", "0.9"),
-        (f"{base}/procedures/", "2026-04-10", "0.9"),
-        (f"{base}/guides/most-expensive-states-healthcare-2026/", "2026-04-10", "0.8"),
+        (f"{base}/", "1.0"),
+        (f"{base}/guides/", "0.8"),
+        (f"{base}/itemized-bill", "0.9"),
+        (f"{base}/ai", "0.7"),
+        (f"{base}/tools/", "0.8"),
+        (f"{base}/fight-debt", "0.9"),
+        (f"{base}/savings", "0.8"),
+        (f"{base}/shop", "0.8"),
+        (f"{base}/watch", "0.7"),
+        (f"{base}/estimate", "0.9"),
+        (f"{base}/rights/", "0.8"),
+        (f"{base}/quiz", "0.9"),
+        (f"{base}/glossary/", "0.8"),
+        (f"{base}/cost/mri/", "0.8"),
+        (f"{base}/cost/colonoscopy/", "0.8"),
+        (f"{base}/cost/ct-scan/", "0.8"),
+        (f"{base}/cost/knee-replacement/", "0.8"),
+        (f"{base}/cost/er-visit/", "0.8"),
+        (f"{base}/about/", "0.7"),
+        (f"{base}/press/", "0.7"),
+        (f"{base}/chargemaster/", "0.9"),
+        (f"{base}/procedures/", "0.9"),
+        (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),
     ]
     core_entries = "".join(
-        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
-        for loc, lastmod, priority in core_urls
+        f"<url><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>{priority}</priority></url>"
+        for loc, priority in core_urls
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -2474,12 +2474,12 @@ async def guides_sitemap():
 
     base = config.APP_URL.rstrip("/")
     guide_entries = "".join(
-        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{max(published, config.SITE_UPDATED)}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
     )
     from guides import get_all_categories as _get_all_cats
     category_entries = "".join(
-        f"<url><loc>{base}/guides/category/{c['slug']}/</loc><lastmod>2026-04-05</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/guides/category/{c['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for c in _get_all_cats()
     )
     xml = (
@@ -2494,7 +2494,7 @@ async def guides_sitemap():
 async def tools_sitemap():
     base = config.APP_URL.rstrip("/")
     tool_entries = "".join(
-        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
         for tool in list_tools()
     )
     xml = (
@@ -2510,7 +2510,7 @@ async def rights_sitemap():
     base = config.APP_URL.rstrip("/")
     from state_rights import get_all_states as _get_all_states_sitemap
     rights_entries = "".join(
-        f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>2026-03-01</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for s in _get_all_states_sitemap()
     )
     xml = (
@@ -2526,7 +2526,7 @@ async def legacy_cost_pages_sitemap():
     base = config.APP_URL.rstrip("/")
     from cost_pages import get_all_cost_slugs
     cost_entries = "".join(
-        f"<url><loc>{base}/cost/{slug}/</loc><lastmod>2026-03-01</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/cost/{slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
         for slug in get_all_cost_slugs()
     )
     xml = (
@@ -2541,7 +2541,7 @@ async def legacy_cost_pages_sitemap():
 async def cpt_pages_sitemap():
     base = config.APP_URL.rstrip("/")
     procedure_entries = "".join(
-        f"<url><loc>{base}/procedures/{p['cpt_code']}/</loc><lastmod>2026-03-01</lastmod><priority>0.6</priority></url>"
+        f"<url><loc>{base}/procedures/{p['cpt_code']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.6</priority></url>"
         for p in get_top_cpt_codes()
     )
     xml = (
@@ -2557,7 +2557,7 @@ async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
     hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
     )
     xml = (
@@ -2574,7 +2574,7 @@ async def compare_sitemap():
     from compare_seo import get_comparison_sitemap_paths
 
     comparison_entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-03</lastmod><priority>0.6</priority></url>"
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.6</priority></url>"
         for path in get_comparison_sitemap_paths()
     )
     xml = (
@@ -2595,7 +2595,7 @@ async def facilities_sitemap():
     base = config.APP_URL.rstrip("/")
     facility_paths = get_facility_sitemap_paths()
     entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-01</lastmod><priority>0.5</priority></url>"
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.5</priority></url>"
         for path in sorted(set(facility_paths))
     )
     xml = (
@@ -2611,12 +2611,12 @@ async def costs_sitemap():
     """Sitemap for procedure × city AND procedure × state cost pages."""
     base = config.APP_URL.rstrip("/")
     city_entries = "".join(
-        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for proc_slug in _PROCEDURE_SLUGS
         for city_slug in _CITY_DATA
     )
     state_entries = "".join(
-        f"<url><loc>{base}/costs/{proc_slug}/{state_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/costs/{proc_slug}/{state_slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for proc_slug in _PROCEDURE_SLUGS
         for state_slug in _STATE_DATA
         if state_slug not in _CITY_DATA  # exclude new-york (served as city)
@@ -2634,9 +2634,9 @@ async def procedures_sitemap():
     """Sitemap for procedure hub pages."""
     base = config.APP_URL.rstrip("/")
     entries = (
-        f'<url><loc>{base}/procedures/</loc><lastmod>2026-04-10</lastmod><priority>0.9</priority></url>'
+        f'<url><loc>{base}/procedures/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.9</priority></url>'
         + "".join(
-            f"<url><loc>{base}/procedures/{slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            f"<url><loc>{base}/procedures/{slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
             for slug in _PROCEDURE_SLUGS
         )
     )
@@ -2653,9 +2653,9 @@ async def data_guides_sitemap():
     """Sitemap for data-driven guide pages (cheapest cities + state comparison)."""
     base = config.APP_URL.rstrip("/")
     entries = (
-        f'<url><loc>{base}/guides/most-expensive-states-healthcare-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>'
+        f'<url><loc>{base}/guides/most-expensive-states-healthcare-2026/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>'
         + "".join(
-            f"<url><loc>{base}/guides/cheapest-cities-{slug}-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            f"<url><loc>{base}/guides/cheapest-cities-{slug}-2026/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
             for slug in _PROCEDURE_SLUGS
         )
     )

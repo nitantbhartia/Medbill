@@ -18,3 +18,9 @@
 - /mcp live: stateless Streamable HTTP MCP server, 4 read-only tools, no auth. Setup page /ai; listed in llms.txt and footer. Links carry utm_source=ai_assistant so visits from assistants show up in analytics.
 - Next: submit to the ChatGPT apps directory and Claude's Connectors Directory once it has been used in production for a while.
 
+
+## 2026-11-15 (relaunch recrawl)
+- Search Console: site was offline roughly Apr–Nov 8; impressions fell from ~3,000/day (Mar) to ~1/day. Pre-outage peak: 116k impressions, 407 clicks.
+- All sitemap `<lastmod>` values now come from `config.SITE_UPDATED` (2026-11-11). They were hardcoded Jan–Apr dates, telling Google nothing had changed since the relaunch.
+- Guide schema: removed the duplicate QAPage block (Search Console errors: missing answerCount); all JSON-LD fields now use `tojson`. 80 guides had invalid Article JSON (bad escapes), and 3 guides emitted blank FAQ questions because they use `question`/`answer` keys.
+- Next (owner): resubmit sitemap.xml in Search Console; Request indexing for pre-outage top pages.
