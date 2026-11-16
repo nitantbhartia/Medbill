@@ -34,3 +34,4 @@
 - "billkarma" search shows Credit Karma and unrelated "karma" results; BillKarma absent. Zero brand queries in Search Console for the past year.
 - Homepage title now leads with brand plus category ("BillKarma: Free Medical Bill Checker and Dispute Service"); schema gets `alternateName` and loses the self-referencing `sameAs` and the retired SiteLinksSearchBox node; About page states it isn't affiliated with Credit Karma or any finance app.
 - Search Console: homepage last crawled Oct 27 as 404, `sitemap-guides.xml` has 1 error. Owner steps in backlog 1b.
+- Sitemap audit: sitemap-guides, tools, rights, procedures all return 200 for every URL (429, 16, 50, 17 URLs, no duplicates). Core and cost sitemaps could not be audited locally without the production database.
