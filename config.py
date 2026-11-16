@@ -85,10 +85,9 @@ FDCPA_LETTER_PRICE_CENTS = 1900  # $19
 CHARITY_CARE_APP_PRICE_CENTS = 900  # $9
 SETTLEMENT_LETTER_PRICE_CENTS = 900  # $9
 
-# Twilio (for fax sending — optional)
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
-TWILIO_FAX_FROM = os.getenv("TWILIO_FAX_FROM", "")
+# Phaxio (fax sending). Twilio shut down its fax API in 2021.
+PHAXIO_API_KEY = os.getenv("PHAXIO_API_KEY", "")
+PHAXIO_API_SECRET = os.getenv("PHAXIO_API_SECRET", "")
 
 # Directory monetization toggles
 ENABLE_AFFILIATE_SLOTS = os.getenv("ENABLE_AFFILIATE_SLOTS", "false").lower() == "true"

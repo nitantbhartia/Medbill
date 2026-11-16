@@ -10,6 +10,7 @@ import email_service
 from appeal_letter import DENIAL_REASONS, PLAN_TYPES, SERVICE_TIMINGS, build_appeal_letter
 from db import get_db
 from debt_fighter import send_certified_letter
+from fax import fax_configured, send_fax
 
 log = logging.getLogger(__name__)
 
@@ -151,6 +152,12 @@ def approve(case: dict, letter_text: str) -> None:
             return
     except (RuntimeError, ValueError) as exc:
         log.error("Automatic mailing of appeal #%s failed, left for ops: %s", case["id"], exc)
+    if fax_configured() and approved["insurer_appeal_fax"]:
+        try:
+            record_sent(approved, "fax", send_fax(approved["insurer_appeal_fax"], approved["letter_text"]))
+            return
+        except (RuntimeError, ValueError) as exc:
+            log.error("Automatic fax of appeal #%s failed, left for ops: %s", case["id"], exc)
     _notify_ops(f"Appeal #{case['id']} approved by the customer and ready to send")
 
 
