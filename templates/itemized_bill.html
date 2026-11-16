@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Get your itemized hospital bill</h1>
+        <p class="bk-lede">A summary bill shows totals. To find mistakes you need every line with its billing code. Fill this in and we&rsquo;ll write the request. The hospital has {{ response_days }} days to send it.</p>
+    </div>
+</section>
+
+<div class="bk-wrap bk-ib" id="ib-app">
+    <form id="ib-form" class="bk-ib-form" novalidate>
+        <fieldset class="bk-ib-step">
+            <legend><span class="bk-ib-n">1</span>Which hospital billed you?</legend>
+            <div class="bk-ib-picked" id="ib-picked" {% if not hospital %}hidden{% endif %}>
+                <div>
+                    <strong id="ib-picked-name">{{ hospital.name if hospital }}</strong>
+                    <span id="ib-picked-address">{% if hospital %}{{ hospital.address }}, {{ hospital.city }}, {{ hospital.state }} {{ hospital.zip }}{% endif %}</span>
+                    <span id="ib-picked-phone">{% if hospital and hospital.phone %}Main line {{ hospital.phone }}{% endif %}</span>
+                </div>
+                <button type="button" class="bk-ib-change" id="ib-change">Change</button>
+            </div>
+            <div id="ib-search" {% if hospital %}hidden{% endif %}>
+                <label class="bk-label" for="ib-hospital-q">Hospital name or city</label>
+                <input id="ib-hospital-q" class="bk-input" type="search" autocomplete="off" value="{{ provider }}" placeholder="e.g. Tampa General" aria-controls="ib-results">
+                <ul id="ib-results" class="bk-ib-results" role="listbox" hidden></ul>
+                <button type="button" class="bk-ib-manual" id="ib-manual-toggle">My hospital isn&rsquo;t listed</button>
+                <div id="ib-manual" hidden>
+                    <label class="bk-label" for="ib-manual-name">Hospital name</label>
+                    <input id="ib-manual-name" class="bk-input" type="text" value="{{ provider }}">
+                    <label class="bk-label" for="ib-manual-address" style="margin-top: 14px">Billing address, from your bill</label>
+                    <textarea id="ib-manual-address" class="bk-input bk-ib-textarea" rows="2"></textarea>
+                </div>
+            </div>
+            <input type="hidden" id="ib-hospital-name" value="{{ hospital.name if hospital }}">
+            <input type="hidden" id="ib-hospital-address" value="{{ hospital.address if hospital }}">
+            <input type="hidden" id="ib-hospital-city-line" value="{% if hospital %}{{ hospital.city }}, {{ hospital.state }} {{ hospital.zip }}{% endif %}">
+        </fieldset>
+
+        <fieldset class="bk-ib-step">
+            <legend><span class="bk-ib-n">2</span>Where the hospital should reply</legend>
+            <label class="bk-label" for="ib-your-name">Your full name</label>
+            <input id="ib-your-name" class="bk-input" type="text" autocomplete="name" required>
+            <label class="bk-label" for="ib-your-address" style="margin-top: 14px">Your mailing address</label>
+            <textarea id="ib-your-address" class="bk-input bk-ib-textarea" rows="2" autocomplete="street-address" required></textarea>
+            <label class="bk-label" for="ib-reply-email" style="margin-top: 14px">Email for the reply <span class="bk-muted">(optional, usually faster than mail)</span></label>
+            <input id="ib-reply-email" class="bk-input" type="email" autocomplete="email">
+        </fieldset>
+
+        <fieldset class="bk-ib-step">
+            <legend><span class="bk-ib-n">3</span>Which bill</legend>
+            <p class="bk-ib-hint">Both are printed on the bill you have. One is enough.</p>
+            <div class="bk-ib-row">
+                <div>
+                    <label class="bk-label" for="ib-account">Account number</label>
+                    <input id="ib-account" class="bk-input" type="text" inputmode="text">
+                </div>
+                <div>
+                    <label class="bk-label" for="ib-dates">Date(s) of service</label>
+                    <input id="ib-dates" class="bk-input" type="text" placeholder="e.g. March 3, 2026">
+                </div>
+            </div>
+            <label class="bk-label" for="ib-patient" style="margin-top: 14px">Patient&rsquo;s name, if not you <span class="bk-muted">(optional)</span></label>
+            <input id="ib-patient" class="bk-input" type="text">
+        </fieldset>
+
+        <p class="bk-ib-error" id="ib-error" role="alert" hidden></p>
+        <button type="submit" class="bk-btn bk-btn-block" id="ib-submit">Write my request</button>
+        <p class="bk-ib-privacy">We don&rsquo;t save what you type here. The letter is written and shown to you, and that&rsquo;s it.</p>
+    </form>
+
+    <aside class="bk-ib-side" id="ib-side">
+        <div class="bk-side-card">
+            <h2>Why ask in writing</h2>
+            <p>Billing records are part of your health records. Under HIPAA&rsquo;s right of access the hospital must respond within {{ response_days }} days, and a dated letter proves when you asked.</p>
+            <p style="margin-bottom: 0">Calling works too. If you call, ask for the same things the letter lists, and note the date and who you spoke to.</p>
+        </div>
+    </aside>
+
+    <section class="bk-ib-result" id="ib-result" hidden aria-live="polite">
+        <h2 class="bk-h2">Your request is ready</h2>
+        <div class="bk-ib-actions">
+            <button type="button" class="bk-btn" id="ib-copy">Copy letter</button>
+            <button type="button" class="bk-btn-outline" id="ib-print">Print or save as PDF</button>
+            <a class="bk-btn-outline" id="ib-email" href="#">Open in email</a>
+        </div>
+        <pre class="bk-ib-letter" id="ib-letter"></pre>
+
+        <h2 class="bk-h3" style="margin-top: 40px">What happens next</h2>
+        <ol class="bk-ib-timeline">
+            <li><strong>Today</strong><span>Send it. Call the billing office first and ask where record requests go: many accept email or a patient portal message, which is faster than mail.</span></li>
+            <li><strong id="ib-due-label">Within {{ response_days }} days</strong><span>The hospital sends the itemized bill, or tells you in writing that it needs one 30-day extension.</span></li>
+            <li><strong>When it arrives</strong><span><a href="/scan">Upload it</a> and see every charge next to what Medicare pays for the same code. Free.</span></li>
+        </ol>
+
+        <form class="bk-ib-remind" id="ib-remind">
+            <label class="bk-label" for="ib-remind-email">Email me when the {{ response_days }} days are up</label>
+            <div class="bk-search">
+                <input id="ib-remind-email" class="bk-input" type="email" autocomplete="email" placeholder="you@example.com" required>
+                <button type="submit" class="bk-btn-outline">Remind me</button>
+            </div>
+            <p class="bk-muted" style="margin: 8px 0 0; font-size: 14px">One email on the due date. We keep only your email, the hospital&rsquo;s name and that date.</p>
+            <p class="bk-ib-done" id="ib-remind-done" hidden></p>
+        </form>
+
+        <button type="button" class="bk-ib-manual" id="ib-edit" style="margin-top: 28px">Edit the details</button>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var form = $('ib-form'), result = $('ib-result'), side = $('ib-side');
+    var q = $('ib-hospital-q'), list = $('ib-results'), timer = null;
+    var fields = { name: $('ib-hospital-name'), address: $('ib-hospital-address'), cityLine: $('ib-hospital-city-line') };
+    var hospitalName = fields.name.value;
+
+    function el(tag, text, cls) { var n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; }
+
+    function pick(h) {
+        fields.name.value = h.name; fields.address.value = h.address || '';
+        fields.cityLine.value = h.city + ', ' + h.state + ' ' + (h.zip || '');
+        hospitalName = h.name;
+        $('ib-picked-name').textContent = h.name;
+        $('ib-picked-address').textContent = [h.address, h.city, h.state + ' ' + (h.zip || '')].filter(Boolean).join(', ');
+        $('ib-picked-phone').textContent = h.phone ? 'Main line ' + h.phone : '';
+        $('ib-picked').hidden = false; $('ib-search').hidden = true; list.hidden = true;
+    }
+
+    function search() {
+        var term = q.value.trim();
+        if (term.length < 2) { list.hidden = true; return; }
+        fetch('/api/billing-contacts?q=' + encodeURIComponent(term))
+            .then(function (r) { return r.json(); })
+            .then(function (body) {
+                list.innerHTML = '';
+                (body.data || []).forEach(function (h) {
+                    var li = el('li'); var b = el('button'); b.type = 'button'; b.setAttribute('role', 'option');
+                    b.appendChild(el('strong', h.name));
+                    b.appendChild(el('span', [h.address, h.city, h.state].filter(Boolean).join(', ')));
+                    b.addEventListener('click', function () { pick(h); });
+                    li.appendChild(b); list.appendChild(li);
+                });
+                if (!list.children.length) list.appendChild(el('li', 'No match. Try the city, or use "My hospital isn’t listed".', 'bk-ib-none'));
+                list.hidden = false;
+            });
+    }
+    q.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(search, 180); });
+    if (q.value && !fields.name.value) search();
+
+    $('ib-change').addEventListener('click', function () { $('ib-picked').hidden = true; $('ib-search').hidden = false; fields.name.value = ''; q.focus(); });
+    $('ib-manual-toggle').addEventListener('click', function () { $('ib-manual').hidden = false; list.hidden = true; $('ib-manual-name').focus(); });
+
+    function payload() {
+        var manual = !$('ib-manual').hidden && !fields.name.value;
+        var manualAddress = $('ib-manual-address').value.trim().split('\n');
+        hospitalName = manual ? $('ib-manual-name').value.trim() : fields.name.value;
+        return {
+            hospital_name: hospitalName,
+            hospital_address: manual ? manualAddress[0] || '' : fields.address.value,
+            hospital_city_line: manual ? manualAddress.slice(1).join(' ') : fields.cityLine.value,
+            your_name: $('ib-your-name').value, your_address: $('ib-your-address').value,
+            reply_email: $('ib-reply-email').value, account_number: $('ib-account').value,
+            service_dates: $('ib-dates').value, patient_name: $('ib-patient').value
+        };
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = $('ib-error'); err.hidden = true;
+        $('ib-submit').disabled = true;
+        fetch('/api/itemized-bill/letter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload()) })
+            .then(function (r) { return r.json().then(function (b) { if (!r.ok) throw new Error(b.detail || 'Something went wrong. Try again.'); return b.data; }); })
+            .then(function (data) {
+                $('ib-letter').textContent = data.letter;
+                var due = new Date(data.response_due + 'T12:00:00');
+                $('ib-due-label').textContent = 'By ' + due.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+                $('ib-email').href = 'mailto:?subject=' + encodeURIComponent('Request for an itemized bill') + '&body=' + encodeURIComponent(data.letter);
+                form.hidden = true; side.hidden = true; result.hidden = false;
+                window.scrollTo({ top: $('ib-app').offsetTop - 80 });
+            })
+            .catch(function (ex) { err.textContent = ex.message; err.hidden = false; })
+            .finally(function () { $('ib-submit').disabled = false; });
+    });
+
+    $('ib-copy').addEventListener('click', function () {
+        var btn = this;
+        navigator.clipboard.writeText($('ib-letter').textContent).then(function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy letter'; }, 2000); });
+    });
+    $('ib-print').addEventListener('click', function () { window.print(); });
+    $('ib-edit').addEventListener('click', function () { result.hidden = true; form.hidden = false; side.hidden = false; });
+
+    $('ib-remind').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var done = $('ib-remind-done');
+        fetch('/api/itemized-bill/reminder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('ib-remind-email').value, hospital_name: hospitalName }) })
+            .then(function (r) { return r.json().then(function (b) { if (!r.ok) throw new Error(b.detail || 'Could not set the reminder.'); return b.data; }); })
+            .then(function (data) {
+                var when = new Date(data.remind_on + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+                done.textContent = 'Reminder set for ' + when + '.'; done.hidden = false;
+            })
+            .catch(function (ex) { done.textContent = ex.message; done.hidden = false; });
+    });
+})();
+</script>
+{% endblock %}

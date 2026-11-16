@@ -10,8 +10,10 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+import appeals
 import config
 import email_service
+import household
 import scanner
 import analyzer
 import negotiation
@@ -1472,12 +1474,23 @@ async def stripe_webhook(request: Request):
                     log.error("Lob send failed for debt_letter_id=%s: %s", debt_letter_id, exc)
                     with get_db() as db:
                         _record_debt_send_failure(db, int(debt_letter_id), session_id, 1, str(exc))
+        elif payment_purpose == "appeal_case":
+            case_id = int(metadata.get("appeal_case_id") or 0)
+            if case_id and data.get("payment_status") == "paid" and appeals.mark_paid(case_id):
+                log_audit(action="appeal_paid", resource_type="appeal_case", resource_id=str(case_id),
+                          metadata={"session_id": session_id})
+        elif payment_purpose == "household":
+            if household.activate_from_session(data):
+                log_audit(action="household_activated", resource_type="household_member",
+                          resource_id=str(metadata.get("user_id")), metadata={"session_id": session_id})
         else:
             # Dispute service payment
             bill_id = payment_module.record_payment_success(session_id)
             if bill_id:
                 log_audit(action="payment_completed", resource_type="dispute_payment",
                           resource_id=session_id, metadata={"bill_id": bill_id})
+    elif event_type in ("customer.subscription.updated", "customer.subscription.deleted"):
+        household.sync_subscription(data)
 
     return {"status": "ok"}
 
@@ -1682,6 +1695,21 @@ async def request_refund(request: Request, case_id: int):
     log_audit(action="dispute_refunded", resource_type="dispute_case", resource_id=str(case_id))
 
     return {"status": "ok", "data": {"refunded": refunded}}
+
+
+@router.post("/dispute/{case_id}/delivery")
+async def deliver_dispute(request: Request, case_id: int):
+    """Send a waiting dispute letter once the patient gives us the billing office email."""
+    require_case_access(request, case_id)
+    payload = await _parse_json_object(request)
+    try:
+        sent = dispute_service.deliver_dispute(case_id, payload.get("hospital_billing_email", ""))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    if not sent:
+        raise HTTPException(502, "We couldn't send the letter to that address. Check it and try again.")
+    log_audit(action="dispute_delivered", resource_type="dispute_case", resource_id=str(case_id))
+    return {"status": "ok", "data": {"case_id": case_id, "new_status": "sent"}}
 
 
 @router.post("/dispute/{case_id}/pause")
@@ -2507,3 +2535,40 @@ async def autopilot_activate_api(request: Request):
     )
 
     return {"status": "ok", "case_id": result.get("case_id")}
+
+
+# ── Itemized-bill requests ───────────────────────────────────────────────────
+
+@router.get("/billing-contacts")
+async def billing_contacts(q: str = ""):
+    """Hospitals matching a name or city, with the billing address and phone."""
+    from itemized_request import find_billing_contacts
+    return {"status": "ok", "data": find_billing_contacts(q)}
+
+
+@router.post("/itemized-bill/letter")
+async def itemized_bill_letter(request: Request):
+    """Write an itemized-bill request letter. Nothing typed here is stored."""
+    from itemized_request import build_request_letter, validate_letter_request
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        raise HTTPException(429, "Too many requests. Try again in a little while.")
+    payload = await _parse_json_object(request)
+    _assert_payload_size(payload, config.MAX_TOOL_PAYLOAD_BYTES, "That's more text than a request letter needs.")
+    problems = validate_letter_request(payload)
+    if problems:
+        raise HTTPException(400, " ".join(problems))
+    return {"status": "ok", "data": build_request_letter(payload)}
+
+
+@router.post("/itemized-bill/reminder")
+async def itemized_bill_reminder(request: Request):
+    """Email the patient when the hospital's 30 days are up."""
+    from itemized_request import save_reminder
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        raise HTTPException(429, "Too many requests. Try again in a little while.")
+    payload = await _parse_json_object(request)
+    try:
+        remind_on = save_reminder(payload.get("email", ""), payload.get("hospital_name", ""))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+    return {"status": "ok", "data": {"remind_on": remind_on}}

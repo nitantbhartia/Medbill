@@ -4,7 +4,7 @@
 
 {% block head %}
 <style>
-    .confirm-bar { background:#00824F; padding:20px 24px; border-radius:0 0 24px 24px; }
+    .confirm-bar { background:#0C6B55; padding:20px 24px; border-radius:0 0 24px 24px; }
     .confirm-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .confirm-bar .cb-crumb { font-size:0.75rem; color:rgba(255,255,255,0.5); }
     .confirm-bar .cb-crumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
@@ -34,6 +34,15 @@
         </p>
     </div>
 
+    {% set coded_items = data.line_items | selectattr('cpt_code') | list %}
+    {% if data.bill and not coded_items %}
+    <div class="bk-note bk-summary-bill">
+        <h2 class="bk-h3">This looks like a summary bill</h2>
+        <p>We couldn&rsquo;t find billing codes on it, and the check needs them to compare each charge with Medicare. Ask the hospital for the itemized version; you have a right to it, and we&rsquo;ll write the request.</p>
+        <a class="bk-btn" href="/itemized-bill?provider={{ (data.bill.provider_name or '') | urlencode }}">Request the itemized bill</a>
+    </div>
+    {% endif %}
+
     {% if data.bill %}
     {% set sums = namespace(charged=0, patient=0, has_patient=false) %}
     {% for item in data.line_items %}
@@ -62,7 +71,7 @@
         <span><span class="text-gray-400">Zip:</span> {{ data.bill.zip_code }}</span>
         {% endif %}
         {% if data.bill.total_charged %}
-        <span><span class="text-gray-400">Total:</span> ${{ "%.2f" | format(data.bill.total_charged) }}</span>
+        <span><span class="text-gray-400">Total:</span> ${{ "{:,.2f}".format(data.bill.total_charged) }}</span>
         {% endif %}
     </div>
 
@@ -75,10 +84,10 @@
     ">
         <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Extraction Reconciliation</p>
         <p class="text-sm text-gray-800">
-            Itemized sum: <strong>${{ "%.2f" | format(extracted_sum) }}</strong>
+            Itemized sum: <strong>${{ "{:,.2f}".format(extracted_sum) }}</strong>
             {% if bill_total %}
-                · Bill total: <strong>${{ "%.2f" | format(bill_total) }}</strong>
-                · Delta: <strong>${{ "%.2f" | format(recon_delta) }}</strong>
+                · Bill total: <strong>${{ "{:,.2f}".format(bill_total) }}</strong>
+                · Delta: <strong>${{ "{:,.2f}".format(recon_delta) }}</strong>
             {% endif %}
         </p>
         <p class="text-xs text-gray-500 mt-1">Basis: {{ recon_basis_label }}</p>

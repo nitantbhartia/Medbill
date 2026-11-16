@@ -8,7 +8,7 @@ import re
 import time
 from collections import defaultdict
 
-from config import APP_URL, ENABLE_FREE_MAPS
+from config import APP_URL, ENABLE_FREE_MAPS, SEO_META_MAX_CHARS, SEO_TITLE_MAX_CHARS
 from db import get_db
 
 GRADE_THRESHOLDS = (
@@ -21,7 +21,6 @@ STATE_COMPARISON_MIN_SAMPLE_SIZE = 25
 NEARBY_RADIUS_MILES = 50.0
 # Highest-search-volume procedures for FAQ Q2, checked in priority order
 FAQ_PRIORITY_CPTS = ("27447", "70553", "45378", "27130", "74178", "71045")
-NATIONAL_AVG_MARKUP = 3.4  # approximate for FAQ answers
 _EARTH_RADIUS_MILES = 3958.8
 # ~1 degree lat ≈ 69 miles; padding for lon variation at different latitudes
 _LAT_DEGREE_MILES = 69.0
@@ -1426,6 +1425,17 @@ def resolve_hospital_slug(state_slug: str, city_slug: str, hospital_slug: str) -
         if exact:
             return exact["slug"]
 
+        # A duplicate's URL carried its facility id (e.g. "-100093" or an NPI); send it to the
+        # hospital's plain slug once the duplicate is gone.
+        unsuffixed = re.sub(r"-[0-9][0-9a-z]{5,9}$", "", target)
+        if unsuffixed != target:
+            plain = db.execute(
+                "SELECT slug FROM hospitals WHERE state_slug = ? AND city_slug = ? AND slug = ? LIMIT 1",
+                (state_slug, city_slug, unsuffixed),
+            ).fetchone()
+            if plain:
+                return plain["slug"]
+
         fallback = db.execute(
             """
             SELECT slug
@@ -1877,7 +1887,7 @@ def generate_intro_paragraph(
 
     parts = [
         f"{name} {location} receives a BillKarma billing grade of {grade} "
-        f"based on an average markup of {markup_txt} Medicare rates{proc_txt}."
+        f"based on list prices averaging {markup_txt} Medicare's hospital rates{proc_txt}."
     ]
 
     # State rank sentence
@@ -2090,6 +2100,8 @@ def get_hospital_sitemap_paths() -> list[str]:
 
     paths = ["/hospitals/"]
     paths.extend([f"/hospitals/{r['state_slug']}/" for r in states])
+    from hospital_rankings import get_ranked_state_slugs
+    paths.extend([f"/hospitals/{slug}/most-expensive/" for slug in get_ranked_state_slugs()])
     paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/" for r in cities])
     paths.extend([f"/hospitals/{r['state_slug']}/{r['city_slug']}/{r['slug']}/" for r in hospitals])
     return paths
@@ -2130,30 +2142,56 @@ def _get_national_avg_charge(cpt_code: str) -> float | None:
         return None
 
 
-def _build_page_title(name: str) -> str:
-    full_suffix = " Billing: Phone, Pay Online & Financial Help | BillKarma"
-    short_suffix = " Billing & Financial Help | BillKarma"
-    title = name + full_suffix
-    if len(title) > 60:
-        title = name + short_suffix
-    if len(title) > 60:
-        title = _truncate_name(name, 60 - len(short_suffix)) + short_suffix
-    return title
+_TITLE_MAX = SEO_TITLE_MAX_CHARS
+_META_MAX = SEO_META_MAX_CHARS
+
+
+def _markup_text(hospital_d: dict) -> str | None:
+    markup = hospital_d.get("avg_markup_vs_medicare")
+    if isinstance(markup, (int, float)) and markup > 0:
+        return f"{markup:.1f}x Medicare"
+    return None
+
+
+def _build_page_title(hospital_d: dict) -> str:
+    """Lead with what searchers want (billing), then our unique number (the markup)."""
+    name = hospital_d.get("name", "")
+    markup = _markup_text(hospital_d)
+    options = [f"{name} Billing Phone: Prices {markup}", f"{name} Billing: Prices {markup}"] if markup else []
+    options += [f"{name} Billing: Phone & Financial Help", f"{name} Billing Phone & Prices"]
+    for title in options:
+        if len(title) <= _TITLE_MAX:
+            return title
+    suffix = " Billing Phone & Prices"
+    return _truncate_name(name, _TITLE_MAX - len(suffix)) + suffix
 
 
 def _build_meta_description(hospital_d: dict, prices_d: list[dict]) -> str:
-    name = hospital_d.get("name", "")
-    desc = (
-        f"Contact {name} billing department. "
-        f"Find the billing phone number, pay your bill online, "
-        f"request an itemized statement, or apply for financial assistance."
-    )
-    if len(desc) <= 155:
+    """Answer the search in the snippet, then give a reason to click."""
+    parts = []
+    if hospital_d.get("phone"):
+        parts.append(f"Main line: {hospital_d['phone']}.")
+    markup = _markup_text(hospital_d)
+    grade = hospital_d.get("billing_grade")
+    if markup and grade:
+        parts.append(f"List prices average {markup} (grade {grade}).")
+    elif markup:
+        parts.append(f"List prices average {markup}.")
+    parts.append("Free itemized-bill letter, financial assistance check and bill review.")
+    desc = " ".join(parts)
+    if len(desc) <= _META_MAX:
         return desc
-    # Truncate at last word boundary before 152 chars, append ellipsis
-    cut = desc[:152]
-    last_space = cut.rfind(" ")
-    return (cut[:last_space] if last_space > 100 else cut) + "..."
+    cut = desc[: _META_MAX - 3]
+    return cut[: cut.rfind(" ")] + "..."
+
+
+def national_median_markup() -> float | None:
+    """Median of graded hospitals' average markup over Medicare's hospital rate."""
+    with get_db() as db:
+        values = [r[0] for r in db.execute(
+            "SELECT avg_markup_vs_medicare FROM billing_metrics WHERE avg_markup_vs_medicare IS NOT NULL ORDER BY 1"
+        ).fetchall()]
+    return round(values[len(values) // 2], 1) if values else None
 
 
 def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict) -> dict:
@@ -2167,16 +2205,13 @@ def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict
     # Q1: billing grade
     q1_answer = (
         f"BillKarma gives {name} a billing grade of {grade}. "
-        f"This grade is based on an average markup of {markup_txt} Medicare rates "
-        f"across {procedures} procedures in their CMS-published price transparency file."
+        f"Its list prices average {markup_txt} what Medicare pays hospitals for the same services, "
+        f"across {procedures} procedures in its CMS-required price transparency file."
     )
-    if grade in ("F", "D"):
-        q1_answer += f" This is above the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare."
-    elif grade in ("A", "B"):
-        q1_answer += (
-            f" This is below the national average of approximately {NATIONAL_AVG_MARKUP}x Medicare, "
-            "making it one of the more fairly priced hospitals in the area."
-        )
+    median = national_median_markup()
+    if median and isinstance(markup, (int, float)):
+        relation = "above" if markup > median else "below" if markup < median else "at"
+        q1_answer += f" That's {relation} the median of {median}x across the hospitals we grade."
 
     # Q2: procedure price — first priority CPT found in hospital data
     prices_by_cpt = {p["cpt_code"]: p for p in prices_d if p.get("cpt_code")}
@@ -2328,7 +2363,7 @@ def generate_seo_elements(
     # Stash raw state code for meta description builder
     hospital_d["_state_code"] = state_code
 
-    page_title = _build_page_title(hospital_d.get("name", ""))
+    page_title = _build_page_title(hospital_d)
     meta_description = _build_meta_description(hospital_d, prices_d)
     faq_schema = _build_faq_schema(hospital_d, prices_d, financials_d)
     breadcrumb_schema = _build_breadcrumb_schema(hospital_d, state_slug, city_slug)

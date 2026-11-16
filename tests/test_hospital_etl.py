@@ -80,8 +80,8 @@ def test_metrics_compute_grade_and_benchmarks():
             ("74177", 500.0),
         ]:
             conn.execute(
-                "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
-                (cpt, "0000000", rate, rate, 2026),
+                "INSERT OR REPLACE INTO hospital_opps_rates (cpt_code, national_payment_rate, effective_year) VALUES (?, ?, ?)",
+                (cpt, rate, 2026),
             )
 
     upsert_hospital_row(
@@ -129,8 +129,8 @@ def test_recompute_billing_metrics_grades_with_five_rows_and_sets_medium_confide
     with get_db() as conn:
         for cpt in ["99285", "99284", "99283", "93000", "80053"]:
             conn.execute(
-                "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
-                (cpt, "0000000", 500.0, 500.0, 2026),
+                "INSERT OR REPLACE INTO hospital_opps_rates (cpt_code, national_payment_rate, effective_year) VALUES (?, ?, ?)",
+                (cpt, 500.0, 2026),
             )
 
     upsert_hospital_row(
@@ -826,3 +826,45 @@ def test_refresh_facility_transparency_tracks_non_hospital_parse_results():
         if os.path.exists(csv_path):
             os.unlink(csv_path)
         os.rmdir(tmp_dir)
+
+
+def test_codes_without_a_hospital_rate_get_no_markup():
+    _db._connection = None
+    _db.init_db()
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO medicare_rates (cpt_code, locality, facility_rate, non_facility_rate, effective_year) VALUES ('27447', '0000000', 1916, 1916, 2026)"
+        )
+    upsert_hospital_row({"facility_id": "100003", "name": "Knee Hospital", "city": "Miami", "state": "FL", "slug": "knee-hospital-miami"})
+    upsert_hospital_price("100003", {"cpt_code": "27447", "description": "Total knee replacement", "gross_charge": 52000.0})
+    with get_db() as conn:
+        row = conn.execute("SELECT medicare_rate, markup_vs_medicare FROM hospital_prices WHERE facility_id = '100003'").fetchone()
+    assert row["medicare_rate"] is None and row["markup_vs_medicare"] is None
+
+
+def test_rebenchmark_replaces_physician_fee_markups_with_opps():
+    from hospital_etl import rebenchmark_hospital_prices
+    _db._connection = None
+    _db.init_db()
+    upsert_hospital_row({"facility_id": "100004", "name": "ER Hospital", "city": "Miami", "state": "FL", "slug": "er-hospital-miami"})
+    with get_db() as conn:
+        conn.execute("INSERT OR REPLACE INTO hospital_opps_rates (cpt_code, national_payment_rate, effective_year) VALUES ('99285', 773.0, 2026)")
+        conn.execute(
+            "INSERT INTO hospital_prices (facility_id, cpt_code, gross_charge, medicare_rate, markup_vs_medicare, data_year) VALUES ('100004', '99285', 4500, 227, 19.8, 2026)"
+        )
+        conn.execute(
+            "INSERT INTO hospital_prices (facility_id, cpt_code, gross_charge, medicare_rate, markup_vs_medicare, data_year) VALUES ('100004', '27447', 52000, 1916, 27.1, 2026)"
+        )
+    rebenchmark_hospital_prices()
+    with get_db() as conn:
+        rows = {r["cpt_code"]: dict(r) for r in conn.execute("SELECT cpt_code, medicare_rate, markup_vs_medicare FROM hospital_prices WHERE facility_id = '100004'")}
+    assert rows["99285"]["medicare_rate"] == 773.0 and round(rows["99285"]["markup_vs_medicare"], 2) == 5.82
+    assert rows["27447"]["markup_vs_medicare"] is None
+
+
+def test_regrade_runs_once():
+    from hospital_bootstrap import apply_opps_benchmark_once
+    _db._connection = None
+    _db.init_db()
+    assert apply_opps_benchmark_once() is True
+    assert apply_opps_benchmark_once() is False

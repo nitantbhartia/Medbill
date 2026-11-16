@@ -46,7 +46,7 @@ class TestCheckPricingWithOpps:
         assert "total_medicare" in result
         # PFS (227) + OPPS (773) = 1000
         assert result["total_medicare"] == 1000.00
-        assert "hospital fee" in result["message"]
+        assert "to the hospital" in result["message"]
 
     def test_pricing_without_opps(self):
         # J0170 has no OPPS rate

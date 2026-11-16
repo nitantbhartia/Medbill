@@ -14,6 +14,9 @@ import esign as esign_module
 import payment as payment_module
 from api import router as api_router
 from advocacy_api import router as advocacy_router
+from appeal_routes import router as appeal_router
+from household_routes import router as household_router
+from ops_routes import router as ops_router
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -39,6 +42,7 @@ from procedure_pages import (
     get_top_cpt_codes,
 )
 from procedure_content import get_content_page_data
+from hospital_rankings import get_ranked_state_slugs, get_state_ranking, ranking_description, ranking_title
 from tools_catalog import list_tools, get_tool
 from access_control import require_bill_access, require_case_access
 
@@ -63,6 +67,9 @@ app = FastAPI(title=config.APP_NAME)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
 app.include_router(advocacy_router)
+app.include_router(appeal_router)
+app.include_router(household_router)
+app.include_router(ops_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
 
 
@@ -490,41 +497,80 @@ def startup():
     db.init_db()
     if config.AUTO_BOOTSTRAP_HOSPITAL_DATA:
         from hospital_bootstrap import ensure_hospital_data_bootstrap
-        ensure_hospital_data_bootstrap()
+        try:
+            ensure_hospital_data_bootstrap()
+        except Exception:
+            # Serve the site with the data it already has; the bootstrap retries on the next deploy.
+            logging.exception("Hospital data bootstrap failed; starting without it")
     # Seed data if database is empty
     from seed_data import seed_if_empty
     seed_if_empty()
+    # One-time regrade against Medicare's hospital rate; in the background so startup stays fast
+    import threading
+    from hospital_bootstrap import apply_opps_benchmark_once
+    def _regrade():
+        try:
+            apply_opps_benchmark_once()
+        except Exception:
+            logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
+    if config.ENV == "production":
+        threading.Thread(target=_regrade, daemon=True).start()
 
 
 # --- Page routes ---
 
 
+def _dispute_tier_labels() -> list[dict]:
+    """Turn config.DISPUTE_FEE_TIERS into display rows, e.g. 'Bills under $1,000' -> 29."""
+    rows, lower = [], 0
+    for upper, fee_cents in config.DISPUTE_FEE_TIERS:
+        if lower == 0:
+            label = f"Bills under ${upper:,.0f}"
+        elif upper == float("inf"):
+            label = f"Bills over ${lower:,.0f}"
+        else:
+            label = f"${lower:,.0f} to ${upper:,.0f}"
+        rows.append({"label": label, "fee": fee_cents // 100})
+        lower = upper
+    return rows
+
+
+def _homepage_example_bill() -> dict:
+    """The illustrative statement on the homepage, with the Medicare rate for the flagged visit."""
+    from validators.pricing import get_medicare_rate, get_opps_rate
+    lines = [dict(line) for line in config.HOMEPAGE_EXAMPLE_BILL]
+    total = sum(line["amount"] for line in lines)
+    clear_errors = sum(
+        line["amount"] for line in lines
+        if line["flag"] and line["code"] in config.HOMEPAGE_EXAMPLE_CLEAR_ERRORS
+    )
+    visit = lines[0]
+    return {
+        "lines": lines,
+        "total": total,
+        "clear_errors": clear_errors,
+        "visit_amount": visit["amount"],
+        "visit_medicare": (get_medicare_rate(visit["code"]) or 0) + (get_opps_rate(visit["code"]) or 0) or None,
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     canonical_url = f"{config.APP_URL.rstrip('/')}/"
-    sample_facilities = _build_home_sample_facilities(6)
-    procedure_cards = _build_home_procedure_cards()
-
     with db.get_db() as conn:
-        graded_facility_count = conn.execute(
-            """
-            SELECT COUNT(DISTINCT facility_id) AS n
-            FROM facility_billing_metrics
-            WHERE facility_type IN ('hospital', 'asc', 'imaging_center')
-              AND billing_grade IS NOT NULL
-            """
-        ).fetchone()["n"]
+        hospital_count = conn.execute("SELECT COUNT(*) AS n FROM hospitals").fetchone()["n"]
 
     return templates.TemplateResponse(
         "landing.html",
         {
             "request": request,
             "canonical_url": canonical_url,
-            "sample_facilities": sample_facilities,
-            "procedure_cards": procedure_cards,
-            "graded_facility_count": graded_facility_count,
-            "og_title": "BillKarma — Find Fair Procedure Costs & Check Hospital Billing Grades",
-            "og_description": "Search any medical procedure to see what hospitals, surgery centers, and imaging centers charge vs. Medicare rates. Grade A-F for 6,798+ facilities. Scan your bill to catch overcharges.",
+            "hospital_count": hospital_count,
+            "dispute_tiers": _dispute_tier_labels(),
+            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
+            "example": _homepage_example_bill(),
+            "og_title": "Hospital bill too high? Check it free, we dispute it | BillKarma",
+            "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
             "meta_robots": "index, follow",
         },
     )
@@ -581,7 +627,7 @@ async def scan_page(request: Request):
             "outcome_stats": get_outcome_stats(),
             "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
             "og_title": "Scan Your Medical Bill for Errors | BillKarma",
-            "og_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. 1 in 4 bills has an overcharge — find yours in 60 seconds.",
+            "og_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. Find overcharges in about 60 seconds.",
             "meta_description": "Upload a medical bill and get a free line-by-line analysis against Medicare benchmarks. No account needed.",
         },
     )
@@ -625,6 +671,8 @@ async def results_page(request: Request, bill_id: int):
     # Case summary with win probability + confidence
     findings = results.get("findings") or []
     case_summary = compute_case_summary(findings, has_eob=has_eob, has_portal=has_portal)
+    from charge_summary import group_findings_by_charge
+    charge_summary = group_findings_by_charge(findings, bill_total or None)
 
     # Build evidence chips for each finding
     import json as _json
@@ -657,6 +705,8 @@ async def results_page(request: Request, bill_id: int):
             "outcome_stats": outcome_stats,
             "dispute_fee_dollars": fee_cents / 100,
             "case_summary": case_summary,
+            "charge_summary": charge_summary,
+            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
             "meta_robots": "noindex, nofollow",
         },
     )
@@ -751,20 +801,101 @@ def _extract_howto_schema(guide: dict) -> str | None:
     return json.dumps(schema)
 
 
+# Data guides must be registered before /guides/{slug}/, which would otherwise match them first.
+@app.get("/guides/cheapest-cities-{proc_slug}-2026/", response_class=HTMLResponse)
+async def cheapest_cities_guide(request: Request, proc_slug: str):
+    """Data-driven guide: cheapest and most expensive cities for a given procedure."""
+    proc = _PROCEDURE_SLUGS.get(proc_slug)
+    if not proc:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
+    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
+    city_costs = _procedure_city_costs(proc["cpt"])  # already sorted cheapest→most expensive
+    cheapest = city_costs[:10]
+    most_expensive = list(reversed(city_costs[-10:]))
+    savings = most_expensive[0]["avg_charge"] - cheapest[0]["avg_charge"] if city_costs else 0
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/cheapest-cities-{proc_slug}-2026/"
+    title = f"Cheapest Cities for {proc['name']} in 2026"
+    meta_description = (
+        f"The cheapest city for {proc['name']} averages ${cheapest[0]['avg_charge']:,} vs ${most_expensive[0]['avg_charge']:,} "
+        f"in the most expensive — a ${savings:,} difference. See all 50 cities ranked by cost."
+    ) if city_costs else f"Compare {proc['name']} costs across 50 US cities."
+    return templates.TemplateResponse("cheapest_cities_guide.html", {
+        "request": request,
+        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
+        "ref": ref,
+        "cheapest": cheapest,
+        "most_expensive": most_expensive,
+        "all_cities": city_costs,
+        "savings": savings,
+        "canonical_url": canonical_url,
+        "og_title": f"{title} | BillKarma",
+        "meta_description": meta_description,
+        "other_procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug],
+    })
+
+
+@app.get("/guides/most-expensive-states-healthcare-2026/", response_class=HTMLResponse)
+async def state_cost_comparison_guide(request: Request):
+    """Data journalism: all US states ranked by healthcare cost index."""
+    # Build state rankings using average multiplier across all tracked procedures
+    # Use knee replacement (27447) as representative anchor — largest ticket item
+    anchor_cpt = "27447"
+    anchor_ref = _CPT_STATIC_RATES.get(anchor_cpt, {})
+    anchor_nat = anchor_ref.get("avg_charge", 30500)
+    states = []
+    for abbr, mult in sorted(_STATE_COST_MULTIPLIER.items(), key=lambda x: -x[1]):
+        # Find state name from _STATE_DATA
+        state_name = next(
+            (v["name"] for v in _STATE_DATA.values() if v["abbr"] == abbr),
+            abbr
+        )
+        state_slug = next(
+            (k for k, v in _STATE_DATA.items() if v["abbr"] == abbr),
+            abbr.lower()
+        )
+        states.append({
+            "abbr": abbr,
+            "name": state_name,
+            "slug": state_slug,
+            "multiplier": mult,
+            "knee_avg": round(anchor_nat * mult),
+            "vs_national_pct": round((mult - 1.0) * 100),
+        })
+    national_avg = anchor_nat
+    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/most-expensive-states-healthcare-2026/"
+    meta_description = (
+        f"DC, NY, CA, and MA have the highest hospital costs — up to 28% above the national average. "
+        f"MS and WV are the cheapest, 13% below average. Full state-by-state ranking for 2026."
+    )
+    return templates.TemplateResponse("state_cost_comparison.html", {
+        "request": request,
+        "states": states,
+        "national_avg": national_avg,
+        "anchor_procedure": "Knee Replacement",
+        "canonical_url": canonical_url,
+        "og_title": "Most Expensive States for Healthcare in 2026 | BillKarma",
+        "meta_description": meta_description,
+        "procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items()],
+    })
+
+
 @app.get("/guides/{slug}", response_class=RedirectResponse)
 async def guide_page_redirect(slug: str):
-    """Redirect no-slash guide URLs to canonical trailing-slash version."""
-    return RedirectResponse(url=f"/guides/{slug}/", status_code=301)
+    """Redirect no-slash guide URLs straight to the final canonical URL (one hop)."""
+    from guides import resolve_redirect
+    return RedirectResponse(url=f"/guides/{resolve_redirect(slug) or slug}/", status_code=301)
 
 
 @app.get("/guides/{slug}/", response_class=HTMLResponse)
 async def guide_page(request: Request, slug: str):
     """Serve a guide article by slug."""
-    from guides import GUIDE_REDIRECTS
-    if slug in GUIDE_REDIRECTS:
-        return RedirectResponse(url=f"/guides/{GUIDE_REDIRECTS[slug]}/", status_code=301)
+    from guides import resolve_redirect
+    final_slug = resolve_redirect(slug)
+    if final_slug:
+        return RedirectResponse(url=f"/guides/{final_slug}/", status_code=301)
     import re
-    from guides import get_guide, get_related_guides, inject_internal_links, inject_scan_cta
+    from guides import _category_slug, get_guide, get_related_guides, inject_internal_links, inject_scan_cta
+    from guide_seo import seo_title, seo_description
     guide = get_guide(slug)
     if not guide:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Guide not found"}, status_code=404)
@@ -777,10 +908,12 @@ async def guide_page(request: Request, slug: str):
         {
             "request": request,
             "guide": {**guide, "body": linked_body},
+            "category_slug": _category_slug(guide.get("category", "")),
             "canonical_url": canonical_url,
-            "og_title": guide["title"] + " | BillKarma",
-            "og_description": guide["meta_description"],
-            "meta_description": guide["meta_description"],
+            "page_title": seo_title(guide),
+            "og_title": seo_title(guide),
+            "og_description": seo_description(guide),
+            "meta_description": seo_description(guide),
             "meta_robots": "index, follow",
             "related_guides": get_related_guides(slug),
             "reading_time": reading_time,
@@ -791,15 +924,21 @@ async def guide_page(request: Request, slug: str):
 
 @app.get("/guides/", response_class=HTMLResponse)
 async def guides_index(request: Request):
-    """List all published guides."""
-    from guides import list_guides, get_all_categories
+    """Start-here guides, then every guide grouped by category."""
+    from guides import GUIDES, get_all_categories, get_guides_by_category
     canonical_url = f"{config.APP_URL.rstrip('/')}/guides/"
+    featured = [{**GUIDES[slug], "label": label} for slug, label in config.FEATURED_GUIDE_SLUGS if slug in GUIDES]
+    groups = [
+        {**category, "guides": get_guides_by_category(category["slug"])}
+        for category in get_all_categories()
+    ]
     return templates.TemplateResponse(
         "guides_index.html",
         {
             "request": request,
-            "guides": list_guides(),
-            "all_categories": get_all_categories(),
+            "featured": featured,
+            "groups": groups,
+            "guide_count": len(GUIDES),
             "canonical_url": canonical_url,
             "og_title": "Medical Billing Guides | BillKarma",
             "og_description": "Free guides on how to read, dispute, and reduce medical bills.",
@@ -1138,13 +1277,51 @@ async def procedures_index(request: Request):
         "procedures": procs,
         "canonical_url": canonical_url,
         "og_title": "Hospital Procedure Cost Guide | BillKarma",
-        "meta_description": "Compare what hospitals charge vs Medicare rates for 16 common procedures. Free data for every major US city.",
+        "meta_description": "Estimated hospital charges for 16 common procedures by state and city, next to what Medicare pays the surgeon. Check your own bill free.",
+        "meta_robots": "index, follow",
     })
+
+
+@app.get("/procedures/{slug}-cost/", response_class=HTMLResponse)
+async def procedure_content_page(request: Request, slug: str):
+    data = get_content_page_data(f"{slug}-cost")
+    if not data:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"}, status_code=404)
+    return templates.TemplateResponse(
+        "procedure_cost_guide.html",
+        {
+            "request": request,
+            "data": data,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/procedures/{slug}-cost/",
+            "meta_description": data["seo"]["meta_description"],
+            "og_title": data["content_heading"] + " | BillKarma",
+            "og_description": data["seo"]["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/procedures/{slug}/", response_class=HTMLResponse)
 async def procedure_hub(request: Request, slug: str):
     """National procedure cost hub — aggregates all city + state data."""
+    if slug.isdigit():
+        profile = get_procedure_profile(slug)
+        if not profile:
+            return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"})
+        canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{slug}/"
+        seo = profile["seo"]
+        return templates.TemplateResponse(
+            "procedures_detail.html",
+            {
+                "request": request,
+                "data": profile,
+                "canonical_url": canonical_url,
+                "og_title": seo["page_title"],
+                "og_description": seo["meta_description"],
+                "meta_description": seo["meta_description"],
+                "meta_robots": "index, follow",
+            },
+        )
     proc = _PROCEDURE_SLUGS.get(slug)
     if not proc:
         return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
@@ -1173,8 +1350,8 @@ async def procedure_hub(request: Request, slug: str):
     medicare_rate = ref.get("medicare_rate", 0)
     canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/{slug}/"
     meta_description = (
-        f"{proc['name']} cost: national average ${national_avg:,}, Medicare rate ${medicare_rate:,}. "
-        f"Compare prices by city and state. Find fair prices with BillKarma."
+        f"{proc['name']} cost: estimated U.S. hospital charge ${national_avg:,}, by state and city. "
+        f"Medicare pays the surgeon ${medicare_rate:,}. Check your own bill free."
     )
     related_procedures = [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != slug]
     return templates.TemplateResponse("procedure_hub.html", {
@@ -1185,7 +1362,7 @@ async def procedure_hub(request: Request, slug: str):
         "state_costs": state_costs,
         "related_procedures": related_procedures,
         "canonical_url": canonical_url,
-        "og_title": f"{proc['name']} Cost: What Hospitals Charge vs Medicare | BillKarma",
+        "og_title": f"{proc['name']} Cost by State and City (Estimates) | BillKarma",
         "meta_description": meta_description,
     })
 
@@ -1209,8 +1386,9 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
         medicare_rate = profile.get("medicare_rate") if profile else None
         avg_str = f"${avg_charge:,.0f}" if avg_charge else "varies"
         meta_description = (
-            f"{proc['name']} cost in {city['name']}, {city['state']}: average {avg_str}. "
-            f"Compare prices vs Medicare rate ${medicare_rate:,.0f}. Find fair prices with BillKarma."
+            f"{proc['name']} cost in {city['name']}, {city['state']}: {avg_str} "
+            f"{'estimated' if (profile or {}).get('data_source') == 'cms_static' else 'average list price'}. "
+            f"Medicare pays the surgeon ${medicare_rate:,.0f}. Check your own bill free."
             if medicare_rate else
             f"{proc['name']} cost in {city['name']}, {city['state']}. Compare hospital prices with BillKarma."
         )
@@ -1243,8 +1421,8 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
     ]
     canonical_url = f"{config.APP_URL.rstrip('/')}/costs/{proc_slug}/{location_slug}/"
     meta_description = (
-        f"{proc['name']} cost in {state['name']}: average ${state_avg:,} vs Medicare rate ${medicare_rate:,}. "
-        f"Compare prices across {len(city_costs)} cities. Find fair prices with BillKarma."
+        f"{proc['name']} cost in {state['name']}: estimated hospital charge ${state_avg:,}. "
+        f"Medicare pays the surgeon ${medicare_rate:,}. See cities and check your own bill free."
     )
     return templates.TemplateResponse("procedure_state.html", {
         "request": request,
@@ -1260,95 +1438,20 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
     })
 
 
-@app.get("/guides/cheapest-cities-{proc_slug}-2026/", response_class=HTMLResponse)
-async def cheapest_cities_guide(request: Request, proc_slug: str):
-    """Data-driven guide: cheapest and most expensive cities for a given procedure."""
-    proc = _PROCEDURE_SLUGS.get(proc_slug)
-    if not proc:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure not found"}, status_code=404)
-    ref = _CPT_STATIC_RATES.get(proc["cpt"], {})
-    city_costs = _procedure_city_costs(proc["cpt"])  # already sorted cheapest→most expensive
-    cheapest = city_costs[:10]
-    most_expensive = list(reversed(city_costs[-10:]))
-    savings = most_expensive[0]["avg_charge"] - cheapest[0]["avg_charge"] if city_costs else 0
-    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/cheapest-cities-{proc_slug}-2026/"
-    title = f"Cheapest Cities for {proc['name']} in 2026"
-    meta_description = (
-        f"The cheapest city for {proc['name']} averages ${cheapest[0]['avg_charge']:,} vs ${most_expensive[0]['avg_charge']:,} "
-        f"in the most expensive — a ${savings:,} difference. See all 50 cities ranked by cost."
-    ) if city_costs else f"Compare {proc['name']} costs across 50 US cities."
-    return templates.TemplateResponse("cheapest_cities_guide.html", {
-        "request": request,
-        "procedure": {"slug": proc_slug, "name": proc["name"], "cpt_code": proc["cpt"]},
-        "ref": ref,
-        "cheapest": cheapest,
-        "most_expensive": most_expensive,
-        "all_cities": city_costs,
-        "savings": savings,
-        "canonical_url": canonical_url,
-        "og_title": f"{title} | BillKarma",
-        "meta_description": meta_description,
-        "other_procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items() if k != proc_slug],
-    })
-
-
-@app.get("/guides/most-expensive-states-healthcare-2026/", response_class=HTMLResponse)
-async def state_cost_comparison_guide(request: Request):
-    """Data journalism: all US states ranked by healthcare cost index."""
-    # Build state rankings using average multiplier across all tracked procedures
-    # Use knee replacement (27447) as representative anchor — largest ticket item
-    anchor_cpt = "27447"
-    anchor_ref = _CPT_STATIC_RATES.get(anchor_cpt, {})
-    anchor_nat = anchor_ref.get("avg_charge", 30500)
-    states = []
-    for abbr, mult in sorted(_STATE_COST_MULTIPLIER.items(), key=lambda x: -x[1]):
-        # Find state name from _STATE_DATA
-        state_name = next(
-            (v["name"] for v in _STATE_DATA.values() if v["abbr"] == abbr),
-            abbr
-        )
-        state_slug = next(
-            (k for k, v in _STATE_DATA.items() if v["abbr"] == abbr),
-            abbr.lower()
-        )
-        states.append({
-            "abbr": abbr,
-            "name": state_name,
-            "slug": state_slug,
-            "multiplier": mult,
-            "knee_avg": round(anchor_nat * mult),
-            "vs_national_pct": round((mult - 1.0) * 100),
-        })
-    national_avg = anchor_nat
-    canonical_url = f"{config.APP_URL.rstrip('/')}/guides/most-expensive-states-healthcare-2026/"
-    meta_description = (
-        f"DC, NY, CA, and MA have the highest hospital costs — up to 28% above the national average. "
-        f"MS and WV are the cheapest, 13% below average. Full state-by-state ranking for 2026."
-    )
-    return templates.TemplateResponse("state_cost_comparison.html", {
-        "request": request,
-        "states": states,
-        "national_avg": national_avg,
-        "anchor_procedure": "Knee Replacement",
-        "canonical_url": canonical_url,
-        "og_title": "Most Expensive States for Healthcare in 2026 | BillKarma",
-        "meta_description": meta_description,
-        "procedures": [{"slug": k, "name": v["name"]} for k, v in _PROCEDURE_SLUGS.items()],
-    })
-
-
 @app.get("/press/", response_class=HTMLResponse)
 async def press_page(request: Request):
     """Press and media kit page."""
     from guides import list_guides
     canonical_url = f"{config.APP_URL.rstrip('/')}/press/"
     guide_count = len(list_guides())
+    import research_report
+    coverage = research_report.coverage()
     stats = {
-        "hospitals_tracked": 6000,
+        "hospitals_tracked": coverage["hospitals"],
+        "hospitals_with_prices": coverage["hospitals_with_prices"],
         "guides_published": guide_count,
-        "avg_markup": 4.2,
-        "states_covered": 51,
-        "data_year": "2026",
+        "states_covered": coverage["states"],
+        "data_year": coverage["data_year"] or "",
     }
     return templates.TemplateResponse(
         "press.html",
@@ -1390,6 +1493,71 @@ async def chargemaster_page(request: Request):
         "meta_description": "Search 6,800+ hospitals to see what they charge for common items like Tylenol, saline bags, and gauze — vs. what they actually cost. The markups will shock you.",
         "meta_robots": "index, follow",
     })
+
+
+@app.get("/ai", response_class=HTMLResponse)
+async def ai_assistants_page(request: Request):
+    """How to add BillKarma to ChatGPT, Claude and other MCP clients."""
+    from mcp_server import TOOLS
+    return templates.TemplateResponse(
+        "ai_assistants.html",
+        {
+            "request": request,
+            "mcp_url": f"{config.APP_URL.rstrip('/')}/mcp",
+            "tools": [{"name": name, "description": spec["description"]} for name, spec in TOOLS.items()],
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/ai",
+            "page_title": "Use BillKarma in ChatGPT or Claude | BillKarma",
+            "og_title": "Use BillKarma in ChatGPT or Claude",
+            "meta_description": "Add BillKarma to ChatGPT or Claude and ask whether a hospital charge is too high, find a billing office, or write an itemized-bill request.",
+            "og_description": "Ask your AI assistant whether a hospital charge is too high, using BillKarma's Medicare data.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
+@app.post("/mcp")
+async def mcp_endpoint(request: Request):
+    """MCP over stateless Streamable HTTP for AI assistants. One JSON-RPC message per POST."""
+    import json as _json
+    from api import _check_tools_rate_limit, _request_client_key
+    from mcp_server import PARSE_ERROR, handle_message
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        return JSONResponse({"jsonrpc": "2.0", "id": None, "error": {"code": -32000, "message": "Too many requests"}}, status_code=429)
+    try:
+        message = _json.loads(await request.body())
+    except (ValueError, UnicodeDecodeError):
+        return JSONResponse({"jsonrpc": "2.0", "id": None, "error": {"code": PARSE_ERROR, "message": "Invalid JSON"}}, status_code=400)
+    reply = handle_message(message)
+    if reply is None:
+        return Response(status_code=202)
+    return JSONResponse(reply)
+
+
+@app.get("/mcp")
+async def mcp_endpoint_get():
+    """No server-to-client stream; this server only answers POSTs."""
+    return Response(status_code=405, headers={"Allow": "POST"})
+
+
+@app.get("/itemized-bill", response_class=HTMLResponse)
+async def itemized_bill_page(request: Request, facility: str = "", provider: str = ""):
+    """Write a request for an itemized hospital bill, optionally prefilled with a hospital."""
+    from itemized_request import get_billing_contact
+    return templates.TemplateResponse(
+        "itemized_bill.html",
+        {
+            "request": request,
+            "hospital": get_billing_contact(facility) if facility else None,
+            "provider": provider.strip()[:120],
+            "response_days": config.ITEMIZED_RESPONSE_DAYS,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/itemized-bill",
+            "page_title": "Request Your Itemized Hospital Bill: Free Letter | BillKarma",
+            "og_title": "Request your itemized hospital bill",
+            "meta_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code. Hospitals have 30 days to respond.",
+            "og_description": "Find your hospital's billing office and get a request letter for an itemized bill with every billing code.",
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/tools/{slug}/", response_class=HTMLResponse)
@@ -1586,12 +1754,21 @@ async def state_protections_map(request: Request):
 
 @app.get("/research/2026-medical-billing-report/", response_class=HTMLResponse)
 async def annual_report_2026(request: Request):
+    """Hospital list-price report built live from hospitals' own price files."""
+    import research_report
     canonical_url = f"{config.APP_URL.rstrip('/')}/research/2026-medical-billing-report/"
+    spreads = research_report.procedure_spreads()
+    widest = max(spreads, key=lambda s: s["spread"] or 0) if spreads else None
     return templates.TemplateResponse("annual_report_2026.html", {
         "request": request,
         "canonical_url": canonical_url,
-        "og_title": "2026 Medical Billing Errors Report | BillKarma Research",
-        "meta_description": "BillKarma analyzed thousands of medical bills in 2026. Key findings: 1 in 3 bills contain errors, average overcharge $1,300, cardiac bills have highest error rate.",
+        "spreads": spreads,
+        "widest": widest,
+        "states": research_report.state_medians(),
+        "state_code": config.REPORT_STATE_CODE,
+        "coverage": research_report.coverage(),
+        "og_title": "2026 Hospital Price Report: Same Procedure, Different Price | BillKarma",
+        "meta_description": "What U.S. hospitals list for the same procedure in their own price files, how far prices spread between hospitals, and how states compare. Free to cite.",
         "meta_robots": "index, follow",
     })
 
@@ -1692,6 +1869,7 @@ async def hospital_state_page(
             "state_name": state_name,
             "state_slug": state_slug,
             "cities": cities,
+            "has_ranking": state_slug in get_ranked_state_slugs(),
             "sort": sort,
             "ownership": ownership,
             "page": page,
@@ -1706,6 +1884,31 @@ async def hospital_state_page(
     if has_params:
         resp.headers["X-Robots-Tag"] = "noindex, follow"
     return resp
+
+
+@app.get("/hospitals/{state_slug}/most-expensive/", response_class=HTMLResponse)
+async def hospital_state_ranking(request: Request, state_slug: str):
+    """Registered before the city route, which would otherwise match 'most-expensive'."""
+    ranking = get_state_ranking(state_slug)
+    if not ranking:
+        return templates.TemplateResponse(
+            "error.html", {"request": request, "message": "Not enough hospital price data for this state yet."}, status_code=404
+        )
+    title = ranking_title(ranking)
+    description = ranking_description(ranking)
+    return templates.TemplateResponse(
+        "hospitals_ranking.html",
+        {
+            "request": request,
+            "r": ranking,
+            "page_title": title,
+            "meta_description": description,
+            "og_title": title,
+            "og_description": description,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/most-expensive/",
+            "meta_robots": "index, follow",
+        },
+    )
 
 
 @app.get("/hospitals/{state_slug}/{city_slug}/", response_class=HTMLResponse)
@@ -1934,47 +2137,6 @@ async def imaging_detail(request: Request, state_slug: str, city_slug: str, slug
             "canonical_url": f"{config.APP_URL.rstrip('/')}/imaging/{state_slug}/{city_slug}/{slug}/",
             "meta_description": data["seo"]["meta_description"],
             "og_title": data["seo"]["page_title"],
-            "og_description": data["seo"]["meta_description"],
-            "meta_robots": "index, follow",
-        },
-    )
-
-
-@app.get("/procedures/", response_class=HTMLResponse)
-async def procedure_index_page(request: Request):
-    procedures = get_top_cpt_codes(100)
-    # Group by body system
-    groups: dict[str, list] = {}
-    for p in procedures:
-        groups.setdefault(p["body_system"], []).append(p)
-    canonical_url = f"{config.APP_URL.rstrip('/')}/procedures/"
-    return templates.TemplateResponse(
-        "procedures_index.html",
-        {
-            "request": request,
-            "groups": groups,
-            "total": len(procedures),
-            "canonical_url": canonical_url,
-            "og_title": "Medical Procedure Costs: Medicare Rates vs What Hospitals Actually Charge (2026)",
-            "og_description": "Compare what Medicare pays vs what hospitals charge for 100+ procedures. See which hospitals overcharge and find fair prices near you.",
-            "meta_robots": "index, follow",
-        },
-    )
-
-
-@app.get("/procedures/{slug}-cost/", response_class=HTMLResponse)
-async def procedure_content_page(request: Request, slug: str):
-    data = get_content_page_data(f"{slug}-cost")
-    if not data:
-        return templates.TemplateResponse("error.html", {"request": request, "message": "Procedure page not found"}, status_code=404)
-    return templates.TemplateResponse(
-        "procedure_cost_guide.html",
-        {
-            "request": request,
-            "data": data,
-            "canonical_url": f"{config.APP_URL.rstrip('/')}/procedures/{slug}-cost/",
-            "meta_description": data["seo"]["meta_description"],
-            "og_title": data["content_heading"] + " | BillKarma",
             "og_description": data["seo"]["meta_description"],
             "meta_robots": "index, follow",
         },
@@ -2253,55 +2415,68 @@ async def compare_detail(request: Request, fid_a: str, fid_b: str):
 @app.get("/sitemap.xml")
 async def sitemap_index():
     base = config.APP_URL.rstrip("/")
-    hospital_paths = get_hospital_sitemap_paths()
-    from compare_seo import get_comparison_sitemap_paths
+    sitemap_urls = [
+        f"{base}/sitemap-core.xml",
+        f"{base}/sitemap-guides.xml",
+        f"{base}/sitemap-tools.xml",
+        f"{base}/sitemap-rights.xml",
+        f"{base}/sitemap-procedures.xml",
+        f"{base}/sitemap-cpt-pages.xml",
+        f"{base}/sitemap-costs.xml",
+        f"{base}/sitemap-legacy-cost-pages.xml",
+        f"{base}/sitemap-hospitals.xml",
+        f"{base}/sitemap-facilities.xml",
+        f"{base}/sitemap-compare.xml",
+        f"{base}/sitemap-data-guides.xml",
+    ]
+    entries = "".join(
+        f"<sitemap><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod></sitemap>"
+        for loc in sitemap_urls
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{entries}</sitemapindex>"
+    )
+    return Response(content=xml, media_type="application/xml")
 
-    comparison_paths = get_comparison_sitemap_paths()
+
+@app.get("/sitemap-core.xml")
+async def core_sitemap():
+    base = config.APP_URL.rstrip("/")
     core_urls = [
-        (f"{base}/", "2026-02-01", "1.0"),
-        (f"{base}/guides/", "2026-02-01", "0.8"),
-        (f"{base}/tools/", "2026-02-01", "0.8"),
-        (f"{base}/fight-debt", "2026-02-24", "0.9"),
-        (f"{base}/savings", "2026-02-25", "0.8"),
-        (f"{base}/shop", "2026-02-25", "0.8"),
-        (f"{base}/watch", "2026-02-25", "0.7"),
-        (f"{base}/estimate", "2026-03-01", "0.9"),
-        (f"{base}/rights/", "2026-03-01", "0.8"),
-        (f"{base}/quiz", "2026-03-01", "0.9"),
-        (f"{base}/glossary/", "2026-03-01", "0.8"),
-        (f"{base}/cost/mri/", "2026-03-01", "0.8"),
-        (f"{base}/cost/colonoscopy/", "2026-03-01", "0.8"),
-        (f"{base}/cost/ct-scan/", "2026-03-01", "0.8"),
-        (f"{base}/cost/knee-replacement/", "2026-03-01", "0.8"),
-        (f"{base}/cost/er-visit/", "2026-03-01", "0.8"),
-        (f"{base}/about/", "2026-04-10", "0.7"),
-        (f"{base}/press/", "2026-04-01", "0.7"),
-        (f"{base}/chargemaster/", "2026-04-01", "0.9"),
-        (f"{base}/procedures/", "2026-04-10", "0.9"),
-        (f"{base}/sitemap-guides.xml", "2026-02-24", "0.5"),
-        (f"{base}/sitemap-procedures.xml", "2026-04-10", "0.5"),
-        (f"{base}/sitemap-hospitals.xml", "2026-02-24", "0.5"),
-        (f"{base}/sitemap-facilities.xml", "2026-03-01", "0.5"),
-        (f"{base}/sitemap-costs.xml", "2026-04-01", "0.5"),
-        (f"{base}/sitemap-data-guides.xml", "2026-04-10", "0.5"),
-        (f"{base}/guides/most-expensive-states-healthcare-2026/", "2026-04-10", "0.8"),
+        (f"{base}/", "1.0"),
+        (f"{base}/guides/", "0.8"),
+        (f"{base}/itemized-bill", "0.9"),
+        (f"{base}/ai", "0.7"),
+        (f"{base}/tools/", "0.8"),
+        (f"{base}/fight-debt", "0.9"),
+        (f"{base}/savings", "0.8"),
+        (f"{base}/shop", "0.8"),
+        (f"{base}/watch", "0.7"),
+        (f"{base}/estimate", "0.9"),
+        (f"{base}/rights/", "0.8"),
+        (f"{base}/quiz", "0.9"),
+        (f"{base}/glossary/", "0.8"),
+        (f"{base}/cost/mri/", "0.8"),
+        (f"{base}/cost/colonoscopy/", "0.8"),
+        (f"{base}/cost/ct-scan/", "0.8"),
+        (f"{base}/cost/knee-replacement/", "0.8"),
+        (f"{base}/cost/er-visit/", "0.8"),
+        (f"{base}/about/", "0.7"),
+        (f"{base}/press/", "0.7"),
+        (f"{base}/chargemaster/", "0.9"),
+        (f"{base}/procedures/", "0.9"),
+        (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),
     ]
     core_entries = "".join(
-        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
-        for loc, lastmod, priority in core_urls
-    )
-    hospital_entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
-        for path in hospital_paths
-    )
-    comparison_entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-03</lastmod><priority>0.6</priority></url>"
-        for path in comparison_paths
+        f"<url><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>{priority}</priority></url>"
+        for loc, priority in core_urls
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{core_entries}{hospital_entries}{comparison_entries}</urlset>"
+        f"{core_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -2311,54 +2486,81 @@ async def guides_sitemap():
     from guides import get_guides_for_sitemap
 
     base = config.APP_URL.rstrip("/")
-    static_urls = [
-        (f"{base}/", "2026-02-01", "1.0"),
-        (f"{base}/fight-debt", "2026-02-24", "0.9"),
-        (f"{base}/collection-notice", "2026-02-24", "0.9"),
-        (f"{base}/statute-of-limitations", "2026-02-24", "0.9"),
-        (f"{base}/charity-care", "2026-02-24", "0.9"),
-        (f"{base}/settle-debt", "2026-02-24", "0.8"),
-        (f"{base}/guides/", "2026-02-01", "0.8"),
-        (f"{base}/tools/", "2026-02-01", "0.8"),
-        (f"{base}/calculator", "2026-02-01", "0.7"),
-        (f"{base}/estimate", "2026-03-01", "0.9"),
-        (f"{base}/rights/", "2026-03-01", "0.8"),
-    ]
-    static_entries = "".join(
-        f"<url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><priority>{priority}</priority></url>"
-        for loc, lastmod, priority in static_urls
-    )
     guide_entries = "".join(
-        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{published}</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/guides/{slug}/</loc><lastmod>{max(published, config.SITE_UPDATED)}</lastmod><priority>0.8</priority></url>"
         for slug, published in get_guides_for_sitemap()
     )
     from guides import get_all_categories as _get_all_cats
     category_entries = "".join(
-        f"<url><loc>{base}/guides/category/{c['slug']}/</loc><lastmod>2026-04-05</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/guides/category/{c['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for c in _get_all_cats()
     )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{guide_entries}{category_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-tools.xml")
+async def tools_sitemap():
+    base = config.APP_URL.rstrip("/")
     tool_entries = "".join(
-        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
         for tool in list_tools()
     )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{tool_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-rights.xml")
+async def rights_sitemap():
+    base = config.APP_URL.rstrip("/")
     from state_rights import get_all_states as _get_all_states_sitemap
     rights_entries = "".join(
-        f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>2026-03-01</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/rights/{s['slug']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for s in _get_all_states_sitemap()
     )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{rights_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-legacy-cost-pages.xml")
+async def legacy_cost_pages_sitemap():
+    base = config.APP_URL.rstrip("/")
     from cost_pages import get_all_cost_slugs
     cost_entries = "".join(
-        f"<url><loc>{base}/cost/{slug}/</loc><lastmod>2026-03-01</lastmod><priority>0.8</priority></url>"
+        f"<url><loc>{base}/cost/{slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
         for slug in get_all_cost_slugs()
     )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{cost_entries}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-cpt-pages.xml")
+async def cpt_pages_sitemap():
+    base = config.APP_URL.rstrip("/")
     procedure_entries = "".join(
-        f"<url><loc>{base}/procedures/{p['cpt_code']}/</loc><lastmod>2026-03-01</lastmod><priority>0.6</priority></url>"
+        f"<url><loc>{base}/procedures/{p['cpt_code']}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.6</priority></url>"
         for p in get_top_cpt_codes()
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{static_entries}{guide_entries}{category_entries}{tool_entries}{rights_entries}{cost_entries}{procedure_entries}</urlset>"
+        f"{procedure_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -2366,31 +2568,32 @@ async def guides_sitemap():
 @app.get("/sitemap-hospitals.xml")
 async def hospital_sitemap_v2():
     base = config.APP_URL.rstrip("/")
-    from compare_seo import get_comparison_sitemap_paths
-
-    core_entries = "".join(
-        [
-            f"<url><loc>{base}/</loc><lastmod>2026-02-01</lastmod><priority>1.0</priority></url>",
-            f"<url><loc>{base}/tools/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>",
-        ]
-    )
-    tool_entries = "".join(
-        f"<url><loc>{base}/tools/{tool['slug']}/</loc><lastmod>2026-02-01</lastmod><priority>0.8</priority></url>"
-        for tool in list_tools()
-    )
     hospital_paths = get_hospital_sitemap_paths()
     urlset = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-01-01</lastmod><priority>0.5</priority></url>"
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
     )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{urlset}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-compare.xml")
+async def compare_sitemap():
+    base = config.APP_URL.rstrip("/")
+    from compare_seo import get_comparison_sitemap_paths
+
     comparison_entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-03</lastmod><priority>0.6</priority></url>"
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.6</priority></url>"
         for path in get_comparison_sitemap_paths()
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{core_entries}{tool_entries}{urlset}{comparison_entries}</urlset>"
+        f"{comparison_entries}</urlset>"
     )
     return Response(content=xml, media_type="application/xml")
 
@@ -2405,8 +2608,8 @@ async def facilities_sitemap():
     base = config.APP_URL.rstrip("/")
     facility_paths = get_facility_sitemap_paths()
     entries = "".join(
-        f"<url><loc>{base}{path}</loc><lastmod>2026-03-01</lastmod><priority>0.5</priority></url>"
-        for path in facility_paths
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.5</priority></url>"
+        for path in sorted(set(facility_paths))
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
@@ -2421,12 +2624,12 @@ async def costs_sitemap():
     """Sitemap for procedure × city AND procedure × state cost pages."""
     base = config.APP_URL.rstrip("/")
     city_entries = "".join(
-        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/costs/{proc_slug}/{city_slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for proc_slug in _PROCEDURE_SLUGS
         for city_slug in _CITY_DATA
     )
     state_entries = "".join(
-        f"<url><loc>{base}/costs/{proc_slug}/{state_slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.7</priority></url>"
+        f"<url><loc>{base}/costs/{proc_slug}/{state_slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.7</priority></url>"
         for proc_slug in _PROCEDURE_SLUGS
         for state_slug in _STATE_DATA
         if state_slug not in _CITY_DATA  # exclude new-york (served as city)
@@ -2444,9 +2647,9 @@ async def procedures_sitemap():
     """Sitemap for procedure hub pages."""
     base = config.APP_URL.rstrip("/")
     entries = (
-        f'<url><loc>{base}/procedures/</loc><lastmod>2026-04-10</lastmod><priority>0.9</priority></url>'
+        f'<url><loc>{base}/procedures/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.9</priority></url>'
         + "".join(
-            f"<url><loc>{base}/procedures/{slug}/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            f"<url><loc>{base}/procedures/{slug}/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
             for slug in _PROCEDURE_SLUGS
         )
     )
@@ -2463,9 +2666,9 @@ async def data_guides_sitemap():
     """Sitemap for data-driven guide pages (cheapest cities + state comparison)."""
     base = config.APP_URL.rstrip("/")
     entries = (
-        f'<url><loc>{base}/guides/most-expensive-states-healthcare-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>'
+        f'<url><loc>{base}/guides/most-expensive-states-healthcare-2026/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>'
         + "".join(
-            f"<url><loc>{base}/guides/cheapest-cities-{slug}-2026/</loc><lastmod>2026-04-10</lastmod><priority>0.8</priority></url>"
+            f"<url><loc>{base}/guides/cheapest-cities-{slug}-2026/</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.8</priority></url>"
             for slug in _PROCEDURE_SLUGS
         )
     )
@@ -2602,10 +2805,15 @@ async def robots_txt():
         "Allow: /\n\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-tools.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-rights.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-procedures.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-cpt-pages.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-costs.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-legacy-cost-pages.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-hospitals.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-facilities.xml\n"
-        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-costs.xml\n"
-        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-procedures.xml\n"
+        f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-compare.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-data-guides.xml\n"
     )
     return Response(content=body, media_type="text/plain")
@@ -2689,8 +2897,10 @@ async def dispute_activate_page(request: Request, bill_id: int):
 
     bill = results.get("bill") or {}
     findings = results.get("findings") or []
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
+    from charge_summary import group_findings_by_charge
+    charges = group_findings_by_charge(findings, bill_total or None)
+    total_savings = charges["total_savings"]
     fee_cents = payment_module.calculate_fee(bill_total)
 
     return templates.TemplateResponse(
@@ -2700,7 +2910,7 @@ async def dispute_activate_page(request: Request, bill_id: int):
             "bill_id": bill_id,
             "provider_name": bill.get("provider_name") or "",
             "potential_savings": total_savings,
-            "finding_count": len(findings),
+            "finding_count": len(charges["charges"]),
             "fee_dollars": fee_cents / 100,
             "hipaa_text": esign_module.get_hipaa_text(
                 patient_name="[Your Name]",
@@ -3162,8 +3372,7 @@ async def autopilot_strategy_page(request: Request, bill_id: int):
     if strategy.get("error"):
         return templates.TemplateResponse("error.html", {"request": request, "message": strategy["error"]}, status_code=404)
 
-    bill_total = float(strategy.get("total_charged") or 0)
-    fee_cents = payment_module.calculate_fee(bill_total)
+    fee_cents = payment_module.fee_cents_for_bill((get_bill_results(bill_id) or {}).get("bill") or {})
 
     return templates.TemplateResponse(
         "autopilot_strategy.html",
@@ -3209,7 +3418,10 @@ async def advisor_page(request: Request, bill_id: int):
 
     bill = results["bill"]
     findings = results.get("findings") or []
-    total_savings = sum(float(f.get("potential_savings") or 0) for f in findings)
+    from charge_summary import group_findings_by_charge
+    total_savings = group_findings_by_charge(
+        findings, float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
+    )["total_savings"]
 
     return templates.TemplateResponse(
         "advisor.html",

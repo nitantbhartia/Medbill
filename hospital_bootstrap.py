@@ -4,16 +4,19 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import urllib.parse
 import urllib.request
 
+import config
 from cms_loader import download_cms_2026, load_transformed_cms_2026, transform_cms_2026
 from db import get_db
-from hospital_etl import load_medicare_rates
+from hospital_etl import load_cms_general, load_medicare_rates
 from hospital_seo import (
     generate_and_save_hospital_content,
     get_state_index_stats,
+    log_refresh,
     recompute_benchmarks,
     recompute_billing_metrics,
     upsert_hospital_row,
@@ -24,6 +27,8 @@ from scripts.load_pricing_from_dolthub import load_prices_for_matches, match_hos
 log = logging.getLogger(__name__)
 
 API_BASE = "https://www.dolthub.com/api/v1alpha1/dolthub/hospital-price-transparency/master"
+# Bump this to rerun the full bootstrap on the next deploy.
+BOOTSTRAP_SOURCE = "hospital_bootstrap_v2"
 
 
 def _api_query(sql: str) -> list[dict]:
@@ -79,15 +84,89 @@ def _seed_hospitals_from_dolthub() -> int:
     return created
 
 
-def ensure_hospital_data_bootstrap() -> None:
+def _bootstrap_done() -> bool:
     with get_db() as db:
-        hospital_count = db.execute("SELECT COUNT(*) AS c FROM hospitals").fetchone()["c"]
-    if hospital_count > 0:
+        row = db.execute(
+            "SELECT 1 FROM data_refresh_log WHERE source = ? AND status = 'success' LIMIT 1",
+            (BOOTSTRAP_SOURCE,),
+        ).fetchone()
+    return row is not None
+
+
+def _is_cms_facility_id(facility_id: str) -> bool:
+    # CMS ids are 6-character CCNs; DoltHub-seeded rows use 10-digit NPIs.
+    return len(facility_id) < 10
+
+
+def _exact_dolthub_duplicates() -> list[str]:
+    """DoltHub-seeded hospitals with the same name, city and state as a CMS hospital."""
+    with get_db() as db:
+        rows = db.execute(
+            """
+            SELECT DISTINCT d.facility_id
+            FROM hospitals d
+            JOIN hospitals c
+              ON UPPER(c.name) = UPPER(d.name) AND UPPER(c.city) = UPPER(d.city) AND c.state = d.state
+            WHERE LENGTH(d.facility_id) = 10 AND d.facility_id NOT GLOB '*[^0-9]*'
+              AND LENGTH(c.facility_id) < 10
+            """
+        ).fetchall()
+    return [row["facility_id"] for row in rows]
+
+
+def _matched_dolthub_duplicates(matches: dict[str, dict]) -> list[str]:
+    """DoltHub-seeded hospitals whose NPI a CMS hospital was matched to, even under a different name."""
+    npis = {m["npi"] for fid, m in matches.items() if _is_cms_facility_id(fid)}
+    with get_db() as db:
+        existing = {row["facility_id"] for row in db.execute("SELECT facility_id FROM hospitals")}
+    return sorted(npis & existing)
+
+
+def _delete_hospitals(facility_ids: list[str]) -> int:
+    """Delete hospitals and every row any table holds for them."""
+    # Other tables point at these by foreign key, so they are deleted last, in this order.
+    referenced_tables = ("hospital_directory", "facilities", "hospitals")
+    with get_db() as db:
+        tables = [
+            row["name"]
+            for row in db.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+            if row["name"] not in referenced_tables
+            and any(col["name"] == "facility_id" for col in db.execute(f"PRAGMA table_info({row['name']})"))
+        ]
+        for facility_id in facility_ids:
+            db.execute(
+                "UPDATE facilities SET parent_hospital_id = NULL"
+                " WHERE parent_hospital_id IN (SELECT id FROM facilities WHERE facility_id = ?)",
+                (facility_id,),
+            )
+            for table in tables + list(referenced_tables):
+                db.execute(f"DELETE FROM {table} WHERE facility_id = ?", (facility_id,))
+    return len(facility_ids)
+
+
+def _load_cms_directory() -> int:
+    """Download CMS Hospital General Information (~5,400 hospitals) and upsert it into hospitals."""
+    os.makedirs(os.path.dirname(config.CMS_HOSPITAL_GENERAL_CSV_PATH), exist_ok=True)
+    try:
+        urllib.request.urlretrieve(config.CMS_HOSPITAL_GENERAL_CSV_URL, config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+    except OSError as exc:
+        log.error("CMS hospital directory download failed from %s: %s", config.CMS_HOSPITAL_GENERAL_CSV_URL, exc)
+        return 0
+    return load_cms_general(config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+
+
+def ensure_hospital_data_bootstrap() -> None:
+    if _bootstrap_done():
         return
 
-    log.warning("Hospital DB empty, running bootstrap load.")
-    seeded = _seed_hospitals_from_dolthub()
-    log.warning("Seeded/updated %s hospitals from DoltHub", seeded)
+    log.warning("Hospital bootstrap %s not done, running it.", BOOTSTRAP_SOURCE)
+    removed = _delete_hospitals(_exact_dolthub_duplicates())
+    log.warning("Removed %s DoltHub hospitals with the same name as a CMS hospital", removed)
+    loaded_cms = _load_cms_directory()
+    log.warning("Loaded %s hospitals from CMS directory", loaded_cms)
+    if loaded_cms == 0:
+        seeded = _seed_hospitals_from_dolthub()
+        log.warning("CMS directory unavailable, seeded %s hospitals from DoltHub instead", seeded)
 
     try:
         download_cms_2026("data/cms/raw")
@@ -102,10 +181,20 @@ def ensure_hospital_data_bootstrap() -> None:
             pass
 
     matches, _ = match_hospitals(limit=10000)
+    matched_duplicates = _matched_dolthub_duplicates(matches) if loaded_cms > 0 else []
+    if matched_duplicates:
+        _delete_hospitals(matched_duplicates)
+        # Reload so CMS hospitals take back the plain slugs the deleted rows held.
+        load_cms_general(config.CMS_HOSPITAL_GENERAL_CSV_PATH)
+        log.warning("Removed %s DoltHub hospitals matched to a CMS hospital", len(matched_duplicates))
+    deleted = set(matched_duplicates)
+    matches = {fid: m for fid, m in matches.items() if fid not in deleted}
     loaded = load_prices_for_matches(matches, year=2026)
     recompute_benchmarks()
     recompute_billing_metrics()
     generate_and_save_hospital_content()
+    if loaded_cms > 0:
+        log_refresh(BOOTSTRAP_SOURCE, loaded_cms, "success")
     log.warning(
         "Hospital bootstrap complete. states=%s matched=%s loaded_facilities=%s rows=%s",
         len(get_state_index_stats()),
@@ -113,3 +202,27 @@ def ensure_hospital_data_bootstrap() -> None:
         loaded.get("facilities", 0),
         loaded.get("rows", 0),
     )
+
+
+OPPS_BENCHMARK_SOURCE = "opps_benchmark_v1"
+
+
+def apply_opps_benchmark_once() -> bool:
+    """One-time regrade after switching hospital markups from the physician fee to OPPS.
+    Recorded in data_refresh_log so it runs on one deploy only. Returns True if it ran."""
+    from hospital_etl import rebenchmark_hospital_prices
+    with get_db() as db:
+        done = db.execute(
+            "SELECT 1 FROM data_refresh_log WHERE source = ? AND status = 'success' LIMIT 1",
+            (OPPS_BENCHMARK_SOURCE,),
+        ).fetchone()
+    if done:
+        return False
+    rows = rebenchmark_hospital_prices()
+    recompute_benchmarks()
+    graded = recompute_billing_metrics()
+    generate_and_save_hospital_content()
+    log_refresh(OPPS_BENCHMARK_SOURCE, rows, "success", f"hospitals regraded={graded}")
+    log.warning("Hospital markups re-benchmarked to OPPS: rows=%s hospitals=%s", rows, graded)
+    return True
+

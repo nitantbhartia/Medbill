@@ -135,7 +135,7 @@
                       width="{{ ((1.0 - data.range_bar.zone_d_end) * 600)|round|int }}" height="20" fill="#fee2e2"/>
                 {% endif %}
                 {# Full range bar #}
-                <rect x="0" y="18" width="600" height="4" fill="#e5e7eb" rx="2"/>
+                <rect x="0" y="18" width="600" height="4" fill="#D6E0DB" rx="2"/>
                 {# Medicare reference line #}
                 {% if data.range_bar.medicare_pos is not none %}
                 {% set mx = (data.range_bar.medicare_pos * 600)|round|int %}
@@ -147,8 +147,8 @@
                 {# National average reference line #}
                 {% if data.range_bar.avg_pos is not none %}
                 {% set ax = (data.range_bar.avg_pos * 600)|round|int %}
-                <line x1="{{ ax }}" y1="8" x2="{{ ax }}" y2="32" stroke="#6b7280" stroke-width="2" stroke-dasharray="3,2"/>
-                <text x="{{ ax }}" y="58" text-anchor="middle" font-size="8" fill="#6b7280">
+                <line x1="{{ ax }}" y1="8" x2="{{ ax }}" y2="32" stroke="#5E6F69" stroke-width="2" stroke-dasharray="3,2"/>
+                <text x="{{ ax }}" y="58" text-anchor="middle" font-size="8" fill="#5E6F69">
                     Avg{% if data.range_bar.avg_charge %}: ${{ "{:,.0f}".format(data.range_bar.avg_charge) }}{% endif %}
                 </text>
                 {% endif %}
@@ -321,7 +321,7 @@
         <p class="text-sm text-blue-800 leading-relaxed">
             If your bill shows more than <strong>${{ "{:,.0f}".format(data.header.medicare_rate * 3) }}</strong>
             (3x Medicare) for this procedure, it may be worth reviewing the charges carefully.
-            <a href="/scan" class="underline font-semibold">Upload your bill to check →</a>
+            <a href="/scan" class="underline font-semibold">Upload your bill to check</a>
         </p>
     </div>
     {% endif %}
@@ -370,7 +370,7 @@
                 Compare hospitals and surgery centers before you book this procedure.
             </p>
             <a href="/hospitals/" class="text-sm text-accent-700 hover:text-accent-800 underline font-medium">
-                Browse graded facilities →
+                Browse graded facilities
             </a>
         </div>
 
@@ -380,7 +380,7 @@
                 Upload your bill to check for errors and overcharges against federal rates.
             </p>
             <a href="/scan" class="text-sm font-bold bg-accent-700 text-white px-4 py-2 rounded-lg inline-block">
-                Scan My Bill Free →
+                Scan My Bill Free
             </a>
         </div>
     </div>

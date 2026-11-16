@@ -222,7 +222,7 @@ register("how-to-negotiate-medical-bills", {
     <li>The bill has gone to collections</li>
 </ul>
 
-<p>Professional advocates typically charge 25&ndash;35% of the savings they achieve. For a $20,000 bill reduced to $8,000 ($12,000 in savings), you&rsquo;d pay the advocate $3,000&ndash;$4,200 and still save $7,800&ndash;$9,000.</p>
+<p>Professional advocates typically charge 25&ndash;35% of the savings they achieve. For a $20,000 bill reduced to $8,000 ($12,000 in savings), you&rsquo;d pay the advocate $3,000&ndash;$4,200 and still save $7,800&ndash;$9,000. Some services cap the fee or charge a flat price instead; see <a href="/guides/medical-bill-negotiation-service-cost/">what medical bill negotiation services cost</a>.</p>
 
 <p>For smaller bills, you can <a href="/scan">upload your bill to BillKarma</a> for an automated audit and dispute tools at a fraction of the cost.</p>
 

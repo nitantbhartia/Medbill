@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Your appeal — {{ case.insurer_name }} | BillKarma{% endblock %}
+
+{% block content %}
+{% set fmt = "%B %-d, %Y" %}
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 80px">
+    <p class="bk-eyebrow">Appeal #{{ case.id }}</p>
+    <h1 style="margin: 0; font-size: clamp(30px, 4vw, 44px); line-height: 1.1; letter-spacing: -0.03em; font-weight: 800">{{ case.insurer_name }} denial: <span class="bk-mark">{{ status_label }}</span></h1>
+    <p class="bk-lede">{{ reason_label }} · ${{ "{:,.2f}".format(case.amount_denied) }} denied on {{ case.denial_date }}</p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 48px; margin-top: 40px; align-items: flex-start">
+        <div style="flex: 999 1 560px; min-width: 0">
+            {% if case.status == "awaiting_payment" %}
+            <section class="bk-panel">
+                <h2 class="bk-h2">Finish payment to start</h2>
+                <p class="bk-lede">We draft your appeal as soon as payment goes through.</p>
+                <form method="post" action="/appeal/case/{{ case.token }}/pay" style="margin-top: 16px">
+                    <button type="submit" class="bk-btn">Pay ${{ case.price_cents // 100 }}</button>
+                </form>
+            </section>
+            {% elif case.status == "drafted" %}
+            <section>
+                <h2 class="bk-h2">Review your appeal letter</h2>
+                <p class="bk-lede">Fill in anything in [BRACKETS], change whatever you like, then approve it. We'll send it to {{ case.insurer_name }} and email you the tracking.</p>
+                <form method="post" action="/appeal/case/{{ case.token }}/approve" style="margin-top: 16px">
+                    <label for="letter_text" class="bk-sr-only">Appeal letter</label>
+                    <textarea id="letter_text" name="letter_text" class="bk-input bk-mono" rows="34" style="height: auto; padding: 16px; font-size: 14px; line-height: 1.55">{{ case.letter_text }}</textarea>
+                    <button type="submit" class="bk-btn" style="margin-top: 16px">Approve and send</button>
+                </form>
+            </section>
+            {% else %}
+            <section>
+                <h2 class="bk-h2">Your appeal letter</h2>
+                {% if case.status == "approved" %}<p class="bk-lede">You approved this letter. We're sending it now and will email you the tracking.</p>{% endif %}
+                {% if case.sent_at %}<p class="bk-lede">Sent {{ case.sent_at[:10] }}{% if case.sent_method %} by {{ case.sent_method | replace("_", " ") }}{% endif %}{% if case.tracking_number %} · tracking <span class="bk-mono">{{ case.tracking_number }}</span>{% endif %}.</p>{% endif %}
+                {% if outcome_label %}<p style="margin: 12px 0 0; font-size: 18px; font-weight: 700">{{ outcome_label }}{% if case.amount_recovered %}: ${{ "{:,.2f}".format(case.amount_recovered) }} recovered{% endif %}.</p>{% endif %}
+                <pre class="bk-box bk-mono" style="margin-top: 16px; white-space: pre-wrap; font-size: 14px; line-height: 1.55">{{ case.letter_text }}</pre>
+            </section>
+            {% endif %}
+        </div>
+
+        <aside style="flex: 1 1 280px; min-width: 0; border-top: 2px solid var(--ink); padding-top: 20px">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 800">Key dates</h2>
+            <dl class="bk-facts">
+                <dt>Appeal must be filed by</dt>
+                <dd>{{ dates.file_by.strftime(fmt) if dates.file_by else "See denial letter" }}</dd>
+                {% if dates.decision_due %}<dt>Insurer must decide by</dt><dd>{{ dates.decision_due.strftime(fmt) }}</dd>{% endif %}
+                {% if dates.external_review_by %}<dt>Request external review by</dt><dd>{{ dates.external_review_by.strftime(fmt) }}</dd>{% endif %}
+            </dl>
+            {% if case.outcome == "upheld" %}
+            <p style="margin: 16px 0 0; font-size: 15px; line-height: 1.55">If the insurer upheld the denial, you can ask an independent reviewer to look at it. We'll help you file that request.</p>
+            {% endif %}
+            <p class="bk-muted" style="margin: 18px 0 0; font-size: 13px; line-height: 1.55">Keep this page's link private. It's how you get back to your appeal. Questions? Reply to any email from us.</p>
+        </aside>
+    </div>
+</div>
+{% endblock %}

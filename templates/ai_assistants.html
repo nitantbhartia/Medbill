@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Use BillKarma in ChatGPT or Claude</h1>
+        <p class="bk-lede">Add BillKarma to your AI assistant and ask about a hospital bill in plain words. It answers with what Medicare pays for the same code, the hospital&rsquo;s billing office and a request letter when you need one.</p>
+        <div class="bk-ai-url">
+            <label class="bk-label" for="mcp-url">Connector URL</label>
+            <div class="bk-search">
+                <input id="mcp-url" class="bk-input bk-mono" type="text" value="{{ mcp_url }}" readonly>
+                <button type="button" class="bk-btn" id="copy-url">Copy</button>
+            </div>
+            <p class="bk-muted" style="margin: 8px 0 0; font-size: 14.5px">No sign-in or API key. Nothing you send through it is stored.</p>
+        </div>
+    </div>
+</section>
+
+<div class="bk-wrap" style="padding-top: 56px; padding-bottom: 88px">
+    <div class="bk-ai-grid">
+        <section>
+            <h2 class="bk-h2">Add it to ChatGPT</h2>
+            <ol class="bk-ai-steps">
+                <li>Open <strong>Settings</strong>, then <strong>Apps &amp; Connectors</strong>, then <strong>Advanced</strong>, and turn on <strong>Developer mode</strong>. It&rsquo;s available on paid plans.</li>
+                <li>Back in Apps &amp; Connectors, choose <strong>Create</strong>.</li>
+                <li>Name it BillKarma, paste the connector URL, and choose <strong>No authentication</strong>.</li>
+                <li>In a chat, add BillKarma from the <strong>+</strong> menu, then ask your question.</li>
+            </ol>
+        </section>
+        <section>
+            <h2 class="bk-h2">Add it to Claude</h2>
+            <ol class="bk-ai-steps">
+                <li>Open <strong>Settings</strong>, then <strong>Connectors</strong>.</li>
+                <li>Choose <strong>Add custom connector</strong>.</li>
+                <li>Name it BillKarma, paste the connector URL and choose <strong>Add</strong>.</li>
+                <li>In a chat, turn BillKarma on from the <strong>+</strong> menu under Connectors.</li>
+            </ol>
+            <p class="bk-muted" style="font-size: 14.5px">On Team and Enterprise plans, an owner adds it in organization settings first. In Claude Code: <code class="bk-mono">claude mcp add --transport http billkarma {{ mcp_url }}</code></p>
+        </section>
+    </div>
+
+    <section style="margin-top: 64px">
+        <h2 class="bk-h2">Things to ask</h2>
+        <ul class="bk-ai-asks">
+            <li>&ldquo;My ER bill charged $4,500 for code 99285. Is that too high?&rdquo;</li>
+            <li>&ldquo;What&rsquo;s the billing phone number for Tampa General Hospital?&rdquo;</li>
+            <li>&ldquo;I only have a summary bill. Write me a request for the itemized one.&rdquo;</li>
+            <li>&ldquo;What would BillKarma charge to dispute a $12,000 bill?&rdquo;</li>
+        </ul>
+    </section>
+
+    <section style="margin-top: 64px" class="bk-narrow">
+        <h2 class="bk-h2">What it can do</h2>
+        <ul class="bk-rows">
+            {% for tool in tools %}
+            <li><div><div class="bk-row-title bk-mono" style="font-size: 15px">{{ tool.name }}</div><div class="bk-row-sub">{{ tool.description }}</div></div></li>
+            {% endfor %}
+        </ul>
+        <p class="bk-muted" style="margin-top: 18px; font-size: 15px">Every tool only reads data. To check a whole bill, upload it at <a href="/scan">billkarma.app/scan</a>. Medicare rates are a benchmark, not what hospitals must charge, and nothing here is legal advice.</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('copy-url').addEventListener('click', function () {
+    var btn = this;
+    navigator.clipboard.writeText(document.getElementById('mcp-url').value).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+    });
+});
+</script>
+{% endblock %}

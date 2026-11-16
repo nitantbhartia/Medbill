@@ -3,6 +3,9 @@ import os
 # App
 APP_NAME = "BillKarma"
 APP_URL = os.getenv("APP_URL", "https://billkarma.app")
+# Sitemap <lastmod> for every page. Bump it when a deploy changes pages site-wide,
+# so Google recrawls them. 2026-11-11: relaunch, redesign and hospital regrade.
+SITE_UPDATED = "2026-11-11"
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 ENV = os.getenv("ENV", "development").lower()
@@ -10,6 +13,8 @@ ENV = os.getenv("ENV", "development").lower()
 # Database
 DB_PATH = os.getenv("DB_PATH", "data/app.db")
 AUTO_BOOTSTRAP_HOSPITAL_DATA = os.getenv("AUTO_BOOTSTRAP_HOSPITAL_DATA", "false").lower() == "true"
+CMS_HOSPITAL_GENERAL_CSV_URL = "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0/download?format=csv"
+CMS_HOSPITAL_GENERAL_CSV_PATH = "data/cms/raw/hospital_general_information.csv"
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -50,6 +55,29 @@ DISPUTE_FEE_TIERS = [
 ]
 DISPUTE_FOLLOWUP_DAYS = [7, 14, 30, 45]
 DISPUTE_MAX_DAYS = 45
+
+# Concierge: denied-claim appeals (flat fee by amount denied)
+APPEAL_PRICE_CENTS = 14900  # $149
+APPEAL_PRICE_LARGE_CENTS = 29900  # $299
+APPEAL_LARGE_CLAIM_THRESHOLD = 5000  # dollars denied at or above this pay the large price
+# Days to file an internal appeal after the denial: 180 under ACA / ERISA rules (employer and
+# individual plans), 65 for a Medicare Advantage reconsideration. Medicaid and other plans vary,
+# so their deadline comes from the denial letter. Insurers decide in 30 days (pre-service),
+# 60 days (post-service) or 72 hours (urgent); external review must be requested within
+# 4 months of a final denial.
+APPEAL_FILING_DAYS = {"employer": 180, "individual": 180, "medicare_advantage": 65}
+APPEAL_DECISION_DAYS = {"pre_service": 30, "post_service": 60, "urgent": 3}
+APPEAL_EXTERNAL_REVIEW_DAYS = 120
+APPEAL_REMINDER_WINDOW_DAYS = 7
+
+# Concierge: household bill plan (Stripe subscription)
+HOUSEHOLD_PRICE_YEARLY_CENTS = 19900  # $199/year
+HOUSEHOLD_PRICE_MONTHLY_CENTS = 2000  # $20/month
+HOUSEHOLD_MATCH_TOLERANCE = 1.00  # dollars of rounding allowed between a bill and its EOB
+
+# Concierge shared
+OPS_NOTIFY_EMAIL = os.getenv("OPS_NOTIFY_EMAIL", "")
+PRIVATE_UPLOAD_DIR = os.getenv("PRIVATE_UPLOAD_DIR", os.path.join(os.path.dirname(DB_PATH) or "data", "private_uploads"))
 
 # Lob (for certified mail — debt validation letters)
 LOB_API_KEY = os.getenv("LOB_API_KEY", "")
@@ -142,3 +170,61 @@ GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "G-QHRP0ZQD8K")
 # Free geocoder backfill
 GEOCODER_FALLBACK_ENABLED = os.getenv("GEOCODER_FALLBACK_ENABLED", "true").lower() == "true"
 GEOCODER_REQUEST_DELAY_MS = int(os.getenv("GEOCODER_REQUEST_DELAY_MS", "1000"))
+
+# Search snippet limits (characters) for page titles and meta descriptions
+SEO_TITLE_MAX_CHARS = 60
+SEO_META_MAX_CHARS = 155
+
+# Google Search Console HTML-tag verification code (the content="..." value only)
+GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
+
+# State "most expensive hospitals" ranking pages
+RANKING_MIN_PROCEDURES = 5   # a hospital needs this many priced procedures to be ranked
+RANKING_MIN_HOSPITALS = 5    # a state needs this many ranked hospitals to get a page
+RANKING_TOP_COUNT = 25       # hospitals shown in the most-expensive list
+RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list
+
+# Guides shown first on /guides/ ("Start here"), in order
+FEATURED_GUIDE_SLUGS = (
+    ("how-to-get-itemized-hospital-bill", "Step 1"),
+    ("common-hospital-billing-errors", "Step 2"),
+    ("how-to-dispute-a-medical-bill", "Step 3"),
+    ("hospital-financial-assistance-charity-care", "If you can't afford it"),
+    ("medical-debt-collections-rights", "If it's in collections"),
+    ("medical-bill-negotiation-service-cost", "If you're hiring help"),
+)
+# Guides shown per topic on /guides/ before "Show all"
+GUIDES_PER_TOPIC = 6
+
+# Press pitch drafts: how many states to write (highest median markup first)
+PITCH_STATE_COUNT = 5
+PITCH_OUTPUT_DIR = "seo/outreach"
+
+# Appended to CSS/JS URLs so a deploy never serves stale styles from browser caches
+ASSET_VERSION = (os.getenv("RAILWAY_GIT_COMMIT_SHA") or os.getenv("ASSET_VERSION") or "dev")[:8]
+
+# Example itemized bill on the homepage (illustrative charges; Medicare rates are looked up live)
+HOMEPAGE_EXAMPLE_BILL = (
+    {"code": "99285", "desc": "Emergency visit, level 5", "amount": 4500.00, "flag": "Level 5 is for life-threatening problems. This visit ended with a splint."},
+    {"code": "73610", "desc": "X-ray, ankle, 3 views", "amount": 610.00, "flag": ""},
+    {"code": "80053", "desc": "Comprehensive metabolic panel", "amount": 198.00, "flag": ""},
+    {"code": "80048", "desc": "Basic metabolic panel", "amount": 142.00, "flag": "Already included in the comprehensive panel."},
+    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": ""},
+    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": "Billed twice for one draw."},
+)
+HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
+
+# Itemized-bill requests: HIPAA right of access gives the hospital 30 days (45 CFR 164.524(b)(2))
+ITEMIZED_RESPONSE_DAYS = 30
+ITEMIZED_LOOKUP_LIMIT = 8
+
+# MCP endpoint (/mcp) for AI assistants such as ChatGPT and Claude
+MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
+MCP_SERVER_VERSION = "1.0.0"
+MCP_LINK_TAG = "utm_source=ai_assistant&utm_medium=mcp"
+
+# Research report: procedures shown and the minimum hospitals behind any published figure
+REPORT_CODES = ("99283", "99284", "99285", "71046", "74177", "70551", "73721", "77067", "80053", "85025", "45378", "93000")
+REPORT_MIN_HOSPITALS = 20
+REPORT_STATE_CODE = "99284"
+REPORT_MIN_STATE_HOSPITALS = 5

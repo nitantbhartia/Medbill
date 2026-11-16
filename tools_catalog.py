@@ -7,7 +7,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-bill-error-checker",
         "title": "Medical Bill Error Checker",
-        "category": "High Intent",
+        "category": "Check your bill",
         "description": "Check CPT charges against Medicare rates and flag likely billing issues.",
         "keywords": ["check medical bill for errors", "medical bill audit", "hospital bill errors"],
         "inline_nudge": "Tip: Most people don't have CPT codes handy. Upload your full bill and our AI extracts them automatically.",
@@ -44,7 +44,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "hospital-financial-assistance-calculator",
         "title": "Hospital Financial Assistance Eligibility Calculator",
-        "category": "High Intent",
+        "category": "Check your bill",
         "description": "Estimate charity care eligibility using income, household size, and hospital status.",
         "keywords": ["hospital charity care eligibility", "501r financial assistance", "hospital bill forgiveness"],
         "inline_nudge": "Did you know? Over 50% of Americans may qualify for some hospital financial assistance and never apply.",
@@ -86,7 +86,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-bill-dispute-letter-generator",
         "title": "Medical Bill Dispute Letter Generator",
-        "category": "High Intent",
+        "category": "Check your bill",
         "description": "Generate a professional dispute letter for billing errors, hardship, or denial issues.",
         "keywords": ["medical bill dispute letter template", "hospital bill negotiation letter"],
         "inline_nudge": "Writing the dispute letter is step 1. Follow-ups are where most people stall.",
@@ -118,7 +118,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "surprise-bill-checker",
         "title": "Surprise Bill Checker (No Surprises Act)",
-        "category": "High Intent",
+        "category": "Check your bill",
         "description": "Check if your situation is likely protected under federal No Surprises Act rules.",
         "keywords": ["no surprises act", "surprise medical bill", "balance billing"],
         "inline_nudge": "Answer a few questions to see if your bill may violate federal protections.",
@@ -160,7 +160,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-bill-negotiation-script-generator",
         "title": "Medical Bill Negotiation Script Generator",
-        "category": "High Intent",
+        "category": "Check your bill",
         "description": "Generate negotiation scripts for phone or written billing conversations.",
         "keywords": ["how to negotiate hospital bill", "medical bill negotiation script"],
         "inline_nudge": "Don't want to make the call? We can handle dispute follow-ups in writing.",
@@ -275,7 +275,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-debt-statute-of-limitations-checker",
         "title": "Medical Debt Statute of Limitations Checker",
-        "category": "Debt/Collections",
+        "category": "Debt and collections",
         "description": "Check debt collection lawsuit windows by state.",
         "keywords": ["medical debt statute of limitations", "how long can they collect"],
         "inline_nudge": "Statute timelines vary by state and debt type; this is informational only.",
@@ -309,7 +309,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-debt-rights-checker",
         "title": "Medical Debt Rights Checker",
-        "category": "Debt/Collections",
+        "category": "Debt and collections",
         "description": "Get a personalized rights summary for your debt stage.",
         "keywords": ["medical debt credit report", "medical bill collections rights"],
         "inline_nudge": "Knowing rights is step 1. Enforcing them is step 2.",
@@ -336,7 +336,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "debt-validation-letter-generator",
         "title": "Debt Validation Letter Generator",
-        "category": "Debt/Collections",
+        "category": "Debt and collections",
         "description": "Generate an FDCPA debt validation request letter.",
         "keywords": ["debt validation letter medical", "medical debt dispute letter"],
         "inline_nudge": "Send within 30 days of first collection contact for strongest protections.",
@@ -364,7 +364,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "insurance-denial-appeal-letter-generator",
         "title": "Insurance Denial Appeal Letter Generator",
-        "category": "Insurance Issues",
+        "category": "Insurance problems",
         "description": "Generate a denial appeal letter with reason-code-specific language.",
         "keywords": ["insurance denial appeal letter", "claim denied template"],
         "inline_nudge": "Important: internal appeals usually have a 180-day filing deadline.",
@@ -394,7 +394,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "eob-decoder",
         "title": "EOB Decoder",
-        "category": "Insurance Issues",
+        "category": "Insurance problems",
         "description": "Decode EOB line items into plain-English payment breakdowns.",
         "keywords": ["how to read EOB", "explanation of benefits explained"],
         "inline_nudge": "If billed amounts and EOB responsibility do not align, dispute before paying.",
@@ -419,7 +419,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medical-bill-payment-plan-calculator",
         "title": "Medical Bill Payment Plan Calculator",
-        "category": "Quick Calculators",
+        "category": "Quick calculators",
         "description": "Estimate payoff timeline based on bill amount and monthly budget.",
         "keywords": ["medical bill payment plan", "hospital payment plan calculator"],
         "inline_nudge": "Before committing to payments, validate whether the bill itself is correct.",
@@ -446,7 +446,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "cpt-code-lookup",
         "title": "CPT Code Lookup",
-        "category": "Quick Calculators",
+        "category": "Quick calculators",
         "description": "Look up CPT descriptions, Medicare rates, and fair-price context.",
         "keywords": ["CPT code lookup", "what is CPT code"],
         "inline_nudge": "A single CPT overcharge often means broader issues across the bill.",
@@ -478,7 +478,7 @@ TOOLS: list[dict[str, Any]] = [
     {
         "slug": "medicare-rate-lookup",
         "title": "Medicare Rate Lookup",
-        "category": "Quick Calculators",
+        "category": "Quick calculators",
         "description": "Find Medicare reimbursement references by CPT and ZIP locality.",
         "keywords": ["Medicare rate for procedure", "Medicare reimbursement rate"],
         "inline_nudge": "Hospitals often bill multiples above Medicare benchmarks.",

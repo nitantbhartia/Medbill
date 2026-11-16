@@ -5,7 +5,6 @@
 {% block head %}
 {% import "_macros.html" as seo with context %}
 <meta name="description" content="Free medical billing tools to estimate fair prices, check rights, and generate dispute letters.">
-<link rel="canonical" href="{{ canonical_url }}">
 {{ seo.breadcrumbs([("Home", "/"), ("Free Tools", "/tools/")]) }}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"CollectionPage","name":"Free Medical Billing Tools","url":"{{ canonical_url }}","description":"Free medical billing tools to estimate fair prices, check rights, and generate dispute letters.","isPartOf":{"@type":"WebSite","name":"BillKarma","url":"{{ request.url.scheme }}://{{ request.url.netloc }}/"}}
@@ -36,7 +35,7 @@
         border-radius: 22px;
         background: #fff;
     }
-    .tool-meta { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--bk-secondary); }
+    .tool-meta { font-size: 0.72rem;   font-weight: 700; color: var(--bk-secondary); }
     .tool-title { font-size: 1.08rem; font-weight: 800; color: var(--bk-black); letter-spacing: -0.02em; }
     .tool-desc { color: var(--bk-secondary); font-size: 0.92rem; line-height: 1.45; }
     .tool-link {
@@ -45,7 +44,7 @@
         width: fit-content;
         align-items: center;
         text-decoration: none;
-        background: var(--bk-black);
+        background: var(--action);
         color: #fff;
         font-size: 0.84rem;
         font-weight: 700;
@@ -76,7 +75,7 @@
             <div class="tool-meta">{{ tool.category }}</div>
             <h2 class="tool-title">{{ tool.title }}</h2>
             <p class="tool-desc">{{ tool.description }}</p>
-            <a class="tool-link" href="/tools/{{ tool.slug }}/">Open Tool &rarr;</a>
+            <a class="tool-link" href="/tools/{{ tool.slug }}/">Open Tool</a>
         </article>
         {% endfor %}
     </div>

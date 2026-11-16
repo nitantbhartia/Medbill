@@ -173,14 +173,16 @@ class TestHospitalSeoPages:
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
         assert "Memorial Regional Hospital" in resp.text
-        assert "Billing Profile" in resp.text
-        assert "Common Procedure Prices" in resp.text
-        assert "Billing Grade Position" in resp.text
+        assert "Call billing" in resp.text
+        assert "free or discounted care" in resp.text
+        assert "Send it in writing" in resp.text
+        assert "Prices at a glance" in resp.text
+        assert "Common procedure prices" in resp.text
         assert "Grade legend:" in resp.text
         assert 'data-free-map="hospital"' in resp.text
         assert "Location" in resp.text
         assert "Last updated:" in resp.text
-        assert "Scan My Bill" in resp.text
+        assert "Check my bill" in resp.text
         expected = f'<link rel="canonical" href="{config.APP_URL.rstrip("/")}/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/"'
         assert expected in resp.text
 
@@ -286,7 +288,7 @@ class TestHospitalSeoPages:
         resp = client.get("/sitemap-hospitals.xml")
         assert resp.status_code == 200
         assert resp.headers["content-type"].startswith("application/xml")
-        assert "<loc>https://billkarma.app/</loc>" in resp.text
+        assert "<sitemapindex" not in resp.text
         assert "/hospitals/fl/" in resp.text
         assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in resp.text
 
@@ -294,7 +296,9 @@ class TestHospitalSeoPages:
         _seed_hospital()
         sitemap = client.get("/sitemap.xml", follow_redirects=True)
         assert sitemap.status_code == 200
-        assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" in sitemap.text
+        assert "<sitemapindex" in sitemap.text
+        assert "https://billkarma.app/sitemap-hospitals.xml" in sitemap.text
+        assert "/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/" not in sitemap.text
 
         robots = client.get("/robots.txt")
         assert robots.status_code == 200
@@ -432,7 +436,7 @@ class TestHospitalSeoPages:
         clear_comparison_cache()
         resp = client.get("/hospitals/fl/hollywood/memorial-regional-hospital-hollywood/")
         assert resp.status_code == 200
-        assert "Billing Grade Position" in resp.text
+        assert 'class="bk-grade"' in resp.text
         assert "Benchmark samples:" not in resp.text
 
     def test_data_quality_endpoint(self):
@@ -535,3 +539,44 @@ class TestHospitalSeoPages:
         # D grade band maps to 0.2..0.4 by product scale (5x-8x Medicare).
         assert p is not None
         assert 0.2 <= p <= 0.4
+
+
+class TestDoltHubDuplicates:
+    def _seed_pensacola_pair(self):
+        # DoltHub row (NPI) loaded first takes the plain slug; the CMS row (CCN) gets an id suffix.
+        upsert_hospital_row({"facility_id": "1700979465", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "slug": "baptist-hospital-pensacola"})
+        upsert_hospital_row({"facility_id": "100093", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "phone": "(850) 434-4011", "slug": "baptist-hospital-pensacola"})
+        upsert_hospital_row({"facility_id": "1942538012", "name": "WEST FLORIDA HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "slug": "west-florida-hospital-pensacola"})
+
+    def test_exact_duplicate_removed_and_suffixed_url_redirects(self):
+        import hospital_bootstrap
+
+        self._seed_pensacola_pair()
+        with get_db() as db:
+            suffixed = db.execute("SELECT slug FROM hospitals WHERE facility_id = '100093'").fetchone()["slug"]
+        assert suffixed == "baptist-hospital-pensacola-100093"
+
+        removed = hospital_bootstrap._delete_hospitals(hospital_bootstrap._exact_dolthub_duplicates())
+        assert removed == 1
+        upsert_hospital_row({"facility_id": "100093", "name": "BAPTIST HOSPITAL", "city": "PENSACOLA",
+                             "state": "FL", "phone": "(850) 434-4011", "slug": "baptist-hospital-pensacola"})
+
+        resp = client.get(f"/hospitals/fl/pensacola/{suffixed}/", follow_redirects=False)
+        assert resp.status_code == 301
+        assert resp.headers["location"] == "/hospitals/fl/pensacola/baptist-hospital-pensacola/"
+        page = client.get("/hospitals/fl/pensacola/baptist-hospital-pensacola/")
+        assert "(850) 434-4011" in page.text
+
+    def test_matched_duplicate_found_by_npi(self):
+        import hospital_bootstrap
+
+        self._seed_pensacola_pair()
+        matches = {
+            "100093": {"npi": "1700979465"},
+            "1942538012": {"npi": "1942538012"},
+            "100231": {"npi": "1942538012"},
+        }
+        assert hospital_bootstrap._matched_dolthub_duplicates(matches) == ["1700979465", "1942538012"]
