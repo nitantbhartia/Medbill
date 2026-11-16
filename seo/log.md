@@ -24,3 +24,6 @@
 - All sitemap `<lastmod>` values now come from `config.SITE_UPDATED` (2026-11-11). They were hardcoded Jan–Apr dates, telling Google nothing had changed since the relaunch.
 - Guide schema: removed the duplicate QAPage block (Search Console errors: missing answerCount); all JSON-LD fields now use `tojson`. 80 guides had invalid Article JSON (bad escapes), and 3 guides emitted blank FAQ questions because they use `question`/`answer` keys.
 - Next (owner): resubmit sitemap.xml in Search Console; Request indexing for pre-outage top pages.
+
+## 2026-11-16
+- Hospital pages link the matching core guide from each step: call script (call billing), how financial assistance works, itemized-bill and dispute guides (send it in writing).
