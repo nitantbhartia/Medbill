@@ -8,7 +8,7 @@ import re
 import time
 from collections import defaultdict
 
-from config import APP_URL, ENABLE_FREE_MAPS, SEO_META_MAX_CHARS, SEO_TITLE_MAX_CHARS
+from config import APP_URL, ENABLE_FREE_MAPS, GRADED_LETTERS, SEO_META_MAX_CHARS, SEO_TITLE_MAX_CHARS
 from db import get_db
 
 GRADE_THRESHOLDS = (
@@ -2205,8 +2205,9 @@ def national_median_markup() -> float | None:
 
 def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict) -> dict:
     name = hospital_d.get("name", "This hospital")
-    grade = hospital_d.get("billing_grade") or "N/A"
+    grade = hospital_d.get("billing_grade")
     markup = hospital_d.get("avg_markup_vs_medicare")
+    is_graded = grade in GRADED_LETTERS and isinstance(markup, (int, float))
     procedures = hospital_d.get("procedures_compared") or len(prices_d)
     markup_txt = f"{markup:.1f}x" if isinstance(markup, (int, float)) else "unknown"
     ownership_label = hospital_d.get("nonprofit_status_label", "Unknown")
@@ -2242,12 +2243,14 @@ def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict
             f"The Medicare rate for this procedure is {medicare_txt}, "
             f"making this a {markup_proc_txt} markup.{nat_txt}"
         )
-    else:
+    elif is_graded:
         q2_question = f"How much do common procedures cost at {name}?"
         q2_answer = (
             f"{name} has an average markup of {markup_txt} Medicare rates. "
             "See the procedure price table on this page for specific CPT codes and charges."
         )
+    else:
+        q2_question = None
 
     # Q3: financial assistance
     if "nonprofit" in ownership_label.lower():
@@ -2276,25 +2279,18 @@ def _build_faq_schema(hospital_d: dict, prices_d: list[dict], financials_d: dict
             "Request their written financial assistance policy and ask about income eligibility thresholds."
         )
 
+    questions = []
+    if is_graded:
+        questions.append((f"What is {name}'s billing grade?", q1_answer))
+    if q2_question:
+        questions.append((q2_question, q2_answer))
+    questions.append((f"Does {name} offer financial assistance?", q3_answer))
     return {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
-            {
-                "@type": "Question",
-                "name": f"What is {name}'s billing grade?",
-                "acceptedAnswer": {"@type": "Answer", "text": q1_answer},
-            },
-            {
-                "@type": "Question",
-                "name": q2_question,
-                "acceptedAnswer": {"@type": "Answer", "text": q2_answer},
-            },
-            {
-                "@type": "Question",
-                "name": f"Does {name} offer financial assistance?",
-                "acceptedAnswer": {"@type": "Answer", "text": q3_answer},
-            },
+            {"@type": "Question", "name": question, "acceptedAnswer": {"@type": "Answer", "text": answer}}
+            for question, answer in questions
         ],
     }
 
@@ -2330,7 +2326,6 @@ def _build_hospital_schema(hospital_d: dict, state_code: str) -> dict:
             "postalCode": hospital_d.get("zip") or "",
             "addressCountry": "US",
         },
-        "medicalSpecialty": "https://schema.org/MedicalSpecialty",
         "isAcceptingNewPatients": True,
     }
     if hospital_d.get("phone"):
@@ -2346,17 +2341,6 @@ def _build_hospital_schema(hospital_d: dict, state_code: str) -> dict:
         schema["sameAs"] = [
             f"https://www.medicare.gov/care-compare/details/hospital/{facility_id}",
         ]
-    # CMS star rating
-    stars = hospital_d.get("cms_star_rating")
-    if stars and isinstance(stars, (int, float)):
-        schema["aggregateRating"] = {
-            "@type": "AggregateRating",
-            "ratingValue": int(stars),
-            "bestRating": 5,
-            "worstRating": 1,
-            "ratingCount": 1,
-            "description": "CMS Hospital Compare overall star rating",
-        }
     return schema
 
 

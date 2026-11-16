@@ -271,5 +271,6 @@ def _get_state_averages(cpt_code: str, limit: int = 15) -> list[dict]:
 
 
 def get_all_cost_slugs() -> list[str]:
-    """Return all available cost page slugs for sitemap generation."""
-    return list(COST_PAGE_SPECS.keys())
+    """Return the cost page slugs that currently render, for the sitemap. A slug whose price data is
+    missing from the database would 404, so it is left out."""
+    return [slug for slug in COST_PAGE_SPECS if get_cost_page_data(slug)]

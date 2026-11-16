@@ -122,8 +122,10 @@
             transition: opacity 0.12s;
             z-index: 9999;
         }
+        /* Hidden bubbles take no space: a 230px bubble near the right edge made the page wider than a phone. */
+        .bk-tip::after, .bk-tip::before { display: none; }
         .bk-tip:hover::after, .bk-tip:hover::before,
-        .bk-tip.tip-open::after, .bk-tip.tip-open::before { opacity: 1; }
+        .bk-tip.tip-open::after, .bk-tip.tip-open::before { display: block; opacity: 1; }
 
         /* === RESPONSIVE === */
         @media (max-width: 640px) {
