@@ -191,6 +191,16 @@ RANKING_MIN_HOSPITALS = 5    # a state needs this many ranked hospitals to get a
 RANKING_TOP_COUNT = 25       # hospitals shown in the most-expensive list
 RANKING_BOTTOM_COUNT = 10    # hospitals shown in the least-expensive list
 
+GRADED_LETTERS = ("A", "B", "C", "D", "F")  # billing grades; "N/A" means ungraded
+CSV_MARKUP_DECIMALS = 2                     # markup precision in the grades CSV
+BADGE_MARKUP_DECIMALS = 1                   # markup precision on the SVG badge, as shown on pages
+BADGE_NAME_MAX_CHARS = 44                   # hospital name length on the badge before truncation
+BADGE_CACHE_MAX_AGE_SECONDS = 86400         # badges change only when grades are recalculated
+BADGE_WIDTH = 420
+BADGE_HEIGHT = 72
+BADGE_ACCENT_WIDTH = 6                      # colored bar on the badge's left edge
+BADGE_TEXT_X = 20
+
 # Guides shown first on /guides/ ("Start here"), in order
 FEATURED_GUIDE_SLUGS = (
     ("how-to-get-itemized-hospital-bill", "Step 1"),

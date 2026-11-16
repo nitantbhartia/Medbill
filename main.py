@@ -17,6 +17,8 @@ from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
 from ops_routes import router as ops_router
+from data_routes import router as data_router
+from hospital_downloads import build_embed_snippet
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_seo import (
@@ -70,6 +72,7 @@ app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)
 app.include_router(ops_router)
+app.include_router(data_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
 
 
@@ -2008,6 +2011,7 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
             "affiliate_url": config.AFFILIATE_URL,
             "enable_hospital_claim": config.ENABLE_HOSPITAL_CLAIM,
             "claim_hospital_url": config.CLAIM_HOSPITAL_URL,
+            "embed_snippet": build_embed_snippet(profile["hospital"]),
         },
     )
 
@@ -2488,6 +2492,7 @@ async def core_sitemap():
         (f"{base}/chargemaster/", "0.9"),
         (f"{base}/procedures/", "0.9"),
         (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),
+        (f"{base}/data/", "0.7"),
     ]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>{priority}</priority></url>"

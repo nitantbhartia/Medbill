@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-wrap" style="padding-top: 64px; padding-bottom: 32px">
+    <p class="bk-eyebrow">Data</p>
+    <h1 style="margin: 0; max-width: 860px; font-size: clamp(32px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 800">Hospital billing grades</h1>
+    <p class="bk-lede" style="margin-top: 20px; max-width: 700px">Each hospital with a usable price file gets a billing grade from A to F. The grade shows how far the hospital&rsquo;s list prices run above what Medicare pays for the same services.</p>
+    <p style="margin-top: 24px"><a class="bk-btn" href="/data/hospital-billing-grades.csv">Download the grades (CSV)</a></p>
+</section>
+
+<section class="bk-wrap" style="padding-bottom: 48px; max-width: 860px">
+    <h2 class="bk-h2">How the grade is calculated</h2>
+    <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">Every U.S. hospital must publish a machine-readable price file listing what it charges for procedures. For each hospital we compare the gross charge in that file (the list price before discounts or insurance) with what Medicare pays hospitals for the same billing code under the outpatient Prospective Payment System (OPPS). Codes Medicare doesn&rsquo;t pay that way, such as lab tests and inpatient surgery, are left out. We average the ratio across the remaining procedures after removing extreme outliers. A hospital needs at least {{ config.RANKING_MIN_PROCEDURES }} comparable procedures to be graded.</p>
+    <p style="margin-top: 16px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">Grades are based on gross charges, not on what a patient pays. Insurers negotiate discounts from gross charges, but deductibles and coinsurance are often calculated from them. A hospital with no grade usually has a missing, incomplete or unreadable price file.</p>
+
+    <h2 class="bk-h2" style="margin-top: 48px">Grade scale</h2>
+    <div class="bk-table-box" style="margin-top: 16px">
+        <table class="bk-table">
+            <thead>
+                <tr><th>Grade</th><th>Average markup vs. Medicare</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="bk-mono">A</td><td class="bk-mono">Below 2.0x</td></tr>
+                <tr><td class="bk-mono">B</td><td class="bk-mono">2.0x to below 3.0x</td></tr>
+                <tr><td class="bk-mono">C</td><td class="bk-mono">3.0x to below 5.0x</td></tr>
+                <tr><td class="bk-mono">D</td><td class="bk-mono">5.0x to below 8.0x</td></tr>
+                <tr><td class="bk-mono">F</td><td class="bk-mono">8.0x or more</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p style="margin-top: 16px; font-size: 15px; line-height: 1.6; color: var(--ink-2)">A billing grade is not a measure of care quality. Use the CMS star rating alongside it. See the <a href="/guides/hospital-billing-grades-explained/">full method and grading guide</a>.</p>
+
+    <h2 class="bk-h2" style="margin-top: 48px">Fields in the CSV</h2>
+    <div class="bk-table-box" style="margin-top: 16px">
+        <table class="bk-table">
+            <thead>
+                <tr><th>Field</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="bk-mono">facility_id</td><td>Identifier BillKarma uses for the hospital</td></tr>
+                <tr><td class="bk-mono">name</td><td>Hospital name, as on its BillKarma profile page</td></tr>
+                <tr><td class="bk-mono">city, state</td><td>Location; state is the two-letter code</td></tr>
+                <tr><td class="bk-mono">ownership</td><td>Ownership type as recorded in the source hospital data</td></tr>
+                <tr><td class="bk-mono">billing_grade</td><td>A to F, from the grade scale above</td></tr>
+                <tr><td class="bk-mono">avg_markup_vs_medicare</td><td>Average of gross charge divided by the Medicare rate, across the procedures compared. 1.0 means the same as Medicare.</td></tr>
+                <tr><td class="bk-mono">procedures_compared</td><td>Number of procedure codes in that average</td></tr>
+                <tr><td class="bk-mono">profile_url</td><td>The hospital&rsquo;s BillKarma profile page</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p style="margin-top: 16px; font-size: 15px; line-height: 1.6; color: var(--ink-2)">Hospital prices come from each hospital&rsquo;s price transparency file. Medicare rates come from CMS.</p>
+
+    <h2 class="bk-h2" style="margin-top: 48px">Embed a grade</h2>
+    <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">Each graded hospital&rsquo;s profile page has an &ldquo;Embed this grade&rdquo; box with a badge image and a link back to the profile. The badge image is at <code>/badge/&lt;facility_id&gt;.svg</code>.</p>
+
+    <h2 class="bk-h2" style="margin-top: 48px">License and attribution</h2>
+    <p style="margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--ink-2)">This data is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You may copy, share and adapt it, including for commercial use, if you credit BillKarma and link to <a href="https://billkarma.app/data/">https://billkarma.app/data/</a>.</p>
+</section>
+{% endblock %}
