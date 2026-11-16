@@ -193,3 +193,24 @@ def test_medicare_advantage_deadline_and_urgent_letter():
 
 def test_unknown_case_is_404():
     assert client.get("/appeal/case/not-a-real-token").status_code == 404
+
+
+def test_approval_mails_automatically_when_lob_is_configured(monkeypatch):
+    monkeypatch.setattr(config, "LOB_API_KEY", "test_lob")
+    monkeypatch.setattr(appeals, "send_certified_letter", lambda **kw: {"lob_id": "ltr_2", "tracking_number": "9407 2000", "expected_delivery_date": ""})
+    case = appeals.create_case(INTAKE, None)
+    appeals.mark_paid(case["id"])
+    appeals.approve(appeals.get_case(case["id"]), "Approved letter text")
+    sent = appeals.get_case(case["id"])
+    assert sent["status"] == "sent" and sent["tracking_number"] == "9407 2000"
+
+
+def test_approval_stays_for_ops_when_lob_fails(monkeypatch):
+    def fail(**kw):
+        raise RuntimeError("Lob error 422")
+    monkeypatch.setattr(config, "LOB_API_KEY", "test_lob")
+    monkeypatch.setattr(appeals, "send_certified_letter", fail)
+    case = appeals.create_case(INTAKE, None)
+    appeals.mark_paid(case["id"])
+    appeals.approve(appeals.get_case(case["id"]), "Approved letter text")
+    assert appeals.get_case(case["id"])["status"] == "approved"
