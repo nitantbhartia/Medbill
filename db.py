@@ -1011,6 +1011,8 @@ def _run_migrations(db):
             "strategy_notes": "TEXT DEFAULT '[]'",
             "certified_tracking": "TEXT",
             "complaint_tracking": "TEXT",
+            "household_income": "REAL",
+            "household_size": "INTEGER",
         },
     )
 

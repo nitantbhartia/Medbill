@@ -85,6 +85,8 @@
         fd.append('account_number', details.account_number || '');
         fd.append('hospital_billing_email', details.hospital_billing_email || '');
         fd.append('hospital_billing_fax', details.hospital_billing_fax || '');
+        fd.append('household_income', details.household_income || '0');
+        fd.append('household_size', details.household_size || '0');
         fd.append('preferred_channels', details.preferred_channels || 'email');
 
         const resp = await fetch('/api/dispute/activate', { method: 'POST', body: fd });

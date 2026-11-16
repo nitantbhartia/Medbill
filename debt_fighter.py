@@ -711,8 +711,12 @@ def generate_charity_care_letter(
     income: float,
     household_size: int,
     date_of_service: str = "",
+    with_enclosures: bool = True,
 ) -> dict:
-    """Generate a financial assistance application cover letter."""
+    """Generate a financial assistance application cover letter.
+
+    with_enclosures=False is for letters mailed without documents: it asks the hospital
+    to send its application and list of required documents instead of claiming enclosures."""
     user_name = _sanitize_text(user_name)
     user_address = _sanitize_text(user_address)
     hospital_name = _sanitize_text(hospital_name)
@@ -725,6 +729,19 @@ def generate_charity_care_letter(
     fpl_pct = round(income / fpl * 100)
     today_str = date.today().strftime("%B %d, %Y")
     service_ref = f" for services on {date_of_service}" if date_of_service else ""
+
+    if with_enclosures:
+        documents_paragraph = """Enclosed please find:
+- Completed Financial Assistance Application (if provided separately by your hospital)
+- Proof of income (most recent tax return / pay stubs)
+- Proof of household size"""
+        enclosures_line = "Enclosures: Financial documents as listed above\n"
+    else:
+        documents_paragraph = (
+            "Please send me your Financial Assistance Application and a list of the documents you require "
+            "(such as proof of income and household size). I will return them promptly."
+        )
+        enclosures_line = ""
 
     letter = f"""{user_name}
 {user_address}
@@ -745,10 +762,7 @@ My household consists of {household_size} person{"s" if household_size > 1 else 
 
 I am unable to pay this bill in full and respectfully request that you review my application for financial assistance under your hospital's policy, as required by IRS Section 501(r) for tax-exempt hospitals.
 
-Enclosed please find:
-- Completed Financial Assistance Application (if provided separately by your hospital)
-- Proof of income (most recent tax return / pay stubs)
-- Proof of household size
+{documents_paragraph}
 
 I request that all collection activity on this account be suspended while my application is under review, as required by federal guidelines for 501(r)-compliant hospitals.
 
@@ -758,8 +772,7 @@ Sincerely,
 
 {user_name}
 
-Enclosures: Financial documents as listed above
-Sent via USPS Certified Mail"""
+{enclosures_line}Sent via USPS Certified Mail"""
 
     return {
         "status": "ok",

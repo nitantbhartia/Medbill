@@ -12,7 +12,7 @@ from email_service import followup_body
 import payment as payment_module
 from db import get_db
 from complaints import build_complaint_letter, file_attorney_general_complaint
-from debt_fighter import send_certified_letter
+from debt_fighter import generate_charity_care_letter, send_certified_letter
 from fax import fax_configured, send_fax
 from dispute_workflow import build_dispute_letter
 
@@ -37,6 +37,8 @@ def activate_dispute(
     hospital_billing_email: str,
     hospital_billing_fax: str = "",
     preferred_channels: str = "email",
+    household_income: float = 0,
+    household_size: int = 0,
 ) -> int:
     """Create an active dispute case after payment is confirmed.
 
@@ -61,14 +63,15 @@ def activate_dispute(
             INSERT INTO dispute_cases (
                 bill_id, payment_id, patient_name, patient_email,
                 patient_address, account_number, hospital_billing_email,
-                hospital_billing_fax, status, is_nonprofit, preferred_channels
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
+                hospital_billing_fax, status, is_nonprofit, preferred_channels,
+                household_income, household_size
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
             """,
             (
                 bill_id, payment_id, patient_name, patient_email,
                 patient_address, account_number, hospital_billing_email,
                 hospital_billing_fax, 1 if is_nonprofit else 0,
-                preferred_channels or "email",
+                preferred_channels or "email", household_income or None, household_size or None,
             ),
         )
         case_id = db.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
@@ -93,7 +96,7 @@ def activate_dispute(
 
     # File financial assistance if nonprofit
     if is_nonprofit:
-        _file_financial_assistance(case_id, bill_id, patient_name, patient_address)
+        _file_financial_assistance(case_id)
 
     if delivered:
         add_strategy_note(case_id, "Dispute letter emailed to the billing department.")
@@ -132,7 +135,9 @@ def _hospital_mailing_address(provider_name: str) -> str:
     return f"{row['address']}, {row['city']}, {row['state']} {row['zip']}"
 
 
-def _mail_certified(case, provider_name: str, letter_text: str, description: str) -> str:
+def _mail_certified(
+    case, provider_name: str, letter_text: str, description: str, department: str = "Billing Department"
+) -> str:
     """Mail the letter to the hospital by Lob certified mail. Returns the tracking number,
     or '' if it was not mailed (no Lob key, or no address for either side)."""
     if not config.LOB_API_KEY or not case["patient_address"]:
@@ -146,7 +151,7 @@ def _mail_certified(case, provider_name: str, letter_text: str, description: str
             description=description,
             from_name=case["patient_name"],
             from_address=case["patient_address"],
-            to_name=f"{provider_name} Billing Department",
+            to_name=f"{provider_name} {department}",
             to_address=hospital_address,
             letter_text=letter_text,
             api_key=config.LOB_API_KEY,
@@ -318,41 +323,42 @@ def _notify_patient_activated(
         log.warning("Could not send patient confirmation for case %d: %s", case_id, exc)
 
 
-def _file_financial_assistance(
-    case_id: int,
-    bill_id: int,
-    patient_name: str,
-    patient_address: str,
-) -> None:
-    """Generate and log a 501(r) financial assistance application."""
+def _file_financial_assistance(case_id: int) -> None:
+    """Mail a 501(r) financial assistance request to a nonprofit hospital. Needs the patient's
+    income and household size; without them nothing is filed and the case isn't marked filed."""
+    case = get_case(case_id)
     with get_db() as db:
-        bill = db.execute(
-            """
-            SELECT b.provider_name, hf.financial_assistance_url, hf.fa_application_url
-            FROM bills b
-            LEFT JOIN hospital_directory hd ON hd.name LIKE '%' || b.provider_name || '%'
-            LEFT JOIN hospital_financials hf ON hf.facility_id = hd.facility_id
-            WHERE b.id = ?
-            LIMIT 1
-            """,
-            (bill_id,),
-        ).fetchone()
-
-    if not bill:
+        bill = db.execute("SELECT * FROM bills WHERE id = ?", (case["bill_id"],)).fetchone()
+    provider = bill["provider_name"] if bill else ""
+    hospital_address = _hospital_mailing_address(provider)
+    amount = bill["total_patient_owes"] or bill["total_charged"]
+    if not (amount and case["household_income"] and case["household_size"] and case["patient_address"] and hospital_address):
         return
-
-    fa_url = (bill["fa_application_url"] or bill["financial_assistance_url"] or "") if bill else ""
-    log.info(
-        "Financial assistance noted for case %d (nonprofit hospital). FA URL: %s",
-        case_id,
-        fa_url or "not found",
-    )
-
-    with get_db() as db:
-        db.execute(
-            "UPDATE dispute_cases SET financial_assistance_filed = 1 WHERE id = ?",
-            (case_id,),
+    try:
+        letter = generate_charity_care_letter(
+            user_name=case["patient_name"],
+            user_address=case["patient_address"],
+            hospital_name=provider,
+            hospital_address=hospital_address,
+            account_number=case["account_number"] or "N/A",
+            bill_amount=str(amount),
+            income=case["household_income"],
+            household_size=case["household_size"],
+            date_of_service=bill["bill_date"] or "",
+            with_enclosures=False,
         )
+    except ValueError as exc:
+        log.error("Could not build financial assistance letter for case %d: %s", case_id, exc)
+        return
+    tracking = _mail_certified(
+        case, provider, letter["letter_text"], f"Financial assistance request, case {case_id}",
+        department="Financial Assistance Department",
+    )
+    if not tracking:
+        return
+    with get_db() as db:
+        db.execute("UPDATE dispute_cases SET financial_assistance_filed = 1 WHERE id = ?", (case_id,))
+    add_strategy_note(case_id, "Financial assistance request mailed to the hospital by certified mail.")
 
 
 def add_strategy_note(case_id: int, note_text: str) -> None:
