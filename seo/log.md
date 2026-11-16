@@ -27,3 +27,4 @@
 
 ## 2026-11-16
 - Hospital pages link the matching core guide from each step: call script (call billing), how financial assistance works, itemized-bill and dispute guides (send it in writing).
+- Search Console review (Nov 2025 to Nov 13 2026): site total is small. Top page is the homepage (15 clicks). The guides with the most impressions (anesthesia-billing 1,344; stent-surgery-cost 1,136; hospital-drug-charges 918; stroke-treatment-cost 472) get 2 to 7 clicks each. Their average position looks like page 1, but anesthesia-billing's individual queries rank 60 to 98, so a title rewrite would not help; it needs a better page, not a better title. State guide pages: 2 clicks in total. No changes made from this review.
