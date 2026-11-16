@@ -225,6 +225,23 @@ HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
 ITEMIZED_RESPONSE_DAYS = 30
 ITEMIZED_LOOKUP_LIMIT = 8
 
+# Good Faith Estimate vs bill check (patient-provider dispute resolution, PPDR).
+# Source: https://www.cms.gov/initiatives/your-patient-rights/medical-bill-rights/get-help/dispute-bill
+# (page last modified 10/02/2026 per CMS; read 2026-11-16) and CMS's PPDR guidance PDF
+# https://www.cms.gov/cciio/resources/regulations-and-guidance/downloads/good-faith-estimate-patient-provider-dispute-resolution-process-for-uninsured-or-self-pay-individuals.pdf
+# Eligible: no insurance, or insurance not used and the provider was told so; care on or after 2022-01-01.
+# The bill must be at least GFE_DISPUTE_THRESHOLD_USD above the estimate from the same provider or facility.
+# Start within GFE_DISPUTE_DEADLINE_DAYS calendar days of the date on the initial bill.
+# The fee is non-refundable and is deducted from what is owed if the dispute is decided for the patient.
+# A reviewer can leave the bill as-is when the extra charges could not reasonably have been anticipated.
+GFE_DISPUTE_THRESHOLD_USD = 400
+GFE_DISPUTE_DEADLINE_DAYS = 120
+GFE_DISPUTE_FEE_USD = 25
+GFE_DISPUTE_INFO_URL = "https://www.cms.gov/initiatives/your-patient-rights/medical-bill-rights/get-help/dispute-bill"
+GFE_DISPUTE_FILING_URL = "https://nsa-idr.cms.gov/billdisputes/s/"
+GFE_MAX_AMOUNT_USD = 10_000_000
+GFE_FIELD_MAX_CHARS = 200
+
 # MCP endpoint (/mcp) for AI assistants such as ChatGPT and Claude
 MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
 MCP_SERVER_VERSION = "1.0.0"

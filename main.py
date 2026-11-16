@@ -1560,6 +1560,25 @@ async def itemized_bill_page(request: Request, facility: str = "", provider: str
     )
 
 
+@app.get("/good-faith-estimate/check", response_class=HTMLResponse)
+async def good_faith_estimate_check_page(request: Request):
+    """Compare a bill to the Good Faith Estimate and prepare the paperwork for a CMS dispute."""
+    return templates.TemplateResponse(
+        "gfe_check.html",
+        {
+            "request": request,
+            "threshold": config.GFE_DISPUTE_THRESHOLD_USD,
+            "deadline_days": config.GFE_DISPUTE_DEADLINE_DAYS,
+            "fee": config.GFE_DISPUTE_FEE_USD,
+            "info_url": config.GFE_DISPUTE_INFO_URL,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/good-faith-estimate/check",
+            "page_title": "Good Faith Estimate vs Bill Checker: Free | BillKarma",
+            "meta_description": f"Check whether your bill is ${config.GFE_DISPUTE_THRESHOLD_USD} or more above your Good Faith Estimate, see your {config.GFE_DISPUTE_DEADLINE_DAYS}-day deadline, and print a letter and checklist.",
+            "meta_robots": "index, follow",
+        },
+    )
+
+
 @app.get("/tools/{slug}/", response_class=HTMLResponse)
 async def tool_detail(request: Request, slug: str):
     tool = get_tool(slug)
@@ -2448,6 +2467,7 @@ async def core_sitemap():
         (f"{base}/", "1.0"),
         (f"{base}/guides/", "0.8"),
         (f"{base}/itemized-bill", "0.9"),
+        (f"{base}/good-faith-estimate/check", "0.9"),
         (f"{base}/ai", "0.7"),
         (f"{base}/tools/", "0.8"),
         (f"{base}/fight-debt", "0.9"),

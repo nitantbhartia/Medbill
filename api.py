@@ -2585,6 +2585,20 @@ async def itemized_bill_letter(request: Request):
     return {"status": "ok", "data": build_request_letter(payload)}
 
 
+@router.post("/good-faith-estimate/check")
+async def good_faith_estimate_check(request: Request):
+    """Compare a bill to its Good Faith Estimate. Nothing typed here is stored."""
+    from gfe_check import check_estimate
+    if not _check_tools_rate_limit(_request_client_key(request)):
+        raise HTTPException(429, "Too many requests. Try again in a little while.")
+    payload = await _parse_json_object(request)
+    _assert_payload_size(payload, config.MAX_TOOL_PAYLOAD_BYTES, "That's more text than this check needs.")
+    try:
+        return {"status": "ok", "data": check_estimate(payload)}
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
+
+
 @router.post("/itemized-bill/reminder")
 async def itemized_bill_reminder(request: Request):
     """Email the patient when the hospital's 30 days are up."""
