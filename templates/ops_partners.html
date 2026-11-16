@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Partner scans | BillKarma ops{% endblock %}
+
+{% block content %}
+<div class="bk-wrap" style="padding-top: 40px; padding-bottom: 80px">
+    <h1 style="margin: 0; font-size: 36px; letter-spacing: -0.03em; font-weight: 800">Partner scans</h1>
+    <p class="bk-lede">Bill scans per referral code, last {{ days }} days.</p>
+
+    {% if not counts %}
+    <p class="bk-muted">No referred scans yet.</p>
+    {% else %}
+    <table style="margin-top: 24px">
+        <thead><tr><th style="text-align: left">Referral code</th><th style="text-align: right">Scans</th></tr></thead>
+        <tbody>
+        {% for row in counts %}
+            <tr><td class="bk-mono">{{ row.referral_code }}</td><td style="text-align: right">{{ row.scans }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

@@ -12,6 +12,7 @@ import appeals
 import config
 import dispute_service
 import household
+import referrals
 from access_control import is_admin_request
 from db import get_db
 
@@ -62,6 +63,20 @@ async def ops_queue(request: Request):
             "help_requests": household.open_requests(),
             "disputes": dispute_service.cases_needing_attention(),
             "lob_ready": bool(config.LOB_API_KEY),
+            "meta_robots": "noindex, nofollow",
+        },
+    )
+
+
+@router.get("/ops/partners", response_class=HTMLResponse)
+async def ops_partners(request: Request):
+    _require_ops(request)
+    return templates.TemplateResponse(
+        "ops_partners.html",
+        {
+            "request": request,
+            "counts": referrals.partner_scan_counts(),
+            "days": config.PARTNER_REPORT_DAYS,
             "meta_robots": "noindex, nofollow",
         },
     )

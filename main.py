@@ -47,6 +47,7 @@ from procedure_content import get_content_page_data
 from hospital_rankings import get_ranked_state_slugs, get_state_ranking, ranking_description, ranking_title
 from tools_catalog import list_tools, get_tool
 from access_control import require_bill_access, require_case_access
+from referrals import valid_referral
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -74,6 +75,23 @@ app.include_router(household_router)
 app.include_router(ops_router)
 app.include_router(data_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def referral_cookie(request: Request, call_next):
+    response = await call_next(request)
+    ref = valid_referral(request.query_params.get("ref"))
+    if ref:
+        response.set_cookie(
+            config.REFERRAL_COOKIE_NAME,
+            ref,
+            max_age=config.REFERRAL_COOKIE_MAX_AGE_SECONDS,
+            httponly=True,
+            secure=not config.DEBUG,
+            samesite="lax",
+            path="/",
+        )
+    return response
 
 
 @app.middleware("http")
@@ -1441,6 +1459,19 @@ async def procedure_location_page(request: Request, proc_slug: str, location_slu
     })
 
 
+@app.get("/partners/", response_class=HTMLResponse)
+async def partners_page(request: Request):
+    return templates.TemplateResponse(
+        "partners.html",
+        {
+            "request": request,
+            "canonical_url": f"{config.APP_URL.rstrip('/')}/partners/",
+            "og_title": "Partners | BillKarma",
+            "meta_description": "A free scan link for medical-debt nonprofits, legal-aid groups, credit unions, employer benefits teams and patient navigators.",
+        },
+    )
+
+
 @app.get("/press/", response_class=HTMLResponse)
 async def press_page(request: Request):
     """Press and media kit page."""
@@ -2489,6 +2520,7 @@ async def core_sitemap():
         (f"{base}/cost/er-visit/", "0.8"),
         (f"{base}/about/", "0.7"),
         (f"{base}/press/", "0.7"),
+        (f"{base}/partners/", "0.7"),
         (f"{base}/chargemaster/", "0.9"),
         (f"{base}/procedures/", "0.9"),
         (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Partners | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_description }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ canonical_url }}">
+<link rel="canonical" href="{{ canonical_url }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Reach people when they hold a hospital bill</h1>
+        <p class="bk-lede">Nonprofits, legal aid groups, credit unions, employer benefits teams and patient navigators often meet people right after a bill arrives. BillKarma checks that bill against what Medicare pays and sends a written dispute for the charges that look wrong.</p>
+    </div>
+</section>
+
+<div class="bk-wrap" style="padding-top: 56px; padding-bottom: 88px">
+    <div class="bk-findings">
+        <div>
+            <h2 class="bk-h2">Who it is for</h2>
+            <p>Medical-debt nonprofits, legal aid offices, credit unions, employer benefits teams and patient navigators whose clients or members hold a hospital or facility bill they think is too high.</p>
+        </div>
+        <div>
+            <h2 class="bk-h2">What a partner gets</h2>
+            <ul>
+                <li>A free scan link with your organization&rsquo;s name on it, for example <code>{{ config.APP_URL }}/scan?ref=your-org</code>.</li>
+                <li>A monthly count of scans that came through your link.</li>
+            </ul>
+            <p>That is all we promise. The scan itself is free for the person checking the bill.</p>
+        </div>
+    </div>
+
+    <h2 class="bk-h2" style="margin-top: 56px">How to start</h2>
+    <ol>
+        <li>Email <a href="mailto:{{ config.PARTNER_CONTACT_EMAIL }}">{{ config.PARTNER_CONTACT_EMAIL }}</a> with your organization&rsquo;s name and who you serve.</li>
+        <li>Choose a short code for your link: lowercase letters, digits and hyphens, up to 40 characters.</li>
+        <li>Share the link where your clients or members will see it.</li>
+    </ol>
+
+    <h2 class="bk-h2" style="margin-top: 56px">What BillKarma does and does not do</h2>
+    <div class="bk-findings">
+        <div>
+            <h3>What we do</h3>
+            <p>Compare each charge on a hospital bill to the Medicare rate for that code, flag possible duplicates and unbundling, and, for a flat fee, send a written dispute to the hospital billing office and follow up on a fixed schedule.</p>
+        </div>
+        <div>
+            <h3>What we do not do</h3>
+            <ul>
+                <li>We do not negotiate by phone.</li>
+                <li>We do not guarantee a reduction. The hospital decides the outcome.</li>
+                <li>We do not give legal advice. For a lawsuit, wage garnishment or bankruptcy, point people to a consumer attorney or legal aid.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="bk-cta-band" style="margin-top: 64px">
+        <div>
+            <h2>Start a partner link</h2>
+            <p>Tell us who you serve and we will reply.</p>
+        </div>
+        <a href="mailto:{{ config.PARTNER_CONTACT_EMAIL }}" class="bk-btn">{{ config.PARTNER_CONTACT_EMAIL }}</a>
+    </div>
+</div>
+{% endblock %}

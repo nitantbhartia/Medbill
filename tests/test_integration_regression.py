@@ -84,7 +84,7 @@ class TestScanEndpointIntegration:
             assert zip_code == "33021"
             return analysis_payload
 
-        def fake_save(user_id, extracted, analysis, zip_code="00000"):
+        def fake_save(user_id, extracted, analysis, zip_code="00000", referral_code=None):
             calls["save"] += 1
             assert user_id is None
             assert extracted == extracted_payload

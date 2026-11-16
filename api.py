@@ -24,6 +24,7 @@ import reply_reader
 import esign as esign_module
 from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
 from db import get_db
+from referrals import valid_referral
 from dispute_packet import generate_dispute_packet
 from appeal_playbooks import generate_appeal_playbook
 from provider_intelligence import get_provider_intelligence
@@ -363,7 +364,8 @@ async def scan_bill(
                     eob_data = scanner.process_multi_page_bill(eob_image_list)
                 extracted = analyzer.merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
         analysis = analyzer.analyze_bill(extracted, zip_code)
-        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code)
+        referral_code = valid_referral(request.cookies.get(config.REFERRAL_COOKIE_NAME))
+        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code, referral_code)
         try:
             grant_bill_access(session_id, bill_id)
         except Exception as access_exc:
