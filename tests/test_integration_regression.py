@@ -45,7 +45,7 @@ class TestLandingPageRegression:
 class TestPageFlowRegression:
     def test_confirm_page_missing_bill_shows_error(self):
         resp = client.get("/confirm/999999")
-        assert resp.status_code == 200
+        assert resp.status_code == 404
         assert "Bill not found" in resp.text
 
     def test_confirm_page_renders_extracted_items_for_existing_bill(self):

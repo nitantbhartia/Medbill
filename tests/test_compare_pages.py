@@ -301,12 +301,12 @@ def test_compare_detail_redirects_float_ids():
 
 
 def test_compare_query_cleans_float_hospital_param():
-    """The ?hospital= param gets cleaned of .0 suffix before redirect."""
+    """The ?hospital= param gets cleaned of .0 suffix and redirects to the hospital page."""
     _seed()
     resp = client.get(f"/compare/?hospital={_FID_A}.0", follow_redirects=False)
     assert resp.status_code == 301
     assert f"{_FID_A}.0" not in resp.headers["location"]
-    assert _FID_A in resp.headers["location"]
+    assert resp.headers["location"].startswith("/hospitals/")
 
 
 def test_normalize_facility_id_strips_float():
