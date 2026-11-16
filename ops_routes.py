@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 import appeals
 import config
+import dispute_service
 import household
 from access_control import is_admin_request
 from db import get_db
@@ -59,6 +60,7 @@ async def ops_queue(request: Request):
             "status_labels": appeals.STATUS_LABELS,
             "outcomes": appeals.OUTCOMES,
             "help_requests": household.open_requests(),
+            "disputes": dispute_service.cases_needing_attention(),
             "lob_ready": bool(config.LOB_API_KEY),
             "meta_robots": "noindex, nofollow",
         },

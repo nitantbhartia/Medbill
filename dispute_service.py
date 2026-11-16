@@ -406,6 +406,27 @@ def get_case(case_id: int) -> dict | None:
     return dict(row) if row else None
 
 
+def cases_needing_attention() -> dict:
+    """Disputes a person should look at: ones that couldn't be sent, and open ones where the hospital
+    replied without settling (denied, asked for information, offered a payment plan, or unreadable)."""
+    with get_db() as db:
+        waiting = db.execute(
+            "SELECT c.id, c.bill_id, c.patient_name, c.patient_email, b.provider_name, c.created_at"
+            " FROM dispute_cases c JOIN bills b ON b.id = c.bill_id"
+            " WHERE c.status = 'needs_delivery' ORDER BY c.created_at"
+        ).fetchall()
+        replies = db.execute(
+            "SELECT r.case_id, r.bill_id, r.outcome, r.summary, r.body, r.created_at, r.patient_name, r.provider_name FROM ("
+            "  SELECT r.*, c.bill_id, c.patient_name, c.status, b.provider_name"
+            "  FROM dispute_replies r JOIN dispute_cases c ON c.id = r.case_id JOIN bills b ON b.id = c.bill_id"
+            "  WHERE r.outcome IN ('denied', 'needs_info', 'payment_plan', 'unclear')"
+            "  AND c.status IN ('active', 'sent', 'refund_pending')"
+            ") r ORDER BY r.created_at DESC LIMIT ?",
+            (config.OPS_QUEUE_REPLY_LIMIT,),
+        ).fetchall()
+    return {"waiting": [dict(row) for row in waiting], "replies": [dict(row) for row in replies]}
+
+
 def get_case_for_bill(bill_id: int) -> dict | None:
     """Get the active dispute case for a bill."""
     with get_db() as db:

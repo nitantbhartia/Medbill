@@ -6,7 +6,7 @@
 {% set fmt = "%b %-d, %Y" %}
 <div class="bk-wrap" style="padding-top: 40px; padding-bottom: 80px">
     <h1 style="margin: 0; font-size: 36px; letter-spacing: -0.03em; font-weight: 800">Concierge queue</h1>
-    <p class="bk-lede">{{ cases | length }} open appeal{{ "" if cases | length == 1 else "s" }} · {{ help_requests | length }} household request{{ "" if help_requests | length == 1 else "s" }}</p>
+    <p class="bk-lede">{{ cases | length }} open appeal{{ "" if cases | length == 1 else "s" }} · {{ help_requests | length }} household request{{ "" if help_requests | length == 1 else "s" }} · {{ disputes.waiting | length + disputes.replies | length }} dispute item{{ "" if disputes.waiting | length + disputes.replies | length == 1 else "s" }}</p>
 
     <section style="margin-top: 36px" aria-labelledby="appeals-heading">
         <h2 id="appeals-heading" class="bk-h2">Appeals</h2>
@@ -53,6 +53,25 @@
                 <div style="flex: 1 1 auto; min-width: 0"><label class="bk-label" for="notes-{{ case.id }}">Ops notes</label><input class="bk-input" id="notes-{{ case.id }}" name="ops_notes" value="{{ case.ops_notes or '' }}" style="height: 44px"></div>
                 <button type="submit" class="bk-btn-outline bk-btn-sm">Save</button>
             </form>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section style="margin-top: 48px" aria-labelledby="disputes-heading">
+        <h2 id="disputes-heading" class="bk-h2">Disputes</h2>
+        {% if not disputes.waiting and not disputes.replies %}<p class="bk-muted">Nothing needs attention.</p>{% endif %}
+        {% for d in disputes.waiting %}
+        <article class="bk-box" style="margin-top: 16px">
+            <div class="bk-row-title">Case #{{ d.id }} · {{ d.patient_name }} · {{ d.provider_name }}</div>
+            <div class="bk-row-sub">Not sent: no billing email, address or fax for the hospital. {{ d.patient_email }} · since {{ d.created_at[:10] }} · <a href="/dispute/dashboard/{{ d.bill_id }}" target="_blank" rel="noopener">customer view</a></div>
+        </article>
+        {% endfor %}
+        {% for r in disputes.replies %}
+        <article class="bk-box" style="margin-top: 16px">
+            <div class="bk-row-title">Case #{{ r.case_id }} · {{ r.patient_name }} · {{ r.provider_name }} · {{ r.outcome | replace("_", " ") }}</div>
+            <div class="bk-row-sub">{{ r.created_at[:16] }} · <a href="/dispute/dashboard/{{ r.bill_id }}" target="_blank" rel="noopener">customer view</a></div>
+            <p style="margin: 8px 0 0; font-size: 15px">{{ r.summary }}</p>
+            <details style="margin-top: 8px"><summary class="bk-muted" style="font-size: 14px; cursor: pointer">Hospital's message</summary><div style="margin-top: 8px; font-size: 14px; white-space: pre-line">{{ r.body }}</div></details>
         </article>
         {% endfor %}
     </section>
