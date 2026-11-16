@@ -29,3 +29,8 @@
 - Hospital pages link the matching core guide from each step: call script (call billing), how financial assistance works, itemized-bill and dispute guides (send it in writing).
 - Search Console review (Nov 2025 to Nov 13 2026): site total is small. Top page is the homepage (15 clicks). The guides with the most impressions (anesthesia-billing 1,344; stent-surgery-cost 1,136; hospital-drug-charges 918; stroke-treatment-cost 472) get 2 to 7 clicks each. Their average position looks like page 1, but anesthesia-billing's individual queries rank 60 to 98, so a title rewrite would not help; it needs a better page, not a better title. State guide pages: 2 clicks in total. No changes made from this review.
 - hospital-drug-charges: meta description now leads with the numbers ($15–$50 per tablet, $180+ IV, up to 2,500x); new FAQ "How much does IV Tylenol cost in a hospital?" to answer the queries it already ranks 8–12 for. Only ~115 query-level impressions so far, so judge it after mid-December.
+
+## 2026-11-16 (brand and indexing review)
+- "billkarma" search shows Credit Karma and unrelated "karma" results; BillKarma absent. Zero brand queries in Search Console for the past year.
+- Homepage title now leads with brand plus category ("BillKarma: Free Medical Bill Checker and Dispute Service"); schema gets `alternateName` and loses the self-referencing `sameAs` and the retired SiteLinksSearchBox node; About page states it isn't affiliated with Credit Karma or any finance app.
+- Search Console: homepage last crawled Oct 27 as 404, `sitemap-guides.xml` has 1 error. Owner steps in backlog 1b.

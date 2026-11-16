@@ -569,7 +569,7 @@ async def landing(request: Request):
             "dispute_tiers": _dispute_tier_labels(),
             "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
             "example": _homepage_example_bill(),
-            "og_title": "Hospital bill too high? Check it free, we dispute it | BillKarma",
+            "og_title": "BillKarma: Free Medical Bill Checker and Dispute Service",
             "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
             "meta_robots": "index, follow",
         },
