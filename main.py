@@ -36,7 +36,7 @@ from hospital_seo import (
     state_display_name,
 )
 from compare_pages import build_comparison_seo, get_comparison_data, search_hospitals_for_compare
-from dispute_workflow import build_phone_script, get_outcome_stats
+from dispute_workflow import _finding_paragraph, build_phone_script, get_outcome_stats
 from facility_pages import get_facility_profile, get_facilities_in_scope, get_facility_sitemap_paths, get_facility_state_index, get_landing_stats
 from procedure_pages import (
     get_hospitals_near_zip_for_cpt,
@@ -567,6 +567,16 @@ def _dispute_tier_labels() -> list[dict]:
     return rows
 
 
+def _example_letter_paragraph(line: dict) -> dict:
+    """The paragraph the dispute letter generator writes for one flagged line of the homepage example."""
+    text = _finding_paragraph(
+        line["type"], line["code"], line["desc"], line["amount"], 0.0,
+        config.HOMEPAGE_EXAMPLE_SERVICE_DATE, {"bundled_code": line.get("bundled")},
+    )
+    title, meta, body = [part.strip() for part in text.split("\n") if part.strip()]
+    return {"title": title, "meta": meta, "body": body}
+
+
 def _homepage_example_bill() -> dict:
     """The illustrative statement on the homepage, with the Medicare rate for the flagged visit."""
     from validators.pricing import get_medicare_rate, get_opps_rate
@@ -581,6 +591,8 @@ def _homepage_example_bill() -> dict:
         "lines": lines,
         "total": total,
         "clear_errors": clear_errors,
+        "fee": dispute_service.calculate_fee(total) // 100,
+        "letter": [_example_letter_paragraph(line) for line in lines if line["flag"]],
         "visit_amount": visit["amount"],
         "visit_medicare": (get_medicare_rate(visit["code"]) or 0) + (get_opps_rate(visit["code"]) or 0) or None,
     }
@@ -602,6 +614,7 @@ async def landing(request: Request):
             "dispute_tiers": _dispute_tier_labels(),
             "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
             "example": _homepage_example_bill(),
+            "outcome_stats": get_outcome_stats(),
             "og_title": "BillKarma: Free Medical Bill Checker and Dispute Service",
             "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
             "meta_robots": "index, follow",

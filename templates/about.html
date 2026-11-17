@@ -30,366 +30,42 @@
   ]
 }
 </script>
-<style>
-  .about-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  /* Hero */
-  .about-hero {
-    background: linear-gradient(135deg, #0C6B55 0%, #08503F 100%);
-    color: #fff;
-    padding: 72px 24px 80px;
-    border-radius: 0 0 40px 40px;
-    text-align: center;
-    margin-bottom: 0;
-  }
-  .about-hero h1 {
-    font-size: 2.6rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    margin: 0 0 18px;
-    color: #fff;
-  }
-  .about-hero .subtitle {
-    font-size: 1.15rem;
-    color: rgba(255,255,255,0.85);
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.65;
-  }
-
-  /* Stats bar */
-  .about-stats-bar {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: -32px auto 56px;
-    max-width: 900px;
-    padding: 0 24px;
-  }
-  .about-stat-tile {
-    background: #fff;
-    border: 1px solid var(--bk-gray-border);
-    border-radius: 16px;
-    padding: 24px 28px;
-    text-align: center;
-    flex: 1;
-    min-width: 160px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-  }
-  .about-stat-number {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--bk-green);
-    line-height: 1.1;
-    display: block;
-    margin-bottom: 4px;
-  }
-  .about-stat-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--bk-gray-text);
-    
-    
-  }
-
-  /* Section */
-  .about-section {
-    margin-bottom: 56px;
-  }
-  .about-section-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--bk-black);
-    margin: 0 0 12px;
-    letter-spacing: -0.02em;
-  }
-  .about-section-body {
-    font-size: 1.05rem;
-    color: #374842;
-    line-height: 1.75;
-    margin: 0;
-  }
-
-  /* Data cards grid */
-  .data-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 24px;
-  }
-  .data-card {
-    background: #fff;
-    border: 1px solid var(--bk-gray-border);
-    border-radius: 16px;
-    border-top: 4px solid var(--bk-green);
-    padding: 24px;
-  }
-  .data-card-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--bk-black);
-    margin: 0 0 10px;
-  }
-  .data-card-body {
-    font-size: 0.9rem;
-    color: #4B5563;
-    line-height: 1.65;
-    margin: 0;
-  }
-
-  /* Editorial standards */
-  .editorial-box {
-    background: #E1F0EA;
-    border: 1px solid #BBF7D0;
-    border-radius: 16px;
-    padding: 28px 32px;
-    font-size: 0.95rem;
-    color: #064E3B;
-    line-height: 1.75;
-    margin-top: 16px;
-  }
-  .editorial-box a {
-    color: var(--bk-green);
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  /* Reviewer box */
-  .reviewer-box {
-    background: #fff;
-    border: 1px solid var(--bk-gray-border);
-    border-left: 5px solid var(--bk-green);
-    border-radius: 0 16px 16px 0;
-    padding: 24px 28px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    margin-top: 16px;
-  }
-  .reviewer-box-icon {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    background: #E1F0EA;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
-  }
-  .reviewer-box-text {
-    font-size: 0.975rem;
-    color: #374842;
-    line-height: 1.7;
-  }
-  .reviewer-box-text strong {
-    display: block;
-    font-weight: 700;
-    color: var(--bk-black);
-    margin-bottom: 4px;
-  }
-
-  /* Independence / team note */
-  .independence-box {
-    background: #F4F7F5;
-    border: 1px solid var(--bk-gray-border);
-    border-radius: 16px;
-    padding: 24px 28px;
-    font-size: 0.95rem;
-    color: #4B5563;
-    line-height: 1.7;
-    margin-top: 16px;
-  }
-
-  /* Contact */
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 16px;
-  }
-  .contact-tile {
-    background: #fff;
-    border: 1px solid var(--bk-gray-border);
-    border-radius: 14px;
-    padding: 20px 24px;
-  }
-  .contact-tile-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    
-    
-    color: var(--bk-gray-text);
-    margin-bottom: 6px;
-  }
-  .contact-tile a {
-    font-size: 0.975rem;
-    font-weight: 600;
-    color: var(--bk-green);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .about-divider {
-    border: none;
-    border-top: 1px solid var(--bk-gray-border);
-    margin: 0 0 56px;
-  }
-
-  @media (max-width: 640px) {
-    .about-hero h1 { font-size: 1.9rem; }
-    .about-hero .subtitle { font-size: 0.95rem; }
-    .about-stat-tile { min-width: 130px; padding: 18px 16px; }
-    .about-stat-number { font-size: 1.6rem; }
-    .data-cards-grid { grid-template-columns: 1fr; }
-    .contact-grid { grid-template-columns: 1fr; }
-    .reviewer-box { flex-direction: column; gap: 10px; }
-    .editorial-box { padding: 20px 20px; }
-  }
-</style>
 {% endblock %}
 
 {% block content %}
-
-<!-- Hero -->
-<section class="about-hero">
-  <h1>About BillKarma</h1>
-  <p class="subtitle">We believe no American should go bankrupt because they couldn't read their hospital bill.</p>
-  <p class="subtitle">BillKarma is a medical bill checker and dispute service. It is not affiliated with Credit Karma or any credit-score or personal-finance app.</p>
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>About BillKarma</h1>
+        <p class="bk-lede">BillKarma checks hospital bills against what Medicare pays and sends written disputes for the charges that look wrong. It is not affiliated with Credit Karma or any credit-score or personal-finance app.</p>
+    </div>
 </section>
 
-<!-- Stats bar -->
-<div class="about-stats-bar">
-  <div class="about-stat-tile">
-    <span class="about-stat-number">6,000+</span>
-    <span class="about-stat-label">Hospitals Tracked</span>
-  </div>
-  <div class="about-stat-tile">
-    <span class="about-stat-number">300+</span>
-    <span class="about-stat-label">Free Guides</span>
-  </div>
-  <div class="about-stat-tile">
-    <span class="about-stat-number">50</span>
-    <span class="about-stat-label">States Covered</span>
-  </div>
+<div class="bk-wrap" style="padding-top: 56px; padding-bottom: 88px">
+<div class="bk-narrow">
+    <h2 class="bk-h2">Why it exists</h2>
+    <p class="bk-lede">Hospital billing departments know what each code normally pays. Patients usually don&rsquo;t. BillKarma puts the public numbers next to your bill, for free, so you can see which charges are worth questioning without hiring a billing advocate or an attorney.</p>
+
+    <h2 class="bk-h2" style="margin-top: 64px">Where the data comes from</h2>
+    <dl class="bk-sources">
+        <div><dt>Hospital prices</dt><dd>The machine-readable price files hospitals publish under the federal Hospital Price Transparency Rule (45 CFR Part 180). Updated annually.</dd></div>
+        <div><dt>Medicare rates</dt><dd>The CMS Medicare Physician Fee Schedule and Outpatient Prospective Payment System. Both are public.</dd></div>
+        <div><dt>Billing rules</dt><dd>CMS National Correct Coding Initiative (NCCI) edits, AMA CPT guidelines and ICD-10-CM coding rules, used to flag likely billing errors.</dd></div>
+    </dl>
+    <p style="margin: 16px 0 0"><a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></p>
+
+    <h2 class="bk-h2" style="margin-top: 64px">How guides are written</h2>
+    <p style="margin: 14px 0 0; color: var(--ink-2)">Guides are checked against <a href="https://www.cms.gov" rel="nofollow noopener" target="_blank">CMS.gov</a>, <a href="https://www.kff.org" rel="nofollow noopener" target="_blank">KFF.org</a> and <a href="https://www.ama-assn.org/practice-management/cpt" rel="nofollow noopener" target="_blank">AMA CPT</a> sources before publication. Guides about patient rights cite the federal law involved, such as the No Surprises Act, the Fair Debt Collection Practices Act and HIPAA. Data pages show the source and the year the data was collected.</p>
+    <p style="margin: 14px 0 0; color: var(--ink-2)">We correct errors when we find them. To report one, email <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.</p>
+
+    <h2 class="bk-h2" style="margin-top: 64px">Independence</h2>
+    <p style="margin: 14px 0 0; color: var(--ink-2)">BillKarma is independent. We don&rsquo;t accept advertising from hospitals, insurers or billing companies, and we are not affiliated with CMS, Medicare or any government agency. We are not a law firm, and nothing here is legal or financial advice.</p>
+
+    <h2 class="bk-h2" style="margin-top: 64px">Contact</h2>
+    <dl class="bk-sources">
+        <div><dt>Help with a bill</dt><dd><a href="mailto:support@billkarma.app">support@billkarma.app</a></dd></div>
+        <div><dt>Corrections</dt><dd><a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a></dd></div>
+        <div><dt>Press</dt><dd><a href="mailto:press@billkarma.app">press@billkarma.app</a></dd></div>
+    </dl>
 </div>
-
-<!-- Main content -->
-<div class="about-container">
-
-  <!-- Mission -->
-  <section class="about-section">
-    <h2 class="about-section-title">Our Mission</h2>
-    <p class="about-section-body">
-      BillKarma was built to give patients the same information that hospital billing departments have — and to make it free.
-      We aggregate hospital chargemaster data under the CMS Price Transparency Rule, Medicare fee schedules, and state billing
-      regulations into tools anyone can use without a billing advocate or attorney.
-    </p>
-  </section>
-
-  <hr class="about-divider">
-
-  <!-- How our data works -->
-  <section class="about-section">
-    <h2 class="about-section-title">How Our Data Works</h2>
-    <div class="data-cards-grid">
-      <div class="data-card">
-        <div class="data-card-title">Hospital Pricing Data</div>
-        <p class="data-card-body">
-          We collect machine-readable price files published by 6,000+ hospitals under the federal
-          Hospital Price Transparency Rule (45 CFR Part 180). Data is updated annually.
-        </p>
-      </div>
-      <div class="data-card">
-        <div class="data-card-title">Medicare Reference Rates</div>
-        <p class="data-card-body">
-          We use CMS Medicare Physician Fee Schedule and Outpatient Prospective Payment System rates
-          as fair-price benchmarks. These are public data.
-        </p>
-      </div>
-      <div class="data-card">
-        <div class="data-card-title">Billing Rules &amp; Codes</div>
-        <p class="data-card-body">
-          Our error detection uses CMS NCCI (National Correct Coding Initiative) edits, AMA CPT
-          guidelines, and ICD-10-CM coding rules to flag likely billing errors.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <hr class="about-divider">
-
-  <!-- Editorial standards -->
-  <section class="about-section">
-    <h2 class="about-section-title">Editorial Standards &amp; Accuracy</h2>
-    <div class="editorial-box">
-      <p style="margin:0 0 12px;">
-        All guides are reviewed against <a href="https://www.cms.gov" rel="nofollow noopener" target="_blank">CMS.gov</a>,
-        <a href="https://www.kff.org" rel="nofollow noopener" target="_blank">KFF.org</a>, and
-        <a href="https://www.ama-assn.org/practice-management/cpt" rel="nofollow noopener" target="_blank">AMA CPT</a> sources
-        before publication.
-      </p>
-      <p style="margin:0 0 12px;">
-        Guides covering patient legal rights reference specific federal statutes — including the No Surprises Act,
-        the Fair Debt Collection Practices Act (FDCPA), and HIPAA — where applicable.
-        Data pages display the source and the year the data was collected.
-      </p>
-      <p style="margin:0;">
-        We correct errors when found. To report a factual error, email
-        <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>.
-      </p>
-    </div>
-
-    <!-- Medical reviewer callout -->
-    <div class="reviewer-box" style="margin-top:20px;">
-      <div class="reviewer-box-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="8.5" stroke="#0C6B55"/>
-          <path d="M5.5 9l2.5 2.5 4.5-5" stroke="#0C6B55" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="reviewer-box-text">
-        <strong>Medically Reviewed Before Publication</strong>
-        Our guides on insurance coverage, billing codes, and patient rights are reviewed for accuracy by licensed
-        medical billing specialists and patient advocacy professionals before publication.
-      </div>
-    </div>
-  </section>
-
-  <hr class="about-divider">
-
-  <!-- Team / independence -->
-  <section class="about-section">
-    <h2 class="about-section-title">Independence</h2>
-    <div class="independence-box">
-      BillKarma is an independent platform. We don't accept advertising from hospitals, insurers, or billing companies.
-      We are not affiliated with CMS, Medicare, or any government agency.
-    </div>
-  </section>
-
-  <hr class="about-divider">
-
-  <!-- Contact -->
-  <section class="about-section">
-    <h2 class="about-section-title">Contact</h2>
-    <div class="contact-grid">
-      <div class="contact-tile">
-        <div class="contact-tile-label">Media &amp; Press</div>
-        <a href="mailto:press@billkarma.app">press@billkarma.app</a>
-      </div>
-      <div class="contact-tile">
-        <div class="contact-tile-label">Factual Corrections</div>
-        <a href="mailto:corrections@billkarma.app">corrections@billkarma.app</a>
-      </div>
-    </div>
-  </section>
-
 </div>
 {% endblock %}

@@ -30,113 +30,8 @@
 }
 </script>
 <style>
-    .scan-hero {
-        background-color: #0C6B55;
-        color: #fff;
-        padding: 52px 0 56px;
-        border-radius: 0 0 40px 40px;
-        position: relative;
-        overflow: hidden;
-    }
-    .scan-hero-blob {
-        position: absolute;
-        border-radius: 50%;
-        background: #08503F;
-        pointer-events: none;
-    }
-    .scan-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 500;
-        letter-spacing: -0.025em;
-        line-height: 1.1;
-        margin-bottom: 14px;
-    }
-    .scan-hero-sub {
-        font-size: 1.05rem;
-        color: rgba(255,255,255,0.8);
-        max-width: 480px;
-        line-height: 1.6;
-    }
-    .scan-stat-strip {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 12px 0;
-        padding: 18px 12px;
-        border-bottom: 1px solid #D6E0DB;
-        background: #F4F7F5;
-    }
-    .scan-stat-item {
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-        padding: 0 28px;
-        flex: 1 1 140px;
-        justify-content: center;
-    }
-    .scan-stat-num {
-        font-size: 1.25rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: #16302A;
-    }
-    .scan-stat-label {
-        font-size: 0.82rem;
-        color: #666;
-        line-height: 1.3;
-    }
-    .scan-stat-divider {
-        width: 1px;
-        height: 24px;
-        background: #D4D4D4;
-        flex-shrink: 0;
-    }
-    .scan-form-card {
-        background: #fff;
-        border: 1px solid #D6E0DB;
-        border-radius: 20px;
-        padding: 32px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    }
-    .scan-checks-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-    .scan-check-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 14px 16px;
-        border: 1px solid #D6E0DB;
-        border-radius: 14px;
-        background: #F4F7F5;
-    }
-    .scan-check-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: #E1F0EA;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .scan-sidebar { display: block; }
-    @media (max-width: 640px) {
-        .scan-hero { padding: 36px 0 44px; }
-        .scan-hero h1 { font-size: 1.85rem; }
-        .scan-hero-sub { font-size: 0.95rem; }
-        .scan-hero-blob { display: none; }
-        .scan-stat-strip { gap: 0; padding: 14px 16px; }
-        .scan-stat-item { padding: 0 12px; }
-        .scan-stat-num { font-size: 1.05rem; }
-        .scan-stat-label { font-size: 0.72rem; }
-        .scan-stat-divider { height: 20px; }
-        .scan-form-card { padding: 20px; border-radius: 16px; }
-        .scan-sidebar { display: none; }
-    }
+    .scan-form-card { background: var(--paper); border: 1px solid var(--rule); border-radius: var(--r-card); padding: 32px; }
+    @media (max-width: 640px) { .scan-sidebar { display: none; } }
 </style>
 {% endblock %}
 
@@ -374,59 +269,14 @@
         <!-- What we check sidebar (2 cols, hidden on mobile) -->
         <div class="sm:col-span-2 scan-sidebar">
             <div class="sticky" style="top:80px;">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">What we check</p>
-                <div class="space-y-3">
-                    <div class="scan-check-item">
-                        <div class="scan-check-icon">
-                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Medicare rate comparison</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Every CPT code checked against federal benchmarks</p>
-                        </div>
-                    </div>
-                    <div class="scan-check-item">
-                        <div class="scan-check-icon">
-                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Duplicate charges</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Same service billed twice or more</p>
-                        </div>
-                    </div>
-                    <div class="scan-check-item">
-                        <div class="scan-check-icon">
-                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Unbundling errors</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Services that should be billed together</p>
-                        </div>
-                    </div>
-                    <div class="scan-check-item">
-                        <div class="scan-check-icon">
-                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Upcoding detection</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Codes billed at a higher level than warranted</p>
-                        </div>
-                    </div>
-                    <div class="scan-check-item">
-                        <div class="scan-check-icon">
-                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Savings calculation</p>
-                            <p class="text-xs text-gray-500 mt-0.5">How much you could recover with a dispute</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 p-4 rounded-2xl bg-accent-50 border border-accent-100">
-                    <p class="text-sm font-semibold text-gray-800 mb-1">Already have results?</p>
-                    <p class="text-xs text-gray-600 leading-relaxed">Use our <a href="/calculator" class="text-accent-500 font-semibold hover:underline">cost calculator</a> to look up Medicare rates for any procedure, or browse <a href="/hospitals/" class="text-accent-500 font-semibold hover:underline">hospital pricing</a> in your area.</p>
-                </div>
+                <h2 class="bk-h3">What we check</h2>
+                <ul class="bk-rows" style="margin-top: 14px">
+                    <li><div><div class="bk-row-title">Prices against Medicare</div><div class="bk-row-sub">Each billing code next to what Medicare pays for it.</div></div></li>
+                    <li><div><div class="bk-row-title">Duplicate charges</div><div class="bk-row-sub">The same service billed twice or more.</div></div></li>
+                    <li><div><div class="bk-row-title">Overlapping tests</div><div class="bk-row-sub">Services that should be billed together.</div></div></li>
+                    <li><div><div class="bk-row-title">Visit levels</div><div class="bk-row-sub">Codes billed at a higher level than the visit suggests.</div></div></li>
+                </ul>
+                <p class="bk-muted" style="margin: 18px 0 0; font-size: 14.5px">Only have a summary bill? <a href="/itemized-bill">Request the itemized version</a>.</p>
             </div>
         </div>
 

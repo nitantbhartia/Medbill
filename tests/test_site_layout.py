@@ -48,8 +48,8 @@ def test_homepage_shows_example_bill_with_flagged_errors_upfront():
     hero = html.split('id="how"')[0]
     assert 'class="bk-statement"' in hero
     assert "Billed twice for one draw." in hero
-    assert "Errors to remove" in hero and "&minus;$180.00" in hero
-    assert "Refund if not reduced in" in hero
+    assert "Flagged to dispute, 3 charges" in hero and "$4,680.00" in hero
+    assert "Full refund" in hero
 
 
 def test_guides_index_has_filter_and_labeled_start_path():
