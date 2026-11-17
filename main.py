@@ -549,6 +549,8 @@ def startup():
             logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
     if config.ENV == "production":
         threading.Thread(target=_regrade, daemon=True).start()
+        from daily_jobs import start_daily_jobs
+        start_daily_jobs()
 
 
 # --- Page routes ---

@@ -135,6 +135,35 @@ def send_followup_to_hospital(
     return send_email(to=to, subject=subject, html_body=html, text_body=body)
 
 
+def send_followup_notice_to_patient(
+    to: str,
+    patient_name: str,
+    case_id: int,
+    hospital_name: str,
+    followup_number: int,
+    days_until_refund: int,
+) -> bool:
+    """Tell the patient a follow-up went to the hospital, so a dispute that is moving never looks silent."""
+    last = followup_number >= len(config.DISPUTE_FOLLOWUP_DAYS)
+    next_step = (
+        "This was the last follow-up. We've also filed a complaint with the regulator."
+        if last
+        else f"If there's still no reply, we'll follow up again on day {config.DISPUTE_FOLLOWUP_DAYS[followup_number]}."
+    )
+    dashboard_url = f"{config.APP_URL}/dispute/dashboard?case={case_id}"
+    html = f"""
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+        <h2 style="color:#00824F;">We followed up with {_he(hospital_name or 'the hospital')}.</h2>
+        <p>Hi {_he(patient_name)},</p>
+        <p>The hospital hasn't answered your dispute yet, so we sent follow-up #{followup_number}. {_he(next_step)}</p>
+        <p>If they contact you directly, reply to this email and tell us what they said.
+        If your bill isn't reduced within {days_until_refund} days, you'll get a full refund.</p>
+        <p><a href="{dashboard_url}" style="background:#00824F;color:#fff;padding:12px 24px;
+        border-radius:999px;text-decoration:none;font-weight:bold;">Track Your Dispute →</a></p>
+    </div>"""
+    return send_email(to=to, subject=f"Update: follow-up #{followup_number} sent for your dispute", html_body=html)
+
+
 def send_refund_confirmation(
     to: str,
     patient_name: str,

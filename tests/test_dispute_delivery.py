@@ -158,3 +158,16 @@ def test_no_lob_key_means_no_mail(mock_email, mock_lob, monkeypatch):
     _add_hospital()
     _activate("billing@memorialregional.org")
     mock_lob.assert_not_called()
+
+
+@patch("dispute_service.email_service")
+def test_patient_is_told_when_a_follow_up_goes_out(mock_email):
+    mock_email.send_dispute_to_hospital.return_value = True
+    mock_email.send_followup_to_hospital.return_value = True
+    case_id = _activate("billing@memorialregional.org")
+    queue_id = dispute_service.get_followups_for_case(case_id)[0]["id"]
+    dispute_service._send_followup(case_id, 1, queue_id)
+    kwargs = mock_email.send_followup_notice_to_patient.call_args.kwargs
+    assert kwargs["to"] == "maria.lopez@example.com"
+    assert kwargs["followup_number"] == 1
+    assert kwargs["days_until_refund"] == config.DISPUTE_MAX_DAYS
