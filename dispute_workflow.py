@@ -126,21 +126,21 @@ def _finding_paragraph(
         return (
             f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
-            f"     CPT code {cpt} appears {count} time(s) on {service_date} with no clinical "
-            f"justification for multiple billings on the same date. Duplicate billing of the "
-            f"same service violates CMS billing guidelines. I am requesting removal of all "
-            f"duplicate instances, retaining only one medically supported billing."
+            f"     CPT code {cpt} appears {count} time(s) on {service_date}, and I can find no "
+            f"documentation supporting more than one billing on that date. Billing the same "
+            f"service twice is not consistent with CMS billing guidelines. I am requesting removal "
+            f"of the duplicate instances, keeping only one medically supported billing."
         )
 
     if finding_type in ("unbundling", "ncci"):
         bundled = detail.get("bundled_code") or ""
         bundled_note = f" when CPT {bundled} applies" if bundled else ""
         return (
-            f"NCCI BUNDLING VIOLATION — CPT {cpt} ({desc.title()})\n"
+            f"POSSIBLE UNBUNDLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
             f"     CMS National Correct Coding Initiative (NCCI) edits indicate that CPT {cpt} "
-            f"cannot be billed separately{bundled_note}. These codes are bundled under Medicare "
-            f"billing rules and should not appear as separate line items. I am requesting "
+            f"is not normally billed separately{bundled_note}. These codes are bundled under Medicare "
+            f"billing rules and usually do not appear as separate line items. I am requesting "
             f"correction or removal of this charge in accordance with NCCI guidelines."
         )
 
@@ -165,7 +165,7 @@ def _finding_paragraph(
         else ""
     )
     return (
-        f"EXCESSIVE CHARGE — CPT {cpt} ({desc.title()})\n"
+        f"CHARGE ABOVE MEDICARE BENCHMARK — CPT {cpt} ({desc.title()})\n"
         f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
         f"     {medicare_line}"
         f"I am requesting a review and adjustment of this charge to a rate consistent "

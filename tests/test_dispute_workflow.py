@@ -91,7 +91,7 @@ class TestBuildDisputeLetter:
         assert "Jane Doe" in result["letter"]
         assert "ACC-001" in result["letter"]
         assert "City Medical Center" in result["letter"]
-        assert "EXCESSIVE CHARGE" in result["letter"]
+        assert "CHARGE ABOVE MEDICARE BENCHMARK" in result["letter"]
         assert "74177" in result["letter"]
         assert result["finding_count"] == 1
         assert result["total_disputed"] == 2304.0
@@ -117,7 +117,7 @@ class TestBuildDisputeLetter:
         _insert_finding(bill_id, "ncci", "80048", details, savings=250.0)
         result = build_dispute_letter(bill_id=bill_id)
         assert result is not None
-        assert "NCCI BUNDLING VIOLATION" in result["letter"]
+        assert "POSSIBLE UNBUNDLING" in result["letter"]
         assert "80048" in result["letter"]
 
     def test_upcoding_finding_produces_correct_paragraph(self):
@@ -332,7 +332,7 @@ class TestDisputeLetterAPI:
         data = resp.json()
         assert data["status"] == "ok"
         assert "letter" in data["data"]
-        assert "EXCESSIVE CHARGE" in data["data"]["letter"]
+        assert "CHARGE ABOVE MEDICARE BENCHMARK" in data["data"]["letter"]
         assert data["data"]["finding_count"] == 1
 
     def test_account_number_param_used_in_letter(self):
@@ -451,7 +451,7 @@ class TestResultsPageRendering:
         assert resp.status_code == 200
         html = resp.text
         assert "Choose how to proceed" in html
-        assert "Fight This Bill" in html
+        assert "Dispute these for $" in html
 
     def test_results_page_404_for_missing_bill(self):
         resp = client.get("/results/9999")

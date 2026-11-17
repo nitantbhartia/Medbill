@@ -104,7 +104,7 @@
                 <li>Follow-ups on days {{ followup_days | join(", ") }}</li>
                 <li>Full refund if the bill isn&rsquo;t reduced in 45 days</li>
             </ul>
-            <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Fight This Bill for ${{ "{:,.0f}".format(fee) }}</a>
+            <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Dispute these for ${{ "{:,.0f}".format(fee) }}</a>
             {% if total_savings > fee %}<p class="bk-decide-note">You keep everything the hospital takes off. No percentage of your savings.</p>{% endif %}
         </div>
         <div class="bk-decide">
@@ -122,7 +122,7 @@
     <div class="mb-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
         <div id="email-form-section">
             <h3 class="font-semibold text-gray-900 mb-1">Get your report emailed</h3>
-            <p class="text-xs text-gray-500 mb-3">We&rsquo;ll send a copy of this analysis to your inbox with all findings and next steps.</p>
+            <p class="text-sm text-gray-500 mb-3">We&rsquo;ll send a copy of this analysis to your inbox with all findings and next steps.</p>
             <div class="flex gap-2">
                 <input id="report-email" type="email" placeholder="you@example.com" required
                     class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
@@ -149,8 +149,8 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <h3 class="font-bold text-gray-900 mb-0.5">Talk to AI Bill Advisor</h3>
-                <p class="text-xs text-gray-600">Ask questions about your bill in plain English. Get explanations, dispute strategies, and documents generated on the spot.</p>
+                <h3 class="font-bold text-gray-900 mb-0.5">Ask questions about your bill</h3>
+                <p class="text-sm text-gray-600">Ask questions about your bill in plain English. Get explanations, dispute strategies, and documents generated on the spot.</p>
             </div>
             <a href="/advisor/{{ data.bill.id }}"
                class="shrink-0 px-5 py-2.5 bg-accent-500 text-white text-sm font-bold rounded-full hover:bg-accent-600 transition whitespace-nowrap">
@@ -161,37 +161,37 @@
 
     <!-- Manual Toolkit -->
     <div id="manual-toolkit" class="mb-10">
-        <h2 class="text-xs uppercase tracking-wide text-gray-400 font-medium mb-4">Manual Toolkit</h2>
+        <h2 class="bk-h3" style="margin-bottom: 16px">Do it yourself</h2>
         <div class="grid sm:grid-cols-2 gap-3">
             <!-- Dispute Letter -->
             <div class="border border-gray-200 rounded-lg p-4">
                 <h3 class="text-sm font-semibold text-gray-900 mb-1">Your Dispute Letter</h3>
-                <p class="text-xs text-gray-500 mb-3">Pre-filled letter citing specific billing errors and Medicare rates.</p>
+                <p class="text-sm text-gray-500 mb-3">Pre-filled letter citing specific billing errors and Medicare rates.</p>
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <div>
-                        <label class="block text-xs text-gray-600 mb-1 flex items-center gap-1">Your name<span class="bk-tip" data-tip="Enter your name exactly as it appears on the billing statement. This becomes the patient name in the dispute letter."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
+                        <label class="block text-sm text-gray-600 mb-1 flex items-center gap-1">Your name<span class="bk-tip" data-tip="Enter your name exactly as it appears on the billing statement. This becomes the patient name in the dispute letter."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input id="requestor-name" type="text" placeholder="Jane Smith"
-                               class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
+                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-600 mb-1 flex items-center gap-1">Account #<span class="bk-tip" data-tip="The account or invoice number from the top of your bill. Labeled 'Account #', 'Invoice #', or 'Patient Account'. Helps the billing department locate your record quickly."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
+                        <label class="block text-sm text-gray-600 mb-1 flex items-center gap-1">Account #<span class="bk-tip" data-tip="The account or invoice number from the top of your bill. Labeled 'Account #', 'Invoice #', or 'Patient Account'. Helps the billing department locate your record quickly."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
                         <input id="account-number" type="text" placeholder="Optional"
-                               class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
+                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
                     </div>
                 </div>
                 <button id="gen-letter-btn"
-                        class="w-full px-3 py-2 bg-accent-700 text-white text-xs font-medium rounded-md hover:bg-accent-800 transition-colors">
+                        class="w-full px-3 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
                     Generate Letter
                 </button>
                 <div id="letter-output" class="hidden mt-3">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-3 mb-2 max-h-60 overflow-y-auto">
-                        <pre id="letter-text" class="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
+                        <pre id="letter-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
                     </div>
                     <div class="flex gap-2">
-                        <button id="copy-letter-btn" class="text-xs px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
+                        <button id="copy-letter-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
                             <span id="copy-letter-text">Copy</span>
                         </button>
-                        <button id="download-pdf-btn" class="text-xs px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
+                        <button id="download-pdf-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
                             Print/PDF
                         </button>
                     </div>
@@ -201,14 +201,14 @@
             <!-- Phone Script -->
             <div class="border border-gray-200 rounded-lg p-4">
                 <h3 class="text-sm font-semibold text-gray-900 mb-1">Phone Script</h3>
-                <p class="text-xs text-gray-500 mb-3">Guided conversation outline for calling the billing department.</p>
+                <p class="text-sm text-gray-500 mb-3">Guided conversation outline for calling the billing department.</p>
                 <button id="gen-phone-btn"
-                        class="w-full px-3 py-2 border border-gray-300 text-xs font-medium rounded-md hover:bg-gray-50 transition-colors">
+                        class="w-full px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
                     Generate Script
                 </button>
                 <div id="phone-output" class="hidden mt-3">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-3 max-h-60 overflow-y-auto">
-                        <pre id="phone-text" class="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
+                        <pre id="phone-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
                     </div>
                 </div>
             </div>
@@ -216,14 +216,14 @@
             <!-- Insurance Appeal -->
             <div class="border border-gray-200 rounded-lg p-4">
                 <h3 class="text-sm font-semibold text-gray-900 mb-1">Insurance Appeal</h3>
-                <p class="text-xs text-gray-500 mb-3">Template for appealing a denied claim with your insurer.</p>
+                <p class="text-sm text-gray-500 mb-3">Template for appealing a denied claim with your insurer.</p>
                 <button id="gen-appeal-btn"
-                        class="w-full px-3 py-2 border border-gray-300 text-xs font-medium rounded-md hover:bg-gray-50 transition-colors">
+                        class="w-full px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
                     Generate Appeal
                 </button>
                 <div id="appeal-output" class="hidden mt-3">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-3 max-h-60 overflow-y-auto">
-                        <pre id="appeal-text" class="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
+                        <pre id="appeal-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
                     </div>
                 </div>
             </div>
@@ -231,9 +231,9 @@
             <!-- Evidence Bundle -->
             <div class="border border-gray-200 rounded-lg p-4">
                 <h3 class="text-sm font-semibold text-gray-900 mb-1">Evidence Bundle</h3>
-                <p class="text-xs text-gray-500 mb-3">Download all findings and supporting evidence as JSON.</p>
+                <p class="text-sm text-gray-500 mb-3">Download all findings and supporting evidence as JSON.</p>
                 <a href="/api/bills/{{ data.bill.id }}/export" target="_blank"
-                   class="block w-full text-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md hover:bg-gray-50 transition-colors">
+                   class="block w-full text-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
                     Download Bundle
                 </a>
             </div>
@@ -250,7 +250,7 @@
 
 <!-- Evidence chip popover -->
 <div id="chip-popover" class="hidden fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-w-xs">
-    <p id="chip-popover-text" class="text-xs text-gray-700"></p>
+    <p id="chip-popover-text" class="text-sm text-gray-700"></p>
 </div>
 {% endblock %}
 

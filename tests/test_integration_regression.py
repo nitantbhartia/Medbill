@@ -55,9 +55,9 @@ class TestPageFlowRegression:
         resp = client.get(f"/confirm/{bill_id}")
         assert resp.status_code == 200
         html = resp.text
-        assert "Confirm extracted items" in html
+        assert "Check what we read from your bill" in html
         assert f'value="{bill_id}"' in html
-        assert "Analyze" in html
+        assert "See what looks wrong" in html
 
 
 class TestScanEndpointIntegration:

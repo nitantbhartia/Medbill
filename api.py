@@ -440,6 +440,10 @@ async def analyze_confirmed(request: Request, bill_id: int, payload: dict):
             raise HTTPException(404, "Bill not found")
 
         zip_code = bill["zip_code"] or "00000"
+        confirmed_zip = str(payload.get("zip_code") or "").strip()
+        if re.fullmatch(r"\d{5}", confirmed_zip):
+            zip_code = confirmed_zip
+            db.execute("UPDATE bills SET zip_code = ? WHERE id = ?", (zip_code, bill_id))
 
         # Preserve insurance data from original line items before replacing
         original_items = db.execute(
