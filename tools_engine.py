@@ -75,20 +75,31 @@ def _to_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def _parse_items_json(payload: dict[str, Any], key: str = "line_items_json") -> list[dict[str, Any]]:
+BILL_LINE_COLUMNS = ("cpt_code", "charged_amount", "date_of_service")
+EOB_LINE_COLUMNS = ("description", "billed_amount", "allowed_amount", "insurance_paid", "patient_owes")
+
+
+def _parse_items_json(payload: dict[str, Any], columns: tuple[str, ...], key: str = "line_items_json") -> list[dict[str, Any]]:
+    """Accept a JSON array, or plain lines like '99285, 4500, 2026-01-10' mapped onto `columns`."""
     raw = payload.get(key)
     if not raw:
         return []
     if isinstance(raw, list):
         return [x for x in raw if isinstance(x, dict)]
-    if isinstance(raw, str):
+    if not isinstance(raw, str):
+        return []
+    if raw.lstrip().startswith("["):
         try:
             data = json.loads(raw)
-            if isinstance(data, list):
-                return [x for x in data if isinstance(x, dict)]
-        except Exception:
+        except json.JSONDecodeError:
             return []
-    return []
+        return [x for x in data if isinstance(x, dict)] if isinstance(data, list) else []
+    items = []
+    for line in raw.splitlines():
+        cells = [c.strip().lstrip("$").replace(",", "") if i else c.strip() for i, c in enumerate(line.split(",", len(columns) - 1))]
+        if any(cells):
+            items.append(dict(zip(columns, cells)))
+    return items
 
 
 def _resolve_state_code(state: str) -> str | None:
@@ -205,7 +216,7 @@ def hash_payload(payload: dict[str, Any]) -> str:
 
 def _run_medical_bill_error_checker(payload: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
     zip_code = (payload.get("zip_code") or "").strip()
-    items = _parse_items_json(payload)
+    items = _parse_items_json(payload, BILL_LINE_COLUMNS)
     issues: list[dict[str, Any]] = []
     total_savings = 0.0
 
@@ -487,7 +498,7 @@ def _run_denial_appeal_generator(payload: dict[str, Any]) -> tuple[str, str, dic
 
 
 def _run_eob_decoder(payload: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
-    lines = _parse_items_json(payload)
+    lines = _parse_items_json(payload, EOB_LINE_COLUMNS)
     decoded: list[dict[str, Any]] = []
     discrepancies: list[str] = []
 

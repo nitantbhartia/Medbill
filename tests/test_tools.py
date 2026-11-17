@@ -150,3 +150,12 @@ def test_get_tool_interface():
     tool = get_tool("medicare-rate-lookup")
     assert tool is not None
     assert tool["slug"] == "medicare-rate-lookup"
+
+
+def test_plain_lines_parse_like_json():
+    from tools_engine import BILL_LINE_COLUMNS, _parse_items_json
+
+    plain = _parse_items_json({"line_items_json": "99285, 4500, 2026-01-10\n36415, $38, 2026-01-10"}, BILL_LINE_COLUMNS)
+    assert plain[0] == {"cpt_code": "99285", "charged_amount": "4500", "date_of_service": "2026-01-10"}
+    assert plain[1]["charged_amount"] == "38"
+    assert _parse_items_json({"line_items_json": "[not json"}, BILL_LINE_COLUMNS) == []

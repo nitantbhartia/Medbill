@@ -11,10 +11,10 @@ TOOLS: list[dict[str, Any]] = [
         "description": "Check CPT charges against Medicare rates and flag likely billing issues.",
         "keywords": ["check medical bill for errors", "medical bill audit", "hospital bill errors"],
         "inline_nudge": "Tip: Most people don't have CPT codes handy. Upload your full bill and our AI extracts them automatically.",
-        "primary_input_hint": "Enter CPT lines as JSON array: [{\"cpt_code\":\"99285\",\"charged_amount\":4500,\"date_of_service\":\"2026-01-10\",\"quantity\":1}]",
+        "primary_input_hint": "One charge per line: CPT code, amount billed, date. Example: 99285, 4500, 2026-01-10",
         "form_fields": [
             {"name": "zip_code", "label": "ZIP code", "type": "text", "placeholder": "e.g. 10001"},
-            {"name": "line_items_json", "label": "Bill line items (JSON)", "type": "textarea", "rows": 7},
+            {"name": "line_items_json", "label": "Bill line items", "type": "textarea", "rows": 7, "placeholder": "99285, 4500, 2026-01-10"},
         ],
         "lead_magnet": {
             "key": "audit_checklist",
@@ -399,7 +399,7 @@ TOOLS: list[dict[str, Any]] = [
         "keywords": ["how to read EOB", "explanation of benefits explained"],
         "inline_nudge": "If billed amounts and EOB responsibility do not align, dispute before paying.",
         "form_fields": [
-            {"name": "line_items_json", "label": "EOB lines (JSON)", "type": "textarea", "rows": 7},
+            {"name": "line_items_json", "label": "EOB lines", "type": "textarea", "rows": 7, "placeholder": "Office visit, 250, 120, 96, 24"},
         ],
         "lead_magnet": {
             "key": "eob_quick_guide",
