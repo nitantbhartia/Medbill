@@ -44,7 +44,7 @@ register("good-faith-estimate-rights", {
         <li><a href="#who-qualifies">Who qualifies for a GFE</a></li>
         <li><a href="#what-must-be-included">What must be included in a GFE</a></li>
         <li><a href="#how-to-request">How to request a Good Faith Estimate</a></li>
-        <li><a href="#real-example">Real example: GFE vs. actual bill for a knee MRI</a></li>
+        <li><a href="#real-example">Example: GFE vs. actual bill for a knee MRI</a></li>
         <li><a href="#how-to-dispute">How to dispute when the bill exceeds the GFE by $400+</a></li>
         <li><a href="#hospital-tricks">Common hospital tricks to avoid GFE obligations</a></li>
         <li><a href="#insured-patients">GFE for insured patients: the Advanced EOB</a></li>
@@ -153,7 +153,7 @@ register("good-faith-estimate-rights", {
     <strong>Pro tip:</strong> Request GFEs from <strong>multiple providers</strong> for the same procedure. Since GFEs include CPT codes, you can directly compare prices across facilities. A knee MRI GFE from a hospital might list $2,800 while a freestanding imaging center lists $475 for the exact same CPT code. Use the <a href="/calculator">BillKarma calculator</a> to verify that quoted prices are reasonable before you commit.
 </div>
 
-<h2 id="real-example">5. Real example: GFE vs. actual bill for a knee MRI</h2>
+<h2 id="real-example">5. Example: GFE vs. actual bill for a knee MRI</h2>
 
 <p>Here&rsquo;s what a Good Faith Estimate dispute looks like in practice. This patient scheduled a knee MRI at a hospital outpatient imaging center as a self-pay patient and received a GFE before the procedure:</p>
 

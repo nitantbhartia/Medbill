@@ -52,7 +52,7 @@ register("hospital-price-transparency", {
         <li><a href="#how-billkarma-uses">How BillKarma uses transparency files</a></li>
         <li><a href="#find-use-files">How to find and use hospital price files yourself</a></li>
         <li><a href="#when-hospital-wont-post">What to do when a hospital won&rsquo;t post prices</a></li>
-        <li><a href="#case-studies">Real examples</a></li>
+        <li><a href="#case-studies">Examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -263,7 +263,8 @@ register("hospital-price-transparency", {
 
 <p><strong>Contact your state insurance commissioner.</strong> Some states have adopted their own all-payer claims databases and price transparency laws that go beyond CMS requirements. Your state insurance commissioner may have enforcement authority over hospitals that aren&rsquo;t meeting state-level disclosure requirements.</p>
 
-<h2 id="case-studies">7. Real examples</h2>
+<h2 id="case-studies">7. Examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Patient finds $4,100 discrepancy using transparency file before scheduled surgery</h3>

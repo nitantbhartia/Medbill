@@ -43,7 +43,7 @@ register("addiction-treatment-billing", {
         <li><a href="#insurer-tactics">Common insurer denial tactics</a></li>
         <li><a href="#how-to-appeal">How to appeal a SUD treatment denial</a></li>
         <li><a href="#charity-care">Charity care at nonprofit treatment centers</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -182,7 +182,8 @@ register("addiction-treatment-billing", {
     <li><strong>Manufacturer patient assistance programs:</strong> For medication-assisted treatment (buprenorphine, naltrexone), pharmaceutical manufacturers offer patient assistance programs that provide medication at low or no cost to uninsured patients who qualify.</li>
 </ul>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Parity law appeal overturns residential SUD denial &mdash; $28,000 claim paid</h3>

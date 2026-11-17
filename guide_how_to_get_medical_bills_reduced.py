@@ -35,7 +35,7 @@ register("how-to-get-medical-bills-reduced", {
         },
     ],
     "body": f"""
-<p class="lead">Your insurance paid its share, and you still owe $4,000&mdash;or $8,000, or $15,000. You&rsquo;re not alone. More than 100 million Americans carry medical debt, and the majority of that debt exists <em>after</em> insurance has already paid. The good news: most medical bills can be reduced significantly if you know what to ask for. This guide walks you through seven proven strategies that can cut your out-of-pocket costs by 50&ndash;80%, with exact scripts, real examples, and step-by-step instructions.</p>
+<p class="lead">Your insurance paid its share, and you still owe $4,000&mdash;or $8,000, or $15,000. You&rsquo;re not alone. More than 100 million Americans carry medical debt, and the majority of that debt exists <em>after</em> insurance has already paid. The good news: most medical bills can be reduced significantly if you know what to ask for. This guide walks you through seven proven strategies that can cut your out-of-pocket costs by 50&ndash;80%, with exact scripts, examples, and step-by-step instructions.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -209,7 +209,7 @@ register("how-to-get-medical-bills-reduced", {
     <strong>Always appeal a denial.</strong> Most patients accept insurance denials without questioning them. But nearly half of all appeals result in a reversal. The appeal process is free, and if you win, the insurer pays &mdash; reducing or eliminating your out-of-pocket balance.
 </div>
 
-<h2 id="bill-example">Real example: $12,000 ER bill reduced to $3,200</h2>
+<h2 id="bill-example">Example: $12,000 ER bill reduced to $3,200</h2>
 
 <div class="bill-example">
     <div class="bill-header">Itemized Statement &mdash; Regional Medical Center &mdash; Date of Service: 01/22/2026 &mdash; Emergency Department Visit</div>

@@ -38,12 +38,12 @@ register("dental-discount-plan-vs-insurance", {
     <ol>
         <li><a href="#how-each-works">How dental insurance vs. discount plans work</a></li>
         <li><a href="#cost-comparison">Side-by-side cost comparison</a></li>
-        <li><a href="#crown-example">Real example: $3,000 crown under each option</a></li>
+        <li><a href="#crown-example">Example: $3,000 crown under each option</a></li>
         <li><a href="#when-discount-wins">When discount plans save more</a></li>
         <li><a href="#when-insurance-wins">When insurance saves more</a></li>
         <li><a href="#stacking-both">Using both simultaneously (legal in most states)</a></li>
         <li><a href="#top-providers">Top discount plan providers compared</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -101,7 +101,7 @@ register("dental-discount-plan-vs-insurance", {
 
 <p>These estimates assume no employer subsidy of the insurance premium. If your employer pays 50&ndash;100% of your dental premium, insurance is nearly always the better deal.</p>
 
-<h2 id="crown-example">3. Real example: $3,000 crown under each option</h2>
+<h2 id="crown-example">3. Example: $3,000 crown under each option</h2>
 
 <p>A porcelain-fused-to-zirconia crown on a molar with a root canal costs approximately $3,000 at a typical general dentist in a mid-size city. Here is exactly what you would pay under each option in year one:</p>
 
@@ -179,7 +179,8 @@ register("dental-discount-plan-vs-insurance", {
 
 <p>Always verify your specific dentist&rsquo;s participation before purchasing any plan. Network directories can be outdated; call the dental office directly and confirm they accept the specific plan you&rsquo;re considering.</p>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Self-employed consultant switches to discount plan and saves $740 in year one</h3>

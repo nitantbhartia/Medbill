@@ -41,7 +41,7 @@ register("cant-afford-medical-bill", {
         <li><a href="#bill-example">Annotated bill: where the savings are</a></li>
         <li><a href="#decision-tree">Which option is right for you?</a></li>
         <li><a href="#phone-scripts">What to say when you call billing</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -230,7 +230,8 @@ register("cant-afford-medical-bill", {
     <strong>Check your hospital's charity care policy before you call.</strong> Our <a href="/hospitals/">hospital directory</a> shows each hospital's nonprofit status, financial assistance thresholds, and billing grade &mdash; go in with the facts so you know exactly what to ask for.
 </div>
 
-<h2 id="case-studies">6. Real patient results</h2>
+<h2 id="case-studies">6. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $8,200 ER bill reduced to $0 via charity care</h3>

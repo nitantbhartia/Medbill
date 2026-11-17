@@ -45,7 +45,7 @@ register("how-much-does-mri-ct-scan-cost", {
         <li><a href="#ct-costs">Common CT scan costs</a></li>
         <li><a href="#real-bill">An actual imaging bill, annotated</a></li>
         <li><a href="#pay-less">5 ways to pay less for imaging</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -127,7 +127,7 @@ register("how-much-does-mri-ct-scan-cost", {
 
 <h2 id="real-bill">4. An actual imaging bill, annotated</h2>
 
-<p>Here&rsquo;s a real bill for a patient who got a knee MRI at a <strong>hospital outpatient department</strong>. We&rsquo;ve flagged the key cost drivers:</p>
+<p>Here&rsquo;s an example bill for a patient who got a knee MRI at a <strong>hospital outpatient department</strong>. We&rsquo;ve flagged the key cost drivers:</p>
 
 <div class="bill-example">
     <div class="bill-header">Itemized Statement &mdash; Metro General Hospital Outpatient &mdash; Date of Service: 01/08/2026</div>
@@ -201,7 +201,8 @@ register("how-much-does-mri-ct-scan-cost", {
     <strong>Already have an imaging bill you think is too high?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we&rsquo;ll flag every overcharge and show you exactly which line items to dispute.
 </div>
 
-<h2 id="case-studies">6. Real-world case studies</h2>
+<h2 id="case-studies">6. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: Knee MRI &mdash; hospital vs. imaging center</h3>

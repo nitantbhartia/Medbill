@@ -185,6 +185,7 @@ register("urgent-care-billing", {
 <div class="key-takeaway"><strong>Compare urgent care costs near you.</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare pays for any CPT code you see on your urgent care bill.</div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Sinus infection upcoded to 99215: $180 recovered</h3>

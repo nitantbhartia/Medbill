@@ -191,6 +191,7 @@ register("dental-implant-cost", {
 </div>
 
 <h2 id="case-study">7. Case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Using FSA + negotiation to cut a $5,200 implant bill to $3,400</h3>

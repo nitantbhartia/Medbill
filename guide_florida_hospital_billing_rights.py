@@ -43,7 +43,7 @@ register("florida-hospital-billing-rights", {
         <li><a href="#bill-example">Annotated Florida ER bill: Medicare patient</a></li>
         <li><a href="#statute-of-limitations">Florida statute of limitations on medical debt</a></li>
         <li><a href="#how-to-dispute">How to file a complaint or dispute in Florida</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -212,7 +212,8 @@ register("florida-hospital-billing-rights", {
     <strong>Medicare patient in Florida?</strong> Use our <a href="/calculator">free calculator</a> to look up the Medicare allowed amount for every procedure on your bill &mdash; and our <a href="/hospitals/">hospital directory</a> to see your facility&rsquo;s ER markup rate, charity care status, and transparency grade before you dispute a single line item.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: Head-of-household exemption blocked $34,000 wage garnishment &mdash; Tampa</h3>

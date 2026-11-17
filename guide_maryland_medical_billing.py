@@ -235,6 +235,7 @@ register("maryland-medical-billing-laws", {
 <p>The path to the corrected liability: (1) file HSCRC complaint to enforce the approved surgical rate, reducing the hernia repair from $18,200 to $14,600; (2) challenge the recovery room charge if it is bundled into the approved rate, potentially eliminating $3,400; (3) appeal the financial assistance denial at 268% FPL under COMAR 10.37.10 for reduced-cost care. The combination brings total patient responsibility from $35,750 to an estimated $6,200 or less.</p>
 
 <h2 id="case-studies">8. Case studies: real Maryland patient results</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $3,600 overcharge reversed after HSCRC rate dispute &mdash; Baltimore</h3>

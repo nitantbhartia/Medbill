@@ -45,7 +45,7 @@ register("fertility-treatment-billing", {
         <li><a href="#appealing-denials">Appealing insurance denials for fertility treatment</a></li>
         <li><a href="#medication-savings">How to save on fertility medications</a></li>
         <li><a href="#financing-options">Financing and multi-cycle discounts</a></li>
-        <li><a href="#case-studies">Case studies: real patients, real savings</a></li>
+        <li><a href="#case-studies">Case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -190,7 +190,8 @@ register("fertility-treatment-billing", {
     </div>
 </div>
 
-<h2 id="case-studies">6. Case studies: real patients, real savings</h2>
+<h2 id="case-studies">6. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>$42,000 for 2 IVF cycles: insurance denial appealed, $28,000 covered</h3>

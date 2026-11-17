@@ -43,7 +43,7 @@ register("mammogram-cost", {
         <li><a href="#3d-tomosynthesis">3D mammogram (tomosynthesis) cost</a></li>
         <li><a href="#insurance-coverage">How insurance covers mammograms</a></li>
         <li><a href="#dispute-charges">How to dispute unexpected mammogram charges</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -184,7 +184,8 @@ register("mammogram-cost", {
     <strong>Document everything in writing.</strong> When you call the billing department or your insurer, follow up every phone call with a written summary sent via certified mail or patient portal message. A paper trail is your strongest tool if the dispute escalates to your state insurance commissioner or a formal grievance.
 </div>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Annual screening billed as diagnostic &mdash; $485 dispute resolved in 3 weeks</h3>

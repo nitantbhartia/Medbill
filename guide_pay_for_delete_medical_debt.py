@@ -42,7 +42,7 @@ register("pay-for-delete-medical-debt", {
         <li><a href="#letter-example">Annotated pay-for-delete letter</a></li>
         <li><a href="#step-by-step">Step-by-step: sending your letter</a></li>
         <li><a href="#negotiation-tips">Negotiation tips for the best outcome</a></li>
-        <li><a href="#case-studies">Real outcomes</a></li>
+        <li><a href="#case-studies">Outcome examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -181,7 +181,8 @@ register("pay-for-delete-medical-debt", {
     <strong>Check your hospital's billing data.</strong> Our <a href="/hospitals/">hospital directory</a> shows markup ratios and billing grades &mdash; if the hospital charges 4x Medicare, you can argue the original bill was inflated, supporting a deeper discount.
 </div>
 
-<h2 id="case-studies">7. Real outcomes</h2>
+<h2 id="case-studies">7. Outcome examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $4,800 collection settled for $1,440 with deletion</h3>

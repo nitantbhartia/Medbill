@@ -43,7 +43,7 @@ register("dental-insurance-explained", {
         <li><a href="#insurer-tactics">Insurer tactics: downgrades and frequency limits</a></li>
         <li><a href="#network-comparison">In-network vs. out-of-network comparison</a></li>
         <li><a href="#maximize-benefits">How to maximize your dental benefits</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -206,7 +206,8 @@ register("dental-insurance-explained", {
     <li><strong>Choose composite over amalgam only if you will pay the difference.</strong> If your plan downgrades composites on back teeth to amalgam rates, ask your dentist to note your preference and confirm what you will owe before treatment.</li>
 </ol>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Downgrade surprise: $280 out of pocket on a &ldquo;covered&rdquo; filling</h3>

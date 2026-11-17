@@ -44,7 +44,7 @@ register("medicare-part-d-explained", {
         <li><a href="#extra-help">Extra Help (Low Income Subsidy) program</a></li>
         <li><a href="#formulary-appeals">How to appeal a formulary denial</a></li>
         <li><a href="#step-therapy">Step therapy and biosimilar substitution</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>

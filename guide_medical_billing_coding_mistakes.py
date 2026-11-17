@@ -35,7 +35,7 @@ register("medical-billing-coding-mistakes", {
         },
     ],
     "body": f"""
-<p class="lead">Up to <strong>80% of medical bills</strong> contain at least one error, and the average overcharge is <strong>$935</strong>. Coding mistakes &mdash; wrong CPT codes, unbundled procedures, duplicate charges &mdash; are the single biggest driver of inflated hospital bills. Most patients pay without checking because medical bills are designed to be unreadable. This guide breaks down the 10 most common medical billing and coding mistakes, shows you exactly what each one looks like on a real bill, and gives you a step-by-step process to catch and reverse them.</p>
+<p class="lead">Up to <strong>80% of medical bills</strong> contain at least one error, and the average overcharge is <strong>$935</strong>. Coding mistakes &mdash; wrong CPT codes, unbundled procedures, duplicate charges &mdash; are the single biggest driver of inflated hospital bills. Most patients pay without checking because medical bills are designed to be unreadable. This guide breaks down the 10 most common medical billing and coding mistakes, shows you exactly what each one looks like on a bill, and gives you a step-by-step process to catch and reverse them.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>
@@ -231,7 +231,7 @@ register("medical-billing-coding-mistakes", {
     </tbody>
 </table>
 
-<h2 id="bill-example">Real bill example: three coding errors on one statement</h2>
+<h2 id="bill-example">Example bill: three coding errors on one statement</h2>
 
 <div class="bill-example">
     <div class="bill-header">Itemized Statement &mdash; Regional Medical Center &mdash; Date of Service: 02/10/2026</div>

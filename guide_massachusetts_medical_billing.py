@@ -215,6 +215,7 @@ register("massachusetts-medical-billing-laws", {
 </div>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $14,500 ER bill covered by Health Safety Net &mdash; Worcester</h3>

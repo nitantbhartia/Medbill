@@ -257,6 +257,7 @@ register("medical-device-billing", {
 </p>
 
 <h2 id="case-studies">6. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>$47,000 knee implant when manufacturer price is $3,500</h3>

@@ -44,7 +44,7 @@ register("mri-costs", {
         <li><a href="#price-transparency">How to compare prices using transparency data</a></li>
         <li><a href="#insurance-coverage">How insurance covers MRI costs</a></li>
         <li><a href="#dispute-charges">How to dispute inflated MRI charges</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -187,7 +187,8 @@ register("mri-costs", {
     <li><strong>Ask about financial assistance.</strong> Nonprofit hospitals are required to have charity care programs. If your income qualifies, you may be eligible for a significant reduction or even forgiveness. See our guide on <a href="/guides/hospital-financial-assistance/">hospital financial assistance</a>.</li>
 </ol>
 
-<h2 id="case-studies">9. Real-world case studies</h2>
+<h2 id="case-studies">9. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Lumbar spine MRI &mdash; switching to an imaging center saves $2,100</h3>

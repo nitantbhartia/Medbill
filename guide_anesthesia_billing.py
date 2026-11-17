@@ -214,6 +214,7 @@ register("anesthesia-billing", {
 <p>If the time units or qualifying codes are wrong, call the anesthesiology group&rsquo;s billing department with your anesthesia record in hand. For NSA violations, go through your insurer and the federal complaint process. For high conversion factors on legitimate out-of-network bills (where NSA may not apply), you can negotiate directly &mdash; ask for the &ldquo;Medicare rate&rdquo; or &ldquo;self-pay rate,&rdquo; or offer to pay the in-network equivalent rate.</p>
 
 <h2 id="case-studies">7. Case studies: anesthesia disputes resolved</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway"><strong>Not sure what you were charged for?</strong> Use our <a href="/calculator">free calculator</a> to look up what Medicare pays for any anesthesia CPT code on your bill.</div>
 

@@ -345,6 +345,7 @@ register("medical-bankruptcy-guide", {
 </p>
 
 <h2 id="case-studies">8. Case Studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 <div class="key-takeaway">
   <strong>Key Takeaway 3:</strong> The moment a bankruptcy petition is filed, the automatic stay stops all collection
   activity immediately. If you are being harassed by collectors, facing wage garnishment, or at risk of a bank

@@ -365,6 +365,7 @@ register("icd10-drg-codes", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Wrong DRG assignment inflated bill by $14,000</h3>

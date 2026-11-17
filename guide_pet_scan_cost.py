@@ -42,7 +42,7 @@ register("pet-scan-cost", {
         <li><a href="#insurance-prior-auth">Insurance coverage and prior authorization</a></li>
         <li><a href="#medicare-coverage">Medicare PET scan coverage rules</a></li>
         <li><a href="#denial-appeal">How to appeal a PET scan denial</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -171,7 +171,8 @@ register("pet-scan-cost", {
     <li><strong>Escalate to external review.</strong> If your internal appeal is denied, the ACA guarantees your right to an independent external review by a third-party organization. External reviewers overturn insurer denials approximately 45% of the time for imaging-related claims.</li>
 </ol>
 
-<h2 id="case-study">7. Real-world case study</h2>
+<h2 id="case-study">7. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Lung cancer PET scan denied for wrong CPT code &mdash; appeal saves $6,450</h3>

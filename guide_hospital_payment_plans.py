@@ -42,7 +42,7 @@ register("hospital-payment-plans", {
         <li><a href="#payment-plan-example">Annotated payment plan agreement</a></li>
         <li><a href="#what-to-watch">What to watch for in the fine print</a></li>
         <li><a href="#reduce-first">Reduce the bill before setting up the plan</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -188,7 +188,8 @@ register("hospital-payment-plans", {
     <strong>Find out what your hospital offers.</strong> Our <a href="/hospitals/">hospital directory</a> lists each facility's nonprofit status, charity care income thresholds, and financial assistance policies &mdash; know what you qualify for before negotiating your payment plan.
 </div>
 
-<h2 id="case-studies">7. Real patient results</h2>
+<h2 id="case-studies">7. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $12,000 surgery bill — 60% charity care, $200/month on the rest</h3>

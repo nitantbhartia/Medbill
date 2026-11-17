@@ -183,6 +183,7 @@ register("invisalign-braces-cost", {
 <p>FSA and HSA funds can be used for remote aligner services, since they are qualified medical expenses regardless of the delivery model.</p>
 
 <h2 id="case-study">7. Case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Invisalign Full&mdash;three quotes, FSA strategy, $2,100 saved</h3>

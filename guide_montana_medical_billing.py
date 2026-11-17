@@ -211,6 +211,7 @@ register("montana-medical-billing", {
 <p>Contact Montana Legal Services Association at montanalegalservices.org (1-800-666-6899) for free legal help if you are facing collection, garnishment, or need help understanding an old debt.</p>
 
 <h2 id="case-studies">9. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Billings patient disputes 885× promethazine markup</h3>

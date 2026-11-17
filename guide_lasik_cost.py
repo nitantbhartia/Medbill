@@ -203,6 +203,7 @@ register("lasik-eye-surgery-cost", {
 </div>
 
 <h2 id="case-study">8. Case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>HSA strategy cuts $4,400 LASIK bill to $3,344 effective cost</h3>

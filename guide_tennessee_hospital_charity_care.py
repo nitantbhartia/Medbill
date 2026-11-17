@@ -167,6 +167,7 @@ register("tennessee-hospital-charity-care", {
 <p>Most low-income single adults in Tennessee do not qualify for TennCare. If you fall in the coverage gap, you may qualify for cost-sharing reductions on the ACA marketplace if your income is at least 100% FPL. Apply at healthcare.gov during open enrollment or after a qualifying life event. Use BillKarma&rsquo;s <a href="/hospitals/">hospital directory</a> to find Tennessee hospitals with the most generous charity care policies before scheduling care.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Vanderbilt charity care eliminates $28,000 surgery bill</h3>

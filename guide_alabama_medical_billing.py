@@ -43,7 +43,7 @@ register("alabama-medical-billing", {
         <li><a href="#debt-collection">Debt collection and wage garnishment</a></li>
         <li><a href="#how-to-dispute">How to dispute an Alabama hospital bill</a></li>
         <li><a href="#bill-example">Annotated Alabama hospital bill</a></li>
-        <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#case-study">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -204,7 +204,8 @@ register("alabama-medical-billing", {
     <li><strong>Charity care eligibility:</strong> With a $31,425 bill, any patient earning under 200&ndash;300% FPL should immediately apply for AL Code &sect;&nbsp;22-21-8 charity care. This bill could be reduced to zero for qualifying patients.</li>
 </ul>
 
-<h2 id="case-study">8. Real patient results</h2>
+<h2 id="case-study">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study: $18,700 hospital bill reduced by 85% in Birmingham</h3>

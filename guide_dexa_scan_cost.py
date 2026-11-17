@@ -43,7 +43,7 @@ register("dexa-scan-cost", {
         <li><a href="#vfa-unnecessary">When VFA (CPT 77085) is unnecessary</a></li>
         <li><a href="#cash-pay">How to get a cash-pay rate</a></li>
         <li><a href="#insurance-coverage">Insurance coverage rules by plan type</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -182,7 +182,8 @@ register("dexa-scan-cost", {
     </tbody>
 </table>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Hospital overbilling on a preventive DEXA &mdash; $490 reduced to $0</h3>

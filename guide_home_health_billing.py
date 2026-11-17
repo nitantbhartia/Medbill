@@ -295,6 +295,7 @@ register("home-health-billing", {
 </ol>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Facing a home health billing dispute?</strong> See how other patients' home health agencies are rated on billing accuracy in our <a href="/hospitals/">facility directory</a> — and find out if yours has a history of billing irregularities flagged by Medicare audits.

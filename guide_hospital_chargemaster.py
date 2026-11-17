@@ -233,6 +233,7 @@ register("hospital-chargemaster-explained", {
 <p><strong>Step 6: Escalate if needed.</strong> If the first billing representative cannot approve a significant discount, ask for a supervisor or the patient financial services manager. Reference the hospital&rsquo;s financial assistance policy (required for all nonprofit hospitals under IRS 501(r)) and ask whether you qualify for additional reductions.</p>
 
 <h2 id="case-study">7. Case study: $16,000 bill negotiated to $3,800</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Uninsured patient uses chargemaster + Medicare comparison to negotiate 76% off</h3>

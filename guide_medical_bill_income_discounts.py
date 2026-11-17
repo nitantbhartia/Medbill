@@ -42,7 +42,7 @@ register("income-based-medical-bill-discounts", {
         <li><a href="#application-example">Annotated financial assistance application</a></li>
         <li><a href="#how-to-apply">How to apply — step by step</a></li>
         <li><a href="#insured-patients">Discounts for insured patients (yes, you qualify too)</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -183,7 +183,8 @@ register("income-based-medical-bill-discounts", {
     <strong>Research your hospital's financial policies.</strong> Our <a href="/hospitals/">hospital directory</a> shows each facility's nonprofit status, income thresholds for discounts, and whether they extend assistance to insured patients' out-of-pocket costs.
 </div>
 
-<h2 id="case-studies">7. Real patient results</h2>
+<h2 id="case-studies">7. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: Family of 4 earning $58,000 — 50% discount on $9,200 surgery bill</h3>

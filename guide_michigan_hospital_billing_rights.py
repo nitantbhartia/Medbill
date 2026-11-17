@@ -203,6 +203,7 @@ register("michigan-hospital-billing-rights", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: Michigan mental health insurance denial overturned via independent review &mdash; $7,400 covered</h3>

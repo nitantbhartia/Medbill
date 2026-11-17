@@ -176,6 +176,7 @@ register("hawaii-medical-billing", {
 <p>A hospital must sue you, win a judgment, and apply for a writ of garnishment before any wages can be withheld. Hawaii also has robust exemptions for retirement accounts, certain personal property, and homestead protections. Under IRS 501(r) rules, nonprofit hospitals cannot initiate collection actions while a charity care application is pending.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Honolulu patient challenges OON assistant surgeon balance bill</h3>

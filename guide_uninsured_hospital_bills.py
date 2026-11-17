@@ -42,7 +42,7 @@ register("uninsured-hospital-bill", {
         <li><a href="#charity-care">Financial assistance for uninsured patients</a></li>
         <li><a href="#good-faith">Your right to a good faith estimate</a></li>
         <li><a href="#negotiate">How to negotiate an uninsured hospital bill</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -183,7 +183,8 @@ register("uninsured-hospital-bill", {
     <strong>Check your hospital's pricing grade.</strong> Our <a href="/hospitals/">hospital directory</a> shows markup ratios, billing accuracy grades, and charity care details for hospitals near you &mdash; some hospitals routinely charge 5x Medicare while others charge 2x. Know where yours falls.
 </div>
 
-<h2 id="case-studies">7. Real patient results</h2>
+<h2 id="case-studies">7. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $14,200 appendectomy — charity care reduced to $0</h3>

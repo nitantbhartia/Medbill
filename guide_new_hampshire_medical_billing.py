@@ -186,6 +186,7 @@ register("new-hampshire-medical-billing", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Manchester patient wins surprise anesthesia dispute under RSA 420-J</h3>

@@ -43,7 +43,7 @@ register("colorado-medical-billing-laws", {
         <li><a href="#statute-of-limitations">Statute of limitations on medical debt</a></li>
         <li><a href="#how-to-dispute">How to dispute a Colorado hospital bill</a></li>
         <li><a href="#bill-example">Annotated Colorado hospital bill</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -247,7 +247,8 @@ register("colorado-medical-billing-laws", {
     <li><strong>Lab charges above Medicare ($240 for CMP):</strong> Medicare pays approximately $14 for a comprehensive metabolic panel (80053). A charge of $240 is a <strong>17&times; markup</strong>. While not illegal, this extreme markup strengthens your case for a charity care discount or negotiated reduction.</li>
 </ul>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $2,040 facility fee refund under HB 22-1285 &mdash; Denver</h3>

@@ -281,6 +281,7 @@ register("orthopedic-surgery-billing-costs", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 <div class="key-takeaway">
   <strong>Key Takeaway 3:</strong> For eligible patients, outpatient joint replacement at an ambulatory surgery
   center costs 40&ndash;60% less than at a hospital outpatient department with comparable surgical outcomes.

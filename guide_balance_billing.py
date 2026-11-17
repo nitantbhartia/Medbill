@@ -36,7 +36,7 @@ register("balance-billing", {
 <nav class="toc">
     <h2>In this guide</h2>
     <ol>
-        <li><a href="#what-is-balance-billing">What balance billing is (with a real example)</a></li>
+        <li><a href="#what-is-balance-billing">What balance billing is (with an example)</a></li>
         <li><a href="#when-legal">When balance billing is legal</a></li>
         <li><a href="#when-illegal">When balance billing is illegal: the No Surprises Act</a></li>
         <li><a href="#consent-forms">NSA consent forms: what to do if asked to sign</a></li>
@@ -48,7 +48,7 @@ register("balance-billing", {
     </ol>
 </nav>
 
-<h2 id="what-is-balance-billing">1. What balance billing is (with a real example)</h2>
+<h2 id="what-is-balance-billing">1. What balance billing is (with an example)</h2>
 
 <p>Balance billing is the practice of charging a patient the gap between a provider&rsquo;s full billed rate and the amount the insurance company paid. It happens almost exclusively with out-of-network providers, because in-network providers have signed contracts agreeing to accept the insurance-allowed amount as payment in full.</p>
 

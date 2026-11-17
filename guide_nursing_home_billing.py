@@ -171,6 +171,7 @@ register("nursing-home-billing", {
 <p>For non-Medicare billing disputes, send a written dispute letter to the facility&rsquo;s billing department with a copy of the itemized statement, your notes on what was and wasn&rsquo;t provided, and a request for a line-by-line review. See our <a href="/guides/dispute-letter-template/">dispute letter template</a> for a starting point.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Therapy upcoding: 14 overbilled PT units reversed</h3>

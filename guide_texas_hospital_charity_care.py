@@ -43,7 +43,7 @@ register("texas-hospital-charity-care", {
         <li><a href="#collections-rights">Your rights before and during collections</a></li>
         <li><a href="#statute-of-limitations">Texas statute of limitations: 4 years</a></li>
         <li><a href="#wage-garnishment">Wage garnishment in Texas</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -212,7 +212,8 @@ register("texas-hospital-charity-care", {
 
 <div class="key-takeaway"><strong>See what Texas hospitals actually charge.</strong> Our <a href="/hospitals/">hospital directory</a> shows charity care eligibility thresholds and billing accuracy grades for every major Texas hospital.</div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $12,400 eliminated under Houston Methodist financial assistance &mdash; Houston</h3>

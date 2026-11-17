@@ -273,6 +273,7 @@ register("washington-state-medical-billing-laws", {
 </ul>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $7,400 ER anesthesiology balance bill eliminated via BBPA arbitration &mdash; Seattle</h3>

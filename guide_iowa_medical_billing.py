@@ -44,7 +44,7 @@ register("iowa-medical-billing", {
         <li><a href="#debt-collection">Debt collection and wage garnishment</a></li>
         <li><a href="#how-to-dispute">How to dispute an Iowa hospital bill</a></li>
         <li><a href="#bill-example">Annotated Iowa hospital bill</a></li>
-        <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#case-study">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -212,7 +212,8 @@ register("iowa-medical-billing", {
     </div>
 </div>
 
-<h2 id="case-study">9. Real patient results</h2>
+<h2 id="case-study">9. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study: $14,800 hospital bill eliminated via retroactive Iowa Medicaid &mdash; Des Moines</h3>

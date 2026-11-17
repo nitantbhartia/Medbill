@@ -43,7 +43,7 @@ register("kentucky-medical-billing", {
         <li><a href="#debt-collection">Debt collection and wage garnishment</a></li>
         <li><a href="#how-to-dispute">How to dispute a Kentucky hospital bill</a></li>
         <li><a href="#bill-example">Annotated Kentucky hospital bill</a></li>
-        <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#case-study">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -206,7 +206,8 @@ register("kentucky-medical-billing", {
     </div>
 </div>
 
-<h2 id="case-study">8. Real patient results</h2>
+<h2 id="case-study">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study: $16,200 surgery bill zeroed out via retroactive Medicaid &mdash; Louisville</h3>

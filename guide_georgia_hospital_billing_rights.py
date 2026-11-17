@@ -207,6 +207,7 @@ register("georgia-hospital-billing-rights", {
 <p>If the hospital does not respond or denies your dispute without explanation, file a complaint with the <strong>Georgia Department of Community Health (DCH)</strong> for billing violations, or the <strong>Georgia Attorney General&rsquo;s consumer protection division</strong> for collection abuses.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: $28,000 ER bill reduced to $2,800 under hospital financial assistance program</h3>

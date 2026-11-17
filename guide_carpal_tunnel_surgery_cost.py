@@ -43,7 +43,7 @@ register("carpal-tunnel-surgery-cost", {
         <li><a href="#postop-pt">Post-op physical therapy billing risks</a></li>
         <li><a href="#five-ways">5 ways to lower your carpal tunnel surgery cost</a></li>
         <li><a href="#how-to-dispute">How to dispute inflated charges</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -171,7 +171,8 @@ register("carpal-tunnel-surgery-cost", {
     <li><strong>File a written dispute</strong> if the phone call does not resolve the issue. Use our <a href="/guides/dispute-bill/">dispute letter template</a>. Include the Medicare rate printout and your itemized bill.</li>
 </ol>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Carpal tunnel surgery at a hospital vs. ASC &mdash; $3,100 saved by asking one question</h3>

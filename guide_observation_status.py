@@ -45,7 +45,7 @@ register("observation-status-billing", {
         <li><a href="#snf-trap">The skilled nursing facility trap</a></li>
         <li><a href="#your-rights">Your rights: the MOON notice</a></li>
         <li><a href="#how-to-appeal">How to appeal observation status</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#private-insurance">Private insurance and observation status</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
@@ -171,7 +171,8 @@ register("observation-status-billing", {
     <strong>Ready to challenge your observation status classification?</strong> Browse <a href="/hospitals/">BillKarma&rsquo;s hospital billing profiles</a> to see how your facility compares on observation status rates and appeal outcomes before you file.
 </div>
 
-<h2 id="case-studies">6. Real-world case studies</h2>
+<h2 id="case-studies">6. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Wondering whether your stay should have been billed as inpatient?</strong> <a href="/scan">Scan your bill with BillKarma</a> &mdash; we cross-reference your diagnosis codes and length of stay against Medicare&rsquo;s two-midnight rule to flag likely observation status misclassifications.

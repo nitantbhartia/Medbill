@@ -34,7 +34,7 @@ register("medical-bill-hardship-letter", {
         },
     ],
     "body": f"""
-<p class="lead">A single medical bill hardship letter can eliminate thousands of dollars in hospital debt &mdash; if you write it correctly. Nonprofit hospitals are <strong>legally required</strong> to offer financial assistance programs under IRS Section 501(r), and a hardship letter is the key document that triggers a review of your eligibility. Yet most patients never send one, either because they don&rsquo;t know it&rsquo;s an option or they don&rsquo;t know what to say. This guide gives you a proven template, step-by-step instructions, and real examples of hardship letters that reduced bills by 80&ndash;100%.</p>
+<p class="lead">A single medical bill hardship letter can eliminate thousands of dollars in hospital debt &mdash; if you write it correctly. Nonprofit hospitals are <strong>legally required</strong> to offer financial assistance programs under IRS Section 501(r), and a hardship letter is the key document that triggers a review of your eligibility. Yet most patients never send one, either because they don&rsquo;t know it&rsquo;s an option or they don&rsquo;t know what to say. This guide gives you a proven template, step-by-step instructions, and examples of hardship letters that reduced bills by 80&ndash;100%.</p>
 
 <nav class="toc">
     <h2>In this guide</h2>

@@ -238,6 +238,7 @@ register("virginia-medical-billing-laws", {
 <p>To identify errors on your Virginia hospital bill and generate a dispute letter citing Virginia law, <a href="/scan">upload your bill to BillKarma</a>.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: $4,200 surprise balance bill eliminated under Virginia HB 1251 &mdash; Northern Virginia emergency room</h3>

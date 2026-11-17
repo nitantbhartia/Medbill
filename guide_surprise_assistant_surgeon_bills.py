@@ -183,6 +183,7 @@ register("surprise-assistant-surgeon-bills", {
 </ol>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>$4,000 assistant surgeon bill for a knee replacement the patient never consented to</h3>

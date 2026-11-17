@@ -224,6 +224,7 @@ register("debt-validation-letter-medical-debt", {
 </div>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $3,200 ER bill — collector couldn't validate</h3>

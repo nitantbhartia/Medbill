@@ -206,6 +206,7 @@ register("north-carolina-medical-debt-laws", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: Wage garnishment attempt stopped &mdash; NC§ 1-362 defense</h3>

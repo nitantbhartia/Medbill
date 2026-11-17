@@ -43,7 +43,7 @@ register("medigap-medicare-supplement", {
         <li><a href="#medigap-vs-advantage">Medigap vs. Medicare Advantage comparison</a></li>
         <li><a href="#when-to-buy">When to buy: open enrollment rules</a></li>
         <li><a href="#billing-interactions">How Medigap interacts with your medical bills</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -225,7 +225,8 @@ register("medigap-medicare-supplement", {
 
 <p><strong>When Medigap claims are denied:</strong> Medigap denial is rare, but it can occur if: (1) Medicare denies the underlying claim (Medigap cannot pay what Medicare refuses to cover), (2) the service is not covered by Medicare at all, or (3) there is a coordination of benefits error. If your Medigap claim is denied, request the denial in writing, confirm that Medicare did pay its share, and appeal using the insurer&rsquo;s grievance process.</p>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Hip replacement &mdash; Plan G keeps out-of-pocket to $257 on a $42,000 procedure</h3>

@@ -46,7 +46,7 @@ register("what-are-cpt-codes", {
         <li><a href="#billing-errors">The 4 most common CPT billing errors</a></li>
         <li><a href="#audit-your-bill">How to audit your bill with CPT codes</a></li>
         <li><a href="#real-bill">An annotated bill with CPT errors</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -205,7 +205,8 @@ register("what-are-cpt-codes", {
     <p><strong>Total recovered after appeal: $543</strong></p>
 </div>
 
-<h2 id="case-studies">7. Real-world case studies</h2>
+<h2 id="case-studies">7. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Seeing a CPT code on your bill that doesn&rsquo;t add up?</strong> Check what Medicare actually pays for that procedure with our <a href="/calculator">free calculator</a> &mdash; knowing the benchmark is the first step to a successful dispute.

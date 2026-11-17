@@ -43,7 +43,7 @@ register("ultrasound-costs", {
         <li><a href="#annotated-bill">Annotated ultrasound bill example</a></li>
         <li><a href="#get-cheaper">How to get a cheaper ultrasound</a></li>
         <li><a href="#dispute-charges">How to dispute inflated ultrasound charges</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -202,7 +202,8 @@ register("ultrasound-costs", {
     <li><strong>For insurance denials,</strong> file a formal appeal citing the medical necessity documentation from your ordering physician. Most ultrasound denials are overturned on first appeal when clinical notes are included. Our <a href="/guides/appeal-denial/">insurance denial guide</a> has templates.</li>
 </ol>
 
-<h2 id="case-studies">8. Real-world case studies</h2>
+<h2 id="case-studies">8. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Pregnancy ultrasound overcharge &mdash; duplicate codes caught</h3>

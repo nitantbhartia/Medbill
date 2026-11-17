@@ -43,7 +43,7 @@ register("south-carolina-medical-billing", {
         <li><a href="#debt-collection">Debt collection and wage garnishment rules</a></li>
         <li><a href="#how-to-dispute">How to dispute a South Carolina hospital bill</a></li>
         <li><a href="#bill-example">Annotated South Carolina hospital bill</a></li>
-        <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#case-study">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -223,7 +223,8 @@ register("south-carolina-medical-billing", {
     <li><strong>Out-of-network radiology surprise bill ($640):</strong> Write a dispute letter citing the federal No Surprises Act. The radiologist interpreted images at an in-network facility — you owe only your in-network cost-sharing amount, not the balance.</li>
 </ul>
 
-<h2 id="case-study">8. Real patient results</h2>
+<h2 id="case-study">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study: $11,400 ER bill reduced to $0 through SC charity care &mdash; Columbia</h3>

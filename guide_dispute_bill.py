@@ -48,7 +48,7 @@ register("how-to-dispute-a-medical-bill", {
         <li><a href="#what-to-dispute">What&rsquo;s worth disputing (and what isn&rsquo;t)</a></li>
         <li><a href="#escalation">How to escalate when billing says no</a></li>
         <li><a href="#timeline">Dispute timeline: what to expect</a></li>
-        <li><a href="#real-examples">Real dispute results</a></li>
+        <li><a href="#real-examples">Dispute examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -186,7 +186,8 @@ register("how-to-dispute-a-medical-bill", {
 
 <p><strong>During the dispute:</strong> Pay the undisputed portion of your bill on time. Request in writing that the disputed amount not be sent to collections while the review is active. Most hospitals will agree to this.</p>
 
-<h2 id="real-examples">7. Real dispute results</h2>
+<h2 id="real-examples">7. Dispute examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Want to see what errors are hiding in your bill before you dispute?</strong> <a href="/scan">Run your bill through BillKarma</a> &mdash; our scanner automatically identifies billing errors like the ones below and generates a dispute-ready summary you can send directly to the hospital.
