@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 import json
+import logging
 import math
 import re
+import sqlite3
 import time
 from collections import defaultdict
 
 from config import APP_URL, ENABLE_FREE_MAPS, GRADED_LETTERS, SEO_META_MAX_CHARS, SEO_TITLE_MAX_CHARS
 from db import get_db
+
+log = logging.getLogger(__name__)
 
 GRADE_THRESHOLDS = (
     (2.0, "A"),
@@ -50,6 +54,12 @@ US_STATE_NAMES = {
     "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
     "DC": "District of Columbia",
 }
+
+TERRITORY_NAMES = {
+    "PR": "Puerto Rico", "VI": "Virgin Islands", "GU": "Guam", "MP": "Northern Mariana Islands", "AS": "American Samoa",
+}
+VALID_STATE_CODES = set(US_STATE_NAMES) | set(TERRITORY_NAMES)
+STATE_CODE_FOR_NAME = {name.upper(): code for code, name in {**US_STATE_NAMES, **TERRITORY_NAMES}.items()}
 
 # Consumer-friendly aliases for commonly searched CPT/HCPCS codes.
 FRIENDLY_CPT_DESCRIPTIONS = {
@@ -189,14 +199,56 @@ def state_display_name(state: str | None) -> str:
     return txt.title() if txt.isupper() else txt
 
 
+def normalize_state_code(state: str | None, zip_code: str | None) -> str | None:
+    """Two-letter code from a code, a full state name, or (when the value is junk like '73') the ZIP. None if unknown."""
+    txt = (state or "").strip().upper()
+    if txt in VALID_STATE_CODES:
+        return txt
+    if txt in STATE_CODE_FOR_NAME:
+        return STATE_CODE_FOR_NAME[txt]
+    from procedure_pages import _resolve_state_from_zip
+
+    inferred = _resolve_state_from_zip(zip_code or "")
+    return inferred if inferred in VALID_STATE_CODES else None
+
+
+def repair_hospital_states() -> int:
+    """Fix hospitals saved with a bad state value (e.g. '73', 'L', 'Florida') so their pages get a real state URL."""
+    with get_db() as db:
+        placeholders = ",".join("?" * len(VALID_STATE_CODES))
+        bad = db.execute(
+            f"SELECT facility_id, name, state, zip FROM hospitals WHERE UPPER(COALESCE(state, '')) NOT IN ({placeholders})",
+            sorted(VALID_STATE_CODES),
+        ).fetchall()
+    fixed = 0
+    for row in bad:
+        code = normalize_state_code(row["state"], row["zip"])
+        if not code:
+            log.error("Hospital %s (%s) has state %r and ZIP %r; cannot tell which state it is in", row["facility_id"], row["name"], row["state"], row["zip"])
+            continue
+        try:
+            with get_db() as db:
+                db.execute(
+                    "UPDATE hospitals SET state = ?, state_slug = ? WHERE facility_id = ?",
+                    (code, state_slug_from_code(code), row["facility_id"]),
+                )
+            fixed += 1
+        except sqlite3.IntegrityError:
+            log.error("Hospital %s (%s): state %s would duplicate another hospital's page address", row["facility_id"], row["name"], code)
+    return fixed
+
+
 def upsert_hospital_row(row: dict) -> None:
     facility_id = normalize_facility_id(row.get("facility_id"))
     if not facility_id:
         return
 
-    state = (row.get("state") or "").strip()
+    state = normalize_state_code(row.get("state"), row.get("zip"))
+    if not state:
+        log.error("Skipping hospital %s (%s): state %r and ZIP %r do not identify a state", facility_id, row.get("name"), row.get("state"), row.get("zip"))
+        return
     city = (row.get("city") or "").strip()
-    state_slug = row.get("state_slug") or state_slug_from_code(state)
+    state_slug = state_slug_from_code(state)
     city_slug = row.get("city_slug") or city_slug_from_name(city)
     slug = row.get("slug") or slugify(f"{row.get('name', '')}-{city}")
 

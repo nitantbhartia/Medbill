@@ -529,6 +529,10 @@ def startup():
             raise RuntimeError("ADMIN_API_TOKEN must be configured in production")
 
     db.init_db()
+    from hospital_seo import repair_hospital_states
+    repaired = repair_hospital_states()
+    if repaired:
+        logging.warning("Fixed the state on %d hospitals", repaired)
     if config.AUTO_BOOTSTRAP_HOSPITAL_DATA:
         from hospital_bootstrap import ensure_hospital_data_bootstrap
         try:
