@@ -290,6 +290,10 @@ input, select, textarea { font: inherit; min-width: 0; max-width: 100%; }
 .bk-findings h3 { margin: 0 0 6px; font-size: 19px; }
 .bk-findings p { margin: 0; color: var(--ink-2); }
 .bk-price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: start; }
+.bk-price-table { background: var(--paper); border: 1px solid var(--rule-strong); border-radius: var(--r-card); overflow: hidden; }
+.bk-price-table div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 18px 22px; border-bottom: 1px solid var(--rule); font-size: 16.5px; }
+.bk-price-table div:last-child { border-bottom: 0; }
+.bk-price-table strong { font-family: var(--display); font-size: 26px; letter-spacing: -0.02em; }
 .bk-faq details { border-bottom: 1px solid var(--rule); }
 .bk-faq summary { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 20px 0; cursor: pointer; list-style: none; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
 .bk-faq summary::-webkit-details-marker { display: none; }

@@ -44,7 +44,7 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
         details = finding.get("parsed_details") or {}
         charge = charges.setdefault(key, {
             "code": item.get("cpt_code"),
-            "description": item.get("description") or "Charge",
+            "description": item.get("description") or "The whole bill",
             "date": item.get("date_of_service"),
             "charged": item.get("charged_amount"),
             "medicare_rate": None,

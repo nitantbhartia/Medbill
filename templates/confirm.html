@@ -3,37 +3,19 @@
 {% block title %}Confirm Items - BillKarma{% endblock %}
 
 {% block head %}
-<style>
-    .confirm-bar { background:#0C6B55; padding:20px 24px; border-radius:0 0 24px 24px; }
-    .confirm-bar-inner { max-width:672px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-    .confirm-bar .cb-crumb { font-size:0.75rem; color:rgba(255,255,255,0.5); }
-    .confirm-bar .cb-crumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
-    .confirm-bar .cb-crumb a:hover { color:rgba(255,255,255,0.8); }
-    .confirm-bar .cb-crumb .cb-active { color:#fff; font-weight:600; }
-    .confirm-bar .cb-title { color:#fff; font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; }
-    @media(max-width:640px){ .confirm-bar{padding:16px 16px;} .confirm-bar-inner{flex-direction:column;align-items:flex-start;gap:4px;} }
-</style>
+
 {% endblock %}
 
 {% block content %}
-<div class="confirm-bar">
-    <div class="confirm-bar-inner">
-        <div class="cb-crumb">
-            <a href="/scan">Upload</a> <span>&rsaquo;</span> <span class="cb-active">Confirm</span> <span>&rsaquo;</span> <span>Results</span>
-        </div>
-        <div class="cb-title">{{ data.line_items | length }} line items extracted</div>
+<section class="bk-hero" style="padding: 40px 0 32px">
+    <div class="bk-wrap" style="max-width: 728px">
+        <p class="bk-crumbs"><a href="/scan">Upload</a> / Confirm / Results</p>
+        <h1 style="font-size: clamp(28px, 4vw, 40px)">Check what we read from your bill</h1>
+        <p class="bk-lede">We found {{ data.line_items | length }} line items. Fix anything that&rsquo;s wrong, then see what looks wrong.</p>
     </div>
-</div>
+</section>
 
 <section class="max-w-2xl mx-auto px-5 py-8 sm:py-10">
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-1">Confirm extracted items</h1>
-        <p class="text-sm text-gray-500">
-            We found <strong class="text-gray-700">{{ data.line_items | length }}</strong> line items.
-            Review and correct anything before analysis.
-        </p>
-    </div>
-
     {% set coded_items = data.line_items | selectattr('cpt_code') | list %}
     {% if data.bill and not coded_items %}
     <div class="bk-note bk-summary-bill">
@@ -60,14 +42,14 @@
     {% set recon_basis_label = 'patient responsibility' if using_patient_basis else 'billed charges' %}
     {% set recon_delta = (extracted_sum - bill_total) if bill_total else 0 %}
     {% set recon_pct = ((recon_delta | abs) / bill_total * 100) if bill_total else 0 %}
-    <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 mb-6 pb-6 border-b border-gray-100">
+    <div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100">
         {% if data.bill.provider_name %}
         <span><span class="text-gray-400">Provider:</span> {{ data.bill.provider_name }}</span>
         {% endif %}
         {% if data.bill.bill_date %}
         <span><span class="text-gray-400">Date:</span> {{ data.bill.bill_date }}</span>
         {% endif %}
-        {% if data.bill.zip_code %}
+        {% if data.bill.zip_code and data.bill.zip_code != '00000' %}
         <span><span class="text-gray-400">Zip:</span> {{ data.bill.zip_code }}</span>
         {% endif %}
         {% if data.bill.total_charged %}
@@ -82,20 +64,20 @@
             border-green-200 bg-green-50
         {% endif %}
     ">
-        <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Extraction Reconciliation</p>
+        <p class="text-sm font-semibold text-gray-800 mb-1">Do the lines add up?</p>
         <p class="text-sm text-gray-800">
-            Itemized sum: <strong>${{ "{:,.2f}".format(extracted_sum) }}</strong>
+            Lines add up to <strong>${{ "{:,.2f}".format(extracted_sum) }}</strong>
             {% if bill_total %}
                 · Bill total: <strong>${{ "{:,.2f}".format(bill_total) }}</strong>
-                · Delta: <strong>${{ "{:,.2f}".format(recon_delta) }}</strong>
+                · Difference: <strong>${{ "{:,.2f}".format(recon_delta) }}</strong>
             {% endif %}
         </p>
-        <p class="text-xs text-gray-500 mt-1">Basis: {{ recon_basis_label }}</p>
+        <p class="text-xs text-gray-500 mt-1">Compared using {{ recon_basis_label }}.</p>
         <p class="text-xs mt-1 {% if bill_total and recon_pct > 2 %}text-amber-700{% else %}text-green-700{% endif %}">
             {% if bill_total and recon_pct > 2 %}
-                Reconciliation mismatch is above 2%. Review missing/incorrect line items before continuing.
+                The lines are more than 2% off the bill total. Check for a missing or misread line before you continue.
             {% else %}
-                Reconciliation looks good. Continue to analysis when ready.
+                The lines match the bill total.
             {% endif %}
         </p>
     </div>
@@ -188,12 +170,17 @@
         </button>
 
         <div class="mt-8 flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100">
-            <p class="text-xs text-gray-400">
-                Comparing against Medicare rates for <strong>{{ data.bill.zip_code | default('N/A') }}</strong>
-            </p>
-            <button type="submit" id="analyze-btn"
-                    class="px-5 py-2.5 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors flex items-center gap-2">
-                <span id="analyze-text">Analyze</span>
+            {% if data.bill.zip_code and data.bill.zip_code != '00000' %}
+            <p class="text-sm text-gray-500">Comparing with Medicare rates for zip code <strong>{{ data.bill.zip_code }}</strong></p>
+            {% else %}
+            <div>
+                <label for="confirm-zip" class="bk-label">Zip code where you were treated</label>
+                <input type="text" id="confirm-zip" class="bk-input" style="width: 140px" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="10001" required>
+                <p class="text-xs text-gray-500 mt-1">Medicare rates vary by area.</p>
+            </div>
+            {% endif %}
+            <button type="submit" id="analyze-btn" class="bk-btn">
+                <span id="analyze-text">See what looks wrong</span>
                 <svg id="analyze-spinner" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
@@ -264,6 +251,7 @@
         container.insertAdjacentHTML('beforeend', html);
     });
 
+    var confirmZip = document.getElementById('confirm-zip');
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         analyzeBtn.disabled = true;
@@ -295,7 +283,7 @@
         fetch('/api/analyze/' + billId, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ line_items: items })
+            body: JSON.stringify({ line_items: items, zip_code: confirmZip ? confirmZip.value.trim() : '' })
         })
         .then(function(res) {
             if (!res.ok) {
@@ -306,7 +294,7 @@
         .then(function() { window.location.href = '/results/' + billId; })
         .catch(function(err) {
             analyzeBtn.disabled = false;
-            analyzeText.textContent = 'Analyze';
+            analyzeText.textContent = 'See what looks wrong';
             analyzeSpinner.classList.add('hidden');
             alert(err.message || 'Something went wrong.');
         });
