@@ -46,7 +46,7 @@ register("hospital-financial-assistance-charity-care", {
         <li><a href="#how-to-apply">How to apply &mdash; step by step</a></li>
         <li><a href="#annotated-example">Annotated example: what a successful application looks like</a></li>
         <li><a href="#what-hospitals-dont-tell-you">What hospitals don&rsquo;t want you to know</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -285,7 +285,8 @@ register("hospital-financial-assistance-charity-care", {
 
 <p>A denial is not the final answer. You can appeal with additional documentation, escalate to the patient advocate, or file a complaint with your state attorney general&rsquo;s consumer protection division. Hospitals take state AG inquiries seriously because they can trigger broader investigations into billing practices.</p>
 
-<h2 id="case-studies">7. Real patient results</h2>
+<h2 id="case-studies">7. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Want to know your hospital&rsquo;s track record before you apply?</strong> Our <a href="/hospitals/">hospital directory</a> includes transparency grades, average charity care spending, and reported income thresholds so you can walk into the process knowing what to expect.

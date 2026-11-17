@@ -247,7 +247,7 @@ register("medical-expenses-tax-deduction", {
 </div>
 
 <div class="case-study">
-    <h3>Real example: recovering $3,400 in tax savings</h3>
+    <h3>Example: recovering $3,400 in tax savings</h3>
     <p>A 58-year-old teacher with an AGI of $72,000 had knee replacement surgery in 2025. Her out-of-pocket medical expenses totaled $19,200 (surgery co-pay $3,800, physical therapy $4,600, Medicare supplement premiums $3,200, prescriptions $2,100, dental implant $4,500, medical mileage $1,000). Her 7.5% threshold was $5,400. She deducted $13,800 ($19,200 &minus; $5,400) on Schedule A. At a 22% tax rate, this saved her <strong>$3,036</strong>. She also discovered she had been overpaying for her knee replacement by $1,400 after <a href="/scan">scanning the bill with BillKarma</a>&mdash;bringing her total savings to <strong>$4,436</strong>.</p>
 </div>
 

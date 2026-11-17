@@ -236,6 +236,7 @@ register("indiana-medical-billing-laws", {
 </ol>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: $480 facility fee refund under HB 1004 at IU Health off-campus clinic</h3>

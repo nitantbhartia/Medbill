@@ -197,6 +197,7 @@ register("wyoming-medical-billing", {
 </div>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Casper uninsured patient reduces $13,220 bill to $1,200 through charity care</h3>

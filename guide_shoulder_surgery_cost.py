@@ -43,7 +43,7 @@ register("shoulder-surgery-cost", {
         <li><a href="#billing-errors">5 most common shoulder surgery billing errors</a></li>
         <li><a href="#insurance-coverage">How insurance covers shoulder surgery</a></li>
         <li><a href="#lower-your-cost">5 ways to lower your shoulder surgery cost</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -173,7 +173,8 @@ register("shoulder-surgery-cost", {
     <li><strong>Ask about reference-based pricing.</strong> Some employers offer plans that reimburse at a percentage of Medicare rates. If your employer offers this, ask HR whether your surgeon and the ASC meet the plan&rsquo;s requirements before scheduling.</li>
 </ol>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Rotator cuff repair &mdash; switching to ASC and disputing unbundling saves $9,400</h3>

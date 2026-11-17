@@ -167,7 +167,7 @@ register("hospital-price-transparency-rules-2026", {
     </tbody>
 </table>
 
-<p><strong>A real example.</strong> Here is what you might find when you look up a common procedure in a hospital&rsquo;s price file:</p>
+<p><strong>An example.</strong> Here is what you might find when you look up a common procedure in a hospital&rsquo;s price file:</p>
 
 <div class="bill-example">
     <div class="bill-header">Sample: Price transparency file entry &mdash; MRI Lumbar Spine (CPT 72148)</div>
@@ -215,7 +215,7 @@ register("hospital-price-transparency-rules-2026", {
 
 <h2 id="negotiate-with-data">5. Using price data in negotiations</h2>
 
-<p>Price transparency data is your strongest negotiation tool because it comes from the hospital&rsquo;s own published file. Here is a real case study showing how one patient used it.</p>
+<p>Price transparency data is your strongest negotiation tool because it comes from the hospital&rsquo;s own published file. Here is a illustrative case study showing how one patient used it.</p>
 
 <div class="case-study">
     <h3>Case study: Patient finds negotiated rate 60% lower than billed amount</h3>

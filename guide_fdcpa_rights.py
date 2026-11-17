@@ -46,7 +46,7 @@ register("fdcpa-rights-medical-debt-collectors", {
         <li><a href="#how-to-respond">How to respond when a collector breaks the rules</a></li>
         <li><a href="#filing-complaints">Filing complaints and lawsuits</a></li>
         <li><a href="#protect-yourself">How to protect yourself from the start</a></li>
-        <li><a href="#case-studies">Real cases of FDCPA violations</a></li>
+        <li><a href="#case-studies">Examples of FDCPA violations</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -236,7 +236,8 @@ register("fdcpa-rights-medical-debt-collectors", {
     <strong>Check your hospital's billing track record.</strong> Our <a href="/hospitals/">hospital directory</a> shows billing accuracy grades, markup data, and charity care policies for facilities near you &mdash; useful context when deciding whether to dispute or negotiate a collection amount.
 </div>
 
-<h2 id="case-studies">7. Real cases of FDCPA violations</h2>
+<h2 id="case-studies">7. Examples of FDCPA violations</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: Inflated balance — $1,200 in unauthorized fees</h3>

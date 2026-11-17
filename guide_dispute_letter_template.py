@@ -204,6 +204,7 @@ Example: &ldquo;Line item: CPT 99284 (Emergency Department Visit, Level 4) bille
 <div class="key-takeaway"><strong>See what's on your bill first.</strong> <a href="/scan">Upload your bill to BillKarma</a> &mdash; we flag every charge that exceeds the Medicare rate and show exact savings before you write the letter.</div>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>ER upcoding: $1,490 recovered with a single letter</h3>

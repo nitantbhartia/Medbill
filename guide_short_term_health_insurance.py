@@ -43,7 +43,7 @@ register("short-term-health-insurance", {
         <li><a href="#when-it-makes-sense">When a short-term plan actually makes sense</a></li>
         <li><a href="#alternatives">Alternatives to short-term health insurance</a></li>
         <li><a href="#claim-denied">What to do if your claim is denied</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -162,7 +162,8 @@ register("short-term-health-insurance", {
     <li><strong>Consult a patient advocate or attorney.</strong> If the denied amount is large ($5,000+), a patient advocate or insurance bad-faith attorney can review whether the denial has a legal basis. Many work on contingency.</li>
 </ol>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Short-term plan denies $22,000 appendectomy &mdash; appeals process and state complaint recover $18,400</h3>

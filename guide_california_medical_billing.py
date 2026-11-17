@@ -43,7 +43,7 @@ register("california-medical-billing-laws", {
         <li><a href="#bill-example">Annotated California hospital bill</a></li>
         <li><a href="#statute-of-limitations">California statute of limitations on medical debt</a></li>
         <li><a href="#how-to-dispute">How to dispute a California hospital bill</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -235,7 +235,8 @@ register("california-medical-billing-laws", {
     <strong>Ready to dispute your California bill?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; our system flags every charge above Medicare rates, identifies balance billing violations, and generates a dispute letter ready to mail. Takes under two minutes.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $18,000 ER bill eliminated under AB 1020 charity care &mdash; San Jose</h3>

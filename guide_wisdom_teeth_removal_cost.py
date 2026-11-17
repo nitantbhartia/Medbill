@@ -178,6 +178,7 @@ register("wisdom-teeth-removal-cost", {
 <p>For teeth classified as D7220 (soft-tissue impaction), a general dentist is typically appropriate and meaningfully less expensive. For D7240 (complete bony impaction), especially when teeth are close to the inferior alveolar nerve on the x-ray, an oral surgeon&rsquo;s additional training is worth the premium.</p>
 
 <h2 id="case-study">6. Case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Four-tooth removal&mdash;upcoding caught, $880 recovered</h3>

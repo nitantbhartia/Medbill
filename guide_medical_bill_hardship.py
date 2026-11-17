@@ -43,7 +43,7 @@ register("medical-bill-financial-hardship", {
         <li><a href="#hardship-example">Annotated hardship application</a></li>
         <li><a href="#other-programs">Pharmaceutical, nonprofit, and community programs</a></li>
         <li><a href="#how-to-apply">How to apply — step by step</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -223,7 +223,8 @@ register("medical-bill-financial-hardship", {
     <strong>Research your hospital before applying.</strong> Our <a href="/hospitals/">hospital directory</a> shows nonprofit status, charity care income thresholds, and financial assistance contact information for every hospital &mdash; walk into the conversation prepared.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $22,000 surgery bill — 100% written off through charity care</h3>

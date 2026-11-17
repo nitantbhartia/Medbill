@@ -196,6 +196,7 @@ register("maine-medical-billing", {
 <p>Contact Pine Tree Legal Assistance at ptla.org for free legal help if you are facing collection or garnishment.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Portland patient challenges 472× Benadryl markup</h3>

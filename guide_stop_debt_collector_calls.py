@@ -42,7 +42,7 @@ register("stop-medical-debt-collector-calls", {
         <li><a href="#documenting">Documenting harassment</a></li>
         <li><a href="#filing-complaints">Filing complaints that get results</a></li>
         <li><a href="#what-happens-next">What happens after you stop the calls</a></li>
-        <li><a href="#case-studies">Real examples of stopped harassment</a></li>
+        <li><a href="#case-studies">Examples of stopped harassment</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -223,7 +223,8 @@ register("stop-medical-debt-collector-calls", {
     <strong>Find out if your hospital offers charity care.</strong> Check our <a href="/hospitals/">hospital directory</a> for financial assistance details, billing grades, and pricing data &mdash; many patients discover they qualify for programs that reduce or eliminate the debt entirely.
 </div>
 
-<h2 id="case-studies">7. Real examples of stopped harassment</h2>
+<h2 id="case-studies">7. Examples of stopped harassment</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: 22 calls in one week — CFPB complaint led to $1,000 settlement</h3>

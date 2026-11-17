@@ -37,7 +37,7 @@ register("how-to-read-your-medical-bill", {
     <h2>In this guide</h2>
     <ol>
         <li><a href="#anatomy">Anatomy of a medical bill</a></li>
-        <li><a href="#real-bill">A real bill, annotated</a></li>
+        <li><a href="#real-bill">An example bill, annotated</a></li>
         <li><a href="#cpt-codes">Understanding CPT codes</a></li>
         <li><a href="#five-errors">The 5 most common billing errors (with dollar examples)</a></li>
         <li><a href="#fair-price">How to check if your price is fair</a></li>
@@ -64,7 +64,8 @@ register("how-to-read-your-medical-bill", {
     <strong>Key rule:</strong> Always request an <em>itemized</em> bill, not just a summary statement. Summary statements lump charges together, making it impossible to audit individual services. Federal law gives you the right to an itemized bill&mdash;just call the billing department and ask.
 </div>
 
-<h2 id="real-bill">2. A real bill, annotated</h2>
+<h2 id="real-bill">2. An example bill, annotated</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <p>Here&rsquo;s what an actual ER bill looks like for a patient who went in with abdominal pain. We&rsquo;ve highlighted the problems:</p>
 
@@ -239,7 +240,7 @@ register("how-to-read-your-medical-bill", {
 <p>If this feels like a lot of work, you can <a href="/scan">upload your bill to BillKarma</a> and we&rsquo;ll do the entire audit automatically&mdash;comparing every line item against federal pricing data and generating a dispute letter for you in 30 seconds.</p>
 
 <div class="case-study">
-    <h3>Real result: ER visit for abdominal pain</h3>
+    <h3>Example: ER visit for abdominal pain</h3>
     <p>A BillKarma user uploaded a $5,323 ER bill for abdominal pain. Our scanner identified <strong>$476 in billing errors</strong> (a duplicate CBC and an unbundled lab panel) plus <strong>$813 in charges above 3x Medicare rates</strong> (the chest X-ray). Total potential savings: <strong>$1,289</strong>. The user sent our auto-generated dispute letter and got $940 reduced from their bill within 3 weeks.</p>
 </div>
 

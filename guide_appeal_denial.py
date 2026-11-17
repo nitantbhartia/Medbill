@@ -4,7 +4,7 @@ from guides import register, _embed
 
 register("how-to-appeal-insurance-denial", {
     "title": "How to Appeal a Health Insurance Claim Denial",
-    "meta_description": "Insurance denials get overturned 40-50% of the time on first appeal. Learn exactly how to appeal a denied claim with templates, timelines, and real examples.",
+    "meta_description": "Insurance denials get overturned 40-50% of the time on first appeal. Learn exactly how to appeal a denied claim with templates, timelines, and examples.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
     "category": "Insurance Basics",
@@ -36,7 +36,7 @@ register("how-to-appeal-insurance-denial", {
         },
     ],
     "body": f"""
-<p class="lead">Insurance companies deny about 17% of in-network claims, according to KFF. But here&rsquo;s what they don&rsquo;t advertise: <strong>40&ndash;50% of first-level appeals succeed</strong>, and external reviews overturn denials another 40% of the time. Most patients never appeal&mdash;which is exactly what insurers count on. An appealed MRI denial alone can save you <strong>$2,000&ndash;$4,000</strong>. This guide walks you through every step of the appeals process, with templates, timelines, and real results.</p>
+<p class="lead">Insurance companies deny about 17% of in-network claims, according to KFF. But here&rsquo;s what they don&rsquo;t advertise: <strong>40&ndash;50% of first-level appeals succeed</strong>, and external reviews overturn denials another 40% of the time. Most patients never appeal&mdash;which is exactly what insurers count on. An appealed MRI denial alone can save you <strong>$2,000&ndash;$4,000</strong>. This guide walks you through every step of the appeals process, with templates, timelines, and worked examples.</p>
 
 <div class="guide-cta-inline">
     <h3>Got a denial notice like this?</h3>

@@ -314,6 +314,7 @@ register("allergy-testing-billing", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>$4,200 allergy panel when skin prick ($380) was clinically appropriate</h3>

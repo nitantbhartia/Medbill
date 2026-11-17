@@ -44,7 +44,7 @@ register("utah-medical-billing", {
         <li><a href="#debt-collection">Debt collection and wage garnishment</a></li>
         <li><a href="#how-to-dispute">How to dispute a Utah hospital bill</a></li>
         <li><a href="#bill-example">Annotated Utah hospital bill</a></li>
-        <li><a href="#case-study">Real patient results</a></li>
+        <li><a href="#case-study">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -209,7 +209,8 @@ register("utah-medical-billing", {
     </div>
 </div>
 
-<h2 id="case-study">9. Real patient results</h2>
+<h2 id="case-study">9. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study: $42,000 surgical bill reduced 80% via Utah charity care &mdash; Salt Lake City</h3>

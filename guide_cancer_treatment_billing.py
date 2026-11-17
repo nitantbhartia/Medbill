@@ -314,6 +314,7 @@ register("cancer-treatment-billing", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 <div class="case-study">
   <h3>$12,000 Drug Billing Error Caught: Wrong Dosage Billed</h3>
   <p>

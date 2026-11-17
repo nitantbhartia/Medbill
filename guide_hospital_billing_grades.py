@@ -47,7 +47,7 @@ register("hospital-billing-grades-explained", {
         <li><a href="#real-dollar-impact">The real dollar impact by grade</a></li>
         <li><a href="#how-to-use">How to use a hospital&rsquo;s grade</a></li>
         <li><a href="#stuck-bad-grade">What to do when you&rsquo;re stuck with a bad-grade hospital</a></li>
-        <li><a href="#case-studies">Real examples</a></li>
+        <li><a href="#case-studies">Examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -220,7 +220,8 @@ register("hospital-billing-grades-explained", {
     <strong>Already got the bill?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we&rsquo;ll cross-check every line item against Medicare rates, flag charges above the hospital&rsquo;s own grade tier, and identify any coding errors worth disputing.
 </div>
 
-<h2 id="case-studies">8. Real examples</h2>
+<h2 id="case-studies">8. Examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Planned MRI: Choosing by grade saved $740</h3>

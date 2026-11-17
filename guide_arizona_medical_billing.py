@@ -240,6 +240,7 @@ register("arizona-medical-billing-laws", {
 </div>
 
 <h2 id="case-studies">8. Case studies: real Arizona patient results</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: AHCCCS retroactive coverage saves $14,200 &mdash; Tucson</h3>

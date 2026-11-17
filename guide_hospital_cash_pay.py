@@ -238,6 +238,7 @@ register("hospital-cash-pay-self-pay-discount", {
 <p><strong>Step 7: Pay after the procedure, once you confirm no unexpected services were added.</strong> If you pre-pay in full, it is harder to dispute add-on charges. Pay by credit card so you have dispute rights if the final bill differs from the agreed price.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: Uninsured patient negotiates colonoscopy from $2,800 to $590</h3>

@@ -363,6 +363,7 @@ register("sleep-study-billing", {
 <p>If the billing department does not resolve your dispute, you can file an appeal through your insurer&rsquo;s formal appeals process, file a complaint with your state insurance commissioner, or for Medicare beneficiaries, request a Medicare redetermination. See <a href="/guides/dispute-bill/">our complete bill dispute guide</a> for templates and escalation steps. Use <a href="/hospitals/">our hospital directory</a> to see other patients&rsquo; billing experiences at your sleep lab.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Choosing a sleep center?</strong> Our <a href="/hospitals/">hospital directory</a> shows pricing transparency grades and billing accuracy data for sleep centers near you.

@@ -43,7 +43,7 @@ register("hospital-facility-fees-explained", {
         <li><a href="#what-is-facility-fee">What is a facility fee?</a></li>
         <li><a href="#why-facility-fees-exist">Why facility fees exist</a></li>
         <li><a href="#legal-vs-questionable">When facility fees are legal vs. questionable</a></li>
-        <li><a href="#real-bill-example">Real bill example: a cardiology visit with a facility fee</a></li>
+        <li><a href="#real-bill-example">Example bill: a cardiology visit with a facility fee</a></li>
         <li><a href="#how-to-avoid">How to avoid or reduce facility fees</a></li>
         <li><a href="#no-surprises-act">What the No Surprises Act says about facility fees</a></li>
         <li><a href="#how-to-dispute">How to dispute a facility fee</a></li>
@@ -119,7 +119,7 @@ register("hospital-facility-fees-explained", {
     <strong>State laws are catching up.</strong> Colorado, Connecticut, Indiana, Maine, New York, Ohio, Oregon, and Texas have passed laws requiring hospitals to disclose facility fees before scheduled visits or restricting facility fee billing for off-campus offices. Check whether your state has protections by searching your state name plus &ldquo;facility fee law&rdquo; at your state legislature&rsquo;s website.
 </div>
 
-<h2 id="real-bill-example">4. Real bill example: a cardiology visit with a facility fee</h2>
+<h2 id="real-bill-example">4. Example bill: a cardiology visit with a facility fee</h2>
 
 <p>Here&rsquo;s what a follow-up cardiology visit looks like when it&rsquo;s billed through a hospital outpatient department vs. what the same visit would cost at an independent cardiologist&rsquo;s office.</p>
 

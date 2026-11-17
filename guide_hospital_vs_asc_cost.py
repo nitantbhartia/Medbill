@@ -42,7 +42,7 @@ register("hospital-vs-asc-cost", {
         <li><a href="#how-to-find-asc">How to find an accredited ASC</a></li>
         <li><a href="#hidden-gotcha">The hidden gotcha: out-of-network surgeon at an in-network ASC</a></li>
         <li><a href="#insurance-coverage">How insurance covers ASC costs</a></li>
-        <li><a href="#case-study">Real-world case studies</a></li>
+        <li><a href="#case-study">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -149,7 +149,8 @@ register("hospital-vs-asc-cost", {
     <li><strong>Medicare:</strong> Medicare Part B covers 80% of the ASC facility payment after the Part B deductible. The patient owes 20%&mdash;which is why the cost difference between ASC and hospital settings translates directly into lower Part B coinsurance for Medicare beneficiaries.</li>
 </ul>
 
-<h2 id="case-study">7. Real-world case studies</h2>
+<h2 id="case-study">7. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Cataract surgery: patient saves $1,400 by switching from hospital to ASC</h3>

@@ -43,7 +43,7 @@ register("dental-implant-alternatives", {
         <li><a href="#implant-denture">Implant-supported dentures &amp; All-on-4</a></li>
         <li><a href="#insurance-coverage">Insurance coverage differences by option</a></li>
         <li><a href="#clinical-comparison">Clinical comparison: longevity, bone, and function</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -193,7 +193,8 @@ register("dental-implant-alternatives", {
     </tbody>
 </table>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Bridge vs. implant: the 12-year total cost comparison</h3>

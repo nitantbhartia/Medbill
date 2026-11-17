@@ -235,6 +235,7 @@ register("open-enrollment-health-insurance", {
 <p><strong>Key COBRA tip:</strong> You have 60 days to elect COBRA, and if you elect it, coverage is retroactive to the day it lapsed. You can strategically wait to elect COBRA until you actually incur a medical expense, then elect and pay back premiums retroactively. Only do this if you are confident you can afford the retroactive premiums and are comfortable with the gap risk.</p>
 
 <h2 id="case-study">9. Case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Switching from PPO to HDHP + HSA&mdash;$3,200 saved in year one</h3>

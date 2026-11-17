@@ -42,7 +42,7 @@ register("sued-for-medical-debt", {
         <li><a href="#how-to-respond">How to file your Answer (step by step)</a></li>
         <li><a href="#court-process">What happens in court</a></li>
         <li><a href="#settlement">Settling before trial</a></li>
-        <li><a href="#case-studies">Real case outcomes</a></li>
+        <li><a href="#case-studies">Case examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -218,7 +218,8 @@ register("sued-for-medical-debt", {
     <strong>Research your hospital before negotiating.</strong> Our <a href="/hospitals/">hospital directory</a> shows billing grades, markup patterns, and charity care eligibility &mdash; data that strengthens your position when the collector's attorney calls to settle.
 </div>
 
-<h2 id="case-studies">7. Real case outcomes</h2>
+<h2 id="case-studies">7. Case examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: $5,400 ER debt — dismissed on SOL defense</h3>

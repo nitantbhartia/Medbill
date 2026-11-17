@@ -197,6 +197,7 @@ register("pennsylvania-hospital-charity-care", {
 <p>After 4 years, the debt is time-barred &mdash; a collector cannot win a lawsuit against you if you raise the SOL as a defense. Be aware: making any payment, even $1, on old Pennsylvania medical debt can restart the SOL clock. If you receive collection contact for a debt that may be approaching or past 4 years old, do not make any payment without first verifying the debt date and consulting a consumer attorney.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: $41,000 Philadelphia inpatient bill eliminated under Act 169 sliding scale</h3>

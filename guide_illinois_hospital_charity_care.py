@@ -43,7 +43,7 @@ register("illinois-hospital-charity-care", {
         <li><a href="#bill-example">Annotated Illinois outpatient surgery bill</a></li>
         <li><a href="#statute-of-limitations">Illinois statute of limitations: the 10-year written contract rule</a></li>
         <li><a href="#wage-garnishment">Wage garnishment protections in Illinois</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -230,7 +230,8 @@ register("illinois-hospital-charity-care", {
     <strong>Illinois hospital bill above Medicare rates?</strong> Use our <a href="/calculator">free calculator</a> to benchmark every CPT code on your bill and our <a href="/hospitals/">hospital directory</a> to see your facility&rsquo;s markup rate and charity care policy. Attaching a Medicare comparison report to your Illinois Charitable Health Care Act application significantly strengthens your case for the maximum sliding-scale discount.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $31,000 inpatient bill eliminated under Illinois 200% FPL free care &mdash; Chicago</h3>

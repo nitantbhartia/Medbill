@@ -198,6 +198,7 @@ register("vermont-medical-billing", {
 <p>Vermont&rsquo;s 15% cap means that even if a creditor wins a judgment against you, the financial impact on your weekly paycheck is significantly less than in most other states. For a person earning $800/week after taxes, the maximum garnishment in Vermont is $120/week vs. $200/week under the federal cap.</p>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Burlington patient eliminates $8,400 bill through retroactive Medicaid enrollment</h3>

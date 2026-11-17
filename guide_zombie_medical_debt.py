@@ -182,6 +182,7 @@ register("zombie-medical-debt", {
 </div>
 
 <h2 id="case-studies">7. Real zombie debt cases</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: 7-year-old ER bill — time-barred, collector couldn't validate</h3>

@@ -46,7 +46,7 @@ register("how-much-does-surgery-cost", {
         <li><a href="#real-surgery-bill">A real surgery bill, annotated</a></li>
         <li><a href="#anesthesia-billing">Understanding anesthesia billing</a></li>
         <li><a href="#lower-your-cost">5 ways to lower your surgery cost</a></li>
-        <li><a href="#case-studies">Real savings: 3 case studies</a></li>
+        <li><a href="#case-studies">Savings examples: 3 case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -127,7 +127,7 @@ register("how-much-does-surgery-cost", {
 
 <h2 id="real-surgery-bill">4. A real surgery bill, annotated</h2>
 
-<p>Here&rsquo;s what an actual outpatient knee arthroscopy bill looks like at a hospital. This is a real bill structure with typical charges. We&rsquo;ve flagged the areas where costs are inflated.</p>
+<p>Here&rsquo;s what an actual outpatient knee arthroscopy bill looks like at a hospital. This is an example bill structure with typical charges. We&rsquo;ve flagged the areas where costs are inflated.</p>
 
 <div class="bill-example">
     <div class="bill-header">Itemized Statement &mdash; Summit Medical Center &mdash; Date of Service: 01/10/2026 &mdash; Outpatient Knee Arthroscopy</div>
@@ -244,7 +244,8 @@ register("how-much-does-surgery-cost", {
     <strong>Already received your surgery bill?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we scan every line item against Medicare rates and identify specific charges you can dispute to reduce what you owe.
 </div>
 
-<h2 id="case-studies">7. Real savings: 3 case studies</h2>
+<h2 id="case-studies">7. Savings examples: 3 case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Think your surgery bill might have errors?</strong> <a href="/scan">Scan your itemized bill with BillKarma</a> &mdash; patients who find billing errors save an average of $1,200 per disputed surgery claim.

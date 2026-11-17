@@ -187,7 +187,7 @@ register("medical-bill-dispute-phone-scripts", {
 <p>Use the <a href="/calculator">BillKarma calculator</a> to look up the Medicare rate for any CPT code before making this call. Having the exact dollar figure turns a vague complaint into a specific, data-backed request.</p>
 
 <div class="case-study">
-    <h3>Real example: ER visit overcharge reduced by $1,840</h3>
+    <h3>Example: ER visit overcharge reduced by $1,840</h3>
     <p>A patient in Ohio received a $2,890 charge for an ER visit coded as Level 4 (CPT 99284). Using BillKarma, she looked up the Medicare rate ($371) and called billing: &ldquo;My ER visit is coded at Level 4, but I was seen for a twisted ankle, had one X-ray, and was discharged in 45 minutes. The Medicare rate for a Level 4 ER visit is $371, and I believe my visit should be coded at Level 2 or 3 at most. Can you review the coding?&rdquo; The hospital reviewed the chart, downgraded to Level 3 (CPT 99283), and reduced the charge to $1,050. <strong>Savings: $1,840.</strong></p>
 </div>
 
@@ -458,7 +458,7 @@ register("medical-bill-dispute-phone-scripts", {
 <p><strong>After the call:</strong> Send a written debt validation letter via certified mail the same day. For a ready-to-use template, see our <a href="/fight-debt">debt validation tools</a>. Also contact the original hospital&rsquo;s billing department to dispute the underlying charges&mdash;if the original bill was wrong, the collection amount is wrong too.</p>
 
 <div class="case-study">
-    <h3>Real example: $3,200 collection dropped after validation request</h3>
+    <h3>Example: $3,200 collection dropped after validation request</h3>
     <p>A patient in Florida received a call from a collection agency about a $3,200 hospital bill from 18 months earlier. She used this script to request written validation. The agency sent a one-page letter with only the total amount&mdash;no itemized statement, no CPT codes, no proof of assignment. She sent a follow-up letter noting the validation was insufficient under FDCPA Section 809. The agency ceased contact and the debt was removed from her credit report within 60 days. <strong>Result: $3,200 debt eliminated.</strong></p>
 </div>
 
@@ -519,7 +519,7 @@ register("medical-bill-dispute-phone-scripts", {
 <p>Most hospitals with more than 100 beds have a patient advocate on staff. Their job is to resolve complaints before they become formal grievances or regulatory filings. They often have direct access to billing managers and can authorize adjustments that front-line staff cannot.</p>
 
 <div class="case-study">
-    <h3>Real example: Escalation path saved $4,100</h3>
+    <h3>Example: Escalation path saved $4,100</h3>
     <p>A patient in Texas was billed $5,400 for outpatient surgery. She called billing, cited the Medicare rate of $1,300, and requested an adjustment. The representative said no. She asked for a supervisor, who offered a 10% discount ($540 off). She declined, sent a formal written dispute citing the Medicare rate and the hospital&rsquo;s own price transparency data showing lower negotiated rates. Two weeks later, the patient advocate called her directly and offered to reduce the bill to $1,300 (the Medicare rate). <strong>Savings: $4,100.</strong></p>
 </div>
 

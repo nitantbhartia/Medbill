@@ -200,6 +200,7 @@ register("skilled-nursing-facility-billing", {
 <p><strong>The application process</strong> typically takes 45 to 90 days. During the gap between Medicare coverage ending and Medicaid approval, the SNF may require private pay. Many facilities will accept a "Medicaid pending" status, meaning they will bill Medicaid retroactively once the application is approved. However, not all facilities accept Medicaid patients, and Medicaid beds may be limited. Before choosing a SNF, check whether the facility accepts Medicaid and review its billing practices in our <a href="/hospitals/">hospital directory</a>.</p>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Observation status blocks SNF coverage — family pays $9,600 out of pocket</h3>

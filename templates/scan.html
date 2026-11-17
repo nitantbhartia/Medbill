@@ -150,6 +150,15 @@
             <li>Free, no account</li>
             <li>Nothing is sent to the hospital unless you choose to</li>
         </ul>
+        <details class="bk-muted" style="margin: 14px 0 0; font-size: 15px">
+            <summary style="cursor: pointer">What happens to your upload</summary>
+            <ul style="margin: 10px 0 0; padding-left: 20px; line-height: 1.55">
+                <li>An AI service (Google Gemini) reads your photo or PDF. We do not save the file itself.</li>
+                <li>We keep what was read from it: the hospital name, each charge with its code and amount, and the last four digits of the account number. We do not save the patient name from the bill.</li>
+                <li>If you give an email address, we save it to send you the report.</li>
+                <li>We do not yet delete saved bills on a schedule. To have yours deleted, email support@billkarma.app.</li>
+            </ul>
+        </details>
         {% if outcome_stats and outcome_stats.show_stat %}
         <p class="bk-muted" style="margin: 16px 0 0; font-size: 15px">BillKarma users recover a median of <strong>${{ "{:,.0f}".format(outcome_stats.median_recovered) }}</strong> per dispute, based on {{ outcome_stats.total_disputes }} verified outcomes.</p>
         {% endif %}

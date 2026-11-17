@@ -44,7 +44,7 @@ register("ct-scan-costs", {
         <li><a href="#er-ct-markups">How ER CT scans get marked up</a></li>
         <li><a href="#get-ct-cheaper">How to get a CT scan cheaper</a></li>
         <li><a href="#dispute-ct">Disputing inflated CT charges</a></li>
-        <li><a href="#case-studies">Real-world case studies</a></li>
+        <li><a href="#case-studies">Illustrative case studies</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -190,7 +190,8 @@ register("ct-scan-costs", {
     <li><strong>Escalate to patient advocate or financial assistance.</strong> If the billing department won&rsquo;t negotiate, ask to speak with the hospital&rsquo;s patient financial advocate. Nonprofit hospitals must offer charity care and financial assistance programs. Our guide on <a href="/guides/how-to-get-medical-bills-reduced/">getting medical bills reduced</a> has the full script.</li>
 </ol>
 
-<h2 id="case-studies">9. Real-world case studies</h2>
+<h2 id="case-studies">9. Illustrative case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>ER CT scan dispute &mdash; E&amp;M level corrected, saving $1,800</h3>

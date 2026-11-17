@@ -199,6 +199,7 @@ register("private-equity-hospital-billing", {
 <p><strong>File a price transparency complaint:</strong> If the hospital&rsquo;s posted price transparency file is incomplete, non-machine-readable, or missing required data, you can file a complaint with CMS. Hospitals face fines of up to $300 per day for non-compliance. CMS has escalated enforcement since 2023.</p>
 
 <h2 id="case-studies">6. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="key-takeaway">
     <strong>Unsure whether your charges are typical for a PE-owned hospital?</strong> Use our <a href="/calculator">Medicare rate calculator</a> &mdash; enter any CPT code from your bill to see the 2026 Medicare benchmark and calculate the markup you&rsquo;re being charged.

@@ -266,6 +266,7 @@ register("hysterectomy-costs", {
 <p>For <a href="/hospitals/">hospital-specific billing patterns</a>, check BillKarma&rsquo;s hospital comparison tool to see how your facility&rsquo;s charges compare to the national median for each CPT code.</p>
 
 <h2 id="case-studies">10. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: Robotic markup dispute saves $3,200</h3>

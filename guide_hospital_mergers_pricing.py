@@ -259,6 +259,7 @@ register("hospital-mergers-higher-prices", {
 </div>
 
 <h2 id="case-studies">7. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Colonoscopy in a consolidated market: $1,960 vs. $396 for the same procedure</h3>

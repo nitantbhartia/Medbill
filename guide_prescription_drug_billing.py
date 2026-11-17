@@ -298,6 +298,7 @@ register("prescription-drug-billing-errors", {
 </div>
 
 <h2 id="case-studies">7. Case Studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 <div class="key-takeaway">
   <strong>Key Takeaway 3:</strong> Audit your pharmacy EOB every quarter. Match the days supply on each claim
   against what was actually dispensed. A 90-day fill billed as 30 days means you paid three copays for one fill

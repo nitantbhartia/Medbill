@@ -276,6 +276,7 @@ register("endoscopy-billing", {
 <p>See our <a href="/guides/dispute-bill/">complete dispute guide</a> for letter templates. For additional help with endoscopy billing errors, <a href="/scan">upload your bill to BillKarma</a> for an automated review.</p>
 
 <h2 id="case-studies">10. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case 1: Screening-to-diagnostic reclassification dispute saves $1,400</h3>

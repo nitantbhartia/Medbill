@@ -43,7 +43,7 @@ register("new-york-medical-billing-laws", {
         <li><a href="#bill-example">Annotated New York inpatient hospital bill</a></li>
         <li><a href="#statute-of-limitations">New York statute of limitations on medical debt</a></li>
         <li><a href="#wage-garnishment">Wage garnishment rules in New York</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -206,7 +206,8 @@ register("new-york-medical-billing-laws", {
     <strong>New York patient with a large hospital bill?</strong> Use our <a href="/calculator">free calculator</a> to see the Medicare benchmark for every charge on your bill &mdash; then check your hospital in our <a href="/hospitals/">hospital directory</a> for markup data and charity care policy details. Knowing the numbers before you apply for PHL &sect; 2807-k assistance is your strongest negotiating tool.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case study 1: $22,000 inpatient bill eliminated after charity care appeal &mdash; New York City</h3>

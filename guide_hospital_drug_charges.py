@@ -50,7 +50,7 @@ register("hospital-drug-charges", {
         <li><a href="#j-codes">J-codes and HCPCS drug codes explained</a></li>
         <li><a href="#340b">The 340B program: what it means for your bill</a></li>
         <li><a href="#how-to-dispute">How to dispute drug charges</a></li>
-        <li><a href="#case-studies">Case studies: real disputes and outcomes</a></li>
+        <li><a href="#case-studies">Case studies: illustrative disputes and outcomes</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -200,7 +200,8 @@ register("hospital-drug-charges", {
     <strong>Skip the manual math.</strong> <a href="/scan">Scan your bill with BillKarma</a> and we&rsquo;ll identify every inflated drug charge automatically, along with the specific Medicare rate and a ready-to-use dispute script.
 </div>
 
-<h2 id="case-studies">7. Case studies: real disputes and outcomes</h2>
+<h2 id="case-studies">7. Case studies: illustrative disputes and outcomes</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Case Study 1: IV saline and &ldquo;pharmacy fees&rdquo; — $680 reduced to $90</h3>

@@ -43,7 +43,7 @@ register("new-jersey-medical-billing-laws", {
         <li><a href="#hospital-billing">Hospital billing and transparency in NJ</a></li>
         <li><a href="#insurance-complaints">NJ insurance complaint process</a></li>
         <li><a href="#dispute-bill">How to dispute a NJ hospital bill step by step</a></li>
-        <li><a href="#case-studies">Real patient results</a></li>
+        <li><a href="#case-studies">Illustrative examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -185,7 +185,8 @@ register("new-jersey-medical-billing-laws", {
     <strong>NJ patients: start with your itemized bill and a Medicare rate comparison.</strong> <a href="/scan">Upload your bill to BillKarma</a> to get an instant audit of every line item against Medicare rates, check for common billing errors, and generate a customized dispute letter citing the correct NJ statutes. Most NJ hospital bills contain at least one correctable error or overcharge.
 </div>
 
-<h2 id="case-studies">8. Real patient results</h2>
+<h2 id="case-studies">8. Illustrative examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="bill-example">
     <div class="bill-header">Itemized Statement &mdash; Central NJ Medical Center &mdash; Date of Service: 01/15/2026 &ndash; 01/17/2026</div>

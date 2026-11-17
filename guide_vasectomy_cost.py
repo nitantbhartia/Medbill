@@ -43,7 +43,7 @@ register("vasectomy-cost", {
         <li><a href="#insurance-coverage">How to verify insurance coverage in advance</a></li>
         <li><a href="#low-cost-options">Low-cost and sliding-scale options</a></li>
         <li><a href="#hsa-fsa">Using HSA or FSA funds</a></li>
-        <li><a href="#case-study">Real-world case study</a></li>
+        <li><a href="#case-study">Illustrative case study</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -179,7 +179,8 @@ register("vasectomy-cost", {
     <strong>If you have an HSA and no insurance coverage for vasectomies,</strong> paying with pre-tax HSA dollars is functionally equivalent to getting a 22%&ndash;37% discount on the procedure cost, depending on your federal and state marginal tax rates. Max your HSA contributions and use them for this procedure.
 </div>
 
-<h2 id="case-study">8. Real-world case study</h2>
+<h2 id="case-study">8. Illustrative case study</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Verifying coverage saves $650 &mdash; and catches an unbundling error</h3>

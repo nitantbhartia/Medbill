@@ -46,7 +46,7 @@ register("for-profit-vs-nonprofit-hospital-billing", {
         <li><a href="#what-nonprofits-owe">What nonprofit hospitals owe you (federal law)</a></li>
         <li><a href="#government-hospitals">Government hospitals: the underrated option</a></li>
         <li><a href="#what-to-do">How to use ownership type when comparing hospitals</a></li>
-        <li><a href="#case-studies">Real examples</a></li>
+        <li><a href="#case-studies">Examples</a></li>
         <li><a href="#faq">Frequently asked questions</a></li>
         <li><a href="#sources">Sources</a></li>
     </ol>
@@ -207,7 +207,8 @@ register("for-profit-vs-nonprofit-hospital-billing", {
     <strong>Got a bill from any type of hospital?</strong> <a href="/scan">Upload it to BillKarma</a> &mdash; we flag overcharges against Medicare rates, identify whether you likely qualify for financial assistance, and show you the specific line items worth disputing.
 </div>
 
-<h2 id="case-studies">7. Real examples</h2>
+<h2 id="case-studies">7. Examples</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>For-profit vs. government hospital: same colonoscopy, $1,200 difference</h3>

@@ -186,6 +186,7 @@ register("idaho-medical-billing", {
 </ul>
 
 <h2 id="case-studies">8. Case studies</h2>
+<p><em>Illustrative examples: they show how the process can work. They are not verified patient cases, and results vary.</em></p>
 
 <div class="case-study">
     <h3>Boise self-pay patient eliminates duplicate ER charge</h3>

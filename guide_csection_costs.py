@@ -89,7 +89,7 @@ register("how-much-does-c-section-cost", {
 </table>
 
 <div class="case-study">
-    <h3>Real bill: planned C-section at a suburban hospital</h3>
+    <h3>Example bill: planned C-section at a suburban hospital</h3>
     <p>A mother in suburban Texas had a planned C-section at 39 weeks with no complications. Her itemized bill totaled <strong>$24,870</strong>: surgeon $4,200, anesthesia $2,800, OR and facility $6,100, room and board (3 nights) $5,900, labs and meds $2,870, newborn care $2,200, and supplies $800. After her insurance negotiated rate, the allowed amount was <strong>$14,300</strong>. She owed <strong>$3,800</strong> after her $2,000 deductible and 20% coinsurance.</p>
 </div>
 
@@ -141,7 +141,7 @@ register("how-much-does-c-section-cost", {
 </table>
 
 <div class="case-study">
-    <h3>Real bill: emergency C-section after failed induction</h3>
+    <h3>Example bill: emergency C-section after failed induction</h3>
     <p>A first-time mother in Ohio was induced at 41 weeks. After 18 hours of labor, fetal distress led to an emergency C-section. Her total bill: <strong>$37,400</strong>&mdash;including $6,800 for the extended labor and delivery room time, $4,200 for the emergency OR, $3,800 for anesthesia (converted from epidural to general), and $4,500 for two days of NICU observation for the baby. With insurance, she paid <strong>$5,200</strong> toward her family out-of-pocket maximum. She later <a href="/scan">uploaded her bill to BillKarma</a> and found $1,800 in duplicate pharmacy charges, which the hospital removed.</p>
 </div>
 

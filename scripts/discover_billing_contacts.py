@@ -79,6 +79,11 @@ class PoliteFetcher:
         parser = RobotFileParser()
         fetched = self._request(f"{root}/robots.txt")
         parser.parse(fetched[1].splitlines() if fetched else [])
+        # The stdlib matches a group when its name is a substring of our user agent, so a group for
+        # "RMA" would apply to "BillKarmaBot". Keep only groups named exactly like us, or "*".
+        our_name = config.BILLING_CONTACT_USER_AGENT.split("/")[0].lower()
+        for entry in parser.entries + ([parser.default_entry] if parser.default_entry else []):
+            entry.useragents = [name if name == "*" or name.lower() == our_name else "\0" + name for name in entry.useragents]
         return parser
 
     def _request(self, url: str) -> tuple[str, str] | None:
