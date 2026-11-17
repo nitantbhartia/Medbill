@@ -48,3 +48,29 @@ def test_repair_fixes_existing_rows_and_their_page_addresses():
     assert repair_hospital_states() == 1
     assert client.get("/hospitals/nv/elko/northeastern-nevada-regional-hospital-elko/").status_code == 200
     assert repair_hospital_states() == 0
+
+
+def test_repair_deletes_a_junk_state_duplicate_of_a_real_hospital():
+    upsert_hospital_row({"facility_id": "010996", "name": "Vaughan Regional Medical Center", "city": "Selma",
+                         "state": "AL", "slug": "vaughan-regional-medical-center-selma"})
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO hospitals (facility_id, name, city, state, zip, slug, state_slug, city_slug) "
+            "VALUES ('1871655993', 'Vaughan Regional Medical Center', 'Selma', 'L', '6701', 'vaughan-dup', 'l', 'selma')"
+        )
+    assert repair_hospital_states() == 1
+    with get_db() as db:
+        assert db.execute("SELECT 1 FROM hospitals WHERE facility_id = '1871655993'").fetchone() is None
+        assert db.execute("SELECT 1 FROM hospitals WHERE facility_id = '010996'").fetchone() is not None
+
+
+def test_repair_uses_the_only_state_in_the_city_when_zip_is_unusable():
+    upsert_hospital_row({"facility_id": "010995", "name": "Elko General", "city": "Elko", "state": "NV", "slug": "elko-general"})
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO hospitals (facility_id, name, city, state, zip, slug, state_slug, city_slug) "
+            "VALUES ('1770674351', 'Unmatched Clinic', 'Elko', '73', '-5151', 'unmatched-clinic-elko', '73', 'elko')"
+        )
+    assert repair_hospital_states() == 1
+    with get_db() as db:
+        assert db.execute("SELECT state_slug FROM hospitals WHERE facility_id = '1770674351'").fetchone()["state_slug"] == "nv"
