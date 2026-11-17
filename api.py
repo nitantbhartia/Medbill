@@ -337,6 +337,9 @@ async def scan_bill(
                 img = await f.read()
                 image_list.append((img, f.content_type or "image/jpeg"))
             extracted = scanner.process_multi_page_bill(image_list)
+    except scanner.ScannerNotConfigured as e:
+        log.error("Scan refused: %s", e)
+        raise HTTPException(503, "Bill reading is unavailable right now. Please try again later, or email support@billkarma.app.")
     except ValueError as e:
         log.warning("Scan extraction rejected: %s", e)
         raise HTTPException(400, f"Failed to extract bill data: {e}")
@@ -680,6 +683,7 @@ def _build_report_html(results: dict) -> str:
     savings = bill.get("total_potential_savings") or 0
     bill_id = bill.get("id", "")
     results_url = f"{config.APP_URL.rstrip('/')}/results/{bill_id}"
+    fee_dollars = payment_module.calculate_fee(float(total_owes or total_charged or 0)) / 100
 
     severity_colors = {"high": "#b91c1c", "medium": "#b45309", "low": "#1d4ed8"}
 
@@ -692,7 +696,7 @@ def _build_report_html(results: dict) -> str:
             f'<tr>'
             f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:{color};font-weight:600;text-transform:uppercase;font-size:11px">{sev}</td>'
             f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827">{_he(f.get("message", ""))}</td>'
-            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#059669;white-space:nowrap">'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#0E1726;white-space:nowrap">'
             f'{"$" + f"{est:,.2f}" if est else "—"}</td>'
             f'</tr>'
         )
@@ -709,8 +713,8 @@ def _build_report_html(results: dict) -> str:
 <html><head><meta charset="UTF-8"></head>
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;margin:0;padding:24px">
   <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
-    <div style="background:#0f766e;padding:24px 28px">
-      <p style="margin:0;color:#ccfbf1;font-size:13px;font-weight:600;letter-spacing:.05em">BILLKARMA REPORT</p>
+    <div style="background:#0E1726;padding:24px 28px">
+      <p style="margin:0;color:#B7C1CF;font-size:13px;font-weight:600;letter-spacing:.05em">BILLKARMA REPORT</p>
       <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:700">{len(findings)} issue{"s" if len(findings) != 1 else ""} found</h1>
     </div>
     <div style="padding:24px 28px">
@@ -733,12 +737,13 @@ def _build_report_html(results: dict) -> str:
         </tr>
         <tr>
           <td style="font-size:12px;color:#6b7280;padding:4px 0">Potential savings</td>
-          <td style="font-size:14px;color:#059669;font-weight:700;padding:4px 0">${savings:,.2f}</td>
+          <td style="font-size:14px;color:#0E1726;font-weight:700;padding:4px 0">${savings:,.2f}</td>
         </tr>
       </table>
-      {"<h2 style='font-size:14px;font-weight:600;color:#111827;margin:0 0 12px'>Issues found</h2><table style='width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden'><thead><tr><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Severity</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Finding</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Est. savings</th></tr></thead><tbody>" + finding_rows + "</tbody></table>" if findings else "<p style='color:#059669;font-weight:600'>No significant issues found — your bill looks clean.</p>"}
-      <div style="margin-top:24px;text-align:center">
-        <a href="{results_url}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:600">View full report &amp; dispute tools →</a>
+      {"<h2 style='font-size:14px;font-weight:600;color:#111827;margin:0 0 12px'>Issues found</h2><table style='width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden'><thead><tr><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Severity</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Finding</th><th style='padding:8px 12px;background:#f9fafb;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase'>Est. savings</th></tr></thead><tbody>" + finding_rows + "</tbody></table>" if findings else "<p style='color:#0E1726;font-weight:600'>No significant issues found — your bill looks clean.</p>"}
+      <p style="margin:24px 0 0;font-size:14px;line-height:1.5;color:#3B4658">Want us to dispute these for you? We send the letter to the billing office and follow up for a flat ${fee_dollars:,.0f}, refunded if the bill isn&rsquo;t reduced in {config.DISPUTE_MAX_DAYS} days.</p>
+      <div style="margin-top:16px;text-align:center">
+        <a href="{results_url}" style="display:inline-block;background:#0E1726;color:#fff;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:600">View full report &amp; dispute tools →</a>
       </div>
     </div>
     <div style="padding:16px 28px;border-top:1px solid #e5e7eb;background:#f9fafb">
