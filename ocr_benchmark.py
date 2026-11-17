@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
@@ -51,20 +51,24 @@ def score_extraction(pred: dict, truth: dict) -> ScoreResult:
             overall_score=1.0,
         )
 
-    matched = 0
     cpt_hits = 0
     amount_hits = 0
-    for i, t in enumerate(truth_items):
-        if i >= len(pred_items):
+    line_hits = 0
+    unused = list(pred_items)
+    for t in truth_items:
+        same_cpt = [p for p in unused if _norm_text(p.get("cpt_code")) == _norm_text(t.get("cpt_code"))]
+        if not same_cpt:
             continue
-        p = pred_items[i]
-        matched += 1
-        if _norm_text(p.get("cpt_code")) == _norm_text(t.get("cpt_code")):
-            cpt_hits += 1
-        if _norm_amount(p.get("charged_amount")) == _norm_amount(t.get("charged_amount")):
-            amount_hits += 1
+        cpt_hits += 1
+        exact = [p for p in same_cpt if _norm_amount(p.get("charged_amount")) == _norm_amount(t.get("charged_amount"))]
+        if not exact:
+            unused.remove(same_cpt[0])
+            continue
+        amount_hits += 1
+        line_hits += 1
+        unused.remove(exact[0])
 
-    line_rate = matched / len(truth_items)
+    line_rate = line_hits / len(truth_items)
     cpt_rate = cpt_hits / len(truth_items)
     amount_rate = amount_hits / len(truth_items)
     overall = (
@@ -85,6 +89,25 @@ def score_extraction(pred: dict, truth: dict) -> ScoreResult:
     )
 
 
+def run_live(truth_jsonl: str | Path, extract) -> dict:
+    """Run `extract(image_bytes, mime_type) -> dict` over every file in a ground-truth JSONL and score it."""
+    truth_file = Path(truth_jsonl)
+    rows = []
+    for line in truth_file.read_text().splitlines():
+        truth = json.loads(line)
+        image_path = truth_file.parent / truth["file"]
+        mime_type = "application/pdf" if image_path.suffix == ".pdf" else f"image/{image_path.suffix.lstrip('.')}"
+        score = score_extraction(extract(image_path.read_bytes(), mime_type), truth)
+        rows.append({"id": image_path.stem, **asdict(score)})
+    return _summarize(rows)
+
+
+def _summarize(rows: list[dict]) -> dict:
+    avg = lambda key: round(sum(r[key] for r in rows) / len(rows), 4) if rows else 0.0
+    keys = ("provider_name_accuracy", "total_charged_accuracy", "line_match_rate", "cpt_accuracy", "amount_accuracy", "overall_score")
+    return {"samples": rows, "aggregate": {"count": len(rows), **{k: avg(k) for k in keys}}}
+
+
 def run_manifest(manifest_path: str | Path) -> dict:
     manifest_file = Path(manifest_path)
     payload = json.loads(manifest_file.read_text())
@@ -93,29 +116,5 @@ def run_manifest(manifest_path: str | Path) -> dict:
     for sample in payload.get("samples", []):
         truth = json.loads((root / sample["truth_json"]).read_text())
         pred = json.loads((root / sample["prediction_json"]).read_text())
-        score = score_extraction(pred, truth)
-        rows.append(
-            {
-                "id": sample["id"],
-                "provider_name_accuracy": score.provider_name_accuracy,
-                "total_charged_accuracy": score.total_charged_accuracy,
-                "line_match_rate": score.line_match_rate,
-                "cpt_accuracy": score.cpt_accuracy,
-                "amount_accuracy": score.amount_accuracy,
-                "overall_score": score.overall_score,
-            }
-        )
-
-    avg = lambda key: round(sum(r[key] for r in rows) / len(rows), 4) if rows else 0.0
-    return {
-        "samples": rows,
-        "aggregate": {
-            "count": len(rows),
-            "provider_name_accuracy": avg("provider_name_accuracy"),
-            "total_charged_accuracy": avg("total_charged_accuracy"),
-            "line_match_rate": avg("line_match_rate"),
-            "cpt_accuracy": avg("cpt_accuracy"),
-            "amount_accuracy": avg("amount_accuracy"),
-            "overall_score": avg("overall_score"),
-        },
-    }
+        rows.append({"id": sample["id"], **asdict(score_extraction(pred, truth))})
+    return _summarize(rows)

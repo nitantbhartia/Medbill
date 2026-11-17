@@ -154,6 +154,9 @@ OCR_ENSEMBLE_ENABLED = os.getenv("OCR_ENSEMBLE_ENABLED", "false").lower() == "tr
 OCR_MAX_VARIANTS = int(os.getenv("OCR_MAX_VARIANTS", "3"))
 OCR_RECONCILIATION_TOLERANCE_PCT = float(os.getenv("OCR_RECONCILIATION_TOLERANCE_PCT", "2.0"))
 
+OCR_BENCHMARK_TRUTH_FILE = "test_assets/scan_baseline/synthetic_ground_truth.jsonl"
+OCR_BENCHMARK_MIN_SCORE = 0.85
+
 # Quality score weights for OCR extraction ranking
 OCR_SCORE_PER_LINE_ITEM = 2.0
 OCR_SCORE_PER_CPT = 2.5
@@ -289,3 +292,7 @@ REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
 REFERRAL_CODE_PATTERN = r"[a-z0-9-]{1,40}"
 PARTNER_REPORT_DAYS = 90
 PARTNER_CONTACT_EMAIL = os.getenv("PARTNER_CONTACT_EMAIL", "support@billkarma.app")
+
+# Hospital x procedure pages
+HOSPITAL_PROCEDURE_SITEMAP_MAX = 40000  # sitemap files allow 50,000 URLs
+HOSPITAL_PROCEDURE_ALTERNATIVES = 5
