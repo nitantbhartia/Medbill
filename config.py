@@ -296,3 +296,4 @@ PARTNER_CONTACT_EMAIL = os.getenv("PARTNER_CONTACT_EMAIL", "support@billkarma.ap
 # Hospital x procedure pages
 HOSPITAL_PROCEDURE_SITEMAP_MAX = 40000  # sitemap files allow 50,000 URLs
 HOSPITAL_PROCEDURE_ALTERNATIVES = 5
+HOSPITAL_PROCEDURE_MIN_HOSPITALS = 30  # codes priced by fewer hospitals are noindex and left out of the sitemap
