@@ -174,7 +174,7 @@ def _build_actions(
             "title": "Request the uninsured/cash-pay rate",
             "description": "Hospitals are required to offer self-pay discounts. These are often 40-60% below list price.",
             "impact": "high",
-            "url": "/guides/hospital-cash-pay-rates",
+            "url": "/guides/hospital-cash-pay-self-pay-discount",
             "button": "Learn More",
         })
 

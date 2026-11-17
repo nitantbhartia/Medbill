@@ -113,7 +113,7 @@ def get_recommendation(answers: dict) -> dict:
                 "title": "Request the self-pay / cash rate",
                 "description": "Hospitals must offer uninsured patients a discount. These are often 40\u201360% below the billed amount.",
                 "impact": "high",
-                "url": "/guides/hospital-cash-pay-rates",
+                "url": "/guides/hospital-cash-pay-self-pay-discount",
                 "button": "Learn How",
                 "price": "Free",
             })
