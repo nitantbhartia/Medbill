@@ -3,7 +3,8 @@
 One charge often triggers several findings (a markup, an upcoding flag and a regional
 benchmark for the same ER visit). Each finding reports savings for that same charge, so
 adding them up overstates what the patient can save. Here each charge counts once, at its
-largest single estimate, and the total never exceeds what the patient owes."""
+largest single estimate and never more than the charge itself, and the total never exceeds
+what the patient owes."""
 
 from __future__ import annotations
 
@@ -78,7 +79,13 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             _TYPE_ORDER.index(r["type"]) if r["type"] in _TYPE_ORDER else len(_TYPE_ORDER),
         ))
         row["strong"] = row["severity"] in ("high", "medium")
-    total = sum(row["savings"] for row in rows)
+        if row["charged"]:
+            row["savings"] = min(row["savings"], float(row["charged"]))
+    # A whole-bill finding (no line item) covers the same money as the line findings, so the
+    # two are alternatives, not a sum.
+    line_total = sum(row["savings"] for row in rows if row["charged"])
+    bill_total = sum(row["savings"] for row in rows if not row["charged"])
+    total = max(line_total, bill_total)
     if amount_owed:
         total = min(total, amount_owed)
     return {
