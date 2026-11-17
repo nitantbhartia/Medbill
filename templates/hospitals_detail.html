@@ -161,7 +161,7 @@
                         <tbody>
                             {% for row in data.prices[:30] %}
                             <tr data-charge="{{ row.gross_charge or '' }}">
-                                <td class="bk-num">{{ row.cpt_code }}</td>
+                                <td class="bk-num"><a href="/hospitals/{{ h.state_slug }}/{{ h.city_slug }}/{{ h.slug }}/{{ row.cpt_code }}/">{{ row.cpt_code }}</a></td>
                                 <td>{{ row.description }}</td>
                                 <td class="bk-num">{{ "$%.2f"|format(row.gross_charge) if row.gross_charge is not none else "N/A" }}</td>
                                 {% if data.show_cash_column %}<td class="bk-num">{{ "$%.2f"|format(row.cash_price) if row.cash_price is not none else "N/A" }}</td>{% endif %}

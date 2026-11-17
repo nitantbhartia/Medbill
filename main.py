@@ -22,6 +22,7 @@ from hospital_downloads import build_embed_snippet
 from es_pages import router as es_router, hreflang_links_for_english
 from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
+from hospital_procedure_pages import get_hospital_procedure_page, get_hospital_procedure_sitemap_paths
 from hospital_seo import (
     find_hospitals,
     get_cities_for_state,
@@ -2075,6 +2076,25 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
     )
 
 
+@app.get("/hospitals/{state_slug}/{city_slug}/{hospital_slug}/{cpt_code}/", response_class=HTMLResponse)
+async def hospital_procedure_page(request: Request, state_slug: str, city_slug: str, hospital_slug: str, cpt_code: str):
+    page = get_hospital_procedure_page(state_slug, city_slug, hospital_slug, cpt_code)
+    if not page:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "Price not found"}, status_code=404)
+    return templates.TemplateResponse(
+        "hospital_procedure.html",
+        {
+            "request": request,
+            "data": page,
+            "canonical_url": page["canonical_url"],
+            "og_title": page["page_title"],
+            "og_description": page["meta_description"],
+            "meta_description": page["meta_description"],
+            "meta_robots": "index, follow",
+        },
+    )
+
+
 @app.get("/surgery-centers/", response_class=HTMLResponse)
 async def surgery_centers_index(request: Request):
     states = get_facility_state_index("asc")
@@ -2507,6 +2527,7 @@ async def sitemap_index():
         f"{base}/sitemap-costs.xml",
         f"{base}/sitemap-legacy-cost-pages.xml",
         f"{base}/sitemap-hospitals.xml",
+        f"{base}/sitemap-hospital-procedures.xml",
         f"{base}/sitemap-facilities.xml",
         f"{base}/sitemap-compare.xml",
         f"{base}/sitemap-data-guides.xml",
@@ -2654,6 +2675,21 @@ async def hospital_sitemap_v2():
     urlset = "".join(
         f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.5</priority></url>"
         for path in hospital_paths
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{urlset}</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
+
+
+@app.get("/sitemap-hospital-procedures.xml")
+async def hospital_procedure_sitemap():
+    base = config.APP_URL.rstrip("/")
+    urlset = "".join(
+        f"<url><loc>{base}{path}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>0.4</priority></url>"
+        for path in get_hospital_procedure_sitemap_paths()
     )
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
