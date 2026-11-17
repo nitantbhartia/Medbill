@@ -34,7 +34,7 @@
         gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
     </script>
     {% endif %}
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400..700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Inter+Tight:wght@500..700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
     <link rel="preload" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}" as="style">
     <link rel="stylesheet" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}">
     <link rel="preload" href="/static/css/app.css?v={{ config.ASSET_VERSION }}" as="style">
@@ -86,7 +86,7 @@
             flex-shrink: 0;
         }
         .bk-tip svg { width: 14px; height: 14px; color: #9CA3AF; transition: color 0.1s; }
-        .bk-tip:hover svg, .bk-tip.tip-open svg { color: #5E6F69; }
+        .bk-tip:hover svg, .bk-tip.tip-open svg { color: #5B6676; }
         .bk-tip::after {
             content: attr(data-tip);
             position: absolute;
@@ -95,7 +95,7 @@
             transform: translateX(-50%);
             width: 230px;
             padding: 7px 10px;
-            background: #16302A;
+            background: #0E1726;
             color: #fff;
             font-size: 11.5px;
             font-weight: 400;
@@ -116,7 +116,7 @@
             left: 50%;
             transform: translateX(-50%);
             border: 5px solid transparent;
-            border-top-color: #16302A;
+            border-top-color: #0E1726;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.12s;

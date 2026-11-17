@@ -38,5 +38,12 @@ def test_landing_shows_the_real_dispute_letter_and_followup_schedule():
     text = client.get("/").text
     assert "DUPLICATE BILLING — CPT 36415 (Blood Draw)" in text
     assert "CPT 80048 cannot be billed separately when CPT 80053 applies" in text
-    assert "Day 45: final follow-up" in text
+    assert "Final follow-up, or your money back" in text
+    assert "$99 flat, refunded if not reduced" in text
     assert "Median reduction" not in text  # hidden until there are enough reported outcomes
+
+
+def test_landing_hero_upload_posts_to_the_scan_api_and_falls_back_to_the_scan_page():
+    text = client.get("/").text
+    assert 'id="bill-file"' in text and "fetch('/api/scan'" in text
+    assert '<a href="/scan" class="bk-btn" id="bill-pick">' in text

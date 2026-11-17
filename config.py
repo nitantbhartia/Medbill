@@ -226,12 +226,12 @@ ASSET_VERSION = (os.getenv("RAILWAY_GIT_COMMIT_SHA") or os.getenv("ASSET_VERSION
 
 # Example itemized bill on the homepage (illustrative charges; Medicare rates are looked up live)
 HOMEPAGE_EXAMPLE_BILL = (
-    {"code": "99285", "desc": "Emergency visit, level 5", "amount": 4500.00, "flag": "Level 5 is for life-threatening problems. This visit ended with a splint.", "type": "upcoding"},
+    {"code": "99285", "desc": "Emergency visit, level 5", "amount": 4500.00, "flag": "Level 5 is for life-threatening problems. This visit ended with a splint.", "type": "upcoding", "tag": "Visit level"},
     {"code": "73610", "desc": "X-ray, ankle, 3 views", "amount": 610.00, "flag": ""},
     {"code": "80053", "desc": "Comprehensive metabolic panel", "amount": 198.00, "flag": ""},
-    {"code": "80048", "desc": "Basic metabolic panel", "amount": 142.00, "flag": "Already included in the comprehensive panel.", "type": "unbundling", "bundled": "80053"},
+    {"code": "80048", "desc": "Basic metabolic panel", "amount": 142.00, "flag": "Already included in the comprehensive panel.", "type": "unbundling", "bundled": "80053", "tag": "Overlap"},
     {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": ""},
-    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": "Billed twice for one draw.", "type": "duplicate"},
+    {"code": "36415", "desc": "Blood draw", "amount": 38.00, "flag": "Billed twice for one draw.", "type": "duplicate", "tag": "Duplicate"},
 )
 HOMEPAGE_EXAMPLE_CLEAR_ERRORS = ("80048", "36415")
 HOMEPAGE_EXAMPLE_SERVICE_DATE = "2026-03-03"

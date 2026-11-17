@@ -591,6 +591,7 @@ def _homepage_example_bill() -> dict:
         "lines": lines,
         "total": total,
         "clear_errors": clear_errors,
+        "fee": dispute_service.calculate_fee(total) // 100,
         "letter": [_example_letter_paragraph(line) for line in lines if line["flag"]],
         "visit_amount": visit["amount"],
         "visit_medicare": (get_medicare_rate(visit["code"]) or 0) + (get_opps_rate(visit["code"]) or 0) or None,

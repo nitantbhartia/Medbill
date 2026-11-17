@@ -10,13 +10,29 @@
 <div class="bk-home">
 <section class="bk-wrap bk-home-hero">
     <div>
-        <h1><span>Check your hospital bill for free.</span> <span>If it&rsquo;s wrong, we&rsquo;ll dispute it in writing.</span></h1>
-        <p class="bk-lede">Upload your itemized bill and see every charge next to what Medicare pays for the same code, with duplicates and overlapping tests flagged. If you want it fixed, we send the dispute to the billing office and follow up until they answer.</p>
-        <div class="bk-home-actions">
-            <a href="/scan" class="bk-btn">Check my bill free</a>
-            <a href="#how" class="bk-link">How it works</a>
+        <p class="bk-home-kicker">Hospital bill checker and written dispute service</p>
+        <h1>Check your hospital bill for free. If it&rsquo;s wrong, <span class="bk-hl">we&rsquo;ll dispute it in writing.</span></h1>
+        <p class="bk-lede">See every charge next to what Medicare pays for the same code, with duplicates and overlapping tests flagged. If you want it fixed, we send the dispute to the billing office and follow up until they answer.</p>
+
+        <div class="bk-drop" id="bill-drop">
+            <div class="bk-drop-text">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                <div>
+                    <strong>Drop your itemized bill here</strong>
+                    <span>Photo or PDF. No account, no card.</span>
+                </div>
+            </div>
+            <a href="/scan" class="bk-btn" id="bill-pick">Check my bill free</a>
+            <input type="file" id="bill-file" accept="image/*,.pdf" multiple hidden aria-label="Itemized bill, photo or PDF">
         </div>
-        <p class="bk-home-note">No account needed. Nothing is sent to the hospital unless you choose to.</p>
+        <p class="bk-drop-status" id="bill-status" role="status"></p>
+        <p class="bk-home-note">Nothing is sent to the hospital unless you choose to. <a href="#faq">What happens to your upload</a></p>
+
+        <dl class="bk-terms">
+            <div><dt>Checking a bill</dt><dd>Free</dd></div>
+            <div><dt>Sending a dispute</dt><dd>${{ dispute_tiers[0].fee }} to ${{ dispute_tiers[-1].fee }}</dd></div>
+            <div><dt>Not reduced in {{ config.DISPUTE_MAX_DAYS }} days</dt><dd>Full refund</dd></div>
+        </dl>
     </div>
 
     <figure style="margin: 0">
@@ -29,7 +45,7 @@
                     <span class="code">{{ line.code }}</span>
                     <span class="desc">{{ line.desc }}</span>
                     <span class="amt">${{ "{:,.2f}".format(line.amount) }}</span>
-                    {% if line.flag %}<span class="why">{{ line.flag }}</span>{% endif %}
+                    {% if line.flag %}<span class="why"><span class="bk-tag">{{ line.tag }}</span>{{ line.flag }}</span>{% endif %}
                     {% if loop.first and example.visit_medicare %}
                     <span class="bk-vs">
                         <span>Billed</span><b></b><span>${{ "{:,.0f}".format(line.amount) }}</span>
@@ -41,80 +57,43 @@
             </ol>
             <div class="bk-statement-foot">
                 <span>Billed</span><span class="amt">${{ "{:,.2f}".format(example.total) }}</span>
-                <span class="save">Flagged to dispute, {{ example.lines | selectattr("flag") | list | length }} charges</span><span class="amt save">${{ "{:,.2f}".format(example.clear_errors + example.visit_amount) }}</span>
+                <span class="save">Flagged to dispute, {{ example.letter | length }} charges</span><span class="amt save">${{ "{:,.2f}".format(example.clear_errors + example.visit_amount) }}</span>
             </div>
+            <div class="bk-statement-offer"><span>We dispute all {{ example.letter | length }} for you</span><strong>${{ example.fee }} flat, refunded if not reduced</strong></div>
         </div>
         <figcaption class="bk-statement-caption">An example of what the free check shows. Charges are illustrative; the Medicare rate is from our CMS data.</figcaption>
     </figure>
 </section>
 
-<section class="bk-wrap">
-    <dl class="bk-terms">
-        <div><dt>Checking a bill</dt><dd>Free</dd><dd>No account and no card.</dd></div>
-        <div><dt>Sending a dispute</dt><dd>${{ dispute_tiers[0].fee }} to ${{ dispute_tiers[-1].fee }}</dd><dd>One flat fee, set by the size of the bill.</dd></div>
-        <div><dt>If the bill isn&rsquo;t reduced</dt><dd>Full refund</dd><dd>Of the dispute fee, after {{ config.DISPUTE_MAX_DAYS }} days.</dd></div>
-        {% if outcome_stats.show_stat %}<div><dt>Median reduction when a bill is lowered</dt><dd>${{ "{:,.0f}".format(outcome_stats.median_recovered) }}</dd><dd>{{ outcome_stats.recovery_count }} of {{ outcome_stats.total_disputes }} reported outcomes.</dd></div>{% endif %}
-    </dl>
-</section>
-
-<section id="how" class="bk-band" style="margin-top: 80px">
+<section id="how" class="bk-band">
     <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
-        <h2 class="bk-h2">How it works</h2>
-        <p class="bk-lede">The first two steps are free. The third is optional.</p>
+        <h2 class="bk-h2">Three steps. The first two are free.</h2>
         <ol class="bk-flow">
             <li>
-                <div>
-                    <h3>Upload your itemized bill</h3>
-                    <p>A photo or PDF. If you only have a summary, <a href="/itemized-bill">we&rsquo;ll write the request for the itemized version</a>; you have a right to it.</p>
-                </div>
                 <span class="bk-flow-price">Free</span>
+                <h3>Upload your itemized bill</h3>
+                <p>A photo or PDF. If you only have a summary, <a href="/itemized-bill">we&rsquo;ll write the request for the itemized version</a>; you have a right to it.</p>
             </li>
             <li>
-                <div>
-                    <h3>See what looks wrong</h3>
-                    <p>Every line with a billing code is compared with Medicare&rsquo;s rate. Duplicates, overlapping tests and high visit levels are flagged.</p>
-                </div>
                 <span class="bk-flow-price">Free</span>
+                <h3>See what looks wrong</h3>
+                <p>Every coded line is compared with Medicare&rsquo;s rate. <a href="/guides/duplicate-charges-hospital-bills/">Duplicates</a>, <a href="/guides/upcoding-unbundling-hospital-bills/">overlapping tests and high visit levels</a> are flagged, as in the example above.</p>
             </li>
             <li>
-                <div>
-                    <h3>We dispute it for you</h3>
-                    <p>We write the letter for the flagged charges, send it to the billing office and follow up until they answer.</p>
-                </div>
-                <span class="bk-flow-price">From ${{ dispute_tiers[0].fee }}</span>
+                <span class="bk-flow-price paid">From ${{ dispute_tiers[0].fee }}</span>
+                <h3>We dispute it for you</h3>
+                <p>Optional. We write the letter for the flagged charges, send it to the billing office and follow up until they answer.</p>
             </li>
         </ol>
     </div>
 </section>
 
-<section class="bk-wrap bk-home-section">
-    <h2 class="bk-h2">What the check looks for</h2>
-    <div class="bk-findings">
-        <div>
-            <h3>Charges billed twice</h3>
-            <p>The same code on the same day, or one blood draw billed as two. <a href="/guides/duplicate-charges-hospital-bills/">Duplicate charges</a></p>
-        </div>
-        <div>
-            <h3>Prices far above Medicare</h3>
-            <p>How many times Medicare&rsquo;s rate each line costs, so you know which numbers to question. For scale, <a href="https://www.rand.org/pubs/periodicals/health-quarterly/issues/v12/n2/05.html" target="_blank" rel="noopener noreferrer">RAND found</a> private insurers paid hospitals about 254% of Medicare rates in 2022. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
-        </div>
-        <div>
-            <h3>Visits billed at a higher level</h3>
-            <p>Level 4 and 5 emergency visits, the most common place for upcoding. <a href="/guides/upcoding-unbundling-hospital-bills/">Upcoding</a></p>
-        </div>
-        <div>
-            <h3>Tests that overlap</h3>
-            <p>A basic panel billed next to the comprehensive one that already includes it. <a href="/guides/upcoding-unbundling-hospital-bills/">Unbundling</a></p>
-        </div>
-    </div>
-</section>
-
-<section class="bk-band" style="margin-top: 80px">
-    <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
+<section id="letter" class="bk-dark">
+    <div class="bk-wrap" style="padding-top: 88px; padding-bottom: 88px">
         <h2 class="bk-h2">What the hospital receives</h2>
-        <p class="bk-lede">This is the letter our system writes for the example bill above. It goes to the billing office by email or fax, in your name, after you sign an authorization.</p>
-        <div class="bk-price" style="margin-top: 36px">
-            <figure style="margin: 0">
+        <p class="bk-lede">The letter our system writes for the example bill. It goes to the billing office by email or fax, in your name, after you sign an authorization.</p>
+        <div class="bk-dark-grid">
+            <figure>
                 <div class="bk-letter">
                     <p><strong>Re: Formal Billing Dispute</strong><br>Account: [your account number]</p>
                     <p class="bk-letter-label">Disputed charges</p>
@@ -123,111 +102,100 @@
                         <li><strong>{{ para.title }}</strong><br><span class="bk-letter-meta">{{ para.meta }}</span><br>{{ para.body }}</li>
                         {% endfor %}
                     </ol>
+                    <p class="bk-letter-note">Excerpt. The full letter also asks for a written reply within 30 days, a corrected statement and a hold on collections.</p>
                 </div>
-                <figcaption class="bk-statement-caption">An excerpt. The full letter also asks for a written reply, a corrected statement and a hold on collections while the dispute is open.</figcaption>
             </figure>
             <div>
-                <h3 class="bk-h3" style="margin-bottom: 18px">Then we keep asking</h3>
-                <ol class="bk-timeline">
-                    <li class="done"><strong>Day 0: letter sent</strong><span>You can read it and every reply on your dispute page.</span></li>
+                <h3 class="bk-h3">Then we keep asking</h3>
+                <ol class="bk-days">
+                    <li><span>Day 0</span><span><strong>Letter sent</strong><span>You can read it, and every reply, on your dispute page.</span></span></li>
                     {% for day in followup_days[:-1] %}
-                    <li><strong>Day {{ day }}: follow-up</strong><span>Sent if the billing office hasn&rsquo;t answered.</span></li>
+                    <li><span>Day {{ day }}</span><span><strong>Follow-up</strong><span>Sent if the billing office hasn&rsquo;t answered.</span></span></li>
                     {% endfor %}
-                    <li class="guarantee"><strong>Day {{ followup_days[-1] }}: final follow-up</strong><span>If the bill hasn&rsquo;t been reduced by day {{ config.DISPUTE_MAX_DAYS }}, your fee is refunded in full.</span></li>
+                    <li><span>Day {{ followup_days[-1] }}</span><span><strong>Final follow-up, or your money back</strong><span>If the bill hasn&rsquo;t been reduced by day {{ config.DISPUTE_MAX_DAYS }}, the fee is refunded in full.</span></span></li>
                 </ol>
+                <p class="bk-dark-note">The hospital decides whether to lower the bill. We make sure it is asked in writing, more than once.</p>
             </div>
         </div>
     </div>
 </section>
 
 <section id="pricing" class="bk-wrap bk-home-section">
-    <div class="bk-price">
-        <div>
-            <h2 class="bk-h2">One flat fee. Refunded if nothing changes.</h2>
-            <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. Our fee depends only on the size of the bill, and you pay it only if you choose to send a dispute.</p>
-            <p class="bk-muted" style="margin-top: 16px; font-size: 15px">The hospital decides whether to lower the bill. If it isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, you get the fee back in full.</p>
-        </div>
-        <div>
-            <div class="bk-price-table">
-                {% for tier in dispute_tiers %}
-                <div><span>{{ tier.label }}</span><strong>${{ tier.fee }}</strong></div>
-                {% endfor %}
-            </div>
-            <div class="bk-table-box">
-                <table class="bk-table bk-compare">
-                    <thead><tr><th>$2,400 bill, $900 saved</th><th>Fee</th><th>You keep</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>BillKarma</strong></td><td class="bk-num">$49</td><td class="bk-num">$851</td></tr>
-                        <tr><td><a href="/guides/billkarma-vs-goodbill-medical-bills/">Goodbill</a> (20%)</td><td class="bk-num">$180</td><td class="bk-num">$720</td></tr>
-                        <tr><td><a href="/guides/billkarma-vs-resolve-medical-bills/">Resolve</a></td><td colspan="2">Takes bills of $5,000 or more</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <h2 class="bk-h2">One flat fee, set by the size of the bill</h2>
+    <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. Our fee doesn&rsquo;t change with the outcome, and you pay it only if you choose to send a dispute.</p>
+    <div class="bk-tiers">
+        {% for tier in dispute_tiers %}
+        <div><span>{{ tier.label }}</span><strong>${{ tier.fee }}</strong></div>
+        {% endfor %}
+    </div>
+    <div class="bk-table-box" style="margin-top: 24px">
+        <table class="bk-table bk-compare">
+            <thead><tr><th>On a $2,400 bill reduced by $900</th><th>Fee</th><th>You keep</th></tr></thead>
+            <tbody>
+                <tr><td><strong>BillKarma</strong>, flat fee</td><td class="bk-num">$49</td><td class="bk-num"><span class="bk-hl">$851</span></td></tr>
+                <tr><td><a href="/guides/billkarma-vs-goodbill-medical-bills/">Goodbill</a> (20%)</td><td class="bk-num">$180</td><td class="bk-num">$720</td></tr>
+                <tr><td><a href="/guides/billkarma-vs-resolve-medical-bills/">Resolve</a></td><td colspan="2">Takes bills of $5,000 or more</td></tr>
+            </tbody>
+        </table>
     </div>
 </section>
 
 <section class="bk-wrap bk-home-section">
-    <div class="bk-price">
+    <div class="bk-trust">
         <div>
             <h2 class="bk-h2">Where the numbers come from</h2>
-            <p class="bk-lede">Every comparison uses public data you can check yourself.</p>
-            <div class="bk-findings" style="grid-template-columns: 1fr; margin-top: 24px">
-                <div><h3>Medicare rates</h3><p>From the fee schedules CMS publishes for each billing code.</p></div>
-                <div><h3>Hospital prices</h3><p>From the price files hospitals are required to post.</p></div>
-                <div><h3>Billing office contacts</h3><p>From CMS hospital records. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></p></div>
+            <p class="bk-lede">Public data you can check yourself.</p>
+            <dl class="bk-sources">
+                <div><dt>Medicare rates</dt><dd>The fee schedules CMS publishes for each billing code.</dd></div>
+                <div><dt>Hospital prices</dt><dd>The price files hospitals are required to post.</dd></div>
+                <div><dt>Billing contacts</dt><dd>CMS hospital records{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></dd></div>
+                {% if outcome_stats.show_stat %}<div><dt>Results so far</dt><dd>Median reduction of ${{ "{:,.0f}".format(outcome_stats.median_recovered) }} when a bill is lowered, in {{ outcome_stats.recovery_count }} of {{ outcome_stats.total_disputes }} reported outcomes.</dd></div>{% endif %}
+            </dl>
+            <form action="/hospitals/" method="get" style="margin-top: 24px">
+                <label for="hospital-search" class="bk-label">Look up your hospital&rsquo;s billing office and prices</label>
+                <div class="bk-search">
+                    <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
+                    <button type="submit" class="bk-btn-outline">Find hospital</button>
+                </div>
+            </form>
+        </div>
+        <div>
+            <div class="bk-nots">
+                <h2>What we don&rsquo;t do</h2>
+                <ul>
+                    <li>No phone negotiation. Everything is in writing, so you keep a dated record.</li>
+                    <li>No insurance denials. That is an appeal to your insurer; start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>.</li>
+                    <li>No legal help. If you&rsquo;re sued, contact local legal aid.</li>
+                    <li>No promise of a reduction. The hospital decides; you get the fee back if nothing changes.</li>
+                </ul>
+                <p>Already in collections? <a href="/collection-notice">Write a validation letter</a>. Can&rsquo;t afford it at all? <a href="/charity-care">Check financial assistance</a>.</p>
             </div>
-        </div>
-        <form action="/hospitals/" method="get" class="bk-panel" style="display: grid; gap: 14px">
-            <label for="hospital-search" class="bk-h3">Look up your hospital</label>
-            <p class="bk-muted" style="margin: -6px 0 4px">Billing office phone number, financial assistance policy and how its prices compare with Medicare{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}.</p>
-            <div class="bk-search">
-                <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
-                <button type="submit" class="bk-btn-outline">Find hospital</button>
-            </div>
-        </form>
-    </div>
-</section>
-
-<section class="bk-wrap bk-home-section">
-    <div class="bk-findings" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 0">
-        <div>
-            <h3>What we don&rsquo;t do</h3>
-            <p>No phone negotiation; everything is in writing so you keep a dated record. No insurance denials; start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>. No legal help; if you&rsquo;re sued, contact local legal aid.</p>
-        </div>
-        <div>
-            <h3>Already in collections?</h3>
-            <p>Ask the collector to prove the debt and the amount. Send a validation letter within 30 days of their first notice. <a href="/collection-notice">Write a validation letter</a></p>
-        </div>
-        <div>
-            <h3>Can&rsquo;t afford it at all?</h3>
-            <p>Nonprofit hospitals must offer financial assistance, and many cover households well above the poverty line. <a href="/charity-care">Check if you qualify</a></p>
         </div>
     </div>
 </section>
 
-<section class="bk-wrap bk-home-section" style="padding-bottom: 80px"><div class="bk-narrow">
+<section id="faq" class="bk-wrap bk-home-section" style="padding-bottom: 88px"><div class="bk-narrow">
     <h2 class="bk-h2">Questions</h2>
-    <div class="bk-faq" style="margin-top: 20px; border-top: 1.5px solid var(--ink)">
+    <div class="bk-faq" style="margin-top: 20px; border-top: 2px solid var(--ink)">
+        <details>
+            <summary>What happens to the bill I upload?</summary>
+            <p>An AI service (Google Gemini) reads your photo or PDF. We do not save the file itself, or the patient name on it. We keep what was read: the hospital name, each charge with its code and amount, and the last four digits of the account number. To have it deleted, email <a href="mailto:support@billkarma.app">support@billkarma.app</a>.</p>
+        </details>
         <details>
             <summary>Do I need my itemized bill?</summary>
             <p>Yes. A summary bill shows totals, not the billing codes we compare. Hospitals must give you the itemized version on request; <a href="/guides/how-to-get-itemized-hospital-bill/">here&rsquo;s how to ask</a>.</p>
         </details>
         <details>
             <summary>Why compare with Medicare?</summary>
-            <p>Medicare publishes what it pays for each billing code, so it&rsquo;s a public, consistent yardstick. Hospitals aren&rsquo;t required to charge Medicare rates, but a charge many times higher is worth questioning.</p>
-        </details>
-        <details>
-            <summary>What happens after I pay for a dispute?</summary>
-            <p>We send the letter to the hospital&rsquo;s billing office, follow up on days {{ followup_days | join(", ") }} and show every reply on your dispute page. If the bill isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, we refund the fee.</p>
+            <p>Medicare publishes what it pays for each billing code, so it&rsquo;s a public, consistent yardstick. Hospitals aren&rsquo;t required to charge Medicare rates, but a charge many times higher is worth questioning. For scale, <a href="https://www.rand.org/pubs/periodicals/health-quarterly/issues/v12/n2/05.html" target="_blank" rel="noopener noreferrer">RAND found</a> private insurers paid hospitals about 254% of Medicare rates in 2022. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
         </details>
         <details>
             <summary>What do you need from me to send a dispute?</summary>
             <p>Your name, email, the account number on the bill and the billing office&rsquo;s email or fax number. You also sign three short documents online, including an authorization that lets us write to the hospital for you.</p>
         </details>
         <details>
-            <summary>What happens to the bill I upload?</summary>
-            <p>An AI service (Google Gemini) reads your photo or PDF. We do not save the file itself, or the patient name on it. We keep what was read: the hospital name, each charge with its code and amount, and the last four digits of the account number. To have it deleted, email <a href="mailto:support@billkarma.app">support@billkarma.app</a>.</p>
+            <summary>What happens after I pay for a dispute?</summary>
+            <p>We send the letter to the hospital&rsquo;s billing office, follow up on days {{ followup_days | join(", ") }} and show every reply on your dispute page. If the bill isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, we refund the fee.</p>
         </details>
         <details>
             <summary>Does this work if I have insurance?</summary>
@@ -236,14 +204,53 @@
     </div>
 </div></section>
 
-<section class="bk-band" style="border-bottom: 0">
-    <div class="bk-wrap bk-home-close">
+<section class="bk-home-close">
+    <div class="bk-wrap">
         <div>
-            <h2 class="bk-h2">See what&rsquo;s wrong with your bill before you pay it.</h2>
+            <h2>See what&rsquo;s wrong with your bill before you pay it.</h2>
             <p>Free, and you decide what happens next.</p>
         </div>
         <a href="/scan" class="bk-btn">Check my bill free</a>
     </div>
 </section>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Hero upload: dropping or picking a file starts the free check; without JS the button goes to /scan.
+(function () {
+    var drop = document.getElementById('bill-drop');
+    var input = document.getElementById('bill-file');
+    var status = document.getElementById('bill-status');
+
+    function sendBill(files) {
+        if (!files.length || drop.classList.contains('busy')) return;
+        var data = new FormData();
+        Array.from(files).forEach(function (file) { data.append('images', file); });
+        drop.classList.add('busy');
+        status.textContent = 'Reading your bill. This usually takes under a minute.';
+        fetch('/api/scan', { method: 'POST', body: data })
+            .then(function (res) {
+                return res.json().then(function (body) {
+                    if (!res.ok) throw new Error(body.detail || 'Upload failed.');
+                    return body;
+                });
+            })
+            .then(function (body) { window.location.href = '/confirm/' + body.data.bill_id; })
+            .catch(function (err) {
+                console.error('Bill upload from homepage failed', err);
+                drop.classList.remove('busy');
+                input.value = '';
+                status.textContent = (err.message || 'Upload failed.') + ' Please try again.';
+            });
+    }
+
+    document.getElementById('bill-pick').addEventListener('click', function (e) { e.preventDefault(); input.click(); });
+    input.addEventListener('change', function () { sendBill(input.files); });
+    drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave', function () { drop.classList.remove('over'); });
+    drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('over'); sendBill(e.dataTransfer.files); });
+})();
+</script>
 {% endblock %}
