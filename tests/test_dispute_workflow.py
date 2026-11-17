@@ -457,3 +457,11 @@ class TestResultsPageRendering:
         resp = client.get("/results/9999")
         assert resp.status_code == 404
         assert "not found" in resp.text.lower()
+
+
+def test_finding_without_a_line_item_does_not_crash_letter_or_phone_script():
+    # A bill-level finding (e.g. No Surprises Act) has no line item, so there is no CPT code to read.
+    bill_id = _insert_bill("Riverside General Hospital", "2026-03-03")
+    _insert_finding(bill_id, "no_surprises_act", "", {"estimated_patient_savings": 2763.0}, savings=2763.0)
+    assert "N/A" in build_dispute_letter(bill_id)["letter"]
+    assert build_phone_script(bill_id)

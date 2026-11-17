@@ -47,7 +47,7 @@ def build_dispute_letter(
     for row in rows:
         detail = json.loads(row["details"] or "{}")
         li = detail.get("line_item") or {}
-        cpt = li.get("cpt_code") or row["cpt_code"] or "N/A"
+        cpt = li.get("cpt_code") or "N/A"
         desc = li.get("description") or "this service"
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
@@ -204,7 +204,7 @@ def build_appeal_letter(
     for row in rows:
         detail = json.loads(row["details"] or "{}")
         li = detail.get("line_item") or {}
-        cpt = li.get("cpt_code") or row["cpt_code"] or "N/A"
+        cpt = li.get("cpt_code") or "N/A"
         desc = li.get("description") or "this service"
         billed = float(li.get("charged_amount") or 0.0)
         savings = float(row["potential_savings"] or 0.0)
@@ -273,7 +273,7 @@ def build_phone_script(bill_id: int) -> str | None:
     for row in rows:
         detail = json.loads(row["details"] or "{}")
         li = detail.get("line_item") or {}
-        cpt = li.get("cpt_code") or row["cpt_code"] or "N/A"
+        cpt = li.get("cpt_code") or "N/A"
         desc = li.get("description") or "this service"
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
