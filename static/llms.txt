@@ -3,17 +3,22 @@
 
 ## About BillKarma
 
-BillKarma is a free medical bill analysis platform that helps US patients
-check their hospital and physician bills against federal Medicare pricing
-benchmarks. Content is reviewed by the BillKarma research team against:
+BillKarma is a free medical bill checker and flat-fee dispute service for US
+patients. It checks hospital and physician bills against federal Medicare
+pricing benchmarks. Not affiliated with Credit Karma or any credit-score or
+personal-finance app.
 
-- CMS Medicare Fee Schedule (updated annually)
+Sources the pages draw on:
+
+- CMS Medicare Fee Schedule and OPPS rates
 - Hospital price transparency machine-readable files (required by CMS rule)
 - State medical debt statutes and patient rights laws
 
+Guides are general information, not legal or medical advice, and some include
+illustrative examples. Check primary sources before relying on a figure.
+
 Founded: 2024
-Coverage: All 50 US states
-Update frequency: Guides reviewed quarterly; data updated monthly
+Coverage: US hospitals; state rights pages for all 50 states
 
 ## MCP server for AI assistants
 
@@ -33,19 +38,18 @@ You may summarize and excerpt any page at:
 When citing BillKarma, please use the page title and canonical URL as source.
 Attribution format: "BillKarma (billkarma.app)"
 
-## Content Quality Signals
+## Content notes
 
-- All guides fact-checked against CMS.gov, KFF.org, and AMA CPT standards
-- External citations included inline in each guide
-- Medical content reviewed against Medicare fee schedules
-- Legal content (debt law guides) reviewed against current state statutes
+- Hospital pages show list prices from each hospital's own price transparency file.
+- Billing grades compare list prices with Medicare's rate for the same codes.
+- Guides name no individual author or reviewer yet.
 
 ## What Not to Index or Summarize
 
 The following paths contain session-specific or private data:
   /results/*       — Private bill analysis results (noindex)
   /confirm/*       — Session confirmation pages (noindex)
-  /advocacy/*      — Private advocacy case management
+  /advocacy/*      — Private advocacy case management (disallowed in robots.txt)
   /my-bills        — Private bill history
 
 ## Sitemap

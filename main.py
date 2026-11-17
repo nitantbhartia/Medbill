@@ -2870,7 +2870,12 @@ async def favicon():
 async def robots_txt():
     body = (
         "User-agent: *\n"
-        "Allow: /\n\n"
+        "Allow: /\n"
+        "Disallow: /results/\n"
+        "Disallow: /confirm/\n"
+        "Disallow: /advocacy/\n"
+        "Disallow: /my-bills\n"
+        "Disallow: /ops/\n\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-core.xml\n"
         f"Sitemap: {config.APP_URL.rstrip('/')}/sitemap-guides.xml\n"
