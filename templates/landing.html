@@ -29,7 +29,13 @@
                     <span class="code">{{ line.code }}</span>
                     <span class="desc">{{ line.desc }}</span>
                     <span class="amt">${{ "{:,.2f}".format(line.amount) }}</span>
-                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} <strong>Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} in total for this code.</strong>{% endif %}</span>{% endif %}
+                    {% if line.flag %}<span class="why">{{ line.flag }}</span>{% endif %}
+                    {% if loop.first and example.visit_medicare %}
+                    <span class="bk-vs">
+                        <span>Billed</span><b></b><span>${{ "{:,.0f}".format(line.amount) }}</span>
+                        <span>Medicare pays</span><b class="medicare" style="width: {{ (100 * example.visit_medicare / line.amount) | round | int }}%"></b><span>${{ "{:,.0f}".format(example.visit_medicare) }} in total</span>
+                    </span>
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ol>
@@ -47,7 +53,7 @@
         <div><dt>Checking a bill</dt><dd>Free</dd><dd>No account and no card.</dd></div>
         <div><dt>Sending a dispute</dt><dd>${{ dispute_tiers[0].fee }} to ${{ dispute_tiers[-1].fee }}</dd><dd>One flat fee, set by the size of the bill.</dd></div>
         <div><dt>If the bill isn&rsquo;t reduced</dt><dd>Full refund</dd><dd>Of the dispute fee, after {{ config.DISPUTE_MAX_DAYS }} days.</dd></div>
-        {% if hospital_count %}<div><dt>Hospitals on file</dt><dd>{{ "{:,}".format(hospital_count) }}</dd><dd>Billing contacts and prices, from CMS.</dd></div>{% endif %}
+        {% if outcome_stats.show_stat %}<div><dt>Median reduction when a bill is lowered</dt><dd>${{ "{:,.0f}".format(outcome_stats.median_recovered) }}</dd><dd>{{ outcome_stats.recovery_count }} of {{ outcome_stats.total_disputes }} reported outcomes.</dd></div>{% endif %}
     </dl>
 </section>
 
@@ -90,7 +96,7 @@
         </div>
         <div>
             <h3>Prices far above Medicare</h3>
-            <p>How many times Medicare&rsquo;s rate each line costs, so you know which numbers to question. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
+            <p>How many times Medicare&rsquo;s rate each line costs, so you know which numbers to question. For scale, <a href="https://www.rand.org/pubs/periodicals/health-quarterly/issues/v12/n2/05.html" target="_blank" rel="noopener noreferrer">RAND found</a> private insurers paid hospitals about 254% of Medicare rates in 2022. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
         </div>
         <div>
             <h3>Visits billed at a higher level</h3>
@@ -103,17 +109,42 @@
     </div>
 </section>
 
+<section class="bk-band" style="margin-top: 80px">
+    <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
+        <h2 class="bk-h2">What the hospital receives</h2>
+        <p class="bk-lede">This is the letter our system writes for the example bill above. It goes to the billing office by email or fax, in your name, after you sign an authorization.</p>
+        <div class="bk-price" style="margin-top: 36px">
+            <figure style="margin: 0">
+                <div class="bk-letter">
+                    <p><strong>Re: Formal Billing Dispute</strong><br>Account: [your account number]</p>
+                    <p class="bk-letter-label">Disputed charges</p>
+                    <ol>
+                        {% for para in example.letter %}
+                        <li><strong>{{ para.title }}</strong><br><span class="bk-letter-meta">{{ para.meta }}</span><br>{{ para.body }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <figcaption class="bk-statement-caption">An excerpt. The full letter also asks for a written reply, a corrected statement and a hold on collections while the dispute is open.</figcaption>
+            </figure>
+            <div>
+                <h3 class="bk-h3" style="margin-bottom: 18px">Then we keep asking</h3>
+                <ol class="bk-timeline">
+                    <li class="done"><strong>Day 0: letter sent</strong><span>You can read it and every reply on your dispute page.</span></li>
+                    {% for day in followup_days[:-1] %}
+                    <li><strong>Day {{ day }}: follow-up</strong><span>Sent if the billing office hasn&rsquo;t answered.</span></li>
+                    {% endfor %}
+                    <li class="guarantee"><strong>Day {{ followup_days[-1] }}: final follow-up</strong><span>If the bill hasn&rsquo;t been reduced by day {{ config.DISPUTE_MAX_DAYS }}, your fee is refunded in full.</span></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="pricing" class="bk-wrap bk-home-section">
     <div class="bk-price">
         <div>
             <h2 class="bk-h2">One flat fee. Refunded if nothing changes.</h2>
             <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. Our fee depends only on the size of the bill, and you pay it only if you choose to send a dispute.</p>
-            <ul class="bk-checks">
-                <li>A dispute letter written for your bill and the charges we flagged</li>
-                <li>Sent to the hospital&rsquo;s billing office for you</li>
-                <li>Follow-ups on days {{ followup_days | join(", ") }} if they don&rsquo;t answer</li>
-                <li>One page to track replies and next steps</li>
-            </ul>
             <p class="bk-muted" style="margin-top: 16px; font-size: 15px">The hospital decides whether to lower the bill. If it isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, you get the fee back in full.</p>
         </div>
         <div>
@@ -189,6 +220,14 @@
         <details>
             <summary>What happens after I pay for a dispute?</summary>
             <p>We send the letter to the hospital&rsquo;s billing office, follow up on days {{ followup_days | join(", ") }} and show every reply on your dispute page. If the bill isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, we refund the fee.</p>
+        </details>
+        <details>
+            <summary>What do you need from me to send a dispute?</summary>
+            <p>Your name, email, the account number on the bill and the billing office&rsquo;s email or fax number. You also sign three short documents online, including an authorization that lets us write to the hospital for you.</p>
+        </details>
+        <details>
+            <summary>What happens to the bill I upload?</summary>
+            <p>An AI service (Google Gemini) reads your photo or PDF. We do not save the file itself, or the patient name on it. We keep what was read: the hospital name, each charge with its code and amount, and the last four digits of the account number. To have it deleted, email <a href="mailto:support@billkarma.app">support@billkarma.app</a>.</p>
         </details>
         <details>
             <summary>Does this work if I have insurance?</summary>

@@ -32,3 +32,11 @@ def test_search_console_tag_renders_only_when_configured(monkeypatch):
     assert "google-site-verification" not in client.get("/").text
     monkeypatch.setattr(config, "GOOGLE_SITE_VERIFICATION", "abc123")
     assert '<meta name="google-site-verification" content="abc123">' in client.get("/").text
+
+
+def test_landing_shows_the_real_dispute_letter_and_followup_schedule():
+    text = client.get("/").text
+    assert "DUPLICATE BILLING — CPT 36415 (Blood Draw)" in text
+    assert "CPT 80048 cannot be billed separately when CPT 80053 applies" in text
+    assert "Day 45: final follow-up" in text
+    assert "Median reduction" not in text  # hidden until there are enough reported outcomes
