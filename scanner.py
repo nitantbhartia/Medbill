@@ -11,6 +11,10 @@ import config
 
 log = logging.getLogger(__name__)
 
+
+class ScannerNotConfigured(RuntimeError):
+    """The bill reader has no API key, so no upload can be read."""
+
 try:
     from PIL import Image, ImageFilter, ImageOps
 except ImportError:  # pragma: no cover - optional dependency fallback
@@ -99,6 +103,8 @@ Return valid JSON only. No markdown, no preamble."""
 
 
 def _get_client() -> genai.Client:
+    if not config.GEMINI_API_KEY:
+        raise ScannerNotConfigured("GEMINI_API_KEY is not set, so no bill can be read")
     return genai.Client(api_key=config.GEMINI_API_KEY)
 
 

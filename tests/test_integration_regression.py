@@ -366,3 +366,15 @@ class TestPricingConsistencyRegression:
         assert page.status_code == 200
         assert "70551" in page.text
         assert "$2000.00" in page.text
+
+
+def test_scan_says_reading_is_unavailable_when_the_reader_has_no_key(monkeypatch):
+    import config
+    monkeypatch.setattr(config, "GEMINI_API_KEY", "")
+    from io import BytesIO
+    from PIL import Image
+    page = BytesIO()
+    Image.new("RGB", (600, 800), "white").save(page, format="PNG")
+    resp = client.post("/api/scan", files={"images": ("bill.png", page.getvalue(), "image/png")})
+    assert resp.status_code == 503
+    assert "unavailable right now" in resp.json()["detail"]

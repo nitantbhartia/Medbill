@@ -143,7 +143,7 @@ def test_compare_detail_shows_ctas():
     _seed()
     resp = client.get(f"/compare/{_FID_A}/vs/{_FID_B}/")
     assert resp.status_code == 200
-    assert "Scan Your Bill" in resp.text
+    assert "Check my bill free" in resp.text
 
 
 def test_compare_detail_shows_share_url():
