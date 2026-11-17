@@ -2,6 +2,7 @@
 
 from tests.test_hospital_pages import _seed_hospital, client  # noqa: F401  (sets up app + in-memory DB)
 
+import config
 from db import get_db
 from hospital_procedure_pages import get_hospital_procedure_page, get_hospital_procedure_sitemap_paths
 from hospital_seo import upsert_hospital_row
@@ -51,8 +52,18 @@ def test_procedure_page_404_for_unknown_code_and_hospital():
     assert client.get("/hospitals/fl/hollywood/no-such-hospital/99285/").status_code == 404
 
 
-def test_sitemap_lists_priced_procedures():
+def test_sitemap_lists_only_widely_priced_codes(monkeypatch):
     _seed_price()
+    assert get_hospital_procedure_sitemap_paths() == []
+    monkeypatch.setattr(config, "HOSPITAL_PROCEDURE_MIN_HOSPITALS", 1)
     assert f"{HOSPITAL_PATH}/99285/" in get_hospital_procedure_sitemap_paths()
     assert f"{HOSPITAL_PATH}/99285/" in client.get("/sitemap-hospital-procedures.xml").text
     assert "sitemap-hospital-procedures.xml" in client.get("/sitemap.xml").text
+
+
+def test_rare_code_is_noindex_and_title_uses_plain_name(monkeypatch):
+    _seed_price()
+    html = client.get(f"{HOSPITAL_PATH}/99285/").text
+    assert 'content="noindex, follow"' in html
+    monkeypatch.setattr(config, "HOSPITAL_PROCEDURE_MIN_HOSPITALS", 1)
+    assert 'content="noindex' not in client.get(f"{HOSPITAL_PATH}/99285/").text

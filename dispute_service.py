@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import config
 import email_service
@@ -542,11 +542,24 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
         )
 
     add_strategy_note(case_id, f"Follow-up #{followup_number} emailed. No reply recorded yet.")
+    _notify_patient_followup(case, provider, followup_number)
 
     # If this is the last follow-up, check if we should auto-refund
     if followup_number >= len(config.DISPUTE_FOLLOWUP_DAYS):
         _file_complaint(case, provider)
         _check_auto_refund(case_id)
+
+
+def _notify_patient_followup(case, provider: str, followup_number: int) -> None:
+    created = datetime.fromisoformat(str(case["created_at"])).date()
+    days_left = max(0, (created + timedelta(days=config.DISPUTE_MAX_DAYS) - date.today()).days)
+    try:
+        email_service.send_followup_notice_to_patient(
+            to=case["patient_email"], patient_name=case["patient_name"], case_id=case["id"],
+            hospital_name=provider, followup_number=followup_number, days_until_refund=days_left,
+        )
+    except Exception as exc:
+        log.warning("Could not send follow-up notice for case %d: %s", case["id"], exc)
 
 
 def _check_auto_refund(case_id: int) -> None:

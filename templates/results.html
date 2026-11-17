@@ -58,6 +58,7 @@
                 {% endif %}
                 {% set first = c.reasons[0] %}
                 <p class="bk-charge-reason"><strong>{{ first.label }}.</strong> {{ first.message }}</p>
+                {% if first.label_es %}<p class="bk-muted" lang="es" style="margin: 4px 0 0; font-size: 14px">En español: {{ first.label_es }}.</p>{% endif %}
                 {% if c.reasons | length > 1 %}
                 <details class="bk-charge-more">
                     <summary>{{ c.reasons | length - 1 }} more reason{{ 's' if c.reasons | length > 2 }}: {{ c.reasons[1:] | map(attribute='label') | join('; ') }}</summary>
@@ -95,6 +96,9 @@
     {% if issue_count %}
     <aside class="bk-results-side" id="decide">
         <h2 class="bk-h3">Choose how to proceed</h2>
+        {% if config.ES_PAGES_ENABLED %}
+        <p class="bk-muted" lang="es" style="margin: 0 0 12px; font-size: 14px">En español: la carta de disputa se envía en inglés, que es el idioma de la oficina de facturación. <a href="/es/guias/como-disputar-factura-medica/">Lea cómo funciona una disputa</a>.</p>
+        {% endif %}
         <div class="bk-decide bk-decide-main">
             <p class="bk-decide-label">We dispute it for you</p>
             <p class="bk-decide-price"><strong>${{ "{:,.0f}".format(fee) }}</strong> flat</p>

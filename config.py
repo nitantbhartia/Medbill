@@ -60,6 +60,7 @@ CERTIFIED_MAIL_FOLLOWUP_NUMBERS = (len(DISPUTE_FOLLOWUP_DAYS),)
 HOUSEHOLD_INCOME_MAX_USD = 5_000_000
 HOUSEHOLD_SIZE_MAX = 20
 DISPUTE_MAX_DAYS = 45
+DAILY_JOBS_HOUR_UTC = 14  # follow-ups and reminders run once a day at this hour
 
 # Concierge: denied-claim appeals (flat fee by amount denied)
 APPEAL_PRICE_CENTS = 14900  # $149
@@ -296,3 +297,4 @@ PARTNER_CONTACT_EMAIL = os.getenv("PARTNER_CONTACT_EMAIL", "support@billkarma.ap
 # Hospital x procedure pages
 HOSPITAL_PROCEDURE_SITEMAP_MAX = 40000  # sitemap files allow 50,000 URLs
 HOSPITAL_PROCEDURE_ALTERNATIVES = 5
+HOSPITAL_PROCEDURE_MIN_HOSPITALS = 30  # codes priced by fewer hospitals are noindex and left out of the sitemap

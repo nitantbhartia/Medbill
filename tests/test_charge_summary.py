@@ -46,3 +46,11 @@ def test_duplicate_leads_and_reasons_are_not_repeated():
     labels = [r["label"] for r in xray["reasons"]]
     assert labels[0] == "Billed more than once"
     assert len(labels) == len(set(labels))
+
+
+def test_flagged_charges_carry_a_spanish_reason():
+    from charge_summary import REASON_LABELS
+    from es_content import REASON_LABELS_ES
+
+    assert set(REASON_LABELS_ES) == set(REASON_LABELS)
+    assert all(label.strip() for label in REASON_LABELS_ES.values())

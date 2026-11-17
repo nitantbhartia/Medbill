@@ -14,6 +14,8 @@ _SEVERITY_RANK = {"high": 3, "medium": 2, "low": 1, "informational": 0}
 _TYPE_ORDER = ["duplicate_charge", "unbundling", "quantity_flag", "upcoding", "price_markup",
                "eob_mismatch", "no_surprises_act", "benchmark_outlier"]
 
+from es_content import REASON_LABELS_ES
+
 REASON_LABELS = {
     "duplicate_charge": "Billed more than once",
     "price_markup": "Far above what Medicare pays",
@@ -67,6 +69,7 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             continue
         charge["reasons"].append({
             "type": finding.get("finding_type"),
+            "label_es": REASON_LABELS_ES.get(finding.get("finding_type"), ""),
             "label": REASON_LABELS.get(finding.get("finding_type"), (finding.get("finding_type") or "Flagged").replace("_", " ").capitalize()),
             "message": finding.get("message") or "",
             "severity": severity,

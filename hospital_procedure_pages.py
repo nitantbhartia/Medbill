@@ -4,6 +4,7 @@ import json
 
 import config
 from db import get_db
+from procedure_pages import _friendly_name
 from hospital_seo import _display_city, _display_name, state_display_name
 
 PRICE_COLUMNS = """
@@ -65,6 +66,10 @@ def get_hospital_procedure_page(state_slug: str, city_slug: str, hospital_slug: 
             "SELECT avg_markup_vs_medicare FROM benchmark_averages WHERE scope = ? AND cpt_code = ?",
             (hospital["state"], cpt_code),
         ).fetchone()
+        hospitals_pricing_code = db.execute(
+            f"SELECT COUNT(DISTINCT hp.facility_id) AS n FROM hospital_prices hp WHERE hp.cpt_code = ? AND {HAS_COMPARABLE_PRICE}",
+            (cpt_code,),
+        ).fetchone()["n"]
         alternatives = db.execute(
             "SELECT h.name, h.city, h.state_slug, h.city_slug, h.slug, hp.gross_charge, hp.cash_price "
             "FROM hospital_prices hp JOIN hospitals h ON h.facility_id = hp.facility_id "
@@ -76,7 +81,7 @@ def get_hospital_procedure_page(state_slug: str, city_slug: str, hospital_slug: 
     price = dict(price)
     price["fair_ceiling"] = _fair_ceiling(price["medicare_rate"])
     price["above_fair"] = max(0.0, round(price["gross_charge"] - price["fair_ceiling"], 2))
-    description = price["description"] or f"CPT {cpt_code}"
+    description = _friendly_name(cpt_code, price["description"] or "")
     name = _display_name(hospital["name"], hospital["facility_id"])
     city = _display_city(hospital["city"])
     state = state_display_name(hospital["state"])
@@ -93,6 +98,7 @@ def get_hospital_procedure_page(state_slug: str, city_slug: str, hospital_slug: 
         ],
         "fair_multiple": f"{config.MEDICARE_MARKUP_THRESHOLD:g}",
         "faq": faq,
+        "meta_robots": "index, follow" if hospitals_pricing_code >= config.HOSPITAL_PROCEDURE_MIN_HOSPITALS else "noindex, follow",
         "faq_schema_json": _json_ld({
             "@context": "https://schema.org",
             "@type": "FAQPage",
@@ -111,13 +117,18 @@ def get_hospital_procedure_page(state_slug: str, city_slug: str, hospital_slug: 
 
 
 def get_hospital_procedure_sitemap_paths() -> list[str]:
+    """Pages for codes many hospitals price, most widely priced codes first."""
     with get_db() as db:
         rows = db.execute(
+            "WITH popular AS ("
+            f"  SELECT hp.cpt_code, COUNT(DISTINCT hp.facility_id) AS hospital_count FROM hospital_prices hp "
+            f"  WHERE {HAS_COMPARABLE_PRICE} GROUP BY hp.cpt_code HAVING hospital_count >= ?) "
             "SELECT h.state_slug, h.city_slug, h.slug, hp.cpt_code "
             "FROM hospital_prices hp JOIN hospitals h ON h.facility_id = hp.facility_id "
+            "JOIN popular ON popular.cpt_code = hp.cpt_code "
             f"WHERE h.state_slug IS NOT NULL AND h.city_slug IS NOT NULL AND h.slug IS NOT NULL AND {HAS_COMPARABLE_PRICE} "
             "GROUP BY h.state_slug, h.city_slug, h.slug, hp.cpt_code "
-            "ORDER BY MAX(hp.markup_vs_medicare) DESC LIMIT ?",
-            (config.HOSPITAL_PROCEDURE_SITEMAP_MAX,),
+            "ORDER BY popular.hospital_count DESC, h.state_slug, h.city_slug, h.slug LIMIT ?",
+            (config.HOSPITAL_PROCEDURE_MIN_HOSPITALS, config.HOSPITAL_PROCEDURE_SITEMAP_MAX),
         ).fetchall()
     return [f"/hospitals/{r['state_slug']}/{r['city_slug']}/{r['slug']}/{r['cpt_code']}/" for r in rows]

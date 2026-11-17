@@ -549,6 +549,8 @@ def startup():
             logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
     if config.ENV == "production":
         threading.Thread(target=_regrade, daemon=True).start()
+        from daily_jobs import start_daily_jobs
+        start_daily_jobs()
 
 
 # --- Page routes ---
@@ -2090,7 +2092,7 @@ async def hospital_procedure_page(request: Request, state_slug: str, city_slug: 
             "og_title": page["page_title"],
             "og_description": page["meta_description"],
             "meta_description": page["meta_description"],
-            "meta_robots": "index, follow",
+            "meta_robots": page["meta_robots"],
         },
     )
 
