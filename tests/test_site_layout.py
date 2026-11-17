@@ -66,3 +66,17 @@ def test_css_is_cache_busted():
 def test_no_unsourced_error_rate_claim_on_scan_or_guides():
     for path in ("/scan", "/guides/upcoding-unbundling-hospital-bills/"):
         assert "1 in 4" not in client.get(path).text
+
+
+def test_privacy_and_terms_pages_exist_and_are_linked_from_the_footer():
+    privacy = client.get("/privacy/")
+    assert privacy.status_code == 200
+    assert "We do not save the file itself" in privacy.text
+    assert "support@billkarma.app" in privacy.text
+
+    terms = client.get("/terms/")
+    assert terms.status_code == 200
+    assert "REFUND POLICY" in terms.text
+
+    footer = client.get("/").text.split("<footer")[1]
+    assert 'href="/privacy/"' in footer and 'href="/terms/"' in footer

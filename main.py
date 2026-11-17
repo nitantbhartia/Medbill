@@ -47,6 +47,7 @@ from procedure_pages import (
 from procedure_content import get_content_page_data
 from hospital_rankings import get_ranked_state_slugs, get_state_ranking, ranking_description, ranking_title
 from tools_catalog import list_tools, get_tool
+import access_control
 from access_control import require_bill_access, require_case_access
 from referrals import valid_referral
 
@@ -3620,6 +3621,28 @@ async def about_page(request: Request):
         "canonical_url": canonical_url,
         "og_title": "About BillKarma — Medical Billing Transparency for Patients",
         "meta_description": "BillKarma helps patients understand and dispute hospital bills using CMS price transparency data, Medicare rates, and billing error detection tools. Free for everyone.",
+    })
+
+
+@app.get("/privacy/", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    return templates.TemplateResponse("privacy.html", {
+        "request": request,
+        "canonical_url": f"{config.APP_URL.rstrip('/')}/privacy/",
+        "og_title": "Privacy: what BillKarma collects and keeps",
+        "meta_description": "What BillKarma reads from an uploaded hospital bill, what it saves, who else handles it, and how to have it deleted.",
+        "session_days": access_control._SESSION_MAX_AGE_SECONDS // 86400,
+    })
+
+
+@app.get("/terms/", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    return templates.TemplateResponse("terms.html", {
+        "request": request,
+        "canonical_url": f"{config.APP_URL.rstrip('/')}/terms/",
+        "og_title": "BillKarma dispute service terms",
+        "meta_description": "The terms you sign before BillKarma sends a dispute: what the flat fee covers, the refund policy, and what we don't do.",
+        "tos_text": esign_module.get_tos_text(),
     })
 
 

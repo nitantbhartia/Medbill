@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Dispute service terms | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Dispute service terms</h1>
+        <p class="bk-lede">Checking a bill is free and needs no agreement. These are the terms you sign at checkout before we send a dispute for you.</p>
+    </div>
+</section>
+
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 88px">
+    <div class="bk-narrow">
+        <pre class="bk-ib-letter">{{ tos_text }}</pre>
+        <p class="bk-muted" style="margin-top: 20px">At checkout you also sign a HIPAA authorization and a form naming BillKarma as your representative for the dispute. You can read both there before signing. See also <a href="/privacy/">what we collect and keep</a>.</p>
+    </div>
+</div>
+{% endblock %}
