@@ -10,8 +10,8 @@
 <div class="bk-home">
 <section class="bk-wrap bk-home-hero">
     <div>
-        <h1>Check your hospital bill for errors before you pay it.</h1>
-        <p class="bk-lede">Upload your itemized bill. We compare every charge with what Medicare pays for the same code and flag duplicates and overlapping tests. If something&rsquo;s wrong, we&rsquo;ll dispute it in writing with the billing office for one flat fee.</p>
+        <h1><span>Check your hospital bill for free.</span> <span>If it&rsquo;s wrong, we&rsquo;ll dispute it in writing.</span></h1>
+        <p class="bk-lede">Upload your itemized bill and see every charge next to what Medicare pays for the same code, with duplicates and overlapping tests flagged. If you want it fixed, we send the dispute to the billing office and follow up until they answer.</p>
         <div class="bk-home-actions">
             <a href="/scan" class="bk-btn">Check my bill free</a>
             <a href="#how" class="bk-link">How it works</a>
@@ -29,14 +29,13 @@
                     <span class="code">{{ line.code }}</span>
                     <span class="desc">{{ line.desc }}</span>
                     <span class="amt">${{ "{:,.2f}".format(line.amount) }}</span>
-                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} in total for this code.{% endif %}</span>{% endif %}
+                    {% if line.flag %}<span class="why">{{ line.flag }}{% if loop.first and example.visit_medicare %} <strong>Medicare pays ${{ "{:,.0f}".format(example.visit_medicare) }} in total for this code.</strong>{% endif %}</span>{% endif %}
                 </li>
                 {% endfor %}
             </ol>
             <div class="bk-statement-foot">
                 <span>Billed</span><span class="amt">${{ "{:,.2f}".format(example.total) }}</span>
-                <span class="save">Errors to remove</span><span class="amt save">&minus;${{ "{:,.2f}".format(example.clear_errors) }}</span>
-                <span>Visit level sent for coding review</span><span class="amt">${{ "{:,.2f}".format(example.visit_amount) }}</span>
+                <span class="save">Flagged to dispute, {{ example.lines | selectattr("flag") | list | length }} charges</span><span class="amt save">${{ "{:,.2f}".format(example.clear_errors + example.visit_amount) }}</span>
             </div>
         </div>
         <figcaption class="bk-statement-caption">An example of what the free check shows. Charges are illustrative; the Medicare rate is from our CMS data.</figcaption>
@@ -74,7 +73,7 @@
             <li>
                 <div>
                     <h3>We dispute it for you</h3>
-                    <p>We write the letter for the flagged charges, send it to billing and follow up on days {{ followup_days | join(", ") }} until they answer.</p>
+                    <p>We write the letter for the flagged charges, send it to the billing office and follow up until they answer.</p>
                 </div>
                 <span class="bk-flow-price">From ${{ dispute_tiers[0].fee }}</span>
             </li>
@@ -138,6 +137,28 @@
 </section>
 
 <section class="bk-wrap bk-home-section">
+    <div class="bk-price">
+        <div>
+            <h2 class="bk-h2">Where the numbers come from</h2>
+            <p class="bk-lede">Every comparison uses public data you can check yourself.</p>
+            <div class="bk-findings" style="grid-template-columns: 1fr; margin-top: 24px">
+                <div><h3>Medicare rates</h3><p>From the fee schedules CMS publishes for each billing code.</p></div>
+                <div><h3>Hospital prices</h3><p>From the price files hospitals are required to post.</p></div>
+                <div><h3>Billing office contacts</h3><p>From CMS hospital records. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></p></div>
+            </div>
+        </div>
+        <form action="/hospitals/" method="get" class="bk-panel" style="display: grid; gap: 14px">
+            <label for="hospital-search" class="bk-h3">Look up your hospital</label>
+            <p class="bk-muted" style="margin: -6px 0 4px">Billing office phone number, financial assistance policy and how its prices compare with Medicare{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}.</p>
+            <div class="bk-search">
+                <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
+                <button type="submit" class="bk-btn-outline">Find hospital</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="bk-wrap bk-home-section">
     <div class="bk-findings" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 0">
         <div>
             <h3>What we don&rsquo;t do</h3>
@@ -154,7 +175,7 @@
     </div>
 </section>
 
-<section class="bk-wrap bk-home-section"><div class="bk-narrow">
+<section class="bk-wrap bk-home-section" style="padding-bottom: 80px"><div class="bk-narrow">
     <h2 class="bk-h2">Questions</h2>
     <div class="bk-faq" style="margin-top: 20px; border-top: 1.5px solid var(--ink)">
         <details>
@@ -173,23 +194,8 @@
             <summary>Does this work if I have insurance?</summary>
             <p>Yes, for what the hospital billed you. If your insurer denied the claim, that&rsquo;s an appeal to the insurer, which we don&rsquo;t handle; see <a href="/appeal">appeal a denied claim</a>.</p>
         </details>
-        <details>
-            <summary>Where does the data come from?</summary>
-            <p>Medicare rates from CMS fee schedules, hospital prices from hospitals&rsquo; own price transparency files, and hospital contact details from CMS. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></p>
-        </details>
     </div>
 </div></section>
-
-<section class="bk-wrap bk-home-section" style="padding-bottom: 80px">
-    <form action="/hospitals/" method="get" class="bk-panel" style="display: grid; gap: 14px">
-        <label for="hospital-search" class="bk-h3">Look up a hospital&rsquo;s billing office</label>
-        <p class="bk-muted" style="margin: -6px 0 4px">Phone number, financial assistance policy and how its prices compare with Medicare{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}.</p>
-        <div class="bk-search">
-            <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
-            <button type="submit" class="bk-btn-outline">Find hospital</button>
-        </div>
-    </form>
-</section>
 
 <section class="bk-band" style="border-bottom: 0">
     <div class="bk-wrap bk-home-close">

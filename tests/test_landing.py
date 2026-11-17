@@ -10,7 +10,7 @@ client = TestClient(app)
 def test_landing_leads_with_the_hospital_bill_dispute():
     r = client.get("/")
     assert r.status_code == 200
-    assert "we&rsquo;ll dispute it in writing" in r.text
+    assert "we&rsquo;ll dispute it in writing." in r.text
     assert 'href="/scan"' in r.text
 
 
