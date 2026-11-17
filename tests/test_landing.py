@@ -47,3 +47,17 @@ def test_landing_hero_upload_posts_to_the_scan_api_and_falls_back_to_the_scan_pa
     text = client.get("/").text
     assert 'id="bill-file"' in text and "fetch('/api/scan'" in text
     assert '<a href="/scan" class="bk-btn" id="bill-pick">' in text
+
+
+def test_results_page_explains_in_spanish_that_the_letter_is_english(monkeypatch):
+    import config
+    from analyzer import analyze_bill, save_bill_and_findings
+    from tests.conftest import SAMPLE_BILL
+
+    bill_id = save_bill_and_findings(None, SAMPLE_BILL, analyze_bill(SAMPLE_BILL, "33021"), "33021")
+    monkeypatch.setattr(config, "ES_PAGES_ENABLED", True)
+    html = client.get(f"/results/{bill_id}").text
+    assert "la carta de disputa se envía en inglés" in html
+    assert "En español:" in html
+    monkeypatch.setattr(config, "ES_PAGES_ENABLED", False)
+    assert "la carta de disputa se envía en inglés" not in client.get(f"/results/{bill_id}").text

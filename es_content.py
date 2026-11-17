@@ -55,3 +55,14 @@ SCAN = {
 <p>Si su factura le preocupa por el monto, lea también estas guías: <a href="/es/guias/asistencia-financiera-hospital/">asistencia financiera del hospital</a> y <a href="/es/guias/no-puedo-pagar-factura-medica/">qué hacer si no puede pagar una factura médica</a>.</p>
 """,
 }
+
+REASON_LABELS_ES = {
+    "duplicate_charge": "Cobrado más de una vez",
+    "price_markup": "Muy por encima de lo que paga Medicare",
+    "upcoding": "El nivel de la visita puede ser más alto que la atención recibida",
+    "unbundling": "Cobrado por separado de una prueba que ya lo incluye",
+    "quantity_flag": "La cantidad parece incorrecta",
+    "benchmark_outlier": "Por encima del cargo típico en su región",
+    "eob_mismatch": "No coincide con el estado de cuenta de su seguro (EOB)",
+    "no_surprises_act": "Puede estar protegido por la Ley No Surprises (No Surprises Act)",
+}
