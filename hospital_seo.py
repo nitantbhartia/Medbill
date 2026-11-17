@@ -212,17 +212,47 @@ def normalize_state_code(state: str | None, zip_code: str | None) -> str | None:
     return inferred if inferred in VALID_STATE_CODES else None
 
 
+def _has_valid_twin(row) -> bool:
+    """True if another hospital has the same name and city under a real state: this row is a bad duplicate of it."""
+    with get_db() as db:
+        twin = db.execute(
+            f"SELECT 1 FROM hospitals WHERE facility_id != ? AND LOWER(name) = LOWER(?) AND LOWER(city) = LOWER(?) "
+            f"AND UPPER(state) IN ({','.join('?' * len(VALID_STATE_CODES))}) LIMIT 1",
+            [row["facility_id"], row["name"], row["city"], *sorted(VALID_STATE_CODES)],
+        ).fetchone()
+    return twin is not None
+
+
+def _only_state_in_city(city: str | None) -> str | None:
+    with get_db() as db:
+        states = {
+            r["state"].upper()
+            for r in db.execute(
+                f"SELECT DISTINCT state FROM hospitals WHERE LOWER(city) = LOWER(?) "
+                f"AND UPPER(state) IN ({','.join('?' * len(VALID_STATE_CODES))})",
+                [city or "", *sorted(VALID_STATE_CODES)],
+            )
+        }
+    return states.pop() if len(states) == 1 else None
+
+
 def repair_hospital_states() -> int:
     """Fix hospitals saved with a bad state value (e.g. '73', 'L', 'Florida') so their pages get a real state URL."""
     with get_db() as db:
         placeholders = ",".join("?" * len(VALID_STATE_CODES))
         bad = db.execute(
-            f"SELECT facility_id, name, state, zip FROM hospitals WHERE UPPER(COALESCE(state, '')) NOT IN ({placeholders})",
+            f"SELECT facility_id, name, city, state, zip FROM hospitals WHERE UPPER(COALESCE(state, '')) NOT IN ({placeholders})",
             sorted(VALID_STATE_CODES),
         ).fetchall()
     fixed = 0
     for row in bad:
-        code = normalize_state_code(row["state"], row["zip"])
+        if _has_valid_twin(row):
+            from hospital_bootstrap import _delete_hospitals
+
+            _delete_hospitals([row["facility_id"]])
+            fixed += 1
+            continue
+        code = normalize_state_code(row["state"], row["zip"]) or _only_state_in_city(row["city"])
         if not code:
             log.error("Hospital %s (%s) has state %r and ZIP %r; cannot tell which state it is in", row["facility_id"], row["name"], row["state"], row["zip"])
             continue
