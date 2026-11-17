@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Privacy: what we collect and keep | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Privacy</h1>
+        <p class="bk-lede">What we read from your bill, what we save, who else handles it, and how to have it deleted.</p>
+    </div>
+</section>
+
+<div class="bk-wrap" style="padding-top: 56px; padding-bottom: 88px">
+<div class="bk-narrow">
+    <h2 class="bk-h2">When you check a bill</h2>
+    <dl class="bk-sources">
+        <div><dt>The file</dt><dd>An AI service (Google Gemini) reads your photo or PDF. We do not save the file itself.</dd></div>
+        <div><dt>What we save</dt><dd>The hospital name, each charge with its code and amount, the bill date and totals, the zip code you give, and the last four digits of the account number.</dd></div>
+        <div><dt>What we don&rsquo;t save</dt><dd>The patient name on the bill, or the full account number.</dd></div>
+        <div><dt>Your email</dt><dd>Only if you enter it, to send you the report. We don&rsquo;t send marketing email or share your address.</dd></div>
+    </dl>
+
+    <h2 class="bk-h2" style="margin-top: 64px">When you ask us to send a dispute</h2>
+    <dl class="bk-sources">
+        <div><dt>Your details</dt><dd>Your name, email, mailing address, the account number, and the billing office&rsquo;s email or fax number. Income and household size if you give them, used only for a financial assistance request.</dd></div>
+        <div><dt>Your signatures</dt><dd>For each document you sign we record the time, your IP address and your browser, as proof of the signature.</dd></div>
+        <div><dt>The letter</dt><dd>We send the dispute letter and follow-ups to the hospital&rsquo;s billing office, and keep a copy and any replies on your dispute page.</dd></div>
+        <div><dt>Payment</dt><dd>Stripe takes the payment. We never see or store your card number.</dd></div>
+    </dl>
+
+    <h2 class="bk-h2" style="margin-top: 64px">Other companies that handle it</h2>
+    <dl class="bk-sources">
+        <div><dt>Google Gemini</dt><dd>Reads the uploaded bill.</dd></div>
+        <div><dt>Stripe</dt><dd>Takes payments.</dd></div>
+        <div><dt>Resend</dt><dd>Delivers email, including the letter to the hospital.</dd></div>
+        <div><dt>Phaxio and Lob</dt><dd>Deliver a fax or certified letter, when one is sent.</dd></div>
+        <div><dt>Google Analytics</dt><dd>Counts page visits. It does not receive your bill.</dd></div>
+    </dl>
+
+    <h2 class="bk-h2" style="margin-top: 64px">Cookies</h2>
+    <p style="margin: 14px 0 0; color: var(--ink-2)">One cookie ties your browser to the bills you uploaded, so only you can open their results. It lasts {{ session_days }} days. A second cookie is set if you arrive through a referral link. Google Analytics sets its own.</p>
+
+    <h2 class="bk-h2" style="margin-top: 64px">How long we keep it, and deletion</h2>
+    <p style="margin: 14px 0 0; color: var(--ink-2)">We do not yet delete saved bills on a schedule. To have your bill and details deleted, email <a href="mailto:support@billkarma.app">support@billkarma.app</a> from the address you used, or tell us the hospital and bill date.</p>
+
+    <p class="bk-muted" style="margin-top: 40px">See also the <a href="/terms/">dispute service terms</a>.</p>
+</div>
+</div>
+{% endblock %}
