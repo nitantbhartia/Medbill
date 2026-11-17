@@ -154,6 +154,9 @@ OCR_ENSEMBLE_ENABLED = os.getenv("OCR_ENSEMBLE_ENABLED", "false").lower() == "tr
 OCR_MAX_VARIANTS = int(os.getenv("OCR_MAX_VARIANTS", "3"))
 OCR_RECONCILIATION_TOLERANCE_PCT = float(os.getenv("OCR_RECONCILIATION_TOLERANCE_PCT", "2.0"))
 
+OCR_BENCHMARK_TRUTH_FILE = "test_assets/scan_baseline/synthetic_ground_truth.jsonl"
+OCR_BENCHMARK_MIN_SCORE = 0.85
+
 # Quality score weights for OCR extraction ranking
 OCR_SCORE_PER_LINE_ITEM = 2.0
 OCR_SCORE_PER_CPT = 2.5
