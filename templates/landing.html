@@ -7,24 +7,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="bk-home">
 <section class="bk-wrap bk-home-hero">
     <div>
-        <h1>Find the mistakes on your hospital bill. <span class="bk-mark">We&rsquo;ll dispute it in writing.</span></h1>
-        <p class="bk-lede">Upload your itemized bill and see every charge next to what Medicare pays for the same code, plus duplicates and tests billed twice. Checking is free. If something&rsquo;s wrong, we send the dispute to the billing office and follow up for one flat fee.</p>
+        <h1>Check your hospital bill for errors before you pay it.</h1>
+        <p class="bk-lede">Upload your itemized bill. We compare every charge with what Medicare pays for the same code and flag duplicates and overlapping tests. If something&rsquo;s wrong, we&rsquo;ll dispute it in writing with the billing office for one flat fee.</p>
         <div class="bk-home-actions">
             <a href="/scan" class="bk-btn">Check my bill free</a>
-            <a href="#pricing" class="bk-btn-outline">See pricing</a>
+            <a href="#how" class="bk-link">How it works</a>
         </div>
-        <ul class="bk-promise">
-            <li>Free check, no account</li>
-            <li>Disputes from ${{ dispute_tiers[0].fee }}</li>
-            <li>Refund if not reduced in {{ config.DISPUTE_MAX_DAYS }} days</li>
-        </ul>
+        <p class="bk-home-note">No account needed. Nothing is sent to the hospital unless you choose to.</p>
     </div>
 
     <figure style="margin: 0">
         <div class="bk-statement" aria-label="Example itemized hospital bill with flagged charges">
-            <div class="bk-statement-head"><strong>Itemized statement</strong><span>Emergency visit, sprained ankle</span></div>
+            <div class="bk-statement-head"><strong>Itemized statement</strong><span>Example: emergency visit, sprained ankle</span></div>
+            <div class="bk-statement-cols" aria-hidden="true"><span>Code</span><span>Service</span><span>Billed</span></div>
             <ol>
                 {% for line in example.lines %}
                 <li class="{{ 'flag' if line.flag }}">
@@ -45,28 +43,46 @@
     </figure>
 </section>
 
-<section id="how" class="bk-band">
+<section class="bk-wrap">
+    <dl class="bk-terms">
+        <div><dt>Checking a bill</dt><dd>Free</dd><dd>No account and no card.</dd></div>
+        <div><dt>Sending a dispute</dt><dd>${{ dispute_tiers[0].fee }} to ${{ dispute_tiers[-1].fee }}</dd><dd>One flat fee, set by the size of the bill.</dd></div>
+        <div><dt>If the bill isn&rsquo;t reduced</dt><dd>Full refund</dd><dd>Of the dispute fee, after {{ config.DISPUTE_MAX_DAYS }} days.</dd></div>
+        {% if hospital_count %}<div><dt>Hospitals on file</dt><dd>{{ "{:,}".format(hospital_count) }}</dd><dd>Billing contacts and prices, from CMS.</dd></div>{% endif %}
+    </dl>
+</section>
+
+<section id="how" class="bk-band" style="margin-top: 80px">
     <div class="bk-wrap" style="padding-top: 72px; padding-bottom: 72px">
         <h2 class="bk-h2">How it works</h2>
         <p class="bk-lede">The first two steps are free. The third is optional.</p>
-        <ol class="bk-steps">
+        <ol class="bk-flow">
             <li>
-                <h3>Upload your itemized bill</h3>
-                <p>A photo or PDF. If you only have a summary, <a href="/itemized-bill">we&rsquo;ll write the request for the itemized version</a>; you have a right to it.</p>
+                <div>
+                    <h3>Upload your itemized bill</h3>
+                    <p>A photo or PDF. If you only have a summary, <a href="/itemized-bill">we&rsquo;ll write the request for the itemized version</a>; you have a right to it.</p>
+                </div>
+                <span class="bk-flow-price">Free</span>
             </li>
             <li>
-                <h3>See what looks wrong</h3>
-                <p>Every line with a billing code is compared with Medicare&rsquo;s rate. Duplicates, overlapping tests and high visit levels are flagged.</p>
+                <div>
+                    <h3>See what looks wrong</h3>
+                    <p>Every line with a billing code is compared with Medicare&rsquo;s rate. Duplicates, overlapping tests and high visit levels are flagged.</p>
+                </div>
+                <span class="bk-flow-price">Free</span>
             </li>
             <li>
-                <h3>We dispute it for you</h3>
-                <p>We write the letter for the flagged charges, send it to billing and follow up on days {{ followup_days | join(", ") }} until they answer.</p>
+                <div>
+                    <h3>We dispute it for you</h3>
+                    <p>We write the letter for the flagged charges, send it to billing and follow up on days {{ followup_days | join(", ") }} until they answer.</p>
+                </div>
+                <span class="bk-flow-price">From ${{ dispute_tiers[0].fee }}</span>
             </li>
         </ol>
     </div>
 </section>
 
-<section class="bk-wrap" style="padding-top: 72px">
+<section class="bk-wrap bk-home-section">
     <h2 class="bk-h2">What the check looks for</h2>
     <div class="bk-findings">
         <div>
@@ -88,7 +104,7 @@
     </div>
 </section>
 
-<section id="pricing" class="bk-wrap" style="padding-top: 88px">
+<section id="pricing" class="bk-wrap bk-home-section">
     <div class="bk-price">
         <div>
             <h2 class="bk-h2">One flat fee. Refunded if nothing changes.</h2>
@@ -121,7 +137,7 @@
     </div>
 </section>
 
-<section class="bk-wrap" style="padding-top: 88px">
+<section class="bk-wrap bk-home-section">
     <div class="bk-findings" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 0">
         <div>
             <h3>What we don&rsquo;t do</h3>
@@ -138,7 +154,7 @@
     </div>
 </section>
 
-<section class="bk-wrap" style="padding-top: 88px"><div class="bk-narrow">
+<section class="bk-wrap bk-home-section"><div class="bk-narrow">
     <h2 class="bk-h2">Questions</h2>
     <div class="bk-faq" style="margin-top: 20px; border-top: 1.5px solid var(--ink)">
         <details>
@@ -164,10 +180,10 @@
     </div>
 </div></section>
 
-<section class="bk-wrap" style="padding-top: 88px">
+<section class="bk-wrap bk-home-section" style="padding-bottom: 80px">
     <form action="/hospitals/" method="get" class="bk-panel" style="display: grid; gap: 14px">
         <label for="hospital-search" class="bk-h3">Look up a hospital&rsquo;s billing office</label>
-        <p class="bk-muted" style="margin: -6px 0 4px">Phone number, financial assistance policy and how its prices compare with Medicare, for {{ "{:,}".format(hospital_count) }} U.S. hospitals.</p>
+        <p class="bk-muted" style="margin: -6px 0 4px">Phone number, financial assistance policy and how its prices compare with Medicare{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}.</p>
         <div class="bk-search">
             <input id="hospital-search" name="q" type="search" class="bk-input" placeholder="Hospital name, city or state" autocomplete="off">
             <button type="submit" class="bk-btn-outline">Find hospital</button>
@@ -175,13 +191,14 @@
     </form>
 </section>
 
-<section class="bk-wrap" style="padding-top: 32px; padding-bottom: 88px">
-    <div class="bk-cta-band">
+<section class="bk-band" style="border-bottom: 0">
+    <div class="bk-wrap bk-home-close">
         <div>
-            <h2>See what&rsquo;s wrong with your bill before you pay it.</h2>
+            <h2 class="bk-h2">See what&rsquo;s wrong with your bill before you pay it.</h2>
             <p>Free, and you decide what happens next.</p>
         </div>
         <a href="/scan" class="bk-btn">Check my bill free</a>
     </div>
 </section>
+</div>
 {% endblock %}
