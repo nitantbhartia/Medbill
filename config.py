@@ -305,3 +305,36 @@ PARTNER_CONTACT_EMAIL = os.getenv("PARTNER_CONTACT_EMAIL", "support@billkarma.ap
 HOSPITAL_PROCEDURE_SITEMAP_MAX = 40000  # sitemap files allow 50,000 URLs
 HOSPITAL_PROCEDURE_ALTERNATIVES = 5
 HOSPITAL_PROCEDURE_MIN_HOSPITALS = 30  # codes priced by fewer hospitals are noindex and left out of the sitemap
+
+# Mobile app
+MOBILE_TOKEN_BYTES = 32
+MOBILE_SCAN_MAX_PAGES = 10
+MOBILE_EVENT_PROPS_MAX_BYTES = 2048
+MOBILE_PLUS_CACHE_SECONDS = 600
+MOBILE_HOSPITAL_SEARCH_LIMIT = 10
+MOBILE_EVENT_NAMES = {
+    "onboarding_step_viewed", "onboarding_completed", "onboarding_skipped",
+    "hospital_insight_shown",
+    "scan_started", "scan_succeeded", "scan_failed",
+    "teaser_viewed", "clean_result_viewed",
+    "paywall_viewed", "paywall_plan_selected", "paywall_closed", "exit_offer_viewed",
+    "purchase_completed",
+    "letter_shared", "phone_script_viewed", "result_shared",
+    "notification_prompt_shown", "notification_prompt_accepted",
+    "review_prompt_requested", "data_deleted",
+}
+MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
+MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
+MOBILE_INSURANCE_STATUSES = {"insured", "uninsured", "unsure"}
+MOBILE_SITUATIONS = {"unexpected", "too_high", "confusing", "out_of_network", "collections", "denied", "cant_afford"}
+MOBILE_DUE_BANDS = {"this_week", "this_month", "past_due", "unsure"}
+MOBILE_ATTRIBUTION_SOURCES = {"tiktok", "instagram", "youtube", "reddit", "google", "article", "friend", "other"}
+MOBILE_ONBOARDING_VARIANTS = {"A", "B"}
+REVENUECAT_API_URL = "https://api.revenuecat.com/v1/subscribers"
+REVENUECAT_SECRET_API_KEY = os.getenv("REVENUECAT_SECRET_API_KEY", "")
+REVENUECAT_WEBHOOK_AUTH = os.getenv("REVENUECAT_WEBHOOK_AUTH", "")
+REVENUECAT_REPORT_PRODUCT_ID = os.getenv("REVENUECAT_REPORT_PRODUCT_ID", "bk_report_unlock")
+REVENUECAT_REPORT_OFFER_PRODUCT_ID = os.getenv("REVENUECAT_REPORT_OFFER_PRODUCT_ID", "bk_report_unlock_offer")
+REVENUECAT_PLUS_ENTITLEMENT = os.getenv("REVENUECAT_PLUS_ENTITLEMENT", "plus")
+IOS_APP_ID = os.getenv("IOS_APP_ID", "")
+APP_STORE_ID = os.getenv("APP_STORE_ID", "")

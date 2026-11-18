@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from datetime import date
 
+from analyzer import get_bill_results
+from charge_summary import group_findings_by_charge
 from db import get_db
 
 
@@ -42,7 +44,6 @@ def build_dispute_letter(
     service_date = bill.get("bill_date") or "[Date of Service]"
     today = date.today().strftime("%B %d, %Y")
 
-    total_disputed = 0.0
     paragraphs = []
     for row in rows:
         detail = json.loads(row["details"] or "{}")
@@ -51,8 +52,6 @@ def build_dispute_letter(
         desc = li.get("description") or "this service"
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
-        savings = float(row["potential_savings"] or 0.0)
-        total_disputed += savings
         finding_type = row["finding_type"] or "pricing"
         paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail))
 
@@ -102,9 +101,18 @@ def build_dispute_letter(
         "provider": provider,
         "service_date": service_date,
         "account_number": account_number,
-        "total_disputed": round(total_disputed, 2),
-        "finding_count": len(rows),
+        **_disputed_totals(bill_id, [row["id"] for row in rows]),
     }
+
+
+def _disputed_totals(bill_id: int, finding_ids: list[int]) -> dict:
+    """Count and total the disputed charges the way the report does: each charge once, not each finding."""
+    results = get_bill_results(bill_id)
+    bill = results["bill"]
+    owed = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
+    chosen = [f for f in results["findings"] if f["id"] in finding_ids]
+    summary = group_findings_by_charge(chosen, owed)
+    return {"total_disputed": summary["total_savings"], "finding_count": len(summary["charges"])}
 
 
 def _finding_paragraph(

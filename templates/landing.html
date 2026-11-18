@@ -23,6 +23,7 @@
                 </div>
             </div>
             <a href="/scan" class="bk-btn" id="bill-pick">Check my bill free</a>
+            {% if config.APP_STORE_ID %}<a href="https://billkarma.app/app/scan" class="bk-link">Open in the app</a>{% endif %}
             <input type="file" id="bill-file" accept="image/*,.pdf" multiple hidden aria-label="Itemized bill, photo or PDF">
         </div>
         <p class="bk-drop-status" id="bill-status" role="status"></p>

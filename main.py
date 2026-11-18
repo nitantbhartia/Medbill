@@ -15,6 +15,9 @@ import payment as payment_module
 import report as report_module
 import slim_launch
 from api import router as api_router
+from mobile_routes import router as mobile_router
+from mobile_bill_routes import router as mobile_bill_router
+from mobile_purchase_routes import router as mobile_purchase_router
 from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
@@ -74,6 +77,9 @@ class _CachedStaticFiles(StaticFiles):
 app = FastAPI(title=config.APP_NAME)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
+app.include_router(mobile_router)
+app.include_router(mobile_bill_router)
+app.include_router(mobile_purchase_router)
 app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)
@@ -2944,6 +2950,21 @@ async def llms_txt():
 @app.get("/favicon.ico")
 async def favicon():
     return RedirectResponse(url="/static/img/favicon.svg", status_code=301)
+
+
+@app.get("/.well-known/apple-app-site-association")
+async def apple_app_site_association():
+    """Universal links: lets the iOS app open /scan and /app/* links."""
+    if not config.IOS_APP_ID:
+        return JSONResponse({"error": "not configured"}, status_code=404)
+    components = [{"/": "/scan*"}, {"/": "/app/*"}]
+    return JSONResponse({"applinks": {"details": [{"appIDs": [config.IOS_APP_ID], "components": components}]}})
+
+
+@app.get("/app/scan")
+async def open_in_app_fallback():
+    """Without the app installed, universal links fall through to the normal web scan."""
+    return RedirectResponse("/scan", status_code=302)
 
 
 @app.get("/robots.txt")

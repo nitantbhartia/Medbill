@@ -343,3 +343,21 @@ def test_the_sitemap_does_not_advertise_hidden_pages(monkeypatch):
     assert f"{config.APP_URL.rstrip('/')}/itemized-bill" in client.get("/sitemap-core.xml").text
     monkeypatch.setattr(config, "SLIM_LAUNCH", False)
     assert "/fight-debt" in client.get("/sitemap-core.xml").text
+
+
+# ── /api/scan must not hand out the paid findings ──────────────────────────────
+
+def test_scan_response_hides_findings_until_unlocked(monkeypatch):
+    import scan_pipeline
+
+    monkeypatch.setattr(scan_pipeline.scanner, "process_bill_with_verification", lambda *a: dict(SAMPLE_BILL))
+    response = client.post(
+        "/api/scan",
+        files=[("images", ("bill.png", b"fake-image", "image/png"))],
+        data={"zip_code": "33021"},
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["analysis"]["locked"] is True
+    assert "findings" not in data["analysis"]
+    assert data["analysis"]["charge_count"] > 0

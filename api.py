@@ -15,6 +15,7 @@ import appeals
 import config
 import email_service
 import household
+import scan_pipeline
 import scanner
 import analyzer
 import negotiation
@@ -326,91 +327,64 @@ async def scan_bill(
                 )
                 user_id = cursor.lastrowid
 
-    # Extract bill data
+    # Read uploads, then extract, analyze and persist
+    image_list = [(await f.read(), f.content_type or "image/jpeg") for f in images]
+    eob_uploads = [f for f in (eob_images or []) if f and f.filename]
+    eob_list = [(await f.read(), f.content_type or "image/jpeg") for f in eob_uploads]
+    referral_code = valid_referral(request.cookies.get(config.REFERRAL_COOKIE_NAME))
     try:
-        if len(images) == 1:
-            image_bytes = await images[0].read()
-            mime_type = images[0].content_type or "image/jpeg"
-            extracted = scanner.process_bill_with_verification(image_bytes, mime_type)
-        else:
-            image_list = []
-            for f in images:
-                img = await f.read()
-                image_list.append((img, f.content_type or "image/jpeg"))
-            extracted = scanner.process_multi_page_bill(image_list)
+        bill_id, extracted, analysis = scan_pipeline.run_scan(image_list, zip_code, user_id, referral_code, eob_list)
     except scanner.ScannerNotConfigured as e:
         log.error("Scan refused: %s", e)
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later, or email support@billkarma.app.")
     except ValueError as e:
         log.warning("Scan extraction rejected: %s", e)
         raise HTTPException(400, f"Failed to extract bill data: {e}")
+    except scan_pipeline.AnalysisFailed as e:
+        raise HTTPException(500, f"Failed to analyze bill: {e}")
     except Exception as e:
         log.error("Scan extraction failed: %s", e, exc_info=True)
         raise HTTPException(500, f"Failed to extract bill data: {e}")
 
     session_id, created_session = get_or_create_session_id(request)
-
-    # Analyze and persist
     try:
-        extracted = scrub_extracted_data(extracted)
-        if eob_images:
-            eob_uploads = [f for f in eob_images if f and f.filename]
-            if eob_uploads:
-                if len(eob_uploads) == 1:
-                    eob_bytes = await eob_uploads[0].read()
-                    eob_data = scanner.process_bill_with_verification(
-                        eob_bytes, eob_uploads[0].content_type or "image/jpeg"
-                    )
-                else:
-                    eob_image_list = []
-                    for f in eob_uploads:
-                        eob_image_list.append((await f.read(), f.content_type or "image/jpeg"))
-                    eob_data = scanner.process_multi_page_bill(eob_image_list)
-                extracted = analyzer.merge_eob_into_extracted(extracted, scrub_extracted_data(eob_data))
-        analysis = analyzer.analyze_bill(extracted, zip_code)
-        referral_code = valid_referral(request.cookies.get(config.REFERRAL_COOKIE_NAME))
-        bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code, referral_code)
+        grant_bill_access(session_id, bill_id)
+    except Exception as access_exc:
+        log.warning("Unable to persist bill access mapping for bill_id=%s: %s", bill_id, access_exc)
+
+    # Track all evidence uploads
+    with get_db() as db:
         try:
-            grant_bill_access(session_id, bill_id)
-        except Exception as access_exc:
-            log.warning("Unable to persist bill access mapping for bill_id=%s: %s", bill_id, access_exc)
+            for i, f in enumerate(images):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'bill_page', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+            for i, f in enumerate(eob_images or []):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'eob_page', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+            for i, f in enumerate(portal_images or []):
+                if f and f.filename:
+                    db.execute(
+                        "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'portal_screenshot', ?, ?)",
+                        (bill_id, i, f.filename),
+                    )
+        except sqlite3.IntegrityError:
+            # Can occur in mocked/integration tests when bill persistence is stubbed.
+            log.warning("Skipping evidence_uploads persistence for bill_id=%s due to FK mismatch", bill_id)
 
-        # Track all evidence uploads
-        with get_db() as db:
-            try:
-                for i, f in enumerate(images):
-                    if f and f.filename:
-                        db.execute(
-                            "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'bill_page', ?, ?)",
-                            (bill_id, i, f.filename),
-                        )
-                for i, f in enumerate(eob_images or []):
-                    if f and f.filename:
-                        db.execute(
-                            "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'eob_page', ?, ?)",
-                            (bill_id, i, f.filename),
-                        )
-                for i, f in enumerate(portal_images or []):
-                    if f and f.filename:
-                        db.execute(
-                            "INSERT INTO evidence_uploads (bill_id, evidence_type, file_index, original_filename) VALUES (?, 'portal_screenshot', ?, ?)",
-                            (bill_id, i, f.filename),
-                        )
-            except sqlite3.IntegrityError:
-                # Can occur in mocked/integration tests when bill persistence is stubbed.
-                log.warning("Skipping evidence_uploads persistence for bill_id=%s due to FK mismatch", bill_id)
-
-        log_audit(
-            action="scan_and_analyze",
-            resource_type="bill",
-            resource_id=str(bill_id),
-            user_id=user_id,
-            bill_id=bill_id,
-            metadata={"zip_code": zip_code, "findings": analysis.get("total_findings", 0)},
-        )
-    except Exception as e:
-        log.error("Analysis/save failed: %s", e, exc_info=True)
-        raise HTTPException(500, f"Failed to analyze bill: {e}")
+    log_audit(
+        action="scan_and_analyze",
+        resource_type="bill",
+        resource_id=str(bill_id),
+        user_id=user_id,
+        bill_id=bill_id,
+        metadata={"zip_code": zip_code, "findings": analysis.get("total_findings", 0)},
+    )
 
     extraction_meta = extracted.get("_extraction_meta", {})
     has_eob = bool(eob_images and any(f and f.filename for f in eob_images))
@@ -420,7 +394,7 @@ async def scan_bill(
         "data": {
             "bill_id": bill_id,
             "extracted": extracted,
-            "analysis": analysis,
+            "analysis": analysis if report_module.is_unlocked(bill_id) else {"locked": True, **report_module.teaser(bill_id)},
             "extraction_quality": {
                 "score": extraction_meta.get("quality_score"),
                 "variant": extraction_meta.get("selected_variant"),

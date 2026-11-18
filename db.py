@@ -1290,6 +1290,43 @@ CREATE TABLE IF NOT EXISTS bill_access_sessions (
 );
 CREATE INDEX IF NOT EXISTS idx_bill_access_bill ON bill_access_sessions(bill_id);
 
+-- iOS app: anonymous devices (the bearer token is stored only as a hash), entitlements, funnel events
+CREATE TABLE IF NOT EXISTS mobile_devices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL UNIQUE,
+    token_hash TEXT NOT NULL UNIQUE,
+    platform TEXT NOT NULL DEFAULT 'ios',
+    app_version TEXT,
+    attribution_source TEXT,
+    zip_code TEXT,
+    bill_type TEXT,
+    amount_band TEXT,
+    insurance_status TEXT,
+    situations_json TEXT,
+    due_band TEXT,
+    hospital_facility_id TEXT,
+    onboarding_variant TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mobile_entitlements (
+    device_id TEXT PRIMARY KEY,
+    plus_active INTEGER NOT NULL DEFAULT 0,
+    plus_expires_at TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mobile_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    props_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_mobile_events_name ON mobile_events(name, created_at);
+CREATE INDEX IF NOT EXISTS idx_mobile_events_device ON mobile_events(device_id);
+
 -- Extracted line items
 CREATE TABLE IF NOT EXISTS line_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

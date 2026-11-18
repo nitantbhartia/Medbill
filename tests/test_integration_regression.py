@@ -16,6 +16,7 @@ sys.modules.setdefault("google.genai.types", MagicMock())
 
 os.environ["DB_PATH"] = ":memory:"
 
+import scan_pipeline  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
 import api as api_module  # noqa: E402
@@ -93,7 +94,7 @@ class TestScanEndpointIntegration:
             return 77
 
         monkeypatch.setattr(api_module.scanner, "process_bill_with_verification", fake_single)
-        monkeypatch.setattr(api_module, "scrub_extracted_data", fake_scrub)
+        monkeypatch.setattr(scan_pipeline, "scrub_extracted_data", fake_scrub)
         monkeypatch.setattr(api_module.analyzer, "analyze_bill", fake_analyze)
         monkeypatch.setattr(api_module.analyzer, "save_bill_and_findings", fake_save)
         monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
@@ -125,7 +126,7 @@ class TestScanEndpointIntegration:
             return extracted_payload
 
         monkeypatch.setattr(api_module.scanner, "process_multi_page_bill", fake_multi)
-        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(scan_pipeline, "scrub_extracted_data", lambda extracted: extracted)
         monkeypatch.setattr(api_module.analyzer, "analyze_bill", lambda extracted, zip_code: analysis_payload)
         monkeypatch.setattr(api_module.analyzer, "save_bill_and_findings", lambda *args, **kwargs: 88)
         monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
@@ -157,7 +158,7 @@ class TestScanEndpointIntegration:
             return bill_payload
 
         monkeypatch.setattr(api_module.scanner, "process_bill_with_verification", fake_extract)
-        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(scan_pipeline, "scrub_extracted_data", lambda extracted: extracted)
         monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
 
         def fake_analyze(extracted, _zip_code):
@@ -199,7 +200,7 @@ class TestScanEndpointIntegration:
             "process_bill_with_verification",
             lambda *_args, **_kwargs: {"provider_name": "Any", "line_items": []},
         )
-        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(scan_pipeline, "scrub_extracted_data", lambda extracted: extracted)
         monkeypatch.setattr(
             api_module.analyzer,
             "analyze_bill",
@@ -245,7 +246,7 @@ class TestScanEndpointIntegration:
             "process_bill_with_verification",
             lambda *_args, **_kwargs: extracted_payload,
         )
-        monkeypatch.setattr(api_module, "scrub_extracted_data", lambda extracted: extracted)
+        monkeypatch.setattr(scan_pipeline, "scrub_extracted_data", lambda extracted: extracted)
         monkeypatch.setattr(api_module.analyzer, "analyze_bill", lambda *_args, **_kwargs: analysis_payload)
         monkeypatch.setattr(api_module, "log_audit", lambda **kwargs: None)
 
