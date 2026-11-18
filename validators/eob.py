@@ -17,6 +17,9 @@ def check_eob_reconciliation(extracted_data: dict) -> list[dict]:
             continue
         if ins_paid is None and ins_adj is None and patient is None:
             continue
+        # A per-line patient share the analyzer spread across lines is an estimate, not a bill figure.
+        if item.get("_patient_resp_prorated") and ins_paid is None and ins_adj is None:
+            continue
 
         total = (ins_paid or 0) + (ins_adj or 0) + (patient or 0)
         diff = round(float(charged) - float(total), 2)

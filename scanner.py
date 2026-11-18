@@ -219,10 +219,10 @@ def _prepare_media_for_ocr(image_bytes: bytes, mime_type: str | None) -> tuple[b
     normalized_mime = _normalize_mime_type(mime_type)
 
     if normalized_mime == "application/pdf":
-        # PDF OCR would require a rasterization dependency not currently wired.
-        raise ValueError(
-            "PDF OCR is not available in this environment yet. Upload bill pages as JPG/PNG images."
-        )
+        # Gemini reads PDFs natively, including multi-page ones, so no rasterizer is needed.
+        if not image_bytes.lstrip().startswith(b"%PDF"):
+            raise ValueError("That file isn't a readable PDF. Try photos of the pages instead.")
+        return image_bytes, normalized_mime
 
     if not normalized_mime.startswith("image/"):
         raise ValueError(f"Unsupported OCR media type '{normalized_mime}'. Upload image files only.")
@@ -415,6 +415,8 @@ def process_bill_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dic
     Returns extracted data with confidence flags.
     """
     image_bytes, mime_type = _prepare_media_for_ocr(image_bytes, mime_type)
+    if mime_type == "application/pdf":
+        return _run_vision_extraction(image_bytes, mime_type, EXTRACTION_PROMPT)
     if config.OCR_ENSEMBLE_ENABLED:
         return _extract_with_ensemble(image_bytes, mime_type)
     return _run_vision_extraction(image_bytes, mime_type, EXTRACTION_PROMPT)

@@ -19,8 +19,8 @@ def check_no_surprises_act(bill_data: dict) -> dict | None:
     high_patient_responsibility = total_patient_owes > total_charged * 0.5
 
     out_of_network = any(
-        "out of network" in (item.get("description", "").lower())
-        or "non-par" in (item.get("description", "").lower())
+        "out of network" in ((item.get("description") or "").lower())
+        or "non-par" in ((item.get("description") or "").lower())
         for item in line_items
     )
 

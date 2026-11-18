@@ -250,6 +250,20 @@ def _sum_patient_responsibility(items: list[dict]) -> float | None:
     return max(0.0, round(sum(values), 2))
 
 
+PAYMENT_ROW = re.compile(r"insurance payment|payor|payer|contractual|adjustment|write[- ]?off|patient payment|copay paid", re.I)
+
+
+def _drop_payment_rows(extracted_data: dict) -> None:
+    """Statements list insurance payments and allowances as rows. They are not charges, so keep them out of the checks."""
+    items = extracted_data.get("line_items") or []
+    kept = [
+        item for item in items
+        if item.get("cpt_code") or not PAYMENT_ROW.search(str(item.get("description") or ""))
+    ]
+    if len(kept) != len(items) and kept:
+        extracted_data["line_items"] = kept
+
+
 def _infer_total_patient_owes(extracted_data: dict) -> str | None:
     """Infer patient balance when bill-level total_patient_owes is missing.
 
@@ -292,6 +306,10 @@ def _infer_total_patient_owes(extracted_data: dict) -> str | None:
             adj_total += float(item.get("insurance_adjustment") or 0)
 
     if not has_insurance_fields:
+        # An itemized statement with no insurance details has no known patient balance. The extractor
+        # reports that as 0, and a 0 would cap every savings estimate at $0, so treat it as unknown.
+        if not current:
+            extracted_data["total_patient_owes"] = None
         return None
 
     inferred = max(0.0, total_charged - paid_total - adj_total)
@@ -465,6 +483,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     freshness = get_data_freshness()
     adaptive = _get_adaptive_thresholds()
 
+    _drop_payment_rows(extracted_data)
     line_items = extracted_data.get("line_items", [])
 
     inferred_patient_owes_source = _infer_total_patient_owes(extracted_data)

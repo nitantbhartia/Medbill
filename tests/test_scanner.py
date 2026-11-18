@@ -173,12 +173,14 @@ class TestOcrInputValidation:
         assert isinstance(data, (bytes, bytearray))
         assert mime == "image/png"
 
-    def test_prepare_media_rejects_pdf(self):
+    def test_prepare_media_passes_a_real_pdf_through_and_rejects_a_fake_one(self):
+        data, mime = _prepare_media_for_ocr(b"%PDF-1.4 bill", "application/pdf")
+        assert mime == "application/pdf" and data.startswith(b"%PDF")
         try:
-            _prepare_media_for_ocr(b"%PDF-1.4", "application/pdf")
+            _prepare_media_for_ocr(b"not a pdf", "application/pdf")
             assert False, "Expected ValueError"
         except ValueError as exc:
-            assert "PDF OCR is not available" in str(exc)
+            assert "isn't a readable PDF" in str(exc)
 
     def test_prepare_media_rejects_invalid_image_bytes(self):
         try:
