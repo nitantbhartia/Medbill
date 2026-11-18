@@ -14,6 +14,8 @@ from data_refresh import refresh_medicare_rates, refresh_opps_rates, refresh_ncc
 RAW_CMS_URLS_2026 = {
     "rvu26a.zip": "https://www.cms.gov/files/zip/rvu26a-updated-12-29-2025.zip",
     "opps_addendum_b_jan2026.zip": "https://www.cms.gov/files/zip/january-2026-opps-addendum-b.zip",
+    # Blood tests and other lab work are paid on the Clinical Laboratory Fee Schedule, not the physician fee schedule.
+    "clfs_2026q1.zip": "https://www.cms.gov/files/zip/26clabq1.zip",
     "ncci_2026q1_pra_f1.zip": (
         "https://www.cms.gov/files/zip/"
         "medicare-ncci-2026q1-practitioner-ptp-edits-ccipra-v320r0-f1.zip"
@@ -153,6 +155,33 @@ def build_medicare_rates_csv_from_rvu(
     return rows_written
 
 
+def append_lab_rates(clfs_csv_path: str, medicare_csv_path: str) -> int:
+    """Add Clinical Laboratory Fee Schedule rates to the medicare_rates CSV for codes the physician schedule lacks."""
+    existing = set()
+    with open(medicare_csv_path, newline="", encoding="utf-8") as f:
+        existing = {row[0] for row in csv.reader(f)}
+
+    added = 0
+    header_found = False
+    with open(clfs_csv_path, newline="", encoding="utf-8-sig", errors="ignore") as f_in, open(
+        medicare_csv_path, "a", newline="", encoding="utf-8"
+    ) as f_out:
+        writer = csv.writer(f_out)
+        for row in csv.reader(f_in):
+            if not header_found:
+                header_found = len(row) > 6 and row[0] == "YEAR" and row[1] == "HCPCS"
+                continue
+            if len(row) < 7 or row[2].strip():  # skip modifier rows
+                continue
+            code, rate = row[1].strip(), _parse_float(row[5])
+            if not code or code in existing or not rate or rate <= 0:
+                continue
+            writer.writerow([code, row[6].strip(), "0000000", "", f"{rate:.2f}", f"{rate:.2f}", row[0].strip()])
+            existing.add(code)
+            added += 1
+    return added
+
+
 def build_opps_rates_csv(
     addendum_b_csv_path: str,
     output_csv_path: str,
@@ -264,6 +293,9 @@ def transform_cms_2026(
     if not opps_csv_path.exists():
         raise FileNotFoundError(f"Could not find expected OPPS Addendum B CSV at {opps_csv_path}")
 
+    clfs_zip = raw_path / "clfs_2026q1.zip"
+    clfs_csvs = [p for p in _extract_zip(clfs_zip, raw_path / "clfs_2026q1") if p.suffix.lower() == ".csv"] if clfs_zip.exists() else []
+
     ncci_txt_paths = sorted(
         str(p) for p in raw_path.glob("ncci_pra_f*/ccipra-v320r0-f*.[Tt][Xx][Tt]")
     )
@@ -277,6 +309,7 @@ def transform_cms_2026(
     counts = {
         "medicare_rates": build_medicare_rates_csv_from_rvu(pprrvu_path, str(medicare_out), 2026),
         "opps_rates": build_opps_rates_csv(str(opps_csv_path), str(opps_out), 2026),
+        "lab_rates": append_lab_rates(str(clfs_csvs[0]), str(medicare_out)) if clfs_csvs else 0,
         "ncci_edits": build_ncci_ptp_csv(ncci_txt_paths, str(ncci_out)),
     }
     return counts

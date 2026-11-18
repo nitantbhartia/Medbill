@@ -352,3 +352,7 @@ APPLE_SIGNIN_TEAM_ID = os.getenv("APPLE_SIGNIN_TEAM_ID", "")
 APPLE_SIGNIN_PRIVATE_KEY = os.getenv("APPLE_SIGNIN_PRIVATE_KEY", "").replace("\\n", "\n")
 APPLE_CLIENT_SECRET_TTL_SECONDS = 300
 APPLE_HTTP_TIMEOUT_SECONDS = 15
+
+# Medicare rate coverage. A table smaller than this only holds the built-in samples, not the CMS fee schedule.
+MIN_FULL_MEDICARE_RATE_COUNT = 1000
+LAB_RATE_MARKER_CODE = "80053"  # a common blood test that only exists once the lab fee schedule is loaded

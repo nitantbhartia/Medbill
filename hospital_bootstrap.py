@@ -204,6 +204,32 @@ def ensure_hospital_data_bootstrap() -> None:
     )
 
 
+def ensure_full_medicare_rates() -> bool:
+    """Load the full CMS fee schedules when the rate table holds only the built-in samples or lacks lab rates.
+
+    Savings estimates compare charges with these rates, so a sample-sized table gives wrong flags.
+    Safe to repeat: each load replaces that year's rows. Returns True if it loaded.
+    """
+    with get_db() as db:
+        count = db.execute("SELECT COUNT(*) AS n FROM medicare_rates").fetchone()["n"]
+        has_labs = db.execute(
+            "SELECT 1 FROM medicare_rates WHERE cpt_code = ? LIMIT 1", (config.LAB_RATE_MARKER_CODE,)
+        ).fetchone()
+    if count >= config.MIN_FULL_MEDICARE_RATE_COUNT and has_labs:
+        log.info("Medicare rates already complete (%s codes).", count)
+        return False
+    log.warning("Medicare rates incomplete (%s codes, labs loaded: %s). Loading the CMS 2026 files.", count, bool(has_labs))
+    try:
+        download_cms_2026("data/cms/raw")
+        counts = transform_cms_2026("data/cms/raw", "data/cms/processed")
+        loaded = load_transformed_cms_2026("data/cms/processed")
+        log.warning("CMS rates loaded: transformed=%s loaded=%s", counts, loaded)
+        return True
+    except Exception:
+        log.exception("Loading CMS rates failed; savings estimates may use the built-in sample rates")
+        return False
+
+
 OPPS_BENCHMARK_SOURCE = "opps_benchmark_v1"
 
 

@@ -565,8 +565,11 @@ def startup():
     # Seed data if database is empty
     from seed_data import seed_if_empty
     seed_if_empty()
-    # One-time regrade against Medicare's hospital rate; in the background so startup stays fast
     import threading
+    from hospital_bootstrap import ensure_full_medicare_rates
+    if config.ENV == "production":
+        threading.Thread(target=ensure_full_medicare_rates, daemon=True).start()
+    # One-time regrade against Medicare's hospital rate; in the background so startup stays fast
     from hospital_bootstrap import apply_opps_benchmark_once
     def _regrade():
         try:

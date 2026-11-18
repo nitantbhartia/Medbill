@@ -253,6 +253,20 @@ def _sum_patient_responsibility(items: list[dict]) -> float | None:
 PAYMENT_ROW = re.compile(r"insurance payment|payor|payer|contractual|adjustment|write[- ]?off|patient payment|copay paid", re.I)
 
 
+BILLING_CODE = re.compile(r"[0-9]{4}[0-9A-Z]|[A-Z][0-9]{4}")
+
+
+def _clean_billing_codes(extracted_data: dict) -> None:
+    """A CPT/HCPCS code is 5 characters. Longer item or revenue numbers the reader put there can't be priced."""
+    for item in extracted_data.get("line_items") or []:
+        code = str(item.get("cpt_code") or "").strip().upper()
+        if code and not BILLING_CODE.fullmatch(code):
+            item["item_number"] = code
+            item["cpt_code"] = None
+        elif code:
+            item["cpt_code"] = code
+
+
 def _drop_payment_rows(extracted_data: dict) -> None:
     """Statements list insurance payments and allowances as rows. They are not charges, so keep them out of the checks."""
     items = extracted_data.get("line_items") or []
@@ -484,6 +498,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     adaptive = _get_adaptive_thresholds()
 
     _drop_payment_rows(extracted_data)
+    _clean_billing_codes(extracted_data)
     line_items = extracted_data.get("line_items", [])
 
     inferred_patient_owes_source = _infer_total_patient_owes(extracted_data)
