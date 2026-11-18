@@ -7,18 +7,20 @@ from main import app
 client = TestClient(app)
 
 
-def test_landing_leads_with_the_hospital_bill_dispute():
-    r = client.get("/")
-    assert r.status_code == 200
-    assert "we&rsquo;ll dispute it in writing." in r.text
-    assert 'href="/scan"' in r.text
-
-
-def test_landing_shows_flat_fee_tiers_from_config():
+def test_landing_leads_with_the_free_check_and_one_price():
     text = re.sub(r"\s+", " ", client.get("/").text)
-    assert "Bills under $1,000" in text and "$29" in text
-    assert "Bills over $20,000" in text and "$149" in text
-    assert "7, 14, 30, 45" in text
+    assert "Is your hospital bill wrong?" in text and "Find out free." in text
+    assert 'href="/scan"' in text
+    assert "Free" in text and "$19 once" in text
+    assert "You pay nothing" in text
+
+
+def test_landing_sells_only_the_report_and_names_no_other_product():
+    text = re.sub(r"\s+", " ", client.get("/").text)
+    assert "What&rsquo;s in your $19 report" in text
+    assert "One price: $19 per bill" in text
+    for stale in ("we dispute it for you", "Bills under $1,000", "Full refund", "Follow-ups", "household", "Household"):
+        assert stale not in text
 
 
 def test_landing_states_what_we_dont_do():
@@ -34,13 +36,11 @@ def test_search_console_tag_renders_only_when_configured(monkeypatch):
     assert '<meta name="google-site-verification" content="abc123">' in client.get("/").text
 
 
-def test_landing_shows_the_real_dispute_letter_and_followup_schedule():
+def test_landing_shows_the_real_dispute_letter_the_report_contains():
     text = client.get("/").text
     assert "DUPLICATE BILLING — CPT 36415 (Blood Draw)" in text
     assert "CPT 80048 is not normally billed separately when CPT 80053 applies" in text
-    assert "Final follow-up, or your money back" in text
-    assert "$99 flat, refunded if not reduced" in text
-    assert "Median reduction" not in text  # hidden until there are enough reported outcomes
+    assert "A dispute letter" in text and "A phone script" in text
 
 
 def test_landing_hero_upload_posts_to_the_scan_api_and_falls_back_to_the_scan_page():
@@ -55,9 +55,10 @@ def test_results_page_explains_in_spanish_that_the_letter_is_english(monkeypatch
     from tests.conftest import SAMPLE_BILL
 
     bill_id = save_bill_and_findings(None, SAMPLE_BILL, analyze_bill(SAMPLE_BILL, "33021"), "33021")
+    monkeypatch.setattr(config, "SLIM_LAUNCH", True)
     monkeypatch.setattr(config, "ES_PAGES_ENABLED", True)
     html = client.get(f"/results/{bill_id}").text
-    assert "la carta de disputa se envía en inglés" in html
+    assert "la carta de disputa está escrita en inglés" in html
     assert "En español:" in html
     monkeypatch.setattr(config, "ES_PAGES_ENABLED", False)
-    assert "la carta de disputa se envía en inglés" not in client.get(f"/results/{bill_id}").text
+    assert "la carta de disputa está escrita en inglés" not in client.get(f"/results/{bill_id}").text

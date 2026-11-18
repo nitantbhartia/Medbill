@@ -23,6 +23,7 @@
         <div><dt>Your email</dt><dd>Only if you enter it, to send you the report. We don&rsquo;t send marketing email or share your address.</dd></div>
     </dl>
 
+    {% if not config.SLIM_LAUNCH %}
     <h2 class="bk-h2" style="margin-top: 64px">When you ask us to send a dispute</h2>
     <dl class="bk-sources">
         <div><dt>Your details</dt><dd>Your name, email, mailing address, the account number, and the billing office&rsquo;s email or fax number. Income and household size if you give them, used only for a financial assistance request.</dd></div>
@@ -30,6 +31,7 @@
         <div><dt>The letter</dt><dd>We send the dispute letter and follow-ups to the hospital&rsquo;s billing office, and keep a copy and any replies on your dispute page.</dd></div>
         <div><dt>Payment</dt><dd>Stripe takes the payment. We never see or store your card number.</dd></div>
     </dl>
+    {% endif %}
 
     <h2 class="bk-h2" style="margin-top: 64px">Other companies that handle it</h2>
     <dl class="bk-sources">
@@ -46,7 +48,7 @@
     <h2 class="bk-h2" style="margin-top: 64px">How long we keep it, and deletion</h2>
     <p style="margin: 14px 0 0; color: var(--ink-2)">We do not yet delete saved bills on a schedule. To have your bill and details deleted, email <a href="mailto:support@billkarma.app">support@billkarma.app</a> from the address you used, or tell us the hospital and bill date.</p>
 
-    <p class="bk-muted" style="margin-top: 40px">See also the <a href="/terms/">dispute service terms</a>.</p>
+    <p class="bk-muted" style="margin-top: 40px">See also the <a href="/terms/">terms of use</a>.</p>
 </div>
 </div>
 {% endblock %}

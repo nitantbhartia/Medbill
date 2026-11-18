@@ -42,6 +42,13 @@ INBOUND_WEBHOOK_SECRET = os.getenv("INBOUND_WEBHOOK_SECRET", "")
 # Stripe
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_REPORT = os.getenv("STRIPE_PRICE_REPORT", "")  # $19 report
+
+# Slim launch: one paid product, the Bill Check Report. The scan and teaser are free; the
+# per-charge findings, dispute letter and phone script unlock for REPORT_PRICE_CENTS.
+# Set SLIM_LAUNCH=0 to make results free again and stop hiding the other product routes.
+SLIM_LAUNCH = os.getenv("SLIM_LAUNCH", "1") == "1"
+REPORT_PRICE_CENTS = int(os.getenv("REPORT_PRICE_CENTS", "1900"))
+REPORT_PAYMENT_PURPOSE = "bill_report"
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL", f"{os.getenv('APP_URL', 'https://billkarma.app')}/dispute/payment-success?session_id={{CHECKOUT_SESSION_ID}}")
 STRIPE_CANCEL_URL = os.getenv("STRIPE_CANCEL_URL", f"{os.getenv('APP_URL', 'https://billkarma.app')}/results/{{bill_id}}")

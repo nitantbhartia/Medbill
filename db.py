@@ -1829,6 +1829,18 @@ CREATE TABLE IF NOT EXISTS dispute_payments (
 CREATE INDEX IF NOT EXISTS idx_dispute_payments_bill ON dispute_payments(bill_id);
 CREATE INDEX IF NOT EXISTS idx_dispute_payments_session ON dispute_payments(stripe_session_id);
 
+CREATE TABLE IF NOT EXISTS report_unlocks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL,
+    stripe_session_id TEXT NOT NULL UNIQUE,
+    amount_cents INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    patient_email TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    paid_at TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_report_unlocks_bill ON report_unlocks(bill_id, status);
+
 CREATE TABLE IF NOT EXISTS esign_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bill_id INTEGER NOT NULL REFERENCES bills(id),

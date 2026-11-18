@@ -1,7 +1,7 @@
 import logging
 import re
 
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Form, Query, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResponse
@@ -12,6 +12,8 @@ import db
 import dispute_service
 import esign as esign_module
 import payment as payment_module
+import report as report_module
+import slim_launch
 from api import router as api_router
 from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
@@ -79,6 +81,18 @@ app.include_router(ops_router)
 app.include_router(data_router)
 app.include_router(es_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def slim_launch_guard(request: Request, call_next):
+    """While only the Bill Check Report is for sale, other products redirect to the free scan."""
+    if config.SLIM_LAUNCH:
+        kind = slim_launch.hidden_kind(request.url.path)
+        if kind == "api":
+            return JSONResponse({"status": "error", "data": {"message": "Not available"}}, status_code=404)
+        if kind == "page":
+            return RedirectResponse("/scan", status_code=302)
+    return await call_next(request)
 
 
 @app.middleware("http")
@@ -619,12 +633,10 @@ async def landing(request: Request):
             "canonical_url": canonical_url,
             "hreflang_links": hreflang_links_for_english("/"),
             "hospital_count": hospital_count,
-            "dispute_tiers": _dispute_tier_labels(),
-            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
+            "report_price": config.REPORT_PRICE_CENTS // 100,
             "example": _homepage_example_bill(),
-            "outcome_stats": get_outcome_stats(),
-            "og_title": "BillKarma: Free Medical Bill Checker and Dispute Service",
-            "og_description": "We compare every charge to what Medicare pays, flag errors, then send a written dispute to the hospital's billing office and follow up.",
+            "og_title": "BillKarma: Is your hospital bill wrong? Check it free",
+            "og_description": "Upload your itemized bill. We compare every charge to what Medicare pays and flag errors for free. Unlock the full report, dispute letter and phone script for $" + str(config.REPORT_PRICE_CENTS // 100) + ".",
             "meta_robots": "index, follow",
         },
     )
@@ -678,7 +690,7 @@ async def scan_page(request: Request):
         "scan.html",
         {
             "request": request,
-            "outcome_stats": get_outcome_stats(),
+            "report_price": config.REPORT_PRICE_CENTS // 100,
             "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
             "hreflang_links": hreflang_links_for_english("/scan"),
             "og_title": "Scan Your Medical Bill for Errors | BillKarma",
@@ -706,64 +718,74 @@ async def results_page(request: Request, bill_id: int):
         return templates.TemplateResponse("error.html", {"request": request, "message": "Bill not found"}, status_code=404)
     log_audit(action="view_results_page", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
 
-    from negotiation import generate_phone_script
-    phone_script = build_phone_script(bill_id) or generate_phone_script(bill_id)
-    outcome_stats = get_outcome_stats()
-
     bill = results.get("bill") or {}
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
-    fee_cents = payment_module.calculate_fee(bill_total)
-
-    # Evidence types for this bill
-    with db.get_db() as dbconn:
-        evidence_rows = dbconn.execute(
-            "SELECT DISTINCT evidence_type FROM evidence_uploads WHERE bill_id = ?", (bill_id,)
-        ).fetchall()
-    evidence_types = {r["evidence_type"] for r in evidence_rows}
-    has_eob = "eob_page" in evidence_types
-    has_portal = "portal_screenshot" in evidence_types
-
-    # Case summary with win probability + confidence
     findings = results.get("findings") or []
-    case_summary = compute_case_summary(findings, has_eob=has_eob, has_portal=has_portal)
     from charge_summary import group_findings_by_charge
     charge_summary = group_findings_by_charge(findings, bill_total or None)
+    unlocked = report_module.is_unlocked(bill_id)
+    context = {
+        "request": request,
+        "data": results,
+        "charge_summary": charge_summary,
+        "unlocked": unlocked,
+        "teaser": report_module.teaser(bill_id),
+        "report_price": config.REPORT_PRICE_CENTS // 100,
+        "checkout_error": request.query_params.get("checkout_error", ""),
+        "just_unlocked": request.query_params.get("unlocked") == "1",
+        "meta_robots": "noindex, nofollow",
+    }
+    if unlocked:
+        from negotiation import generate_phone_script
+        context["phone_script"] = build_phone_script(bill_id) or generate_phone_script(bill_id)
+    return templates.TemplateResponse("results.html", context)
 
-    # Build evidence chips for each finding
-    import json as _json
-    for f in findings:
-        chips = []
-        evidence = {}
+
+@app.post("/report/checkout")
+async def report_checkout(request: Request, bill_id: int = Form(...), email: str = Form(...)):
+    """Start the $19 Stripe checkout for one bill, then send the browser to Stripe."""
+    require_bill_access(request, bill_id)
+    back = f"/results/{bill_id}"
+    email = email.strip()
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        return RedirectResponse(f"{back}?checkout_error=email#unlock", status_code=303)
+    if not get_bill_results(bill_id) or report_module.is_unlocked(bill_id):
+        return RedirectResponse(back, status_code=303)
+    # A buyer who paid but came back before the webhook landed must not be charged twice.
+    for pending_id in report_module.pending_session_ids(bill_id)[:3]:
         try:
-            evidence = _json.loads(f.get("evidence_json") or "{}") if isinstance(f.get("evidence_json"), str) else (f.get("evidence_json") or {})
-        except (ValueError, TypeError):
-            pass
-        source = f.get("evidence_source") or evidence.get("source", "")
-        anchor = evidence.get("source_anchor") or {}
+            if payment_module.get_session(pending_id).get("payment_status") == "paid":
+                report_module.mark_paid(pending_id)
+                return RedirectResponse(f"{back}?unlocked=1", status_code=303)
+        except RuntimeError as exc:
+            logging.getLogger(__name__).error("Could not check pending report payment %s: %s", pending_id, exc)
+    try:
+        session = payment_module.create_report_checkout(bill_id, email)
+    except RuntimeError as exc:
+        logging.getLogger(__name__).error("Report checkout failed for bill %s: %s", bill_id, exc)
+        return RedirectResponse(f"{back}?checkout_error=unavailable#unlock", status_code=303)
+    report_module.record_pending(bill_id, session["id"], email)
+    log_audit(action="report_checkout_started", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return RedirectResponse(session["url"], status_code=303)
 
-        if anchor.get("line_index") is not None:
-            chips.append({"type": "bill", "label": f"Bill line {anchor['line_index'] + 1}", "index": anchor["line_index"], "snippet": anchor.get("snippet", "")})
-        if "medicare" in source.lower() or "cms" in source.lower():
-            chips.append({"type": "bill", "label": "Medicare rate", "index": 0, "snippet": source})
-        if f.get("finding_type") == "eob_reconciliation" or "eob" in source.lower():
-            chips.append({"type": "eob", "label": "EOB mismatch", "index": 0, "snippet": ""})
-        if "benchmark" in source.lower():
-            chips.append({"type": "bill", "label": "Regional benchmark", "index": 0, "snippet": source})
-        f["evidence_chips"] = chips
 
+@app.get("/report/success", response_class=HTMLResponse)
+async def report_success(request: Request, session_id: str = ""):
+    """Where Stripe sends the buyer back. Confirms payment (the webhook may be a moment behind) and opens the report."""
+    bill_id = report_module.bill_for_session(session_id) if 0 < len(session_id) <= 200 else None
+    if not bill_id:
+        return templates.TemplateResponse("error.html", {"request": request, "message": "We couldn't find that payment."}, status_code=404)
+    if not report_module.is_paid(bill_id):
+        try:
+            if payment_module.get_session(session_id).get("payment_status") == "paid":
+                report_module.mark_paid(session_id)
+        except RuntimeError as exc:
+            logging.getLogger(__name__).error("Could not confirm report payment %s: %s", session_id, exc)
+    if report_module.is_paid(bill_id):
+        return RedirectResponse(f"/results/{bill_id}?unlocked=1", status_code=303)
     return templates.TemplateResponse(
-        "results.html",
-        {
-            "request": request,
-            "data": results,
-            "phone_script": phone_script,
-            "outcome_stats": outcome_stats,
-            "dispute_fee_dollars": fee_cents / 100,
-            "case_summary": case_summary,
-            "charge_summary": charge_summary,
-            "followup_days": config.DISPUTE_FOLLOWUP_DAYS,
-            "meta_robots": "noindex, nofollow",
-        },
+        "report_pending.html",
+        {"request": request, "bill_id": bill_id, "meta_robots": "noindex, nofollow"},
     )
 
 
@@ -2578,6 +2600,8 @@ async def core_sitemap():
         (f"{base}/guides/most-expensive-states-healthcare-2026/", "0.8"),
         (f"{base}/data/", "0.7"),
     ]
+    if config.SLIM_LAUNCH:
+        core_urls = [(loc, p) for loc, p in core_urls if not slim_launch.hidden_kind(loc.removeprefix(base))]
     core_entries = "".join(
         f"<url><loc>{loc}</loc><lastmod>{config.SITE_UPDATED}</lastmod><priority>{priority}</priority></url>"
         for loc, priority in core_urls

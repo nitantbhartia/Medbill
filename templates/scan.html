@@ -23,7 +23,7 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {"@type": "Question", "name": "Is BillKarma's bill scanner really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Uploading your bill and getting a full analysis against Medicare rates is completely free. No account required. You only pay if you choose to use the paid dispute letter or negotiation services."}},
+    {"@type": "Question", "name": "Is BillKarma's bill scanner really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Uploading your bill and seeing how many charges look wrong, and the most you could save, is free with no account. If we flag charges, you can unlock the full report, with every flagged charge, a dispute letter and a phone script, for ${{ report_price }}."}},
     {"@type": "Question", "name": "What does the bill scanner check for?", "acceptedAnswer": {"@type": "Answer", "text": "BillKarma checks every line item against the CMS Medicare fee schedule, flags charges that exceed the Medicare rate by more than 3x, detects duplicate charges, identifies unbundled codes that should be combined, and checks for upcoded procedures."}},
     {"@type": "Question", "name": "How long does the bill scan take?", "acceptedAnswer": {"@type": "Answer", "text": "Under 60 seconds for most bills. Upload a photo or PDF, enter your zip code, and BillKarma returns a full line-by-line analysis with flagged charges and estimated savings instantly."}}
   ]
@@ -42,8 +42,9 @@
         <h1>Check your hospital bill</h1>
         <p class="bk-lede">Upload a photo or PDF of your itemized bill. We read every line, compare it with what Medicare pays for the same code and flag duplicates and overlapping charges.</p>
         <ul class="bk-promise">
-            <li>Free, no account</li>
-            <li>Nothing is sent to the hospital unless you choose to</li>
+            <li>Free to check, no account</li>
+            <li>${{ report_price }} only if you want the full report: every flagged charge, a dispute letter and a phone script</li>
+            <li>Nothing is sent to the hospital. You decide what to do with the report</li>
         </ul>
         <details class="bk-muted" style="margin: 14px 0 0; font-size: 15px">
             <summary style="cursor: pointer">What happens to your upload</summary>
@@ -54,9 +55,7 @@
                 <li>We do not yet delete saved bills on a schedule. To have yours deleted, email support@billkarma.app.</li>
             </ul>
         </details>
-        {% if outcome_stats and outcome_stats.show_stat %}
-        <p class="bk-muted" style="margin: 16px 0 0; font-size: 15px">BillKarma users recover a median of <strong>${{ "{:,.0f}".format(outcome_stats.median_recovered) }}</strong> per dispute, based on {{ outcome_stats.total_disputes }} verified outcomes.</p>
-        {% endif %}
+
     </div>
 </section>
 
