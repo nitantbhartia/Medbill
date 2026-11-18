@@ -15,7 +15,7 @@ import scanner
 from access_control import grant_bill_access
 from api import ALLOWED_MIME_TYPES, _check_rate_limit
 from compliance import log_audit
-from dispute_workflow import build_dispute_letter, build_phone_script
+from dispute_workflow import build_dispute_letter, build_phone_script, split_script_sections
 from mobile_routes import delete_bill_everywhere, ok
 
 router = APIRouter(prefix="/api/m")
@@ -103,7 +103,7 @@ async def phone_script(bill_id: int, device_id: str = Depends(mobile_auth.device
     script = build_phone_script(bill_id)
     if not script:
         raise HTTPException(404, "Bill not found or no findings")
-    return ok({"script": script})
+    return ok({"script": script, "sections": split_script_sections(script)})
 
 
 @router.delete("/bills/{bill_id}")

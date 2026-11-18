@@ -319,7 +319,7 @@ MOBILE_EVENT_NAMES = {
     "teaser_viewed", "clean_result_viewed",
     "paywall_viewed", "paywall_plan_selected", "paywall_closed", "exit_offer_viewed",
     "purchase_completed",
-    "letter_shared", "phone_script_viewed", "result_shared",
+    "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
 }

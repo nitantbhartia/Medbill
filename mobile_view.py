@@ -29,6 +29,8 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "report": None,
         "price": {"report_product_id": mobile_purchases.REPORT_PRODUCTS[0]},
         "extraction_quality": None,
+        "line_item_count": len(results["line_items"]),
+        "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),
     }
     if unlocked:
         owed = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None

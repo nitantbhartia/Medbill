@@ -392,3 +392,18 @@ def get_outcome_stats() -> dict:
         "avg_recovered": round(avg, 2),
         "show_stat": total_count >= 50,
     }
+
+
+def split_script_sections(script: str) -> list[dict]:
+    """Split the phone script into [{"title", "body"}] at its UPPERCASE headings (each followed by a rule line)."""
+    lines = script.split("\n")
+    heading_at = [
+        i for i in range(len(lines) - 1)
+        if lines[i].strip() and lines[i] == lines[i].upper() and lines[i + 1].startswith("─")
+    ]
+    sections = []
+    for position, start in enumerate(heading_at):
+        end = heading_at[position + 1] if position + 1 < len(heading_at) else len(lines)
+        body = "\n".join(lines[start + 2:end]).strip()
+        sections.append({"title": lines[start].strip(), "body": body})
+    return sections
