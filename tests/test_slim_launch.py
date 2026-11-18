@@ -68,7 +68,7 @@ def test_locked_results_show_the_count_the_savings_and_one_price(flagged_bill):
     html = text_of(client.get(f"/results/{flagged_bill}"))
     teaser = report.teaser(flagged_bill)
     assert f"{teaser['charge_count']} charge" in html
-    assert "you could save, at most" in html
+    assert "billing errors we found" in html or "above typical Medicare pricing" in html
     assert "Unlock your full report" in html
     assert "Unlock my report for $19" in html
     assert 'action="/report/checkout"' in html

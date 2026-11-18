@@ -14,8 +14,9 @@ import mobile_view
 import scan_pipeline
 import scanner
 from access_control import grant_bill_access
-from api import ALLOWED_MIME_TYPES, _check_rate_limit
+from api import ALLOWED_MIME_TYPES, VALID_OUTCOMES, _check_rate_limit
 from compliance import log_audit
+from db import get_db
 from dispute_workflow import build_dispute_letter, build_phone_script, split_script_sections
 from mobile_routes import delete_bill_everywhere, ok
 
@@ -114,3 +115,30 @@ async def delete_bill(bill_id: int, device_id: str = Depends(mobile_auth.device_
     delete_bill_everywhere(bill_id)
     log_audit(action="mobile_delete_bill", resource_type="bill", resource_id=str(bill_id))
     return ok({"deleted": True})
+
+
+@router.post("/bills/{bill_id}/outcome")
+async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
+    """The user tells us what the hospital did after they disputed, so the app can show real results."""
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    outcome = payload.get("outcome")
+    final_owed = payload.get("final_patient_owes", 0)
+    if outcome not in VALID_OUTCOMES:
+        raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
+    if not isinstance(final_owed, (int, float)) or isinstance(final_owed, bool) or final_owed < 0:
+        raise HTTPException(400, "final_patient_owes must be a non-negative number")
+    with get_db() as db:
+        bill = db.execute("SELECT provider_name, total_patient_owes FROM bills WHERE id = ?", (bill_id,)).fetchone()
+        if not bill:
+            raise HTTPException(404, "Bill not found")
+        original = bill["total_patient_owes"] or 0
+        saved = max(0, original - final_owed)
+        db.execute(
+            "INSERT INTO dispute_outcomes (bill_id, hospital_name, called_billing, outcome, "
+            "original_patient_owes, final_patient_owes, actual_savings, shared_publicly) "
+            "VALUES (?, ?, 1, ?, ?, ?, ?, 0)",
+            (bill_id, bill["provider_name"], outcome, original, final_owed, saved),
+        )
+    log_audit(action="mobile_report_outcome", resource_type="bill", resource_id=str(bill_id),
+              metadata={"outcome": outcome, "actual_savings": saved})
+    return ok({"actual_savings": saved})

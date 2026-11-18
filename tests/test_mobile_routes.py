@@ -274,3 +274,14 @@ def test_apple_app_site_association_serves_json(monkeypatch):
     assert response.headers["content-type"].startswith("application/json")
     assert response.json()["applinks"]["details"][0]["appIDs"] == ["ABCDE12345.app.billkarma.ios"]
     assert client.get("/app/scan").headers["location"] == "/scan"
+
+
+def test_outcome_is_recorded_and_bad_input_rejected():
+    _, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    good = client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "reduced", "final_patient_owes": 0}, headers=headers)
+    assert good.status_code == 200 and good.json()["data"]["actual_savings"] >= 0
+    bad = client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "magic"}, headers=headers)
+    assert bad.status_code == 400
+    with get_db() as db:
+        assert db.execute("SELECT COUNT(*) FROM dispute_outcomes WHERE bill_id = ?", (bill_id,)).fetchone()[0] == 1

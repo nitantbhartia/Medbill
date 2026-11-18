@@ -356,3 +356,7 @@ APPLE_HTTP_TIMEOUT_SECONDS = 15
 # Medicare rate coverage. A table smaller than this only holds the built-in samples, not the CMS fee schedule.
 MIN_FULL_MEDICARE_RATE_COUNT = 1000
 LAB_RATE_MARKER_CODE = "80053"  # a common blood test that only exists once the lab fee schedule is loaded
+
+# A scan whose line items differ from the bill total by more than this is probably misread.
+READ_CHECK_TOLERANCE = 0.10
+READ_CHECK_MIN_GAP = 25.0

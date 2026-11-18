@@ -34,6 +34,10 @@ def teaser(bill_id: int) -> dict | None:
         "charge_count": len(summary["charges"]),
         "strong_count": summary["strong_count"],
         "total_savings": summary["total_savings"],
+        "error_savings": summary["error_savings"],
+        "markup_savings": summary["markup_savings"],
+        "headline_kind": summary["headline_kind"],
+        "headline_amount": summary["headline_amount"],
         "reason_counts": _reason_counts(summary["charges"]),
     }
 

@@ -34,7 +34,7 @@
         {% if issue_count %}
         <div class="bk-result-summary">
             <div class="bk-result-figures">
-                <div><span class="bk-result-num save">${{ "{:,.0f}".format(total_savings) }}</span><span>you could save, at most</span></div>
+                <div>{% if cs.headline_kind == "errors" %}<span class="bk-result-num save">${{ "{:,.0f}".format(cs.headline_amount) }}</span><span>in billing errors we found</span>{% else %}<span class="bk-result-num save">${{ "{:,.0f}".format(total_savings) }}</span><span>above typical Medicare pricing (hospitals rarely cut to that)</span>{% endif %}</div>
                 <div><span class="bk-result-num">{{ issue_count }}</span><span>charge{{ 's' if issue_count != 1 }} flagged</span></div>
             </div>
             {% if not unlocked %}
