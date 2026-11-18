@@ -188,17 +188,25 @@ def _add_confidence_flags(extracted: dict) -> dict:
     return extracted
 
 
+OCR_JSON_ATTEMPTS = 2  # one retry when the model returns broken JSON
+
+
 def _run_vision_extraction(image_bytes: bytes, mime_type: str, prompt: str) -> dict:
     """Run Gemini vision extraction with a supplied prompt."""
     client = _get_client()
     image_part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=[image_part, prompt],
-        config=types.GenerateContentConfig(response_mime_type="application/json"),
-    )
-    extracted = _parse_json_response(response.text)
-    return _add_confidence_flags(extracted)
+    # Temperature 0 keeps repeat reads of the same bill consistent.
+    generation = types.GenerateContentConfig(response_mime_type="application/json", temperature=0)
+    for attempt in range(OCR_JSON_ATTEMPTS):
+        response = client.models.generate_content(
+            model=config.GEMINI_MODEL, contents=[image_part, prompt], config=generation,
+        )
+        try:
+            return _add_confidence_flags(_parse_json_response(response.text))
+        except ValueError:
+            if attempt == OCR_JSON_ATTEMPTS - 1:
+                raise
+            log.warning("Gemini returned broken JSON, retrying (attempt %s)", attempt + 1)
 
 
 def _normalize_mime_type(mime_type: str | None) -> str:
