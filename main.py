@@ -18,6 +18,7 @@ from api import router as api_router
 from mobile_routes import router as mobile_router
 from mobile_bill_routes import router as mobile_bill_router
 from mobile_purchase_routes import router as mobile_purchase_router
+from mobile_account_routes import router as mobile_account_router
 from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
@@ -80,6 +81,7 @@ app.include_router(api_router)
 app.include_router(mobile_router)
 app.include_router(mobile_bill_router)
 app.include_router(mobile_purchase_router)
+app.include_router(mobile_account_router)
 app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)

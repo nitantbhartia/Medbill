@@ -58,6 +58,8 @@ def _run_migrations(db):
         },
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
+    ensure_columns("mobile_devices", {"account_id": "INTEGER"})
+    db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_bills_referral ON bills(referral_code, created_at)")
     ensure_columns(
@@ -1306,8 +1308,18 @@ CREATE TABLE IF NOT EXISTS mobile_devices (
     due_band TEXT,
     hospital_facility_id TEXT,
     onboarding_variant TEXT,
+    account_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_seen_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mobile_accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    apple_sub TEXT NOT NULL UNIQUE,
+    email TEXT,
+    email_is_relay INTEGER NOT NULL DEFAULT 0,
+    apple_refresh_token TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS mobile_entitlements (

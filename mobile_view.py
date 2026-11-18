@@ -13,6 +13,26 @@ from db import get_db
 HEADER_FIELDS = ("id", "provider_name", "bill_date", "total_charged", "total_patient_owes")
 
 
+def free_charge(results: dict) -> dict | None:
+    """One strongest charge shown free on a locked bill. With a single flagged charge, only its name and reason."""
+    bill = results["bill"]
+    owed = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
+    charges = group_findings_by_charge(results["findings"], owed)["charges"]
+    strong = [c for c in charges if c["strong"]]
+    if not strong:
+        return None
+    best = max(strong, key=lambda c: c["savings"])
+    reason = best["reasons"][0]
+    if len(charges) == 1:
+        return {"code": best["code"], "description": best["description"], "reason_label": reason["label"]}
+    return {
+        "code": best["code"], "description": best["description"], "date": best["date"],
+        "charged": best["charged"], "medicare_rate": best["medicare_rate"], "markup": best["markup"],
+        "savings": best["savings"], "severity": best["severity"], "strong": True,
+        "reason_label": reason["label"], "reason_message": reason["message"],
+    }
+
+
 def build_bill_view(bill_id: int, device_id: str) -> dict:
     results = get_bill_results(bill_id)
     if not results:
@@ -29,6 +49,7 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "report": None,
         "price": {"report_product_id": mobile_purchases.REPORT_PRODUCTS[0]},
         "extraction_quality": None,
+        "free_charge": None if unlocked else free_charge(results),
         "line_item_count": len(results["line_items"]),
         "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),
     }

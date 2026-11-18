@@ -94,8 +94,10 @@ def test_flagged_scan_is_locked_with_a_teaser_and_no_charge_details():
     assert view["teaser"]["charge_count"] > 0
     assert view["price"] == {"report_product_id": "bk_report_unlock"}
     assert view["bill"]["provider_name"] == "Memorial Regional Hospital"
-    for item in SAMPLE_BILL["line_items"]:
-        assert item["description"] not in str(view)
+    assert view["free_charge"]["description"]
+    assert "finding_ids" not in str(view)
+    shown = [i for i in SAMPLE_BILL["line_items"] if i["description"] in str(view)]
+    assert len(shown) <= 1
 
 
 def test_clean_scan_is_unlocked_without_payment(monkeypatch):

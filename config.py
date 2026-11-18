@@ -322,6 +322,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -338,3 +339,15 @@ REVENUECAT_REPORT_OFFER_PRODUCT_ID = os.getenv("REVENUECAT_REPORT_OFFER_PRODUCT_
 REVENUECAT_PLUS_ENTITLEMENT = os.getenv("REVENUECAT_PLUS_ENTITLEMENT", "plus")
 IOS_APP_ID = os.getenv("IOS_APP_ID", "")
 APP_STORE_ID = os.getenv("APP_STORE_ID", "")
+
+# Sign in with Apple (optional accounts for the iOS app)
+APPLE_BUNDLE_ID = os.getenv("APPLE_BUNDLE_ID", "app.billkarma.ios")
+APPLE_ISSUER = "https://appleid.apple.com"
+APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
+APPLE_TOKEN_URL = "https://appleid.apple.com/auth/token"
+APPLE_REVOKE_URL = "https://appleid.apple.com/auth/revoke"
+APPLE_SIGNIN_KEY_ID = os.getenv("APPLE_SIGNIN_KEY_ID", "")
+APPLE_SIGNIN_TEAM_ID = os.getenv("APPLE_SIGNIN_TEAM_ID", "")
+APPLE_SIGNIN_PRIVATE_KEY = os.getenv("APPLE_SIGNIN_PRIVATE_KEY", "").replace("\\n", "\n")
+APPLE_CLIENT_SECRET_TTL_SECONDS = 300
+APPLE_HTTP_TIMEOUT_SECONDS = 15

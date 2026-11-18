@@ -7,6 +7,7 @@ import re
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 import config
+import mobile_accounts
 import mobile_auth
 import mobile_purchases
 import mobile_view
@@ -57,6 +58,7 @@ async def scan(
     except scan_pipeline.AnalysisFailed as exc:
         raise HTTPException(500, "We couldn't analyze that bill.") from exc
     grant_bill_access(device_id, bill_id)
+    mobile_accounts.share_bill_with_account(device_id, bill_id)
     log_audit(
         action="mobile_scan", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
         metadata={"findings": analysis.get("total_findings", 0), "pages": len(images)},
