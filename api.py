@@ -19,6 +19,7 @@ import scanner
 import analyzer
 import negotiation
 import payment as payment_module
+import report as report_module
 import dispute_service
 import reply_reader
 import esign as esign_module
@@ -563,6 +564,10 @@ async def get_results(request: Request, bill_id: int):
     if not results:
         raise HTTPException(404, "Bill not found")
     log_audit(action="view_results", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    if not report_module.is_unlocked(bill_id):
+        bill = results["bill"]
+        shown = {key: bill.get(key) for key in ("id", "provider_name", "bill_date", "total_charged", "total_patient_owes")}
+        return {"status": "ok", "data": {"locked": True, "bill": shown, **report_module.teaser(bill_id)}}
     return {"status": "ok", "data": results}
 
 
@@ -592,6 +597,7 @@ async def search_hospitals(q: str = "", limit: int = 8):
 async def get_dispute_packet(request: Request, bill_id: int):
     """Generate a full dispute packet."""
     require_bill_access(request, bill_id)
+    report_module.require_unlocked(bill_id)
     packet = generate_dispute_packet(bill_id)
     if not packet:
         raise HTTPException(404, "Bill not found")
@@ -603,6 +609,7 @@ async def get_dispute_packet(request: Request, bill_id: int):
 async def get_dispute_letter(request: Request, bill_id: int, payload: dict):
     """Generate a structured dispute letter from selected findings."""
     require_bill_access(request, bill_id)
+    report_module.require_unlocked(bill_id)
     selected_ids = payload.get("finding_ids", [])
     requestor_name = payload.get("requestor_name", "[Your Name]")
     account_number = payload.get("account_number", "[Account Number]")
@@ -636,6 +643,7 @@ async def get_dispute_letter(request: Request, bill_id: int, payload: dict):
 async def get_dispute_phone_script(request: Request, bill_id: int):
     """Generate a structured phone script for disputing flagged charges."""
     require_bill_access(request, bill_id)
+    report_module.require_unlocked(bill_id)
     script = build_phone_script(bill_id)
     if not script:
         raise HTTPException(404, "Bill not found or no findings")
@@ -765,6 +773,7 @@ async def email_report(request: Request):
     if not bill_id:
         raise HTTPException(400, "bill_id is required")
     require_bill_access(request, int(bill_id))
+    report_module.require_unlocked(int(bill_id))
     client_key = _request_client_key(request)
     if not _check_email_report_limits(client_key, int(bill_id), to_email):
         raise HTTPException(429, "Too many email report requests. Please try again later.")
@@ -1511,6 +1520,12 @@ async def stripe_webhook(request: Request):
             if case_id and data.get("payment_status") == "paid" and appeals.mark_paid(case_id):
                 log_audit(action="appeal_paid", resource_type="appeal_case", resource_id=str(case_id),
                           metadata={"session_id": session_id})
+        elif payment_purpose == config.REPORT_PAYMENT_PURPOSE:
+            if data.get("payment_status") == "paid":
+                bill_id = report_module.mark_paid(session_id)
+                if bill_id:
+                    log_audit(action="report_unlocked", resource_type="bill", resource_id=str(bill_id),
+                              bill_id=bill_id, metadata={"session_id": session_id})
         elif payment_purpose == "household":
             if household.activate_from_session(data):
                 log_audit(action="household_activated", resource_type="household_member",
@@ -2344,6 +2359,7 @@ async def generate_settlement(request: Request):
 async def api_bill_score(request: Request, bill_id: int):
     """Return the Bill Health Score for a bill."""
     require_bill_access(request, bill_id)
+    report_module.require_unlocked(bill_id)
     from bill_score import compute_bill_score
     score = compute_bill_score(bill_id)
     if not score:

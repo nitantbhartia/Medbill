@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Results - BillKarma{% endblock %}
+{% block title %}{% if unlocked %}Your Bill Check Report{% else %}Your bill check results{% endif %} - BillKarma{% endblock %}
 {% block head %}{% endblock %}
 
 {% block content %}
@@ -8,7 +8,6 @@
 {% set total_savings = cs.total_savings %}
 {% set patient_balance = data.bill.total_patient_owes if data.bill and data.bill.total_patient_owes else 0 %}
 {% set has_patient_data = data.has_patient_data if data.has_patient_data is defined else false %}
-{% set fee = dispute_fee_dollars | default(29) %}
 
 <section class="bk-results-head">
     <div class="bk-wrap">
@@ -28,19 +27,44 @@
 
 <div class="bk-wrap bk-results">
     <div class="bk-results-main">
+        {% if just_unlocked %}
+        <p class="bk-notice" role="status" style="margin: 0 0 20px; padding: 14px 18px; border: 2px solid var(--ink); background: #e8f6ec"><strong>Your report is unlocked.</strong> Every flagged charge, the dispute letter and the phone script are below.</p>
+        {% endif %}
+
         {% if issue_count %}
         <div class="bk-result-summary">
             <div class="bk-result-figures">
                 <div><span class="bk-result-num save">${{ "{:,.0f}".format(total_savings) }}</span><span>you could save, at most</span></div>
                 <div><span class="bk-result-num">{{ issue_count }}</span><span>charge{{ 's' if issue_count != 1 }} flagged</span></div>
             </div>
+            {% if not unlocked %}
             <div class="bk-summary-cta">
-                <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Dispute these for ${{ "{:,.0f}".format(fee) }}</a>
-                <a href="#decide">Compare with doing it yourself</a>
+                <a href="#unlock" class="bk-btn bk-btn-block">See which charges, for ${{ report_price }}</a>
             </div>
+            {% endif %}
             <p class="bk-muted" style="margin: 14px 0 0; font-size: 14.5px">Each charge is counted once, at its largest estimate{% if patient_balance %}, and the total never exceeds what you owe{% endif %}. The hospital decides what it will change.</p>
         </div>
 
+        {% if not unlocked %}
+        <h2 class="bk-h3" style="margin: 36px 0 12px">What we found</h2>
+        <ul class="bk-found">
+            {% for reason in teaser.reason_counts %}
+            <li>{{ reason.label }}: <strong>{{ reason.count }}</strong></li>
+            {% endfor %}
+        </ul>
+        <p class="bk-muted" style="margin: 10px 0 18px">Unlock the report to see the exact charges, the Medicare rate for each, and what to say to the billing office.</p>
+        <ol class="bk-charges bk-charges-locked" aria-label="Flagged charges, hidden until you unlock the report">
+            {% for c in cs.charges[:4] %}
+            <li class="bk-charge">
+                <div class="bk-charge-head">
+                    <div class="bk-charge-what"><strong>Flagged charge {{ loop.index }}</strong> <span class="bk-muted">&middot; details hidden</span></div>
+                    <span class="bk-charge-amt" aria-hidden="true">$&bull;&bull;&bull;&bull;</span>
+                </div>
+            </li>
+            {% endfor %}
+            {% if issue_count > 4 %}<li class="bk-charge"><span class="bk-muted">and {{ issue_count - 4 }} more</span></li>{% endif %}
+        </ol>
+        {% else %}
         <h2 class="bk-h3" style="margin: 36px 0 12px">Charges we flagged</h2>
         <ol class="bk-charges">
             {% for c in cs.charges %}
@@ -68,15 +92,16 @@
                 </details>
                 {% endif %}
                 <div class="bk-charge-foot">
-                    <label><input class="finding-selector" type="checkbox" data-ids="{{ c.finding_ids | join(',') }}" checked> Include in the dispute</label>
+                    <label><input class="finding-selector" type="checkbox" data-ids="{{ c.finding_ids | join(',') }}" checked> Include in the letter</label>
                     {% if c.savings %}<span class="bk-charge-save">Up to ${{ "{:,.0f}".format(c.savings) }} {{ 'off your share' if has_patient_data else 'off' }}</span>{% endif %}
                 </div>
             </li>
             {% endfor %}
         </ol>
+        {% endif %}
         {% else %}
         <div class="bk-result-summary">
-            <p style="margin: 0; font-size: 17px">We didn&rsquo;t find duplicates or charges far above Medicare rates. If the total still seems wrong, check whether you qualify for <a href="/charity-care">financial assistance</a> or ask about a <a href="/guides/hospital-payment-plans/">payment plan</a>.</p>
+            <p style="margin: 0; font-size: 17px">We didn&rsquo;t find duplicates or charges far above Medicare rates, so there is nothing to unlock and nothing to pay. If the total still seems wrong, <a href="/itemized-bill">ask the hospital for an itemized bill</a> or <a href="/guides/hospital-payment-plans/">ask about a payment plan</a>.</p>
         </div>
         {% endif %}
 
@@ -93,175 +118,106 @@
         {% endif %}
     </div>
 
-    {% if issue_count %}
-    <aside class="bk-results-side" id="decide">
-        <h2 class="bk-h3">Choose how to proceed</h2>
+    {% if issue_count and not unlocked %}
+    <aside class="bk-results-side" id="unlock">
+        <h2 class="bk-h3">Unlock your full report</h2>
         {% if config.ES_PAGES_ENABLED %}
-        <p class="bk-muted" lang="es" style="margin: 0 0 12px; font-size: 14px">En español: la carta de disputa se envía en inglés, que es el idioma de la oficina de facturación. <a href="/es/guias/como-disputar-factura-medica/">Lea cómo funciona una disputa</a>.</p>
+        <p class="bk-muted" lang="es" style="margin: 0 0 12px; font-size: 14px">En español: la carta de disputa está escrita en inglés, que es el idioma de la oficina de facturación. <a href="/es/guias/como-disputar-factura-medica/">Lea cómo funciona una disputa</a>.</p>
         {% endif %}
         <div class="bk-decide bk-decide-main">
-            <p class="bk-decide-label">We dispute it for you</p>
-            <p class="bk-decide-price"><strong>${{ "{:,.0f}".format(fee) }}</strong> flat</p>
+            <p class="bk-decide-label">Bill Check Report</p>
+            <p class="bk-decide-price"><strong>${{ report_price }}</strong> one time</p>
             <ul class="bk-checks">
-                <li>Letter written for the charges you selected</li>
-                <li>Sent to the billing office for you</li>
-                <li>Follow-ups on days {{ followup_days | join(", ") }}</li>
-                <li>Full refund if the bill isn&rsquo;t reduced in 45 days</li>
+                <li>Every flagged charge, with the Medicare rate and why it&rsquo;s flagged</li>
+                <li>A dispute letter filled in for the charges you pick</li>
+                <li>A phone script for the billing office</li>
+                <li>Yours to keep. You send it, so you stay in control</li>
             </ul>
-            <a href="/autopilot/strategy/{{ data.bill.id }}" class="bk-btn bk-btn-block">Dispute these for ${{ "{:,.0f}".format(fee) }}</a>
-            {% if total_savings > fee %}<p class="bk-decide-note">You keep everything the hospital takes off. No percentage of your savings.</p>{% endif %}
-        </div>
-        <div class="bk-decide">
-            <p class="bk-decide-label">Do it yourself</p>
-            <p class="bk-decide-copy">Free dispute letter, phone script and evidence bundle for these charges. You send it and follow up.</p>
-            <a href="#manual-toolkit" class="bk-btn-outline bk-btn-block">Open the free toolkit</a>
+            {% if checkout_error == "email" %}<p class="bk-error" role="alert" style="margin: 0 0 10px; color: #b00020">Please enter a valid email address.</p>{% elif checkout_error == "unavailable" %}<p class="bk-error" role="alert" style="margin: 0 0 10px; color: #b00020">Checkout isn&rsquo;t available right now. Please try again in a few minutes.</p>{% endif %}
+            <form method="post" action="/report/checkout">
+                <input type="hidden" name="bill_id" value="{{ data.bill.id }}">
+                <label for="unlock-email" class="bk-label">Your email</label>
+                <input id="unlock-email" name="email" type="email" class="bk-input" placeholder="you@example.com" autocomplete="email" required style="margin-bottom: 10px">
+                <button type="submit" class="bk-btn bk-btn-block">Unlock my report for ${{ report_price }}</button>
+            </form>
+            <p class="bk-decide-note">Secure payment with Stripe. We use your email only for this purchase. No subscription. We can&rsquo;t promise the hospital will lower your bill; the report shows you exactly what to ask for.</p>
         </div>
     </aside>
     {% endif %}
 </div>
 
+{% if issue_count and unlocked %}
 <div class="bk-wrap bk-results-more">
-    {% if issue_count %}
-    <!-- Email Report -->
-    <div class="mb-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
-        <div id="email-form-section">
-            <h3 class="font-semibold text-gray-900 mb-1">Get your report emailed</h3>
-            <p class="text-sm text-gray-500 mb-3">We&rsquo;ll send a copy of this analysis to your inbox with all findings and next steps.</p>
-            <div class="flex gap-2">
-                <input id="report-email" type="email" placeholder="you@example.com" required
-                    class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
-                <button id="send-report-btn"
-                    class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-lg hover:bg-accent-800 transition-colors whitespace-nowrap">
-                    Email Report
-                </button>
-            </div>
-        </div>
-        <div id="email-success" class="hidden text-center py-2">
-            <p class="text-sm text-green-700 font-semibold">Report sent! Check your inbox.</p>
-        </div>
-        <div id="email-error" class="hidden text-center py-2">
-            <p class="text-sm text-red-700 font-semibold" id="email-error-msg">Failed to send.</p>
-        </div>
-    </div>
-
-    <!-- AI Advisor CTA -->
-    <div class="mb-10 bg-gradient-to-r from-accent-50 to-green-50 border border-green-200 rounded-xl p-6">
-        <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-accent-500 flex items-center justify-center flex-shrink-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h3 class="font-bold text-gray-900 mb-0.5">Ask questions about your bill</h3>
-                <p class="text-sm text-gray-600">Ask questions about your bill in plain English. Get explanations, dispute strategies, and documents generated on the spot.</p>
-            </div>
-            <a href="/advisor/{{ data.bill.id }}"
-               class="shrink-0 px-5 py-2.5 bg-accent-500 text-white text-sm font-bold rounded-full hover:bg-accent-600 transition whitespace-nowrap">
-                Ask AI
-            </a>
-        </div>
-    </div>
-
-    <!-- Manual Toolkit -->
-    <div id="manual-toolkit" class="mb-10">
-        <h2 class="bk-h3" style="margin-bottom: 16px">Do it yourself</h2>
+    <div id="toolkit" class="mb-10">
+        <h2 class="bk-h3" style="margin-bottom: 8px">Your next steps</h2>
+        <ol class="bk-steps-list" style="margin: 0 0 20px; padding-left: 22px; line-height: 1.6; list-style: decimal">
+            <li>Call the billing office and ask for a hold on collections while you dispute.</li>
+            <li>Send the dispute letter below by mail or email and keep a copy.</li>
+            <li>Follow up in 30 days if you haven&rsquo;t heard back.</li>
+        </ol>
         <div class="grid sm:grid-cols-2 gap-3">
-            <!-- Dispute Letter -->
             <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">Your Dispute Letter</h3>
-                <p class="text-sm text-gray-500 mb-3">Pre-filled letter citing specific billing errors and Medicare rates.</p>
+                <h3 class="text-sm font-semibold text-gray-900 mb-1">Your dispute letter</h3>
+                <p class="text-sm text-gray-500 mb-3">Pre-filled with the charges you checked above, the Medicare rates and the specific errors.</p>
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1 flex items-center gap-1">Your name<span class="bk-tip" data-tip="Enter your name exactly as it appears on the billing statement. This becomes the patient name in the dispute letter."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                        <input id="requestor-name" type="text" placeholder="Jane Smith"
-                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
+                        <label for="requestor-name" class="block text-sm text-gray-600 mb-1">Your name</label>
+                        <input id="requestor-name" type="text" placeholder="Jane Smith" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1 flex items-center gap-1">Account #<span class="bk-tip" data-tip="The account or invoice number from the top of your bill. Labeled 'Account #', 'Invoice #', or 'Patient Account'. Helps the billing department locate your record quickly."><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span></label>
-                        <input id="account-number" type="text" placeholder="Optional"
-                               class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
+                        <label for="account-number" class="block text-sm text-gray-600 mb-1">Account #</label>
+                        <input id="account-number" type="text" placeholder="From your bill" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"/>
                     </div>
                 </div>
-                <button id="gen-letter-btn"
-                        class="w-full px-3 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">
-                    Generate Letter
-                </button>
+                <button id="gen-letter-btn" class="w-full px-3 py-2 bg-accent-700 text-white text-sm font-medium rounded-md hover:bg-accent-800 transition-colors">Write my letter</button>
                 <div id="letter-output" class="hidden mt-3">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-3 mb-2 max-h-60 overflow-y-auto">
                         <pre id="letter-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
                     </div>
                     <div class="flex gap-2">
-                        <button id="copy-letter-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
-                            <span id="copy-letter-text">Copy</span>
-                        </button>
-                        <button id="download-pdf-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">
-                            Print/PDF
-                        </button>
+                        <button id="copy-letter-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50"><span id="copy-letter-text">Copy</span></button>
+                        <button id="download-pdf-btn" class="text-sm px-2 py-1 border border-gray-300 rounded-md hover:bg-gray-50">Print / PDF</button>
                     </div>
                 </div>
             </div>
-
-            <!-- Phone Script -->
             <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">Phone Script</h3>
-                <p class="text-sm text-gray-500 mb-3">Guided conversation outline for calling the billing department.</p>
-                <button id="gen-phone-btn"
-                        class="w-full px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                    Generate Script
-                </button>
+                <h3 class="text-sm font-semibold text-gray-900 mb-1">Your phone script</h3>
+                <p class="text-sm text-gray-500 mb-3">What to say when you call the billing office, step by step.</p>
+                <button id="gen-phone-btn" class="w-full px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">Show my script</button>
                 <div id="phone-output" class="hidden mt-3">
                     <div class="bg-gray-50 border border-gray-200 rounded-md p-3 max-h-60 overflow-y-auto">
                         <pre id="phone-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Insurance Appeal -->
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">Insurance Appeal</h3>
-                <p class="text-sm text-gray-500 mb-3">Template for appealing a denied claim with your insurer.</p>
-                <button id="gen-appeal-btn"
-                        class="w-full px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                    Generate Appeal
-                </button>
-                <div id="appeal-output" class="hidden mt-3">
-                    <div class="bg-gray-50 border border-gray-200 rounded-md p-3 max-h-60 overflow-y-auto">
-                        <pre id="appeal-text" class="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed"></pre>
-                    </div>
+        <div class="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-5">
+            <div id="email-form-section">
+                <h3 class="font-semibold text-gray-900 mb-1">Email me a copy</h3>
+                <p class="text-sm text-gray-500 mb-3">Keep this report in your inbox.</p>
+                <div class="flex gap-2">
+                    <input id="report-email" type="email" placeholder="you@example.com" required class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                    <button id="send-report-btn" class="px-4 py-2 bg-accent-700 text-white text-sm font-medium rounded-lg hover:bg-accent-800 transition-colors whitespace-nowrap">Email report</button>
                 </div>
             </div>
-
-            <!-- Evidence Bundle -->
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1">Evidence Bundle</h3>
-                <p class="text-sm text-gray-500 mb-3">Download all findings and supporting evidence as JSON.</p>
-                <a href="/api/bills/{{ data.bill.id }}/export" target="_blank"
-                   class="block w-full text-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                    Download Bundle
-                </a>
-            </div>
+            <div id="email-success" class="hidden text-center py-2"><p class="text-sm text-green-700 font-semibold">Sent. Check your inbox.</p></div>
+            <div id="email-error" class="hidden text-center py-2"><p class="text-sm text-red-700 font-semibold" id="email-error-msg">Failed to send.</p></div>
         </div>
     </div>
-    {% endif %}
-
-    <div class="text-center">
-        <a href="/scan" class="text-sm text-accent-700 font-medium hover:text-accent-800 transition-colors">
-            Upload another bill
-        </a>
-    </div>
 </div>
+{% endif %}
 
-<!-- Evidence chip popover -->
-<div id="chip-popover" class="hidden fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-w-xs">
-    <p id="chip-popover-text" class="text-sm text-gray-700"></p>
+<div class="bk-wrap text-center" style="padding-bottom: 40px">
+    <a href="/scan" class="text-sm text-accent-700 font-medium hover:text-accent-800 transition-colors">Check another bill</a>
 </div>
 {% endblock %}
 
 {% block scripts %}
+{% if unlocked and charge_summary.charges %}
 <script>
 (function() {
-    var billId = '{{ data.bill.id if data and data.bill else "" }}';
+    var billId = '{{ data.bill.id }}';
 
     function selectedFindingIds() {
         return Array.from(document.querySelectorAll('.finding-selector:checked'))
@@ -270,178 +226,89 @@
             .filter(Number.isFinite);
     }
 
+    function showError(message) { alert(message); }
+
     function generateLetter(onSuccess) {
         var genBtn = document.getElementById('gen-letter-btn');
         var letterText = document.getElementById('letter-text');
-
-        if (letterText && letterText.textContent.trim()) {
-            onSuccess(letterText.textContent);
-            return;
-        }
-
-        if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Generating...'; }
-
-        var payload = {
-            finding_ids: selectedFindingIds(),
-            requestor_name: (document.getElementById('requestor-name').value || '').trim() || '[Your Name]',
-            account_number: (document.getElementById('account-number').value || '').trim() || '[Account Number]'
-        };
-
+        if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Writing...'; }
         fetch('/api/dispute-letter/' + billId, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                finding_ids: selectedFindingIds(),
+                requestor_name: (document.getElementById('requestor-name').value || '').trim() || '[Your Name]',
+                account_number: (document.getElementById('account-number').value || '').trim() || '[Account Number]'
+            })
         })
-        .then(function(r) { if (!r.ok) throw new Error('Could not generate letter'); return r.json(); })
+        .then(function(r) { if (!r.ok) throw new Error('Could not write the letter. Please try again.'); return r.json(); })
         .then(function(d) {
             letterText.textContent = d.data.letter;
             document.getElementById('letter-output').classList.remove('hidden');
-            onSuccess(d.data.letter);
+            if (onSuccess) onSuccess(d.data.letter);
         })
-        .catch(function(err) { alert(err.message || 'Failed to generate letter.'); })
-        .finally(function() {
-            if (genBtn) { genBtn.disabled = false; genBtn.textContent = 'Generate Letter'; }
-        });
+        .catch(function(err) { showError(err.message); })
+        .finally(function() { if (genBtn) { genBtn.disabled = false; genBtn.textContent = 'Write my letter'; } });
     }
 
     function downloadPdf(letterContent) {
         var w = window.open('', '_blank');
         var safe = letterContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        w.document.write(
-            '<html><head><title>Dispute Letter</title>' +
-            '<style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;font-size:12pt}' +
-            'pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head>' +
-            '<body><pre>' + safe + '</pre></body></html>'
-        );
-        w.document.close();
-        w.focus();
+        w.document.write('<html><head><title>Dispute Letter</title><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;font-size:12pt}pre{white-space:pre-wrap;font-family:inherit;line-height:1.6}</style></head><body><pre>' + safe + '</pre></body></html>');
+        w.document.close(); w.focus();
         setTimeout(function() { w.print(); }, 400);
     }
 
-    // Generate letter button
-    var genBtn = document.getElementById('gen-letter-btn');
-    if (genBtn) {
-        genBtn.addEventListener('click', function() {
-            generateLetter(function() {});
-        });
-    }
+    document.getElementById('gen-letter-btn').addEventListener('click', function() { generateLetter(); });
 
-    // Copy letter
-    var copyLetterBtn = document.getElementById('copy-letter-btn');
-    if (copyLetterBtn) {
-        copyLetterBtn.addEventListener('click', function() {
-            var letterText = document.getElementById('letter-text');
-            navigator.clipboard.writeText(letterText.textContent.trim()).then(function() {
-                document.getElementById('copy-letter-text').textContent = 'Copied!';
-                setTimeout(function() { document.getElementById('copy-letter-text').textContent = 'Copy'; }, 2000);
-            });
+    document.getElementById('copy-letter-btn').addEventListener('click', function() {
+        navigator.clipboard.writeText(document.getElementById('letter-text').textContent.trim()).then(function() {
+            document.getElementById('copy-letter-text').textContent = 'Copied';
+            setTimeout(function() { document.getElementById('copy-letter-text').textContent = 'Copy'; }, 2000);
         });
-    }
+    });
 
-    // Download PDF
-    var pdfBtn = document.getElementById('download-pdf-btn');
-    if (pdfBtn) {
-        pdfBtn.addEventListener('click', function() {
-            var letter = document.getElementById('letter-text').textContent;
-            if (!letter.trim()) {
-                generateLetter(function(l) { downloadPdf(l); });
-            } else {
-                downloadPdf(letter);
-            }
-        });
-    }
+    document.getElementById('download-pdf-btn').addEventListener('click', function() {
+        var letter = document.getElementById('letter-text').textContent;
+        if (letter.trim()) { downloadPdf(letter); } else { generateLetter(downloadPdf); }
+    });
 
-    // Phone script
     var phoneBtn = document.getElementById('gen-phone-btn');
-    if (phoneBtn) {
-        phoneBtn.addEventListener('click', function() {
-            phoneBtn.disabled = true;
-            phoneBtn.textContent = 'Generating...';
-            fetch('/api/dispute-phone-script/' + billId)
-            .then(function(r) { if (!r.ok) throw new Error('Failed'); return r.json(); })
-            .then(function(d) {
-                document.getElementById('phone-text').textContent = d.data.script || d.data.phone_script || '';
-                document.getElementById('phone-output').classList.remove('hidden');
-            })
-            .catch(function() { alert('Could not generate phone script.'); })
-            .finally(function() { phoneBtn.disabled = false; phoneBtn.textContent = 'Generate Script'; });
-        });
-    }
+    phoneBtn.addEventListener('click', function() {
+        phoneBtn.disabled = true; phoneBtn.textContent = 'Loading...';
+        fetch('/api/dispute-phone-script/' + billId)
+        .then(function(r) { if (!r.ok) throw new Error('Could not load the script. Please try again.'); return r.json(); })
+        .then(function(d) {
+            document.getElementById('phone-text').textContent = d.data.script || d.data.phone_script || '';
+            document.getElementById('phone-output').classList.remove('hidden');
+        })
+        .catch(function(err) { showError(err.message); })
+        .finally(function() { phoneBtn.disabled = false; phoneBtn.textContent = 'Show my script'; });
+    });
 
-    // Insurance appeal
-    var appealBtn = document.getElementById('gen-appeal-btn');
-    if (appealBtn) {
-        appealBtn.addEventListener('click', function() {
-            appealBtn.disabled = true;
-            appealBtn.textContent = 'Generating...';
-            fetch('/api/appeal-template/' + billId)
-            .then(function(r) { if (!r.ok) throw new Error('Failed'); return r.json(); })
-            .then(function(d) {
-                document.getElementById('appeal-text').textContent = d.data.letter || '';
-                document.getElementById('appeal-output').classList.remove('hidden');
-            })
-            .catch(function() { alert('Could not generate appeal template.'); })
-            .finally(function() { appealBtn.disabled = false; appealBtn.textContent = 'Generate Appeal'; });
-        });
-    }
-
-    // Email report
     var sendBtn = document.getElementById('send-report-btn');
-    if (sendBtn) {
-        sendBtn.addEventListener('click', function() {
-            var email = (document.getElementById('report-email').value || '').trim();
-            if (!email || email.indexOf('@') < 1) {
-                document.getElementById('email-error-msg').textContent = 'Please enter a valid email.';
-                document.getElementById('email-error').classList.remove('hidden');
-                return;
-            }
-            sendBtn.disabled = true;
-            sendBtn.textContent = 'Sending...';
-            document.getElementById('email-error').classList.add('hidden');
-
-            fetch('/api/email-report', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({bill_id: billId, email: email})
-            })
-            .then(function(r) {
-                if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed'); });
-                return r.json();
-            })
-            .then(function() {
-                document.getElementById('email-form-section').classList.add('hidden');
-                document.getElementById('email-success').classList.remove('hidden');
-            })
-            .catch(function(err) {
-                document.getElementById('email-error-msg').textContent = err.message || 'Failed to send report.';
-                document.getElementById('email-error').classList.remove('hidden');
-            })
-            .finally(function() {
-                sendBtn.disabled = false;
-                sendBtn.textContent = 'Email Report';
-            });
-        });
-    }
-
-    // Evidence chip popovers
-    document.querySelectorAll('.evidence-chip').forEach(function(chip) {
-        chip.addEventListener('click', function(e) {
-            var snippet = chip.getAttribute('data-snippet');
-            if (!snippet) return;
-            var popover = document.getElementById('chip-popover');
-            document.getElementById('chip-popover-text').textContent = snippet;
-            popover.style.left = Math.min(e.clientX, window.innerWidth - 280) + 'px';
-            popover.style.top = (e.clientY + 10) + 'px';
-            popover.classList.remove('hidden');
-            setTimeout(function() { popover.classList.add('hidden'); }, 3000);
-        });
-    });
-    document.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('evidence-chip')) {
-            document.getElementById('chip-popover').classList.add('hidden');
+    sendBtn.addEventListener('click', function() {
+        var email = (document.getElementById('report-email').value || '').trim();
+        var errorBox = document.getElementById('email-error');
+        if (!email || email.indexOf('@') < 1) {
+            document.getElementById('email-error-msg').textContent = 'Please enter a valid email.';
+            errorBox.classList.remove('hidden');
+            return;
         }
+        sendBtn.disabled = true; sendBtn.textContent = 'Sending...'; errorBox.classList.add('hidden');
+        fetch('/api/email-report', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({bill_id: billId, email: email}) })
+        .then(function(r) { if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Failed'); }); return r.json(); })
+        .then(function() {
+            document.getElementById('email-form-section').classList.add('hidden');
+            document.getElementById('email-success').classList.remove('hidden');
+        })
+        .catch(function(err) {
+            document.getElementById('email-error-msg').textContent = err.message || 'Failed to send report.';
+            errorBox.classList.remove('hidden');
+        })
+        .finally(function() { sendBtn.disabled = false; sendBtn.textContent = 'Email report'; });
     });
-
 })();
 </script>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Confirming your payment - BillKarma{% endblock %}
+{% block head %}<meta http-equiv="refresh" content="5">{% endblock %}
+
+{% block content %}
+<section class="bk-wrap" style="max-width: 640px; padding-top: 72px; padding-bottom: 72px">
+    <h1 class="bk-h2">Confirming your payment&hellip;</h1>
+    <p class="bk-lede">This usually takes a few seconds. This page refreshes on its own and opens your report as soon as Stripe confirms.</p>
+    <p class="bk-muted">If it doesn&rsquo;t open within a minute, <a href="/results/{{ bill_id }}">go to your results</a> and refresh. You won&rsquo;t be charged twice.</p>
+</section>
+{% endblock %}

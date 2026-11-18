@@ -439,9 +439,9 @@ class TestResultsPageRendering:
         assert resp.status_code == 200
         html = resp.text
         assert 'id="gen-letter-btn"' in html
-        assert "Your Dispute Letter" in html
+        assert "Your dispute letter" in html
 
-    def test_results_page_has_outcome_tracker(self):
+    def test_results_page_has_next_steps_and_phone_script(self):
         bill_id = _insert_bill()
         _insert_finding(
             bill_id, "pricing", "71046",
@@ -450,8 +450,8 @@ class TestResultsPageRendering:
         resp = client.get(f"/results/{bill_id}")
         assert resp.status_code == 200
         html = resp.text
-        assert "Choose how to proceed" in html
-        assert "Dispute these for $" in html
+        assert "Your next steps" in html
+        assert 'id="gen-phone-btn"' in html
 
     def test_results_page_404_for_missing_bill(self):
         resp = client.get("/results/9999")

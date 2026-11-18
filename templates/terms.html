@@ -6,6 +6,27 @@
 {% endblock %}
 
 {% block content %}
+{% if config.SLIM_LAUNCH %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Terms of use</h1>
+        <p class="bk-lede">Checking a bill is free and needs no agreement. These terms cover the Bill Check Report.</p>
+    </div>
+</section>
+<div class="bk-wrap" style="padding-top: 48px; padding-bottom: 88px">
+    <div class="bk-narrow">
+        <h2 class="bk-h3">The Bill Check Report</h2>
+        <p>The report is a one-time digital purchase for one bill. It shows each charge we flagged and why, and includes a dispute letter and phone script filled in with your bill&rsquo;s details. You receive it on screen as soon as payment is confirmed.</p>
+        <h2 class="bk-h3" style="margin-top: 28px">What we are and aren&rsquo;t</h2>
+        <p>BillKarma is not a law firm, and nothing here is legal or financial advice. We don&rsquo;t send anything to the hospital for you; you decide whether and how to use the letter and script. We can&rsquo;t promise a reduction, because the hospital decides.</p>
+        <h2 class="bk-h3" style="margin-top: 28px">Accuracy</h2>
+        <p>Findings are estimates based on Medicare rates, public pricing data and common billing rules. They can be wrong or incomplete, so check them against your own records before you rely on them.</p>
+        <h2 class="bk-h3" style="margin-top: 28px">Problems with a purchase</h2>
+        <p>Email <a href="mailto:support@billkarma.app">support@billkarma.app</a> and we&rsquo;ll help. See also <a href="/privacy/">what we collect and keep</a>.</p>
+    </div>
+</div>
+{% else %}
+
 <section class="bk-hero">
     <div class="bk-wrap">
         <h1>Dispute service terms</h1>
@@ -19,4 +40,5 @@
         <p class="bk-muted" style="margin-top: 20px">At checkout you also sign a HIPAA authorization and a form naming BillKarma as your representative for the dispute. You can read both there before signing. See also <a href="/privacy/">what we collect and keep</a>.</p>
     </div>
 </div>
+{% endif %}
 {% endblock %}

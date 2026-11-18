@@ -10,6 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Force an in-memory database so tests never touch production data
 os.environ["DB_PATH"] = ":memory:"
+# Product tests run with every product reachable; tests/test_slim_launch.py turns the slim launch on.
+os.environ["SLIM_LAUNCH"] = "0"
 
 import config  # noqa: E402 — must come after env override
 config.DB_PATH = ":memory:"

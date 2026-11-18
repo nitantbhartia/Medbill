@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}BillKarma: Free Medical Bill Checker and Dispute Service{% endblock %}
+{% block title %}BillKarma: Is Your Hospital Bill Wrong? Check It Free{% endblock %}
 
 {% block head %}
-<meta name="description" content="Upload a hospital bill. We compare every charge to what Medicare pays, flag errors, then send a written dispute to billing and follow up. Checking is free.">
+<meta name="description" content="Upload your itemized hospital bill. We compare every charge to what Medicare pays and flag duplicates and overcharges for free. Unlock the full report, dispute letter and phone script for ${{ report_price }}.">
 {% endblock %}
 
 {% block content %}
 <div class="bk-home">
 <section class="bk-wrap bk-home-hero">
     <div>
-        <p class="bk-home-kicker">Hospital bill checker and written dispute service</p>
-        <h1>Check your hospital bill for free. If it&rsquo;s wrong, <span class="bk-hl">we&rsquo;ll dispute it in writing.</span></h1>
-        <p class="bk-lede">See every charge next to what Medicare pays for the same code, with duplicates and overlapping tests flagged. If you want it fixed, we send the dispute to the billing office and follow up until they answer.</p>
+        <p class="bk-home-kicker">Hospital bill checker</p>
+        <h1>Is your hospital bill wrong? <span class="bk-hl">Find out free.</span></h1>
+        <p class="bk-lede">Upload your itemized bill. We compare every charge with what Medicare pays and flag duplicates and overcharges. You see how many charges look wrong, and the most you could save, free. For ${{ report_price }}, unlock which charges, plus a dispute letter and phone script to send yourself.</p>
 
         <div class="bk-drop" id="bill-drop">
             <div class="bk-drop-text">
@@ -29,9 +29,9 @@
         <p class="bk-home-note">Nothing is sent to the hospital unless you choose to. <a href="#faq">What happens to your upload</a></p>
 
         <dl class="bk-terms">
-            <div><dt>Checking a bill</dt><dd>Free</dd></div>
-            <div><dt>Sending a dispute</dt><dd>${{ dispute_tiers[0].fee }} to ${{ dispute_tiers[-1].fee }}</dd></div>
-            <div><dt>Not reduced in {{ config.DISPUTE_MAX_DAYS }} days</dt><dd>Full refund</dd></div>
+            <div><dt>Checking your bill</dt><dd>Free</dd></div>
+            <div><dt>Full report, letter and call script</dt><dd>${{ report_price }} once</dd></div>
+            <div><dt>Nothing flagged</dt><dd>You pay nothing</dd></div>
         </dl>
     </div>
 
@@ -57,9 +57,9 @@
             </ol>
             <div class="bk-statement-foot">
                 <span>Billed</span><span class="amt">${{ "{:,.2f}".format(example.total) }}</span>
-                <span class="save">Flagged to dispute, {{ example.letter | length }} charges</span><span class="amt save">${{ "{:,.2f}".format(example.clear_errors + example.visit_amount) }}</span>
+                <span class="save">Flagged, {{ example.letter | length }} charges</span><span class="amt save">${{ "{:,.2f}".format(example.clear_errors + example.visit_amount) }}</span>
             </div>
-            <div class="bk-statement-offer"><span>We dispute all {{ example.letter | length }} for you</span><strong>${{ example.fee }} flat, refunded if not reduced</strong></div>
+            <div class="bk-statement-offer"><span>Which charges, and the letter to dispute all {{ example.letter | length }}</span><strong>${{ report_price }} to unlock</strong></div>
         </div>
         <figcaption class="bk-statement-caption">An example of what the free check shows. Charges are illustrative; the Medicare rate is from our CMS data.</figcaption>
     </figure>
@@ -76,13 +76,13 @@
             </li>
             <li>
                 <span class="bk-flow-price">Free</span>
-                <h3>See what looks wrong</h3>
-                <p>Every coded line is compared with Medicare&rsquo;s rate. <a href="/guides/duplicate-charges-hospital-bills/">Duplicates</a>, <a href="/guides/upcoding-unbundling-hospital-bills/">overlapping tests and high visit levels</a> are flagged, as in the example above.</p>
+                <h3>See how many charges look wrong</h3>
+                <p>Every coded line is compared with Medicare&rsquo;s rate. <a href="/guides/duplicate-charges-hospital-bills/">Duplicates</a> and <a href="/guides/upcoding-unbundling-hospital-bills/">overlapping tests</a> are flagged. You see the count and the most you could save.</p>
             </li>
             <li>
-                <span class="bk-flow-price paid">From ${{ dispute_tiers[0].fee }}</span>
-                <h3>We dispute it for you</h3>
-                <p>Optional. We write the letter for the flagged charges, send it to the billing office and follow up until they answer.</p>
+                <span class="bk-flow-price paid">${{ report_price }}</span>
+                <h3>Unlock the full report</h3>
+                <p>See each flagged charge and why, and get a dispute letter and phone script filled in for your bill. You send them, so you stay in control.</p>
             </li>
         </ol>
     </div>
@@ -90,8 +90,8 @@
 
 <section id="letter" class="bk-dark">
     <div class="bk-wrap" style="padding-top: 88px; padding-bottom: 88px">
-        <h2 class="bk-h2">What the hospital receives</h2>
-        <p class="bk-lede">The letter our system writes for the example bill. It goes to the billing office by email or fax, in your name, after you sign an authorization.</p>
+        <h2 class="bk-h2">What&rsquo;s in your ${{ report_price }} report</h2>
+        <p class="bk-lede">The letter our system writes for the example bill. It&rsquo;s filled in with your charges and Medicare&rsquo;s rates, and it&rsquo;s yours to send.</p>
         <div class="bk-dark-grid">
             <figure>
                 <div class="bk-letter">
@@ -106,33 +106,26 @@
                 </div>
             </figure>
             <div>
-                <h3 class="bk-h3">Then we keep asking</h3>
+                <h3 class="bk-h3">Everything you get</h3>
                 <ol class="bk-days">
-                    <li><span>Day 0</span><span><strong>Letter sent</strong><span>You can read it, and every reply, on your dispute page.</span></span></li>
-                    {% for day in followup_days[:-1] %}
-                    <li><span>Day {{ day }}</span><span><strong>Follow-up</strong><span>Sent if the billing office hasn&rsquo;t answered.</span></span></li>
-                    {% endfor %}
-                    <li><span>Day {{ followup_days[-1] }}</span><span><strong>Final follow-up, or your money back</strong><span>If the bill hasn&rsquo;t been reduced by day {{ config.DISPUTE_MAX_DAYS }}, the fee is refunded in full.</span></span></li>
+                    <li><span>1</span><span><strong>Every flagged charge</strong><span>The code, what you were billed, what Medicare pays, and why it&rsquo;s flagged.</span></span></li>
+                    <li><span>2</span><span><strong>A dispute letter</strong><span>For the charges you choose, with your name and account number.</span></span></li>
+                    <li><span>3</span><span><strong>A phone script</strong><span>What to say to the billing office, step by step.</span></span></li>
                 </ol>
-                <p class="bk-dark-note">The hospital decides whether to lower the bill. We make sure it is asked in writing, more than once.</p>
+                <p class="bk-dark-note">The hospital decides whether to lower the bill. We make sure you ask the right way, in writing.</p>
             </div>
         </div>
     </div>
 </section>
 
 <section id="pricing" class="bk-wrap bk-home-section">
-    <h2 class="bk-h2">One flat fee, set by the size of the bill</h2>
-    <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. Our fee doesn&rsquo;t change with the outcome, and you pay it only if you choose to send a dispute.</p>
-    <div class="bk-tiers">
-        {% for tier in dispute_tiers %}
-        <div><span>{{ tier.label }}</span><strong>${{ tier.fee }}</strong></div>
-        {% endfor %}
-    </div>
+    <h2 class="bk-h2">One price: ${{ report_price }} per bill</h2>
+    <p class="bk-lede"><a href="/guides/medical-bill-negotiation-service-cost/">Bill negotiators</a> usually take 10&ndash;35% of what they save you, and some set a minimum fee of $1,000 or more. The report is ${{ report_price }} once, whatever the bill, and you keep everything the hospital takes off.</p>
     <div class="bk-table-box" style="margin-top: 24px">
         <table class="bk-table bk-compare">
-            <thead><tr><th>On a $2,400 bill reduced by $900</th><th>Fee</th><th>You keep</th></tr></thead>
+            <thead><tr><th>On a $2,400 bill reduced by $900</th><th>Cost</th><th>You keep</th></tr></thead>
             <tbody>
-                <tr><td><strong>BillKarma</strong>, flat fee</td><td class="bk-num">$49</td><td class="bk-num"><span class="bk-hl">$851</span></td></tr>
+                <tr><td><strong>BillKarma</strong> report (you send the letter)</td><td class="bk-num">${{ report_price }}</td><td class="bk-num"><span class="bk-hl">${{ 900 - report_price }}</span></td></tr>
                 <tr><td><a href="/guides/billkarma-vs-goodbill-medical-bills/">Goodbill</a> (20%)</td><td class="bk-num">$180</td><td class="bk-num">$720</td></tr>
                 <tr><td><a href="/guides/billkarma-vs-resolve-medical-bills/">Resolve</a></td><td colspan="2">Takes bills of $5,000 or more</td></tr>
             </tbody>
@@ -149,8 +142,7 @@
                 <div><dt>Medicare rates</dt><dd>The fee schedules CMS publishes for each billing code.</dd></div>
                 <div><dt>Hospital prices</dt><dd>The price files hospitals are required to post.</dd></div>
                 <div><dt>Billing contacts</dt><dd>CMS hospital records{% if hospital_count %}, for {{ "{:,}".format(hospital_count) }} U.S. hospitals{% endif %}. <a href="/guides/hospital-billing-grades-explained/">How we grade hospitals</a></dd></div>
-                {% if outcome_stats.show_stat %}<div><dt>Results so far</dt><dd>Median reduction of ${{ "{:,.0f}".format(outcome_stats.median_recovered) }} when a bill is lowered, in {{ outcome_stats.recovery_count }} of {{ outcome_stats.total_disputes }} reported outcomes.</dd></div>{% endif %}
-            </dl>
+                </dl>
             <form action="/hospitals/" method="get" style="margin-top: 24px">
                 <label for="hospital-search" class="bk-label">Look up your hospital&rsquo;s billing office and prices</label>
                 <div class="bk-search">
@@ -163,12 +155,12 @@
             <div class="bk-nots">
                 <h2>What we don&rsquo;t do</h2>
                 <ul>
-                    <li>No phone negotiation. Everything is in writing, so you keep a dated record.</li>
+                    <li>We don&rsquo;t contact the hospital for you. The letter and script are yours to send.</li>
                     <li>No insurance denials. That is an appeal to your insurer; start with <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>.</li>
                     <li>No legal help. If you&rsquo;re sued, contact local legal aid.</li>
-                    <li>No promise of a reduction. The hospital decides; you get the fee back if nothing changes.</li>
+                    <li>No promise of a reduction. The hospital decides.</li>
                 </ul>
-                <p>Already in collections? <a href="/collection-notice">Write a validation letter</a>. Can&rsquo;t afford it at all? <a href="/charity-care">Check financial assistance</a>.</p>
+                <p>Can&rsquo;t afford the bill at all? <a href="/guides/hospital-payment-plans/">Ask about a payment plan</a>.</p>
             </div>
         </div>
     </div>
@@ -190,25 +182,28 @@
             <p>Medicare publishes what it pays for each billing code, so it&rsquo;s a public, consistent yardstick. Hospitals aren&rsquo;t required to charge Medicare rates, but a charge many times higher is worth questioning. For scale, <a href="https://www.rand.org/pubs/periodicals/health-quarterly/issues/v12/n2/05.html" target="_blank" rel="noopener noreferrer">RAND found</a> private insurers paid hospitals about 254% of Medicare rates in 2022. <a href="/guides/average-hospital-markup-over-medicare/">Hospital markups</a></p>
         </details>
         <details>
-            <summary>What do you need from me to send a dispute?</summary>
-            <p>Your name, email, the account number on the bill and the billing office&rsquo;s email or fax number. You also sign three short documents online, including an authorization that lets us write to the hospital for you.</p>
+            <summary>What do I get for ${{ report_price }}?</summary>
+            <p>Every flagged charge with the Medicare rate and the reason it was flagged, a dispute letter filled in for the charges you pick, and a phone script for the billing office. It&rsquo;s one payment for one bill, with no subscription.</p>
         </details>
         <details>
-            <summary>What happens after I pay for a dispute?</summary>
-            <p>We send the letter to the hospital&rsquo;s billing office, follow up on days {{ followup_days | join(", ") }} and show every reply on your dispute page. If the bill isn&rsquo;t reduced within {{ config.DISPUTE_MAX_DAYS }} days, we refund the fee.</p>
+            <summary>What if you find nothing wrong?</summary>
+            <p>Then there&rsquo;s nothing to unlock and you pay nothing. You only see the ${{ report_price }} option when we flag at least one charge.</p>
+        </details>
+        <details>
+            <summary>Do you contact the hospital for me?</summary>
+            <p>No. The letter and script are yours; you decide whether and how to send them.</p>
         </details>
         <details>
             <summary>Does this work if I have insurance?</summary>
-            <p>Yes, for what the hospital billed you. If your insurer denied the claim, that&rsquo;s an appeal to the insurer, which we don&rsquo;t handle; see <a href="/appeal">appeal a denied claim</a>.</p>
+            <p>Yes, for what the hospital billed you. If your insurer denied the claim, that&rsquo;s an appeal to the insurer, which we don&rsquo;t handle; see <a href="/guides/how-to-appeal-insurance-denial/">how to appeal a denial</a>.</p>
         </details>
-    </div>
-</div></section>
+    </div></section>
 
 <section class="bk-home-close">
     <div class="bk-wrap">
         <div>
             <h2>See what&rsquo;s wrong with your bill before you pay it.</h2>
-            <p>Free, and you decide what happens next.</p>
+            <p>Free to check. ${{ report_price }} only if you want the full report.</p>
         </div>
         <a href="/scan" class="bk-btn">Check my bill free</a>
     </div>

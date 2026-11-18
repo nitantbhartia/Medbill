@@ -130,6 +130,19 @@ def create_payment_checkout(
     return _stripe_post("checkout/sessions", params)
 
 
+def create_report_checkout(bill_id: int, email: str) -> dict:
+    """Stripe Checkout session for the one-time Bill Check Report. Returns the session (id, url)."""
+    app_url = config.APP_URL.rstrip("/")
+    return create_payment_checkout(
+        product_name="BillKarma Bill Check Report",
+        amount_cents=config.REPORT_PRICE_CENTS,
+        email=email,
+        metadata={"payment_purpose": config.REPORT_PAYMENT_PURPOSE, "bill_id": bill_id},
+        success_url=f"{app_url}/report/success?session_id={{CHECKOUT_SESSION_ID}}",
+        cancel_url=f"{app_url}/results/{bill_id}#unlock",
+    )
+
+
 def create_subscription_checkout(
     product_name: str, amount_cents: int, interval: str, email: str, metadata: dict, success_url: str, cancel_url: str
 ) -> dict:
