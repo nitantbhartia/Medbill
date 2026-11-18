@@ -285,3 +285,16 @@ def test_outcome_is_recorded_and_bad_input_rejected():
     assert bad.status_code == 400
     with get_db() as db:
         assert db.execute("SELECT COUNT(*) FROM dispute_outcomes WHERE bill_id = ?", (bill_id,)).fetchone()[0] == 1
+
+
+def test_assistance_check_letter_and_wins():
+    _, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    check = client.post(f"/api/m/bills/{bill_id}/assistance", json={"income": 38000, "household_size": 3}, headers=headers)
+    assert check.json()["data"]["eligibility"] == "likely_full"
+    letter = client.post(f"/api/m/bills/{bill_id}/assistance-letter",
+                         json={"income": 38000, "household_size": 3, "name": "Dana Reyes"}, headers=headers)
+    assert "Financial Assistance" in letter.json()["data"]["letter"]
+    assert client.post(f"/api/m/bills/{bill_id}/assistance", json={"income": -5, "household_size": 3}, headers=headers).status_code == 400
+    client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "forgiven", "final_patient_owes": 0}, headers=headers)
+    assert client.get("/api/m/wins", headers=headers).json()["data"]["reports"] == 1

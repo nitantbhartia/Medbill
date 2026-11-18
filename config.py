@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -360,3 +360,4 @@ LAB_RATE_MARKER_CODE = "80053"  # a common blood test that only exists once the 
 # A scan whose line items differ from the bill total by more than this is probably misread.
 READ_CHECK_TOLERANCE = 0.10
 READ_CHECK_MIN_GAP = 25.0
+MAX_HOUSEHOLD_SIZE = 20

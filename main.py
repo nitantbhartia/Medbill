@@ -17,6 +17,7 @@ import slim_launch
 from api import router as api_router
 from mobile_routes import router as mobile_router
 from mobile_bill_routes import router as mobile_bill_router
+from mobile_assistance_routes import router as mobile_assistance_router
 from mobile_purchase_routes import router as mobile_purchase_router
 from mobile_account_routes import router as mobile_account_router
 from advocacy_api import router as advocacy_router
@@ -80,6 +81,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
 app.include_router(mobile_router)
 app.include_router(mobile_bill_router)
+app.include_router(mobile_assistance_router)
 app.include_router(mobile_purchase_router)
 app.include_router(mobile_account_router)
 app.include_router(advocacy_router)
