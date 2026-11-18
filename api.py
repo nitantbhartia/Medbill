@@ -59,13 +59,13 @@ _debt_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 _email_report_rate_buckets: dict[str, list[float]] = collections.defaultdict(list)
 
 
-def _check_rate_limit(ip: str) -> bool:
+def _check_rate_limit(ip: str, limit: int | None = None) -> bool:
     """Return True if the request is allowed. Prunes expired timestamps in-place."""
     now = time.monotonic()
     window = config.RATE_LIMIT_WINDOW_SECONDS
     bucket = _rate_buckets[ip]
     _rate_buckets[ip] = [t for t in bucket if now - t < window]
-    if len(_rate_buckets[ip]) >= config.RATE_LIMIT_REQUESTS:
+    if len(_rate_buckets[ip]) >= (limit or config.RATE_LIMIT_REQUESTS):
         return False
     _rate_buckets[ip].append(now)
     return True

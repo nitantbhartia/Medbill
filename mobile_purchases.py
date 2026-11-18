@@ -96,15 +96,15 @@ def _refresh_plus_from_revenuecat(device_id: str) -> None:
     _set_plus(device_id, active, expires)
 
 
-def plus_is_active(device_id: str) -> bool:
-    """Cached Plus status; refreshed from RevenueCat when older than MOBILE_PLUS_CACHE_SECONDS."""
+def plus_is_active(device_id: str, force_refresh: bool = False) -> bool:
+    """Cached Plus status; refreshed from RevenueCat when older than MOBILE_PLUS_CACHE_SECONDS or when forced."""
     with get_db() as db:
         row = db.execute(
             "SELECT plus_active, strftime('%s', 'now') - strftime('%s', updated_at) AS age "
             "FROM mobile_entitlements WHERE device_id = ?",
             (device_id,),
         ).fetchone()
-    if row and (row["age"] <= config.MOBILE_PLUS_CACHE_SECONDS or _in_mock_mode()):
+    if row and (row["plus_active"] or not force_refresh) and (row["age"] <= config.MOBILE_PLUS_CACHE_SECONDS or _in_mock_mode()):
         return bool(row["plus_active"])
     if _in_mock_mode():
         return False
@@ -112,9 +112,9 @@ def plus_is_active(device_id: str) -> bool:
     return plus_is_active(device_id)
 
 
-def unlock_with_plus(device_id: str, bill_id: int) -> bool:
+def unlock_with_plus(device_id: str, bill_id: int, force_refresh: bool = False) -> bool:
     """Unlock with Plus. The row is permanent, so the bill stays unlocked if Plus later lapses."""
-    if not plus_is_active(device_id):
+    if not plus_is_active(device_id, force_refresh):
         return False
     _insert_unlock(bill_id, f"plus:{device_id}:{bill_id}")
     return True

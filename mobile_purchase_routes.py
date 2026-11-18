@@ -21,7 +21,7 @@ async def unlock_bill(bill_id: int, payload: dict, device_id: str = Depends(mobi
     transaction_id = str(payload.get("transaction_id") or "").strip()
     if transaction_id:
         mobile_purchases.unlock_with_purchase(device_id, bill_id, transaction_id)
-    elif not mobile_purchases.unlock_with_plus(device_id, bill_id):
+    elif not mobile_purchases.unlock_with_plus(device_id, bill_id, force_refresh=True):
         raise HTTPException(402, "BillKarma Plus is not active on this device")
     return ok(mobile_view.build_bill_view(bill_id, device_id))
 

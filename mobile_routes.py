@@ -33,7 +33,7 @@ def ok(data) -> dict:
 
 @router.post("/device")
 async def register_device(request: Request, payload: dict):
-    if not _check_rate_limit(f"m-register:{_request_client_key(request)}"):
+    if not _check_rate_limit(f"m-register:{_request_client_key(request)}", config.MOBILE_REGISTER_LIMIT_PER_HOUR):
         raise HTTPException(429, "Too many new devices from this network. Try again later.")
     return ok(mobile_auth.register_device(str(payload.get("app_version", ""))))
 

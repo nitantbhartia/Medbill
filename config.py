@@ -308,6 +308,7 @@ HOSPITAL_PROCEDURE_MIN_HOSPITALS = 30  # codes priced by fewer hospitals are noi
 
 # Mobile app
 MOBILE_TOKEN_BYTES = 32
+MOBILE_REGISTER_LIMIT_PER_HOUR = 60  # per IP; carrier and office networks share addresses
 MOBILE_SCAN_MAX_PAGES = 10
 MOBILE_EVENT_PROPS_MAX_BYTES = 2048
 MOBILE_PLUS_CACHE_SECONDS = 600
