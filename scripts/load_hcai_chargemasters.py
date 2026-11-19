@@ -10,6 +10,7 @@ Needs `pip install openpyxl` (not a production dependency). The yearly zips are 
 
 import argparse
 import csv
+import json
 import os
 import re
 from pathlib import Path
@@ -40,17 +41,33 @@ def discover() -> None:
         print(link)
 
 
+def post_workbooks(base_url: str, paths: list[str]) -> None:
+    token = os.environ["ADMIN_API_TOKEN"]
+    totals = {"loaded": 0, "skipped_unknown_hospital": 0}
+    for path in paths:
+        rows = list(code_lookup.hcai_workbook_rows(path))
+        for start in range(0, len(rows), config.CHARGEMASTER_POST_MAX_ROWS):
+            request = Request(base_url.rstrip("/") + "/ops/load-chargemaster", data=json.dumps(rows[start:start + config.CHARGEMASTER_POST_MAX_ROWS]).encode(),
+                              headers={"Content-Type": "application/json", "X-Admin-Token": token})
+            result = json.loads(urlopen(request, timeout=300).read())["data"]
+            totals = {key: totals[key] + result[key] for key in totals}
+        print(path, totals, flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--discover", action="store_true")
     parser.add_argument("--file")
     parser.add_argument("--dir")
     parser.add_argument("--source-url")
+    parser.add_argument("--post-to", help="Base URL of the live site; rows are sent to /ops/load-chargemaster using the ADMIN_API_TOKEN env var")
     args = parser.parse_args()
     if args.discover:
         return discover()
     if not args.file and not args.dir:
         parser.error("give --file, --dir or --discover")
+    if args.post_to:
+        return post_workbooks(args.post_to, [args.file] if args.file else sorted(str(p) for p in Path(args.dir).rglob("*.xlsx")))
     init_db()
     if args.dir:
         totals = {"loaded": 0, "skipped_unknown_hospital": 0}

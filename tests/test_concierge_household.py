@@ -5,6 +5,7 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
+import code_lookup
 import config
 import household
 import payment
@@ -157,3 +158,13 @@ def test_login_with_wrong_password_shows_error(client):
     resp = client.post("/account/login", data={"email": "sam@example.com", "password": "wrong password"})
     assert resp.status_code == 401
     assert "Invalid email or password" in resp.text
+
+
+def test_chargemaster_load_needs_token_and_valid_rows(client, monkeypatch):
+    monkeypatch.setattr(config, "ADMIN_API_TOKEN", "ops-secret")
+    monkeypatch.setattr(code_lookup, "load_chargemaster", lambda rows, source: {"loaded": len(rows), "skipped_unknown_hospital": 0})
+    row = {"facility_name": "Adventist Health Bakersfield", "description": "INJ KETOROLAC 15MG", "code": "J1885"}
+    assert client.post("/ops/load-chargemaster", json=[row]).status_code == 403
+    ok = client.post("/ops/load-chargemaster", json=[row], headers={"x-admin-token": "ops-secret"})
+    assert ok.json()["data"]["loaded"] == 1
+    assert client.post("/ops/load-chargemaster", json=[{"facility_name": "X"}], headers={"x-admin-token": "ops-secret"}).status_code == 400

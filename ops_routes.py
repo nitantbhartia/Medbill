@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 import appeals
+import code_lookup
 import config
 import dispute_service
 import household
@@ -66,6 +67,18 @@ async def ops_queue(request: Request):
             "meta_robots": "noindex, nofollow",
         },
     )
+
+
+@router.post("/ops/load-chargemaster")
+async def ops_load_chargemaster(request: Request):
+    """Rows of {facility_name, description, code} extracted from HCAI workbooks (scripts/load_hcai_chargemasters.py --post-to)."""
+    _require_ops(request)
+    rows = await request.json()
+    if not isinstance(rows, list) or len(rows) > config.CHARGEMASTER_POST_MAX_ROWS:
+        raise HTTPException(400, "Send a list of at most %d rows" % config.CHARGEMASTER_POST_MAX_ROWS)
+    if not all(isinstance(row, dict) and all(isinstance(row.get(key), str) and row[key].strip() for key in ("facility_name", "description", "code")) for row in rows):
+        raise HTTPException(400, "Every row needs facility_name, description and code as text")
+    return {"status": "ok", "data": code_lookup.load_chargemaster(rows, config.HCAI_CHARGEMASTER_PAGE)}
 
 
 @router.get("/ops/partners", response_class=HTMLResponse)
