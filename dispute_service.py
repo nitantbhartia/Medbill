@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import config
 import email_service
@@ -17,6 +17,12 @@ from fax import fax_configured, send_fax
 from dispute_workflow import build_dispute_letter
 
 log = logging.getLogger(__name__)
+
+
+
+def _utc_today() -> date:
+    """created_at comes from SQLite's CURRENT_TIMESTAMP, which is UTC, so the deadline is counted in UTC dates too."""
+    return datetime.now(timezone.utc).date()
 
 
 def calculate_fee(bill_total: float) -> int:
@@ -552,7 +558,7 @@ def _send_followup(case_id: int, followup_number: int, queue_id: int) -> None:
 
 def _notify_patient_followup(case, provider: str, followup_number: int) -> None:
     created = datetime.fromisoformat(str(case["created_at"])).date()
-    days_left = max(0, (created + timedelta(days=config.DISPUTE_MAX_DAYS) - date.today()).days)
+    days_left = max(0, (created + timedelta(days=config.DISPUTE_MAX_DAYS) - _utc_today()).days)
     try:
         email_service.send_followup_notice_to_patient(
             to=case["patient_email"], patient_name=case["patient_name"], case_id=case["id"],
@@ -652,7 +658,7 @@ def get_dispute_summary(bill_id: int) -> dict:
     except (ValueError, TypeError):
         pass
 
-    created = date.fromisoformat(str(case["created_at"])[:10]) if case.get("created_at") else date.today()
+    created = date.fromisoformat(str(case["created_at"])[:10]) if case.get("created_at") else _utc_today()
     next_followup = next((f["scheduled_for"] for f in followups if not f.get("sent_at")), None)
     letter = build_dispute_letter(
         bill_id, requestor_name=case["patient_name"], account_number=case.get("account_number") or "[Account Number]",

@@ -1,23 +1,39 @@
 import sqlite3
 import os
+import threading
 from contextlib import contextmanager
 
 import config
 
 _connection = None
+_local = threading.local()
+BUSY_TIMEOUT_SECONDS = 30
+
+
+def _connect(path: str) -> sqlite3.Connection:
+    connection = sqlite3.connect(path, check_same_thread=False, timeout=BUSY_TIMEOUT_SECONDS)
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("PRAGMA foreign_keys=ON")
+    return connection
 
 
 def get_connection() -> sqlite3.Connection:
+    """One connection per thread. Threads used to share a single connection, so one thread's commit could end another
+    thread's transaction ("cannot commit - no transaction is active"). An in-memory database (tests) must stay shared."""
     global _connection
-    if _connection is None:
+    if config.DB_PATH == ":memory:":
+        if _connection is None:
+            _connection = _connect(":memory:")
+        return _connection
+    connection = getattr(_local, "connection", None)
+    if connection is None or getattr(_local, "path", None) != config.DB_PATH:
         db_dir = os.path.dirname(config.DB_PATH)
         if db_dir:
             os.makedirs(db_dir, exist_ok=True)
-        _connection = sqlite3.connect(config.DB_PATH, check_same_thread=False)
-        _connection.row_factory = sqlite3.Row
-        _connection.execute("PRAGMA journal_mode=WAL")
-        _connection.execute("PRAGMA foreign_keys=ON")
-    return _connection
+        connection = _local.connection = _connect(config.DB_PATH)
+        _local.path = config.DB_PATH
+    return connection
 
 
 @contextmanager
