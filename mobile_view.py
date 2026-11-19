@@ -8,6 +8,7 @@ import config
 import insurance_check
 import outcome_verification
 import mobile_purchases
+import json
 import report
 import report_recheck
 from analyzer import get_bill_results
@@ -106,10 +107,18 @@ def confirm_lines(results: dict) -> list[dict]:
     for index, item in enumerate(results["line_items"]):
         if not item.get("needs_confirm"):
             continue
+        lookup = json.loads(item["issue_choices"]) if item.get("issue_choices") else None
+        message = CONFIRM_MESSAGES.get(item["issue_kind"], "We couldn't read this line clearly.")
+        if lookup and len(lookup["choices"]) == 1:
+            choice = lookup["choices"][0]
+            message = f"This looks like {choice['description']} (code {choice['code']}) at {lookup['hospital']}. Right?"
+        elif lookup:
+            message = f"{lookup['hospital']}'s price list has more than one code for this. Which is it?"
         lines.append({"line_index": index, "code": item.get("cpt_code"), "description": item.get("description"),
                       "date": item.get("date_of_service"), "field": item["issue_field"],
                       "read_value": item.get(item["issue_field"]), "kind": item["issue_kind"],
-                      "message": CONFIRM_MESSAGES.get(item["issue_kind"], "We couldn't read this line clearly.")})
+                      "choices": [c["code"] for c in lookup["choices"]] if lookup else None,
+                      "message": message})
     return lines
 
 

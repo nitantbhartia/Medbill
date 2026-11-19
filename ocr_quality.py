@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 
+import code_lookup
 import config
 from accuracy_gate import measure
 from db import get_db
@@ -23,6 +24,7 @@ def weekly_numbers() -> dict:
             "SELECT COUNT(*) FROM extraction_corrections WHERE created_at >= datetime('now', ?) AND issue_kind != 'web_edit' "
             "AND extracted_value != confirmed_value", (window,)).fetchone()[0]
     return {
+        **{f"code_{key}": value for key, value in code_lookup.coverage().items()},
         "scans": scans,
         "share_of_scans_needing_confirmation": round(asked / scans, 4) if scans else None,
         # The real-world error rate: of the lines users confirmed, how many they had to change.

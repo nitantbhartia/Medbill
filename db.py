@@ -81,7 +81,8 @@ def _run_migrations(db):
                                         "rule_ids": "TEXT", "facility_id": "TEXT",
                                         "rejected_rule_ids": "TEXT", "reason_category": "TEXT"})
     ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
-    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT"})
+    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT",
+                                  "code_source": "TEXT", "issue_choices": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
         "billing_phone": "TEXT", "billing_email": "TEXT", "billing_address": "TEXT", "account_number": "TEXT",
@@ -1480,6 +1481,18 @@ CREATE TABLE IF NOT EXISTS shadow_findings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_shadow_findings_rule ON shadow_findings(rule_id);
+
+CREATE TABLE IF NOT EXISTS hospital_code_lookup (
+    facility_id TEXT NOT NULL,
+    description_norm TEXT NOT NULL,
+    cpt_code TEXT NOT NULL,
+    source TEXT NOT NULL,
+    source_url TEXT,
+    seen_count INTEGER NOT NULL DEFAULT 1,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_code_lookup_unique ON hospital_code_lookup(facility_id, description_norm, cpt_code);
+CREATE INDEX IF NOT EXISTS idx_code_lookup_desc ON hospital_code_lookup(facility_id, description_norm);
 
 CREATE TABLE IF NOT EXISTS bill_notices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

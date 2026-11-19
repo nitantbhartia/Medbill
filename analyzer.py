@@ -6,6 +6,7 @@ import time
 from difflib import SequenceMatcher
 
 import config
+from code_lookup import CODE_SOURCE, fill_codes
 from db import get_db
 from rule_learning import demoted_rules
 from rule_sources import RULES
@@ -553,6 +554,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     _drop_payment_rows(extracted_data)
     _clean_billing_codes(extracted_data)
+    matched_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
+    fill_codes(extracted_data, matched_hospital)
     line_items = extracted_data.get("line_items", [])
 
     inferred_patient_owes_source = _infer_total_patient_owes(extracted_data)
@@ -595,7 +598,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             findings.append(finding)
             total_potential_savings += finding["potential_savings"]
 
-    hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code) if extracted_data.get("insurer_name") else None
+    hospital = matched_hospital if extracted_data.get("insurer_name") else None
     for item in line_items:
         # CHECK 0: the insurer's own contracted rate at this hospital, which beats the Medicare comparison
         insurer_finding = check_insurer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital else None
@@ -693,7 +696,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         total_potential_savings += eob_finding.get("potential_savings", 0)
 
     # B16.7: rules that hospitals mostly reject are shown only as worth asking, and rules still in shadow mode are set aside
-    outcome_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
+    outcome_hospital = matched_hospital
     demoted = demoted_rules(outcome_hospital["facility_id"] if outcome_hospital else None)
     shadow = [f for f in findings if _is_shadow(f)]
     findings = [f for f in findings if f not in shadow]
@@ -721,6 +724,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     for finding in findings:
         finding["rule_id"] = finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding.get("type"), "RULE_GENERIC_HEURISTIC")
         finding["confidence"] = _assign_confidence(finding)
+        if (finding.get("line_item") or {}).get("code_source") == CODE_SOURCE and matched_hospital:
+            finding["code_source_note"] = f"Code from {matched_hospital['name']}'s own price list."
         _ensure_evidence_panel(finding, freshness)
 
     # Within a severity, findings this hospital has actually corrected for people come first.
@@ -857,8 +862,8 @@ def save_bill_and_findings(
                 "INSERT INTO line_items (bill_id, date_of_service, cpt_code, description, "
                 "quantity, charged_amount, insurance_paid, insurance_adjustment, "
                 "patient_responsibility, medicare_rate, markup_multiple, extraction_confidence, "
-                "needs_confirm, issue_kind, issue_field, modifiers) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "needs_confirm, issue_kind, issue_field, modifiers, code_source, issue_choices) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     item.get("date_of_service"),
@@ -876,6 +881,8 @@ def save_bill_and_findings(
                     item.get("issue_kind"),
                     item.get("issue_field"),
                     json.dumps(item.get("modifiers") or []),
+                    item.get("code_source"),
+                    item.get("issue_choices"),
                 ),
             )
 

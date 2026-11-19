@@ -495,3 +495,13 @@ REJECTED_OUTCOMES = ("no_change", "denied")
 RULE_DEMOTE_PRECISION = 0.3
 RULE_LIFT_DAYS = 30
 RULE_DEMOTION_RUN_STATUS = "rule_demotions"
+
+# B14.7: description -> code lookup from each hospital's own price file
+CODE_LOOKUP_MIN_SIMILARITY = 0.9
+DESCRIPTION_ABBREVIATIONS = {
+    "W/O": "WITHOUT", "W/": "WITH", "CNTRST": "CONTRAST", "CONT": "CONTRAST", "XR": "XRAY", "X-RAY": "XRAY",
+    "CT": "CT", "MRI": "MRI", "INJ": "INJECTION", "IV": "IV", "ABD": "ABDOMEN", "EXT": "EXTREMITY", "LT": "LEFT",
+    "RT": "RIGHT", "BILAT": "BILATERAL", "PROC": "PROCEDURE", "EVAL": "EVALUATION", "SVC": "SERVICE",
+}
+HCAI_CHARGEMASTER_PAGE = "https://hcai.ca.gov/data-and-reports/cost-transparency/hospital-chargemasters/"
+HCAI_NAME_MATCH_MIN = 0.8
