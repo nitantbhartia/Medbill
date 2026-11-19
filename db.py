@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 import config
 
-_shared_connection = None
+_connection = None
 _local = threading.local()
 BUSY_TIMEOUT_SECONDS = 30
 
@@ -21,11 +21,11 @@ def _connect(path: str) -> sqlite3.Connection:
 def get_connection() -> sqlite3.Connection:
     """One connection per thread. Threads used to share a single connection, so one thread's commit could end another
     thread's transaction ("cannot commit - no transaction is active"). An in-memory database (tests) must stay shared."""
-    global _shared_connection
+    global _connection
     if config.DB_PATH == ":memory:":
-        if _shared_connection is None:
-            _shared_connection = _connect(":memory:")
-        return _shared_connection
+        if _connection is None:
+            _connection = _connect(":memory:")
+        return _connection
     connection = getattr(_local, "connection", None)
     if connection is None or getattr(_local, "path", None) != config.DB_PATH:
         db_dir = os.path.dirname(config.DB_PATH)

@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 sys.modules.setdefault("google", MagicMock())
@@ -105,7 +105,7 @@ def test_dashboard_tells_the_truth_about_delivery_and_refund_date(mock_email):
     assert "Your letter is ready to send" in html
     assert "Letter not sent yet" in html
     assert "Letter emailed to the billing office" not in html
-    refund_on = (date.today() + timedelta(days=config.DISPUTE_MAX_DAYS)).isoformat()
+    refund_on = (datetime.now(timezone.utc).date() + timedelta(days=config.DISPUTE_MAX_DAYS)).isoformat()
     assert f"isn&rsquo;t reduced by <strong>{refund_on}</strong>" in html
     assert "Formal" in html or "dispute" in html.lower()
     assert "submitted a financial assistance application" not in html
