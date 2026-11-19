@@ -41,6 +41,15 @@ async def _read_pages(pages: list[UploadFile]) -> list[tuple[bytes, str]]:
     return images
 
 
+USER_FACING_PREFIXES = ("That file", "That photo", "Unsupported", "Could not decode", "The scan could not be read")
+
+
+def _read_error(what: str, exc: Exception) -> str:
+    """Show the reason only when we wrote it for the user; anything else stays in the logs."""
+    text = str(exc)
+    return f"We couldn't read that {what}: {text}" if text.startswith(USER_FACING_PREFIXES) else f"We couldn't read that {what}. Try clearer photos."
+
+
 def _remember_bill_type(device_id: str, extracted: dict) -> None:
     """Bill type is no longer asked: it comes from the codes, and never overwrites an answer the user gave."""
     with get_db() as db:
@@ -70,7 +79,7 @@ async def scan(
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
-        raise HTTPException(400, f"We couldn't read that bill: {exc}") from exc
+        raise HTTPException(400, _read_error("bill", exc)) from exc
     except scan_pipeline.AnalysisFailed as exc:
         raise HTTPException(500, "We couldn't analyze that bill.") from exc
     grant_bill_access(device_id, bill_id)
@@ -166,7 +175,7 @@ async def verify_outcome(bill_id: int, pages: list[UploadFile] = File(...),
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
-        raise HTTPException(400, f"We couldn't read that statement: {exc}") from exc
+        raise HTTPException(400, _read_error("statement", exc)) from exc
     log_audit(action="mobile_verify_outcome", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
               metadata={"verified": result["verified"]})
     return ok(result)
@@ -189,7 +198,7 @@ async def add_eob(bill_id: int, eob_pages: list[UploadFile] = File(...),
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
-        raise HTTPException(400, f"We couldn't read that statement: {exc}") from exc
+        raise HTTPException(400, _read_error("statement", exc)) from exc
     except scan_pipeline.AnalysisFailed as exc:
         raise HTTPException(500, "We couldn't check that statement.") from exc
     log_audit(action="mobile_add_eob", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)

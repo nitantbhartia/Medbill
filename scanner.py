@@ -41,8 +41,8 @@ def _parse_json_response(text: str) -> dict:
         data = json.loads(cleaned)
         return _normalize_structure(data)
     except json.JSONDecodeError as e:
-        log.error("Failed to parse Gemini JSON response after cleanup: %s. Raw text: %.200s", e, text)
-        raise ValueError(f"Gemini returned unparseable JSON: {e}") from e
+        log.error("Failed to parse Gemini JSON response after cleanup: %s (%d characters; text not logged, it can hold bill details)", e, len(text))
+        raise ValueError("The scan could not be read. Try clearer photos.") from e
 
 
 def _normalize_structure(data) -> dict:
@@ -260,7 +260,11 @@ def _prepare_media_for_ocr(image_bytes: bytes, mime_type: str | None) -> tuple[b
         try:
             # Validate bytes are decodable image content.
             img = Image.open(BytesIO(image_bytes))
+            if img.width * img.height > config.OCR_MAX_IMAGE_PIXELS:
+                raise ValueError("That photo is too large. Try a smaller one.")
             img.verify()
+        except ValueError:
+            raise
         except Exception as exc:
             raise ValueError(
                 f"Could not decode uploaded image ({normalized_mime}). Try a JPG or PNG screenshot."

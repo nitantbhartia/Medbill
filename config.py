@@ -463,3 +463,11 @@ TWILIO_VERIFY_SERVICE_SID = os.getenv("TWILIO_VERIFY_SERVICE_SID", "")
 HOLD_DISCLOSURE = ("Hi, thank you for picking up. This is an automated assistant holding for a patient. "
                    "I'm connecting them now; it'll take a few seconds.")
 HOLD_USER_MISSED_MESSAGE = "Sorry, the patient isn't available right now. They'll call back. Thank you."
+
+OCR_MAX_IMAGE_PIXELS = 60_000_000  # refuse decompression bombs
+
+# Abuse limits for hold calls and SMS codes (each code costs money, and a victim's number must not be pumped)
+SMS_CODES_PER_DEVICE_PER_HOUR = 5
+SMS_CODES_PER_NUMBER_PER_HOUR = 3
+SMS_CHECKS_PER_DEVICE_PER_HOUR = 10
+HOLD_CALL_REQUESTS_PER_DEVICE_PER_HOUR = 10

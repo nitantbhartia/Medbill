@@ -308,3 +308,15 @@ def typical_hold(facility_id: str) -> dict | None:
         return None
     seconds = sorted(r["hold_seconds"] for r in rows)
     return {"median_minutes": round(seconds[len(seconds) // 2] / 60), "calls": len(seconds)}
+
+
+def reap_stale_calls() -> int:
+    """A call that never reported an end (a dropped webhook) is failed and its numbers hashed once it outlives the hold limit."""
+    limit = f"-{config.HOLD_CALL_MAX_MINUTES + 10} minutes"
+    with get_db() as db:
+        stale = [row["id"] for row in db.execute(
+            "SELECT id FROM hold_calls WHERE status IN (?, ?, ?, ?, ?, ?, ?) AND created_at < datetime('now', ?)",
+            (*ACTIVE_STATUSES, limit)).fetchall()]
+    for call_id in stale:
+        finish(call_id, "failed", "stale")
+    return len(stale)

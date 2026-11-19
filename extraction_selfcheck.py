@@ -55,7 +55,11 @@ def check_lines(extracted: dict, images: list[tuple[bytes, str]]) -> dict:
             if candidate and not _blocking(candidate, index):
                 items[index] = candidate
                 continue
-    flagged = [(index, _blocking(item, index)[0]) for index, item in enumerate(items) if _blocking(item, index)]
+    flagged = []
+    for index, item in enumerate(items):
+        issues = _blocking(item, index)
+        if issues:
+            flagged.append((index, issues[0]))
     flagged.sort(key=lambda pair: ISSUE_PRIORITY[pair[1]["kind"]])
     for index, issue in flagged[: config.OCR_MAX_CONFIRM_LINES]:
         items[index].update(needs_confirm=True, issue_kind=issue["kind"], issue_field=issue["field"])

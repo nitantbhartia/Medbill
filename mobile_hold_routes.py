@@ -8,6 +8,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
 
+from api import _check_rate_limit
 import config
 import hold_call_ai
 import hold_calls
@@ -31,6 +32,9 @@ async def start_phone_verification(payload: dict, device_id: str = Depends(mobil
         raise HTTPException(400, "Enter a 10-digit US phone number.")
     if not config.HOLD_CALLS_ENABLED or not config.TWILIO_VERIFY_SERVICE_SID:
         raise HTTPException(503, "Waiting on hold isn't available yet.")
+    if not _check_rate_limit(f"m-sms:{device_id}", config.SMS_CODES_PER_DEVICE_PER_HOUR) or \
+            not _check_rate_limit(f"m-sms-number:{hold_calls.phone_hash(number)}", config.SMS_CODES_PER_NUMBER_PER_HOUR):
+        raise HTTPException(429, "Too many codes requested. Try again later.")
     try:
         twilio_client.start_verification(number)
     except twilio_client.TwilioError as exc:
@@ -43,6 +47,8 @@ async def check_phone_verification(payload: dict, device_id: str = Depends(mobil
     number, code = hold_calls.to_e164(str(payload.get("phone") or "")), str(payload.get("code") or "")
     if not number or not code.isdigit() or len(code) != 6:
         raise HTTPException(400, "Enter the 6-digit code.")
+    if not _check_rate_limit(f"m-sms-check:{device_id}", config.SMS_CHECKS_PER_DEVICE_PER_HOUR):
+        raise HTTPException(429, "Too many attempts. Try again later.")
     try:
         approved = twilio_client.check_verification(number, code)
     except twilio_client.TwilioError as exc:
@@ -69,6 +75,8 @@ async def hold_call_info(bill_id: int, device_id: str = Depends(mobile_auth.devi
 @router.post("/api/m/bills/{bill_id}/hold-call")
 async def request_hold_call(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
     mobile_auth.require_device_bill_access(device_id, bill_id)
+    if not _check_rate_limit(f"m-hold:{device_id}", config.HOLD_CALL_REQUESTS_PER_DEVICE_PER_HOUR):
+        raise HTTPException(429, "Too many call requests. Try again later.")
     try:
         return ok(hold_calls.request_call(device_id, bill_id, str(payload.get("hospital_number") or ""),
                                           str(payload.get("user_number") or "")))

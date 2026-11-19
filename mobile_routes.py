@@ -172,6 +172,10 @@ async def delete_device(device_id: str = Depends(mobile_auth.device_from_request
         delete_bill_everywhere(bill_id)
     with get_db() as db:
         db.execute("DELETE FROM mobile_events WHERE device_id = ?", (device_id,))
+        db.execute("DELETE FROM hold_call_events WHERE call_id IN (SELECT id FROM hold_calls WHERE device_id = ?)", (device_id,))
+        db.execute("DELETE FROM hold_calls WHERE device_id = ?", (device_id,))
+        db.execute("DELETE FROM phone_verifications WHERE device_id = ?", (device_id,))
+        db.execute("DELETE FROM hold_call_credits WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM mobile_entitlements WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM mobile_devices WHERE device_id = ?", (device_id,))
     log_audit(action="mobile_delete_device", resource_type="device", resource_id=device_id)

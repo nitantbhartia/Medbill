@@ -1719,7 +1719,8 @@ async def request_refund(request: Request, case_id: int):
     try:
         refunded = dispute_service.issue_refund_for_case(case_id)
     except Exception as exc:
-        raise HTTPException(500, f"Refund failed: {exc}")
+        log.error("Refund failed for case %s: %s", case_id, exc)
+        raise HTTPException(500, "The refund could not be completed. Please contact support.")
 
     log_audit(action="dispute_refunded", resource_type="dispute_case", resource_id=str(case_id))
 

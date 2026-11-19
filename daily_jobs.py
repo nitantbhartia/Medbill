@@ -9,6 +9,7 @@ from pathlib import Path
 
 import config
 import dispute_service
+import hold_calls
 import ocr_quality
 
 log = logging.getLogger(__name__)
@@ -27,6 +28,10 @@ def run_daily_jobs() -> None:
         log.info("Daily jobs: %d hospital follow-ups sent", dispute_service.process_due_followups())
     except Exception:
         log.exception("Daily jobs: hospital follow-ups failed")
+    try:
+        hold_calls.reap_stale_calls()
+    except Exception:
+        log.exception("Daily jobs: stale hold calls failed")
     try:
         ocr_quality.record_weekly()
     except Exception:

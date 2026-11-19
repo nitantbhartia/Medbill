@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResp
 from fastapi.middleware.gzip import GZipMiddleware
 
 import config
+import secrets
 import payer_rates
 import db
 import dispute_service
@@ -2899,7 +2900,8 @@ async def newsletter_subscribe(request: Request):
 async def admin_ping_indexnow(request: Request):
     """Ping IndexNow with all procedure + cost pages. Requires ADMIN_API_TOKEN."""
     token = request.headers.get("X-Admin-Token", "")
-    if config.ADMIN_API_TOKEN and token != config.ADMIN_API_TOKEN:
+    expected = config.ADMIN_API_TOKEN or ""
+    if not expected or not secrets.compare_digest(token, expected):  # no token configured means the endpoint stays closed
         return JSONResponse({"status": "error", "message": "Unauthorized"}, status_code=401)
     base = config.APP_URL.rstrip("/")
     urls = (
