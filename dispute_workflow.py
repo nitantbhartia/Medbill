@@ -45,6 +45,9 @@ def build_dispute_letter(
     service_date = bill.get("bill_date") or "[Date of Service]"
     today = date.today().strftime("%B %d, %Y")
 
+    rows = [row for row in rows if row["finding_type"] != "price_info"]  # information, never in a letter
+    if not rows:
+        return None
     paragraphs = []
     for row in rows:
         detail = json.loads(row["details"] or "{}")
@@ -54,7 +57,11 @@ def build_dispute_letter(
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
         finding_type = row["finding_type"] or "pricing"
-        paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail, bill))
+        worth_asking = row["severity"] in ("low", "informational") or finding_type in ("quantity_question", "upcoding")
+        if worth_asking and finding_type not in ("eob_mismatch", "upcoding"):
+            paragraphs.append(_request_paragraph(finding_type, cpt, desc, billed, service_date))
+        else:
+            paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail, bill))
 
     body = "\n\n".join(f"  {i+1}. {p}" for i, p in enumerate(paragraphs))
     sources = _source_footnotes(rows)
@@ -84,7 +91,7 @@ def build_dispute_letter(
         f"Please provide:\n"
         f"  1. Written acknowledgment that this dispute has been received and is under review.\n"
         f"  2. An itemized explanation of each disputed charge.\n"
-        f"  3. A corrected statement if any charges are found to be in error.\n"
+        f"  3. A corrected statement if any charges are found to be in error, and an itemized bill with the documentation behind each charge.\n"
         f"  4. Confirmation that collection activity on the disputed amounts is on hold "
         f"pending resolution.\n\n"
         f"Please respond in writing to [Your Email / Mailing Address]. "
@@ -155,10 +162,9 @@ def _finding_paragraph(
         return (
             f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
-            f"     CPT code {cpt} appears {count} time(s) on {service_date}, and I can find no "
-            f"documentation supporting more than one billing on that date. Billing the same "
-            f"service twice is not consistent with CMS billing guidelines. I am requesting removal "
-            f"of the duplicate instances, keeping only one medically supported billing."
+            f"     I was charged {count} times for {desc.lower()} (CPT {cpt}) on {service_date}, and I can find no "
+            f"documentation supporting more than one billing on that date. Please remove the duplicate, "
+            f"keeping only one medically supported charge."
         )
 
     if finding_type in ("unbundling", "ncci"):
@@ -196,6 +202,16 @@ def _finding_paragraph(
         f"I am requesting a review and adjustment of this charge to a rate consistent "
         f"with recognized Medicare reimbursement benchmarks."
     )
+
+
+def _request_paragraph(finding_type: str, cpt: str, desc: str, billed: float, service_date: str) -> str:
+    """A finding that is worth asking about is phrased as a request for an explanation, never as an accusation."""
+    billed_fmt = f"${billed:,.2f}" if billed else "[charge]"
+    head = f"REQUEST FOR EXPLANATION \u2014 CPT {cpt} ({desc.title()})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
+    if finding_type in ("duplicate", "duplicate_charge"):
+        return head + ("This service appears more than once on the same day. Please explain, or provide documentation that it was "
+                       "repeated (a repeat test is normally shown with modifier 91). If it was billed in error, please remove the extra charge.")
+    return head + "Please explain, or provide documentation for, this charge, and confirm that the code and quantity are correct."
 
 
 def _eob_paragraph(cpt: str, desc: str, billed_fmt: str, service_date: str, bill: dict) -> str:
