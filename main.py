@@ -149,6 +149,11 @@ async def security_headers(request: Request, call_next):
         if proto == "https" and request.scope.get("scheme") != "https":
             request.scope["scheme"] = "https"
 
+    declared = request.headers.get("content-length", "")
+    if request.url.path.startswith("/api/m/") and request.headers.get("content-type", "").startswith("application/json") \
+            and declared.isdigit() and int(declared) > config.MOBILE_JSON_MAX_BYTES:
+        return JSONResponse({"status": "error", "data": {"message": "Request too large"}}, status_code=413)
+
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     if not request.url.path.startswith("/embed/"):

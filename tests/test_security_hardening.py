@@ -110,3 +110,9 @@ def test_the_indexnow_admin_endpoint_is_closed_without_a_configured_token(monkey
     assert client.post("/admin/ping-indexnow").status_code == 401
     monkeypatch.setattr(config, "ADMIN_API_TOKEN", "s3cret")
     assert client.post("/admin/ping-indexnow", headers={"X-Admin-Token": "wrong"}).status_code == 401
+
+
+def test_oversized_json_bodies_to_the_mobile_api_are_refused():
+    _, headers = device()
+    huge = {"outcome": "reduced", "padding": "x" * (config.MOBILE_JSON_MAX_BYTES + 10)}
+    assert client.post("/api/m/bills/1/outcome", json=huge, headers=headers).status_code == 413

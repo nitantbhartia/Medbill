@@ -476,3 +476,5 @@ HOLD_CALL_REQUESTS_PER_DEVICE_PER_HOUR = 10
 ASSISTANCE_POLICY_AUTO_REFRESH = os.getenv("ASSISTANCE_POLICY_AUTO_REFRESH", "true").lower() == "true"
 ASSISTANCE_POLICY_AUTO_CITIES = ("San Diego", "Los Angeles")
 ASSISTANCE_POLICY_AUTO_LIMIT = 20
+
+MOBILE_JSON_MAX_BYTES = 100_000  # mobile JSON bodies are tiny; uploads use multipart and have their own limit
