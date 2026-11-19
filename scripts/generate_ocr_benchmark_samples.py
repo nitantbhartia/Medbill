@@ -29,6 +29,41 @@ def _write_bill_image(path: Path, provider: str, lines: list[dict], total: float
     img.save(path)
 
 
+def _render_rule_bill(path: Path, bill: dict) -> None:
+    """One of three layouts: a ruled table, a stacked statement, or a compact two-column list."""
+    img = Image.new("RGB", (1200, 1600), "white")
+    draw = ImageDraw.Draw(img)
+    draw.text((60, 60), bill["provider_name"], fill="black")
+    y = 140
+    for row in bill["line_items"]:
+        amount = f"${row['charged_amount']:,.2f}"
+        if bill["layout"] == "table":
+            draw.rectangle((50, y - 6, 1150, y + 28), outline="black")
+            draw.text((60, y), f"{row['cpt_code']:<8} {row['description'][:34]:<34} x{row['quantity']}  {amount}", fill="black")
+            y += 40
+        elif bill["layout"] == "statement":
+            draw.text((60, y), f"{row['description']}", fill="black")
+            draw.text((60, y + 22), f"Code {row['cpt_code']}  Qty {row['quantity']}  Charge {amount}  {' '.join(row.get('modifiers') or [])}", fill="black")
+            y += 62
+        else:
+            draw.text((60, y), f"{row['cpt_code']} {' '.join(row.get('modifiers') or [])}".strip(), fill="black")
+            draw.text((700, y), amount, fill="black")
+            y += 28
+    draw.text((60, y + 30), f"TOTAL CHARGED: ${bill['total_charged']:,.2f}", fill="black")
+    img.save(path)
+
+
+def write_rule_bills(images: bool = False) -> None:
+    """The 200 synthetic bills for the rule benchmark (B16.6): planted errors and legitimate look-alikes in 3 layouts."""
+    import rule_benchmark
+    bills = rule_benchmark.generate_bills()
+    rule_benchmark.save(bills)
+    if images:
+        for bill in bills:
+            _render_rule_bill(rule_benchmark.BENCHMARK_DIR / f"{bill['id']}.png", bill)
+    print({"rule_benchmark_bills": len(bills), "directory": str(rule_benchmark.BENCHMARK_DIR), "images": images})
+
+
 def main() -> None:
     root = Path("data/ocr_benchmark")
     root.mkdir(parents=True, exist_ok=True)

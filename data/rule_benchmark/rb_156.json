@@ -1,0 +1,28 @@
+{
+ "id": "rb_156",
+ "layout": "compact",
+ "rule": "quantity",
+ "kind": "lookalike",
+ "finding_type": "quantity_flag",
+ "codes": [
+  "J1100"
+ ],
+ "provider_name": "Broward Health Medical Center",
+ "total_charged": 1245.0,
+ "line_items": [
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "J1100",
+   "description": "Dexamethasone injection per unit",
+   "quantity": 3,
+   "charged_amount": 45.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

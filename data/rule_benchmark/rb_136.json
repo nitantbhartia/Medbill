@@ -1,0 +1,41 @@
+{
+ "id": "rb_136",
+ "layout": "statement",
+ "rule": "duplicate",
+ "kind": "lookalike",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "93306"
+ ],
+ "provider_name": "Broward Health Medical Center",
+ "total_charged": 2600.0,
+ "line_items": [
+  {
+   "cpt_code": "93306",
+   "description": "Echocardiogram",
+   "quantity": 1,
+   "charged_amount": 700.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "TC"
+   ]
+  },
+  {
+   "cpt_code": "93306",
+   "description": "Echocardiogram",
+   "quantity": 1,
+   "charged_amount": 700.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "26"
+   ]
+  },
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "id": "rb_134",
+ "layout": "table",
+ "rule": "duplicate",
+ "kind": "lookalike",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "73030"
+ ],
+ "provider_name": "Broward Health Medical Center",
+ "total_charged": 840.0,
+ "line_items": [
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "RT"
+   ]
+  },
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "LT"
+   ]
+  },
+  {
+   "cpt_code": "99213",
+   "description": "Office visit level 3",
+   "quantity": 1,
+   "charged_amount": 240.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

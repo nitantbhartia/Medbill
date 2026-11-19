@@ -1,0 +1,36 @@
+{
+ "id": "rb_036",
+ "layout": "table",
+ "rule": "unbundling",
+ "kind": "planted",
+ "finding_type": "unbundling",
+ "codes": [
+  "80048",
+  "80053"
+ ],
+ "provider_name": "Memorial Regional Hospital",
+ "total_charged": 1430.0,
+ "line_items": [
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "80053",
+   "description": "Comprehensive metabolic panel",
+   "quantity": 1,
+   "charged_amount": 140.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "80048",
+   "description": "Basic metabolic panel",
+   "quantity": 1,
+   "charged_amount": 90.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

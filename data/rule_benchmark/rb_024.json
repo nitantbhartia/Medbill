@@ -1,0 +1,42 @@
+{
+ "id": "rb_024",
+ "layout": "statement",
+ "rule": "duplicate",
+ "kind": "planted",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "71046"
+ ],
+ "provider_name": "Sharp Memorial Hospital",
+ "total_charged": 3140.0,
+ "line_items": [
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "71046",
+   "description": "Chest X-Ray 2 views",
+   "quantity": 1,
+   "charged_amount": 850.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "71046",
+   "description": "Chest X-Ray 2 views",
+   "quantity": 1,
+   "charged_amount": 850.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "99213",
+   "description": "Office visit level 3",
+   "quantity": 1,
+   "charged_amount": 240.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "id": "rb_125",
+ "layout": "statement",
+ "rule": "duplicate",
+ "kind": "lookalike",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "73030"
+ ],
+ "provider_name": "Memorial Regional Hospital",
+ "total_charged": 1800.0,
+ "line_items": [
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "LT"
+   ]
+  },
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "RT"
+   ]
+  }
+ ]
+}

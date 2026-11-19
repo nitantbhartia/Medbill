@@ -1,0 +1,41 @@
+{
+ "id": "rb_122",
+ "layout": "table",
+ "rule": "duplicate",
+ "kind": "lookalike",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "73030"
+ ],
+ "provider_name": "Aspirus Iron River Hospital",
+ "total_charged": 980.0,
+ "line_items": [
+  {
+   "cpt_code": "71046",
+   "description": "Chest X-Ray 2 views",
+   "quantity": 1,
+   "charged_amount": 380.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "LT"
+   ]
+  },
+  {
+   "cpt_code": "73030",
+   "description": "Shoulder X-Ray",
+   "quantity": 1,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "RT"
+   ]
+  }
+ ]
+}

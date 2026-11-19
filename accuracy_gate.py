@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import config
@@ -36,4 +38,11 @@ def run_gate(suites=None, accept: bool = False) -> list[str]:
         print(f"{name}: {current}")
         failures += [f"{name}: {metric} dropped {points} points (allowed {config.OCR_GATE_MAX_DROP_PCT})"
                      for metric, points in lost.items()]
-    return failures
+    return failures + (rule_gate(accept) if suites is None else [])
+
+
+def rule_gate(accept: bool = False) -> list[str]:
+    """B16.6: score every rule on the synthetic bills in a separate process with a throwaway database."""
+    command = [sys.executable, "scripts/rule_benchmark.py", "--accept" if accept else "--gate"]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=config.RULE_GATE_TIMEOUT_SECONDS)
+    return [] if result.returncode == 0 else (result.stderr.strip() or result.stdout.strip()).splitlines()

@@ -525,3 +525,7 @@ UPLOAD_MIME_TYPES = {
     "image/heic", "image/heif", "image/tiff", "image/bmp",
     "application/pdf",
 }
+
+# B16.6: deploy gate on the rule benchmark, in percentage points
+RULE_GATE_MAX_DROP_PCT = 2
+RULE_GATE_TIMEOUT_SECONDS = 300
