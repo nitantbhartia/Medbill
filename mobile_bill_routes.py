@@ -87,7 +87,8 @@ async def scan(
 
 @router.get("/bills")
 async def list_bills(device_id: str = Depends(mobile_auth.device_from_request)):
-    return ok({"bills": mobile_view.list_bill_summaries(device_id)})
+    return ok({"bills": mobile_view.list_bill_summaries(device_id),
+               "free_checks_remaining": mobile_view.free_checks_remaining(device_id)})
 
 
 @router.get("/bills/{bill_id}")

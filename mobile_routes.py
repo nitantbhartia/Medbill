@@ -115,6 +115,18 @@ async def search_hospitals(q: str = "", device_id: str = Depends(mobile_auth.dev
     return ok({"hospitals": hospitals})
 
 
+@router.get("/stats")
+async def public_stats():
+    """Verified savings across all users, for the welcome screen. Null until the totals are big enough to state."""
+    with get_db() as db:
+        row = db.execute(
+            "SELECT COUNT(*) AS bills, COALESCE(SUM(saved), 0) AS total FROM (SELECT bill_id, MAX(actual_savings) AS saved "
+            "FROM dispute_outcomes WHERE verified = 1 AND actual_savings > 0 GROUP BY bill_id)").fetchone()
+    if row["total"] < config.VERIFIED_STATS_MIN_TOTAL or row["bills"] < config.VERIFIED_STATS_MIN_BILLS:
+        return ok({"verified": None})
+    return ok({"verified": {"total_saved": round(row["total"]), "bills": row["bills"]}})
+
+
 @router.get("/hospital-insight")
 async def hospital_insight(facility_id: str, device_id: str = Depends(mobile_auth.device_from_request)):
     """Real CMS-based markup for one hospital, or null when too few procedures were compared."""
@@ -133,7 +145,7 @@ async def hospital_insight(facility_id: str, device_id: str = Depends(mobile_aut
         "city": _display_city(row["city"]),
         "state": state_display_name(row["state"]),
         "avg_markup": round(row["avg_markup_vs_medicare"], 1),
-        "billing_grade": row["billing_grade"],
+        "billing_grade": row["billing_grade"] if row["procedures_compared"] >= config.GRADE_MIN_PROCEDURES else None,
         "procedures_compared": row["procedures_compared"],
         "as_of": str(row["computed_at"] or "")[:10] or None,
         "outcomes": outcome_stats.get_hospital_outcomes(facility_id),

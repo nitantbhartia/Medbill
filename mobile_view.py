@@ -51,6 +51,33 @@ def locked_kinds(results: dict, free: dict | None) -> list[str]:
     return kinds
 
 
+def flagged_bill_keys(device_id: str) -> list[tuple]:
+    """Each distinct flagged bill this device has checked, in order. A re-scan of the same bill (same provider, total and
+    date) is one check, and a bill with no findings isn't one."""
+    with get_db() as db:
+        rows = db.execute(
+            "SELECT b.provider_name, b.total_charged, b.bill_date FROM bills b "
+            "JOIN bill_access_sessions s ON s.bill_id = b.id WHERE s.session_id = ? AND b.total_findings > 0 "
+            "ORDER BY b.created_at, b.id", (device_id,)).fetchall()
+    keys = []
+    for row in rows:
+        key = (row["provider_name"], row["total_charged"], row["bill_date"])
+        if key not in keys:
+            keys.append(key)
+    return keys
+
+
+def free_checks_remaining(device_id: str) -> int:
+    return max(config.FREE_CHECKS_LIMIT - len(flagged_bill_keys(device_id)), 0)
+
+
+def over_free_limit(device_id: str, bill: dict) -> bool:
+    """True from the fourth distinct flagged bill on: the scan still runs, but the free preview charge is withheld."""
+    keys = flagged_bill_keys(device_id)
+    key = (bill.get("provider_name"), bill.get("total_charged"), bill.get("bill_date"))
+    return key in keys and keys.index(key) >= config.FREE_CHECKS_LIMIT
+
+
 def headline(summary: dict | None) -> dict | None:
     """Mobile shows one number: billing errors when there are any, else the price-gap total."""
     if not summary:
@@ -108,12 +135,16 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "price": {"report_product_id": mobile_purchases.REPORT_PRODUCTS[0], "plus_default_min_owed": config.PLUS_DEFAULT_MIN_OWED},
         "extraction_quality": None,
         "free_charge": None if unlocked else free_charge(results),
+        "free_checks_remaining": free_checks_remaining(device_id),
+        "free_limit_reached": False,
         "read_warning": read_check(results),
         "confirm_lines": confirm_lines(results),
         "insurance_check": insurance_check.view(bill),
         "line_item_count": len(results["line_items"]),
         "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),
     }
+    if not unlocked and over_free_limit(device_id, bill):
+        view["free_charge"], view["free_limit_reached"] = None, True
     if not unlocked and view["teaser"]:
         view["teaser"]["locked_kinds"] = locked_kinds(results, view["free_charge"])
     if unlocked:
