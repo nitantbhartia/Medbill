@@ -115,7 +115,7 @@ def list_bill_summaries(device_id: str) -> list[dict]:
         ).fetchall()
     summaries = []
     for row in rows:
-        info = headline(report.teaser(row["id"])) or {"charge_count": 0, "total_savings": 0, "headline_kind": "pricing"}
+        info = headline(report.teaser(row["id"], with_outcome=False)) or {"charge_count": 0, "total_savings": 0, "headline_kind": "pricing"}
         summaries.append({
             "bill_id": row["id"],
             "provider_name": row["provider_name"],
