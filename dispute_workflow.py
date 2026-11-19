@@ -7,7 +7,7 @@ from datetime import date
 
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
-from rule_sources import basis_for
+from rule_sources import basis_for, reply_for
 from db import get_db
 
 
@@ -37,6 +37,7 @@ def build_dispute_letter(
                 "SELECT * FROM findings WHERE bill_id = ? ORDER BY id", (bill_id,)
             ).fetchall()
 
+    rows = [row for row in rows if row["finding_type"] != "price_info"]
     if not rows:
         return None
 
@@ -331,7 +332,13 @@ def build_phone_script(bill_id: int) -> str | None:
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
         finding_type = row["finding_type"] or "pricing"
-        finding_scripts.append(_phone_finding_block(finding_type, cpt, desc, billed, medicare, service_date))
+        if finding_type == "price_info":
+            continue
+        block = _phone_finding_block(finding_type, cpt, desc, billed, medicare, service_date)
+        reply = reply_for(detail.get("innocent_reason"))
+        if reply:
+            block += f'\n\nThey may say: {reply["may_say"]}\nWhat to say back: "{reply["say_back"]}"'
+        finding_scripts.append(block)
 
     findings_text = "\n\n".join(finding_scripts)
 

@@ -478,3 +478,8 @@ ASSISTANCE_POLICY_AUTO_CITIES = ("San Diego", "Los Angeles")
 ASSISTANCE_POLICY_AUTO_LIMIT = 20
 
 MOBILE_JSON_MAX_BYTES = 100_000  # mobile JSON bodies are tiny; uploads use multipart and have their own limit
+
+# B16.5: lines whose code or revenue code points to a drug or supply, where a Medicare comparison is weak
+DRUG_SUPPLY_CODE_PREFIXES = ("J", "A", "C", "Q")
+DRUG_SUPPLY_REVENUE_CODES = {"250", "251", "252", "270", "271", "272", "636"}
+LLM_REVIEW_ENABLED = os.environ.get("LLM_REVIEW_ENABLED", "false").lower() == "true"

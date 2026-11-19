@@ -16,7 +16,7 @@ _TYPE_ORDER = ["duplicate_charge", "unbundling", "quantity_flag", "insurer_rate"
 
 from analyzer import RULE_ID_BY_TYPE
 from es_content import REASON_LABELS_ES
-from rule_sources import basis_for
+from rule_sources import basis_for, reply_for
 
 # Objectively wrong on the bill itself. Everything else compares a price with a benchmark, which a
 # hospital can reasonably decline to act on, so it is reported separately and never as "errors".
@@ -93,6 +93,8 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             "message": finding.get("message") or "",
             "severity": severity,
             "basis": basis_for(finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding.get("finding_type")), details),
+            "hospital_may_say": (reply_for(details.get("innocent_reason")) or {}).get("may_say"),
+            "say_back": (reply_for(details.get("innocent_reason")) or {}).get("say_back"),
         })
 
     rows = sorted(charges.values(), key=lambda c: (-_SEVERITY_RANK[c["severity"]], -c["savings"]))

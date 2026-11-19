@@ -8,6 +8,8 @@ from difflib import SequenceMatcher
 import config
 from db import get_db
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
+from validators.llm_review import review_findings
+from validators.innocent_explanations import apply_innocent_explanations
 from validators.duplicates import find_duplicates
 from validators.unbundling import check_unbundling
 from validators.upcoding import check_upcoding
@@ -688,6 +690,16 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         findings.append(eob_finding)
         total_potential_savings += eob_finding.get("potential_savings", 0)
 
+    # B16.5: a legitimate explanation downgrades a finding, and a charge only worth asking about adds nothing to the total
+    for finding in findings:
+        was_counted = finding.get("severity") in ("high", "medium")
+        apply_innocent_explanations([finding])
+        if was_counted and finding.get("innocent_reason") and finding["severity"] not in ("high", "medium"):
+            total_potential_savings -= finding.get("potential_savings", 0)
+
+    counted = [f for f in findings if f.get("severity") in ("high", "medium")]
+    review_findings(line_items, findings)
+    total_potential_savings -= sum(f.get("potential_savings", 0) for f in counted if f.get("severity") not in ("high", "medium"))
     bill_patient_owes = extracted_data.get("total_patient_owes")
     if bill_patient_owes is not None:
         total_potential_savings = min(total_potential_savings, float(bill_patient_owes))
