@@ -66,6 +66,7 @@ def _validated_profile(payload: dict) -> dict:
 
 
 @router.post("/profile")
+@router.patch("/profile")
 async def save_profile(payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
     fields = _validated_profile(payload)
     if fields:

@@ -458,3 +458,11 @@ def test_hospital_outcomes_need_ten_verified_cases_per_rule():
     assert (stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["verified"], stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["succeeded"]) == (12, 9)
     assert outcome_stats.outcome_line("Harbor View", "F9", ["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]) == \
         "Harbor View corrected duplicate charges for 9 of 12 BillKarma users"
+
+
+def test_scan_infers_the_bill_type_and_profile_patch_is_accepted():
+    device_id, headers = new_device()
+    scan(headers)
+    with get_db() as db:
+        assert db.execute("SELECT bill_type FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == "er"
+    assert client.patch("/api/m/profile", json={"situations": ["too_high"], "due_band": "this_month"}, headers=headers).status_code == 200
