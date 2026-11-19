@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 import config
 import mobile_auth
 from api import _check_rate_limit, _request_client_key
-from compliance import delete_bill_data, log_audit
+from compliance import delete_bill_data, log_audit, record_consent
 from db import get_db
 from hospital_seo import _display_city, _display_name, state_display_name
 
@@ -161,3 +161,16 @@ async def delete_device(device_id: str = Depends(mobile_auth.device_from_request
         db.execute("DELETE FROM mobile_devices WHERE device_id = ?", (device_id,))
     log_audit(action="mobile_delete_device", resource_type="device", resource_id=device_id)
     return ok({"deleted": True})
+
+
+@router.post("/consent")
+async def data_improvement_consent(payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
+    """The opt-in "Help improve BillKarma" choice. Off unless the user says yes; logged either way."""
+    granted = payload.get("granted")
+    if not isinstance(granted, bool):
+        raise HTTPException(400, "granted must be true or false")
+    with get_db() as db:
+        db.execute("UPDATE mobile_devices SET data_improvement = ? WHERE device_id = ?", (int(granted), device_id))
+    record_consent(None, None, "data_improvement" if granted else "data_improvement_withdrawn",
+                   config.DATA_IMPROVEMENT_CONSENT_VERSION)
+    return ok({"granted": granted})

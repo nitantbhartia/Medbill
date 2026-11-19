@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -387,3 +387,15 @@ OCR_LINE_MATH_TOLERANCE = 1.0
 OCR_MAX_LINE_REREADS = 3
 OCR_REREAD_MAX_SIDE_PX = 3000
 OCR_MAX_CONFIRM_LINES = 5
+
+# Accuracy gate (B14.2): a deploy is blocked when amount or code accuracy drops by more than this many points.
+OCR_GATE_MAX_DROP_PCT = 1.0
+OCR_GATE_METRICS = ("amount_accuracy", "cpt_accuracy")
+OCR_GATE_SUITES = (
+    ("synthetic", "data/ocr_benchmark/manifest.json", "data/ocr_benchmark/baseline.json"),
+    ("golden", "data/ocr_benchmark/golden_manifest.json", "data/ocr_benchmark/golden_baseline.json"),
+)
+
+DATA_IMPROVEMENT_CONSENT_VERSION = "1"
+OCR_QUALITY_RUN_STATUS = "ocr_weekly"
+OCR_QUALITY_WINDOW_DAYS = 7

@@ -9,6 +9,7 @@ from pathlib import Path
 
 import config
 import dispute_service
+import ocr_quality
 
 log = logging.getLogger(__name__)
 REMINDER_SCRIPT = Path(__file__).parent / "scripts" / "send_concierge_reminders.py"
@@ -26,6 +27,10 @@ def run_daily_jobs() -> None:
         log.info("Daily jobs: %d hospital follow-ups sent", dispute_service.process_due_followups())
     except Exception:
         log.exception("Daily jobs: hospital follow-ups failed")
+    try:
+        ocr_quality.record_weekly()
+    except Exception:
+        log.exception("Daily jobs: weekly OCR quality numbers failed")
     try:
         runpy.run_path(str(REMINDER_SCRIPT), run_name="__main__")
     except Exception:

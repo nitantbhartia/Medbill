@@ -397,3 +397,14 @@ def test_sent_is_recorded_and_shows_in_my_bills():
     assert client.post(f"/api/m/bills/{bill_id}/sent", json={"channel": "email"}, headers=headers).status_code == 200
     summary = client.get("/api/m/bills", headers=headers).json()["data"]["bills"][0]
     assert summary["sent_at"]
+
+
+def test_improvement_consent_is_off_by_default_logged_and_must_be_a_boolean():
+    device_id, headers = new_device()
+    with get_db() as db:
+        assert db.execute("SELECT data_improvement FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == 0
+    assert client.post("/api/m/consent", json={"granted": "yes"}, headers=headers).status_code == 400
+    assert client.post("/api/m/consent", json={"granted": True}, headers=headers).status_code == 200
+    with get_db() as db:
+        assert db.execute("SELECT data_improvement FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == 1
+        assert db.execute("SELECT COUNT(*) FROM consent_logs WHERE consent_type = 'data_improvement'").fetchone()[0] >= 1

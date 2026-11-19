@@ -16,3 +16,9 @@ build/
 venv/
 node_modules/
 .env.local
+
+# Real, de-identified bill samples used to measure scan accuracy. This repo is public: they must never be committed.
+# Only the three synthetic samples in data/ocr_benchmark/ are tracked.
+data/ocr_benchmark/golden/
+data/ocr_benchmark/golden_manifest.json
+data/ocr_benchmark/golden_baseline.json
