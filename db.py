@@ -73,7 +73,7 @@ def _run_migrations(db):
             "evidence_json": "TEXT",
         },
     )
-    ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
+    ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL", "mrf_reliability": "TEXT"})
     ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT"})

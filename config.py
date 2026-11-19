@@ -505,3 +505,10 @@ DESCRIPTION_ABBREVIATIONS = {
 }
 HCAI_CHARGEMASTER_PAGE = "https://hcai.ca.gov/data-and-reports/cost-transparency/hospital-chargemasters/"
 HCAI_NAME_MATCH_MIN = 0.8
+
+# B14.9: insurer rates learned from bill + EOB pairs
+MRF_MATCH_TOLERANCE_PCT = 10
+MRF_RELIABILITY_MIN_MATCH_SHARE = 0.5
+MRF_TRUTH_RUN_STATUS = "mrf_truth_check"
+EOB_OBSERVATION_CONFIDENCE_PHOTO = 0.8
+EOB_OBSERVATION_CONFIDENCE_TEXT = 1.0

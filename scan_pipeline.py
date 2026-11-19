@@ -6,6 +6,7 @@ import logging
 
 import analyzer
 import bill_contact
+import eob_observations
 import extraction_selfcheck
 import insurance_check
 import scanner
@@ -32,6 +33,7 @@ def run_scan(
     user_id: int | None,
     referral_code: str | None,
     eob_images: list[tuple[bytes, str]] | None = None,
+    share_observations: bool = False,
 ) -> tuple[int, dict, dict]:
     """OCR the pages, analyze, save. Returns (bill_id, extracted, analysis)."""
     extracted = extract_pages(images)
@@ -47,10 +49,19 @@ def run_scan(
         bill_contact.store_from_extraction(bill_id, extracted)
         if eob_data:
             insurance_check.record(bill_id, eob_data, extracted.get("total_patient_owes"))
+            if share_observations:
+                _share_observations(bill_id, eob_data, extracted, zip_code)
     except Exception as exc:
         log.error("Analysis/save failed: %s", exc, exc_info=True)
         raise AnalysisFailed(str(exc)) from exc
     return bill_id, extracted, analysis
+
+
+def _share_observations(bill_id: int, eob_data: dict, extracted: dict, zip_code: str) -> None:
+    """Store what the insurer allowed per line, for a user who agreed to help improve BillKarma."""
+    hospital = analyzer.find_hospital_match(extracted.get("provider_name") or "", zip_code)
+    if hospital:
+        eob_observations.record(bill_id, {**eob_data, "insurer_name": eob_data.get("insurer_name") or extracted.get("insurer_name")}, hospital["facility_id"])
 
 
 class CannotRebuild(Exception):
@@ -70,7 +81,7 @@ def rebuild_extracted(bill_id: int) -> tuple[dict, dict]:
     return dict(bill), extracted
 
 
-def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]]) -> None:
+def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]], share_observations: bool = False) -> None:
     """Merge an insurance statement into a saved bill and redo its checks. The unlock is kept."""
     bill, extracted = rebuild_extracted(bill_id)
     eob_data = scrub_extracted_data(extract_pages(eob_images))
@@ -79,6 +90,8 @@ def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]]) -> None:
         analysis = analyzer.analyze_bill(merged, bill["zip_code"] or "")
         analyzer.replace_findings_and_insurance_fields(bill_id, merged, analysis)
         insurance_check.record(bill_id, eob_data, bill["total_patient_owes"])
+        if share_observations:
+            _share_observations(bill_id, eob_data, extracted, bill["zip_code"] or "")
     except Exception as exc:
         log.error("Adding a statement failed: %s", exc, exc_info=True)
         raise AnalysisFailed(str(exc)) from exc

@@ -23,7 +23,7 @@ from validators.eob import check_eob_reconciliation
 from outcome_stats import get_hospital_outcomes
 from validators.er_level import check_er_level_v2
 from validators.quantity import check_quantities_v2
-from validators.insurer_rate import check_insurer_rate
+from validators.insurer_rate import check_insurer_rate, check_peer_rate
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
@@ -602,13 +602,19 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     for item in line_items:
         # CHECK 0: the insurer's own contracted rate at this hospital, which beats the Medicare comparison
         insurer_finding = check_insurer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital else None
+        # A hospital whose files often disagree with what insurers paid keeps its file rate as supporting evidence only
+        file_unreliable = bool(insurer_finding and hospital.get("mrf_reliability") == "low")
+        if file_unreliable:
+            insurer_finding["severity"] = "low"
+        peer_finding = check_peer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital and not insurer_finding else None
+        insurer_finding = insurer_finding or peer_finding
         if insurer_finding:
             _apply_evidence_policy(insurer_finding, freshness)
             findings.append(insurer_finding)
             total_potential_savings += insurer_finding["potential_savings"]
 
         # CHECK 1: Price vs Medicare rate (the fallback when no insurer rate was found)
-        pricing_finding = None if insurer_finding else check_pricing(
+        pricing_finding = None if insurer_finding and not file_unreliable and insurer_finding is not peer_finding else check_pricing(
             item,
             locality,
             markup_threshold=adaptive["pricing_markup_threshold"],
@@ -916,7 +922,7 @@ def find_hospital_match(provider_name: str, zip_code: str | None) -> dict | None
                h.is_pe_owned, h.pe_firm, h.slug, h.state_slug, h.city_slug,
                h.cms_star_rating, h.bed_count,
                m.avg_markup_vs_medicare, m.billing_grade, m.national_percentile,
-               f.charity_care_pct, f.has_financial_assistance, f.fa_application_url
+               f.charity_care_pct, f.has_financial_assistance, f.fa_application_url, h.mrf_reliability
         FROM hospitals h
         LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
         LEFT JOIN hospital_financials f ON f.facility_id = h.facility_id

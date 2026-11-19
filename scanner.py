@@ -73,6 +73,7 @@ Return a JSON object with this exact structure:
   "bill_date": "YYYY-MM-DD",
   "account_number": "Account or invoice number",
   "insurer_name": "Health insurance company name, only if printed (common on insurance statements)",
+  "plan_name": "Insurance plan name, only if printed on an insurance statement",
   "billing_phone": "Billing office phone number, only if printed on the bill",
   "billing_email": "Billing office email, only if printed on the bill",
   "billing_address": "Address to send payments or billing questions to, only if printed on the bill",
@@ -88,6 +89,7 @@ Return a JSON object with this exact structure:
       "modifiers": ["91"],
       "page": 1,
       "charged_amount": 500.00,
+      "allowed_amount": 400.00,
       "insurance_paid": 300.00,
       "insurance_adjustment": 100.00,
       "patient_responsibility": 100.00
@@ -100,6 +102,7 @@ CRITICAL RULES:
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
 - modifiers: the 2-character modifier codes printed next to the procedure code (for example 91, RT, 26, 59), as a list; [] if none.
+- allowed_amount: on an insurance statement, the amount the plan allowed for the line; null on a hospital bill.
 - unit_price: the price per unit, only when the bill prints one. page: the page number the line is on (1 for a single page).
 - insurer_name, billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
 - For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
@@ -143,7 +146,7 @@ def _add_confidence_flags(extracted: dict) -> dict:
     for idx, item in enumerate(extracted.get("line_items", [])):
         # Normalize numeric fields that Gemini may return as strings
         for field in ("charged_amount", "insurance_paid", "insurance_adjustment",
-                      "patient_responsibility", "unit_price"):
+                      "patient_responsibility", "unit_price", "allowed_amount"):
             item[field] = _coerce_numeric(item.get(field))
         qty = _coerce_numeric(item.get("quantity"))
         item["quantity"] = int(qty) if qty else 1

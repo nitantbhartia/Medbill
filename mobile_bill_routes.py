@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 import bill_contact
 import config
 import line_confirmation
+import eob_observations
 import outcome_verification
 import mobile_accounts
 import mobile_auth
@@ -75,7 +76,7 @@ async def scan(
     images = await _read_pages(pages)
     eob_images = await _read_pages(eob_pages)
     try:
-        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None)
+        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None, eob_observations.consented(device_id))
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
@@ -195,7 +196,7 @@ async def add_eob(bill_id: int, eob_pages: list[UploadFile] = File(...),
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
     images = await _read_pages(eob_pages)
     try:
-        scan_pipeline.add_eob(bill_id, images)
+        scan_pipeline.add_eob(bill_id, images, eob_observations.consented(device_id))
     except scan_pipeline.CannotRebuild as exc:
         raise HTTPException(409, "Rescan the bill together with the statement.") from exc
     except scanner.ScannerNotConfigured as exc:

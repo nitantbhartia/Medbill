@@ -333,6 +333,27 @@ def test_scan_with_a_statement_flags_a_bill_that_asks_for_more(monkeypatch):
     assert check == {"status": "mismatch", "eob_owed": 640.0, "bill_owed": 4215.0, "difference": 3575.0, "eob_date": "2026-10-03"}
 
 
+def test_statement_lines_become_observations_only_for_a_consenting_device(monkeypatch):
+    with get_db() as db:
+        db.execute("INSERT OR IGNORE INTO hospitals (facility_id, name, city, state, zip, slug, state_slug, city_slug) "
+                   "VALUES ('999001', ?, 'Miami', 'FL', '33021', 'x', 'florida', 'miami')", (SAMPLE_BILL["provider_name"],))
+    eob = {"bill_date": "2026-10-03", "insurer_name": "Aetna", "total_patient_owes": 640.0, "line_items": [
+        {"cpt_code": "99285", "allowed_amount": 900.0, "charged_amount": 4200.0}]}
+    monkeypatch.setattr(scan_pipeline, "extract_pages", lambda images: eob if images[0][0] == b"fake-eob" else dict(SAMPLE_BILL))
+
+    def observations():
+        with get_db() as db:
+            return db.execute("SELECT COUNT(*) FROM price_observations WHERE source_type = 'eob'").fetchone()[0]
+
+    device_id, headers = new_device()
+    client.post("/api/m/scan", files=[PAGE, EOB_PAGE], data={"zip_code": "33021"}, headers=headers)
+    assert observations() == 0
+    with get_db() as db:
+        db.execute("UPDATE mobile_devices SET data_improvement = 1 WHERE device_id = ?", (device_id,))
+    client.post("/api/m/scan", files=[PAGE, EOB_PAGE], data={"zip_code": "33021"}, headers=headers)
+    assert observations() == 1
+
+
 def test_statement_that_agrees_with_the_bill_matches_and_unreadable_is_reported(monkeypatch):
     _, headers = new_device()
     monkeypatch.setattr(scan_pipeline, "extract_pages", fake_pages(4215.0))

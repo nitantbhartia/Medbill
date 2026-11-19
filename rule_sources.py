@@ -32,6 +32,15 @@ RULES = {
         "source_url": "https://www.cms.gov/priorities/key-initiatives/hospital-price-transparency",
         "source_year": lambda: None,
     },
+    "RULE_PEER_EOB_RATE": {
+        "kind": "check",
+        "explanation": "Other BillKarma users with {insurer} paid a median of {median} for code {code} at {hospital}.",
+        "needs": ("insurer", "median", "code", "hospital"),
+        "fallback": "Other BillKarma users with this insurer paid less for this code at this hospital.",
+        "source_name": "Insurance statements shared by BillKarma users",
+        "source_url": None,
+        "source_year": lambda: None,
+    },
     "RULE_MARKUP_VS_MEDICARE": {
         "kind": "official",
         "explanation": "Medicare pays {medicare} for code {code}. This bill charges {charged}, which is {markup}× that.",
@@ -117,6 +126,7 @@ def _values(details: dict) -> dict:
         "insurer": details.get("insurer"),
         "hospital": details.get("hospital_name"),
         "rate": _dollars(details.get("contracted_rate")),
+        "median": _dollars(details.get("peer_median")),
     }
 
 
