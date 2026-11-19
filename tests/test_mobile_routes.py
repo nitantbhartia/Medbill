@@ -1,6 +1,7 @@
 """The iOS app API: anonymous devices, locked/unlocked bill views, in-app purchase unlocks, data deletion."""
 
 import hashlib
+import json
 
 import pytest
 from fastapi.testclient import TestClient
@@ -49,7 +50,7 @@ def clean_scan(headers, monkeypatch):
 
 def test_registered_device_can_list_bills_and_bad_token_cannot():
     _, headers = new_device()
-    assert client.get("/api/m/bills", headers=headers).json() == {"status": "ok", "data": {"bills": []}}
+    assert client.get("/api/m/bills", headers=headers).json() == {"status": "ok", "data": {"bills": [], "free_checks_remaining": config.FREE_CHECKS_LIMIT}}
     assert client.get("/api/m/bills", headers={"Authorization": "Bearer nope"}).status_code == 401
     assert client.get("/api/m/bills").status_code == 401
 
@@ -93,7 +94,7 @@ def test_flagged_scan_is_locked_with_a_teaser_and_no_charge_details():
     assert view["locked"] is True
     assert view["report"] is None
     assert view["teaser"]["charge_count"] > 0
-    assert view["price"] == {"report_product_id": "bk_report_unlock"}
+    assert view["price"] == {"report_product_id": "bk_report_unlock", "plus_default_min_owed": config.PLUS_DEFAULT_MIN_OWED}
     assert view["bill"]["provider_name"] == "Memorial Regional Hospital"
     assert view["free_charge"]["description"]
     assert "finding_ids" not in str(view)
@@ -261,7 +262,7 @@ def test_hospital_insight_needs_enough_procedures():
     seed_hospital("050200", "SMALL DATA HOSPITAL", config.RANKING_MIN_PROCEDURES - 1)
     _, headers = new_device()
     full = client.get("/api/m/hospital-insight?facility_id=050100", headers=headers).json()["data"]
-    assert (full["avg_markup"], full["billing_grade"], full["procedures_compared"]) == (4.2, "D", 12)
+    assert (full["avg_markup"], full["billing_grade"], full["procedures_compared"]) == (4.2, None, 12)  # fewer than GRADE_MIN_PROCEDURES compared: no grade shown
     assert client.get("/api/m/hospital-insight?facility_id=050200", headers=headers).json()["data"] is None
     assert client.get("/api/m/hospital-insight?facility_id=999999", headers=headers).json()["data"] is None
 
@@ -458,3 +459,62 @@ def test_hospital_outcomes_need_ten_verified_cases_per_rule():
     assert (stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["verified"], stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["succeeded"]) == (12, 9)
     assert outcome_stats.outcome_line("Harbor View", "F9", ["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]) == \
         "Harbor View corrected duplicate charges for 9 of 12 BillKarma users"
+
+
+def test_scan_infers_the_bill_type_and_profile_patch_is_accepted():
+    device_id, headers = new_device()
+    scan(headers)
+    with get_db() as db:
+        assert db.execute("SELECT bill_type FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == "er"
+    assert client.patch("/api/m/profile", json={"situations": ["too_high"], "due_band": "this_month"}, headers=headers).status_code == 200
+
+
+def test_locked_view_lists_evidence_kinds_of_locked_charges_and_no_line_details():
+    _, headers = new_device()
+    view = scan(headers)
+    assert view["locked"] and view["teaser"]["locked_kinds"]
+    assert set(view["teaser"]["locked_kinds"]) <= {"official", "bill", "check"}
+    assert len(view["teaser"]["locked_kinds"]) == view["teaser"]["charge_count"] - 1
+    free = view["free_charge"]
+    text = json.dumps({key: value for key, value in view.items() if key != "free_charge"})
+    for item in SAMPLE_BILL["line_items"]:
+        if item["description"] != free["description"]:
+            assert item["description"] not in text
+    assert view["price"]["plus_default_min_owed"] == config.PLUS_DEFAULT_MIN_OWED
+
+
+# ── Free check limit, public stats, explainer pages ────────────────────────────
+
+def distinct_flagged_scan(headers, monkeypatch, provider, total):
+    bill = {**SAMPLE_BILL, "provider_name": provider, "total_charged": total}
+    monkeypatch.setattr(scan_pipeline.scanner, "process_bill_with_verification", lambda *a: dict(bill))
+    return scan(headers)
+
+
+def test_a_clean_bill_does_not_use_a_check_and_the_fourth_flagged_bill_has_no_free_preview(monkeypatch):
+    _, headers = new_device()
+    clean = clean_scan(headers, monkeypatch)
+    assert clean["free_checks_remaining"] == config.FREE_CHECKS_LIMIT
+    monkeypatch.undo()
+    monkeypatch.setattr(config, "SLIM_LAUNCH", True)
+    views = [distinct_flagged_scan(headers, monkeypatch, f"Hospital {n} Medical Center", 12000.0 + n) for n in range(4)]
+    assert [v["free_charge"] is not None for v in views] == [True, True, True, False]
+    assert views[3]["free_checks_remaining"] == 0 and views[3]["free_limit_reached"] is True
+    assert views[3]["teaser"]["charge_count"] > 0 and views[3]["teaser"]["locked_kinds"]
+    assert client.get("/api/m/bills", headers=headers).json()["data"]["free_checks_remaining"] == 0
+
+
+def test_rescanning_the_same_bill_does_not_use_another_check(monkeypatch):
+    _, headers = new_device()
+    for _ in range(3):
+        view = scan(headers)
+    assert view["free_checks_remaining"] == config.FREE_CHECKS_LIMIT - 1 and view["free_charge"] is not None
+
+
+def test_public_stats_stay_null_until_the_totals_are_large_enough():
+    assert client.get("/api/m/stats").json()["data"] == {"verified": None}
+
+
+def test_explainer_pages_render():
+    assert "Grade A" in client.get("/how-we-grade/").text
+    assert "Medicare Physician Fee Schedule" in client.get("/sources/").text

@@ -32,6 +32,7 @@ from analyzer import compute_case_summary, get_bill_results, get_stats
 from compliance import log_audit
 from hospital_procedure_pages import get_hospital_procedure_page, get_hospital_procedure_sitemap_paths
 from hospital_seo import (
+    GRADE_THRESHOLDS,
     find_hospitals,
     get_cities_for_state,
     get_grade_distribution,
@@ -3717,6 +3718,33 @@ async def about_page(request: Request):
         "canonical_url": canonical_url,
         "og_title": "About BillKarma — Medical Billing Transparency for Patients",
         "meta_description": "BillKarma helps patients understand and dispute hospital bills using CMS price transparency data, Medicare rates, and billing error detection tools. Free for everyone.",
+    })
+
+
+@app.get("/how-we-grade/", response_class=HTMLResponse)
+async def how_we_grade_page(request: Request):
+    return templates.TemplateResponse("how_we_grade.html", {
+        "request": request, "canonical_url": f"{config.APP_URL.rstrip('/')}/how-we-grade/",
+        "og_title": "How BillKarma grades hospital prices",
+        "meta_description": "The data, the formula and the date behind each hospital's BillKarma billing grade.",
+        "thresholds": GRADE_THRESHOLDS, "min_procedures": config.GRADE_MIN_PROCEDURES,
+        "data_year": config.MEDICARE_PFS_YEAR,
+    })
+
+
+@app.get("/sources/", response_class=HTMLResponse)
+async def sources_page(request: Request):
+    import rule_sources
+    sources = {}
+    for rule in rule_sources.RULES.values():
+        if rule["kind"] == "official":
+            year = rule["source_year"]()
+            sources[rule["source_name"]] = (rule["source_url"], year)
+    return templates.TemplateResponse("sources.html", {
+        "request": request, "canonical_url": f"{config.APP_URL.rstrip('/')}/sources/",
+        "og_title": "Where BillKarma's numbers come from",
+        "meta_description": "Every public data source BillKarma compares your bill with, and the year of each.",
+        "sources": sources,
     })
 
 

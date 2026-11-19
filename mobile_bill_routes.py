@@ -17,6 +17,7 @@ import mobile_view
 import scan_pipeline
 import scanner
 from access_control import grant_bill_access
+from analyzer import infer_bill_type
 from api import ALLOWED_MIME_TYPES, VALID_OUTCOMES, _check_rate_limit
 from compliance import log_audit
 from db import get_db
@@ -38,6 +39,13 @@ async def _read_pages(pages: list[UploadFile]) -> list[tuple[bytes, str]]:
             raise HTTPException(400, f"A page is larger than {config.MAX_UPLOAD_SIZE_MB} MB.")
         images.append((data, mime))
     return images
+
+
+def _remember_bill_type(device_id: str, extracted: dict) -> None:
+    """Bill type is no longer asked: it comes from the codes, and never overwrites an answer the user gave."""
+    with get_db() as db:
+        db.execute("UPDATE mobile_devices SET bill_type = ? WHERE device_id = ? AND bill_type IS NULL",
+                   (infer_bill_type(extracted.get("line_items") or []), device_id))
 
 
 @router.post("/scan")
@@ -66,6 +74,7 @@ async def scan(
     except scan_pipeline.AnalysisFailed as exc:
         raise HTTPException(500, "We couldn't analyze that bill.") from exc
     grant_bill_access(device_id, bill_id)
+    _remember_bill_type(device_id, extracted)
     mobile_accounts.share_bill_with_account(device_id, bill_id)
     log_audit(
         action="mobile_scan", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
@@ -78,7 +87,8 @@ async def scan(
 
 @router.get("/bills")
 async def list_bills(device_id: str = Depends(mobile_auth.device_from_request)):
-    return ok({"bills": mobile_view.list_bill_summaries(device_id)})
+    return ok({"bills": mobile_view.list_bill_summaries(device_id),
+               "free_checks_remaining": mobile_view.free_checks_remaining(device_id)})
 
 
 @router.get("/bills/{bill_id}")

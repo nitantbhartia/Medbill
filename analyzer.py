@@ -115,6 +115,31 @@ def _as_price_info(finding: dict) -> dict:
     return {**finding, "type": "price_info", "severity": "low", "potential_savings": 0,
             "message": (f"Priced at {finding['markup_multiple']}\u00d7 Medicare. Your insurer already applied its discount, "
                         "so this mostly affects the insurer, not you.")}
+ER_CODES = {"99281", "99282", "99283", "99284", "99285"}
+HOSPITAL_STAY_CODES = {"99221", "99222", "99223", "99231", "99232", "99233", "99238", "99239"}
+LAB_IMAGING_RANGES = ((70010, 79999), (80047, 89398))
+SURGERY_RANGE = (10004, 69990)
+NOT_SURGERY_RANGE = (36400, 36599)  # blood draws and IV access
+DOCTOR_CODES = {"99202", "99203", "99204", "99205", "99211", "99212", "99213", "99214", "99215"}
+ROOM_AND_BOARD_REVENUE_CODES = {"0100", "0101", "0110", "0111", "0120", "0121", "0130", "0140", "0150", "0200", "0201", "0210"}
+
+
+def infer_bill_type(line_items: list[dict]) -> str:
+    """The kind of bill, from its codes: er, hospital_stay, surgery, lab_imaging, doctor or other. ER wins over the rest,
+    then a stay, then surgery; lab and imaging only when every coded line is a test."""
+    codes = [str(item.get("cpt_code") or "").strip().upper() for item in line_items]
+    if any(code in ER_CODES for code in codes):
+        return "er"
+    if any(code in HOSPITAL_STAY_CODES or code in ROOM_AND_BOARD_REVENUE_CODES for code in codes):
+        return "hospital_stay"
+    numeric = [int(code) for code in codes if len(code) == 5 and code.isdigit()]
+    if any(SURGERY_RANGE[0] <= value <= SURGERY_RANGE[1] and not NOT_SURGERY_RANGE[0] <= value <= NOT_SURGERY_RANGE[1] for value in numeric):
+        return "surgery"
+    if numeric and all(any(low <= value <= high for low, high in LAB_IMAGING_RANGES) for value in numeric):
+        return "lab_imaging"
+    if any(code in DOCTOR_CODES for code in codes):
+        return "doctor"
+    return "other"
 
 
 def _assign_confidence(finding: dict) -> str:

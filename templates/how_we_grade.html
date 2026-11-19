@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}How BillKarma grades hospital prices | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>How BillKarma grades hospital prices</h1>
+    </div>
+</section>
+<section class="bk-section">
+    <div class="bk-wrap" style="max-width: 720px">
+        <p>Each hospital's grade compares what it charges with what Medicare pays for the same services.</p>
+        <h2 class="bk-h2">The data</h2>
+        <p>Prices come from each hospital's own public price file and from the Centers for Medicare &amp; Medicaid Services (CMS) {{ data_year }} Medicare rates. A hospital is only graded when at least {{ min_procedures }} of its procedures could be compared. With fewer, we show no grade.</p>
+        <h2 class="bk-h2">The formula</h2>
+        <p>For each compared procedure we divide the hospital's charge by the Medicare rate, then average across procedures. The average is the hospital's markup over Medicare.</p>
+        <ul>{% for limit, grade in thresholds %}<li>Grade {{ grade }}: average markup up to {{ limit }}&times; Medicare</li>{% endfor %}<li>Anything higher is graded F.</li></ul>
+        <h2 class="bk-h2">What a grade does not say</h2>
+        <p>A grade is about list prices, not the quality of care, and not what any one patient pays after insurance. Estimates only. Not legal or medical advice.</p>
+    </div>
+</section>
+{% endblock %}

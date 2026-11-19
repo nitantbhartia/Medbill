@@ -436,3 +436,11 @@ COMPONENT_MODIFIERS = {"26", "TC"}
 DISTINCT_SERVICE_MODIFIERS = {"59", "XE", "XS", "XP", "XU"}
 COMMONLY_REPEATED_CODES = {"36415"}  # plus every lab code (80047-89398)
 OUT_OF_NETWORK_WORDS = ("out of network", "out-of-network", "non-par", "nonpar", "non participating")
+# Paywall: Plus is pre-selected for someone who says they can't afford it and owes more than this (B15.3).
+PLUS_DEFAULT_MIN_OWED = 2000
+
+# Free checks (B15.4), the welcome-screen proof line and hospital grades (B15.6)
+FREE_CHECKS_LIMIT = 3
+VERIFIED_STATS_MIN_TOTAL = 10000
+VERIFIED_STATS_MIN_BILLS = 50
+GRADE_MIN_PROCEDURES = 20

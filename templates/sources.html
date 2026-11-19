@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Where BillKarma's numbers come from | BillKarma{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}
+
+{% block content %}
+<section class="bk-hero">
+    <div class="bk-wrap">
+        <h1>Where BillKarma's numbers come from</h1>
+    </div>
+</section>
+<section class="bk-section">
+    <div class="bk-wrap" style="max-width: 720px">
+        <p>BillKarma compares your bill with public data. Here is each source and its year.</p>
+        <ul>{% for name, info in sources.items() %}<li><a href="{{ info[0] }}">{{ name }}</a>{% if info[1] %}, {{ info[1] }}{% endif %}</li>{% endfor %}</ul>
+        <p>Your own bill and insurance statement are also evidence: duplicates and balance mismatches come straight from them. BillKarma checks are our own rules of thumb and are labelled that way.</p>
+    </div>
+</section>
+{% endblock %}
