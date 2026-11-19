@@ -1,4 +1,4 @@
-"""The slim launch: free scan and teaser, one $19 Bill Check Report, every other product hidden."""
+"""The slim launch: free scan and teaser, one $19.99 Bill Check Report, every other product hidden."""
 
 import hashlib
 import hmac
@@ -70,18 +70,28 @@ def test_locked_results_show_the_count_the_savings_and_one_price(flagged_bill):
     assert f"{teaser['charge_count']} charge" in html
     assert "billing errors we found" in html or "above typical Medicare pricing" in html
     assert "Unlock your full report" in html
-    assert "Unlock my report for $19" in html
+    assert "Unlock my report for $19.99" in html
     assert 'action="/report/checkout"' in html
 
 
-def test_locked_results_hide_every_charge_detail_and_the_letter_tools(flagged_bill):
+def test_locked_results_show_one_charge_free_and_hide_the_rest_and_the_letter_tools(flagged_bill):
+    from analyzer import get_bill_results
+    from mobile_view import free_charge
+    free = free_charge(get_bill_results(flagged_bill))
     html = client.get(f"/results/{flagged_bill}").text
-    assert "Medicare pays $" not in html
+    assert "Free preview" in html and free["description"] in html
+    assert html.count("Medicare pays $") == 1
     assert 'id="gen-letter-btn"' not in html
     assert 'id="gen-phone-btn"' not in html
     assert "Charges we flagged" not in html
     for item in SAMPLE_BILL["line_items"]:
-        assert item["description"] not in html
+        if item["description"] != free["description"]:
+            assert item["description"] not in html
+
+
+def test_the_free_preview_is_gone_once_the_report_is_unlocked(flagged_bill):
+    unlock(flagged_bill)
+    assert "Free preview" not in client.get(f"/results/{flagged_bill}").text
 
 
 def test_locked_results_name_no_other_product(flagged_bill):
@@ -120,7 +130,7 @@ def test_letters_script_packet_score_and_email_need_the_unlock(flagged_bill, met
     else:
         response = client.get(url)
     assert response.status_code == 402
-    assert "$19" in response.json()["detail"]
+    assert "$19.99" in response.json()["detail"]
 
 
 # ── Checkout ───────────────────────────────────────────────────────────────────
@@ -142,7 +152,7 @@ def test_checkout_charges_the_configured_price_for_one_bill(flagged_bill, monkey
     sent = {}
     monkeypatch.setattr(payment, "create_payment_checkout", lambda **kw: sent.update(kw) or {"id": "cs_1", "url": "https://x"})
     payment.create_report_checkout(flagged_bill, "buyer@example.com")
-    assert sent["amount_cents"] == 1900 and sent["metadata"]["bill_id"] == flagged_bill
+    assert sent["amount_cents"] == 1999 and sent["metadata"]["bill_id"] == flagged_bill
     assert sent["metadata"]["payment_purpose"] == config.REPORT_PAYMENT_PURPOSE
     assert "/report/success?session_id={CHECKOUT_SESSION_ID}" in sent["success_url"]
     assert sent["cancel_url"].endswith(f"/results/{flagged_bill}#unlock")
@@ -322,9 +332,9 @@ def test_turning_the_flag_off_restores_free_results_and_the_hidden_routes(flagge
 
 def test_homepage_scan_and_results_all_state_the_same_offer(flagged_bill):
     home, scan, results = (text_of(client.get(p)) for p in ("/", "/scan", f"/results/{flagged_bill}"))
-    assert "Free" in home and "$19" in home
-    assert "Free to check, no account" in scan and "$19 only if you want the full report" in scan
-    assert "$19" in results and "dispute letter" in results.lower() and "phone script" in results.lower()
+    assert "Free" in home and "$19.99" in home
+    assert "Free to check, no account" in scan and "$19.99 only if you want the full report" in scan
+    assert "$19.99" in results and "dispute letter" in results.lower() and "phone script" in results.lower()
 
 
 def test_scan_faq_structured_data_matches_the_real_offer():

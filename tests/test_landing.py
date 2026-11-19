@@ -11,14 +11,14 @@ def test_landing_leads_with_the_free_check_and_one_price():
     text = re.sub(r"\s+", " ", client.get("/").text)
     assert "Is your hospital bill wrong?" in text and "Find out free." in text
     assert 'href="/scan"' in text
-    assert "Free" in text and "$19 once" in text
+    assert "Free" in text and "$19.99 once" in text
     assert "You pay nothing" in text
 
 
 def test_landing_sells_only_the_report_and_names_no_other_product():
     text = re.sub(r"\s+", " ", client.get("/").text)
-    assert "What&rsquo;s in your $19 report" in text
-    assert "One price: $19 per bill" in text
+    assert "What&rsquo;s in your $19.99 report" in text
+    assert "One price: $19.99 per bill" in text
     for stale in ("we dispute it for you", "Bills under $1,000", "Full refund", "Follow-ups", "household", "Household"):
         assert stale not in text
 
