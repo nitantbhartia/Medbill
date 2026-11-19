@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "hold_call_started", "hold_call_human", "hold_call_connected", "hold_call_missed", "hold_call_failed", "hold_call_purchased", "outcome_verified", "outcome_verify_failed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "confirm_shown", "confirm_fixed", "confirm_skipped", "processing_question_answered", "processing_questions_skipped", "hold_call_started", "hold_call_human", "hold_call_connected", "hold_call_missed", "hold_call_failed", "hold_call_purchased", "outcome_verified", "outcome_verify_failed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}

@@ -22,7 +22,7 @@ PAID = "paid"
 PENDING = "pending"
 
 
-def teaser(bill_id: int) -> dict | None:
+def teaser(bill_id: int, with_outcome: bool = True) -> dict | None:
     """What the free results page shows: how many charges are flagged and the most they could save."""
     results = get_bill_results(bill_id)
     if not results:
@@ -30,12 +30,9 @@ def teaser(bill_id: int) -> dict | None:
     bill = results.get("bill") or {}
     owed = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
     summary = group_findings_by_charge(results.get("findings") or [], owed)
-    import outcome_stats
-    import outcome_verification
-    rule_ids = outcome_verification.bill_rule_ids(bill_id)
     return {
         "info_only": summary["info_only"],
-        "outcome_line": outcome_stats.outcome_line(bill.get("provider_name") or "", outcome_verification.facility_for(bill), rule_ids),
+        "outcome_line": _outcome_line(bill_id, bill) if with_outcome else None,
         "charge_count": len(summary["charges"]),
         "strong_count": summary["strong_count"],
         "total_savings": summary["total_savings"],
@@ -45,6 +42,14 @@ def teaser(bill_id: int) -> dict | None:
         "headline_amount": summary["headline_amount"],
         "reason_counts": _reason_counts(summary["charges"]),
     }
+
+
+def _outcome_line(bill_id: int, bill: dict) -> str | None:
+    """The hospital's track record for the teaser. It costs several queries, so lists of bills skip it."""
+    import outcome_stats
+    import outcome_verification
+    return outcome_stats.outcome_line(bill.get("provider_name") or "", outcome_verification.facility_for(bill),
+                                      outcome_verification.bill_rule_ids(bill_id))
 
 
 def _reason_counts(charges: list[dict]) -> list[dict]:
@@ -57,7 +62,7 @@ def _reason_counts(charges: list[dict]) -> list[dict]:
 
 
 def has_flagged_charges(bill_id: int) -> bool:
-    info = teaser(bill_id)
+    info = teaser(bill_id, with_outcome=False)
     return bool(info and info["charge_count"] and not info["info_only"])
 
 
