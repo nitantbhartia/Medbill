@@ -14,7 +14,9 @@ _SEVERITY_RANK = {"high": 3, "medium": 2, "low": 1, "informational": 0}
 _TYPE_ORDER = ["duplicate_charge", "unbundling", "quantity_flag", "upcoding", "price_markup",
                "eob_mismatch", "no_surprises_act", "benchmark_outlier"]
 
+from analyzer import RULE_ID_BY_TYPE
 from es_content import REASON_LABELS_ES
+from rule_sources import basis_for
 
 # Objectively wrong on the bill itself. Everything else compares a price with a benchmark, which a
 # hospital can reasonably decline to act on, so it is reported separately and never as "errors".
@@ -82,6 +84,7 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             "label": REASON_LABELS.get(finding.get("finding_type"), (finding.get("finding_type") or "Flagged").replace("_", " ").capitalize()),
             "message": finding.get("message") or "",
             "severity": severity,
+            "basis": basis_for(finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding.get("finding_type")), details),
         })
 
     rows = sorted(charges.values(), key=lambda c: (-_SEVERITY_RANK[c["severity"]], -c["savings"]))

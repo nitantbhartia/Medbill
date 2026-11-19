@@ -7,6 +7,7 @@ from datetime import date
 
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
+from rule_sources import basis_for
 from db import get_db
 
 
@@ -56,6 +57,7 @@ def build_dispute_letter(
         paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail))
 
     body = "\n\n".join(f"  {i+1}. {p}" for i, p in enumerate(paragraphs))
+    sources = _source_footnotes(rows)
 
     letter = (
         f"{today}\n\n"
@@ -93,6 +95,7 @@ def build_dispute_letter(
         f"Sincerely,\n\n"
         f"{requestor_name}\n"
         f"[Your Signature]\n\n"
+        f"{sources}"
         f"Enclosures: Itemized bill, EOB (if applicable)"
     )
 
@@ -103,6 +106,20 @@ def build_dispute_letter(
         "account_number": account_number,
         **_disputed_totals(bill_id, [row["id"] for row in rows]),
     }
+
+
+def _source_footnotes(rows) -> str:
+    """The public sources behind the disputed charges, so the billing office can check them."""
+    lines = []
+    for row in rows:
+        basis = basis_for(row["rule_id"], json.loads(row["details"] or "{}"))
+        if not basis or basis["kind"] != "official":
+            continue
+        year = f", {basis['source_year']}" if basis.get("source_year") else ""
+        line = f"  - {basis['source_name']}{year}: {basis['source_url']}"
+        if line not in lines:
+            lines.append(line)
+    return "SOURCES\n" + "\n".join(lines) + "\n\n" if lines else ""
 
 
 def _disputed_totals(bill_id: int, finding_ids: list[int]) -> dict:

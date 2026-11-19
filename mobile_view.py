@@ -31,7 +31,7 @@ def free_charge(results: dict) -> dict | None:
         "code": best["code"], "description": best["description"], "date": best["date"],
         "charged": best["charged"], "medicare_rate": best["medicare_rate"], "markup": best["markup"],
         "savings": best["savings"], "severity": best["severity"], "strong": True,
-        "reason_label": reason["label"], "reason_message": reason["message"],
+        "reason_label": reason["label"], "reason_message": reason["message"], "basis": reason["basis"],
     }
 
 
