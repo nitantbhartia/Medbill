@@ -16,6 +16,7 @@ import debt_fighter
 import mobile_auth
 from compliance import log_audit
 from db import get_db
+from hospital_seo import _display_name
 from mobile_routes import ok
 
 router = APIRouter(prefix="/api/m")
@@ -135,10 +136,11 @@ async def hospital_policy(facility_id: str, device_id: str = Depends(mobile_auth
     if not policy:
         raise HTTPException(404, "No policy on file for this hospital")
     reviewed = policy["review_status"] == "reviewed"
+    name = _display_name(policy["hospital_name"], policy["facility_id"])  # HCAI files names in capitals
     return ok({
-        "hospital_name": policy["hospital_name"], "source_url": policy["source_url"],
+        "hospital_name": name, "source_url": policy["source_url"],
         "effective_date": policy["effective_date"], "review_status": policy["review_status"],
-        "label": f"From {policy['hospital_name']}'s policy" + ("" if reviewed else " (not yet checked by BillKarma)"),
+        "label": f"From {name}'s policy" + ("" if reviewed else " (not yet checked by BillKarma)"),
         "application_form_url": policy["application_form_url"],
         "terms": {field: {"value": policy[field], "quote": policy["evidence"].get(field)}
                   for field in POLICY_FIELDS if policy[field] not in (None, [], "")},

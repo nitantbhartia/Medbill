@@ -60,6 +60,7 @@ def test_endpoint_returns_terms_with_quotes_and_an_unchecked_label():
     headers = {"Authorization": f"Bearer {data['token']}"}
     body = client.get("/api/m/assistance/policy/050001", headers=headers).json()["data"]
     assert body["label"].endswith("(not yet checked by BillKarma)")
+    assert body["label"].startswith("From Harbor View")
     assert body["terms"]["free_care_max_fpl"]["quote"].startswith("Patients at or below 200%")
     assert body["terms"]["discount_max_fpl"]["value"] == 400 and "California law" in body["floor_note"]
     assert client.get("/api/m/assistance/policy/none", headers=headers).status_code == 404
