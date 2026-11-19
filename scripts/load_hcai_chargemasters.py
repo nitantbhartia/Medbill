@@ -48,7 +48,7 @@ def post_workbooks(base_url: str, paths: list[str]) -> None:
         rows = list(code_lookup.hcai_workbook_rows(path))
         for start in range(0, len(rows), config.CHARGEMASTER_POST_MAX_ROWS):
             request = Request(base_url.rstrip("/") + "/ops/load-chargemaster", data=json.dumps(rows[start:start + config.CHARGEMASTER_POST_MAX_ROWS]).encode(),
-                              headers={"Content-Type": "application/json", "X-Admin-Token": token})
+                              headers={"Content-Type": "application/json", "X-Admin-Token": token, "User-Agent": "BillKarma data loader"})
             result = json.loads(urlopen(request, timeout=300).read())["data"]
             totals = {key: totals[key] + result[key] for key in totals}
         print(path, totals, flush=True)
