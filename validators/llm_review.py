@@ -53,7 +53,7 @@ def review_findings(line_items: list[dict], findings: list[dict], ask=_ask_model
         return
     try:
         reviews = ask(line_items, findings)
-    except (json.JSONDecodeError, TypeError, ValueError, OSError, genai.errors.APIError) as error:
+    except Exception as error:  # any model or network failure must leave the findings as the rules made them
         log.error("LLM review failed for %d findings, leaving them unchanged: %s", len(findings), error)
         return
     apply_reviews(findings, reviews)
