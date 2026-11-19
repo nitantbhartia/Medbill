@@ -65,7 +65,7 @@ def rebuild_extracted(bill_id: int) -> tuple[dict, dict]:
     if not bill or not items:
         raise CannotRebuild("no stored line items")
     extracted = {key: bill[key] for key in ("provider_name", "provider_address", "bill_date",
-                                            "total_charged", "total_patient_owes")}
+                                            "total_charged", "total_patient_owes", "insurer_name")}
     extracted["line_items"] = [dict(item) for item in items]
     return dict(bill), extracted
 

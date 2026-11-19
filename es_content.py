@@ -64,5 +64,6 @@ REASON_LABELS_ES = {
     "quantity_flag": "La cantidad parece incorrecta",
     "benchmark_outlier": "Por encima del cargo típico en su región",
     "eob_mismatch": "No coincide con el estado de cuenta de su seguro (EOB)",
+    "insurer_rate": "Por encima de la tarifa contratada de su seguro",
     "no_surprises_act": "Puede estar protegido por la Ley No Surprises (No Surprises Act)",
 }

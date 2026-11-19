@@ -11,7 +11,7 @@ from __future__ import annotations
 _SEVERITY_RANK = {"high": 3, "medium": 2, "low": 1, "informational": 0}
 
 # Within one charge, the clearest errors lead: a duplicate beats a price comparison
-_TYPE_ORDER = ["duplicate_charge", "unbundling", "quantity_flag", "upcoding", "price_markup",
+_TYPE_ORDER = ["duplicate_charge", "unbundling", "quantity_flag", "insurer_rate", "upcoding", "price_markup",
                "eob_mismatch", "no_surprises_act", "benchmark_outlier"]
 
 from analyzer import RULE_ID_BY_TYPE
@@ -24,6 +24,7 @@ ERROR_TYPES = {"duplicate_charge", "unbundling", "quantity_flag", "eob_mismatch"
 
 REASON_LABELS = {
     "duplicate_charge": "Billed more than once",
+    "insurer_rate": "Above your insurer's contracted rate",
     "price_markup": "Far above what Medicare pays",
     "upcoding": "Visit level may be higher than the care",
     "unbundling": "Billed separately from a test that includes it",

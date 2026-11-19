@@ -60,7 +60,7 @@ def _run_migrations(db):
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
     ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
-    ensure_columns("bills", {"referral_code": "TEXT"})
+    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT"})
     ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
@@ -573,6 +573,11 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_code ON price_observations(code)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_geo_zip ON price_observations(geo_zip5)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_geo_state ON price_observations(geo_state)")
+    ensure_columns("price_observations", {
+        "negotiated_rate": "REAL", "median_allowed": "REAL", "p10_allowed": "REAL", "p90_allowed": "REAL",
+        "source_url": "TEXT", "file_updated": "DATE", "parsed_at": "TIMESTAMP",
+    })
+    db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_facility_code ON price_observations(facility_id, code)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_price_obs_source ON price_observations(source_type)")
     db.execute(
         """
@@ -1346,6 +1351,38 @@ CREATE INDEX IF NOT EXISTS idx_mobile_events_name ON mobile_events(name, created
 CREATE INDEX IF NOT EXISTS idx_mobile_events_device ON mobile_events(device_id);
 
 -- Extracted line items
+CREATE TABLE IF NOT EXISTS hospital_assistance_policies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    facility_id TEXT,
+    hospital_name TEXT NOT NULL,
+    city TEXT,
+    zip TEXT,
+    hcai_license TEXT,
+    source TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    document_sha256 TEXT NOT NULL,
+    effective_date TEXT,
+    fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    free_care_max_fpl INTEGER,
+    discount_max_fpl INTEGER,
+    discount_rule TEXT,
+    asset_test TEXT,
+    presumptive_programs TEXT,
+    required_documents TEXT,
+    application_deadline TEXT,
+    application_form_url TEXT,
+    contact_phone TEXT,
+    evidence TEXT NOT NULL DEFAULT '{}',
+    review_status TEXT NOT NULL DEFAULT 'auto'
+);
+CREATE INDEX IF NOT EXISTS idx_assistance_policies_facility ON hospital_assistance_policies(facility_id);
+CREATE INDEX IF NOT EXISTS idx_assistance_policies_license ON hospital_assistance_policies(hcai_license);
+
+CREATE TABLE IF NOT EXISTS payer_aliases (
+    alias TEXT PRIMARY KEY,
+    canonical TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS extraction_corrections (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bill_id INTEGER NOT NULL REFERENCES bills(id),

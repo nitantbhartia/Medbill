@@ -15,6 +15,7 @@ from validators.nsa import check_no_surprises_act
 from validators.extraction import validate_extraction, validate_cpt_description
 from validators.benchmarks import check_benchmark
 from validators.eob import check_eob_reconciliation
+from validators.insurer_rate import check_insurer_rate
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,8 @@ def merge_eob_into_extracted(extracted: dict, eob_data: dict) -> dict:
             item["date_of_service"] = candidate["date_of_service"]
 
     merged["line_items"] = bill_items
+    if not merged.get("insurer_name") and eob_data.get("insurer_name"):
+        merged["insurer_name"] = eob_data["insurer_name"]
     merged["_eob_merge"] = {
         "bill_lines": len(bill_items),
         "eob_lines": len(eob_items),
@@ -90,6 +93,7 @@ RULE_ID_BY_TYPE = {
     "no_surprises_act": "RULE_NO_SURPRISES_ACT_HEURISTIC",
     "benchmark_outlier": "RULE_REGIONAL_BENCHMARK_OUTLIER",
     "eob_mismatch": "RULE_EOB_RECONCILIATION",
+    "insurer_rate": "RULE_INSURER_CONTRACTED_RATE",
 }
 
 
@@ -535,9 +539,17 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
                     f"for '{item['description']}'. The code may be misread."
                 )
 
+    hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code) if extracted_data.get("insurer_name") else None
     for item in line_items:
-        # CHECK 1: Price vs Medicare rate
-        pricing_finding = check_pricing(
+        # CHECK 0: the insurer's own contracted rate at this hospital, which beats the Medicare comparison
+        insurer_finding = check_insurer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital else None
+        if insurer_finding:
+            _apply_evidence_policy(insurer_finding, freshness)
+            findings.append(insurer_finding)
+            total_potential_savings += insurer_finding["potential_savings"]
+
+        # CHECK 1: Price vs Medicare rate (the fallback when no insurer rate was found)
+        pricing_finding = None if insurer_finding else check_pricing(
             item,
             locality,
             markup_threshold=adaptive["pricing_markup_threshold"],
@@ -712,8 +724,8 @@ def save_bill_and_findings(
     with get_db() as db:
         cursor = db.execute(
             "INSERT INTO bills (user_id, provider_name, provider_address, bill_date, zip_code, "
-            "total_charged, total_patient_owes, total_findings, total_potential_savings, status, referral_code) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'analyzed', ?)",
+            "total_charged, total_patient_owes, total_findings, total_potential_savings, status, referral_code, insurer_name) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'analyzed', ?, ?)",
             (
                 user_id,
                 extracted.get("provider_name"),
@@ -725,6 +737,7 @@ def save_bill_and_findings(
                 analysis["total_findings"],
                 analysis["total_potential_savings"],
                 referral_code,
+                extracted.get("insurer_name"),
             ),
         )
         bill_id = cursor.lastrowid

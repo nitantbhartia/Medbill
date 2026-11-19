@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResp
 from fastapi.middleware.gzip import GZipMiddleware
 
 import config
+import payer_rates
 import db
 import dispute_service
 import esign as esign_module
@@ -553,6 +554,7 @@ def startup():
             raise RuntimeError("ADMIN_API_TOKEN must be configured in production")
 
     db.init_db()
+    payer_rates.seed_aliases()
     from hospital_seo import repair_hospital_states
     repaired = repair_hospital_states()
     if repaired:

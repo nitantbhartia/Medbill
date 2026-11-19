@@ -14,7 +14,9 @@ from urllib.request import urlopen
 from datetime import date
 from typing import Iterable
 
+import payer_rates
 from db import get_db
+from payer_rates import WIDE_COLUMN
 from hospital_seo import (
     city_slug_from_name,
     log_refresh,
@@ -201,7 +203,35 @@ def is_valid_cpt(code: str | None) -> bool:
     return bool(len(txt) == 5 and txt[0].isalnum() and txt[1:].isdigit())
 
 
+PAYER_KEYS = ("payer_name", "payer", "insurer", "insurance", "payer_name_")
+PLAN_KEYS = ("plan_name", "plan", "plan_name_")
+PERCENTILE_COLUMNS = {"median_allowed": "median_amount", "p10_allowed": "10th_percentile", "p90_allowed": "90th_percentile"}
+
+
+def _percentiles(row: dict) -> dict:
+    """The 2026 price rule's allowed amounts: median, 10th and 90th percentile of what the hospital was paid."""
+    found = {}
+    for field, token in PERCENTILE_COLUMNS.items():
+        for key, value in row.items():
+            if token in str(key).lower().replace(" ", "_") and parse_float(value) is not None:
+                found[field] = parse_float(value)
+                break
+    return found
+
+
+def _wide_payer_rates(row: dict) -> list[tuple[str, str, float]]:
+    """Wide files carry one column per payer and plan: standard_charge|Aetna|PPO|negotiated_dollar."""
+    found = []
+    for key, value in row.items():
+        match = WIDE_COLUMN.search(str(key).strip())
+        rate = parse_float(value) if match else None
+        if match and rate:
+            found.append((match.group("payer").strip(), match.group("plan").strip(), rate))
+    return found
+
+
 def normalize_price_rows(rows: list[dict]) -> list[dict]:
+    """One row per code, payer and plan (not collapsed), each with the payer's negotiated rate and allowed amounts."""
     if not rows:
         return []
     mapping = auto_map_columns(list(rows[0].keys()))
@@ -221,32 +251,45 @@ def normalize_price_rows(rows: list[dict]) -> list[dict]:
         gross = parse_float(row.get(mapping.get("gross_charge", ""))) if mapping.get("gross_charge") else None
         cash = parse_float(row.get(mapping.get("cash_price", ""))) if mapping.get("cash_price") else None
         negotiated = parse_float(row.get(mapping.get("negotiated_rate", ""))) if mapping.get("negotiated_rate") else None
-        modifier = (
-            first(
-                row,
-                (
-                    "modifier",
-                    "mod",
-                    "cpt_modifier",
-                    "hcpcs_modifier",
-                    "code_modifier",
-                ),
-            )
-            or inferred_modifier
-        )
-        normalized.append(
-            {
-                "cpt_code": cpt_code,
-                "cpt_modifier": normalize_modifier(modifier),
-                "description": str(desc).strip() if desc is not None else None,
-                "gross_charge": gross,
-                "cash_price": cash,
-                "avg_negotiated_rate": negotiated,
-                "min_negotiated_rate": negotiated,
-                "max_negotiated_rate": negotiated,
-            }
-        )
+        modifier = first(row, ("modifier", "mod", "cpt_modifier", "hcpcs_modifier", "code_modifier")) or inferred_modifier
+        base = {
+            "cpt_code": cpt_code,
+            "cpt_modifier": normalize_modifier(modifier),
+            "description": str(desc).strip() if desc is not None else None,
+            "gross_charge": gross,
+            "cash_price": cash,
+            **_percentiles(row),
+        }
+        wide = _wide_payer_rates(row)
+        if wide:
+            normalized += [{**base, "payer": payer, "plan_name": plan, "avg_negotiated_rate": rate,
+                            "min_negotiated_rate": rate, "max_negotiated_rate": rate} for payer, plan, rate in wide]
+            continue
+        payer, plan = first(row, PAYER_KEYS), first(row, PLAN_KEYS)
+        normalized.append({**base, "payer": str(payer).strip() if payer else None, "plan_name": str(plan).strip() if plan else None,
+                           "avg_negotiated_rate": negotiated, "min_negotiated_rate": negotiated, "max_negotiated_rate": negotiated})
     return normalized
+
+
+def summarize_by_code(rows: list[dict]) -> list[dict]:
+    """The avg/min/max table the SEO pages use: one row per code, across payers."""
+    grouped: dict[tuple, list[dict]] = {}
+    for row in rows:
+        grouped.setdefault((row["cpt_code"], row["cpt_modifier"]), []).append(row)
+    summaries = []
+    for group in grouped.values():
+        rates = [r["avg_negotiated_rate"] for r in group if r["avg_negotiated_rate"] is not None]
+        first_row = group[0]
+        summaries.append({
+            "cpt_code": first_row["cpt_code"], "cpt_modifier": first_row["cpt_modifier"],
+            "description": next((r["description"] for r in group if r["description"]), None),
+            "gross_charge": next((r["gross_charge"] for r in group if r["gross_charge"] is not None), None),
+            "cash_price": next((r["cash_price"] for r in group if r["cash_price"] is not None), None),
+            "avg_negotiated_rate": round(sum(rates) / len(rates), 2) if rates else None,
+            "min_negotiated_rate": min(rates) if rates else None,
+            "max_negotiated_rate": max(rates) if rates else None,
+        })
+    return summaries
 
 
 def normalize_modifier(value: str | None) -> str | None:
@@ -1166,7 +1209,7 @@ def parse_transparency_file(path: str) -> tuple[list[dict], str, str]:
     extracted = [r for r in normalized if r["cpt_code"] in TARGET_PROCEDURES]
     if not extracted:
         extracted = normalized[:200]
-    return extracted, fmt, "parsed"
+    return extracted, fmt, "parsed"  # payer-level rows; callers summarize for the SEO table
 
 
 def refresh_top300_transparency(files_dir: str = "", data_year: int | None = None) -> dict:
@@ -1303,8 +1346,10 @@ def refresh_facility_transparency(
                 failed += 1
                 continue
 
-            for item in rows:
+            for item in summarize_by_code(rows):
                 upsert_facility_procedure_price(fid, item, facility_type, data_year=data_year)
+            if facility_type == "hospital":
+                payer_rates.save_payer_rates(fid, rows, str(file_url or ""), None, data_year)
 
             size_mb = (os.path.getsize(local_path) / (1024 * 1024)) if os.path.exists(local_path) else None
             _update_parse_result(

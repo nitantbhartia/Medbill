@@ -14,6 +14,15 @@ CMS_BILL_RIGHTS_URL = "https://www.cms.gov/medical-bill-rights"
 
 # explanation uses the values in `needs`; fallback is used when any of them is missing.
 RULES = {
+    "RULE_INSURER_CONTRACTED_RATE": {
+        "kind": "official",
+        "explanation": "{insurer}'s contracted rate at {hospital} for code {code} is {rate}. You were charged {charged}.",
+        "needs": ("insurer", "hospital", "code", "rate", "charged"),
+        "fallback": "Your insurer's contracted rate at this hospital, from the hospital's own price file, is below what this bill asks.",
+        "source_name": "Hospital price transparency file",
+        "source_url": "https://www.cms.gov/priorities/key-initiatives/hospital-price-transparency",
+        "source_year": lambda: None,
+    },
     "RULE_MARKUP_VS_MEDICARE": {
         "kind": "official",
         "explanation": "Medicare pays {medicare} for code {code}. This bill charges {charged}, which is {markup}× that.",
@@ -95,6 +104,9 @@ def _values(details: dict) -> dict:
         "other": related[0].get("cpt_code") if related and isinstance(related[0], dict) else None,
         "times": len(details["duplicate_of"]) + 1 if details.get("duplicate_of") else None,
         "quantity": quantity if isinstance(quantity, (int, float)) and quantity > 1 else None,
+        "insurer": details.get("insurer"),
+        "hospital": details.get("hospital_name"),
+        "rate": _dollars(details.get("contracted_rate")),
     }
 
 
@@ -106,9 +118,9 @@ def basis_for(rule_id: str | None, details: dict) -> dict | None:
     values = _values(details)
     complete = all(values[name] is not None for name in rule["needs"])
     text = rule["explanation"].format(**values) if complete else rule["fallback"]
-    year = rule["source_year"]() if "source_year" in rule else None
+    year = details.get("rate_year") if rule_id == "RULE_INSURER_CONTRACTED_RATE" else (rule["source_year"]() if "source_year" in rule else None)
     basis = {"kind": rule["kind"], "rule_id": rule_id, "explanation": text,
-             "source_name": rule["source_name"], "source_url": rule.get("source_url")}
+             "source_name": rule["source_name"], "source_url": (details.get("rate_source_url") if rule_id == "RULE_INSURER_CONTRACTED_RATE" else None) or rule.get("source_url")}
     if year:
         basis["source_year"] = year
     return basis

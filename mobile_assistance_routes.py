@@ -10,6 +10,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 
+import assistance_policies
 import config
 import debt_fighter
 import mobile_auth
@@ -121,3 +122,25 @@ async def wins(device_id: str = Depends(mobile_auth.device_from_request)):
             "GROUP BY o.bill_id HAVING MAX(o.actual_savings) > 0)", (device_id,),
         ).fetchone()
     return ok({"reports": row["reports"], "total_saved": round(row["total"], 2)})
+
+
+POLICY_FIELDS = ("free_care_max_fpl", "discount_max_fpl", "discount_rule", "asset_test", "presumptive_programs",
+                 "required_documents", "application_deadline", "contact_phone")
+
+
+@router.get("/assistance/policy/{facility_id}")
+async def hospital_policy(facility_id: str, device_id: str = Depends(mobile_auth.device_from_request)):
+    """One hospital's own charity care terms, each with the sentence it came from. No income is sent or stored."""
+    policy = assistance_policies.get_policy(facility_id)
+    if not policy:
+        raise HTTPException(404, "No policy on file for this hospital")
+    reviewed = policy["review_status"] == "reviewed"
+    return ok({
+        "hospital_name": policy["hospital_name"], "source_url": policy["source_url"],
+        "effective_date": policy["effective_date"], "review_status": policy["review_status"],
+        "label": f"From {policy['hospital_name']}'s policy" + ("" if reviewed else " (not yet checked by BillKarma)"),
+        "application_form_url": policy["application_form_url"],
+        "terms": {field: {"value": policy[field], "quote": policy["evidence"].get(field)}
+                  for field in POLICY_FIELDS if policy[field] not in (None, [], "")},
+        "floor_note": policy["evidence"].get("discount_max_fpl_floor"),
+    })

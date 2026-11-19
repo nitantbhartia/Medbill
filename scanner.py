@@ -72,6 +72,7 @@ Return a JSON object with this exact structure:
   "patient_name": "Patient name (will be redacted)",
   "bill_date": "YYYY-MM-DD",
   "account_number": "Account or invoice number",
+  "insurer_name": "Health insurance company name, only if printed (common on insurance statements)",
   "billing_phone": "Billing office phone number, only if printed on the bill",
   "billing_email": "Billing office email, only if printed on the bill",
   "billing_address": "Address to send payments or billing questions to, only if printed on the bill",
@@ -98,7 +99,7 @@ CRITICAL RULES:
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
 - unit_price: the price per unit, only when the bill prints one. page: the page number the line is on (1 for a single page).
-- billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
+- insurer_name, billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
 - For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
 - CPT codes may be labeled "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
 - Some bills show only descriptions without codes — still extract those items.

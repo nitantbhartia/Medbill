@@ -399,3 +399,13 @@ OCR_GATE_SUITES = (
 DATA_IMPROVEMENT_CONSENT_VERSION = "1"
 OCR_QUALITY_RUN_STATUS = "ocr_weekly"
 OCR_QUALITY_WINDOW_DAYS = 7
+
+# Hospital charity care policies (B14.6)
+HCAI_POLICIES_SITEMAP = "https://hcai.ca.gov/hospital_policies-sitemap.xml"
+POLICY_FETCH_DELAY_SECONDS = 1.0
+POLICY_MAX_TEXT_CHARS = 60000
+CA_CHARITY_CARE_FPL_FLOOR = 400
+
+# Insurer-specific prices from hospital files (B14.3)
+MRF_MAX_AGE_DAYS = 400
+INSURER_RATE_TOLERANCE = 1.10
