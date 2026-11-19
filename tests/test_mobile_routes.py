@@ -276,6 +276,7 @@ def test_apple_app_site_association_serves_json(monkeypatch):
     assert response.headers["content-type"].startswith("application/json")
     assert response.json()["applinks"]["details"][0]["appIDs"] == ["ABCDE12345.app.billkarma.ios"]
     assert client.get("/app/scan").headers["location"] == "/scan"
+    assert client.get("/app/bills", follow_redirects=False).headers["location"] == "/scan"
 
 
 def test_outcome_is_recorded_and_bad_input_rejected():

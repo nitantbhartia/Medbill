@@ -2988,6 +2988,12 @@ async def open_in_app_fallback():
     return RedirectResponse("/scan", status_code=302)
 
 
+@app.get("/app/bills")
+async def open_bills_in_app_fallback():
+    """The share extension opens this link: the app takes it, and without the app it falls back to the web scan."""
+    return RedirectResponse("/scan", status_code=302)
+
+
 @app.get("/robots.txt")
 async def robots_txt():
     body = (
