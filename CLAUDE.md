@@ -213,3 +213,7 @@ project/
 - Readable code is better than clever code
 - Working code is better than perfect code
 - 80% solution shipped today beats 100% solution shipped never
+
+## iOS app project
+
+The spec for the BillKarma iOS app and its backend changes is in `docs/ios-guide.md`. Read the sections a task names before writing code. Screen mockups are in `docs/mockups/` (index in its README); where a mockup and the guide disagree, the mockup wins.
