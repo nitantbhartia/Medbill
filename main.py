@@ -748,6 +748,7 @@ async def results_page(request: Request, bill_id: int):
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
     findings = results.get("findings") or []
     from charge_summary import group_findings_by_charge
+    from mobile_view import free_charge
     charge_summary = group_findings_by_charge(findings, bill_total or None)
     unlocked = report_module.is_unlocked(bill_id)
     context = {
@@ -756,6 +757,7 @@ async def results_page(request: Request, bill_id: int):
         "charge_summary": charge_summary,
         "unlocked": unlocked,
         "teaser": report_module.teaser(bill_id),
+        "free_charge": None if unlocked else free_charge(results),
         "report_price": config.REPORT_PRICE_CENTS // 100,
         "checkout_error": request.query_params.get("checkout_error", ""),
         "just_unlocked": request.query_params.get("unlocked") == "1",

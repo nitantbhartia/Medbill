@@ -74,14 +74,24 @@ def test_locked_results_show_the_count_the_savings_and_one_price(flagged_bill):
     assert 'action="/report/checkout"' in html
 
 
-def test_locked_results_hide_every_charge_detail_and_the_letter_tools(flagged_bill):
+def test_locked_results_show_one_charge_free_and_hide_the_rest_and_the_letter_tools(flagged_bill):
+    from analyzer import get_bill_results
+    from mobile_view import free_charge
+    free = free_charge(get_bill_results(flagged_bill))
     html = client.get(f"/results/{flagged_bill}").text
-    assert "Medicare pays $" not in html
+    assert "Free preview" in html and free["description"] in html
+    assert html.count("Medicare pays $") == 1
     assert 'id="gen-letter-btn"' not in html
     assert 'id="gen-phone-btn"' not in html
     assert "Charges we flagged" not in html
     for item in SAMPLE_BILL["line_items"]:
-        assert item["description"] not in html
+        if item["description"] != free["description"]:
+            assert item["description"] not in html
+
+
+def test_the_free_preview_is_gone_once_the_report_is_unlocked(flagged_bill):
+    unlock(flagged_bill)
+    assert "Free preview" not in client.get(f"/results/{flagged_bill}").text
 
 
 def test_locked_results_name_no_other_product(flagged_bill):
