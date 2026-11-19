@@ -147,3 +147,10 @@ def test_the_diff_script_reports_added_findings_and_writes_nothing(tmp_path):
     summary = finding_diff.run([entry], str(tmp_path / "diff.csv"))
     assert summary["changes"] >= 1 and "upcoding" in (tmp_path / "diff.csv").read_text()
     assert config.ER_LEVEL_RULE_V2 is False  # flags are put back after the run
+
+
+def test_unbundling_does_not_crash_when_a_scanned_line_has_no_description():
+    """Found by running real bills: a missing description made the unbundling message fail."""
+    first = {**line("80048"), "description": None}
+    second = {**line("80053"), "description": None}
+    assert isinstance(run(first, second), list)

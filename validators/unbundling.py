@@ -144,8 +144,8 @@ def check_unbundling(item: dict, all_items: list[dict]) -> dict | None:
             )
 
         savings = max(0, total_charged - correct_rate)
-        descriptions = [item.get("description", "")] + [
-            r.get("description", "") for r in related
+        descriptions = [item.get("description") or item.get("cpt_code") or "a service"] + [
+            r.get("description") or r.get("cpt_code") or "a service" for r in related
         ]
 
         # Check NCCI modifier indicator
