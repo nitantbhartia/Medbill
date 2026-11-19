@@ -11,6 +11,7 @@ import config
 import dispute_service
 import hold_calls
 import ocr_quality
+import rule_learning
 
 log = logging.getLogger(__name__)
 REMINDER_SCRIPT = Path(__file__).parent / "scripts" / "send_concierge_reminders.py"
@@ -32,6 +33,10 @@ def run_daily_jobs() -> None:
         hold_calls.reap_stale_calls()
     except Exception:
         log.exception("Daily jobs: stale hold calls failed")
+    try:
+        rule_learning.nightly_update()
+    except Exception:
+        log.exception("Daily jobs: rule demotions failed")
     try:
         ocr_quality.record_weekly()
     except Exception:

@@ -153,8 +153,11 @@ async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(m
         raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
     if not isinstance(final_owed, (int, float)) or isinstance(final_owed, bool) or final_owed < 0:
         raise HTTPException(400, "final_patient_owes must be a non-negative number")
+    reason = payload.get("reason_category")
+    if reason is not None and reason not in config.REJECTION_REASONS:
+        raise HTTPException(400, f"reason_category must be one of: {', '.join(config.REJECTION_REASONS)}")
     bill = _bill_row(bill_id)
-    saved = outcome_verification.record_reported(bill_id, bill, outcome, final_owed)
+    saved = outcome_verification.record_reported(bill_id, bill, outcome, final_owed, reason)
     log_audit(action="mobile_report_outcome", resource_type="bill", resource_id=str(bill_id),
               metadata={"outcome": outcome, "actual_savings": saved})
     return ok({"actual_savings": saved})

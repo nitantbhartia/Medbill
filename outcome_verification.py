@@ -33,16 +33,19 @@ def facility_for(bill: dict) -> str | None:
     return match["facility_id"] if match else None
 
 
-def record_reported(bill_id: int, bill: dict, outcome: str, final_owed: float) -> float:
-    """A self-reported outcome. Unverified until the user sends the new statement."""
+def record_reported(bill_id: int, bill: dict, outcome: str, final_owed: float, reason_category: str | None = None) -> float:
+    """A self-reported outcome. Unverified until the user sends the new statement.
+    A rejection keeps the rules that were flagged and the reason the hospital gave."""
+    rejected = json.dumps(bill_rule_ids(bill_id)) if outcome in config.REJECTED_OUTCOMES else None
     original = bill.get("total_patient_owes") or 0
     saved = max(0, original - final_owed)
     with get_db() as db:
         db.execute(
             "INSERT INTO dispute_outcomes (bill_id, hospital_name, called_billing, outcome, original_patient_owes, "
-            "final_patient_owes, actual_savings, shared_publicly, facility_id, rule_ids) VALUES (?, ?, 1, ?, ?, ?, ?, 0, ?, ?)",
+            "final_patient_owes, actual_savings, shared_publicly, facility_id, rule_ids, rejected_rule_ids, reason_category) "
+            "VALUES (?, ?, 1, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
             (bill_id, bill.get("provider_name"), outcome, original, final_owed, saved, facility_for(bill),
-             json.dumps(bill_rule_ids(bill_id))))
+             json.dumps(bill_rule_ids(bill_id)), rejected, reason_category if rejected else None))
     return saved
 
 

@@ -488,3 +488,10 @@ LLM_REVIEW_ENABLED = os.environ.get("LLM_REVIEW_ENABLED", "false").lower() == "t
 RULES_VERSION = "2026-11-19"
 RECHECK_DAYS = 90
 APPLE_REFUND_URL = "https://reportaproblem.apple.com"
+
+# B16.7: learning from hospital replies
+REJECTION_REASONS = ("documentation_provided", "modifier", "correct_as_billed", "other")
+REJECTED_OUTCOMES = ("no_change", "denied")
+RULE_DEMOTE_PRECISION = 0.3
+RULE_LIFT_DAYS = 30
+RULE_DEMOTION_RUN_STATUS = "rule_demotions"

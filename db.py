@@ -78,7 +78,8 @@ def _run_migrations(db):
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT"})
     ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
-                                        "rule_ids": "TEXT", "facility_id": "TEXT"})
+                                        "rule_ids": "TEXT", "facility_id": "TEXT",
+                                        "rejected_rule_ids": "TEXT", "reason_category": "TEXT"})
     ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
     ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT"})
     ensure_columns("bills", {
@@ -1456,6 +1457,29 @@ CREATE TABLE IF NOT EXISTS hold_call_credits (
     used INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS rule_demotions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rule_id TEXT NOT NULL,
+    facility_id TEXT NOT NULL DEFAULT '',
+    precision REAL NOT NULL,
+    sample INTEGER NOT NULL,
+    demoted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    above_since TIMESTAMP,
+    lifted_at TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rule_demotions_rule ON rule_demotions(rule_id, facility_id);
+
+CREATE TABLE IF NOT EXISTS shadow_findings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    rule_id TEXT NOT NULL,
+    finding_type TEXT NOT NULL,
+    severity TEXT,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_shadow_findings_rule ON shadow_findings(rule_id);
 
 CREATE TABLE IF NOT EXISTS bill_notices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

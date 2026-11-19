@@ -7,6 +7,8 @@ from difflib import SequenceMatcher
 
 import config
 from db import get_db
+from rule_learning import demoted_rules
+from rule_sources import RULES
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
 from validators.llm_review import review_findings
 from validators.innocent_explanations import apply_innocent_explanations
@@ -690,6 +692,17 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         findings.append(eob_finding)
         total_potential_savings += eob_finding.get("potential_savings", 0)
 
+    # B16.7: rules that hospitals mostly reject are shown only as worth asking, and rules still in shadow mode are set aside
+    outcome_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
+    demoted = demoted_rules(outcome_hospital["facility_id"] if outcome_hospital else None)
+    shadow = [f for f in findings if _is_shadow(f)]
+    findings = [f for f in findings if f not in shadow]
+    total_potential_savings -= sum(f.get("potential_savings", 0) for f in shadow)
+    for finding in findings:
+        if RULE_ID_BY_TYPE.get(finding.get("type")) in demoted and finding.get("severity") in ("high", "medium"):
+            finding["severity"], finding["demoted"] = "low", True
+            total_potential_savings -= finding.get("potential_savings", 0)
+
     # B16.5: a legitimate explanation downgrades a finding, and a charge only worth asking about adds nothing to the total
     for finding in findings:
         was_counted = finding.get("severity") in ("high", "medium")
@@ -711,7 +724,6 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         _ensure_evidence_panel(finding, freshness)
 
     # Within a severity, findings this hospital has actually corrected for people come first.
-    outcome_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
     hospital_outcomes = get_hospital_outcomes(outcome_hospital["facility_id"]) if outcome_hospital else {}
     for finding in findings:
         record = hospital_outcomes.get(finding.get("rule_id") or "")
@@ -732,6 +744,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             sum(float(f.get("gross_potential_savings", f.get("potential_savings", 0) or 0)) for f in findings), 2
         ),
         "findings": findings,
+        "shadow_findings": shadow,
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
@@ -747,6 +760,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
 
 def _insert_findings(db, bill_id: int, analysis: dict) -> None:
+    for finding in analysis.get("shadow_findings", []):
+        db.execute("INSERT INTO shadow_findings (bill_id, rule_id, finding_type, severity, details) VALUES (?, ?, ?, ?, ?)",
+                   (bill_id, finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding["type"], ""), finding["type"], finding.get("severity"), json.dumps(finding)))
     for finding in analysis.get("findings", []):
         db.execute(
             "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
@@ -785,6 +801,10 @@ def replace_findings_and_insurance_fields(bill_id: int, extracted: dict, analysi
                    (analysis["total_findings"], analysis["total_potential_savings"], config.RULES_VERSION,
                     json.dumps(dataset_versions()), bill_id))
         _insert_findings(db, bill_id, analysis)
+
+
+def _is_shadow(finding: dict) -> bool:
+    return bool(RULES.get(RULE_ID_BY_TYPE.get(finding.get("type"), ""), {}).get("shadow"))
 
 
 def dataset_versions() -> dict:

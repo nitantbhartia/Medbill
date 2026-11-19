@@ -289,6 +289,17 @@ def test_outcome_is_recorded_and_bad_input_rejected():
         assert db.execute("SELECT COUNT(*) FROM dispute_outcomes WHERE bill_id = ?", (bill_id,)).fetchone()[0] == 1
 
 
+def test_rejection_reason_is_validated_and_stored():
+    _, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    bad = client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "no_change", "final_patient_owes": 100, "reason_category": "rude"}, headers=headers)
+    assert bad.status_code == 400
+    good = client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "no_change", "final_patient_owes": 100, "reason_category": "modifier"}, headers=headers)
+    assert good.status_code == 200
+    with get_db() as db:
+        assert db.execute("SELECT reason_category FROM dispute_outcomes WHERE bill_id = ?", (bill_id,)).fetchone()[0] == "modifier"
+
+
 def test_assistance_check_letter_and_wins():
     _, headers = new_device()
     bill_id = scan(headers)["bill_id"]
