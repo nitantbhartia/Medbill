@@ -64,7 +64,7 @@ def _run_migrations(db):
     ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
                                         "rule_ids": "TEXT", "facility_id": "TEXT"})
     ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
-    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT"})
+    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
         "billing_phone": "TEXT", "billing_email": "TEXT", "billing_address": "TEXT", "account_number": "TEXT",
@@ -1381,6 +1381,16 @@ CREATE TABLE IF NOT EXISTS hospital_assistance_policies (
 CREATE INDEX IF NOT EXISTS idx_assistance_policies_facility ON hospital_assistance_policies(facility_id);
 CREATE INDEX IF NOT EXISTS idx_assistance_policies_license ON hospital_assistance_policies(hcai_license);
 
+CREATE TABLE IF NOT EXISTS mue_limits (
+    code TEXT NOT NULL,
+    max_units INTEGER NOT NULL,
+    setting TEXT NOT NULL,
+    version TEXT NOT NULL,
+    effective_date TEXT,
+    PRIMARY KEY (code, setting, version)
+);
+CREATE INDEX IF NOT EXISTS idx_mue_code ON mue_limits(code);
+
 CREATE TABLE IF NOT EXISTS payer_aliases (
     alias TEXT PRIMARY KEY,
     canonical TEXT NOT NULL
@@ -1415,6 +1425,7 @@ CREATE TABLE IF NOT EXISTS line_items (
     needs_confirm INTEGER DEFAULT 0,
     issue_kind TEXT,
     issue_field TEXT,
+    modifiers TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -1,3 +1,5 @@
+import config
+from validators.modifiers import modifiers_of
 from validators.pricing import get_medicare_rate
 from db import get_db
 
@@ -148,6 +150,9 @@ def check_unbundling(item: dict, all_items: list[dict]) -> dict | None:
 
         # Check NCCI modifier indicator
         modifier_ind = _check_ncci_modifier(item["cpt_code"], matching[0])
+        if config.DUPLICATE_MODIFIERS and modifier_ind == "1" and (
+                modifiers_of(item) | set().union(*(modifiers_of(r) for r in related))) & config.DISTINCT_SERVICE_MODIFIERS:
+            return None  # NCCI allows the pair with 59/X{EPSU}, and the bill carries one
         if modifier_ind == "1":
             severity = "low"
             caveat = (

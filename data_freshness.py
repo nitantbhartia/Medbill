@@ -53,6 +53,17 @@ def get_data_freshness() -> dict:
             ),
         }
 
+        # Medically unlikely edits (units per day)
+        row = db.execute("SELECT MAX(version) AS version, MAX(effective_date) AS dt FROM mue_limits").fetchone()
+        sources["mue_limits"] = {
+            "name": "Medically Unlikely Edits",
+            "latest_date": row["dt"] if row else None,
+            "version": row["version"] if row else None,
+            "expected_frequency": "Quarterly",
+            "fresh": bool(row and row["dt"]),
+            "warning": None if row and row["dt"] else "No MUE limits are loaded, so quantity checks can't use Medicare's daily limits.",
+        }
+
         # OPPS rates
         row = db.execute("SELECT MAX(effective_year) as yr FROM hospital_opps_rates").fetchone()
         latest_opps_year = row["yr"] if row else None

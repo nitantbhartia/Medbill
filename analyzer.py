@@ -16,6 +16,8 @@ from validators.extraction import validate_extraction, validate_cpt_description
 from validators.benchmarks import check_benchmark
 from validators.eob import check_eob_reconciliation
 from outcome_stats import get_hospital_outcomes
+from validators.er_level import check_er_level_v2
+from validators.quantity import check_quantities_v2
 from validators.insurer_rate import check_insurer_rate
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
@@ -95,7 +97,24 @@ RULE_ID_BY_TYPE = {
     "benchmark_outlier": "RULE_REGIONAL_BENCHMARK_OUTLIER",
     "eob_mismatch": "RULE_EOB_RECONCILIATION",
     "insurer_rate": "RULE_INSURER_CONTRACTED_RATE",
+    "quantity_question": "RULE_HIGH_QUANTITY_CHECK",
+    "price_info": "RULE_MARKUP_VS_MEDICARE",
 }
+
+
+def _insured_in_network(item: dict, extracted_data: dict) -> bool:
+    """The line shows an insurance adjustment and nothing says the care was out of network."""
+    if item.get("insurance_adjustment") is None:
+        return False
+    text = " ".join(str(value or "") for value in (item.get("description"), extracted_data.get("provider_name"))).lower()
+    return not any(word in text for word in config.OUT_OF_NETWORK_WORDS)
+
+
+def _as_price_info(finding: dict) -> dict:
+    """A price comparison on an insured, in-network line is information: the insurer already took its discount."""
+    return {**finding, "type": "price_info", "severity": "low", "potential_savings": 0,
+            "message": (f"Priced at {finding['markup_multiple']}\u00d7 Medicare. Your insurer already applied its discount, "
+                        "so this mostly affects the insurer, not you.")}
 
 
 def _assign_confidence(finding: dict) -> str:
@@ -377,7 +396,8 @@ def _apply_evidence_policy(finding: dict, freshness: dict) -> None:
     if ftype == "upcoding":
         # Without clinical documentation, this should remain a softer signal.
         finding["evidence_level"] = "low"
-        finding["severity"] = _downgrade_severity(finding.get("severity", "medium"))
+        if not config.ER_LEVEL_RULE_V2:  # v2 findings are already "low"
+            finding["severity"] = _downgrade_severity(finding.get("severity", "medium"))
         finding["message"] += " This is an informational flag and requires chart-level review."
 
     stale_rate_data = not freshness.get("medicare_pfs", {}).get("fresh", True)
@@ -540,6 +560,12 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
                     f"for '{item['description']}'. The code may be misread."
                 )
 
+    if config.QUANTITY_RULE_V2:
+        for finding in check_quantities_v2(line_items):
+            _apply_evidence_policy(finding, freshness)
+            findings.append(finding)
+            total_potential_savings += finding["potential_savings"]
+
     hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code) if extracted_data.get("insurer_name") else None
     for item in line_items:
         # CHECK 0: the insurer's own contracted rate at this hospital, which beats the Medicare comparison
@@ -556,6 +582,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             markup_threshold=adaptive["pricing_markup_threshold"],
             high_markup_threshold=adaptive["pricing_high_threshold"],
         )
+        if pricing_finding and config.INSURED_PRICE_INFO_ONLY and _insured_in_network(item, extracted_data):
+            pricing_finding = _as_price_info(pricing_finding)
         if pricing_finding:
             _apply_evidence_policy(pricing_finding, freshness)
             _apply_patient_impact_savings(pricing_finding, extracted_data.get("total_patient_owes"))
@@ -579,15 +607,15 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             total_potential_savings += unbundle_finding["potential_savings"]
 
         # CHECK 4: Upcoding detection
-        upcode_finding = check_upcoding(item)
+        upcode_finding = check_er_level_v2(item, line_items) if config.ER_LEVEL_RULE_V2 else check_upcoding(item)
         if upcode_finding:
             _apply_evidence_policy(upcode_finding, freshness)
             _apply_patient_impact_savings(upcode_finding, extracted_data.get("total_patient_owes"))
             findings.append(upcode_finding)
             total_potential_savings += upcode_finding["potential_savings"]
 
-        # CHECK 5: Quantity flags
-        if item.get("quantity") and item["quantity"] > 1 and item.get("charged_amount"):
+        # CHECK 5: Quantity flags (the old rule; QUANTITY_RULE_V2 replaces it below, once per bill)
+        if not config.QUANTITY_RULE_V2 and item.get("quantity") and item["quantity"] > 1 and item.get("charged_amount"):
             extra = item["charged_amount"] * (item["quantity"] - 1) / item["quantity"]
             findings.append(
                 {
@@ -641,7 +669,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     # Assign confidence to each finding
     for finding in findings:
-        finding["rule_id"] = RULE_ID_BY_TYPE.get(finding.get("type"), "RULE_GENERIC_HEURISTIC")
+        finding["rule_id"] = finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding.get("type"), "RULE_GENERIC_HEURISTIC")
         finding["confidence"] = _assign_confidence(finding)
         _ensure_evidence_panel(finding, freshness)
 
@@ -760,8 +788,8 @@ def save_bill_and_findings(
                 "INSERT INTO line_items (bill_id, date_of_service, cpt_code, description, "
                 "quantity, charged_amount, insurance_paid, insurance_adjustment, "
                 "patient_responsibility, medicare_rate, markup_multiple, extraction_confidence, "
-                "needs_confirm, issue_kind, issue_field) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "needs_confirm, issue_kind, issue_field, modifiers) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     item.get("date_of_service"),
@@ -778,6 +806,7 @@ def save_bill_and_findings(
                     1 if item.get("needs_confirm") else 0,
                     item.get("issue_kind"),
                     item.get("issue_field"),
+                    json.dumps(item.get("modifiers") or []),
                 ),
             )
 

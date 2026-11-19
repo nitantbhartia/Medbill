@@ -34,6 +34,7 @@ def teaser(bill_id: int) -> dict | None:
     import outcome_verification
     rule_ids = outcome_verification.bill_rule_ids(bill_id)
     return {
+        "info_only": summary["info_only"],
         "outcome_line": outcome_stats.outcome_line(bill.get("provider_name") or "", outcome_verification.facility_for(bill), rule_ids),
         "charge_count": len(summary["charges"]),
         "strong_count": summary["strong_count"],
@@ -57,7 +58,7 @@ def _reason_counts(charges: list[dict]) -> list[dict]:
 
 def has_flagged_charges(bill_id: int) -> bool:
     info = teaser(bill_id)
-    return bool(info and info["charge_count"])
+    return bool(info and info["charge_count"] and not info["info_only"])
 
 
 def is_paid(bill_id: int) -> bool:

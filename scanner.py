@@ -85,6 +85,7 @@ Return a JSON object with this exact structure:
       "description": "Service description",
       "quantity": 1,
       "unit_price": 500.00,
+      "modifiers": ["91"],
       "page": 1,
       "charged_amount": 500.00,
       "insurance_paid": 300.00,
@@ -98,6 +99,7 @@ CRITICAL RULES:
 - The "line_items" field MUST be an array containing ALL line items from the bill.
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
+- modifiers: the 2-character modifier codes printed next to the procedure code (for example 91, RT, 26, 59), as a list; [] if none.
 - unit_price: the price per unit, only when the bill prints one. page: the page number the line is on (1 for a single page).
 - insurer_name, billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
 - For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
@@ -126,6 +128,16 @@ def _coerce_numeric(value):
         return None
 
 
+def clean_modifiers(value) -> list[str]:
+    """Only 2-character letters and numbers are modifiers. Anything else is dropped."""
+    if isinstance(value, str):
+        value = re.split(r"[,\s]+", value)
+    if not isinstance(value, list):
+        return []
+    return [m.upper() for m in value if isinstance(m, str) and re.fullmatch(r"[A-Za-z0-9]{2}", m.strip())
+            for m in [m.strip()]]
+
+
 def _add_confidence_flags(extracted: dict) -> dict:
     """Normalize numeric fields and flag items that need user confirmation."""
     for idx, item in enumerate(extracted.get("line_items", [])):
@@ -136,6 +148,7 @@ def _add_confidence_flags(extracted: dict) -> dict:
         qty = _coerce_numeric(item.get("quantity"))
         item["quantity"] = int(qty) if qty else 1
 
+        item["modifiers"] = clean_modifiers(item.get("modifiers"))
         item["confidence"] = "high"
 
         if item.get("cpt_code") is None:

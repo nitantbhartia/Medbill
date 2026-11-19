@@ -414,3 +414,25 @@ INSURER_RATE_TOLERANCE = 1.10
 OUTCOME_MIN_SAMPLE = 10
 VERIFY_REWARD_PLUS_DAYS = 90
 VERIFY_NAME_MATCH_MIN_SHARED_WORDS = 2
+
+# B16: stricter findings. Each rule change is behind its own flag, off until scripts/finding_diff.py has been read by hand.
+QUANTITY_RULE_V2 = os.getenv("QUANTITY_RULE_V2", "false").lower() == "true"
+ER_LEVEL_RULE_V2 = os.getenv("ER_LEVEL_RULE_V2", "false").lower() == "true"
+DUPLICATE_MODIFIERS = os.getenv("DUPLICATE_MODIFIERS", "false").lower() == "true"
+INSURED_PRICE_INFO_ONLY = os.getenv("INSURED_PRICE_INFO_ONLY", "false").lower() == "true"
+
+# ER level: services that support a level 4 or 5 visit (CPT code ranges, inclusive)
+ER_ADVANCED_IMAGING_RANGES = ((70450, 70498), (71250, 71275), (72125, 72133), (73200, 73206), (74150, 74178),
+                              (70540, 70553), (72141, 72158), (73218, 73225), (74181, 74185), (76536, 76882))
+ER_IV_RANGE = (96360, 96379)
+ER_CRITICAL_CARE_CODES = {"99291"}
+ER_LAB_RANGE = (80047, 89398)
+ER_LAB_PANEL_MIN_CODES = 3
+
+# Modifiers (B16.3): a repeat with one of these is not a duplicate
+REPEAT_MODIFIERS = {"91", "76", "77", "50", "59", "XE", "XS", "XP", "XU"}
+SIDE_MODIFIERS = {"RT", "LT"}
+COMPONENT_MODIFIERS = {"26", "TC"}
+DISTINCT_SERVICE_MODIFIERS = {"59", "XE", "XS", "XP", "XU"}
+COMMONLY_REPEATED_CODES = {"36415"}  # plus every lab code (80047-89398)
+OUT_OF_NETWORK_WORDS = ("out of network", "out-of-network", "non-par", "nonpar", "non participating")

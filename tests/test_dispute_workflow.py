@@ -129,9 +129,9 @@ class TestBuildDisputeLetter:
         _insert_finding(bill_id, "upcoding", "99285", details, savings=1400.0)
         result = build_dispute_letter(bill_id=bill_id)
         assert result is not None
-        assert "UPCODING CONCERN" in result["letter"]
+        assert "ER VISIT LEVEL" in result["letter"]
         assert "99285" in result["letter"]
-        assert "99283" in result["letter"]
+        assert "Please send the documentation that supports a level 5 visit" in result["letter"]
 
     def test_finding_ids_filter_works(self):
         bill_id = _insert_bill()

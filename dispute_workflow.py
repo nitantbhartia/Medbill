@@ -174,16 +174,12 @@ def _finding_paragraph(
         )
 
     if finding_type == "upcoding":
-        expected = detail.get("expected_code")
-        expected_phrase = f"(e.g., CPT {expected})" if expected else "(a lower-level code)"
+        level = detail.get("billed_level") or {"99284": 4, "99285": 5}.get(cpt, "")
         return (
-            f"UPCODING CONCERN — CPT {cpt} ({desc.title()})\n"
+            f"ER VISIT LEVEL — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
-            f"     The evaluation and management code assigned (CPT {cpt}) appears inconsistent "
-            f"with the documented service level. I am requesting review of the supporting "
-            f"clinical documentation to confirm the correct complexity level was assigned. "
-            f"If the documentation does not support this code, the charge should be revised "
-            f"to the appropriate level {expected_phrase}."
+            f"     Please send the documentation that supports a level {level} visit. I am asking for the "
+            f"records that show why this level was assigned."
         )
 
     # Default: pricing markup

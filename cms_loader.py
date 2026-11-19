@@ -330,3 +330,24 @@ def load_transformed_cms_2026(processed_dir: str = "data/cms/processed") -> dict
         "opps_rates": refresh_opps_rates(str(opps_csv)),
         "ncci_edits": refresh_ncci_edits(str(ncci_csv)),
     }
+
+
+def load_mue_limits(csv_path: str, setting: str, version: str, effective_date: str) -> int:
+    """Load a CMS medically unlikely edits file (practitioner, outpatient hospital or equipment) into mue_limits.
+    The CSV has a header row with 'HCPCS/CPT Code' and a column whose name contains 'MUE Values'; lines above it are ignored."""
+    from db import get_db
+
+    with open(csv_path, newline="", encoding="utf-8-sig") as handle:
+        rows = list(csv.reader(handle))
+    header_index = next(i for i, row in enumerate(rows) if row and "HCPCS/CPT Code" in row[0])
+    header = rows[header_index]
+    value_column = next(i for i, name in enumerate(header) if "MUE Values" in name)
+    loaded = 0
+    with get_db() as db:
+        for row in rows[header_index + 1:]:
+            if len(row) <= value_column or not row[0].strip() or not row[value_column].strip().isdigit():
+                continue
+            db.execute("INSERT OR REPLACE INTO mue_limits (code, max_units, setting, version, effective_date) VALUES (?, ?, ?, ?, ?)",
+                       (row[0].strip().upper(), int(row[value_column]), setting, version, effective_date))
+            loaded += 1
+    return loaded

@@ -40,7 +40,11 @@ def headline(summary: dict | None) -> dict | None:
     """Mobile shows one number: billing errors when there are any, else the price-gap total."""
     if not summary:
         return summary
-    return {**summary, "total_savings": summary["headline_amount"]}
+    shown = {**summary, "total_savings": summary["headline_amount"]}
+    if summary.get("info_only"):
+        shown.update(total_savings=0, strong_count=0, charges=[], charge_count=0, reason_counts=[],
+                     info_note="Prices on this bill are high, but your insurance already reduced them.")
+    return shown
 
 
 CONFIRM_MESSAGES = {

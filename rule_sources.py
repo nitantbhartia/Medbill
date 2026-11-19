@@ -14,6 +14,15 @@ CMS_BILL_RIGHTS_URL = "https://www.cms.gov/medical-bill-rights"
 
 # explanation uses the values in `needs`; fallback is used when any of them is missing.
 RULES = {
+    "RULE_QUANTITY_OVER_MUE": {
+        "kind": "official",
+        "explanation": "Medicare's limit for code {code} is {limit} per day; you were billed {quantity}.",
+        "needs": ("code", "limit", "quantity"),
+        "fallback": "Medicare publishes a daily limit for this code, and this bill is over it.",
+        "source_name": "CMS medically unlikely edits",
+        "source_url": "https://www.cms.gov/medicare/coding-billing/national-correct-coding-initiative-ncci-edits/medically-unlikely-edits",
+        "source_year": lambda: None,
+    },
     "RULE_INSURER_CONTRACTED_RATE": {
         "kind": "official",
         "explanation": "{insurer}'s contracted rate at {hospital} for code {code} is {rate}. You were charged {charged}.",
@@ -104,6 +113,7 @@ def _values(details: dict) -> dict:
         "other": related[0].get("cpt_code") if related and isinstance(related[0], dict) else None,
         "times": len(details["duplicate_of"]) + 1 if details.get("duplicate_of") else None,
         "quantity": quantity if isinstance(quantity, (int, float)) and quantity > 1 else None,
+        "limit": details.get("mue_limit"),
         "insurer": details.get("insurer"),
         "hospital": details.get("hospital_name"),
         "rate": _dollars(details.get("contracted_rate")),
@@ -118,7 +128,8 @@ def basis_for(rule_id: str | None, details: dict) -> dict | None:
     values = _values(details)
     complete = all(values[name] is not None for name in rule["needs"])
     text = rule["explanation"].format(**values) if complete else rule["fallback"]
-    year = details.get("rate_year") if rule_id == "RULE_INSURER_CONTRACTED_RATE" else (rule["source_year"]() if "source_year" in rule else None)
+    year = details.get("rate_year") or details.get("source_version") if rule_id in ("RULE_INSURER_CONTRACTED_RATE", "RULE_QUANTITY_OVER_MUE") \
+        else (rule["source_year"]() if "source_year" in rule else None)
     basis = {"kind": rule["kind"], "rule_id": rule_id, "explanation": text,
              "source_name": rule["source_name"], "source_url": (details.get("rate_source_url") if rule_id == "RULE_INSURER_CONTRACTED_RATE" else None) or rule.get("source_url")}
     if year:

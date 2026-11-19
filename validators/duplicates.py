@@ -1,3 +1,7 @@
+import config
+from validators.modifiers import commonly_repeated, explains_repeat, modifiers_of
+
+
 def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
     """
     Find duplicate charges: same CPT code + same non-null date + same quantity + same amount.
@@ -20,6 +24,8 @@ def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
         and other.get("charged_amount") == item["charged_amount"]
     ]
 
+    if config.DUPLICATE_MODIFIERS:
+        matches = [other for other in matches if modifiers_of(item) == modifiers_of(other) and not explains_repeat(item, other)]
     if not matches:
         return None
 
@@ -32,6 +38,15 @@ def find_duplicates(item: dict, all_items: list[dict]) -> dict | None:
 
     description = item.get("description") or item.get("cpt_code") or "this service"
     date_str = item.get("date_of_service") or "the same date"
+
+    # A commonly repeated test with no modifiers on any line may be a legitimate repeat: worth asking, not strong.
+    if config.DUPLICATE_MODIFIERS and commonly_repeated(item["cpt_code"]) and not any(modifiers_of(x) for x in [item, *matches]):
+        return {
+            "type": "duplicate_charge", "severity": "low", "line_item": item, "duplicate_of": matches,
+            "potential_savings": 0,
+            "message": (f"'{description}' is billed {len(matches) + 1} times on {date_str}. If this test was repeated, "
+                        "the bill should show modifier 91. Ask them to confirm."),
+        }
 
     return {
         "type": "duplicate_charge",
