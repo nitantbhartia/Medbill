@@ -64,6 +64,7 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             "severity": "informational",
             "reasons": [],
             "finding_ids": [],
+            "not_checked": bool(item.get("needs_confirm")),
         })
         charge["finding_ids"].append(finding["id"])
         amount = float(finding.get("potential_savings") or 0)
@@ -93,7 +94,7 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
             -_SEVERITY_RANK.get(r["severity"], 0),
             _TYPE_ORDER.index(r["type"]) if r["type"] in _TYPE_ORDER else len(_TYPE_ORDER),
         ))
-        row["strong"] = row["severity"] in ("high", "medium")
+        row["strong"] = row["severity"] in ("high", "medium") and not row["not_checked"]
         if row["charged"]:
             for key in ("savings", "error_savings", "markup_savings"):
                 row[key] = min(row[key], float(row["charged"]))
@@ -101,11 +102,13 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
         row["markup_savings"] = max(row["markup_savings"] - row["error_savings"], 0.0)
     # A whole-bill finding (no line item) covers the same money as the line findings, so the
     # two are alternatives, not a sum.
-    line_total = sum(row["savings"] for row in rows if row["charged"])
-    bill_total = sum(row["savings"] for row in rows if not row["charged"])
+    # A line the user skipped confirming is shown as "not checked" and left out of every total.
+    counted = [row for row in rows if not row["not_checked"]]
+    line_total = sum(row["savings"] for row in counted if row["charged"])
+    bill_total = sum(row["savings"] for row in counted if not row["charged"])
     total = max(line_total, bill_total)
-    errors = sum(row["error_savings"] for row in rows if row["charged"])
-    pricing = sum(row["markup_savings"] for row in rows if row["charged"])
+    errors = sum(row["error_savings"] for row in counted if row["charged"])
+    pricing = sum(row["markup_savings"] for row in counted if row["charged"])
     if amount_owed:
         total = min(total, amount_owed)
         errors = min(errors, amount_owed)
@@ -119,5 +122,5 @@ def group_findings_by_charge(findings: list[dict], amount_owed: float | None = N
         "markup_savings": round(pricing, 2),
         "headline_kind": kind,
         "headline_amount": round(errors if errors > 0 else total, 2),
-        "strong_count": sum(1 for row in rows if row["strong"]),
+        "strong_count": sum(1 for row in counted if row["strong"]),
     }

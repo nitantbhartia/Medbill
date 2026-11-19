@@ -43,6 +43,28 @@ def headline(summary: dict | None) -> dict | None:
     return {**summary, "total_savings": summary["headline_amount"]}
 
 
+CONFIRM_MESSAGES = {
+    "line_math": "The quantity and price on this line don't match its amount.",
+    "payer_math": "The amounts on this line don't add up.",
+    "negative_amount": "This amount reads as negative.",
+    "invalid_code": "We couldn't read this billing code.",
+    "unknown_code": "We couldn't match this billing code.",
+}
+
+
+def confirm_lines(results: dict) -> list[dict]:
+    """The few lines the scan couldn't read clearly, with the value we read, for the user to confirm."""
+    lines = []
+    for index, item in enumerate(results["line_items"]):
+        if not item.get("needs_confirm"):
+            continue
+        lines.append({"line_index": index, "code": item.get("cpt_code"), "description": item.get("description"),
+                      "date": item.get("date_of_service"), "field": item["issue_field"],
+                      "read_value": item.get(item["issue_field"]), "kind": item["issue_kind"],
+                      "message": CONFIRM_MESSAGES.get(item["issue_kind"], "We couldn't read this line clearly.")})
+    return lines
+
+
 def read_check(results: dict) -> str | None:
     """Warn when the scan probably misread the bill: line items that don't add up to the total."""
     total = float(results["bill"].get("total_charged") or 0)
@@ -72,6 +94,7 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "extraction_quality": None,
         "free_charge": None if unlocked else free_charge(results),
         "read_warning": read_check(results),
+        "confirm_lines": confirm_lines(results),
         "insurance_check": insurance_check.view(bill),
         "line_item_count": len(results["line_items"]),
         "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),

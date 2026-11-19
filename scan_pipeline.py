@@ -6,6 +6,7 @@ import logging
 
 import analyzer
 import bill_contact
+import extraction_selfcheck
 import insurance_check
 import scanner
 from db import get_db
@@ -37,6 +38,7 @@ def run_scan(
     eob_data = None
     try:
         extracted = scrub_extracted_data(extracted)
+        extracted = extraction_selfcheck.check_lines(extracted, images)
         if eob_images:
             eob_data = scrub_extracted_data(extract_pages(eob_images))
             extracted = analyzer.merge_eob_into_extracted(extracted, eob_data)
@@ -55,8 +57,8 @@ class CannotRebuild(Exception):
     """The stored bill doesn't hold enough to merge a statement into."""
 
 
-def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]]) -> None:
-    """Merge an insurance statement into a saved bill and redo its checks. The unlock is kept."""
+def rebuild_extracted(bill_id: int) -> tuple[dict, dict]:
+    """The saved bill and its lines in the shape the analyzer takes."""
     with get_db() as db:
         bill = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
         items = db.execute("SELECT * FROM line_items WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
@@ -65,6 +67,12 @@ def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]]) -> None:
     extracted = {key: bill[key] for key in ("provider_name", "provider_address", "bill_date",
                                             "total_charged", "total_patient_owes")}
     extracted["line_items"] = [dict(item) for item in items]
+    return dict(bill), extracted
+
+
+def add_eob(bill_id: int, eob_images: list[tuple[bytes, str]]) -> None:
+    """Merge an insurance statement into a saved bill and redo its checks. The unlock is kept."""
+    bill, extracted = rebuild_extracted(bill_id)
     eob_data = scrub_extracted_data(extract_pages(eob_images))
     try:
         merged = analyzer.merge_eob_into_extracted(extracted, eob_data)

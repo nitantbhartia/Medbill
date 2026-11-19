@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 import appeals
 import config
+import line_confirmation
 import email_service
 import household
 import scan_pipeline
@@ -439,6 +440,9 @@ async def analyze_confirmed(request: Request, bill_id: int, payload: dict):
                     "patient_responsibility": orig["patient_responsibility"],
                     "date_of_service": orig["date_of_service"],
                 }
+
+        originals = db.execute("SELECT * FROM line_items WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
+        line_confirmation.record_web_corrections(bill_id, originals, payload.get("line_items", []))
 
         # Update line items with user-confirmed data
         db.execute("DELETE FROM line_items WHERE bill_id = ?", (bill_id,))

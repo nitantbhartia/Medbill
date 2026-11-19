@@ -61,6 +61,7 @@ def _run_migrations(db):
     ensure_columns("mobile_devices", {"account_id": "INTEGER"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT"})
+    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
         "billing_phone": "TEXT", "billing_email": "TEXT", "billing_address": "TEXT", "account_number": "TEXT",
@@ -1345,6 +1346,18 @@ CREATE INDEX IF NOT EXISTS idx_mobile_events_name ON mobile_events(name, created
 CREATE INDEX IF NOT EXISTS idx_mobile_events_device ON mobile_events(device_id);
 
 -- Extracted line items
+CREATE TABLE IF NOT EXISTS extraction_corrections (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    line_index INTEGER NOT NULL,
+    field TEXT NOT NULL,
+    extracted_value TEXT,
+    confirmed_value TEXT,
+    issue_kind TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_extraction_corrections_bill ON extraction_corrections(bill_id);
+
 CREATE TABLE IF NOT EXISTS line_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bill_id INTEGER REFERENCES bills(id),
@@ -1359,6 +1372,9 @@ CREATE TABLE IF NOT EXISTS line_items (
     medicare_rate REAL,
     markup_multiple REAL,
     extraction_confidence TEXT,
+    needs_confirm INTEGER DEFAULT 0,
+    issue_kind TEXT,
+    issue_field TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

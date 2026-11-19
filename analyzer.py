@@ -739,8 +739,9 @@ def save_bill_and_findings(
             db.execute(
                 "INSERT INTO line_items (bill_id, date_of_service, cpt_code, description, "
                 "quantity, charged_amount, insurance_paid, insurance_adjustment, "
-                "patient_responsibility, medicare_rate, markup_multiple, extraction_confidence) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "patient_responsibility, medicare_rate, markup_multiple, extraction_confidence, "
+                "needs_confirm, issue_kind, issue_field) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     item.get("date_of_service"),
@@ -754,6 +755,9 @@ def save_bill_and_findings(
                     medicare_rate,
                     markup,
                     item.get("confidence", "high"),
+                    1 if item.get("needs_confirm") else 0,
+                    item.get("issue_kind"),
+                    item.get("issue_field"),
                 ),
             )
 

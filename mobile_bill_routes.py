@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 import bill_contact
 import config
+import line_confirmation
 import mobile_accounts
 import mobile_auth
 import mobile_purchases
@@ -196,3 +197,18 @@ async def sent(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth
         raise HTTPException(400, f"channel must be one of: {', '.join(sorted(config.SENT_CHANNELS))}")
     bill_contact.mark_sent(bill_id, channel)
     return ok({"sent_at": _bill_row(bill_id)["sent_at"], "channel": channel})
+
+
+@router.post("/bills/{bill_id}/confirm")
+async def confirm_lines(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
+    """The user confirms or fixes lines the scan couldn't read clearly. Lines left out stay unchecked."""
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    try:
+        line_confirmation.apply_confirmations(bill_id, payload.get("lines"))
+    except line_confirmation.InvalidConfirmation as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except scan_pipeline.CannotRebuild as exc:
+        raise HTTPException(409, "This bill can't be rechecked. Rescan it.") from exc
+    log_audit(action="mobile_confirm_lines", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
+              metadata={"lines": len(payload.get("lines") or [])})
+    return ok(mobile_view.build_bill_view(bill_id, device_id))

@@ -83,6 +83,8 @@ Return a JSON object with this exact structure:
       "cpt_code": "99283",
       "description": "Service description",
       "quantity": 1,
+      "unit_price": 500.00,
+      "page": 1,
       "charged_amount": 500.00,
       "insurance_paid": 300.00,
       "insurance_adjustment": 100.00,
@@ -95,6 +97,7 @@ CRITICAL RULES:
 - The "line_items" field MUST be an array containing ALL line items from the bill.
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
+- unit_price: the price per unit, only when the bill prints one. page: the page number the line is on (1 for a single page).
 - billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
 - For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
 - CPT codes may be labeled "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
@@ -127,7 +130,7 @@ def _add_confidence_flags(extracted: dict) -> dict:
     for idx, item in enumerate(extracted.get("line_items", [])):
         # Normalize numeric fields that Gemini may return as strings
         for field in ("charged_amount", "insurance_paid", "insurance_adjustment",
-                      "patient_responsibility"):
+                      "patient_responsibility", "unit_price"):
             item[field] = _coerce_numeric(item.get(field))
         qty = _coerce_numeric(item.get("quantity"))
         item["quantity"] = int(qty) if qty else 1
@@ -525,3 +528,39 @@ def process_multi_page_bill(images: list[tuple[bytes, str]]) -> dict:
         "ensemble_enabled": False,
     }
     return extracted
+
+
+REREAD_PROMPT = """Look at this page of a medical bill again, at full resolution. Find ONLY the line that looks like this:
+{hint}
+
+Return JSON for that one line with exactly these keys, using null for anything not visible:
+{{"cpt_code": "99283", "description": "Service description", "quantity": 1, "unit_price": null,
+"charged_amount": 500.00, "insurance_paid": null, "insurance_adjustment": null, "patient_responsibility": null}}
+Read every digit carefully. Do not guess. Return valid JSON only."""
+
+
+def _enlarge(image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
+    """Upscale a photo so small print is easier to read. PDFs are passed through."""
+    if Image is None or mime_type == "application/pdf":
+        return image_bytes, mime_type
+    img = Image.open(BytesIO(image_bytes)).convert("RGB")
+    longest = max(img.size)
+    if longest < config.OCR_REREAD_MAX_SIDE_PX:
+        scale = config.OCR_REREAD_MAX_SIDE_PX / longest
+        img = img.resize((int(img.width * scale), int(img.height * scale)), Image.LANCZOS)
+    out = BytesIO()
+    img.save(out, format="PNG")
+    return out.getvalue(), "image/png"
+
+
+def reread_line(image_bytes: bytes, mime_type: str, line: dict) -> dict | None:
+    """Re-read one bill line from its page at higher resolution. Returns the line's fields, or None if unreadable."""
+    image_bytes, mime_type = _prepare_media_for_ocr(image_bytes, mime_type)
+    image_bytes, mime_type = _enlarge(image_bytes, mime_type)
+    hint = f"code {line.get('cpt_code') or '?'}, {line.get('description') or 'no description'}, amount {line.get('charged_amount')}"
+    try:
+        data = _run_vision_extraction(image_bytes, mime_type, REREAD_PROMPT.format(hint=hint))
+    except (ValueError, RuntimeError) as exc:
+        log.warning("Line re-read failed: %s", exc)
+        return None
+    return data if isinstance(data, dict) and "line_items" not in data else None
