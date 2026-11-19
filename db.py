@@ -73,14 +73,17 @@ def _run_migrations(db):
             "evidence_json": "TEXT",
         },
     )
-    ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
-    ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
+    ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL", "mrf_reliability": "TEXT"})
+    ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0", "inbound_token": "TEXT"})
+    db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_mobile_devices_inbound ON mobile_devices(inbound_token)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
-    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT"})
+    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT", "input_kind": "TEXT"})
     ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
-                                        "rule_ids": "TEXT", "facility_id": "TEXT"})
+                                        "rule_ids": "TEXT", "facility_id": "TEXT",
+                                        "rejected_rule_ids": "TEXT", "reason_category": "TEXT"})
     ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
-    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT"})
+    ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT", "modifiers": "TEXT",
+                                  "code_source": "TEXT", "issue_choices": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
         "billing_phone": "TEXT", "billing_email": "TEXT", "billing_address": "TEXT", "account_number": "TEXT",
@@ -1456,6 +1459,58 @@ CREATE TABLE IF NOT EXISTS hold_call_credits (
     used INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS rule_demotions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rule_id TEXT NOT NULL,
+    facility_id TEXT NOT NULL DEFAULT '',
+    precision REAL NOT NULL,
+    sample INTEGER NOT NULL,
+    demoted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    above_since TIMESTAMP,
+    lifted_at TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rule_demotions_rule ON rule_demotions(rule_id, facility_id);
+
+CREATE TABLE IF NOT EXISTS shadow_findings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    rule_id TEXT NOT NULL,
+    finding_type TEXT NOT NULL,
+    severity TEXT,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_shadow_findings_rule ON shadow_findings(rule_id);
+
+CREATE TABLE IF NOT EXISTS hospital_code_lookup (
+    facility_id TEXT NOT NULL,
+    description_norm TEXT NOT NULL,
+    cpt_code TEXT NOT NULL,
+    source TEXT NOT NULL,
+    source_url TEXT,
+    seen_count INTEGER NOT NULL DEFAULT 1,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_code_lookup_unique ON hospital_code_lookup(facility_id, description_norm, cpt_code);
+CREATE INDEX IF NOT EXISTS idx_code_lookup_desc ON hospital_code_lookup(facility_id, description_norm);
+
+CREATE TABLE IF NOT EXISTS inbound_mail_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_inbound_mail_device ON inbound_mail_log(device_id, created_at);
+
+CREATE TABLE IF NOT EXISTS bill_notices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    kind TEXT NOT NULL,
+    message TEXT NOT NULL,
+    items_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_bill_notices_bill ON bill_notices(bill_id);
 
 CREATE TABLE IF NOT EXISTS payer_aliases (
     alias TEXT PRIMARY KEY,

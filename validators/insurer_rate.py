@@ -1,6 +1,7 @@
 """The insurer's contracted rate at this hospital, from the hospital's own price file."""
 
 import config
+from eob_observations import peer_median
 from payer_rates import find_contracted_rate
 
 
@@ -34,4 +35,23 @@ def check_insurer_rate(item: dict, facility_id: str, insurer: str, hospital_name
                     f"${contracted['rate']:,.2f}. This bill asks for ${asked:,.2f}."),
         "evidence": {"source": "hospital_price_file", "data_date": contracted["file_updated"], "sample_size": 1,
                      "limitations": "Contracted rates vary by plan. Confirm your plan with the hospital."},
+    }
+
+
+def check_peer_rate(item: dict, facility_id: str, insurer: str, hospital_name: str) -> dict | None:
+    """With no hospital-file rate, other users' insurance statements can still show what this insurer paid. Worth asking, never strong."""
+    code, charged = item.get("cpt_code"), item.get("charged_amount")
+    if not code or not charged or find_contracted_rate(facility_id, code, insurer):
+        return None
+    peers = peer_median(facility_id, code, insurer)
+    asked = item.get("patient_responsibility", charged if item.get("insurance_paid") is None else None)
+    if not peers or asked is None or asked <= peers["median"] * config.INSURER_RATE_TOLERANCE:
+        return None
+    return {
+        "type": "insurer_rate", "rule_id": "RULE_PEER_EOB_RATE", "severity": "low", "line_item": item, "charged": charged,
+        "insurer": peers["payer"], "peer_median": peers["median"], "hospital_name": hospital_name, "potential_savings": 0,
+        "message": (f"Other BillKarma users with {peers['payer']} paid a median of ${peers['median']:,.2f} for code {code} "
+                    f"at {hospital_name}. This bill asks for ${asked:,.2f}."),
+        "evidence": {"source": "user_statements", "sample_size": peers["sample"],
+                     "limitations": "Statements come from BillKarma users and plans differ. Confirm your plan with the hospital."},
     }

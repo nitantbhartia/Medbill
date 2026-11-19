@@ -106,7 +106,8 @@ class TestBuildDisputeLetter:
         result = build_dispute_letter(bill_id=bill_id)
         assert result is not None
         assert "DUPLICATE BILLING" in result["letter"]
-        assert "2 time(s)" in result["letter"]
+        assert "I was charged 2 times for chest x-ray" in result["letter"]
+        assert "Please remove the duplicate" in result["letter"]
 
     def test_ncci_finding_produces_correct_paragraph(self):
         bill_id = _insert_bill()
@@ -465,3 +466,32 @@ def test_finding_without_a_line_item_does_not_crash_letter_or_phone_script():
     _insert_finding(bill_id, "no_surprises_act", "", {"estimated_patient_savings": 2763.0}, savings=2763.0)
     assert "N/A" in build_dispute_letter(bill_id)["letter"]
     assert build_phone_script(bill_id)
+
+
+BANNED_LETTER_WORDS = ("fraud", "illegal", "guaranteed", "you must")
+
+
+class TestLetterStrength:
+    def test_strong_and_worth_asking_use_both_phrasings(self):
+        bill_id = _insert_bill()
+        _insert_finding(bill_id, "duplicate", "71046", {
+            "line_item": {"cpt_code": "71046", "description": "Chest X-Ray", "charged_amount": 850.0},
+            "duplicate_count": 2,
+        })
+        _insert_finding(bill_id, "quantity_question", "96372", {
+            "line_item": {"cpt_code": "96372", "description": "Injection", "charged_amount": 120.0},
+        })
+        letter = build_dispute_letter(bill_id=bill_id)["letter"]
+        assert "Please remove the duplicate" in letter
+        assert "Please explain, or provide documentation for" in letter
+        assert "itemized bill" in letter.lower()
+        assert "collection" in letter.lower()
+        for word in BANNED_LETTER_WORDS:
+            assert word not in letter.lower()
+
+    def test_info_finding_never_in_letter(self):
+        bill_id = _insert_bill()
+        _insert_finding(bill_id, "price_info", "99285", {
+            "line_item": {"cpt_code": "99285", "description": "ER visit", "charged_amount": 4000.0},
+        })
+        assert build_dispute_letter(bill_id=bill_id) is None

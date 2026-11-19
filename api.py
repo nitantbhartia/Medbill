@@ -23,6 +23,7 @@ import negotiation
 import payment as payment_module
 import report as report_module
 import dispute_service
+import inbound_bills
 import reply_reader
 import esign as esign_module
 from dispute_workflow import build_dispute_letter, build_phone_script, get_outcome_stats
@@ -230,11 +231,7 @@ def _attempt_debt_letter_send(db, debt_letter_id: int, session_id: str | None) -
             return {"state": "pending_send", "error": refund_error, "attempts": attempts}
 
 
-ALLOWED_MIME_TYPES = {
-    "image/jpeg", "image/png", "image/gif", "image/webp",
-    "image/heic", "image/heif", "image/tiff", "image/bmp",
-    "application/pdf",
-}
+ALLOWED_MIME_TYPES = config.UPLOAD_MIME_TYPES
 
 CLAIM_TRANSITIONS = {
     "drafted": {"sent", "denied"},
@@ -1433,8 +1430,12 @@ async def inbound_email_webhook(request: Request, token: str = ""):
     email_id = (event.get("data") or {}).get("email_id")
     if event.get("type") != "email.received" or not email_id:
         return {"status": "ok", "data": {"outcome": "ignored"}}
+    to_addresses = (event.get("data") or {}).get("to") or []
     try:
-        outcome = reply_reader.process_reply(email_id)
+        if inbound_bills.token_from(to_addresses):
+            outcome = inbound_bills.process(email_id, to_addresses)
+        else:
+            outcome = reply_reader.process_reply(email_id)
     except RuntimeError as exc:
         log.error("Inbound email %s failed: %s", email_id, exc)
         raise HTTPException(502, "Could not read the email")

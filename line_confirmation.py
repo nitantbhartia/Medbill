@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 import analyzer
 import scan_pipeline
+from code_lookup import CODE_SOURCE
 from db import get_db
 
 CODE = re.compile(r"[0-9A-Z]{5}")
@@ -53,7 +55,9 @@ def apply_confirmations(bill_id: int, confirmations: list[dict]) -> None:
                 raise InvalidConfirmation(f"Line {index} isn't waiting for confirmation")
         for index, field, value in checked:
             row = rows[index]
-            db.execute(f"UPDATE line_items SET {field} = ?, needs_confirm = 0 WHERE id = ?", (value, row["id"]))
+            from_list = row["issue_kind"] == "code_lookup" and any(c["code"] == value for c in json.loads(row["issue_choices"] or "{}").get("choices", []))
+            db.execute(f"UPDATE line_items SET {field} = ?, needs_confirm = 0, code_source = COALESCE(?, code_source) WHERE id = ?",
+                       (value, CODE_SOURCE if from_list else None, row["id"]))
             db.execute(
                 "INSERT INTO extraction_corrections (bill_id, line_index, field, extracted_value, confirmed_value, issue_kind) "
                 "VALUES (?, ?, ?, ?, ?, ?)",

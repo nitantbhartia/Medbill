@@ -1,0 +1,42 @@
+{
+ "id": "rb_171",
+ "layout": "statement",
+ "rule": "er_level",
+ "kind": "lookalike",
+ "finding_type": "upcoding",
+ "codes": [
+  "99285"
+ ],
+ "provider_name": "Sharp Memorial Hospital",
+ "total_charged": 5940.0,
+ "line_items": [
+  {
+   "cpt_code": "96365",
+   "description": "IV infusion",
+   "quantity": 1,
+   "charged_amount": 400.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "99285",
+   "description": "ER visit level 5",
+   "quantity": 1,
+   "charged_amount": 3100.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "74177",
+   "description": "CT abdomen pelvis",
+   "quantity": 1,
+   "charged_amount": 2200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "99213",
+   "description": "Office visit level 3",
+   "quantity": 1,
+   "charged_amount": 240.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

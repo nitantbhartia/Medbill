@@ -1,0 +1,35 @@
+{
+ "id": "rb_051",
+ "layout": "table",
+ "rule": "quantity",
+ "kind": "planted",
+ "finding_type": "quantity_flag",
+ "codes": [
+  "96372"
+ ],
+ "provider_name": "Memorial Regional Hospital",
+ "total_charged": 1740.0,
+ "line_items": [
+  {
+   "cpt_code": "70450",
+   "description": "CT Head without contrast",
+   "quantity": 1,
+   "charged_amount": 1200.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "99213",
+   "description": "Office visit level 3",
+   "quantity": 1,
+   "charged_amount": 240.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "96372",
+   "description": "Injection",
+   "quantity": 12,
+   "charged_amount": 300.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+  "duplicate": {
+    "planted": 25,
+    "caught": 25,
+    "lookalikes": 50,
+    "false_flags": 0,
+    "catch_rate": 1.0,
+    "false_flag_rate": 0.0
+  },
+  "unbundling": {
+    "planted": 25,
+    "caught": 25,
+    "lookalikes": 0,
+    "false_flags": 0,
+    "catch_rate": 1.0,
+    "false_flag_rate": null
+  },
+  "quantity": {
+    "planted": 25,
+    "caught": 25,
+    "lookalikes": 15,
+    "false_flags": 0,
+    "catch_rate": 1.0,
+    "false_flag_rate": 0.0
+  },
+  "eob": {
+    "planted": 25,
+    "caught": 25,
+    "lookalikes": 0,
+    "false_flags": 0,
+    "catch_rate": 1.0,
+    "false_flag_rate": null
+  },
+  "er_level": {
+    "planted": 0,
+    "caught": 0,
+    "lookalikes": 15,
+    "false_flags": 0,
+    "catch_rate": null,
+    "false_flag_rate": 0.0
+  },
+  "price": {
+    "planted": 0,
+    "caught": 0,
+    "lookalikes": 20,
+    "false_flags": 0,
+    "catch_rate": null,
+    "false_flag_rate": 0.0
+  }
+}

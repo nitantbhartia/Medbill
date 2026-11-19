@@ -175,6 +175,7 @@ async def delete_device(device_id: str = Depends(mobile_auth.device_from_request
         db.execute("DELETE FROM hold_call_events WHERE call_id IN (SELECT id FROM hold_calls WHERE device_id = ?)", (device_id,))
         db.execute("DELETE FROM hold_calls WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM phone_verifications WHERE device_id = ?", (device_id,))
+        db.execute("DELETE FROM inbound_mail_log WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM hold_call_credits WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM mobile_entitlements WHERE device_id = ?", (device_id,))
         db.execute("DELETE FROM mobile_devices WHERE device_id = ?", (device_id,))

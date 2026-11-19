@@ -32,6 +32,15 @@ RULES = {
         "source_url": "https://www.cms.gov/priorities/key-initiatives/hospital-price-transparency",
         "source_year": lambda: None,
     },
+    "RULE_PEER_EOB_RATE": {
+        "kind": "check",
+        "explanation": "Other BillKarma users with {insurer} paid a median of {median} for code {code} at {hospital}.",
+        "needs": ("insurer", "median", "code", "hospital"),
+        "fallback": "Other BillKarma users with this insurer paid less for this code at this hospital.",
+        "source_name": "Insurance statements shared by BillKarma users",
+        "source_url": None,
+        "source_year": lambda: None,
+    },
     "RULE_MARKUP_VS_MEDICARE": {
         "kind": "official",
         "explanation": "Medicare pays {medicare} for code {code}. This bill charges {charged}, which is {markup}× that.",
@@ -117,6 +126,7 @@ def _values(details: dict) -> dict:
         "insurer": details.get("insurer"),
         "hospital": details.get("hospital_name"),
         "rate": _dollars(details.get("contracted_rate")),
+        "median": _dollars(details.get("peer_median")),
     }
 
 
@@ -135,3 +145,32 @@ def basis_for(rule_id: str | None, details: dict) -> dict | None:
     if year:
         basis["source_year"] = year
     return basis
+
+
+# What a hospital may legitimately say about a flagged charge, and what to say back. Fixed text, never written by a model.
+HOSPITAL_REPLIES = {
+    "different_time_or_room": {
+        "may_say": "The two charges were for separate visits, times or rooms.",
+        "say_back": "Please send the record showing the separate times or rooms, and the time each was ordered.",
+    },
+    "different_revenue_code": {
+        "may_say": "The two lines are for different departments, so they are not the same charge.",
+        "say_back": "Please explain what each line is for and send the itemized bill that shows the department for each.",
+    },
+    "allowed_modifier": {
+        "may_say": "A modifier on the bill shows these two services were separate.",
+        "say_back": "Please send the documentation that shows these services were done separately, not as one procedure.",
+    },
+    "different_dates_or_providers": {
+        "may_say": "These services were on different dates or by different providers.",
+        "say_back": "Please send the record showing the date and provider for each service.",
+    },
+    "drug_or_supply": {
+        "may_say": "Drugs and supplies are priced by the hospital's own pharmacy and supply list, not by Medicare's physician rates.",
+        "say_back": "Please send the itemized price for this drug or supply and say how the price was set.",
+    },
+}
+
+
+def reply_for(reason: str | None) -> dict | None:
+    return HOSPITAL_REPLIES.get(reason or "")

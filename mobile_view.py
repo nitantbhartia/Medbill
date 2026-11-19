@@ -8,7 +8,9 @@ import config
 import insurance_check
 import outcome_verification
 import mobile_purchases
+import json
 import report
+import report_recheck
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
 from db import get_db
@@ -96,6 +98,7 @@ CONFIRM_MESSAGES = {
     "negative_amount": "This amount reads as negative.",
     "invalid_code": "We couldn't read this billing code.",
     "unknown_code": "We couldn't match this billing code.",
+    "text_layer_mismatch": "This amount doesn't match the text in your PDF.",
 }
 
 
@@ -105,10 +108,18 @@ def confirm_lines(results: dict) -> list[dict]:
     for index, item in enumerate(results["line_items"]):
         if not item.get("needs_confirm"):
             continue
+        lookup = json.loads(item["issue_choices"]) if item.get("issue_choices") else None
+        message = CONFIRM_MESSAGES.get(item["issue_kind"], "We couldn't read this line clearly.")
+        if lookup and len(lookup["choices"]) == 1:
+            choice = lookup["choices"][0]
+            message = f"This looks like {choice['description']} (code {choice['code']}) at {lookup['hospital']}. Right?"
+        elif lookup:
+            message = f"{lookup['hospital']}'s price list has more than one code for this. Which is it?"
         lines.append({"line_index": index, "code": item.get("cpt_code"), "description": item.get("description"),
                       "date": item.get("date_of_service"), "field": item["issue_field"],
                       "read_value": item.get(item["issue_field"]), "kind": item["issue_kind"],
-                      "message": CONFIRM_MESSAGES.get(item["issue_kind"], "We couldn't read this line clearly.")})
+                      "choices": [c["code"] for c in lookup["choices"]] if lookup else None,
+                      "message": message})
     return lines
 
 
@@ -146,6 +157,7 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "read_warning": read_check(results),
         "confirm_lines": confirm_lines(results),
         "insurance_check": insurance_check.view(bill),
+        "notices": report_recheck.notices_for(bill_id),
         "line_item_count": len(results["line_items"]),
         "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),
     }

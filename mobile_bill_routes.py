@@ -9,6 +9,8 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 import bill_contact
 import config
 import line_confirmation
+import eob_observations
+import inbound_bills
 import outcome_verification
 import mobile_accounts
 import mobile_auth
@@ -41,6 +43,18 @@ async def _read_pages(pages: list[UploadFile]) -> list[tuple[bytes, str]]:
     return images
 
 
+def _input_kind(images: list[tuple[bytes, str]], text_layer: str) -> str:
+    if any(mime == "application/pdf" for _, mime in images):
+        return "pdf_text" if text_layer.strip() else "pdf_image"
+    return "photo"
+
+
+@router.get("/inbound-address")
+async def inbound_address(device_id: str = Depends(mobile_auth.device_from_request)):
+    """The private address this device can email bills to. Created the first time it is asked for."""
+    return ok({"address": inbound_bills.address_for(device_id)})
+
+
 USER_FACING_PREFIXES = ("That file", "That photo", "Unsupported", "Could not decode", "The scan could not be read")
 
 
@@ -62,6 +76,7 @@ async def scan(
     pages: list[UploadFile] = File(...),
     zip_code: str = Form(...),
     eob_pages: list[UploadFile] = File(default=[]),
+    text_layer: str = Form(default=""),
     device_id: str = Depends(mobile_auth.device_from_request),
 ):
     if not pages or len(pages) > config.MOBILE_SCAN_MAX_PAGES:
@@ -75,7 +90,8 @@ async def scan(
     images = await _read_pages(pages)
     eob_images = await _read_pages(eob_pages)
     try:
-        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None)
+        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None, eob_observations.consented(device_id),
+                                                           text_layer, _input_kind(images, text_layer))
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
@@ -153,8 +169,11 @@ async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(m
         raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
     if not isinstance(final_owed, (int, float)) or isinstance(final_owed, bool) or final_owed < 0:
         raise HTTPException(400, "final_patient_owes must be a non-negative number")
+    reason = payload.get("reason_category")
+    if reason is not None and reason not in config.REJECTION_REASONS:
+        raise HTTPException(400, f"reason_category must be one of: {', '.join(config.REJECTION_REASONS)}")
     bill = _bill_row(bill_id)
-    saved = outcome_verification.record_reported(bill_id, bill, outcome, final_owed)
+    saved = outcome_verification.record_reported(bill_id, bill, outcome, final_owed, reason)
     log_audit(action="mobile_report_outcome", resource_type="bill", resource_id=str(bill_id),
               metadata={"outcome": outcome, "actual_savings": saved})
     return ok({"actual_savings": saved})
@@ -192,7 +211,7 @@ async def add_eob(bill_id: int, eob_pages: list[UploadFile] = File(...),
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
     images = await _read_pages(eob_pages)
     try:
-        scan_pipeline.add_eob(bill_id, images)
+        scan_pipeline.add_eob(bill_id, images, eob_observations.consented(device_id))
     except scan_pipeline.CannotRebuild as exc:
         raise HTTPException(409, "Rescan the bill together with the statement.") from exc
     except scanner.ScannerNotConfigured as exc:

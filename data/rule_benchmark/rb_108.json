@@ -1,0 +1,38 @@
+{
+ "id": "rb_108",
+ "layout": "statement",
+ "rule": "duplicate",
+ "kind": "lookalike",
+ "finding_type": "duplicate_charge",
+ "codes": [
+  "85025"
+ ],
+ "provider_name": "Memorial Regional Hospital",
+ "total_charged": 550.0,
+ "line_items": [
+  {
+   "cpt_code": "85025",
+   "description": "CBC with differential",
+   "quantity": 1,
+   "charged_amount": 85.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "71046",
+   "description": "Chest X-Ray 2 views",
+   "quantity": 1,
+   "charged_amount": 380.0,
+   "date_of_service": "2026-02-18"
+  },
+  {
+   "cpt_code": "85025",
+   "description": "CBC with differential",
+   "quantity": 1,
+   "charged_amount": 85.0,
+   "date_of_service": "2026-02-18",
+   "modifiers": [
+    "91"
+   ]
+  }
+ ]
+}

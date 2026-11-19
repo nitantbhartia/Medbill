@@ -1,0 +1,31 @@
+{
+ "id": "rb_185",
+ "layout": "statement",
+ "rule": "price",
+ "kind": "lookalike",
+ "finding_type": "price_markup",
+ "codes": [
+  "99283"
+ ],
+ "provider_name": "Broward Health Medical Center",
+ "total_charged": 1280.0,
+ "line_items": [
+  {
+   "cpt_code": "99283",
+   "description": "ER visit level 3",
+   "quantity": 1,
+   "charged_amount": 900.0,
+   "date_of_service": "2026-02-18",
+   "insurance_paid": 300.0,
+   "insurance_adjustment": 600.0,
+   "patient_responsibility": 0.0
+  },
+  {
+   "cpt_code": "71046",
+   "description": "Chest X-Ray 2 views",
+   "quantity": 1,
+   "charged_amount": 380.0,
+   "date_of_service": "2026-02-18"
+  }
+ ]
+}

@@ -478,3 +478,54 @@ ASSISTANCE_POLICY_AUTO_CITIES = ("San Diego", "Los Angeles")
 ASSISTANCE_POLICY_AUTO_LIMIT = 20
 
 MOBILE_JSON_MAX_BYTES = 100_000  # mobile JSON bodies are tiny; uploads use multipart and have their own limit
+
+# B16.5: lines whose code or revenue code points to a drug or supply, where a Medicare comparison is weak
+DRUG_SUPPLY_CODE_PREFIXES = ("J", "A", "C", "Q")
+DRUG_SUPPLY_REVENUE_CODES = {"250", "251", "252", "270", "271", "272", "636"}
+LLM_REVIEW_ENABLED = os.environ.get("LLM_REVIEW_ENABLED", "false").lower() == "true"
+
+# B16.8: bump with any rule change so old reports can be rechecked
+RULES_VERSION = "2026-11-19"
+RECHECK_DAYS = 90
+APPLE_REFUND_URL = "https://reportaproblem.apple.com"
+
+# B16.7: learning from hospital replies
+REJECTION_REASONS = ("documentation_provided", "modifier", "correct_as_billed", "other")
+REJECTED_OUTCOMES = ("no_change", "denied")
+RULE_DEMOTE_PRECISION = 0.3
+RULE_LIFT_DAYS = 30
+RULE_DEMOTION_RUN_STATUS = "rule_demotions"
+
+# B14.7: description -> code lookup from each hospital's own price file
+CODE_LOOKUP_MIN_SIMILARITY = 0.9
+DESCRIPTION_ABBREVIATIONS = {
+    "W/O": "WITHOUT", "W/": "WITH", "CNTRST": "CONTRAST", "CONT": "CONTRAST", "XR": "XRAY", "X-RAY": "XRAY",
+    "CT": "CT", "MRI": "MRI", "INJ": "INJECTION", "IV": "IV", "ABD": "ABDOMEN", "EXT": "EXTREMITY", "LT": "LEFT",
+    "RT": "RIGHT", "BILAT": "BILATERAL", "PROC": "PROCEDURE", "EVAL": "EVALUATION", "SVC": "SERVICE",
+}
+HCAI_CHARGEMASTER_PAGE = "https://hcai.ca.gov/data-and-reports/cost-transparency/hospital-chargemasters/"
+HCAI_NAME_MATCH_MIN = 0.8
+
+# B14.9: insurer rates learned from bill + EOB pairs
+MRF_MATCH_TOLERANCE_PCT = 10
+MRF_RELIABILITY_MIN_MATCH_SHARE = 0.5
+MRF_TRUTH_RUN_STATUS = "mrf_truth_check"
+EOB_OBSERVATION_CONFIDENCE_PHOTO = 0.8
+EOB_OBSERVATION_CONFIDENCE_TEXT = 1.0
+
+# B14.8: digital documents first
+INBOUND_MAX_PER_DAY = 20
+INBOUND_DOMAIN = "billkarma.app"
+MAX_TEXT_LAYER_CHARS = 60000
+TEXT_LAYER_FIX_MAX_DIGIT_DIFFS = 2
+HEALTH_RECORDS_ENABLED = False
+INPUT_KINDS = ("photo", "pdf_text", "pdf_image", "email")
+UPLOAD_MIME_TYPES = {
+    "image/jpeg", "image/png", "image/gif", "image/webp",
+    "image/heic", "image/heif", "image/tiff", "image/bmp",
+    "application/pdf",
+}
+
+# B16.6: deploy gate on the rule benchmark, in percentage points
+RULE_GATE_MAX_DROP_PCT = 2
+RULE_GATE_TIMEOUT_SECONDS = 300

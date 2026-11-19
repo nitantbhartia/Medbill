@@ -14,6 +14,7 @@ from urllib.request import urlopen
 from datetime import date
 from typing import Iterable
 
+import code_lookup
 import payer_rates
 from db import get_db
 from payer_rates import WIDE_COLUMN
@@ -491,6 +492,7 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
     facility_id = normalize_facility_id(facility_id)
     if not facility_id:
         return
+    code_lookup.record(facility_id, row.get("description"), row.get("cpt_code"), "mrf", row.get("source_url"))
     # A hospital's list price is a facility charge, so compare it with Medicare's hospital
     # outpatient (OPPS) payment. Codes without one (labs, inpatient-only surgery) get no markup
     # rather than a comparison with the physician fee, which would overstate it several-fold.

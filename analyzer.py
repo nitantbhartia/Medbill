@@ -6,8 +6,13 @@ import time
 from difflib import SequenceMatcher
 
 import config
+from code_lookup import CODE_SOURCE, fill_codes
 from db import get_db
+from rule_learning import demoted_rules
+from rule_sources import RULES
 from validators.pricing import check_pricing, get_medicare_locality, get_medicare_rate, validate_geo_match
+from validators.llm_review import review_findings
+from validators.innocent_explanations import apply_innocent_explanations
 from validators.duplicates import find_duplicates
 from validators.unbundling import check_unbundling
 from validators.upcoding import check_upcoding
@@ -18,7 +23,7 @@ from validators.eob import check_eob_reconciliation
 from outcome_stats import get_hospital_outcomes
 from validators.er_level import check_er_level_v2
 from validators.quantity import check_quantities_v2
-from validators.insurer_rate import check_insurer_rate
+from validators.insurer_rate import check_insurer_rate, check_peer_rate
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
 log = logging.getLogger(__name__)
@@ -549,6 +554,8 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
     _drop_payment_rows(extracted_data)
     _clean_billing_codes(extracted_data)
+    matched_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
+    fill_codes(extracted_data, matched_hospital)
     line_items = extracted_data.get("line_items", [])
 
     inferred_patient_owes_source = _infer_total_patient_owes(extracted_data)
@@ -591,17 +598,23 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             findings.append(finding)
             total_potential_savings += finding["potential_savings"]
 
-    hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code) if extracted_data.get("insurer_name") else None
+    hospital = matched_hospital if extracted_data.get("insurer_name") else None
     for item in line_items:
         # CHECK 0: the insurer's own contracted rate at this hospital, which beats the Medicare comparison
         insurer_finding = check_insurer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital else None
+        # A hospital whose files often disagree with what insurers paid keeps its file rate as supporting evidence only
+        file_unreliable = bool(insurer_finding and hospital.get("mrf_reliability") == "low")
+        if file_unreliable:
+            insurer_finding["severity"] = "low"
+        peer_finding = check_peer_rate(item, hospital["facility_id"], extracted_data["insurer_name"], hospital["name"]) if hospital and not insurer_finding else None
+        insurer_finding = insurer_finding or peer_finding
         if insurer_finding:
             _apply_evidence_policy(insurer_finding, freshness)
             findings.append(insurer_finding)
             total_potential_savings += insurer_finding["potential_savings"]
 
         # CHECK 1: Price vs Medicare rate (the fallback when no insurer rate was found)
-        pricing_finding = None if insurer_finding else check_pricing(
+        pricing_finding = None if insurer_finding and not file_unreliable and insurer_finding is not peer_finding else check_pricing(
             item,
             locality,
             markup_threshold=adaptive["pricing_markup_threshold"],
@@ -688,6 +701,27 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         findings.append(eob_finding)
         total_potential_savings += eob_finding.get("potential_savings", 0)
 
+    # B16.7: rules that hospitals mostly reject are shown only as worth asking, and rules still in shadow mode are set aside
+    outcome_hospital = matched_hospital
+    demoted = demoted_rules(outcome_hospital["facility_id"] if outcome_hospital else None)
+    shadow = [f for f in findings if _is_shadow(f)]
+    findings = [f for f in findings if f not in shadow]
+    total_potential_savings -= sum(f.get("potential_savings", 0) for f in shadow)
+    for finding in findings:
+        if RULE_ID_BY_TYPE.get(finding.get("type")) in demoted and finding.get("severity") in ("high", "medium"):
+            finding["severity"], finding["demoted"] = "low", True
+            total_potential_savings -= finding.get("potential_savings", 0)
+
+    # B16.5: a legitimate explanation downgrades a finding, and a charge only worth asking about adds nothing to the total
+    for finding in findings:
+        was_counted = finding.get("severity") in ("high", "medium")
+        apply_innocent_explanations([finding])
+        if was_counted and finding.get("innocent_reason") and finding["severity"] not in ("high", "medium"):
+            total_potential_savings -= finding.get("potential_savings", 0)
+
+    counted = [f for f in findings if f.get("severity") in ("high", "medium")]
+    review_findings(line_items, findings)
+    total_potential_savings -= sum(f.get("potential_savings", 0) for f in counted if f.get("severity") not in ("high", "medium"))
     bill_patient_owes = extracted_data.get("total_patient_owes")
     if bill_patient_owes is not None:
         total_potential_savings = min(total_potential_savings, float(bill_patient_owes))
@@ -696,10 +730,11 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     for finding in findings:
         finding["rule_id"] = finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding.get("type"), "RULE_GENERIC_HEURISTIC")
         finding["confidence"] = _assign_confidence(finding)
+        if (finding.get("line_item") or {}).get("code_source") == CODE_SOURCE and matched_hospital:
+            finding["code_source_note"] = f"Code from {matched_hospital['name']}'s own price list."
         _ensure_evidence_panel(finding, freshness)
 
     # Within a severity, findings this hospital has actually corrected for people come first.
-    outcome_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
     hospital_outcomes = get_hospital_outcomes(outcome_hospital["facility_id"]) if outcome_hospital else {}
     for finding in findings:
         record = hospital_outcomes.get(finding.get("rule_id") or "")
@@ -720,6 +755,7 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
             sum(float(f.get("gross_potential_savings", f.get("potential_savings", 0) or 0)) for f in findings), 2
         ),
         "findings": findings,
+        "shadow_findings": shadow,
         "warnings": warnings,
         "bill_total": extracted_data.get("total_charged"),
         "patient_owes": extracted_data.get("total_patient_owes"),
@@ -735,6 +771,9 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
 
 
 def _insert_findings(db, bill_id: int, analysis: dict) -> None:
+    for finding in analysis.get("shadow_findings", []):
+        db.execute("INSERT INTO shadow_findings (bill_id, rule_id, finding_type, severity, details) VALUES (?, ?, ?, ?, ?)",
+                   (bill_id, finding.get("rule_id") or RULE_ID_BY_TYPE.get(finding["type"], ""), finding["type"], finding.get("severity"), json.dumps(finding)))
     for finding in analysis.get("findings", []):
         db.execute(
             "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
@@ -769,9 +808,23 @@ def replace_findings_and_insurance_fields(bill_id: int, extracted: dict, analysi
                 (item.get("insurance_paid"), item.get("insurance_adjustment"), item.get("patient_responsibility"),
                  item.get("date_of_service"), row["id"]),
             )
-        db.execute("UPDATE bills SET total_findings = ?, total_potential_savings = ? WHERE id = ?",
-                   (analysis["total_findings"], analysis["total_potential_savings"], bill_id))
+        db.execute("UPDATE bills SET total_findings = ?, total_potential_savings = ?, rules_version = ?, dataset_versions = ? WHERE id = ?",
+                   (analysis["total_findings"], analysis["total_potential_savings"], config.RULES_VERSION,
+                    json.dumps(dataset_versions()), bill_id))
         _insert_findings(db, bill_id, analysis)
+
+
+def _is_shadow(finding: dict) -> bool:
+    return bool(RULES.get(RULE_ID_BY_TYPE.get(finding.get("type"), ""), {}).get("shadow"))
+
+
+def dataset_versions() -> dict:
+    """The data a result was computed from, stored with the bill so it can be reproduced."""
+    with get_db() as db:
+        mue = db.execute("SELECT MAX(version) AS v FROM mue_limits").fetchone()
+        files = db.execute("SELECT MAX(file_updated) AS d FROM price_observations").fetchone()
+    return {"medicare_pfs": config.MEDICARE_PFS_YEAR, "ncci": config.NCCI_EDITS_VERSION,
+            "mue": mue["v"] if mue else None, "hospital_files": files["d"] if files else None}
 
 
 def save_bill_and_findings(
@@ -801,6 +854,8 @@ def save_bill_and_findings(
             ),
         )
         bill_id = cursor.lastrowid
+        db.execute("UPDATE bills SET rules_version = ?, dataset_versions = ? WHERE id = ?",
+                   (config.RULES_VERSION, json.dumps(dataset_versions()), bill_id))
 
         for item in extracted.get("line_items", []):
             medicare_rate = get_medicare_rate(item.get("cpt_code", "")) if item.get("cpt_code") else None
@@ -813,8 +868,8 @@ def save_bill_and_findings(
                 "INSERT INTO line_items (bill_id, date_of_service, cpt_code, description, "
                 "quantity, charged_amount, insurance_paid, insurance_adjustment, "
                 "patient_responsibility, medicare_rate, markup_multiple, extraction_confidence, "
-                "needs_confirm, issue_kind, issue_field, modifiers) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "needs_confirm, issue_kind, issue_field, modifiers, code_source, issue_choices) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     bill_id,
                     item.get("date_of_service"),
@@ -832,6 +887,8 @@ def save_bill_and_findings(
                     item.get("issue_kind"),
                     item.get("issue_field"),
                     json.dumps(item.get("modifiers") or []),
+                    item.get("code_source"),
+                    item.get("issue_choices"),
                 ),
             )
 
@@ -865,7 +922,7 @@ def find_hospital_match(provider_name: str, zip_code: str | None) -> dict | None
                h.is_pe_owned, h.pe_firm, h.slug, h.state_slug, h.city_slug,
                h.cms_star_rating, h.bed_count,
                m.avg_markup_vs_medicare, m.billing_grade, m.national_percentile,
-               f.charity_care_pct, f.has_financial_assistance, f.fa_application_url
+               f.charity_care_pct, f.has_financial_assistance, f.fa_application_url, h.mrf_reliability
         FROM hospitals h
         LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
         LEFT JOIN hospital_financials f ON f.facility_id = h.facility_id
