@@ -44,11 +44,11 @@ def _in_mock_mode() -> bool:
     return config.ENV != "production" and not config.REVENUECAT_SECRET_API_KEY
 
 
-def _transaction_is_genuine(device_id: str, transaction_id: str) -> bool:
+def _transaction_is_genuine(device_id: str, transaction_id: str, products: tuple = REPORT_PRODUCTS) -> bool:
     if _in_mock_mode():
         return transaction_id.startswith(TEST_TRANSACTION_PREFIX)
     purchases = _fetch_subscriber(device_id).get("non_subscriptions", {})
-    for product_id in REPORT_PRODUCTS:
+    for product_id in products:
         if any(p.get("store_transaction_id") == transaction_id for p in purchases.get(product_id, [])):
             return True
     return False

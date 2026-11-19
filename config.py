@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "outcome_verified", "outcome_verify_failed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "hold_call_started", "hold_call_human", "hold_call_connected", "hold_call_missed", "hold_call_failed", "hold_call_purchased", "outcome_verified", "outcome_verify_failed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -444,3 +444,22 @@ FREE_CHECKS_LIMIT = 3
 VERIFIED_STATS_MIN_TOTAL = 10000
 VERIFIED_STATS_MIN_BILLS = 50
 GRADE_MIN_PROCEDURES = 20
+
+# B17: "we wait on hold for you". Off until the 20-call test in the guide passes.
+HOLD_CALLS_ENABLED = os.getenv("HOLD_CALLS_ENABLED", "false").lower() == "true"
+PLUS_HOLD_CALLS_PER_BILL = 3
+HOLD_CALL_OPEN = (8, 0)        # hospital's local time, weekdays
+HOLD_CALL_CLOSE = (16, 30)
+HOLD_CALL_USER_RING_SECONDS = 30
+HOLD_CALL_MAX_MINUTES = 90
+HOLD_CALL_DAILY_BUDGET_CENTS = int(os.getenv("HOLD_CALL_DAILY_BUDGET_CENTS", "5000"))
+HOLD_CALL_COST_ESTIMATE_CENTS = 250
+HOLD_CALL_PRODUCT_ID = "bk_hold_call"
+PHONE_VERIFY_VALID_DAYS = 30
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", "")
+TWILIO_VERIFY_SERVICE_SID = os.getenv("TWILIO_VERIFY_SERVICE_SID", "")
+HOLD_DISCLOSURE = ("Hi, thank you for picking up. This is an automated assistant holding for a patient. "
+                   "I'm connecting them now; it'll take a few seconds.")
+HOLD_USER_MISSED_MESSAGE = "Sorry, the patient isn't available right now. They'll call back. Thank you."
