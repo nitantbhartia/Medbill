@@ -101,3 +101,14 @@ def test_confirm_sheet_asks_with_the_hospitals_choices_and_remembers_the_source(
     with get_db() as db:
         row = db.execute("SELECT cpt_code, code_source, needs_confirm FROM line_items WHERE bill_id = ?", (bill_id,)).fetchone()
     assert (row["cpt_code"], row["code_source"], row["needs_confirm"]) == ("70460", "hospital_lookup", 0)
+
+
+def test_chargemaster_script_reads_a_csv_with_loosely_named_columns(tmp_path, monkeypatch):
+    import runpy
+    import sys
+    _hospital()
+    csv_file = tmp_path / "cm.csv"
+    csv_file.write_text("FACILITY_NAME,ITEM_DESCRIPTION,CPT_HCPCS\nSharp Memorial Hospital,CT HEAD W/O CONTRAST,70450\nSharp Memorial Hospital,ROOM CHARGE,\n")
+    monkeypatch.setattr(sys, "argv", ["load_hcai_chargemasters.py", "--file", str(csv_file)])
+    runpy.run_path("scripts/load_hcai_chargemasters.py", run_name="__main__")
+    assert code_lookup.lookup("050625", "CT head without contrast")["choices"][0]["code"] == "70450"

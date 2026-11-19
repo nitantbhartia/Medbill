@@ -90,3 +90,15 @@ def test_reported_rejection_keeps_rules_and_reason():
     with get_db() as db:
         row = db.execute("SELECT rejected_rule_ids, reason_category FROM dispute_outcomes WHERE bill_id = ?", (bill_id,)).fetchone()
     assert json.loads(row["rejected_rule_ids"]) == [DUP] and row["reason_category"] == "modifier"
+
+
+def test_demotion_summary_is_emailed_to_ops(monkeypatch):
+    import email_service
+    sent = []
+    monkeypatch.setattr(config, "OPS_NOTIFY_EMAIL", "ops@example.test")
+    monkeypatch.setattr(email_service, "send_email", lambda to, subject, html, text="": sent.append((to, subject, html)) or True)
+    for _ in range(9):
+        _outcome(DUP, False)
+    _outcome(DUP, True)
+    rule_learning.nightly_update()
+    assert len(sent) == 1 and sent[0][0] == "ops@example.test" and DUP in sent[0][2]
