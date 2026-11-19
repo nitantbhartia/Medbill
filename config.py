@@ -414,3 +414,6 @@ INSURER_RATE_TOLERANCE = 1.10
 OUTCOME_MIN_SAMPLE = 10
 VERIFY_REWARD_PLUS_DAYS = 90
 VERIFY_NAME_MATCH_MIN_SHARED_WORDS = 2
+
+# Paywall: Plus is pre-selected for someone who says they can't afford it and owes more than this (B15.3).
+PLUS_DEFAULT_MIN_OWED = 2000

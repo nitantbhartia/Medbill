@@ -1,6 +1,7 @@
 """The iOS app API: anonymous devices, locked/unlocked bill views, in-app purchase unlocks, data deletion."""
 
 import hashlib
+import json
 
 import pytest
 from fastapi.testclient import TestClient
@@ -93,7 +94,7 @@ def test_flagged_scan_is_locked_with_a_teaser_and_no_charge_details():
     assert view["locked"] is True
     assert view["report"] is None
     assert view["teaser"]["charge_count"] > 0
-    assert view["price"] == {"report_product_id": "bk_report_unlock"}
+    assert view["price"] == {"report_product_id": "bk_report_unlock", "plus_default_min_owed": config.PLUS_DEFAULT_MIN_OWED}
     assert view["bill"]["provider_name"] == "Memorial Regional Hospital"
     assert view["free_charge"]["description"]
     assert "finding_ids" not in str(view)
@@ -466,3 +467,17 @@ def test_scan_infers_the_bill_type_and_profile_patch_is_accepted():
     with get_db() as db:
         assert db.execute("SELECT bill_type FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == "er"
     assert client.patch("/api/m/profile", json={"situations": ["too_high"], "due_band": "this_month"}, headers=headers).status_code == 200
+
+
+def test_locked_view_lists_evidence_kinds_of_locked_charges_and_no_line_details():
+    _, headers = new_device()
+    view = scan(headers)
+    assert view["locked"] and view["teaser"]["locked_kinds"]
+    assert set(view["teaser"]["locked_kinds"]) <= {"official", "bill", "check"}
+    assert len(view["teaser"]["locked_kinds"]) == view["teaser"]["charge_count"] - 1
+    free = view["free_charge"]
+    text = json.dumps({key: value for key, value in view.items() if key != "free_charge"})
+    for item in SAMPLE_BILL["line_items"]:
+        if item["description"] != free["description"]:
+            assert item["description"] not in text
+    assert view["price"]["plus_default_min_owed"] == config.PLUS_DEFAULT_MIN_OWED
