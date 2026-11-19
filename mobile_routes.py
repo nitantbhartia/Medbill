@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 import config
 import mobile_auth
+import outcome_stats
 from api import _check_rate_limit, _request_client_key
 from compliance import delete_bill_data, log_audit, record_consent
 from db import get_db
@@ -134,6 +135,7 @@ async def hospital_insight(facility_id: str, device_id: str = Depends(mobile_aut
         "billing_grade": row["billing_grade"],
         "procedures_compared": row["procedures_compared"],
         "as_of": str(row["computed_at"] or "")[:10] or None,
+        "outcomes": outcome_stats.get_hospital_outcomes(facility_id),
     })
 
 

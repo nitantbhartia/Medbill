@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "outcome_verified", "outcome_verify_failed", "improve_prompt_shown", "improve_consent", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -409,3 +409,8 @@ CA_CHARITY_CARE_FPL_FLOOR = 400
 # Insurer-specific prices from hospital files (B14.3)
 MRF_MAX_AGE_DAYS = 400
 INSURER_RATE_TOLERANCE = 1.10
+
+# Verified outcomes (B14.4)
+OUTCOME_MIN_SAMPLE = 10
+VERIFY_REWARD_PLUS_DAYS = 90
+VERIFY_NAME_MATCH_MIN_SHARED_WORDS = 2

@@ -113,12 +113,12 @@ Sincerely,
 
 @router.get("/wins")
 async def wins(device_id: str = Depends(mobile_auth.device_from_request)):
-    """Self-reported reductions only: the best reported result per bill, and only when money came off."""
+    """Verified savings only: the best verified result per bill, and only when money came off."""
     with get_db() as db:
         row = db.execute(
             "SELECT COUNT(*) AS reports, COALESCE(SUM(saved), 0) AS total FROM ("
             "SELECT MAX(o.actual_savings) AS saved FROM dispute_outcomes o "
-            "JOIN bill_access_sessions bas ON bas.bill_id = o.bill_id WHERE bas.session_id = ? "
+            "JOIN bill_access_sessions bas ON bas.bill_id = o.bill_id WHERE bas.session_id = ? AND o.verified = 1 "
             "GROUP BY o.bill_id HAVING MAX(o.actual_savings) > 0)", (device_id,),
         ).fetchone()
     return ok({"reports": row["reports"], "total_saved": round(row["total"], 2)})

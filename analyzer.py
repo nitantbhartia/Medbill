@@ -15,6 +15,7 @@ from validators.nsa import check_no_surprises_act
 from validators.extraction import validate_extraction, validate_cpt_description
 from validators.benchmarks import check_benchmark
 from validators.eob import check_eob_reconciliation
+from outcome_stats import get_hospital_outcomes
 from validators.insurer_rate import check_insurer_rate
 from data_freshness import get_data_freshness_warnings, get_data_freshness
 
@@ -644,7 +645,13 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
         finding["confidence"] = _assign_confidence(finding)
         _ensure_evidence_panel(finding, freshness)
 
-    findings.sort(key=lambda f: SEVERITY_ORDER.get(f.get("severity", "low"), 2))
+    # Within a severity, findings this hospital has actually corrected for people come first.
+    outcome_hospital = find_hospital_match(extracted_data.get("provider_name") or "", zip_code)
+    hospital_outcomes = get_hospital_outcomes(outcome_hospital["facility_id"]) if outcome_hospital else {}
+    for finding in findings:
+        record = hospital_outcomes.get(finding.get("rule_id") or "")
+        finding["hospital_success_rate"] = record["success_rate"] if record else None
+    findings.sort(key=lambda f: (SEVERITY_ORDER.get(f.get("severity", "low"), 2), -(f.get("hospital_success_rate") or 0)))
 
     has_patient_data = any(
         item.get("patient_responsibility") is not None for item in line_items

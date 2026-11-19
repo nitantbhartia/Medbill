@@ -96,8 +96,27 @@ def _refresh_plus_from_revenuecat(device_id: str) -> None:
     _set_plus(device_id, active, expires)
 
 
+def grant_reward_plus(device_id: str, days: int) -> None:
+    """Free Plus as a reward, kept apart from the paid status so a RevenueCat refresh can't erase it."""
+    with get_db() as db:
+        db.execute(
+            "INSERT INTO mobile_entitlements (device_id, plus_active, reward_plus_until) "
+            "VALUES (?, 0, datetime('now', ?)) ON CONFLICT(device_id) DO UPDATE SET "
+            "reward_plus_until = MAX(COALESCE(reward_plus_until, ''), excluded.reward_plus_until)",
+            (device_id, f"+{days} days"))
+
+
+def _reward_plus_active(device_id: str) -> bool:
+    with get_db() as db:
+        row = db.execute("SELECT 1 FROM mobile_entitlements WHERE device_id = ? AND reward_plus_until > datetime('now')",
+                         (device_id,)).fetchone()
+    return row is not None
+
+
 def plus_is_active(device_id: str, force_refresh: bool = False) -> bool:
     """Cached Plus status; refreshed from RevenueCat when older than MOBILE_PLUS_CACHE_SECONDS or when forced."""
+    if _reward_plus_active(device_id):
+        return True
     with get_db() as db:
         row = db.execute(
             "SELECT plus_active, strftime('%s', 'now') - strftime('%s', updated_at) AS age "

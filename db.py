@@ -61,6 +61,9 @@ def _run_migrations(db):
     ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT"})
+    ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
+                                        "rule_ids": "TEXT", "facility_id": "TEXT"})
+    ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
     ensure_columns("line_items", {"needs_confirm": "INTEGER DEFAULT 0", "issue_kind": "TEXT", "issue_field": "TEXT"})
     ensure_columns("bills", {
         "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",

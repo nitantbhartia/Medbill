@@ -30,7 +30,11 @@ def teaser(bill_id: int) -> dict | None:
     bill = results.get("bill") or {}
     owed = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0) or None
     summary = group_findings_by_charge(results.get("findings") or [], owed)
+    import outcome_stats
+    import outcome_verification
+    rule_ids = outcome_verification.bill_rule_ids(bill_id)
     return {
+        "outcome_line": outcome_stats.outcome_line(bill.get("provider_name") or "", outcome_verification.facility_for(bill), rule_ids),
         "charge_count": len(summary["charges"]),
         "strong_count": summary["strong_count"],
         "total_savings": summary["total_savings"],

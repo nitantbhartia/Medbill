@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 import bill_contact
 import config
 import line_confirmation
+import outcome_verification
 import mobile_accounts
 import mobile_auth
 import mobile_purchases
@@ -125,7 +126,7 @@ async def delete_bill(bill_id: int, device_id: str = Depends(mobile_auth.device_
 
 @router.post("/bills/{bill_id}/outcome")
 async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
-    """The user tells us what the hospital did after they disputed, so the app can show real results."""
+    """The user tells us what the hospital did. Self-reported until they verify it with the new statement."""
     mobile_auth.require_device_bill_access(device_id, bill_id)
     outcome = payload.get("outcome")
     final_owed = payload.get("final_patient_owes", 0)
@@ -133,21 +134,32 @@ async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(m
         raise HTTPException(400, f"outcome must be one of: {', '.join(sorted(VALID_OUTCOMES))}")
     if not isinstance(final_owed, (int, float)) or isinstance(final_owed, bool) or final_owed < 0:
         raise HTTPException(400, "final_patient_owes must be a non-negative number")
-    with get_db() as db:
-        bill = db.execute("SELECT provider_name, total_patient_owes FROM bills WHERE id = ?", (bill_id,)).fetchone()
-        if not bill:
-            raise HTTPException(404, "Bill not found")
-        original = bill["total_patient_owes"] or 0
-        saved = max(0, original - final_owed)
-        db.execute(
-            "INSERT INTO dispute_outcomes (bill_id, hospital_name, called_billing, outcome, "
-            "original_patient_owes, final_patient_owes, actual_savings, shared_publicly) "
-            "VALUES (?, ?, 1, ?, ?, ?, ?, 0)",
-            (bill_id, bill["provider_name"], outcome, original, final_owed, saved),
-        )
+    bill = _bill_row(bill_id)
+    saved = outcome_verification.record_reported(bill_id, bill, outcome, final_owed)
     log_audit(action="mobile_report_outcome", resource_type="bill", resource_id=str(bill_id),
               metadata={"outcome": outcome, "actual_savings": saved})
     return ok({"actual_savings": saved})
+
+
+@router.post("/bills/{bill_id}/outcome/verify")
+async def verify_outcome(bill_id: int, pages: list[UploadFile] = File(...),
+                         device_id: str = Depends(mobile_auth.device_from_request)):
+    """The new statement from the hospital. If its balance is lower, the saving is verified and earns free Plus."""
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    if not pages or len(pages) > config.MOBILE_SCAN_MAX_PAGES:
+        raise HTTPException(400, f"Send between 1 and {config.MOBILE_SCAN_MAX_PAGES} pages.")
+    if not _check_rate_limit(f"m-scan:{device_id}"):
+        raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
+    images = await _read_pages(pages)
+    try:
+        result = outcome_verification.verify_with_statement(bill_id, device_id, images)
+    except scanner.ScannerNotConfigured as exc:
+        raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
+    except ValueError as exc:
+        raise HTTPException(400, f"We couldn't read that statement: {exc}") from exc
+    log_audit(action="mobile_verify_outcome", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
+              metadata={"verified": result["verified"]})
+    return ok(result)
 
 
 @router.post("/bills/{bill_id}/eob")

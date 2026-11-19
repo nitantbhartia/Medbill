@@ -408,3 +408,53 @@ def test_improvement_consent_is_off_by_default_logged_and_must_be_a_boolean():
     with get_db() as db:
         assert db.execute("SELECT data_improvement FROM mobile_devices WHERE device_id = ?", (device_id,)).fetchone()[0] == 1
         assert db.execute("SELECT COUNT(*) FROM consent_logs WHERE consent_type = 'data_improvement'").fetchone()[0] >= 1
+
+
+# ── Verified outcomes ──────────────────────────────────────────────────────────
+
+def statement(owes, provider="Memorial Regional Hospital"):
+    return lambda images: {"provider_name": provider, "total_patient_owes": owes, "line_items": []}
+
+
+def verify_call(headers, bill_id):
+    return client.post(f"/api/m/bills/{bill_id}/outcome/verify", files=[("pages", ("new.jpg", b"new-statement", "image/jpeg"))], headers=headers)
+
+
+def test_a_lower_balance_from_the_same_hospital_verifies_and_earns_plus(monkeypatch):
+    device_id, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "reduced", "final_patient_owes": 3000}, headers=headers)
+    monkeypatch.setattr(scan_pipeline, "extract_pages", statement(1500.0))
+    result = verify_call(headers, bill_id).json()["data"]
+    assert result == {"verified": True, "actual_savings": 2715.0, "reward_days": 90}
+    assert mobile_purchases.plus_is_active(device_id)
+    assert client.get("/api/m/wins", headers=headers).json()["data"]["total_saved"] == 2715.0
+
+
+def test_unverified_reports_do_not_count_in_wins_and_bad_statements_do_not_verify(monkeypatch):
+    device_id, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "reduced", "final_patient_owes": 100}, headers=headers)
+    assert client.get("/api/m/wins", headers=headers).json()["data"]["total_saved"] == 0
+    for owes, provider, reason in ((5000.0, "Memorial Regional Hospital", "not_lower"), (100.0, "Sunrise Clinic", "different_hospital"), (None, "Memorial Regional Hospital", "unreadable")):
+        monkeypatch.setattr(scan_pipeline, "extract_pages", statement(owes, provider))
+        assert verify_call(headers, bill_id).json()["data"] == {"verified": False, "reason": reason}
+    assert not mobile_purchases.plus_is_active(device_id)
+
+
+def test_hospital_outcomes_need_ten_verified_cases_per_rule():
+    import json
+    import outcome_stats
+    with get_db() as db:
+        db.execute("DELETE FROM dispute_outcomes WHERE facility_id = 'F9'")
+        for index in range(12):
+            db.execute("INSERT INTO dispute_outcomes (facility_id, verified, actual_savings, rule_ids) VALUES ('F9', 1, ?, ?)",
+                       (100.0 if index < 9 else 0.0, json.dumps(["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"])))
+        for index in range(4):
+            db.execute("INSERT INTO dispute_outcomes (facility_id, verified, actual_savings, rule_ids) VALUES ('F9', 1, 50, ?)",
+                       (json.dumps(["RULE_NCCI_UNBUNDLING"]),))
+    stats = outcome_stats.get_hospital_outcomes("F9")
+    assert list(stats) == ["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]
+    assert (stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["verified"], stats["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]["succeeded"]) == (12, 9)
+    assert outcome_stats.outcome_line("Harbor View", "F9", ["RULE_DUPLICATE_SAME_CODE_DATE_AMOUNT"]) == \
+        "Harbor View corrected duplicate charges for 9 of 12 BillKarma users"
