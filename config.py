@@ -471,3 +471,8 @@ SMS_CODES_PER_DEVICE_PER_HOUR = 5
 SMS_CODES_PER_NUMBER_PER_HOUR = 3
 SMS_CHECKS_PER_DEVICE_PER_HOUR = 10
 HOLD_CALL_REQUESTS_PER_DEVICE_PER_HOUR = 10
+
+# First-time read of charity care policies in production: a few big California cities, once, when none are stored yet.
+ASSISTANCE_POLICY_AUTO_REFRESH = os.getenv("ASSISTANCE_POLICY_AUTO_REFRESH", "true").lower() == "true"
+ASSISTANCE_POLICY_AUTO_CITIES = ("San Diego", "Los Angeles")
+ASSISTANCE_POLICY_AUTO_LIMIT = 20

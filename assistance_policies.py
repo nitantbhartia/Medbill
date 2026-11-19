@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 import config
 import scanner
+from analyzer import find_hospital_match
 from db import get_db
 from google.genai import types
 
@@ -20,6 +21,9 @@ USER_AGENT = "Mozilla/5.0 (compatible; BillKarma policy research)"
 TEXT_FIELDS = ("discount_rule", "asset_test", "application_deadline", "contact_phone")
 LIST_FIELDS = ("presumptive_programs", "required_documents")
 INCOME_FIELDS = ("free_care_max_fpl", "discount_max_fpl")
+# A free-care limit must come from a sentence about free or forgiven care, not an eligibility or flat-fee sentence.
+FREE_CARE_WORDS = ("free", "charity", "100%", "forgiv", "write off", "write-off", "no charge", "zero", "not financially responsible")
+PHONE_QUOTE_WORDS = ("call", "phone", "contact", "telephone", "questions")
 
 PROMPT = """You read a hospital's charity care and discount payment policy. Return JSON with exactly these keys.
 Each key holds an object {{"value": ..., "quote": "..."}} or null. "quote" must be one sentence copied EXACTLY from the policy
@@ -79,6 +83,11 @@ def verify_terms(raw: dict, policy_text: str) -> tuple[dict, dict]:
         value = entry.get("value")
         if field in INCOME_FIELDS and not _percent_in(entry["quote"], value):
             continue
+        quote = entry["quote"].lower()
+        if field == "free_care_max_fpl" and not any(word in quote for word in FREE_CARE_WORDS):
+            continue
+        if field == "contact_phone" and (not any(word in quote for word in PHONE_QUOTE_WORDS) or "appeal" in quote):
+            continue
         if field in LIST_FIELDS:
             value = [str(item).strip() for item in value if str(item).strip()] if isinstance(value, list) else None
         elif field in TEXT_FIELDS:
@@ -109,14 +118,16 @@ def extract_policy_terms(text: str) -> tuple[dict, dict]:
     return verify_terms(scanner._parse_json_response(response.text), text)
 
 
-def match_facility_id(name: str, zip_code: str | None) -> str | None:
-    """Our CMS facility id for an HCAI hospital, by exact name or by name inside the same ZIP. None when unsure."""
+def match_facility_id(name: str, zip_code: str | None, city: str | None = None) -> str | None:
+    """Our CMS facility id for an HCAI hospital: an exact name, else the closest match in the same city and ZIP. None when unsure."""
     with get_db() as db:
         rows = db.execute("SELECT facility_id FROM hospitals WHERE lower(name) = lower(?)", (name,)).fetchall()
-        if len(rows) != 1 and zip_code:
-            rows = db.execute("SELECT facility_id FROM hospitals WHERE zip LIKE ? AND lower(name) LIKE ?",
-                              (f"{zip_code[:5]}%", f"%{name.lower().split()[0]}%")).fetchall()
-    return rows[0]["facility_id"] if len(rows) == 1 else None
+    if len(rows) == 1:
+        return rows[0]["facility_id"]
+    match = find_hospital_match(name, zip_code)
+    if match and city and (match.get("city") or "").lower() == city.lower() and zip_code and str(match.get("zip") or "")[:5] == zip_code[:5]:
+        return match["facility_id"]
+    return None
 
 
 def latest_hash(hcai_license: str) -> str | None:
@@ -154,3 +165,8 @@ def get_policy(facility_id: str) -> dict | None:
         policy[field] = json.loads(policy[field] or "[]")
     policy["evidence"] = json.loads(policy["evidence"] or "{}")
     return policy
+
+
+def policies_exist() -> bool:
+    with get_db() as db:
+        return db.execute("SELECT 1 FROM hospital_assistance_policies LIMIT 1").fetchone() is not None

@@ -559,6 +559,8 @@ def startup():
 
     db.init_db()
     payer_rates.seed_aliases()
+    import policy_refresh
+    policy_refresh.start_first_read_if_needed()
     from hospital_seo import repair_hospital_states
     repaired = repair_hospital_states()
     if repaired:
