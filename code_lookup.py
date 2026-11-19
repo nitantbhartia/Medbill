@@ -113,6 +113,8 @@ def hcai_workbook_rows(path: str):
     from openpyxl import load_workbook
 
     workbook = load_workbook(path, read_only=True, data_only=True)
+    if not {"Cover Page", "Hospital CDM"} <= set(workbook.sheetnames):
+        return  # hospitals file their own layouts; only this standard one is read
     name = next((cell for row in workbook["Cover Page"].iter_rows(min_row=1, max_row=6, values_only=True) for cell in row if isinstance(cell, str) and cell.strip()), None)
     for _, description, code, *_ in workbook["Hospital CDM"].iter_rows(min_row=2, values_only=True):
         if name and description and code:

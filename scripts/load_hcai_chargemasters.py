@@ -15,6 +15,7 @@ import os
 import re
 from pathlib import Path
 import sys
+from zipfile import BadZipFile
 from urllib.request import Request, urlopen
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -45,7 +46,14 @@ def post_workbooks(base_url: str, paths: list[str]) -> None:
     token = os.environ["ADMIN_API_TOKEN"]
     totals = {"loaded": 0, "skipped_unknown_hospital": 0}
     for path in paths:
-        rows = list(code_lookup.hcai_workbook_rows(path))
+        try:
+            rows = list(code_lookup.hcai_workbook_rows(path))
+        except (ValueError, OSError, KeyError, BadZipFile) as error:
+            print(path, "skipped: unreadable workbook:", error, flush=True)
+            continue
+        if not rows:
+            print(path, "skipped: not the standard Cover Page / Hospital CDM layout", flush=True)
+            continue
         for start in range(0, len(rows), config.CHARGEMASTER_POST_MAX_ROWS):
             request = Request(base_url.rstrip("/") + "/ops/load-chargemaster", data=json.dumps(rows[start:start + config.CHARGEMASTER_POST_MAX_ROWS]).encode(),
                               headers={"Content-Type": "application/json", "X-Admin-Token": token, "User-Agent": "BillKarma data loader"})
