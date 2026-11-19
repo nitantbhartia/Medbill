@@ -74,9 +74,10 @@ def _run_migrations(db):
         },
     )
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL", "mrf_reliability": "TEXT"})
-    ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
+    ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0", "inbound_token": "TEXT"})
+    db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_mobile_devices_inbound ON mobile_devices(inbound_token)")
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
-    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT"})
+    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT", "input_kind": "TEXT"})
     ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
                                         "rule_ids": "TEXT", "facility_id": "TEXT",
                                         "rejected_rule_ids": "TEXT", "reason_category": "TEXT"})
@@ -1493,6 +1494,13 @@ CREATE TABLE IF NOT EXISTS hospital_code_lookup (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_code_lookup_unique ON hospital_code_lookup(facility_id, description_norm, cpt_code);
 CREATE INDEX IF NOT EXISTS idx_code_lookup_desc ON hospital_code_lookup(facility_id, description_norm);
+
+CREATE TABLE IF NOT EXISTS inbound_mail_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_inbound_mail_device ON inbound_mail_log(device_id, created_at);
 
 CREATE TABLE IF NOT EXISTS bill_notices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

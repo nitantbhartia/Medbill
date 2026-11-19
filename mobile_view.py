@@ -98,6 +98,7 @@ CONFIRM_MESSAGES = {
     "negative_amount": "This amount reads as negative.",
     "invalid_code": "We couldn't read this billing code.",
     "unknown_code": "We couldn't match this billing code.",
+    "text_layer_mismatch": "This amount doesn't match the text in your PDF.",
 }
 
 

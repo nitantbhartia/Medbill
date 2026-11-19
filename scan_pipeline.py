@@ -10,6 +10,7 @@ import eob_observations
 import extraction_selfcheck
 import insurance_check
 import scanner
+import validators.text_layer as text_layer_check
 from db import get_db
 from compliance import scrub_extracted_data
 
@@ -20,11 +21,12 @@ class AnalysisFailed(Exception):
     """Raised when extraction worked but analyzing or saving the bill did not."""
 
 
-def extract_pages(images: list[tuple[bytes, str]]) -> dict:
-    """OCR one page, or several pages merged into one bill. Raises scanner errors as-is."""
+def extract_pages(images: list[tuple[bytes, str]], text_layer: str | None = None) -> dict:
+    """OCR one page, or several pages merged into one bill. Raises scanner errors as-is.
+    A PDF's text layer, when there is one, is passed along: its numbers are exact and win over the image."""
     if len(images) == 1:
-        return scanner.process_bill_with_verification(*images[0])
-    return scanner.process_multi_page_bill(images)
+        return scanner.process_bill_with_verification(*images[0], text_layer=text_layer) if text_layer else scanner.process_bill_with_verification(*images[0])
+    return scanner.process_multi_page_bill(images, text_layer) if text_layer else scanner.process_multi_page_bill(images)
 
 
 def run_scan(
@@ -34,18 +36,25 @@ def run_scan(
     referral_code: str | None,
     eob_images: list[tuple[bytes, str]] | None = None,
     share_observations: bool = False,
+    text_layer: str | None = None,
+    input_kind: str | None = None,
 ) -> tuple[int, dict, dict]:
     """OCR the pages, analyze, save. Returns (bill_id, extracted, analysis)."""
-    extracted = extract_pages(images)
+    text_layer = text_layer_check.clean(text_layer) or None
+    extracted = extract_pages(images, text_layer) if text_layer else extract_pages(images)
     eob_data = None
     try:
         extracted = scrub_extracted_data(extracted)
+        if text_layer:
+            text_layer_check.reconcile(extracted, text_layer)
         extracted = extraction_selfcheck.check_lines(extracted, images)
         if eob_images:
             eob_data = scrub_extracted_data(extract_pages(eob_images))
             extracted = analyzer.merge_eob_into_extracted(extracted, eob_data)
         analysis = analyzer.analyze_bill(extracted, zip_code)
         bill_id = analyzer.save_bill_and_findings(user_id, extracted, analysis, zip_code, referral_code)
+        with get_db() as db:
+            db.execute("UPDATE bills SET input_kind = ? WHERE id = ?", (input_kind, bill_id))
         bill_contact.store_from_extraction(bill_id, extracted)
         if eob_data:
             insurance_check.record(bill_id, eob_data, extracted.get("total_patient_owes"))

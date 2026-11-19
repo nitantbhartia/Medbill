@@ -512,3 +512,16 @@ MRF_RELIABILITY_MIN_MATCH_SHARE = 0.5
 MRF_TRUTH_RUN_STATUS = "mrf_truth_check"
 EOB_OBSERVATION_CONFIDENCE_PHOTO = 0.8
 EOB_OBSERVATION_CONFIDENCE_TEXT = 1.0
+
+# B14.8: digital documents first
+INBOUND_MAX_PER_DAY = 20
+INBOUND_DOMAIN = "billkarma.app"
+MAX_TEXT_LAYER_CHARS = 60000
+TEXT_LAYER_FIX_MAX_DIGIT_DIFFS = 2
+HEALTH_RECORDS_ENABLED = False
+INPUT_KINDS = ("photo", "pdf_text", "pdf_image", "email")
+UPLOAD_MIME_TYPES = {
+    "image/jpeg", "image/png", "image/gif", "image/webp",
+    "image/heic", "image/heif", "image/tiff", "image/bmp",
+    "application/pdf",
+}

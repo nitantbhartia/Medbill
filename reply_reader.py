@@ -51,7 +51,20 @@ def fetch_inbound_email(email_id: str) -> dict:
     except (OSError, ValueError) as exc:
         raise RuntimeError(f"Could not fetch inbound email {email_id}: {exc}") from exc
     body = data.get("text") or email_service._strip_tags(data.get("html") or "")
-    return {"sender": data.get("from", ""), "subject": data.get("subject", ""), "body": body}
+    return {"sender": data.get("from", ""), "subject": data.get("subject", ""), "body": body,
+            "attachments": data.get("attachments") or []}
+
+
+def fetch_attachment(email_id: str, attachment_id: str) -> bytes:
+    """Download one attachment of a received email. Raises RuntimeError if it fails."""
+    headers = {"Authorization": f"Bearer {config.RESEND_API_KEY}"}
+    try:
+        with urllib.request.urlopen(urllib.request.Request(f"{RESEND_RECEIVING_URL}{email_id}/attachments/{attachment_id}", headers=headers), timeout=15) as resp:
+            download_url = json.loads(resp.read())["download_url"]
+        with urllib.request.urlopen(urllib.request.Request(download_url), timeout=30) as resp:
+            return resp.read(config.MAX_UPLOAD_SIZE_MB * 1024 * 1024 + 1)
+    except (OSError, ValueError, KeyError) as exc:
+        raise RuntimeError(f"Could not fetch attachment {attachment_id} of email {email_id}: {exc}") from exc
 
 
 def find_case_id(subject: str, body: str) -> int | None:

@@ -10,6 +10,7 @@ import bill_contact
 import config
 import line_confirmation
 import eob_observations
+import inbound_bills
 import outcome_verification
 import mobile_accounts
 import mobile_auth
@@ -42,6 +43,18 @@ async def _read_pages(pages: list[UploadFile]) -> list[tuple[bytes, str]]:
     return images
 
 
+def _input_kind(images: list[tuple[bytes, str]], text_layer: str) -> str:
+    if any(mime == "application/pdf" for _, mime in images):
+        return "pdf_text" if text_layer.strip() else "pdf_image"
+    return "photo"
+
+
+@router.get("/inbound-address")
+async def inbound_address(device_id: str = Depends(mobile_auth.device_from_request)):
+    """The private address this device can email bills to. Created the first time it is asked for."""
+    return ok({"address": inbound_bills.address_for(device_id)})
+
+
 USER_FACING_PREFIXES = ("That file", "That photo", "Unsupported", "Could not decode", "The scan could not be read")
 
 
@@ -63,6 +76,7 @@ async def scan(
     pages: list[UploadFile] = File(...),
     zip_code: str = Form(...),
     eob_pages: list[UploadFile] = File(default=[]),
+    text_layer: str = Form(default=""),
     device_id: str = Depends(mobile_auth.device_from_request),
 ):
     if not pages or len(pages) > config.MOBILE_SCAN_MAX_PAGES:
@@ -76,7 +90,8 @@ async def scan(
     images = await _read_pages(pages)
     eob_images = await _read_pages(eob_pages)
     try:
-        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None, eob_observations.consented(device_id))
+        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None, eob_observations.consented(device_id),
+                                                           text_layer, _input_kind(images, text_layer))
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
