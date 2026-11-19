@@ -662,6 +662,46 @@ def analyze_bill(extracted_data: dict, zip_code: str) -> dict:
     }
 
 
+def _insert_findings(db, bill_id: int, analysis: dict) -> None:
+    for finding in analysis.get("findings", []):
+        db.execute(
+            "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
+            "evidence_source, evidence_json, potential_savings, message, details) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                bill_id,
+                finding["type"],
+                finding.get("rule_id"),
+                finding["severity"],
+                finding.get("confidence"),
+                (finding.get("evidence") or {}).get("source"),
+                json.dumps(finding.get("evidence") or {}),
+                finding.get("potential_savings", 0),
+                finding["message"],
+                json.dumps(finding),
+            ),
+        )
+
+
+def replace_findings_and_insurance_fields(bill_id: int, extracted: dict, analysis: dict) -> None:
+    """Re-run results for a saved bill (after adding an EOB). The bill row, and so its unlock, stays."""
+    global _stats_cache_ts
+    _stats_cache_ts = 0.0
+    with get_db() as db:
+        db.execute("DELETE FROM findings WHERE bill_id = ?", (bill_id,))
+        stored = db.execute("SELECT id FROM line_items WHERE bill_id = ? ORDER BY id", (bill_id,)).fetchall()
+        for row, item in zip(stored, extracted.get("line_items", [])):
+            db.execute(
+                "UPDATE line_items SET insurance_paid = ?, insurance_adjustment = ?, patient_responsibility = ?, "
+                "date_of_service = ? WHERE id = ?",
+                (item.get("insurance_paid"), item.get("insurance_adjustment"), item.get("patient_responsibility"),
+                 item.get("date_of_service"), row["id"]),
+            )
+        db.execute("UPDATE bills SET total_findings = ?, total_potential_savings = ? WHERE id = ?",
+                   (analysis["total_findings"], analysis["total_potential_savings"], bill_id))
+        _insert_findings(db, bill_id, analysis)
+
+
 def save_bill_and_findings(
     user_id: int | None, extracted: dict, analysis: dict, zip_code: str = "", referral_code: str | None = None
 ) -> int:
@@ -717,24 +757,7 @@ def save_bill_and_findings(
                 ),
             )
 
-        for finding in analysis.get("findings", []):
-            db.execute(
-                "INSERT INTO findings (bill_id, finding_type, rule_id, severity, confidence, "
-                "evidence_source, evidence_json, potential_savings, message, details) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    bill_id,
-                    finding["type"],
-                    finding.get("rule_id"),
-                    finding["severity"],
-                    finding.get("confidence"),
-                    (finding.get("evidence") or {}).get("source"),
-                    json.dumps(finding.get("evidence") or {}),
-                    finding.get("potential_savings", 0),
-                    finding["message"],
-                    json.dumps(finding),
-                ),
-            )
+        _insert_findings(db, bill_id, analysis)
 
     return bill_id
 

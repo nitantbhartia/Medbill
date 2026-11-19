@@ -6,6 +6,7 @@ import re
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
+import bill_contact
 import config
 import mobile_accounts
 import mobile_auth
@@ -41,6 +42,7 @@ async def _read_pages(pages: list[UploadFile]) -> list[tuple[bytes, str]]:
 async def scan(
     pages: list[UploadFile] = File(...),
     zip_code: str = Form(...),
+    eob_pages: list[UploadFile] = File(default=[]),
     device_id: str = Depends(mobile_auth.device_from_request),
 ):
     if not pages or len(pages) > config.MOBILE_SCAN_MAX_PAGES:
@@ -49,9 +51,12 @@ async def scan(
         raise HTTPException(400, "zip_code must be a 5-digit US ZIP code")
     if not _check_rate_limit(f"m-scan:{device_id}"):
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
+    if len(eob_pages) > config.MOBILE_SCAN_MAX_PAGES:
+        raise HTTPException(400, f"Send at most {config.MOBILE_SCAN_MAX_PAGES} insurance statement pages.")
     images = await _read_pages(pages)
+    eob_images = await _read_pages(eob_pages)
     try:
-        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None)
+        bill_id, extracted, analysis = scan_pipeline.run_scan(images, zip_code.strip(), None, None, eob_images or None)
     except scanner.ScannerNotConfigured as exc:
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
     except ValueError as exc:
@@ -142,3 +147,52 @@ async def report_outcome(bill_id: int, payload: dict, device_id: str = Depends(m
     log_audit(action="mobile_report_outcome", resource_type="bill", resource_id=str(bill_id),
               metadata={"outcome": outcome, "actual_savings": saved})
     return ok({"actual_savings": saved})
+
+
+@router.post("/bills/{bill_id}/eob")
+async def add_eob(bill_id: int, eob_pages: list[UploadFile] = File(...),
+                  device_id: str = Depends(mobile_auth.device_from_request)):
+    """Add an insurance statement to a bill already scanned."""
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    if not eob_pages or len(eob_pages) > config.MOBILE_SCAN_MAX_PAGES:
+        raise HTTPException(400, f"Send between 1 and {config.MOBILE_SCAN_MAX_PAGES} pages.")
+    if not _check_rate_limit(f"m-scan:{device_id}"):
+        raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
+    images = await _read_pages(eob_pages)
+    try:
+        scan_pipeline.add_eob(bill_id, images)
+    except scan_pipeline.CannotRebuild as exc:
+        raise HTTPException(409, "Rescan the bill together with the statement.") from exc
+    except scanner.ScannerNotConfigured as exc:
+        raise HTTPException(503, "Bill reading is unavailable right now. Please try again later.") from exc
+    except ValueError as exc:
+        raise HTTPException(400, f"We couldn't read that statement: {exc}") from exc
+    except scan_pipeline.AnalysisFailed as exc:
+        raise HTTPException(500, "We couldn't check that statement.") from exc
+    log_audit(action="mobile_add_eob", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id)
+    return ok(mobile_view.build_bill_view(bill_id, device_id))
+
+
+def _bill_row(bill_id: int) -> dict:
+    with get_db() as db:
+        row = db.execute("SELECT * FROM bills WHERE id = ?", (bill_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Bill not found")
+    return dict(row)
+
+
+@router.get("/bills/{bill_id}/contact")
+async def contact(bill_id: int, device_id: str = Depends(mobile_auth.device_from_request)):
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    mobile_purchases.ensure_unlocked(device_id, bill_id)
+    return ok(bill_contact.contact_for(_bill_row(bill_id)))
+
+
+@router.post("/bills/{bill_id}/sent")
+async def sent(bill_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
+    mobile_auth.require_device_bill_access(device_id, bill_id)
+    channel = payload.get("channel")
+    if channel not in config.SENT_CHANNELS:
+        raise HTTPException(400, f"channel must be one of: {', '.join(sorted(config.SENT_CHANNELS))}")
+    bill_contact.mark_sent(bill_id, channel)
+    return ok({"sent_at": _bill_row(bill_id)["sent_at"], "channel": channel})

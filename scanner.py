@@ -72,6 +72,9 @@ Return a JSON object with this exact structure:
   "patient_name": "Patient name (will be redacted)",
   "bill_date": "YYYY-MM-DD",
   "account_number": "Account or invoice number",
+  "billing_phone": "Billing office phone number, only if printed on the bill",
+  "billing_email": "Billing office email, only if printed on the bill",
+  "billing_address": "Address to send payments or billing questions to, only if printed on the bill",
   "total_charged": 1234.56,
   "total_patient_owes": 567.89,
   "line_items": [
@@ -92,6 +95,7 @@ CRITICAL RULES:
 - The "line_items" field MUST be an array containing ALL line items from the bill.
 - Extract EVERY service line, even if there are 20+. Do not summarize or skip any.
 - If a field is not visible or unclear, use null.
+- billing_phone, billing_email and billing_address: copy only what is printed. Never guess or look anything up.
 - For total_patient_owes, look for labels including: "Outstanding balance", "Amount due", "Remaining responsibility", "Patient responsibility", "You owe", "Balance due".
 - CPT codes may be labeled "Procedure Code", "Service Code", "HCPCS", or just a 5-digit code.
 - Some bills show only descriptions without codes — still extract those items.

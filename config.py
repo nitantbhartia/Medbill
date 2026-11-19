@@ -323,7 +323,7 @@ MOBILE_EVENT_NAMES = {
     "letter_shared", "phone_script_viewed", "call_logged", "result_shared",
     "notification_prompt_shown", "notification_prompt_accepted",
     "review_prompt_requested", "data_deleted",
-    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "assistance_checked", "assistance_letter_made",
+    "outcome_reported", "win_shared", "signin_prompt_shown", "signin_completed", "letter_emailed", "eob_prompt_shown", "eob_added", "insurance_check", "send_screen_viewed", "letter_sent", "call_started", "call_notes_saved", "assistance_checked", "assistance_letter_made",
 }
 MOBILE_BILL_TYPES = {"er", "hospital_stay", "surgery", "lab_imaging", "doctor", "other"}
 MOBILE_AMOUNT_BANDS = {"under_500", "500_2k", "2k_10k", "over_10k", "unsure"}
@@ -373,3 +373,11 @@ MAX_FPL_PERCENT = 5000
 MEDICARE_PFS_YEAR = 2026
 MEDICARE_OPPS_YEAR = 2026
 NCCI_EDITS_VERSION = "2026 Q1, v32.0"
+
+# EOB check: the bill matches the insurer's statement when it asks for no more than this much extra.
+EOB_MATCH_TOLERANCE_DOLLARS = 5.0
+
+# Billing contact details read off a bill (B13.3).
+BILLING_PHONE_DIGITS = (10, 11)
+MAX_BILLING_ADDRESS_LEN = 300
+SENT_CHANNELS = {"email", "call", "mail", "portal"}

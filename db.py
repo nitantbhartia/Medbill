@@ -61,6 +61,11 @@ def _run_migrations(db):
     ensure_columns("mobile_devices", {"account_id": "INTEGER"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
     ensure_columns("bills", {"referral_code": "TEXT"})
+    ensure_columns("bills", {
+        "eob_patient_owes": "REAL", "eob_date": "TEXT", "eob_status": "TEXT",
+        "billing_phone": "TEXT", "billing_email": "TEXT", "billing_address": "TEXT", "account_number": "TEXT",
+        "sent_at": "TIMESTAMP", "sent_channel": "TEXT",
+    })
     db.execute("CREATE INDEX IF NOT EXISTS idx_bills_referral ON bills(referral_code, created_at)")
     ensure_columns(
         "billing_metrics",

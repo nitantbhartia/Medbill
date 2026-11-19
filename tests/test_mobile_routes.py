@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 import api
 import config
 import mobile_purchases
+import report
 import scan_pipeline
 from db import get_db
 from main import app
@@ -300,3 +301,99 @@ def test_assistance_check_letter_and_wins():
     assert client.get("/api/m/wins", headers=headers).json()["data"]["reports"] == 0
     client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "no_change", "final_patient_owes": 9999999}, headers=headers)
     assert client.get("/api/m/wins", headers=headers).json()["data"]["total_saved"] == 0
+
+
+# ── Insurance statement (EOB) ──────────────────────────────────────────────────
+
+EOB_PAGE = ("eob_pages", ("eob.jpg", b"fake-eob", "image/jpeg"))
+
+
+def fake_pages(eob_owes):
+    eob = {"bill_date": "2026-10-03", "total_patient_owes": eob_owes, "line_items": []}
+    return lambda images: eob if images[0][0] == b"fake-eob" else dict(SAMPLE_BILL)
+
+
+def test_scan_with_a_statement_flags_a_bill_that_asks_for_more(monkeypatch):
+    monkeypatch.setattr(scan_pipeline, "extract_pages", fake_pages(640.0))
+    _, headers = new_device()
+    response = client.post("/api/m/scan", files=[PAGE, EOB_PAGE], data={"zip_code": "33021"}, headers=headers)
+    check = response.json()["data"]["insurance_check"]
+    assert check == {"status": "mismatch", "eob_owed": 640.0, "bill_owed": 4215.0, "difference": 3575.0, "eob_date": "2026-10-03"}
+
+
+def test_statement_that_agrees_with_the_bill_matches_and_unreadable_is_reported(monkeypatch):
+    _, headers = new_device()
+    monkeypatch.setattr(scan_pipeline, "extract_pages", fake_pages(4215.0))
+    match = client.post("/api/m/scan", files=[PAGE, EOB_PAGE], data={"zip_code": "33021"}, headers=headers)
+    assert match.json()["data"]["insurance_check"] == {"status": "match"}
+    monkeypatch.setattr(scan_pipeline, "extract_pages", fake_pages(None))
+    unreadable = client.post("/api/m/scan", files=[PAGE, EOB_PAGE], data={"zip_code": "33021"}, headers=headers)
+    assert unreadable.json()["data"]["insurance_check"] == {"status": "unreadable"}
+
+
+def test_bill_without_a_statement_has_no_insurance_check():
+    _, headers = new_device()
+    assert scan(headers)["insurance_check"] is None
+
+
+def test_adding_a_statement_later_keeps_the_same_bill_and_unlock(monkeypatch):
+    device_id, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    report.record_pending(bill_id, "iap:test", "")
+    report.mark_paid("iap:test")
+    monkeypatch.setattr(scan_pipeline, "extract_pages", fake_pages(640.0))
+    response = client.post(f"/api/m/bills/{bill_id}/eob", files=[EOB_PAGE], headers=headers)
+    data = response.json()["data"]
+    assert data["bill_id"] == bill_id and data["locked"] is False
+    assert data["insurance_check"]["status"] == "mismatch"
+
+
+def test_adding_a_statement_to_a_bill_with_no_stored_lines_asks_for_a_rescan(monkeypatch):
+    _, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    with get_db() as db:
+        db.execute("DELETE FROM line_items WHERE bill_id = ?", (bill_id,))
+    response = client.post(f"/api/m/bills/{bill_id}/eob", files=[EOB_PAGE], headers=headers)
+    assert response.status_code == 409
+
+
+def test_letter_names_the_statement_amounts():
+    from dispute_workflow import _eob_paragraph
+    text = _eob_paragraph("99285", "ER visit", "$4,500.00", "2026-01-10",
+                          {"eob_patient_owes": 640.0, "total_patient_owes": 1840.0, "eob_date": "2026-10-03"})
+    assert "$640.00" in text and "$1,840.00" in text and "$1,200.00" in text and "2026-10-03" in text
+
+
+# ── Sending the letter ─────────────────────────────────────────────────────────
+
+def unlocked_bill(headers):
+    bill_id = scan(headers)["bill_id"]
+    report.record_pending(bill_id, f"iap:{bill_id}", "")
+    report.mark_paid(f"iap:{bill_id}")
+    return bill_id
+
+
+def test_contact_uses_printed_details_and_never_invents_an_email(monkeypatch):
+    printed = {**SAMPLE_BILL, "billing_phone": "(954) 555-0142", "billing_email": "not an email",
+               "billing_address": "PO Box 100, Hollywood FL 33021"}
+    monkeypatch.setattr(scan_pipeline.scanner, "process_bill_with_verification", lambda *a: dict(printed))
+    _, headers = new_device()
+    bill_id = unlocked_bill(headers)
+    data = client.get(f"/api/m/bills/{bill_id}/contact", headers=headers).json()["data"]
+    assert data["phone"] == "(954) 555-0142" and data["email"] is None
+    assert data["address"].startswith("PO Box 100") and data["source"] == "bill"
+
+
+def test_contact_needs_an_unlocked_bill():
+    _, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    assert client.get(f"/api/m/bills/{bill_id}/contact", headers=headers).status_code == 402
+
+
+def test_sent_is_recorded_and_shows_in_my_bills():
+    _, headers = new_device()
+    bill_id = unlocked_bill(headers)
+    assert client.post(f"/api/m/bills/{bill_id}/sent", json={"channel": "fax"}, headers=headers).status_code == 400
+    assert client.post(f"/api/m/bills/{bill_id}/sent", json={"channel": "email"}, headers=headers).status_code == 200
+    summary = client.get("/api/m/bills", headers=headers).json()["data"]["bills"][0]
+    assert summary["sent_at"]

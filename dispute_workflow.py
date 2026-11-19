@@ -54,7 +54,7 @@ def build_dispute_letter(
         billed = float(li.get("charged_amount") or 0.0)
         medicare = float(detail.get("medicare_rate") or 0.0)
         finding_type = row["finding_type"] or "pricing"
-        paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail))
+        paragraphs.append(_finding_paragraph(finding_type, cpt, desc, billed, medicare, service_date, detail, bill))
 
     body = "\n\n".join(f"  {i+1}. {p}" for i, p in enumerate(paragraphs))
     sources = _source_footnotes(rows)
@@ -140,14 +140,18 @@ def _finding_paragraph(
     medicare: float,
     service_date: str,
     detail: dict,
+    bill: dict | None = None,
 ) -> str:
     """Return a dispute paragraph tailored to the finding type."""
     billed_fmt = f"${billed:,.2f}" if billed else "[charge]"
     medicare_fmt = f"${medicare:,.2f}" if medicare else None
     markup = round(billed / medicare, 1) if medicare and billed else None
 
-    if finding_type == "duplicate":
-        count = int(detail.get("duplicate_count") or 2)
+    if finding_type == "eob_mismatch":
+        return _eob_paragraph(cpt, desc, billed_fmt, service_date, bill or {})
+
+    if finding_type in ("duplicate", "duplicate_charge"):
+        count = len(detail["duplicate_of"]) + 1 if detail.get("duplicate_of") else int(detail.get("duplicate_count") or 2)
         return (
             f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
@@ -196,6 +200,18 @@ def _finding_paragraph(
         f"I am requesting a review and adjustment of this charge to a rate consistent "
         f"with recognized Medicare reimbursement benchmarks."
     )
+
+
+def _eob_paragraph(cpt: str, desc: str, billed_fmt: str, service_date: str, bill: dict) -> str:
+    owed, billed_owes = bill.get("eob_patient_owes"), bill.get("total_patient_owes")
+    head = f"BALANCE DOES NOT MATCH MY INSURANCE STATEMENT \u2014 CPT {cpt} ({desc.title()})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
+    if owed is None or billed_owes is None:
+        return head + ("My Explanation of Benefits (EOB) does not agree with the amount on this bill. I am requesting "
+                       "that the balance be corrected to match my insurer's determination.")
+    dated = f" dated {bill['eob_date']}" if bill.get("eob_date") else ""
+    return head + (f"My insurer's Explanation of Benefits (EOB){dated} shows that I owe ${owed:,.2f}. This bill asks me to "
+                   f"pay ${billed_owes:,.2f}. I am requesting that the balance be corrected to match my insurer's "
+                   f"determination, and that the difference of ${billed_owes - owed:,.2f} be removed from my account.")
 
 
 def build_appeal_letter(
