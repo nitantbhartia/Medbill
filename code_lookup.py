@@ -105,3 +105,15 @@ def load_chargemaster(rows, source_url: str | None = None) -> dict:
         record(facility_by_name[name], row["description"], row["code"], "chargemaster", source_url)
         loaded += 1
     return {"loaded": loaded, "skipped_unknown_hospital": skipped}
+
+
+def hcai_workbook_rows(path: str):
+    """Rows from one hospital's HCAI chargemaster workbook: the name is on the cover page, the lines on the "Hospital CDM" sheet
+    (Charge Code, Charge Code Description, HCPCS Code, price). Lines with no HCPCS code, such as room charges, are skipped."""
+    from openpyxl import load_workbook
+
+    workbook = load_workbook(path, read_only=True, data_only=True)
+    name = next((cell for row in workbook["Cover Page"].iter_rows(min_row=1, max_row=6, values_only=True) for cell in row if isinstance(cell, str) and cell.strip()), None)
+    for _, description, code, *_ in workbook["Hospital CDM"].iter_rows(min_row=2, values_only=True):
+        if name and description and code:
+            yield {"facility_name": name.strip(), "description": str(description), "code": str(code)}

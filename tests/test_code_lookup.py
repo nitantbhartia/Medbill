@@ -1,3 +1,4 @@
+import pytest
 import analyzer
 import code_lookup
 from db import get_db
@@ -112,3 +113,20 @@ def test_chargemaster_script_reads_a_csv_with_loosely_named_columns(tmp_path, mo
     monkeypatch.setattr(sys, "argv", ["load_hcai_chargemasters.py", "--file", str(csv_file)])
     runpy.run_path("scripts/load_hcai_chargemasters.py", run_name="__main__")
     assert code_lookup.lookup("050625", "CT head without contrast")["choices"][0]["code"] == "70450"
+
+
+def test_hcai_workbook_in_the_real_layout_loads(tmp_path):
+    openpyxl = pytest.importorskip("openpyxl")
+    _hospital()
+    workbook = openpyxl.Workbook()
+    cover = workbook.active
+    cover.title = "Cover Page"
+    cover["B2"] = "Sharp Memorial Hospital"
+    sheet = workbook.create_sheet("Hospital CDM")
+    sheet.append(["Charge Code", "Charge Code Description", "HCPCS Code", "June 2025 Prices"])
+    sheet.append([1255, "ROOM/BED: INTENSIVE CARE", None, 10165])
+    sheet.append([5688, "NEOSTIGMINE 1MG/ML INJ 1ML", "J2710", 60])
+    path = tmp_path / "106150788_CDM_All_.xlsx"
+    workbook.save(path)
+    assert code_lookup.load_chargemaster(code_lookup.hcai_workbook_rows(str(path))) == {"loaded": 1, "skipped_unknown_hospital": 0}
+    assert code_lookup.lookup("050625", "Neostigmine 1mg/mL injection 1mL")["choices"][0]["code"] == "J2710"
