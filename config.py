@@ -483,3 +483,8 @@ MOBILE_JSON_MAX_BYTES = 100_000  # mobile JSON bodies are tiny; uploads use mult
 DRUG_SUPPLY_CODE_PREFIXES = ("J", "A", "C", "Q")
 DRUG_SUPPLY_REVENUE_CODES = {"250", "251", "252", "270", "271", "272", "636"}
 LLM_REVIEW_ENABLED = os.environ.get("LLM_REVIEW_ENABLED", "false").lower() == "true"
+
+# B16.8: bump with any rule change so old reports can be rechecked
+RULES_VERSION = "2026-11-19"
+RECHECK_DAYS = 90
+APPLE_REFUND_URL = "https://reportaproblem.apple.com"

@@ -781,9 +781,19 @@ def replace_findings_and_insurance_fields(bill_id: int, extracted: dict, analysi
                 (item.get("insurance_paid"), item.get("insurance_adjustment"), item.get("patient_responsibility"),
                  item.get("date_of_service"), row["id"]),
             )
-        db.execute("UPDATE bills SET total_findings = ?, total_potential_savings = ? WHERE id = ?",
-                   (analysis["total_findings"], analysis["total_potential_savings"], bill_id))
+        db.execute("UPDATE bills SET total_findings = ?, total_potential_savings = ?, rules_version = ?, dataset_versions = ? WHERE id = ?",
+                   (analysis["total_findings"], analysis["total_potential_savings"], config.RULES_VERSION,
+                    json.dumps(dataset_versions()), bill_id))
         _insert_findings(db, bill_id, analysis)
+
+
+def dataset_versions() -> dict:
+    """The data a result was computed from, stored with the bill so it can be reproduced."""
+    with get_db() as db:
+        mue = db.execute("SELECT MAX(version) AS v FROM mue_limits").fetchone()
+        files = db.execute("SELECT MAX(file_updated) AS d FROM price_observations").fetchone()
+    return {"medicare_pfs": config.MEDICARE_PFS_YEAR, "ncci": config.NCCI_EDITS_VERSION,
+            "mue": mue["v"] if mue else None, "hospital_files": files["d"] if files else None}
 
 
 def save_bill_and_findings(
@@ -813,6 +823,8 @@ def save_bill_and_findings(
             ),
         )
         bill_id = cursor.lastrowid
+        db.execute("UPDATE bills SET rules_version = ?, dataset_versions = ? WHERE id = ?",
+                   (config.RULES_VERSION, json.dumps(dataset_versions()), bill_id))
 
         for item in extracted.get("line_items", []):
             medicare_rate = get_medicare_rate(item.get("cpt_code", "")) if item.get("cpt_code") else None

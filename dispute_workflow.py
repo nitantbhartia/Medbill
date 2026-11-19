@@ -7,6 +7,7 @@ from datetime import date
 
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
+import report_recheck
 from rule_sources import basis_for, reply_for
 from db import get_db
 
@@ -342,7 +343,12 @@ def build_phone_script(bill_id: int) -> str | None:
 
     findings_text = "\n\n".join(finding_scripts)
 
+    withdrawn = report_recheck.withdrawn_items_for_sent_letter(bill_id)
+    withdrawn_line = (f"WITHDRAW THESE ITEMS\n{'─' * 50}\nWe no longer think this charge was an error, and your letter named it: "
+                      f"{', '.join(withdrawn)}. Tell them you withdraw that item.\n\n") if withdrawn else ""
+
     return (
+        withdrawn_line +
         f"BEFORE YOU CALL\n"
         f"{'─' * 50}\n"
         f"Have ready: your account number, the date of service ({service_date}), and this script.\n"

@@ -76,7 +76,7 @@ def _run_migrations(db):
     ensure_columns("hospitals", {"lat": "REAL", "lon": "REAL"})
     ensure_columns("mobile_devices", {"account_id": "INTEGER", "data_improvement": "INTEGER DEFAULT 0"})
     db.execute("CREATE INDEX IF NOT EXISTS idx_mobile_devices_account ON mobile_devices(account_id)")
-    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT"})
+    ensure_columns("bills", {"referral_code": "TEXT", "insurer_name": "TEXT", "rules_version": "TEXT", "dataset_versions": "TEXT"})
     ensure_columns("dispute_outcomes", {"verified": "INTEGER DEFAULT 0", "evidence_upload_id": "TEXT",
                                         "rule_ids": "TEXT", "facility_id": "TEXT"})
     ensure_columns("mobile_entitlements", {"reward_plus_until": "TIMESTAMP"})
@@ -1456,6 +1456,16 @@ CREATE TABLE IF NOT EXISTS hold_call_credits (
     used INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS bill_notices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL REFERENCES bills(id),
+    kind TEXT NOT NULL,
+    message TEXT NOT NULL,
+    items_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_bill_notices_bill ON bill_notices(bill_id);
 
 CREATE TABLE IF NOT EXISTS payer_aliases (
     alias TEXT PRIMARY KEY,

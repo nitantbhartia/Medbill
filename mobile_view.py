@@ -9,6 +9,7 @@ import insurance_check
 import outcome_verification
 import mobile_purchases
 import report
+import report_recheck
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
 from db import get_db
@@ -146,6 +147,7 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "read_warning": read_check(results),
         "confirm_lines": confirm_lines(results),
         "insurance_check": insurance_check.view(bill),
+        "notices": report_recheck.notices_for(bill_id),
         "line_item_count": len(results["line_items"]),
         "has_line_item_codes": any(item.get("cpt_code") for item in results["line_items"]),
     }
