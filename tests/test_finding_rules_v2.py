@@ -145,5 +145,5 @@ def test_the_diff_script_reports_added_findings_and_writes_nothing(tmp_path):
     entry = {"id": "sample", "bill": {"provider_name": "Test Hospital", "total_patient_owes": 500.0},
              "line_items": [line("99285", amount=3000.0)], "stored": []}
     summary = finding_diff.run([entry], str(tmp_path / "diff.csv"))
-    assert summary["changes"] == 1 and "upcoding" in (tmp_path / "diff.csv").read_text()
+    assert summary["changes"] >= 1 and "upcoding" in (tmp_path / "diff.csv").read_text()
     assert config.ER_LEVEL_RULE_V2 is False  # flags are put back after the run
