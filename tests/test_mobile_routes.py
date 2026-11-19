@@ -493,10 +493,10 @@ def distinct_flagged_scan(headers, monkeypatch, provider, total):
 
 def test_a_clean_bill_does_not_use_a_check_and_the_fourth_flagged_bill_has_no_free_preview(monkeypatch):
     _, headers = new_device()
+    real_analyze = scan_pipeline.analyzer.analyze_bill
     clean = clean_scan(headers, monkeypatch)
     assert clean["free_checks_remaining"] == config.FREE_CHECKS_LIMIT
-    monkeypatch.undo()
-    monkeypatch.setattr(config, "SLIM_LAUNCH", True)
+    monkeypatch.setattr(scan_pipeline.analyzer, "analyze_bill", real_analyze)
     views = [distinct_flagged_scan(headers, monkeypatch, f"Hospital {n} Medical Center", 12000.0 + n) for n in range(4)]
     assert [v["free_charge"] is not None for v in views] == [True, True, True, False]
     assert views[3]["free_checks_remaining"] == 0 and views[3]["free_limit_reached"] is True

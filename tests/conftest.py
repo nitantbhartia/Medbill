@@ -19,6 +19,17 @@ config.DB_PATH = ":memory:"
 import db as _db  # noqa: E402
 
 
+RULE_FLAGS = ("QUANTITY_RULE_V2", "ER_LEVEL_RULE_V2", "DUPLICATE_MODIFIERS", "INSURED_PRICE_INFO_ONLY")
+
+
+@pytest.fixture(autouse=True)
+def rule_flags_off(monkeypatch):
+    """The B16 rule flags default to off, whatever the environment says, so results don't depend on the machine.
+    Tests that want a flag on turn it on themselves (tests/test_finding_rules_v2.py, tests/test_flags_on_smoke.py)."""
+    for flag in RULE_FLAGS:
+        monkeypatch.setattr(config, flag, False)
+
+
 @pytest.fixture(autouse=True)
 def fresh_db():
     """Reset the global connection and reinitialise the schema + seed data
