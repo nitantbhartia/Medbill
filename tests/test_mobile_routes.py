@@ -518,3 +518,12 @@ def test_public_stats_stay_null_until_the_totals_are_large_enough():
 def test_explainer_pages_render():
     assert "Grade A" in client.get("/how-we-grade/").text
     assert "Medicare Physician Fee Schedule" in client.get("/sources/").text
+
+
+def test_bill_view_names_the_hospital_so_the_app_can_load_its_policy():
+    with get_db() as db:
+        db.execute("DELETE FROM hospitals WHERE facility_id = 'FP1'")
+        db.execute("INSERT INTO hospitals (facility_id, name, city, state, zip, slug, state_slug, city_slug) VALUES "
+                   "('FP1', 'Memorial Regional Hospital', 'Hollywood', 'FL', '33021', 'memorial-regional', 'florida', 'hollywood')")
+    _, headers = new_device()
+    assert scan(headers)["facility_id"] == "FP1"

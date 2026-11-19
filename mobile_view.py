@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 import config
 import insurance_check
+import outcome_verification
 import mobile_purchases
 import report
 from analyzer import get_bill_results
@@ -140,6 +141,7 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
         "extraction_quality": None,
         "free_charge": None if unlocked else free_charge(results),
         "free_checks_remaining": free_checks_remaining(device_id),
+        "facility_id": outcome_verification.facility_for(bill),
         "free_limit_reached": False,
         "read_warning": read_check(results),
         "confirm_lines": confirm_lines(results),
