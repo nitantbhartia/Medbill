@@ -1381,6 +1381,57 @@ CREATE TABLE IF NOT EXISTS hospital_assistance_policies (
 CREATE INDEX IF NOT EXISTS idx_assistance_policies_facility ON hospital_assistance_policies(facility_id);
 CREATE INDEX IF NOT EXISTS idx_assistance_policies_license ON hospital_assistance_policies(hcai_license);
 
+CREATE TABLE IF NOT EXISTS hold_calls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bill_id INTEGER NOT NULL,
+    device_id TEXT NOT NULL,
+    hospital_number TEXT NOT NULL,
+    user_number TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'queued',
+    hold_seconds INTEGER,
+    scheduled_for TIMESTAMP,
+    started_at TIMESTAMP,
+    human_at TIMESTAMP,
+    ended_at TIMESTAMP,
+    menu_path TEXT,
+    cost_cents INTEGER DEFAULT 0,
+    end_reason TEXT,
+    hospital_call_sid TEXT,
+    user_call_sid TEXT,
+    facility_id TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_hold_calls_bill ON hold_calls(bill_id);
+CREATE INDEX IF NOT EXISTS idx_hold_calls_status ON hold_calls(status);
+
+CREATE TABLE IF NOT EXISTS hold_call_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    call_id INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    detail TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS hospital_menu_paths (
+    facility_id TEXT PRIMARY KEY,
+    menu_path TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS phone_verifications (
+    device_id TEXT NOT NULL,
+    phone_hash TEXT NOT NULL,
+    verified_at TIMESTAMP NOT NULL,
+    PRIMARY KEY (device_id, phone_hash)
+);
+
+CREATE TABLE IF NOT EXISTS hold_call_credits (
+    transaction_id TEXT PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS payer_aliases (
     alias TEXT PRIMARY KEY,
     canonical TEXT NOT NULL
