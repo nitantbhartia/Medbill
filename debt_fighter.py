@@ -7,6 +7,8 @@ import urllib.parse
 import urllib.request
 from datetime import date
 
+import config
+
 log = logging.getLogger(__name__)
 
 _MIN_DATE = date(1990, 1, 1)
@@ -104,11 +106,6 @@ STATE_NAMES = {
     "WI": "Wisconsin", "WY": "Wyoming", "DC": "District of Columbia",
 }
 
-FPL_2025 = {
-    1: 15650, 2: 21150, 3: 26650, 4: 32150,
-    5: 37650, 6: 43150, 7: 48650, 8: 54150,
-}
-FPL_PER_ADDITIONAL = 5500
 
 LEGAL_DISCLAIMER = (
     "This is a self-help document tool, not legal advice. "
@@ -524,18 +521,20 @@ Sent via USPS Certified Mail"""
 # ── Charity care ─────────────────────────────────────────────────────────────
 
 def get_fpl(household_size: int) -> int:
-    """Return Federal Poverty Level for a given household size."""
-    if household_size <= 0:
-        return FPL_2025[1]
-    if household_size <= 8:
-        return FPL_2025[household_size]
-    return FPL_2025[8] + FPL_PER_ADDITIONAL * (household_size - 8)
+    """Federal Poverty Level for a household size, from the guidelines in config.py."""
+    return config.FPL_ONE_PERSON + config.FPL_EACH_ADDITIONAL_PERSON * (max(household_size, 1) - 1)
 
 
 def check_charity_care(income: float, household_size: int) -> dict:
     """Check likely charity care eligibility based on FPL."""
     fpl = get_fpl(household_size)
     fpl_pct = round(income / fpl * 100)
+    return {**charity_care_for_percent(fpl_pct, household_size), "income": income}
+
+
+def charity_care_for_percent(fpl_pct: int, household_size: int) -> dict:
+    """Eligibility from a poverty-level percentage, so the app can keep income on the phone."""
+    fpl = get_fpl(household_size)
 
     if fpl_pct <= 200:
         eligibility = "likely_full"
@@ -565,7 +564,6 @@ def check_charity_care(income: float, household_size: int) -> dict:
 
     return {
         "status": "ok",
-        "income": income,
         "household_size": household_size,
         "fpl": fpl,
         "fpl_percentage": fpl_pct,
@@ -758,7 +756,7 @@ Dear Financial Assistance Department:
 
 I am writing to request consideration under your hospital's Financial Assistance Program (FAP) for the balance of ${bill_amount} on the above-referenced account{service_ref}.
 
-My household consists of {household_size} person{"s" if household_size > 1 else ""} with an annual household income of ${income:,.0f}. This represents approximately {fpl_pct}% of the 2025 Federal Poverty Level for my household size.
+My household consists of {household_size} person{"s" if household_size > 1 else ""} with an annual household income of ${income:,.0f}. This represents approximately {fpl_pct}% of the {config.FPL_YEAR} Federal Poverty Level for my household size.
 
 I am unable to pay this bill in full and respectfully request that you review my application for financial assistance under your hospital's policy, as required by IRS Section 501(r) for tax-exempt hospitals.
 

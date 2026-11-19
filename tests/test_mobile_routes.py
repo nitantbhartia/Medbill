@@ -290,11 +290,13 @@ def test_outcome_is_recorded_and_bad_input_rejected():
 def test_assistance_check_letter_and_wins():
     _, headers = new_device()
     bill_id = scan(headers)["bill_id"]
-    check = client.post(f"/api/m/bills/{bill_id}/assistance", json={"income": 38000, "household_size": 3}, headers=headers)
+    assert client.get("/api/m/assistance/guidelines", headers=headers).json()["data"]["year"] == 2026
+    check = client.post(f"/api/m/bills/{bill_id}/assistance", json={"fpl_percentage": 140, "household_size": 3}, headers=headers)
     assert check.json()["data"]["eligibility"] == "likely_full"
     letter = client.post(f"/api/m/bills/{bill_id}/assistance-letter",
-                         json={"income": 38000, "household_size": 3, "name": "Dana Reyes"}, headers=headers)
+                         json={"fpl_percentage": 140, "household_size": 3, "name": "Dana Reyes"}, headers=headers)
     assert "Financial Assistance" in letter.json()["data"]["letter"]
-    assert client.post(f"/api/m/bills/{bill_id}/assistance", json={"income": -5, "household_size": 3}, headers=headers).status_code == 400
-    client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "forgiven", "final_patient_owes": 0}, headers=headers)
-    assert client.get("/api/m/wins", headers=headers).json()["data"]["reports"] == 1
+    assert client.post(f"/api/m/bills/{bill_id}/assistance", json={"fpl_percentage": -5, "household_size": 3}, headers=headers).status_code == 400
+    assert client.get("/api/m/wins", headers=headers).json()["data"]["reports"] == 0
+    client.post(f"/api/m/bills/{bill_id}/outcome", json={"outcome": "no_change", "final_patient_owes": 9999999}, headers=headers)
+    assert client.get("/api/m/wins", headers=headers).json()["data"]["total_saved"] == 0

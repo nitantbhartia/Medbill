@@ -361,3 +361,10 @@ LAB_RATE_MARKER_CODE = "80053"  # a common blood test that only exists once the 
 READ_CHECK_TOLERANCE = 0.10
 READ_CHECK_MIN_GAP = 25.0
 MAX_HOUSEHOLD_SIZE = 20
+
+# Federal Poverty Guidelines, 48 contiguous states + DC. Source: HHS ASPE, in effect from 2026-01-13.
+# Update every January: https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines
+FPL_YEAR = 2026
+FPL_ONE_PERSON = 15960
+FPL_EACH_ADDITIONAL_PERSON = 5680
+MAX_FPL_PERCENT = 5000
