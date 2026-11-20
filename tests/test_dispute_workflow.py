@@ -495,3 +495,17 @@ class TestLetterStrength:
             "line_item": {"cpt_code": "99285", "description": "ER visit", "charged_amount": 4000.0},
         })
         assert build_dispute_letter(bill_id=bill_id) is None
+
+
+def test_phone_script_words_a_duplicate_charge_as_a_duplicate_and_puts_it_first():
+    """The analyzer emits "duplicate_charge"; it must not fall through to the price wording."""
+    from dispute_workflow import build_phone_script
+    bill_id = _insert_bill()
+    price = {"line_item": {"cpt_code": "80053", "description": "Metabolic panel", "charged_amount": 212.0}, "medicare_rate": 29.0}
+    twice = {"line_item": {"cpt_code": "85025", "description": "Blood count (CBC)", "charged_amount": 148.0}, "duplicate_count": 2}
+    _insert_finding(bill_id, "price_markup", "80053", price, savings=183.0)
+    _insert_finding(bill_id, "duplicate_charge", "85025", twice, savings=148.0)
+    script = build_phone_script(bill_id)
+    assert "appears more than once" in script
+    assert script.index("85025") < script.index("80053")
+    assert "(Blood Count (CBC))" in script

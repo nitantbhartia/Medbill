@@ -342,6 +342,10 @@ def build_phone_script(bill_id: int) -> str | None:
     provider = bill.get("provider_name") or "the provider"
     service_date = _readable_date(bill.get("bill_date")) or "your date of service"
 
+    # Errors on the bill come first, so the call opens with the strongest points; price questions follow.
+    errors_first = {"duplicate", "duplicate_charge", "unbundling", "ncci", "eob_mismatch"}
+    rows = sorted(rows, key=lambda row: (row["finding_type"] not in errors_first))
+
     finding_scripts = []
     for row in rows:
         detail = json.loads(row["details"] or "{}")
@@ -407,7 +411,7 @@ def _phone_finding_block(
         f"({_proper(desc)}). "
     )
 
-    if finding_type == "duplicate":
+    if finding_type in ("duplicate", "duplicate_charge"):
         detail = (
             f"This code appears more than once on the same date — I'd like to understand "
             f"the clinical justification for billing it multiple times. Can you review that?"
