@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timedelta
 
+import cc_cases
 from db import get_db
 
 
@@ -116,4 +117,4 @@ def purge_old_data(days: int = 365) -> int:
     for bill_id in old_ids:
         if delete_bill_data(bill_id):
             deleted += 1
-    return deleted
+    return deleted + cc_cases.purge_old(days)

@@ -93,6 +93,7 @@ CC_SCAN_LIMIT_PER_HOUR = 10
 CC_EXTRACT_SCHEMA_VERSION = "cc-1"
 CC_CONFIRM_CONFIDENCE = 0.8  # fields read with less confidence are shown for the user to confirm
 CC_DENIAL_REASON_MAX_CHARS = 300
+CC_CONFIRMED_FIELD_MAX_CHARS = 300  # longest value a user can type when confirming a field
 CC_EXTRA_FACTS_MAX_CHARS = 1500
 CC_FREE_CHECKLIST_ITEMS = 3
 CC_APPEAL_KIT_PRODUCT_ID = os.getenv("CC_APPEAL_KIT_PRODUCT_ID", "cc_appeal_kit")
@@ -106,6 +107,7 @@ CC_EVENT_NAMES = {
     "reminder_scheduled", "outcome_reported", "next_level_started", "crosspromo_tapped", "data_deleted",
 }
 CC_EVENT_PROP_PATTERN = r"[a-z0-9_]{1,40}"
+CC_GOLDEN_DIR = "test_assets/cc_golden"
 CC_GOLDEN_MIN_CASES = 5
 CC_GOLDEN_MIN_ACCURACY = 0.95
 

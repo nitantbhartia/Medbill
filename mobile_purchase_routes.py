@@ -6,6 +6,7 @@ import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
+import cc_purchases
 import config
 import mobile_auth
 import mobile_purchases
@@ -32,5 +33,7 @@ async def revenuecat_webhook(request: Request, payload: dict):
     presented = request.headers.get("authorization", "")
     if not expected or not secrets.compare_digest(presented, expected):
         raise HTTPException(401, "Invalid webhook authorization")
-    mobile_purchases.handle_webhook_event(payload.get("event") or {})
+    event = payload.get("event") or {}
+    mobile_purchases.handle_webhook_event(event)
+    cc_purchases.handle_webhook_event(event)
     return ok({"ok": True})

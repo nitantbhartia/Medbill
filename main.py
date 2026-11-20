@@ -23,6 +23,8 @@ from mobile_assistance_routes import router as mobile_assistance_router
 from mobile_hold_routes import router as mobile_hold_router
 from mobile_purchase_routes import router as mobile_purchase_router
 from mobile_account_routes import router as mobile_account_router
+from cc_routes import router as cc_router
+from cc_case_routes import router as cc_case_router
 from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
@@ -89,6 +91,8 @@ app.include_router(mobile_assistance_router)
 app.include_router(mobile_hold_router)
 app.include_router(mobile_purchase_router)
 app.include_router(mobile_account_router)
+app.include_router(cc_router)
+app.include_router(cc_case_router)
 app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)

@@ -22,3 +22,6 @@ node_modules/
 data/ocr_benchmark/golden/
 data/ocr_benchmark/golden_manifest.json
 data/ocr_benchmark/golden_baseline.json
+
+# Real denial letters for the ClaimCoach golden set (redacted, with consent). This repo is public: never commit them.
+test_assets/cc_golden/real/

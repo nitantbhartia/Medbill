@@ -1,0 +1,5 @@
+{"file": "employer_medical_necessity.png", "claim_number": "BH26-0412876", "notice_date": "2026-02-12", "printed_deadline": "2026-08-11", "plan_type": "employer", "reason_key": "medical_necessity"}
+{"file": "aca_out_of_network.png", "claim_number": "KCH-7731904-02", "notice_date": "2026-03-09", "printed_deadline": "2026-09-05", "plan_type": "individual", "reason_key": "out_of_network"}
+{"file": "medicare_advantage_reconsideration.png", "claim_number": "SMA2026-559318", "notice_date": "2026-05-04", "printed_deadline": "2026-07-08", "plan_type": "medicare_advantage", "reason_key": "medical_necessity"}
+{"file": "medicaid_plan_appeal.png", "claim_number": "EMC-90455512", "notice_date": "2026-04-14", "printed_deadline": "2026-06-13", "plan_type": "medicaid", "reason_key": "not_covered"}
+{"file": "employer_prior_auth.png", "claim_number": "PA-26-0093147", "notice_date": "2026-06-22", "printed_deadline": null, "plan_type": "employer", "reason_key": "prior_authorization"}

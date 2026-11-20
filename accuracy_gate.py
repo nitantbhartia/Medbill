@@ -7,6 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import cc_accuracy
 import config
 from ocr_benchmark import run_manifest
 
@@ -38,7 +39,7 @@ def run_gate(suites=None, accept: bool = False) -> list[str]:
         print(f"{name}: {current}")
         failures += [f"{name}: {metric} dropped {points} points (allowed {config.OCR_GATE_MAX_DROP_PCT})"
                      for metric, points in lost.items()]
-    return failures + (rule_gate(accept) if suites is None else [])
+    return failures + (rule_gate(accept) + cc_accuracy.cc_gate() if suites is None else [])
 
 
 def rule_gate(accept: bool = False) -> list[str]:
