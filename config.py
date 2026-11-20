@@ -334,6 +334,10 @@ MOBILE_DUE_BANDS = {"this_week", "this_month", "past_due", "unsure"}
 MOBILE_ATTRIBUTION_SOURCES = {"tiktok", "instagram", "youtube", "reddit", "google", "article", "friend", "other"}
 MOBILE_ONBOARDING_VARIANTS = {"A", "B"}
 REVENUECAT_API_URL = "https://api.revenuecat.com/v1/subscribers"
+# "2" reads customers with a V2 secret key (the only kind new RevenueCat projects issue); "1" uses the legacy endpoint.
+REVENUECAT_API_VERSION = os.getenv("REVENUECAT_API_VERSION", "2")
+REVENUECAT_V2_URL = "https://api.revenuecat.com/v2"
+REVENUECAT_PROJECT_ID = os.getenv("REVENUECAT_PROJECT_ID", "")  # empty: use the key's only project
 REVENUECAT_SECRET_API_KEY = os.getenv("REVENUECAT_SECRET_API_KEY", "")
 REVENUECAT_WEBHOOK_AUTH = os.getenv("REVENUECAT_WEBHOOK_AUTH", "")
 REVENUECAT_REPORT_PRODUCT_ID = os.getenv("REVENUECAT_REPORT_PRODUCT_ID", "bk_report_unlock")

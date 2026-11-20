@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
@@ -25,19 +26,82 @@ TEST_TRANSACTION_PREFIX = "test_"
 REPORT_PRODUCTS = (config.REVENUECAT_REPORT_PRODUCT_ID, config.REVENUECAT_REPORT_OFFER_PRODUCT_ID)
 ACTIVATING_EVENTS = {"INITIAL_PURCHASE", "RENEWAL", "PRODUCT_CHANGE", "UNCANCELLATION"}
 REVENUECAT_TIMEOUT_SECONDS = 15
+V2_MAX_PAGES = 10
 
 
 def _fetch_subscriber(device_id: str) -> dict:
-    request = urllib.request.Request(
-        f"{config.REVENUECAT_API_URL}/{device_id}",
-        headers={"Authorization": f"Bearer {config.REVENUECAT_SECRET_API_KEY}"},
-    )
+    """The device's purchases as {"entitlements": {key: {"expires_date"}}, "non_subscriptions": {product: [..]}}."""
     try:
-        with urllib.request.urlopen(request, timeout=REVENUECAT_TIMEOUT_SECONDS) as response:
-            return json.loads(response.read())["subscriber"]
-    except (urllib.error.URLError, ValueError, KeyError) as exc:
+        if config.REVENUECAT_API_VERSION == "2":
+            return _fetch_subscriber_v2(device_id)
+        return _get_json(f"{config.REVENUECAT_API_URL}/{device_id}")["subscriber"]
+    except (urllib.error.URLError, ValueError, KeyError, TypeError) as exc:
         log.error("RevenueCat lookup failed for device %s: %s", device_id, exc)
         raise HTTPException(503, "Could not verify your purchase right now. Please try again.") from exc
+
+
+def _get_json(url: str) -> dict:
+    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {config.REVENUECAT_SECRET_API_KEY}"})
+    try:
+        with urllib.request.urlopen(request, timeout=REVENUECAT_TIMEOUT_SECONDS) as response:
+            return json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        # Name the endpoint: a 403 here means the key lacks read permission for that part of the API.
+        exc.msg = f"{exc.msg} from {url.split('?')[0]}"
+        raise
+
+
+_v2_names: dict[tuple[str, str], str] = {}  # (kind, RevenueCat id) -> our identifier; these never change
+_v2_project: list[str] = []
+
+
+def _v2_project_url() -> str:
+    project = config.REVENUECAT_PROJECT_ID or (_v2_project[0] if _v2_project else "")
+    if not project:
+        project = _get_json(f"{config.REVENUECAT_V2_URL}/projects")["items"][0]["id"]
+        _v2_project.append(project)
+    return f"{config.REVENUECAT_V2_URL}/projects/{project}"
+
+
+def _v2_items(path: str) -> list[dict]:
+    """Every item of a V2 list. A customer RevenueCat has never seen has bought nothing."""
+    items: list[dict] = []
+    url = _v2_project_url() + path
+    for _ in range(V2_MAX_PAGES):
+        try:
+            page = _get_json(url)
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return items
+            raise
+        items += page.get("items") or []
+        if not page.get("next_page"):
+            break
+        url = urllib.parse.urljoin(config.REVENUECAT_V2_URL, page["next_page"])
+    return items
+
+
+def _v2_name(kind: str, revenuecat_id: str, field: str) -> str:
+    """V2 lists carry RevenueCat's own ids; look up the store product id or entitlement key once."""
+    if (kind, revenuecat_id) not in _v2_names:
+        _v2_names[(kind, revenuecat_id)] = _get_json(f"{_v2_project_url()}/{kind}/{revenuecat_id}")[field]
+    return _v2_names[(kind, revenuecat_id)]
+
+
+def _fetch_subscriber_v2(device_id: str) -> dict:
+    customer = f"/customers/{urllib.parse.quote(device_id, safe='')}"
+    entitlements = {}
+    for item in _v2_items(f"{customer}/active_entitlements"):
+        expires_ms = item.get("expires_at")
+        expires = datetime.fromtimestamp(expires_ms / 1000, timezone.utc).isoformat() if expires_ms else None
+        entitlements[_v2_name("entitlements", item["entitlement_id"], "lookup_key")] = {"expires_date": expires}
+    purchases: dict[str, list[dict]] = {}
+    for item in _v2_items(f"{customer}/purchases"):
+        if item.get("status") != "owned":
+            continue
+        product = _v2_name("products", item["product_id"], "store_identifier")
+        purchases.setdefault(product, []).append({"store_transaction_id": item.get("store_purchase_identifier")})
+    return {"entitlements": entitlements, "non_subscriptions": purchases}
 
 
 def _in_mock_mode() -> bool:

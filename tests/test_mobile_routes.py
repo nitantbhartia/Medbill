@@ -571,3 +571,76 @@ def test_scan_still_returns_when_the_purchase_service_is_down(monkeypatch):
     _, headers = new_device()
     view = scan(headers)
     assert view["locked"] is True
+
+
+# ── RevenueCat V2 keys ─────────────────────────────────────────────────────────
+
+def _revenuecat_v2(monkeypatch, pages: dict):
+    """Serve V2 responses by URL; anything not listed is a 404, like a customer RevenueCat has never seen."""
+    import urllib.error
+    calls = []
+
+    def fake_get(url):
+        calls.append(url)
+        if url not in pages:
+            raise urllib.error.HTTPError(url, 404, "Not Found", None, None)
+        return pages[url]
+
+    monkeypatch.setattr(config, "REVENUECAT_SECRET_API_KEY", "sk_v2_x")
+    monkeypatch.setattr(config, "REVENUECAT_API_VERSION", "2")
+    monkeypatch.setattr(config, "REVENUECAT_PROJECT_ID", "")
+    monkeypatch.setattr(mobile_purchases, "_get_json", fake_get)
+    monkeypatch.setattr(mobile_purchases, "_v2_names", {})
+    monkeypatch.setattr(mobile_purchases, "_v2_project", [])
+    return calls
+
+
+def test_v2_key_verifies_an_owned_purchase_and_ignores_refunded_ones(monkeypatch):
+    device_id, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    base = "https://api.revenuecat.com/v2/projects/proj1"
+    calls = _revenuecat_v2(monkeypatch, {
+        "https://api.revenuecat.com/v2/projects": {"items": [{"id": "proj1"}]},
+        f"{base}/customers/{device_id}/active_entitlements": {"items": [], "next_page": None},
+        f"{base}/customers/{device_id}/purchases": {
+            "items": [{"product_id": "prodA", "status": "owned", "store_purchase_identifier": "2000000123"}],
+            "next_page": f"/v2/projects/proj1/customers/{device_id}/purchases?starting_after=p1"},
+        f"{base}/customers/{device_id}/purchases?starting_after=p1": {
+            "items": [{"product_id": "prodA", "status": "refunded", "store_purchase_identifier": "2000000999"}]},
+        f"{base}/products/prodA": {"store_identifier": "bk_report_unlock"},
+    })
+    unlock = lambda tx: client.post(f"/api/m/bills/{bill_id}/unlock", json={"transaction_id": tx}, headers=headers).status_code
+    assert unlock("2000000999") == 402  # refunded
+    assert unlock("2000000777") == 402  # never bought
+    assert unlock("2000000123") == 200
+    assert calls.count(f"{base}/products/prodA") == 1  # product names are looked up once
+
+
+def test_v2_key_reads_plus_and_treats_an_unknown_customer_as_not_subscribed(monkeypatch):
+    device_id, _ = new_device()
+    base = "https://api.revenuecat.com/v2/projects/proj9"
+    _revenuecat_v2(monkeypatch, {})
+    monkeypatch.setattr(config, "REVENUECAT_PROJECT_ID", "proj9")
+    assert not mobile_purchases.plus_is_active(device_id, force_refresh=True)
+
+    future_ms = 4102444800000  # year 2100
+    _revenuecat_v2(monkeypatch, {
+        f"{base}/customers/{device_id}/active_entitlements": {"items": [{"entitlement_id": "entl1", "expires_at": future_ms}]},
+        f"{base}/entitlements/entl1": {"lookup_key": "plus"},
+    })
+    monkeypatch.setattr(config, "REVENUECAT_PROJECT_ID", "proj9")
+    assert mobile_purchases.plus_is_active(device_id, force_refresh=True)
+
+
+def test_v2_permission_error_is_a_503_not_a_crash(monkeypatch):
+    import urllib.error
+    device_id, headers = new_device()
+    bill_id = scan(headers)["bill_id"]
+    _revenuecat_v2(monkeypatch, {})
+
+    def forbidden(url):
+        raise urllib.error.HTTPError(url, 403, "Forbidden", None, None)
+
+    monkeypatch.setattr(mobile_purchases, "_get_json", forbidden)
+    response = client.post(f"/api/m/bills/{bill_id}/unlock", json={"transaction_id": "2000000123"}, headers=headers)
+    assert response.status_code == 503
