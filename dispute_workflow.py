@@ -164,9 +164,9 @@ def _finding_paragraph(
         return (
             f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
-            f"     I was charged {count} times for {desc.lower()} (CPT {cpt}) on {service_date}, and I can find no "
-            f"documentation supporting more than one billing on that date. Please remove the duplicate, "
-            f"keeping only one medically supported charge."
+            f"     I was charged {count} times for {desc.lower()} (CPT {cpt}) on {service_date}. Please send the "
+            f"documentation that supports more than one billing on that date. If there is none, please remove the "
+            f"duplicate, keeping only the charges your records support."
         )
 
     if finding_type in ("unbundling", "ncci"):
@@ -192,7 +192,7 @@ def _finding_paragraph(
 
     # Default: pricing markup
     medicare_line = (
-        f"The 2026 Medicare rate for this procedure is {medicare_fmt}"
+        f"The current Medicare rate for this procedure is {medicare_fmt}"
         f"{f', representing a {markup}x markup' if markup else ''}. "
         if medicare_fmt
         else ""
@@ -352,7 +352,6 @@ def build_phone_script(bill_id: int) -> str | None:
         f"BEFORE YOU CALL\n"
         f"{'─' * 50}\n"
         f"Have ready: your account number, the date of service ({service_date}), and this script.\n"
-        f"Best time to call: Tuesday–Thursday, 9am–11am. Avoid Mondays and Fridays.\n"
         f"Ask to speak with: a billing specialist, not general customer service.\n\n"
         f"OPENING\n"
         f"{'─' * 50}\n"
