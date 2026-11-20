@@ -3,13 +3,31 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime
 
 from analyzer import get_bill_results
 from charge_summary import group_findings_by_charge
 import report_recheck
 from rule_sources import basis_for, reply_for
 from db import get_db
+
+
+
+def _readable_date(value) -> str | None:
+    """'2026-09-14' becomes 'September 14, 2026'. Anything else is returned as it came."""
+    if not value:
+        return None
+    text = str(value)
+    try:
+        parsed = datetime.strptime(text[:10], "%Y-%m-%d")
+    except ValueError:
+        return text
+    return f"{parsed.strftime('%B')} {parsed.day}, {parsed.year}"
+
+
+def _proper(description: str) -> str:
+    """Title-case a description word by word, leaving words that are already in capitals (CBC stays CBC, not Cbc)."""
+    return " ".join(word if word.isupper() else word.title() for word in description.split(" "))
 
 
 def build_dispute_letter(
@@ -44,7 +62,7 @@ def build_dispute_letter(
 
     bill = dict(bill)
     provider = bill.get("provider_name") or "[Hospital/Provider Name]"
-    service_date = bill.get("bill_date") or "[Date of Service]"
+    service_date = _readable_date(bill.get("bill_date")) or "[Date of Service]"
     today = date.today().strftime("%B %d, %Y")
 
     rows = [row for row in rows if row["finding_type"] != "price_info"]  # information, never in a letter
@@ -162,7 +180,7 @@ def _finding_paragraph(
     if finding_type in ("duplicate", "duplicate_charge"):
         count = len(detail["duplicate_of"]) + 1 if detail.get("duplicate_of") else int(detail.get("duplicate_count") or 2)
         return (
-            f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
+            f"DUPLICATE BILLING — CPT {cpt} ({_proper(desc)})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
             f"     I was charged {count} times for {desc.lower()} (CPT {cpt}) on {service_date}. Please send the "
             f"documentation that supports more than one billing on that date. Please remove the duplicate if there "
@@ -173,7 +191,7 @@ def _finding_paragraph(
         bundled = detail.get("bundled_code") or ""
         bundled_note = f" when CPT {bundled} applies" if bundled else ""
         return (
-            f"POSSIBLE UNBUNDLING — CPT {cpt} ({desc.title()})\n"
+            f"POSSIBLE UNBUNDLING — CPT {cpt} ({_proper(desc)})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
             f"     CMS National Correct Coding Initiative (NCCI) edits indicate that CPT {cpt} "
             f"is not normally billed separately{bundled_note}. These codes are bundled under Medicare "
@@ -184,7 +202,7 @@ def _finding_paragraph(
     if finding_type == "upcoding":
         level = detail.get("billed_level") or {"99284": 4, "99285": 5}.get(cpt, "")
         return (
-            f"ER VISIT LEVEL — CPT {cpt} ({desc.title()})\n"
+            f"ER VISIT LEVEL — CPT {cpt} ({_proper(desc)})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
             f"     Please send the documentation that supports a level {level} visit. I am asking for the "
             f"records that show why this level was assigned."
@@ -198,7 +216,7 @@ def _finding_paragraph(
         else ""
     )
     return (
-        f"CHARGE ABOVE MEDICARE BENCHMARK — CPT {cpt} ({desc.title()})\n"
+        f"CHARGE ABOVE MEDICARE BENCHMARK — CPT {cpt} ({_proper(desc)})\n"
         f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
         f"     {medicare_line}"
         f"I am requesting a review and adjustment of this charge to a rate consistent "
@@ -209,7 +227,7 @@ def _finding_paragraph(
 def _request_paragraph(finding_type: str, cpt: str, desc: str, billed: float, service_date: str) -> str:
     """A finding that is worth asking about is phrased as a request for an explanation, never as an accusation."""
     billed_fmt = f"${billed:,.2f}" if billed else "[charge]"
-    head = f"REQUEST FOR EXPLANATION \u2014 CPT {cpt} ({desc.title()})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
+    head = f"REQUEST FOR EXPLANATION \u2014 CPT {cpt} ({_proper(desc)})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
     if finding_type in ("duplicate", "duplicate_charge"):
         return head + ("This service appears more than once on the same day. Please explain, or provide documentation that it was "
                        "repeated (a repeat test is normally shown with modifier 91). If it was billed in error, please remove the extra charge.")
@@ -218,7 +236,7 @@ def _request_paragraph(finding_type: str, cpt: str, desc: str, billed: float, se
 
 def _eob_paragraph(cpt: str, desc: str, billed_fmt: str, service_date: str, bill: dict) -> str:
     owed, billed_owes = bill.get("eob_patient_owes"), bill.get("total_patient_owes")
-    head = f"BALANCE DOES NOT MATCH MY INSURANCE STATEMENT \u2014 CPT {cpt} ({desc.title()})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
+    head = f"BALANCE DOES NOT MATCH MY INSURANCE STATEMENT \u2014 CPT {cpt} ({_proper(desc)})\n     Date of Service: {service_date} | Charge: {billed_fmt}\n\n     "
     if owed is None or billed_owes is None:
         return head + ("My Explanation of Benefits (EOB) does not agree with the amount on this bill. I am requesting "
                        "that the balance be corrected to match my insurer's determination.")
@@ -251,7 +269,7 @@ def build_appeal_letter(
 
     bill = dict(bill)
     provider = bill.get("provider_name") or "[Hospital/Provider Name]"
-    service_date = bill.get("bill_date") or "[Date of Service]"
+    service_date = _readable_date(bill.get("bill_date")) or "[Date of Service]"
     today = date.today().strftime("%B %d, %Y")
 
     issues = []
@@ -264,7 +282,7 @@ def build_appeal_letter(
         billed = float(li.get("charged_amount") or 0.0)
         savings = float(row["potential_savings"] or 0.0)
         total_disputed += savings
-        issues.append(f"CPT {cpt} ({desc.title()}) — billed ${billed:,.2f}, potential overcharge ${savings:,.2f}")
+        issues.append(f"CPT {cpt} ({_proper(desc)}) — billed ${billed:,.2f}, potential overcharge ${savings:,.2f}")
 
     issues_text = "\n".join(f"  {i+1}. {issue}" for i, issue in enumerate(issues))
 
@@ -322,7 +340,7 @@ def build_phone_script(bill_id: int) -> str | None:
 
     bill = dict(bill)
     provider = bill.get("provider_name") or "the provider"
-    service_date = bill.get("bill_date") or "your date of service"
+    service_date = _readable_date(bill.get("bill_date")) or "your date of service"
 
     finding_scripts = []
     for row in rows:
@@ -386,7 +404,7 @@ def _phone_finding_block(
 
     opening = (
         f'"On {service_date}, I was billed {billed_fmt} for CPT code {cpt} '
-        f"({desc.title()}). "
+        f"({_proper(desc)}). "
     )
 
     if finding_type == "duplicate":
