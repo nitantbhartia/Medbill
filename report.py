@@ -81,12 +81,18 @@ def is_unlocked(bill_id: int) -> bool:
     return is_paid(bill_id) or not has_flagged_charges(bill_id)
 
 
+def price_text() -> str:
+    """The report price as shown to buyers: "19.99", or "25" when it is a whole number of dollars."""
+    dollars, cents = divmod(config.REPORT_PRICE_CENTS, 100)
+    return f"{dollars}.{cents:02d}" if cents else str(dollars)
+
+
 def require_unlocked(bill_id: int) -> None:
     """Raise 402 with a clear message when the full report has not been unlocked for this bill."""
     if not is_unlocked(bill_id):
         raise HTTPException(
             402,
-            f"Unlock the full report for ${config.REPORT_PRICE_CENTS / 100:,.0f} to see every flagged charge "
+            f"Unlock the full report for ${price_text()} to see every flagged charge "
             "and get the dispute letter and phone script.",
         )
 

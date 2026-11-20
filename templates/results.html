@@ -39,7 +39,7 @@
             </div>
             {% if not unlocked %}
             <div class="bk-summary-cta">
-                <a href="#unlock" class="bk-btn bk-btn-block">See which charges, for ${{ report_price }}</a>
+                <a href="#unlock" class="bk-btn bk-btn-block">{% if free_charge and issue_count > 1 %}See the other {{ issue_count - 1 }}, for ${{ report_price }}{% else %}See which charges, for ${{ report_price }}{% endif %}</a>
             </div>
             {% endif %}
             <p class="bk-muted" style="margin: 14px 0 0; font-size: 14.5px">Each charge is counted once, at its largest estimate{% if patient_balance %}, and the total never exceeds what you owe{% endif %}. The hospital decides what it will change.</p>
@@ -52,18 +52,39 @@
             <li>{{ reason.label }}: <strong>{{ reason.count }}</strong></li>
             {% endfor %}
         </ul>
-        <p class="bk-muted" style="margin: 10px 0 18px">Unlock the report to see the exact charges, the Medicare rate for each, and what to say to the billing office.</p>
+        {% set locked_count = issue_count - (1 if free_charge else 0) %}
+        {% if free_charge %}
+        <h3 class="bk-label" style="margin: 18px 0 8px">Free preview &middot; 1 of {{ issue_count }}</h3>
+        <ol class="bk-charges">
+            <li class="bk-charge strong">
+                <div class="bk-charge-head">
+                    <div class="bk-charge-what">
+                        {% if free_charge.code %}<span class="bk-charge-code">{{ free_charge.code }}</span>{% endif %}
+                        <strong>{{ free_charge.description }}</strong>
+                    </div>
+                    {% if free_charge.charged %}<span class="bk-charge-amt">${{ "{:,.2f}".format(free_charge.charged) }}</span>{% endif %}
+                </div>
+                {% if free_charge.medicare_rate %}
+                <p class="bk-charge-compare">Medicare pays ${{ "{:,.2f}".format(free_charge.medicare_rate) }} for this code{% if free_charge.markup %}. This charge is {{ "%.1f" | format(free_charge.markup) }}&times; that{% endif %}.</p>
+                {% endif %}
+                <p class="bk-charge-reason"><strong>{{ free_charge.reason_label }}.</strong> {{ free_charge.reason_message or "" }}</p>
+            </li>
+        </ol>
+        {% endif %}
+        <p class="bk-muted" style="margin: 10px 0 18px">{% if free_charge and locked_count %}Unlock the report to see the other {{ locked_count }}, the Medicare rate for each, and what to say to the billing office.{% elif free_charge %}Unlock the report for the amounts, the dispute letter and what to say to the billing office.{% else %}Unlock the report to see the exact charges, the Medicare rate for each, and what to say to the billing office.{% endif %}</p>
+        {% if locked_count %}
         <ol class="bk-charges bk-charges-locked" aria-label="Flagged charges, hidden until you unlock the report">
-            {% for c in cs.charges[:4] %}
+            {% for n in range([locked_count, 4] | min) %}
             <li class="bk-charge">
                 <div class="bk-charge-head">
-                    <div class="bk-charge-what"><strong>Flagged charge {{ loop.index }}</strong> <span class="bk-muted">&middot; details hidden</span></div>
+                    <div class="bk-charge-what"><strong>Flagged charge {{ loop.index + (1 if free_charge else 0) }}</strong> <span class="bk-muted">&middot; details hidden</span></div>
                     <span class="bk-charge-amt" aria-hidden="true">$&bull;&bull;&bull;&bull;</span>
                 </div>
             </li>
             {% endfor %}
-            {% if issue_count > 4 %}<li class="bk-charge"><span class="bk-muted">and {{ issue_count - 4 }} more</span></li>{% endif %}
+            {% if locked_count > 4 %}<li class="bk-charge"><span class="bk-muted">and {{ locked_count - 4 }} more</span></li>{% endif %}
         </ol>
+        {% endif %}
         {% else %}
         <h2 class="bk-h3" style="margin: 36px 0 12px">Charges we flagged</h2>
         <ol class="bk-charges">

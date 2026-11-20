@@ -659,10 +659,10 @@ async def landing(request: Request):
             "canonical_url": canonical_url,
             "hreflang_links": hreflang_links_for_english("/"),
             "hospital_count": hospital_count,
-            "report_price": config.REPORT_PRICE_CENTS // 100,
+            "report_price": report_module.price_text(),
             "example": _homepage_example_bill(),
             "og_title": "BillKarma: Is your hospital bill wrong? Check it free",
-            "og_description": "Upload your itemized bill. We compare every charge to what Medicare pays and flag errors for free. Unlock the full report, dispute letter and phone script for $" + str(config.REPORT_PRICE_CENTS // 100) + ".",
+            "og_description": "Upload your itemized bill. We compare every charge to what Medicare pays and flag errors for free. Unlock the full report, dispute letter and phone script for $" + report_module.price_text() + ".",
             "meta_robots": "index, follow",
         },
     )
@@ -716,7 +716,7 @@ async def scan_page(request: Request):
         "scan.html",
         {
             "request": request,
-            "report_price": config.REPORT_PRICE_CENTS // 100,
+            "report_price": report_module.price_text(),
             "canonical_url": f"{config.APP_URL.rstrip('/')}/scan",
             "hreflang_links": hreflang_links_for_english("/scan"),
             "og_title": "Scan Your Medical Bill for Errors | BillKarma",
@@ -748,6 +748,7 @@ async def results_page(request: Request, bill_id: int):
     bill_total = float(bill.get("total_patient_owes") or bill.get("total_charged") or 0)
     findings = results.get("findings") or []
     from charge_summary import group_findings_by_charge
+    from mobile_view import free_charge
     charge_summary = group_findings_by_charge(findings, bill_total or None)
     unlocked = report_module.is_unlocked(bill_id)
     context = {
@@ -756,7 +757,8 @@ async def results_page(request: Request, bill_id: int):
         "charge_summary": charge_summary,
         "unlocked": unlocked,
         "teaser": report_module.teaser(bill_id),
-        "report_price": config.REPORT_PRICE_CENTS // 100,
+        "free_charge": None if unlocked else free_charge(results),
+        "report_price": report_module.price_text(),
         "checkout_error": request.query_params.get("checkout_error", ""),
         "just_unlocked": request.query_params.get("unlocked") == "1",
         "meta_robots": "noindex, nofollow",
@@ -769,7 +771,7 @@ async def results_page(request: Request, bill_id: int):
 
 @app.post("/report/checkout")
 async def report_checkout(request: Request, bill_id: int = Form(...), email: str = Form(...)):
-    """Start the $19 Stripe checkout for one bill, then send the browser to Stripe."""
+    """Start the Stripe checkout for one bill, then send the browser to Stripe."""
     require_bill_access(request, bill_id)
     back = f"/results/{bill_id}"
     email = email.strip()

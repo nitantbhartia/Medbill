@@ -126,7 +126,7 @@
         <table class="bk-table bk-compare">
             <thead><tr><th>On a $2,400 bill reduced by $900</th><th>Cost</th><th>You keep</th></tr></thead>
             <tbody>
-                <tr><td><strong>BillKarma</strong> report (you send the letter)</td><td class="bk-num">${{ report_price }}</td><td class="bk-num"><span class="bk-hl">${{ 900 - report_price }}</span></td></tr>
+                <tr><td><strong>BillKarma</strong> report (you send the letter)</td><td class="bk-num">${{ report_price }}</td><td class="bk-num"><span class="bk-hl">${{ "%.2f" | format(900 - config.REPORT_PRICE_CENTS / 100) }}</span></td></tr>
                 <tr><td><a href="/guides/billkarma-vs-goodbill-medical-bills/">Goodbill</a> (20%)</td><td class="bk-num">$180</td><td class="bk-num">$720</td></tr>
                 <tr><td><a href="/guides/billkarma-vs-resolve-medical-bills/">Resolve</a></td><td colspan="2">Takes bills of $5,000 or more</td></tr>
             </tbody>
