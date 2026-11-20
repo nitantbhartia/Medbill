@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 import api
 import config
 import mobile_purchases
+from fastapi import HTTPException
 import report
 import scan_pipeline
 from db import get_db
@@ -560,3 +561,13 @@ def test_bill_view_names_the_hospital_so_the_app_can_load_its_policy():
                    "('FP1', 'Memorial Regional Hospital', 'Hollywood', 'FL', '33021', 'memorial-regional', 'florida', 'hollywood')")
     _, headers = new_device()
     assert scan(headers)["facility_id"] == "FP1"
+
+
+def test_scan_still_returns_when_the_purchase_service_is_down(monkeypatch):
+    """A RevenueCat outage or a rejected key must not throw away a bill that was read: it comes back locked."""
+    def down(device_id, bill_id, force_refresh=False):
+        raise HTTPException(503, "Could not verify your purchase right now. Please try again.")
+    monkeypatch.setattr(mobile_purchases, "unlock_with_plus", down)
+    _, headers = new_device()
+    view = scan(headers)
+    assert view["locked"] is True

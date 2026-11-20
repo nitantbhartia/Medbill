@@ -139,7 +139,12 @@ def build_bill_view(bill_id: int, device_id: str) -> dict:
     if not results:
         raise HTTPException(404, "Bill not found")
     if not report.is_unlocked(bill_id):
-        mobile_purchases.unlock_with_plus(device_id, bill_id)
+        try:
+            mobile_purchases.unlock_with_plus(device_id, bill_id)
+        except HTTPException:
+            # The purchase service could not be reached. Show the bill locked instead of failing the scan;
+            # the unlock route checks again and reports the problem there.
+            pass
     unlocked = report.is_unlocked(bill_id)
     bill = results["bill"]
     view = {

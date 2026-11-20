@@ -165,8 +165,8 @@ def _finding_paragraph(
             f"DUPLICATE BILLING — CPT {cpt} ({desc.title()})\n"
             f"     Date of Service: {service_date} | Charge: {billed_fmt}\n\n"
             f"     I was charged {count} times for {desc.lower()} (CPT {cpt}) on {service_date}. Please send the "
-            f"documentation that supports more than one billing on that date. If there is none, please remove the "
-            f"duplicate, keeping only the charges your records support."
+            f"documentation that supports more than one billing on that date. Please remove the duplicate if there "
+            f"is none, keeping only the charges your records support."
         )
 
     if finding_type in ("unbundling", "ncci"):
