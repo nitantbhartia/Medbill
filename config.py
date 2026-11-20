@@ -79,10 +79,35 @@ APPEAL_LARGE_CLAIM_THRESHOLD = 5000  # dollars denied at or above this pay the l
 # so their deadline comes from the denial letter. Insurers decide in 30 days (pre-service),
 # 60 days (post-service) or 72 hours (urgent); external review must be requested within
 # 4 months of a final denial.
-APPEAL_FILING_DAYS = {"employer": 180, "individual": 180, "medicare_advantage": 65}
+APPEAL_FILING_DAYS = {"employer": 180, "individual": 180, "medicare_advantage": 65, "original_medicare": 120, "medicaid": 60}
 APPEAL_DECISION_DAYS = {"pre_service": 30, "post_service": 60, "urgent": 3}
 APPEAL_EXTERNAL_REVIEW_DAYS = 120
+APPEAL_ORIGINAL_MEDICARE_DECISION_DAYS = 60  # redetermination, for every service timing
+APPEAL_QIC_DAYS = 180  # original Medicare: days to ask for a QIC reconsideration
+APPEAL_FAIR_HEARING_DAYS = 120  # Medicaid: days to ask for a state fair hearing
 APPEAL_REMINDER_WINDOW_DAYS = 7
+
+# ClaimCoach
+CC_SCAN_MAX_PAGES = 8
+CC_SCAN_LIMIT_PER_HOUR = 10
+CC_EXTRACT_SCHEMA_VERSION = "cc-1"
+CC_CONFIRM_CONFIDENCE = 0.8  # fields read with less confidence are shown for the user to confirm
+CC_DENIAL_REASON_MAX_CHARS = 300
+CC_EXTRA_FACTS_MAX_CHARS = 1500
+CC_FREE_CHECKLIST_ITEMS = 3
+CC_APPEAL_KIT_PRODUCT_ID = os.getenv("CC_APPEAL_KIT_PRODUCT_ID", "cc_appeal_kit")
+CC_PLUS_ENTITLEMENT = os.getenv("CC_PLUS_ENTITLEMENT", "cc_plus")
+CC_SEND_FOR_ME_ENABLED = os.getenv("CC_SEND_FOR_ME_ENABLED", "") == "1"
+CC_REMINDER_DAYS_BEFORE = (14, 3)
+CC_RETENTION_DAYS = 365
+CC_EVENT_NAMES = {
+    "onboarding_completed", "case_scan_started", "case_scan_succeeded", "case_scan_failed", "case_confirmed",
+    "explained_viewed", "paywall_viewed", "purchase_completed", "letter_viewed", "letter_shared", "letter_sent",
+    "reminder_scheduled", "outcome_reported", "next_level_started", "crosspromo_tapped", "data_deleted",
+}
+CC_EVENT_PROP_PATTERN = r"[a-z0-9_]{1,40}"
+CC_GOLDEN_MIN_CASES = 5
+CC_GOLDEN_MIN_ACCURACY = 0.95
 
 # Concierge: household bill plan (Stripe subscription)
 HOUSEHOLD_PRICE_YEARLY_CENTS = 19900  # $199/year

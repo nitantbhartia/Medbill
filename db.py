@@ -3,6 +3,7 @@ import os
 import threading
 from contextlib import contextmanager
 
+import cc_db
 import config
 
 _connection = None
@@ -51,6 +52,7 @@ def init_db():
     with get_db() as db:
         db.executescript(SCHEMA)
         _run_migrations(db)
+        cc_db.init(db)
 
 
 def _run_migrations(db):

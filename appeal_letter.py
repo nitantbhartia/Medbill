@@ -9,6 +9,7 @@ PLAN_TYPES = {
     "employer": "Employer or union plan",
     "individual": "Marketplace or individual plan",
     "medicare_advantage": "Medicare Advantage plan",
+    "original_medicare": "Original Medicare (Part A or B)",
     "medicaid": "Medicaid plan",
     "other": "Other or not sure",
 }
@@ -97,6 +98,10 @@ _ENCLOSURES = [
 ]
 
 
+def _article(noun: str) -> str:
+    return ("an " if noun[0].lower() in "aeiou" else "a ") + noun
+
+
 def build_appeal_letter(case: dict, today: date | None = None) -> str:
     """Draft an internal appeal letter for a denied claim from the case's intake fields."""
     today = today or date.today()
@@ -107,19 +112,25 @@ def build_appeal_letter(case: dict, today: date | None = None) -> str:
         f"Provider: {case.get('provider_name') or '[PROVIDER]'}",
         f"Date of service: {case.get('service_date') or '[DATE OF SERVICE]'}",
         f"Date of denial: {case['denial_date']}",
-        f"Amount denied: ${case['amount_denied']:,.2f}",
     ]
+    if case.get("amount_denied") is not None:
+        reference_lines.append(f"Amount denied: ${case['amount_denied']:,.2f}")
     service = case.get("service_description") or "the service listed above"
     urgent = case.get("service_timing") == "urgent"
+    level = case.get("level_label") or ""
+    level = level if level[:3].isupper() else level[:1].lower() + level[1:]
+    request_line = f"Request for EXPEDITED {level or 'appeal'}" if urgent else f"Request for {level or 'internal appeal'}"
     paragraphs = [
         today.strftime("%B %d, %Y").replace(" 0", " "),
         f"{case['insurer_name']}\nAttn: Appeals Department\n{case.get('insurer_appeal_address') or '[APPEALS ADDRESS]'}",
-        "RE: " + ("Request for EXPEDITED appeal" if urgent else "Request for internal appeal") + "\n" + "\n".join(reference_lines),
+        "RE: " + request_line + "\n" + "\n".join(reference_lines),
         "To the Appeals Department:",
         f"I am writing to appeal the denial of coverage for {service}, which I received notice of on "
-        f"{case['denial_date']}. Please treat this letter as my formal request for an internal appeal.",
+        f"{case['denial_date']}. Please treat this letter as my formal request for {_article(level or 'internal appeal')}.",
         _REASON_ARGUMENTS.get(case["denial_reason"], _REASON_ARGUMENTS["other"]),
     ]
+    if case.get("case_paragraph"):
+        paragraphs.append(case["case_paragraph"])
     if urgent:
         paragraphs.append(
             "My provider has indicated that waiting the standard time for a decision could seriously "
@@ -138,7 +149,7 @@ def build_appeal_letter(case: dict, today: date | None = None) -> str:
         case["patient_name"],
         case.get("mailing_address") or "[YOUR ADDRESS]",
         case.get("phone") or "",
-        case["email"],
+        case.get("email"),
     ]
     paragraphs.append("\n".join(line for line in signature if line is not None).rstrip())
     return "\n\n".join(paragraphs)

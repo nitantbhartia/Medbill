@@ -2,9 +2,10 @@
 
 import logging
 import secrets
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from html import escape
 
+import appeal_rules
 import config
 import email_service
 from appeal_letter import DENIAL_REASONS, PLAN_TYPES, SERVICE_TIMINGS, build_appeal_letter
@@ -205,14 +206,15 @@ def record_outcome(case: dict, outcome: str, amount_recovered: float | None) -> 
 
 def deadlines(case: dict) -> dict:
     """Key dates for the case: when to file by, when the insurer must decide, when external review closes."""
+    plan, timing = case.get("plan_type"), case.get("service_timing")
     denial = date.fromisoformat(case["denial_date"])
-    filing_days = config.APPEAL_FILING_DAYS.get(case.get("plan_type") or "")
-    result = {"file_by": denial + timedelta(days=filing_days) if filing_days else None, "decision_due": None, "external_review_by": None}
+    result = {"file_by": appeal_rules.route(plan, timing, denial, None)["file_by"], "decision_due": None, "external_review_by": None}
     if case.get("sent_at"):
         sent = datetime.fromisoformat(str(case["sent_at"])).date()
-        result["decision_due"] = sent + timedelta(days=config.APPEAL_DECISION_DAYS[case["service_timing"]])
+        result["decision_due"] = appeal_rules.decision_due(plan, timing, sent)
     if case.get("outcome") == "upheld" and case.get("decided_at"):
-        result["external_review_by"] = date.fromisoformat(str(case["decided_at"])) + timedelta(days=config.APPEAL_EXTERNAL_REVIEW_DAYS)
+        upheld = appeal_rules.next_level(plan, date.fromisoformat(str(case["decided_at"])))
+        result["external_review_by"] = upheld["file_by"] if upheld else None
     return result
 
 
