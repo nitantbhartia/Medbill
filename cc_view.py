@@ -139,6 +139,7 @@ def case_summary(case: dict) -> dict:
         "reason_label": DENIAL_REASONS.get(reason_key, DENIAL_REASONS["other"]),
         "file_by": case["file_by"],
         "deadline_source": case["deadline_source"],
+        "decision_due": case["decision_due"],
         "status": case["status"],
         "locked": not cc_purchases.is_unlocked(case["id"]),
         "outcome": case["outcome"],
