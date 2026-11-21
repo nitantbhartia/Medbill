@@ -79,7 +79,7 @@ def _fa_next_steps(today: date, earliest_action: date, application_end: date) ->
     steps = [f"Apply for financial assistance by {_fmt(application_end)}. Ask for the application and the plain-language summary of the policy."]
     if today < earliest_action:
         steps.append(
-            f"Before {_fmt(earliest_action)}, the hospital may not report you to credit bureaus, sell the debt, sue, or take similar steps. "
+            f"Before {_fmt(earliest_action)}, the hospital may not report you to credit bureaus, sell the debt, take you to court, or take similar steps. "
             "It must also send written notice at least 30 days before starting any of them."
         )
     else:
@@ -100,7 +100,7 @@ def run_financial_assistance_deadline(payload: dict[str, Any], today: date | Non
     state = "window_open" if today <= application_end else "window_closed"
     lead = "If the hospital is a nonprofit, under" if nonprofit == "unsure" else "Under"
     summary = (
-        f"{lead} IRS 501(r) rules, collection actions like credit reporting or lawsuits may not start before {_fmt(earliest_action)}, "
+        f"{lead} IRS 501(r) rules, collection actions like credit reporting or court action may not start before {_fmt(earliest_action)}, "
         f"and the hospital must accept financial assistance applications through at least {_fmt(application_end)}."
     )
     details = {
@@ -175,8 +175,10 @@ def _medicaid_summary(state: str, care: date, application: date, start: date) ->
 
 def _medicaid_next_steps(state: str, application: date, apply_by: date, today: date) -> list[str]:
     steps = []
-    if state in ("outside_window", "depends_on_group") and apply_by >= today:
+    if state == "outside_window" and apply_by >= today:
         steps.append(f"To reach this care date, the application must be filed by {_fmt(apply_by)}.")
+    if state == "depends_on_group" and apply_by >= today:
+        steps.append(f"If you are an ACA expansion adult, file by {_fmt(apply_by)} to reach this care date.")
     if today < RETRO_CHANGE_DATE and application < RETRO_CHANGE_DATE:
         steps.append(f"Filing before {_fmt(RETRO_CHANGE_DATE)} keeps the 3-month window. Applications filed on or after that date get 1 or 2 months.")
     if state in ("inside_window", "depends_on_group"):

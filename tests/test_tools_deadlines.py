@@ -124,7 +124,7 @@ def test_unsure_group_after_2027_depends():
     assert state == "depends_on_group"
     assert "expansion" in summary
     assert details["retroactive_coverage_can_start"] == "November 1, 2026"
-    assert any("filed by December 31, 2026" in s for s in details["next_steps"])
+    assert any("If you are an ACA expansion adult, file by December 31, 2026" in s for s in details["next_steps"])
 
 
 def test_care_in_application_month_is_not_retroactive():
