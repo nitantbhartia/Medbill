@@ -845,6 +845,16 @@ import guide_billkarma_vs_resolve  # noqa: F401
 import guide_billkarma_vs_goodbill  # noqa: F401
 import guide_upcoding_unbundling_hospital_bills  # noqa: F401
 import guide_hospital_revenue_codes_explained  # noqa: F401
+import guide_multiple_bills_one_hospital_visit  # noqa: F401
+import guide_hospital_did_not_bill_insurance  # noqa: F401
+import guide_pay_hospital_bill_while_disputing  # noqa: F401
+import guide_medical_credit_cards_hospital_bills  # noqa: F401
+import guide_er_level_5_charge_99285  # noqa: F401
+import guide_trauma_activation_fee  # noqa: F401
+import guide_medical_identity_theft_bills  # noqa: F401
+import guide_financial_assistance_after_paying_hospital_bill  # noqa: F401
+import guide_hospital_bill_higher_than_estimate  # noqa: F401
+import guide_medicare_summary_notice_vs_hospital_bill  # noqa: F401
 
 
 def _extend_link_map_from_guides():
