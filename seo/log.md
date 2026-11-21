@@ -53,3 +53,9 @@ Not fixed, needs a person (details in the audit report): unsourced statistics an
 - New: multiple-bills-one-hospital-visit, hospital-did-not-bill-insurance, pay-hospital-bill-while-disputing, medical-credit-cards-hospital-bills, er-level-5-charge-99285, trauma-activation-fee, medical-identity-theft-bills, financial-assistance-after-paying-hospital-bill, hospital-bill-higher-than-estimate, medicare-summary-notice-vs-hospital-bill.
 - Judgment calls to re-check: hospital-bill-higher-than-estimate says AEOB is "still not enforced as of November 2026" (2021 deferral, no rule found since); medicare-summary-notice-vs-hospital-bill's QMB "all providers" line rests on CMS wording seen in search results (MLN7936176 PDF only partly readable).
 - Next: after mid-December, check Search Console impressions for these slugs and link the strongest from the hospital pages.
+
+## 2026-11-20 (10 news-hook guides)
+- Owner asked for guides tied to current news; same accuracy bar as the earlier batch (primary sources for rules and figures; news facts attributed to reporting; advocacy positions attributed).
+- New: insurers-not-paying-er-bills-no-surprises-act, medicaid-work-requirements-hospital-bills, hospital-leaving-medicare-advantage-network, uninsured-hospital-price-limits-refunds, medicare-2027-costs-what-changes, going-uninsured-2027-hospital-bills, medicare-wiser-prior-authorization, new-medical-debt-laws-2026, ai-insurance-claim-denials-appeal, site-neutral-facility-fees-2026.
+- Time-sensitive facts to re-check in January 2027: 2027 Medicare A/B amounts (CMS Nov 17, 2026), Medicaid work-requirement hold-harmless (SMD 26-006), state laws in new-medical-debt-laws-2026, WISeR status, the No Surprises Enforcement Act status.
+- going-uninsured-2027-hospital-bills overlaps uninsured-hospital-bill; watch both in Search Console for cannibalization.
