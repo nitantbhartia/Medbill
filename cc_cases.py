@@ -80,7 +80,10 @@ def update_confirmed(case: dict, fields: dict) -> None:
     choices = {name: case[name] for name in CHOICE_FIELDS}
     confirmed = set()
     for name, value in fields.items():
-        if name in EXTRACTED_FIELDS:
+        if name == "printed_appeal_deadline" and value in (None, ""):
+            extracted.pop("printed_appeal_deadline", None)  # "Not on my letter": drop the date and any window counted from it
+            extracted.pop("printed_appeal_window_text", None)
+        elif name in EXTRACTED_FIELDS:
             extracted[name] = _clean_extracted_value(name, value)
         elif name in CHOICE_FIELDS:
             if value not in CHOICE_FIELDS[name]:
