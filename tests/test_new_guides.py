@@ -18,6 +18,16 @@ from main import app  # noqa: E402
 client = TestClient(app)
 
 NEW_GUIDES = (
+    "insurers-not-paying-er-bills-no-surprises-act",
+    "medicaid-work-requirements-hospital-bills",
+    "hospital-leaving-medicare-advantage-network",
+    "uninsured-hospital-price-limits-refunds",
+    "medicare-2027-costs-what-changes",
+    "going-uninsured-2027-hospital-bills",
+    "medicare-wiser-prior-authorization",
+    "new-medical-debt-laws-2026",
+    "ai-insurance-claim-denials-appeal",
+    "site-neutral-facility-fees-2026",
     "billkarma-vs-goodbill-medical-bills",
     "upcoding-unbundling-hospital-bills",
     "hospital-revenue-codes-explained",
