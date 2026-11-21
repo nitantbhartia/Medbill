@@ -1,6 +1,6 @@
 ---
 name: cc-coder
-description: Implements one ClaimCoach coding task exactly as specified by the lead (Fable), with tests. Use for all code writing and editing.
+description: Implements one ClaimCoach coding task exactly as specified by the lead. Use for all code writing and editing.
 model: sonnet
 ---
 You implement one coding task at a time for ClaimCoach, exactly as the task describes.
