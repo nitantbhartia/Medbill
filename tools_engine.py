@@ -7,6 +7,7 @@ from typing import Any
 
 from db import get_db
 from tools_catalog import get_tool
+from tools_deadlines import run_financial_assistance_deadline, run_medicaid_retro_checker
 from validators.benchmarks import get_benchmark
 from validators.duplicates import find_duplicates
 from validators.geo import get_medicare_locality, get_region
@@ -196,6 +197,8 @@ def run_tool(slug: str, payload: dict[str, Any]) -> dict[str, Any]:
         "medical-bill-payment-plan-calculator": _run_payment_plan_calculator,
         "cpt-code-lookup": _run_cpt_lookup,
         "medicare-rate-lookup": _run_medicare_rate_lookup,
+        "hospital-financial-assistance-deadline": run_financial_assistance_deadline,
+        "medicaid-retroactive-coverage-checker": run_medicaid_retro_checker,
     }
     state_key, summary, details = handlers[slug](payload)
     return {

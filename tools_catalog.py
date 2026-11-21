@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from tools_deadlines_catalog import DEADLINE_TOOLS
+
 
 TOOLS: list[dict[str, Any]] = [
     {
@@ -507,7 +509,7 @@ TOOLS: list[dict[str, Any]] = [
             },
         },
     },
-]
+] + DEADLINE_TOOLS
 
 TOOLS_BY_SLUG = {tool["slug"]: tool for tool in TOOLS}
 

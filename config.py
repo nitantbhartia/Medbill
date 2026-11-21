@@ -536,3 +536,19 @@ RULE_GATE_MAX_DROP_PCT = 2
 RULE_GATE_TIMEOUT_SECONDS = 300
 
 CHARGEMASTER_POST_MAX_ROWS = 5000
+
+# Free tool: nonprofit hospital collection timeline under IRS 501(r).
+# Day counts run from the first billing statement after discharge.
+FA_501R_ECA_WAIT_DAYS = 120  # 26 CFR 1.501(r)-6(b): no extraordinary collection actions before this
+FA_501R_APPLICATION_PERIOD_DAYS = 240  # 26 CFR 1.501(r)-1(b)(3): end of the application period
+FA_501R_ECA_SOURCE_URL = "https://www.ecfr.gov/current/title-26/section-1.501(r)-6"
+FA_501R_APPLICATION_PERIOD_SOURCE_URL = "https://www.ecfr.gov/current/title-26/section-1.501(r)-1#p-1.501(r)-1(b)(3)"
+
+# Free tool: Medicaid retroactive coverage window, counted in whole months before the application month.
+MEDICAID_RETRO_MONTHS = 3  # 42 CFR 435.915(a)
+MEDICAID_RETRO_SOURCE_URL = "https://www.ecfr.gov/current/title-42/section-435.915"
+MEDICAID_RETRO_CHANGE_DATE = "2027-01-01"  # applies to applications filed on or after this date
+MEDICAID_RETRO_MONTHS_EXPANSION_ADULT = 1  # P.L. 119-21 sec. 71112
+MEDICAID_RETRO_MONTHS_OTHER = 2  # P.L. 119-21 sec. 71112
+MEDICAID_RETRO_LAW_URL = "https://www.congress.gov/bill/119th-congress/house-bill/1/text"
+MEDICAID_RETRO_CMS_BULLETIN_URL = "https://www.medicaid.gov/federal-policy-guidance/downloads/cib11182025.pdf"
