@@ -21,6 +21,16 @@ NEW_GUIDES = (
     "billkarma-vs-goodbill-medical-bills",
     "upcoding-unbundling-hospital-bills",
     "hospital-revenue-codes-explained",
+    "multiple-bills-one-hospital-visit",
+    "hospital-did-not-bill-insurance",
+    "pay-hospital-bill-while-disputing",
+    "medical-credit-cards-hospital-bills",
+    "er-level-5-charge-99285",
+    "trauma-activation-fee",
+    "medical-identity-theft-bills",
+    "financial-assistance-after-paying-hospital-bill",
+    "hospital-bill-higher-than-estimate",
+    "medicare-summary-notice-vs-hospital-bill",
 )
 
 
