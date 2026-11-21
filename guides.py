@@ -884,6 +884,25 @@ import guide_operating_room_time_charges  # noqa: F401
 import guide_sexual_assault_exam_hospital_bill  # noqa: F401
 import guide_two_charges_one_xray_scan  # noqa: F401
 import guide_ub_04_claim_form_hospital_bill  # noqa: F401
+import guide_ai_chatbot_read_hospital_bill  # noqa: F401
+import guide_big_hospital_bill_first_48_hours  # noqa: F401
+import guide_caregiver_managing_parents_hospital_bills  # noqa: F401
+import guide_contractual_adjustment_hospital_bill  # noqa: F401
+import guide_crowdfunding_hospital_bill  # noqa: F401
+import guide_emergency_medicaid_immigrants_hospital_bills  # noqa: F401
+import guide_eob_denial_codes_explained  # noqa: F401
+import guide_er_visit_billing_checklist  # noqa: F401
+import guide_hospital_bill_myths  # noqa: F401
+import guide_hospital_billing_email_templates  # noqa: F401
+import guide_hospital_or_insurer_who_to_call  # noqa: F401
+import guide_how_a_hospital_bill_is_made  # noqa: F401
+import guide_language_help_hospital_bill  # noqa: F401
+import guide_letter_of_medical_necessity  # noqa: F401
+import guide_mental_health_crisis_er_bill  # noqa: F401
+import guide_questions_before_surgery_cost  # noqa: F401
+import guide_sent_out_lab_test_bill  # noqa: F401
+import guide_track_hospital_bills_one_stay  # noqa: F401
+import guide_wrong_info_hospital_bill_claim_denied  # noqa: F401
 
 
 def _extend_link_map_from_guides():
