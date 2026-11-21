@@ -16,12 +16,14 @@ from db import get_db
 EXTRACTED_FIELDS = ("insurer_name", "claim_number", "service_description", "notice_date", "printed_appeal_deadline")
 DATE_FIELDS = ("notice_date", "printed_appeal_deadline")
 CHOICE_FIELDS = {"denial_reason": DENIAL_REASONS, "plan_type": PLAN_TYPES, "service_timing": SERVICE_TIMINGS}
+DECISION_TEXT_FIELDS = ("review_address", "review_fax", "review_phone")
 SEND_TO_FIELDS = {"send_to_address": "appeal_address", "send_to_fax": "appeal_fax", "send_to_phone": "appeal_phone"}
 
 
 def _case_from_row(row) -> dict:
     case = dict(row)
     case["extracted"] = json.loads(case.pop("extracted_json") or "{}")
+    case["decision"] = json.loads(case.pop("decision_json") or "{}")
     case["needs_confirmation"] = json.loads(case["needs_confirmation"] or "[]")
     return case
 
@@ -81,12 +83,38 @@ def _clean_extracted_value(name: str, value) -> str:
     return text
 
 
+def _clean_decision_value(name: str, value, case: dict) -> str | None:
+    """A correction to what was read off the decision letter. Empty clears it."""
+    if value in (None, ""):
+        return None
+    if name == "decision_letter_date":
+        return parse_decision_letter_date(value, case).isoformat()
+    text = clean_text(name, value, config.CC_SEND_TO_MAX_CHARS)
+    if name == "review_deadline":
+        try:
+            return date.fromisoformat(text).isoformat()
+        except ValueError as exc:
+            raise HTTPException(400, "review_deadline must be a date like 2026-10-12") from exc
+    return text
+
+
 def update_confirmed(case: dict, fields: dict) -> None:
     """Apply what the user confirmed or corrected. No fields at all means "Looks right"."""
     extracted = dict(case["extracted"])
     choices = {name: case[name] for name in CHOICE_FIELDS}
+    decision = dict(case["decision"])
+    decision_letter_date = case["decision_letter_date"]
     confirmed = set()
     for name, value in fields.items():
+        if name in DECISION_TEXT_FIELDS or name in ("review_deadline", "decision_letter_date"):
+            cleaned = _clean_decision_value(name, value, case)
+            if name == "decision_letter_date":
+                decision_letter_date, name = cleaned, "decision_date"
+            if cleaned is None:
+                decision.pop(name, None)
+            else:
+                decision[name] = cleaned
+            continue  # about the decision letter, not one of the fields the user was asked to confirm
         if name == "printed_appeal_deadline" and value in (None, ""):
             extracted.pop("printed_appeal_deadline", None)  # "Not on my letter": drop the date and any window counted from it
             extracted.pop("printed_appeal_window_text", None)
@@ -109,10 +137,11 @@ def update_confirmed(case: dict, fields: dict) -> None:
     with get_db() as db:
         db.execute(
             "UPDATE cc_cases SET extracted_json = ?, notice_date = ?, denial_reason = ?, plan_type = ?, "
-            "service_timing = ?, needs_confirmation = ?, status = CASE WHEN status = 'draft' THEN 'ready' ELSE status END, "
+            "service_timing = ?, needs_confirmation = ?, decision_json = ?, decision_letter_date = ?, status = CASE WHEN status = 'draft' THEN 'ready' ELSE status END, "
             "updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (json.dumps(extracted), extracted.get("notice_date"), choices["denial_reason"], choices["plan_type"],
-             choices["service_timing"], json.dumps(remaining), case["id"]),
+             choices["service_timing"], json.dumps(remaining), json.dumps(decision) if decision else None,
+             decision_letter_date, case["id"]),
         )
     reroute(case["id"])
 
@@ -205,12 +234,23 @@ def letter_case(case: dict, name: str, member_id: str, details: dict | None = No
         "deadline_source": case["deadline_source"],
         "case_paragraph": case["case_paragraph"],
         "decision_letter_date": details.get("decision_letter_date") or case["decision_letter_date"],
-        "next_level_address": details.get("next_level_address"),
+        "next_level_address": details.get("next_level_address") or case["decision"].get("review_address"),
+        "final_reason_text": case["decision"].get("final_reason_text"),
         "mailing_address": details.get("mailing_address"),
         "phone": details.get("phone"),
         "has_doctor_letter": details.get("has_doctor_letter", False),
         "email": None,
     }
+
+
+def record_decision_letter(case_id: int, decision: dict) -> None:
+    """Keep what was read off the insurer's decision letter. Its date becomes the case's decision letter date."""
+    with get_db() as db:
+        db.execute(
+            "UPDATE cc_cases SET decision_json = ?, decision_letter_date = COALESCE(?, decision_letter_date), "
+            "updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (json.dumps(decision), decision.get("decision_date"), case_id),
+        )
 
 
 def delete_case(case_id: int) -> None:

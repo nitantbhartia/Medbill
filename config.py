@@ -98,6 +98,7 @@ CC_SCAN_LIMIT_PER_HOUR = 10
 CC_EXTRACT_SCHEMA_VERSION = "cc-1"
 CC_CONFIRM_CONFIDENCE = 0.8  # fields read with less confidence are shown for the user to confirm
 CC_DENIAL_REASON_MAX_CHARS = 300
+CC_FINAL_REASON_MAX_CHARS = 500  # the insurer's reason on a decision letter, copied word for word
 CC_CONFIRMED_FIELD_MAX_CHARS = 300  # longest value a user can type when confirming a field
 CC_EXTRA_FACTS_MAX_CHARS = 1500
 CC_SEND_TO_MAX_CHARS = 300  # longest address, fax or phone a user can type to override what was read

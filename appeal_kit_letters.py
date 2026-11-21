@@ -169,6 +169,9 @@ def build_external_review_request(case: dict, next_level: dict) -> str:
         f"The reason given for the denial is: {_reason_label(case)}. I ask the reviewer to look at this denial again, independently, "
         "using the enclosed records and the statement from my treating provider.",
     ]
+    if case.get("final_reason_text"):
+        lines.append(f"Your decision dated {final_denial} states: '{case['final_reason_text']}'" if case.get("decision_letter_date")
+                     else f"Your final decision states: '{case['final_reason_text']}'")
     if case.get("case_paragraph"):
         lines.append(case["case_paragraph"])
     lines += [

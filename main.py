@@ -26,6 +26,7 @@ from mobile_account_routes import router as mobile_account_router
 from cc_links import apple_app_site_association as cc_aasa, is_claimcoach_host
 from cc_routes import router as cc_router
 from cc_case_routes import router as cc_case_router
+from cc_decision_routes import router as cc_decision_router
 from advocacy_api import router as advocacy_router
 from appeal_routes import router as appeal_router
 from household_routes import router as household_router
@@ -94,6 +95,7 @@ app.include_router(mobile_purchase_router)
 app.include_router(mobile_account_router)
 app.include_router(cc_router)
 app.include_router(cc_case_router)
+app.include_router(cc_decision_router)
 app.include_router(advocacy_router)
 app.include_router(appeal_router)
 app.include_router(household_router)

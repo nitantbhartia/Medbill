@@ -7,6 +7,7 @@ from datetime import date
 import appeal_kit
 import appeal_rules
 import cc_cases
+import cc_decision
 import cc_purchases
 import config
 from appeal_kit import _lower_label, _pretty_date
@@ -19,12 +20,13 @@ def _iso(value) -> str | None:
     return str(value)[:10] if value else None
 
 
-def next_level(case: dict) -> dict | None:
-    """The next step after an upheld appeal. Its deadline counts from the date on the final denial letter, when known."""
+def next_level(case: dict, locked: bool = False) -> dict | None:
+    """The next step after an upheld appeal. Its deadline is the one the decision letter prints, else the usual one
+    counted from the date on that letter. A locked case never uses what the decision letter said."""
     if case["outcome"] != "upheld":
         return None
     final_denial = date.fromisoformat(case["decision_letter_date"]) if case["decision_letter_date"] else None
-    level = appeal_rules.next_level(case["plan_type"], final_denial)
+    level = appeal_rules.next_level(case["plan_type"], final_denial, None if locked else cc_decision.printed_review_deadline(case["decision"]))
     if level:
         level["file_by"] = level["file_by"].isoformat() if level["file_by"] else None
     return level
@@ -119,7 +121,8 @@ def build_case_view(case_id: int) -> dict:
         "letter": {"letter_text": case["letter_text"]} if case["letter_text"] and not locked else None,
         "timeline": _timeline(case),
         "next_step": _next_step(case, route["level_label"]),
-        "next_level": next_level(case),
+        "next_level": next_level(case, locked),
+        "decision_letter": None if locked or not case["decision"] else cc_decision.view_fields(case["decision"]),
         "crosspromo": "billkarma" if appeal_kit.wants_billkarma(case) else None,
         "rule_source_url": route["source_url"],
         "price": {"product_id": config.CC_APPEAL_KIT_PRODUCT_ID},

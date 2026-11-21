@@ -103,19 +103,25 @@ def decision_due(plan_type: str | None, service_timing: str | None, sent_on: dat
     return sent_on + timedelta(days=days) if days else None
 
 
-def next_level(plan_type: str | None, final_denial_date: date | None) -> dict | None:
+def next_level(plan_type: str | None, final_denial_date: date | None, printed_deadline: date | None = None) -> dict | None:
     """What to do after an upheld denial, or None for an unknown plan type.
-    The deadline counts from the date on the final denial letter; without that date there is no deadline to state."""
+    The deadline is the one the final denial letter prints, else the default window counted from the date on that letter;
+    without either there is no deadline to state."""
     rule = RULES.get(plan_type or "")
     if not rule:
         return None
     days = rule["next_level_days"]
     goes_to = rule["next_level_goes_to"]
-    if days and not final_denial_date:
+    file_by, deadline_source = None, None
+    if printed_deadline and not rule["next_level_automatic"]:
+        file_by, deadline_source = printed_deadline, "letter"
+    elif days and final_denial_date:
+        file_by, deadline_source = final_denial_date + timedelta(days=days), "default"
+    if days and not file_by:
         goes_to = f"{NO_DECISION_DATE_NOTE} {goes_to}"
     return {
         "level": rule["next_level"], "level_label": rule["next_level_label"],
-        "file_by": final_denial_date + timedelta(days=days) if days and final_denial_date else None,
+        "file_by": file_by, "deadline_source": deadline_source,
         "automatic": rule["next_level_automatic"], "goes_to": goes_to,
         "source_url": rule["source_url"],
     }

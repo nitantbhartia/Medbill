@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS cc_cases (
     decision_due DATE,
     outcome TEXT,  -- overturned | partial | upheld
     amount_denied REAL, amount_recovered REAL,
-    plain_reason TEXT, needs_confirmation TEXT, letter_text TEXT, case_paragraph TEXT, decided_at DATE, decision_letter_date DATE,
+    plain_reason TEXT, needs_confirmation TEXT, letter_text TEXT, case_paragraph TEXT, decided_at DATE, decision_letter_date DATE, decision_json TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -47,7 +47,7 @@ CREATE INDEX IF NOT EXISTS idx_cc_sends_case ON cc_sends(case_id);
 def init(db) -> None:
     db.executescript(SCHEMA)
     case_columns = {row[1] for row in db.execute("PRAGMA table_info(cc_cases)").fetchall()}
-    for column, kind in (("case_paragraph", "TEXT"), ("decision_letter_date", "DATE")):
+    for column, kind in (("case_paragraph", "TEXT"), ("decision_letter_date", "DATE"), ("decision_json", "TEXT")):
         if column not in case_columns:
             db.execute(f"ALTER TABLE cc_cases ADD COLUMN {column} {kind}")
     columns = {row[1] for row in db.execute("PRAGMA table_info(mobile_devices)").fetchall()}
