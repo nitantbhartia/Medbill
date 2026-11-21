@@ -201,8 +201,9 @@ def build_appeal_letter(case: dict, today: date | None = None) -> str:
         "Copy of the denial letter or Explanation of Benefits",
         "Letter of medical necessity from my treating provider" + ("" if has_doctor_letter else " (to follow)"),
         "Relevant medical records",
-        "Signed authorized representative form" if helping_someone(case) else "Authorized representative form (if required by the plan)",
     ]
+    if helping_someone(case):
+        enclosures.append("Signed authorized representative form")
     paragraphs.append("Enclosures:\n" + "\n".join(f"- {item}" for item in enclosures))
     paragraphs.append(signature_block(case))
     return "\n\n".join(paragraphs)

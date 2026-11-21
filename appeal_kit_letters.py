@@ -166,8 +166,8 @@ def build_external_review_request(case: dict, next_level: dict) -> str:
         "To the reviewer:",
         f"I am asking for {_lower_label(label)} of the denial of coverage for {service}. {insurer} denied this on {denial_date} "
         f"and upheld its decision in a final denial letter dated {final_denial}. I disagree with that decision.",
-        f"The reason given for the denial is: {_reason_label(case)}. I ask the reviewer to look at this denial again, independently, "
-        "using the enclosed records and the statement from my treating provider.",
+        (f"The reason given for the denial is: {_reason_label(case)}. " if not case.get("final_reason_text") else "")
+        + "I ask the reviewer to look at this denial again, independently, using the enclosed records and the statement from my treating provider.",
     ]
     if case.get("final_reason_text"):
         lines.append(f"Your decision dated {final_denial} states: '{case['final_reason_text']}'" if case.get("decision_letter_date")
@@ -181,8 +181,8 @@ def build_external_review_request(case: dict, next_level: dict) -> str:
         f"- The original denial letter dated {denial_date}\n"
         "- My appeal letter and any response to it\n"
         "- Letter of medical necessity from my treating provider (if available)\n"
-        "- Relevant medical records\n"
-        "- Authorized representative form (if required)",
+        "- Relevant medical records"
+        + ("\n- Signed authorized representative form" if helping_someone(case) else ""),
         signature_block(case),
     ]
     return "\n\n".join(lines)
