@@ -7,8 +7,10 @@ import config
 VERIFIED_ON = "2026-11-20"
 _DECISION_DAYS = config.APPEAL_DECISION_DAYS
 _EXTERNAL_GOES_TO = (
-    "An independent reviewer outside your insurer decides. Your final denial letter says how to ask for it."
+    "You may be able to ask for an external review. Your final denial letter says if you can. "
+    "If you can, an independent reviewer outside your insurer decides."
 )
+NO_DECISION_DATE_NOTE = "Check your final denial letter for the deadline."
 
 RULES = {
     "individual": {
@@ -28,8 +30,8 @@ RULES = {
         "next_level": "external", "next_level_label": "External review",
         "next_level_days": config.APPEAL_EXTERNAL_REVIEW_DAYS, "next_level_automatic": False,
         "next_level_goes_to": (
-            "An independent reviewer decides, through a federal or state process. Your final denial letter says "
-            "which one and how to ask. Some employer plans have a second internal appeal first."
+            "You may be able to ask for an external review. Your final denial letter says if you can, and which "
+            "federal or state process to use. Some employer plans have a second internal appeal first."
         ),
         "source_url": "https://www.hhs.gov/guidance/sites/default/files/hhs-guidance-documents/Internal-Appeals-External-Review-Slides-2022.pdf",
         "verified_on": VERIFIED_ON,
@@ -101,15 +103,19 @@ def decision_due(plan_type: str | None, service_timing: str | None, sent_on: dat
     return sent_on + timedelta(days=days) if days else None
 
 
-def next_level(plan_type: str | None, decided_on: date) -> dict | None:
-    """What to do after an upheld denial, or None for an unknown plan type."""
+def next_level(plan_type: str | None, final_denial_date: date | None) -> dict | None:
+    """What to do after an upheld denial, or None for an unknown plan type.
+    The deadline counts from the date on the final denial letter; without that date there is no deadline to state."""
     rule = RULES.get(plan_type or "")
     if not rule:
         return None
     days = rule["next_level_days"]
+    goes_to = rule["next_level_goes_to"]
+    if days and not final_denial_date:
+        goes_to = f"{NO_DECISION_DATE_NOTE} {goes_to}"
     return {
         "level": rule["next_level"], "level_label": rule["next_level_label"],
-        "file_by": decided_on + timedelta(days=days) if days else None,
-        "automatic": rule["next_level_automatic"], "goes_to": rule["next_level_goes_to"],
+        "file_by": final_denial_date + timedelta(days=days) if days and final_denial_date else None,
+        "automatic": rule["next_level_automatic"], "goes_to": goes_to,
         "source_url": rule["source_url"],
     }

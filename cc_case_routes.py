@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 import appeal_kit
-import appeal_rules
+import appeal_kit_letters
 import cc_cases
 import cc_classify
 import cc_extract
@@ -18,17 +19,19 @@ import config
 import mobile_auth
 import scanner
 from api import _check_rate_limit
-from appeal_letter import PLAN_TYPES, SERVICE_TIMINGS, build_appeal_letter
+from appeal_letter import PLAN_TYPES, RELATIONSHIPS, SERVICE_TIMINGS, build_appeal_letter
 from compliance import log_audit
 from mobile_bill_routes import _read_pages
 from mobile_routes import ok
 
 router = APIRouter(prefix="/api/cc")
+log = logging.getLogger(__name__)
 
 FOR_WHOM = ("self", "someone_else")
 OUTCOMES = ("overturned", "partial", "upheld")
 SEND_CHANNELS = ("fax", "mail")
 NO_NEXT_LEVEL = "This appeal has no next level yet"
+LETTER_TEXT_FIELDS = ("mailing_address", "phone", "patient_name", "representative_name", "next_level_address")
 
 
 def _choice(name: str, value: str, allowed) -> str | None:
@@ -71,6 +74,10 @@ async def create_case(
         reason_key, cc_classify.plain_reason(extracted, reason_key), confirm,
     )
     cc_cases.reroute(case_id)
+    try:
+        cc_purchases.unlock_with_plus(device_id, case_id)  # a Plus subscriber never meets the paywall
+    except HTTPException:
+        log.warning("Plus check failed for new case %s; it stays locked until unlocked", case_id)
     log_audit("cc_scan", "cc_case", str(case_id), metadata={"pages": len(images)})
     return ok(cc_view.build_case_view(case_id))
 
@@ -112,11 +119,31 @@ async def unlock_case(case_id: int, payload: dict, device_id: str = Depends(mobi
 
 
 def _next_level_for(case: dict) -> dict:
-    decided_on = date.fromisoformat(case["decided_at"]) if case["decided_at"] else date.today()
-    level = appeal_rules.next_level(case["plan_type"], decided_on) if case["outcome"] == "upheld" else None
+    level = cc_view.next_level(case)
     if not level:
         raise HTTPException(400, NO_NEXT_LEVEL)
     return level
+
+
+def _letter_details(payload: dict, case: dict) -> dict:
+    """The optional letter-form fields, checked. Anything left out stays out."""
+    details = {}
+    for name in LETTER_TEXT_FIELDS:
+        value = payload.get(name)
+        if value is None or (isinstance(value, str) and not value.strip()):
+            continue
+        details[name] = cc_cases.clean_text(name, value, config.CC_LETTER_FIELD_MAX_CHARS)
+    relationship = _choice("relationship", str(payload.get("relationship") or ""), RELATIONSHIPS)
+    if relationship:
+        details["relationship"] = relationship
+    if "has_doctor_letter" in payload:
+        if not isinstance(payload["has_doctor_letter"], bool):
+            raise HTTPException(400, "has_doctor_letter must be true or false")
+        details["has_doctor_letter"] = payload["has_doctor_letter"]
+    decided = cc_cases.parse_decision_letter_date(payload.get("decision_letter_date"), case)
+    if decided:
+        details["decision_letter_date"] = decided.isoformat()
+    return details
 
 
 @router.post("/cases/{case_id}/letter")
@@ -127,23 +154,25 @@ async def build_letter(case_id: int, payload: dict, device_id: str = Depends(mob
     name = str(payload.get("name") or "").strip()
     if not name:
         raise HTTPException(400, "name is required")
-    letter_case = cc_cases.letter_case(case, name, str(payload.get("member_id") or "").strip())
+    letter_case = cc_cases.letter_case(case, name, str(payload.get("member_id") or "").strip(), _letter_details(payload, case))
+    first_level = payload.get("next_level") is not True
+    paragraph = None
     paragraph_range = None
-    if payload.get("next_level") is True:
-        letter_text = appeal_kit.build_external_review_request(letter_case, _next_level_for(case))
-    else:
+    if first_level:
         paragraph = appeal_kit.case_paragraph(letter_case, str(payload.get("extra_facts") or ""))
         readable = {key: appeal_kit._pretty_date(letter_case[key]) or letter_case[key] for key in ("denial_date", "service_date")}
         letter_text = build_appeal_letter({**letter_case, **readable, "case_paragraph": paragraph})
         start = letter_text.find(paragraph) if paragraph else -1
         paragraph_range = [start, start + len(paragraph)] if start >= 0 else None
-    cc_cases.save_letter(case_id, letter_text)
+    else:
+        letter_text = appeal_kit_letters.build_external_review_request(letter_case, _next_level_for(case))
+    cc_cases.save_letter(case_id, letter_text, paragraph, first_level)
     return ok({
         "letter_text": letter_text,
         "case_paragraph_range": paragraph_range,
-        "doctor_request": appeal_kit.build_doctor_request(letter_case),
-        "checklist": appeal_kit.evidence_checklist(case["denial_reason"] or "other"),
-        "phone_script": appeal_kit.phone_script(letter_case),
+        "doctor_request": appeal_kit_letters.build_doctor_request(letter_case),
+        "checklist": appeal_kit.evidence_checklist(case["denial_reason"] or "other", case["for_whom"]),
+        "phone_script": appeal_kit_letters.phone_script(letter_case),
     })
 
 
@@ -191,5 +220,6 @@ async def report_outcome(case_id: int, payload: dict, device_id: str = Depends(m
     recovered = payload.get("amount_recovered")
     if recovered is not None and (isinstance(recovered, bool) or not isinstance(recovered, (int, float)) or recovered < 0):
         raise HTTPException(400, "amount_recovered must be a number of 0 or more")
-    cc_cases.record_outcome(case, outcome, recovered)
+    decision_letter_date = cc_cases.parse_decision_letter_date(payload.get("decision_letter_date"), case)
+    cc_cases.record_outcome(case, outcome, recovered, decision_letter_date)
     return ok(cc_view.build_case_view(case_id))

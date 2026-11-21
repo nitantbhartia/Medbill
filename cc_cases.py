@@ -16,6 +16,7 @@ from db import get_db
 EXTRACTED_FIELDS = ("insurer_name", "claim_number", "service_description", "notice_date", "printed_appeal_deadline")
 DATE_FIELDS = ("notice_date", "printed_appeal_deadline")
 CHOICE_FIELDS = {"denial_reason": DENIAL_REASONS, "plan_type": PLAN_TYPES, "service_timing": SERVICE_TIMINGS}
+SEND_TO_FIELDS = {"send_to_address": "appeal_address", "send_to_fax": "appeal_fax", "send_to_phone": "appeal_phone"}
 
 
 def _case_from_row(row) -> dict:
@@ -62,10 +63,16 @@ def list_cases(device_id: str) -> list[dict]:
     return [_case_from_row(row) for row in rows]
 
 
-def _clean_extracted_value(name: str, value) -> str:
+def clean_text(name: str, value, limit: int) -> str:
+    """Trimmed text of 1 to `limit` characters, or a 400."""
     text = value.strip() if isinstance(value, str) else ""
-    if not text or len(text) > config.CC_CONFIRMED_FIELD_MAX_CHARS:
-        raise HTTPException(400, f"{name} must be text of 1 to {config.CC_CONFIRMED_FIELD_MAX_CHARS} characters")
+    if not text or len(text) > limit:
+        raise HTTPException(400, f"{name} must be text of 1 to {limit} characters")
+    return text
+
+
+def _clean_extracted_value(name: str, value) -> str:
+    text = clean_text(name, value, config.CC_CONFIRMED_FIELD_MAX_CHARS)
     if name in DATE_FIELDS:
         try:
             return date.fromisoformat(text).isoformat()
@@ -83,6 +90,12 @@ def update_confirmed(case: dict, fields: dict) -> None:
         if name == "printed_appeal_deadline" and value in (None, ""):
             extracted.pop("printed_appeal_deadline", None)  # "Not on my letter": drop the date and any window counted from it
             extracted.pop("printed_appeal_window_text", None)
+        elif name in SEND_TO_FIELDS:
+            if value in (None, ""):
+                extracted.pop(SEND_TO_FIELDS[name], None)
+            else:
+                extracted[SEND_TO_FIELDS[name]] = clean_text(name, value, config.CC_SEND_TO_MAX_CHARS)
+            continue  # where the appeal goes is not one of the fields the user was asked to confirm
         elif name in EXTRACTED_FIELDS:
             extracted[name] = _clean_extracted_value(name, value)
         elif name in CHOICE_FIELDS:
@@ -126,28 +139,52 @@ def record_sent(case: dict, channel: str, sent_on: date) -> None:
         )
 
 
-def record_outcome(case: dict, outcome: str, amount_recovered: float | None) -> None:
+def parse_decision_letter_date(value, case: dict) -> date | None:
+    """The date on the insurer's decision letter: a real date, not in the future, not before the denial notice."""
+    if value in (None, ""):
+        return None
+    try:
+        decided = date.fromisoformat(str(value))
+    except ValueError as exc:
+        raise HTTPException(400, "decision_letter_date must be a date like 2026-10-12") from exc
+    if decided > date.today():
+        raise HTTPException(400, "decision_letter_date can't be in the future")
+    if case["notice_date"] and decided < date.fromisoformat(case["notice_date"]):
+        raise HTTPException(400, "decision_letter_date can't be before the denial notice")
+    return decided
+
+
+def record_outcome(case: dict, outcome: str, amount_recovered: float | None, decision_letter_date: date | None) -> None:
     with get_db() as db:
         db.execute(
             "UPDATE cc_cases SET status = 'decided', outcome = ?, amount_recovered = ?, decided_at = ?, "
-            "updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-            (outcome, amount_recovered, date.today().isoformat(), case["id"]),
+            "decision_letter_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (outcome, amount_recovered, date.today().isoformat(),
+             decision_letter_date.isoformat() if decision_letter_date else None, case["id"]),
         )
 
 
-def save_letter(case_id: int, letter_text: str) -> None:
+def save_letter(case_id: int, letter_text: str, case_paragraph: str | None = None, first_level: bool = True) -> None:
+    """Keep the last generated letter. A next-level letter leaves the round-one personal paragraph in place."""
     with get_db() as db:
         db.execute(
-            "UPDATE cc_cases SET letter_text = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (letter_text, case_id)
+            "UPDATE cc_cases SET letter_text = ?, case_paragraph = CASE WHEN ? THEN ? ELSE case_paragraph END, "
+            "updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (letter_text, first_level, case_paragraph, case_id),
         )
 
 
-def letter_case(case: dict, name: str, member_id: str) -> dict:
-    """The case in the shape appeal_letter.build_appeal_letter and appeal_kit expect."""
+def letter_case(case: dict, name: str, member_id: str, details: dict | None = None) -> dict:
+    """The case in the shape appeal_letter.build_appeal_letter and appeal_kit expect.
+    `details` are the optional letter-form fields the user typed (see cc_case_routes.letter_details)."""
+    details = details or {}
     extracted = case["extracted"]
     route = appeal_rules.route(case["plan_type"], case["service_timing"], None, None)
     return {
-        "patient_name": name,
+        "patient_name": details.get("patient_name") or name,
+        "representative_name": details.get("representative_name"),
+        "relationship": details.get("relationship"),
+        "for_whom": case["for_whom"],
         "member_id": member_id or extracted.get("member_id"),
         "claim_number": extracted.get("claim_number"),
         "provider_name": extracted.get("provider_name"),
@@ -157,12 +194,22 @@ def letter_case(case: dict, name: str, member_id: str) -> dict:
         "denial_date": case["notice_date"] or "[DATE OF DENIAL]",
         "amount_denied": case["amount_denied"],
         "insurer_appeal_address": extracted.get("appeal_address"),
+        "insurer_appeal_fax": extracted.get("appeal_fax"),
+        "denial_reason_text": extracted.get("denial_reason_text"),
+        "criteria_cited": extracted.get("criteria_cited"),
         "service_timing": case["service_timing"],
         "denial_reason": case["denial_reason"],
         "plan_type": case["plan_type"],
         "level_label": route["level_label"],
         "file_by": case["file_by"],
-        "mailing_address": None, "phone": None, "email": None,
+        "deadline_source": case["deadline_source"],
+        "case_paragraph": case["case_paragraph"],
+        "decision_letter_date": details.get("decision_letter_date") or case["decision_letter_date"],
+        "next_level_address": details.get("next_level_address"),
+        "mailing_address": details.get("mailing_address"),
+        "phone": details.get("phone"),
+        "has_doctor_letter": details.get("has_doctor_letter", False),
+        "email": None,
     }
 
 

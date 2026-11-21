@@ -19,27 +19,31 @@ def _iso(value) -> str | None:
     return str(value)[:10] if value else None
 
 
-def _next_level(case: dict) -> dict | None:
+def next_level(case: dict) -> dict | None:
+    """The next step after an upheld appeal. Its deadline counts from the date on the final denial letter, when known."""
     if case["outcome"] != "upheld":
         return None
-    decided_on = date.fromisoformat(case["decided_at"]) if case["decided_at"] else date.today()
-    level = appeal_rules.next_level(case["plan_type"], decided_on)
+    final_denial = date.fromisoformat(case["decision_letter_date"]) if case["decision_letter_date"] else None
+    level = appeal_rules.next_level(case["plan_type"], final_denial)
     if level:
         level["file_by"] = level["file_by"].isoformat() if level["file_by"] else None
     return level
 
 
+def _level_label(case: dict) -> str:
+    return appeal_rules.route(case["plan_type"], case["service_timing"], None, None)["level_label"]
+
+
 def _timeline(case: dict) -> list[dict]:
     sent = case["status"] in SENT_STATUSES
     decided = case["status"] == "decided"
-    steps = [
-        {"label": "Denial notice", "date": case["notice_date"], "done": True},
-        {"label": "File by", "date": case["file_by"], "done": sent},
-    ]
+    steps = [{"label": "Denial notice", "date": case["notice_date"], "done": True}]
     if sent:
         steps.append({"label": "Sent", "date": _iso(case["sent_at"]), "done": True})
+    else:
+        steps.append({"label": "File by", "date": case["file_by"], "done": False})
     if sent and case["decision_due"]:
-        steps.append({"label": "Decision due", "date": case["decision_due"], "done": decided})
+        steps.append({"label": "Decision usually due", "date": case["decision_due"], "done": decided})
     if decided:
         steps.append({"label": "Decision", "date": case["decided_at"], "done": True})
     return steps
@@ -58,7 +62,7 @@ def _next_step(case: dict, level_label: str) -> dict:
         return {"kind": "file_appeal", "label": label}
     if case["status"] == "sent":
         due = _pretty_date(case["decision_due"])
-        return {"kind": "wait_for_decision", "label": f"Your insurer's decision is due by {due}" if due else "Wait for your insurer's decision"}
+        return {"kind": "wait_for_decision", "label": f"Your insurer's decision is usually due by {due}" if due else "Wait for your insurer's decision"}
     if case["outcome"] == "upheld":
         return {"kind": "next_level", "label": "Your insurer kept its decision. See what you can do next"}
     return {"kind": "done", "label": "This appeal is closed"}
@@ -73,7 +77,7 @@ def build_case_view(case_id: int) -> dict:
         case["plan_type"], case["service_timing"],
         date.fromisoformat(case["notice_date"]) if case["notice_date"] else None, None,
     )
-    checklist = appeal_kit.evidence_checklist(reason_key)
+    checklist = appeal_kit.evidence_checklist(reason_key, case["for_whom"])
     return {
         "case_id": case_id,
         "locked": locked,
@@ -91,6 +95,9 @@ def build_case_view(case_id: int) -> dict:
             "reason_key": reason_key,
             "reason_label": DENIAL_REASONS.get(reason_key, DENIAL_REASONS["other"]),
             "plain_reason": case["plain_reason"],
+            "denial_reason_text": extracted.get("denial_reason_text"),
+            "printed_window_text": extracted.get("printed_appeal_window_text"),
+            "patient_name": extracted.get("patient_name"),
         },
         "route": {
             "plan_type": case["plan_type"],
@@ -112,7 +119,7 @@ def build_case_view(case_id: int) -> dict:
         "letter": {"letter_text": case["letter_text"]} if case["letter_text"] and not locked else None,
         "timeline": _timeline(case),
         "next_step": _next_step(case, route["level_label"]),
-        "next_level": _next_level(case),
+        "next_level": next_level(case),
         "crosspromo": "billkarma" if appeal_kit.wants_billkarma(case) else None,
         "rule_source_url": route["source_url"],
         "price": {"product_id": config.CC_APPEAL_KIT_PRODUCT_ID},
@@ -131,4 +138,10 @@ def case_summary(case: dict) -> dict:
         "deadline_source": case["deadline_source"],
         "status": case["status"],
         "locked": not cc_purchases.is_unlocked(case["id"]),
+        "outcome": case["outcome"],
+        "next_step": _next_step(case, _level_label(case)),
+        "for_whom": case["for_whom"],
+        "service_timing": case["service_timing"],
+        "notice_date": case["notice_date"],
+        "amount_denied": case["amount_denied"],
     }
