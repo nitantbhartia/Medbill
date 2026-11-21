@@ -152,6 +152,10 @@ async def mark_sent(case_id: int, payload: dict, device_id: str = Depends(mobile
     case = cc_cases.require_case(device_id, case_id)
     if payload.get("channel") != "self":
         raise HTTPException(400, "channel must be self")
+    if case["status"] not in ("ready", "sent"):
+        raise HTTPException(409, "This appeal isn't ready to be marked as sent")
+    if not cc_purchases.is_unlocked(case_id):
+        raise HTTPException(402, "Unlock this appeal first")
     try:
         sent_on = date.fromisoformat(str(payload["date"])) if payload.get("date") else date.today()
     except ValueError as exc:
@@ -179,6 +183,8 @@ async def send_case(case_id: int, payload: dict, device_id: str = Depends(mobile
 @router.post("/cases/{case_id}/outcome")
 async def report_outcome(case_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
     case = cc_cases.require_case(device_id, case_id)
+    if case["status"] not in ("sent", "decided"):
+        raise HTTPException(409, "Mark the appeal as sent before recording a decision")
     outcome = payload.get("outcome")
     if outcome not in OUTCOMES:
         raise HTTPException(400, "outcome must be overturned, partial or upheld")
