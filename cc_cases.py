@@ -146,6 +146,16 @@ def update_confirmed(case: dict, fields: dict) -> None:
     reroute(case["id"])
 
 
+def update_intake(case: dict, for_whom: str | None, service_timing: str | None) -> None:
+    """Save the two answers asked while the letter was being read, then recompute the route. Status and confirmations stay as they are."""
+    with get_db() as db:
+        db.execute(
+            "UPDATE cc_cases SET for_whom = ?, service_timing = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (for_whom or case["for_whom"], service_timing or case["service_timing"], case["id"]),
+        )
+    reroute(case["id"])
+
+
 def reroute(case_id: int) -> None:
     """Recompute level, file-by date and where the date came from."""
     case = get_case(case_id)

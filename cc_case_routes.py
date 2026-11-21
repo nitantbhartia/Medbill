@@ -99,6 +99,15 @@ async def confirm_case(case_id: int, payload: dict, device_id: str = Depends(mob
     return ok(cc_view.build_case_view(case_id))
 
 
+@router.patch("/cases/{case_id}/intake")
+async def save_intake(case_id: int, payload: dict, device_id: str = Depends(mobile_auth.device_from_request)):
+    case = cc_cases.require_case(device_id, case_id)
+    for_whom = _choice("for_whom", payload.get("for_whom") or "", FOR_WHOM)
+    service_timing = _choice("service_timing", payload.get("service_timing") or "", SERVICE_TIMINGS)
+    cc_cases.update_intake(case, for_whom, service_timing)
+    return ok(cc_view.build_case_view(case_id))
+
+
 @router.delete("/cases/{case_id}")
 async def delete_case(case_id: int, device_id: str = Depends(mobile_auth.device_from_request)):
     cc_cases.require_case(device_id, case_id)
