@@ -79,6 +79,7 @@ NEW_GUIDES = (
     "sent-out-lab-test-bill",
     "track-hospital-bills-one-stay",
     "wrong-info-hospital-bill-claim-denied",
+    "anatomy-of-an-er-bill",
 )
 
 

@@ -903,6 +903,7 @@ import guide_questions_before_surgery_cost  # noqa: F401
 import guide_sent_out_lab_test_bill  # noqa: F401
 import guide_track_hospital_bills_one_stay  # noqa: F401
 import guide_wrong_info_hospital_bill_claim_denied  # noqa: F401
+import guide_anatomy_of_an_er_bill  # noqa: F401
 
 
 def _extend_link_map_from_guides():
