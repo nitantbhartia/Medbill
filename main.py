@@ -23,7 +23,7 @@ from mobile_assistance_routes import router as mobile_assistance_router
 from mobile_hold_routes import router as mobile_hold_router
 from mobile_purchase_routes import router as mobile_purchase_router
 from mobile_account_routes import router as mobile_account_router
-from cc_links import apple_app_site_association as cc_aasa, is_claimcoach_host
+from cc_links import apple_app_site_association as cc_aasa, is_claimcoach_host, site_page as cc_site_page
 from cc_routes import router as cc_router
 from cc_case_routes import router as cc_case_router
 from cc_decision_routes import router as cc_decision_router
@@ -103,6 +103,16 @@ app.include_router(ops_router)
 app.include_router(data_router)
 app.include_router(es_router)
 app.mount("/static", _CachedStaticFiles(directory="static"), name="static")
+
+
+@app.middleware("http")
+async def claimcoach_site(request: Request, call_next):
+    """On claimcoach.app, /, /privacy, /terms and /support are ClaimCoach's static pages, not BillKarma's."""
+    if request.method in ("GET", "HEAD"):
+        html = cc_site_page(request.headers.get("host", ""), request.url.path)
+        if html is not None:
+            return HTMLResponse(html)
+    return await call_next(request)
 
 
 @app.middleware("http")
