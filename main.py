@@ -23,6 +23,7 @@ from mobile_assistance_routes import router as mobile_assistance_router
 from mobile_hold_routes import router as mobile_hold_router
 from mobile_purchase_routes import router as mobile_purchase_router
 from mobile_account_routes import router as mobile_account_router
+from cc_links import apple_app_site_association as cc_aasa, is_claimcoach_host
 from cc_routes import router as cc_router
 from cc_case_routes import router as cc_case_router
 from advocacy_api import router as advocacy_router
@@ -2980,8 +2981,13 @@ async def favicon():
 
 
 @app.get("/.well-known/apple-app-site-association")
-async def apple_app_site_association():
-    """Universal links: lets the iOS app open /scan and /app/* links."""
+@app.get("/apple-app-site-association")
+async def apple_app_site_association(request: Request):
+    """Universal links. claimcoach.app serves the ClaimCoach file; every other host serves BillKarma's (/scan and /app/*)."""
+    if is_claimcoach_host(request.headers.get("host", "")):
+        if not config.APPLE_TEAM_ID:
+            return JSONResponse({"error": "not configured"}, status_code=404)
+        return JSONResponse(cc_aasa())
     if not config.IOS_APP_ID:
         return JSONResponse({"error": "not configured"}, status_code=404)
     components = [{"/": "/scan*"}, {"/": "/app/*"}]

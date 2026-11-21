@@ -7,6 +7,7 @@ register("insurance-claim-denied-what-to-do", {
     "meta_description": "Insurance denied your claim? Learn the most common denial reasons, your ACA appeal rights, how to write an effective appeal, and why 39% of appealed denials are overturned.",
     "published": "2026-04-05",
     "author": "BillKarma Team",
+    "claimcoach": True,
     "category": "Appeals & Disputes",
     "faqs": [
         {

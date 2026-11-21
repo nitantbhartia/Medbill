@@ -133,7 +133,7 @@
             .bk-map-compare { height: 240px; }
         }
     </style>
-    {% if config.APP_STORE_ID %}<meta name="apple-itunes-app" content="app-id={{ config.APP_STORE_ID }}">{% endif %}
+    {% block app_banner %}{% if config.APP_STORE_ID %}<meta name="apple-itunes-app" content="app-id={{ config.APP_STORE_ID }}">{% endif %}{% endblock %}
     {% block head %}{% endblock %}
 </head>
 <body class="text-gray-900 min-h-screen flex flex-col antialiased">

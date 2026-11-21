@@ -88,6 +88,11 @@ APPEAL_FAIR_HEARING_DAYS = 120  # Medicaid: days to ask for a state fair hearing
 APPEAL_REMINDER_WINDOW_DAYS = 7
 
 # ClaimCoach
+CC_BUNDLE_ID = "app.claimcoach.ios"
+CC_DOMAIN = "claimcoach.app"
+CC_APP_STORE_ID = os.getenv("CC_APP_STORE_ID", "")
+APPLE_TEAM_ID = os.getenv("APPLE_TEAM_ID", "")
+CC_UNIVERSAL_LINK_PATHS = ("/appeal/*", "/open/*")
 CC_SCAN_MAX_PAGES = 8
 CC_SCAN_LIMIT_PER_HOUR = 10
 CC_EXTRACT_SCHEMA_VERSION = "cc-1"

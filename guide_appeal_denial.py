@@ -7,6 +7,7 @@ register("how-to-appeal-insurance-denial", {
     "meta_description": "Insurance denials get overturned 40-50% of the time on first appeal. Learn exactly how to appeal a denied claim with templates, timelines, and examples.",
     "published": "2026-02-20",
     "author": "BillKarma Team",
+    "claimcoach": True,
     "category": "Insurance Basics",
     "hide_default_cta": True,
     "faqs": [

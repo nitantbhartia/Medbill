@@ -4,6 +4,7 @@ register("health-insurance-denial-appeal-guide", {
     "title": "How to Appeal a Health Insurance Denial (And Win)",
     "meta_description": "Step-by-step guide to appealing a health insurance denial: internal appeal, external review, peer-to-peer review, and expedited appeal for urgent care within 72 hours.",
     "published": "2026-04-06",
+    "claimcoach": True,
     "category": "Insurance & Coverage",
     "faqs": [
         {

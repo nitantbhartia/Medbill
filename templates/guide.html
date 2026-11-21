@@ -2,6 +2,10 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
+{% set _cc_promo = guide.claimcoach and config.CC_APP_STORE_ID %}
+
+{% block app_banner %}{% if _cc_promo %}<meta name="apple-itunes-app" content="app-id={{ config.CC_APP_STORE_ID }}">{% else %}{{ super() }}{% endif %}{% endblock %}
+
 {% block head %}
 <meta name="description" content="{{ meta_description }}">
 <meta property="og:title" content="{{ og_title }}">
@@ -142,6 +146,18 @@
         </div>
     </aside>
 </div>
+
+{% if _cc_promo %}
+<section class="bk-wrap" style="padding-top: 24px">
+    <div class="bk-cta-band">
+        <div>
+            <h2>Got a denial letter? Use ClaimCoach.</h2>
+            <p>ClaimCoach helps you write and send an appeal. Your insurer makes the decision.</p>
+        </div>
+        <a href="https://apps.apple.com/app/id{{ config.CC_APP_STORE_ID }}" class="bk-btn">Open in ClaimCoach</a>
+    </div>
+</section>
+{% endif %}
 
 {% if not guide.hide_default_cta %}
 <section class="bk-wrap" style="padding-top: 24px; padding-bottom: 88px">

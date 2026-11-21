@@ -7,6 +7,7 @@ register("how-to-appeal-insurance-denial-and-win", {
     "meta_description": "Under 1% of denied claims are appealed, yet 44-80% of appeals succeed. Learn the step-by-step process to write a winning appeal letter.",
     "published": "2026-02-27",
     "author": "BillKarma Team",
+    "claimcoach": True,
     "category": "Insurance Basics",
     "faqs": [
         {

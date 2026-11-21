@@ -6,6 +6,7 @@ register("insurance-prior-authorization-denied", {
     "meta_description": "What to do when insurance denies prior authorization—peer-to-peer review, the internal and IRO appeals ladder, No Surprises Act timelines, and how to escalate to your state insurance commissioner.",
     "published": "2026-04-10",
     "author": "BillKarma Team",
+    "claimcoach": True,
     "category": "Insurance & Coverage",
     "faqs": [
         {
