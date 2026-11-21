@@ -133,7 +133,8 @@ async def build_letter(case_id: int, payload: dict, device_id: str = Depends(mob
         letter_text = appeal_kit.build_external_review_request(letter_case, _next_level_for(case))
     else:
         paragraph = appeal_kit.case_paragraph(letter_case, str(payload.get("extra_facts") or ""))
-        letter_text = build_appeal_letter({**letter_case, "case_paragraph": paragraph})
+        readable = {key: appeal_kit._pretty_date(letter_case[key]) or letter_case[key] for key in ("denial_date", "service_date")}
+        letter_text = build_appeal_letter({**letter_case, **readable, "case_paragraph": paragraph})
         start = letter_text.find(paragraph) if paragraph else -1
         paragraph_range = [start, start + len(paragraph)] if start >= 0 else None
     cc_cases.save_letter(case_id, letter_text)
