@@ -62,7 +62,12 @@
     Object.keys(details).forEach(function (key) {
       var value = details[key];
       if (value == null) return;
-      if (typeof value === 'object') {
+      if (Array.isArray(value) && value.every(function (v) { return typeof v === 'string'; })) {
+        html += '<div><strong>' + escapeHtml(key.replace(/_/g, ' ')) + ':</strong><ul>' + value.map(function (v) {
+          var safe = escapeHtml(v);
+          return '<li>' + (/^https:\/\//.test(v) ? '<a href="' + safe + '" rel="noopener" target="_blank">' + safe + '</a>' : safe) + '</li>';
+        }).join('') + '</ul></div>';
+      } else if (typeof value === 'object') {
         html += '<div><strong>' + escapeHtml(key.replace(/_/g, ' ')) + ':</strong> <code>' + escapeHtml(JSON.stringify(value)) + '</code></div>';
       } else {
         html += '<div><strong>' + escapeHtml(key.replace(/_/g, ' ')) + ':</strong> ' + escapeHtml(value) + '</div>';

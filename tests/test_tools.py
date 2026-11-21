@@ -20,9 +20,9 @@ client = TestClient(app)
 
 def test_tools_registry_complete_and_unique():
     tools = list_tools()
-    assert len(tools) == 16
+    assert len(tools) == 18
     slugs = [t["slug"] for t in tools]
-    assert len(set(slugs)) == 16
+    assert len(set(slugs)) == 18
     for tool in tools:
         assert tool["title"]
         assert tool["description"]
