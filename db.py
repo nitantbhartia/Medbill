@@ -2083,6 +2083,20 @@ CREATE TABLE IF NOT EXISTS report_unlocks (
 );
 CREATE INDEX IF NOT EXISTS idx_report_unlocks_bill ON report_unlocks(bill_id, status);
 
+CREATE TABLE IF NOT EXISTS scan_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_scan_attempts_key ON scan_attempts(key, created_at);
+
+CREATE TABLE IF NOT EXISTS traffic_landings (
+    day TEXT NOT NULL,
+    source TEXT NOT NULL,
+    landings INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (day, source)
+);
+
 CREATE TABLE IF NOT EXISTS esign_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bill_id INTEGER NOT NULL REFERENCES bills(id),

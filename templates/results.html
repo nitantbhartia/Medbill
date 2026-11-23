@@ -155,7 +155,7 @@
                 <li>Yours to keep. You send it, so you stay in control</li>
             </ul>
             {% if checkout_error == "email" %}<p class="bk-error" role="alert" style="margin: 0 0 10px; color: #b00020">Please enter a valid email address.</p>{% elif checkout_error == "unavailable" %}<p class="bk-error" role="alert" style="margin: 0 0 10px; color: #b00020">Checkout isn&rsquo;t available right now. Please try again in a few minutes.</p>{% endif %}
-            <form method="post" action="/report/checkout">
+            <form method="post" action="/report/checkout" onsubmit="bkTrack('begin_checkout', { value: {{ config.REPORT_PRICE_CENTS / 100 }}, currency: 'USD' })">
                 <input type="hidden" name="bill_id" value="{{ data.bill.id }}">
                 <label for="unlock-email" class="bk-label">Your email</label>
                 <input id="unlock-email" name="email" type="email" class="bk-input" placeholder="you@example.com" autocomplete="email" required style="margin-bottom: 10px">
@@ -235,6 +235,9 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    bkTrack('{{ "purchase" if just_unlocked else "results_viewed" }}', { flagged: {{ charge_summary.charges | length }}{% if just_unlocked %}, value: {{ config.REPORT_PRICE_CENTS / 100 }}, currency: 'USD', transaction_id: 'bill-{{ data.bill.id }}'{% endif %} });
+</script>
 {% if unlocked and charge_summary.charges %}
 <script>
 (function() {

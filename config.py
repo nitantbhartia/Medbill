@@ -105,6 +105,7 @@ AUTO_FILE_COMPLAINTS = os.getenv("AUTO_FILE_COMPLAINTS", "false").lower() == "tr
 COMPLAINT_AUTHORIZATION_START = "2026-11-16"
 
 OPS_QUEUE_REPLY_LIMIT = 50
+OPS_LOGIN_ATTEMPTS_PER_HOUR = 10  # per address, so the admin token cannot be guessed at speed
 
 # Phaxio (fax sending). Twilio shut down its fax API in 2021.
 PHAXIO_API_KEY = os.getenv("PHAXIO_API_KEY", "")
@@ -307,10 +308,19 @@ HOSPITAL_PROCEDURE_SITEMAP_MAX = 40000  # sitemap files allow 50,000 URLs
 HOSPITAL_PROCEDURE_ALTERNATIVES = 5
 HOSPITAL_PROCEDURE_MIN_HOSPITALS = 30  # codes priced by fewer hospitals are noindex and left out of the sitemap
 
+# Free-scan limits (see scan_limits.py). All are counts over the last 24 hours.
+SCAN_DAILY_LIMIT_PER_VISITOR = int(os.getenv("SCAN_DAILY_LIMIT_PER_VISITOR", "3"))  # web: successful scans per browser
+SCAN_DAILY_LIMIT_PER_IP = int(os.getenv("SCAN_DAILY_LIMIT_PER_IP", "8"))  # web: attempts per network address
+SCAN_DAILY_LIMIT_PER_DEVICE = int(os.getenv("SCAN_DAILY_LIMIT_PER_DEVICE", "6"))  # app: successful scans per phone
+SCAN_DAILY_LIMIT_PER_DEVICE_IP = int(os.getenv("SCAN_DAILY_LIMIT_PER_DEVICE_IP", "20"))  # app: attempts per address; carriers share them
+SCAN_DAILY_LIMIT_TOTAL = int(os.getenv("SCAN_DAILY_LIMIT_TOTAL", "400"))  # every scan, web and app
+SCAN_MAX_PAGES = 10  # bill pages, and separately insurance pages, in one scan
+SCAN_MAX_REQUEST_MB = 60  # the whole upload; refused before it is read into memory
+
 # Mobile app
 MOBILE_TOKEN_BYTES = 32
 MOBILE_REGISTER_LIMIT_PER_HOUR = 60  # per IP; carrier and office networks share addresses
-MOBILE_SCAN_MAX_PAGES = 10
+MOBILE_SCAN_MAX_PAGES = SCAN_MAX_PAGES
 MOBILE_EVENT_PROPS_MAX_BYTES = 2048
 MOBILE_PLUS_CACHE_SECONDS = 600
 MOBILE_HOSPITAL_SEARCH_LIMIT = 10

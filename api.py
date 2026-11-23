@@ -16,6 +16,7 @@ import config
 import line_confirmation
 import email_service
 import household
+import scan_limits
 import scan_pipeline
 import scanner
 import analyzer
@@ -281,19 +282,22 @@ async def scan_bill(
     """Scan one or more bill images, extract line items, and analyze."""
     if not images:
         raise HTTPException(400, "No files uploaded")
-
-    # Rate limit by client IP
-    client_ip = _request_client_key(request)
-    if not _check_rate_limit(client_ip):
-        raise HTTPException(
-            429,
-            f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour per IP.",
-        )
-
-    # Validate ZIP code format
+    if len(images) > config.SCAN_MAX_PAGES or len(eob_images or []) > config.SCAN_MAX_PAGES or len(portal_images or []) > config.SCAN_MAX_PAGES:
+        raise HTTPException(400, f"Upload at most {config.SCAN_MAX_PAGES} pages at a time.")
     zip_code = zip_code.strip()
     if not re.fullmatch(r"\d{5}", zip_code):
         raise HTTPException(400, "zip_code must be a 5-digit US ZIP code")
+    email = email.strip()
+    if email and (len(email) > 254 or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)):
+        raise HTTPException(400, "Please enter a valid email address, or leave it empty.")
+
+    # Burst limit per address, then the daily free-scan limits (per visitor, per address, site-wide)
+    client_ip = _request_client_key(request)
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(429, "Too many scans in a short time. Please wait a few minutes and try again.")
+    session_id, created_session = get_or_create_session_id(request)
+    scan_limits.check_and_count(f"visitor:{session_id}", f"ip:{client_ip}",
+                                config.SCAN_DAILY_LIMIT_PER_VISITOR, config.SCAN_DAILY_LIMIT_PER_IP)
 
     # Validate each uploaded file
     max_bytes = config.MAX_UPLOAD_SIZE_MB * 1024 * 1024
@@ -337,14 +341,14 @@ async def scan_bill(
         raise HTTPException(503, "Bill reading is unavailable right now. Please try again later, or email support@billkarma.app.")
     except ValueError as e:
         log.warning("Scan extraction rejected: %s", e)
-        raise HTTPException(400, f"Failed to extract bill data: {e}")
-    except scan_pipeline.AnalysisFailed as e:
-        raise HTTPException(500, f"Failed to analyze bill: {e}")
+        raise HTTPException(400, "We couldn't read that as a medical bill. Try a clearer photo or the PDF of your itemized bill.")
+    except scan_pipeline.AnalysisFailed:
+        raise HTTPException(500, "We read your bill but couldn't check it. Please try again in a minute.")
     except Exception as e:
         log.error("Scan extraction failed: %s", e, exc_info=True)
-        raise HTTPException(500, f"Failed to extract bill data: {e}")
+        raise HTTPException(500, "Something went wrong reading your bill. Please try again in a minute.")
 
-    session_id, created_session = get_or_create_session_id(request)
+    scan_limits.count_success(f"visitor:{session_id}")
     try:
         grant_bill_access(session_id, bill_id)
     except Exception as access_exc:

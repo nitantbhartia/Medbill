@@ -14,6 +14,7 @@ import config
 import dispute_service
 import household
 import referrals
+import traffic
 from access_control import is_admin_request
 from db import get_db
 
@@ -38,8 +39,11 @@ def _back() -> RedirectResponse:
 
 
 @router.get("/ops/login")
-async def ops_login(token: str = ""):
+async def ops_login(request: Request, token: str = ""):
     """Exchange the admin token for a cookie so the queue works in a browser. Use once, then bookmark the queue."""
+    from api import _check_rate_limit, _request_client_key
+    if not _check_rate_limit(f"ops-login:{_request_client_key(request)}", config.OPS_LOGIN_ATTEMPTS_PER_HOUR):
+        raise HTTPException(429, "Too many attempts. Try again in an hour.")
     expected = (config.ADMIN_API_TOKEN or "").strip()
     if not expected or not secrets.compare_digest(token, expected):
         raise HTTPException(403, "Invalid admin token")
@@ -89,6 +93,7 @@ async def ops_partners(request: Request):
         {
             "request": request,
             "counts": referrals.partner_scan_counts(),
+            "sources": traffic.source_report(config.PARTNER_REPORT_DAYS),
             "days": config.PARTNER_REPORT_DAYS,
             "meta_robots": "noindex, nofollow",
         },

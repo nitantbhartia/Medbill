@@ -226,6 +226,7 @@
         Array.from(files).forEach(function (file) { data.append('images', file); });
         drop.classList.add('busy');
         status.textContent = 'Reading your bill. This usually takes under a minute.';
+        bkTrack('scan_started', { from: 'home' });
         fetch('/api/scan', { method: 'POST', body: data })
             .then(function (res) {
                 return res.json().then(function (body) {
@@ -233,7 +234,7 @@
                     return body;
                 });
             })
-            .then(function (body) { window.location.href = '/confirm/' + body.data.bill_id; })
+            .then(function (body) { bkTrack('scan_completed', { from: 'home' }); window.location.href = '/confirm/' + body.data.bill_id; })
             .catch(function (err) {
                 console.error('Bill upload from homepage failed', err);
                 drop.classList.remove('busy');
