@@ -62,6 +62,7 @@ from tools_catalog import list_tools, get_tool
 import access_control
 from access_control import require_bill_access, require_case_access
 from referrals import valid_referral
+import traffic
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -80,7 +81,9 @@ class _CachedStaticFiles(StaticFiles):
         await super().__call__(scope, receive, send_with_cache)
 
 
-app = FastAPI(title=config.APP_NAME)
+# The interactive API docs list every route, admin ones included, so they are off in production.
+_docs = {} if config.ENV != "production" else {"docs_url": None, "redoc_url": None, "openapi_url": None}
+app = FastAPI(title=config.APP_NAME, **_docs)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(api_router)
 app.include_router(mobile_router)
@@ -113,8 +116,10 @@ async def slim_launch_guard(request: Request, call_next):
 @app.middleware("http")
 async def referral_cookie(request: Request, call_next):
     response = await call_next(request)
-    ref = valid_referral(request.query_params.get("ref"))
-    if ref:
+    ref = traffic.source_of(request) if traffic.is_page_visit(request) else None
+    # First touch wins for a month, so a visitor who comes back directly still counts for the source that sent them.
+    if ref and response.status_code == 200 and not valid_referral(request.cookies.get(config.REFERRAL_COOKIE_NAME)):
+        traffic.record_landing(ref)
         response.set_cookie(
             config.REFERRAL_COOKIE_NAME,
             ref,
@@ -150,6 +155,8 @@ async def security_headers(request: Request, call_next):
             request.scope["scheme"] = "https"
 
     declared = request.headers.get("content-length", "")
+    if request.url.path in ("/api/scan", "/api/m/scan") and declared.isdigit() and int(declared) > config.SCAN_MAX_REQUEST_MB * 1024 * 1024:
+        return JSONResponse({"status": "error", "detail": "That upload is too large. Send fewer or smaller pages."}, status_code=413)
     if request.url.path.startswith("/api/m/") and request.headers.get("content-type", "").startswith("application/json") \
             and declared.isdigit() and int(declared) > config.MOBILE_JSON_MAX_BYTES:
         return JSONResponse({"status": "error", "data": {"message": "Request too large"}}, status_code=413)

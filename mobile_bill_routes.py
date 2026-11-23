@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 
 import bill_contact
 import config
@@ -16,11 +16,12 @@ import mobile_accounts
 import mobile_auth
 import mobile_purchases
 import mobile_view
+import scan_limits
 import scan_pipeline
 import scanner
 from access_control import grant_bill_access
 from analyzer import infer_bill_type
-from api import ALLOWED_MIME_TYPES, VALID_OUTCOMES, _check_rate_limit
+from api import ALLOWED_MIME_TYPES, VALID_OUTCOMES, _check_rate_limit, _request_client_key
 from compliance import log_audit
 from db import get_db
 from dispute_workflow import build_dispute_letter, build_phone_script, split_script_sections
@@ -73,6 +74,7 @@ def _remember_bill_type(device_id: str, extracted: dict) -> None:
 
 @router.post("/scan")
 async def scan(
+    request: Request,
     pages: list[UploadFile] = File(...),
     zip_code: str = Form(...),
     eob_pages: list[UploadFile] = File(default=[]),
@@ -87,6 +89,8 @@ async def scan(
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
     if len(eob_pages) > config.MOBILE_SCAN_MAX_PAGES:
         raise HTTPException(400, f"Send at most {config.MOBILE_SCAN_MAX_PAGES} insurance statement pages.")
+    scan_limits.check_and_count(f"device:{device_id}", f"device-ip:{_request_client_key(request)}",
+                                config.SCAN_DAILY_LIMIT_PER_DEVICE, config.SCAN_DAILY_LIMIT_PER_DEVICE_IP)
     images = await _read_pages(pages)
     eob_images = await _read_pages(eob_pages)
     try:
@@ -101,6 +105,7 @@ async def scan(
     grant_bill_access(device_id, bill_id)
     _remember_bill_type(device_id, extracted)
     mobile_accounts.share_bill_with_account(device_id, bill_id)
+    scan_limits.count_success(f"device:{device_id}")
     log_audit(
         action="mobile_scan", resource_type="bill", resource_id=str(bill_id), bill_id=bill_id,
         metadata={"findings": analysis.get("total_findings", 0), "pages": len(images)},
@@ -188,6 +193,7 @@ async def verify_outcome(bill_id: int, pages: list[UploadFile] = File(...),
         raise HTTPException(400, f"Send between 1 and {config.MOBILE_SCAN_MAX_PAGES} pages.")
     if not _check_rate_limit(f"m-scan:{device_id}"):
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
+    scan_limits.count_extra_read()
     images = await _read_pages(pages)
     try:
         result = outcome_verification.verify_with_statement(bill_id, device_id, images)
@@ -209,6 +215,7 @@ async def add_eob(bill_id: int, eob_pages: list[UploadFile] = File(...),
         raise HTTPException(400, f"Send between 1 and {config.MOBILE_SCAN_MAX_PAGES} pages.")
     if not _check_rate_limit(f"m-scan:{device_id}"):
         raise HTTPException(429, f"Too many scans. Max {config.RATE_LIMIT_REQUESTS} per hour.")
+    scan_limits.count_extra_read()
     images = await _read_pages(eob_pages)
     try:
         scan_pipeline.add_eob(bill_id, images, eob_observations.consented(device_id))

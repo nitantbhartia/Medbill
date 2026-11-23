@@ -192,7 +192,7 @@ class TestScanEndpointIntegration:
         )
 
         assert resp.status_code == 500
-        assert "Failed to extract bill data" in resp.json()["detail"]
+        assert "Something went wrong reading your bill" in resp.json()["detail"]
 
     def test_scan_returns_500_when_analysis_fails(self, monkeypatch):
         monkeypatch.setattr(
@@ -214,7 +214,7 @@ class TestScanEndpointIntegration:
         )
 
         assert resp.status_code == 500
-        assert "Failed to analyze bill" in resp.json()["detail"]
+        assert "couldn't check it" in resp.json()["detail"]
 
     def test_scan_to_results_and_dispute_artifacts_flow(self, monkeypatch):
         extracted_payload = {

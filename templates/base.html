@@ -34,6 +34,10 @@
         gtag('config', '{{ config.GA_MEASUREMENT_ID }}');
     </script>
     {% endif %}
+    <script>
+        // Funnel events for Google Analytics; does nothing when analytics is off or blocked.
+        function bkTrack(name, params) { if (window.gtag) { gtag('event', name, params || {}); } }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Inter+Tight:wght@500..700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
     <link rel="preload" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}" as="style">
     <link rel="stylesheet" href="/static/css/tw.css?v={{ config.ASSET_VERSION }}">

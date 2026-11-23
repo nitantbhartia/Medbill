@@ -7,6 +7,22 @@
     <h1 style="margin: 0; font-size: 36px; letter-spacing: -0.03em; font-weight: 800">Partner scans</h1>
     <p class="bk-lede">Bill scans per referral code, last {{ days }} days.</p>
 
+    <h2 style="margin: 32px 0 0; font-size: 22px">Where visitors come from</h2>
+    <p class="bk-muted">New visitors per source, last {{ days }} days. A source is the <span class="bk-mono">?ref=</span> or <span class="bk-mono">?utm_source=</span> on the link, the app whose browser opened it (Instagram, TikTok, Facebook), or the referring site. Bots and direct visits are not counted.</p>
+    {% if not sources %}
+    <p class="bk-muted">No visits from a named source yet.</p>
+    {% else %}
+    <table style="margin-top: 16px">
+        <thead><tr><th style="text-align: left">Source</th><th style="text-align: right">Visitors</th><th style="text-align: right">Bills scanned</th><th style="text-align: right">Last visit</th></tr></thead>
+        <tbody>
+        {% for row in sources %}
+            <tr><td class="bk-mono">{{ row.source }}</td><td style="text-align: right">{{ row.landings }}</td><td style="text-align: right">{{ row.scans }}</td><td style="text-align: right">{{ row.last_day or "" }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2 style="margin: 32px 0 0; font-size: 22px">Scans per referral code</h2>
     {% if not counts %}
     <p class="bk-muted">No referred scans yet.</p>
     {% else %}
