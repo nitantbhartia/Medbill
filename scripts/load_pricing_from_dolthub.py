@@ -248,6 +248,36 @@ def _chunks(values: list[str], size: int) -> list[list[str]]:
     return [values[i : i + size] for i in range(0, len(values), size)]
 
 
+def summarize_dolthub_prices(items: list[dict]) -> dict | None:
+    """Split one hospital's price rows for a code into gross charge, cash price and negotiated rates.
+
+    The gross charge comes only from rows labelled as gross. It is never filled in from negotiated rates:
+    doing so made a hospital's markup look like 1x and earned it an undeserved A grade.
+    """
+    gross_prices, cash_prices, negotiated = [], [], []
+    for item in items:
+        payer = (item.get("payer") or "").lower()
+        price = parse_float(item.get("price"))
+        if price is None:
+            continue
+        if any(k in payer for k in ("gross", "standard", "list", "charge")):
+            gross_prices.append(price)
+        elif any(k in payer for k in ("cash", "self", "uninsured")):
+            cash_prices.append(price)
+        else:
+            negotiated.append(price)
+
+    if not gross_prices and not negotiated:
+        return None
+    return {
+        "gross_charge": max(gross_prices) if gross_prices else None,
+        "cash_price": min(cash_prices) if cash_prices else None,
+        "avg_negotiated_rate": sum(negotiated) / len(negotiated) if negotiated else None,
+        "min_negotiated_rate": min(negotiated) if negotiated else None,
+        "max_negotiated_rate": max(negotiated) if negotiated else None,
+    }
+
+
 def load_prices_for_matches(facility_matches: dict[str, dict], year: int) -> dict[str, int]:
     npi_to_facility = {m["npi"]: fid for fid, m in facility_matches.items()}
     npis = list(npi_to_facility.keys())
@@ -275,34 +305,8 @@ def load_prices_for_matches(facility_matches: dict[str, dict], year: int) -> dic
                 if not facility_id:
                     continue
 
-                gross_candidates = []
-                cash_candidates = []
-                negotiated = []
-                for item in items:
-                    payer = (item.get("payer") or "").lower()
-                    price = parse_float(item.get("price"))
-                    if price is None:
-                        continue
-                    if any(k in payer for k in ("gross", "standard", "list", "charge")):
-                        gross_candidates.append(price)
-                    elif any(k in payer for k in ("cash", "self", "uninsured")):
-                        cash_candidates.append(price)
-                    else:
-                        negotiated.append(price)
-
-                if not gross_candidates and (negotiated or cash_candidates):
-                    gross_candidates = negotiated[:] or cash_candidates[:]
-
-                gross = max(gross_candidates) if gross_candidates else None
-                cash = min(cash_candidates) if cash_candidates else None
-                if negotiated:
-                    avg_neg = sum(negotiated) / len(negotiated)
-                    min_neg = min(negotiated)
-                    max_neg = max(negotiated)
-                else:
-                    avg_neg = min_neg = max_neg = None
-
-                if gross is None and avg_neg is None:
+                summary = summarize_dolthub_prices(items)
+                if summary is None:
                     continue
 
                 upsert_hospital_price(
@@ -310,11 +314,7 @@ def load_prices_for_matches(facility_matches: dict[str, dict], year: int) -> dic
                     {
                         "cpt_code": code,
                         "description": None,
-                        "gross_charge": gross,
-                        "cash_price": cash,
-                        "avg_negotiated_rate": avg_neg,
-                        "min_negotiated_rate": min_neg,
-                        "max_negotiated_rate": max_neg,
+                        **summary,
                     },
                     data_year=year,
                 )
