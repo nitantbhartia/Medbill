@@ -125,3 +125,16 @@ def test_hospital_prices_shows_list_cash_and_medicare_for_real_scan_rows():
 def test_hospital_prices_without_data_says_so():
     data = call("get_hospital_prices", {"facility_id": "999999"})["structuredContent"]
     assert data["found"] is False
+
+
+def test_hospital_prices_fills_missing_description_from_medicare_rate_table():
+    from db import get_db
+    upsert_hospital_row({"facility_id": "440053", "name": "Saint Thomas Rutherford Hospital", "city": "Murfreesboro", "state": "TN",
+                         "zip": "37129", "slug": "saint-thomas-rutherford-hospital-murfreesboro"})
+    with get_db() as db:
+        db.execute("INSERT OR REPLACE INTO hospital_opps_rates (cpt_code, apc, description, national_payment_rate, effective_year) VALUES (?, ?, ?, ?, ?)",
+                   ("74176", "5522", "CT abdomen and pelvis without contrast", 243.77, 2026))
+        db.execute("INSERT OR REPLACE INTO hospital_prices (facility_id, cpt_code, gross_charge, cash_price, medicare_rate, markup_vs_medicare, data_year) "
+                   "VALUES (?, ?, ?, ?, ?, ?, ?)", ("440053", "74176", 4699.40, 1409.82, 243.77, 19.3, 2026))
+    price = call("get_hospital_prices", {"facility_id": "440053", "billing_code": "74176"})["structuredContent"]["prices"][0]
+    assert price["description"] == "CT abdomen and pelvis without contrast"

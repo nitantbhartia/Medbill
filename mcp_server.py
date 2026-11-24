@@ -87,7 +87,10 @@ def find_hospital_billing_office(query: str) -> dict:
 def get_hospital_prices(facility_id: str, billing_code: str = "") -> dict:
     code = billing_code.strip().upper()
     query = """
-        SELECT cpt_code, description, gross_charge, cash_price, medicare_rate, markup_vs_medicare
+        SELECT cpt_code,
+               COALESCE(description, (SELECT o.description FROM hospital_opps_rates o
+                                      WHERE o.cpt_code = hospital_prices.cpt_code ORDER BY o.effective_year DESC LIMIT 1)) AS description,
+               gross_charge, cash_price, medicare_rate, markup_vs_medicare
         FROM hospital_prices
         WHERE facility_id = ? AND gross_charge IS NOT NULL AND medicare_rate IS NOT NULL
           AND data_year = (SELECT MAX(data_year) FROM hospital_prices WHERE facility_id = ? AND gross_charge IS NOT NULL)
