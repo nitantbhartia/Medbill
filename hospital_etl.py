@@ -6,6 +6,7 @@ import csv
 import json
 import os
 import re
+import shutil
 import tempfile
 from glob import glob
 from urllib.error import URLError
@@ -42,7 +43,7 @@ COLUMN_VARIANTS = {
     "description": ["description", "service_description", "procedure_description", "item_description", "service"],
     "gross_charge": ["gross_charge", "gross", "standard_charge", "chargemaster", "list_price", "charge", "price", "amount"],
     "cash_price": ["cash_price", "self_pay", "discounted_cash", "self_pay_price", "cash", "discount_cash_price"],
-    "negotiated_rate": ["negotiated_rate", "allowed_amount", "contracted_rate", "payer_rate", "negotiated_amount"],
+    "negotiated_rate": ["negotiated_rate", "negotiated_dollar", "allowed_amount", "contracted_rate", "payer_rate", "negotiated_amount"],
 }
 
 
@@ -144,9 +145,48 @@ def detect_file_format(path: str) -> str:
     return "unknown"
 
 
-def load_csv_rows(path: str) -> list[dict]:
+CODE_COLUMN = re.compile(r"^code\|(\d+)$")
+BILLING_CODE_TYPES = {"CPT", "HCPCS"}
+
+
+def billing_code(row: dict, fallback_column: str | None = None) -> str | None:
+    """CMS files list several codes per row (code|1, code|2...), each typed. Return the CPT/HCPCS one."""
+    typed_columns = False
+    for key, value in row.items():
+        if not CODE_COLUMN.match(str(key).strip().lower()):
+            continue
+        code_type = row.get(f"{key}|type")
+        if code_type is None:
+            continue
+        typed_columns = True
+        if str(code_type).strip().upper() in BILLING_CODE_TYPES and value:
+            return str(value).strip()
+    if typed_columns:
+        return None
+    return row.get(fallback_column) if fallback_column else None
+
+
+def load_csv_rows(path: str, only_codes: set[str] | None = None) -> list[dict]:
+    """CMS CSVs start with two hospital-info lines before the real header. Streams the file and, when
+    only_codes is given, keeps just those procedures so a 350 MB file does not have to fit in memory."""
+    rows = []
     with open(path, newline="", encoding="utf-8-sig") as f:
-        return list(csv.DictReader(f))
+        reader = csv.reader(f)
+        header = next(reader, None)
+        if header and header[0].strip().lower() == "hospital_name":
+            next(reader, None)
+            header = next(reader, None)
+        if not header:
+            return []
+        code_column = auto_map_columns(header).get("code")
+        for values in reader:
+            row = dict(zip(header, values))
+            if only_codes is not None:
+                code = split_cpt_modifier(billing_code(row, code_column) or "")[0]
+                if code not in only_codes:
+                    continue
+            rows.append(row)
+    return rows
 
 
 def load_json_rows(path: str) -> list[dict]:
@@ -185,9 +225,9 @@ def load_xlsx_rows(path: str) -> list[dict]:
     return rows
 
 
-def load_rows_by_format(path: str, fmt: str) -> list[dict]:
+def load_rows_by_format(path: str, fmt: str, only_codes: set[str] | None = None) -> list[dict]:
     if fmt == "csv":
-        return load_csv_rows(path)
+        return load_csv_rows(path, only_codes)
     if fmt == "json":
         return load_json_rows(path)
     if fmt == "xlsx":
@@ -242,7 +282,7 @@ def normalize_price_rows(rows: list[dict]) -> list[dict]:
 
     normalized = []
     for row in rows:
-        code = row.get(code_col)
+        code = billing_code(row, code_col)
         if code is None:
             continue
         cpt_code, inferred_modifier = split_cpt_modifier(str(code))
@@ -1200,17 +1240,15 @@ def parse_transparency_file(path: str) -> tuple[list[dict], str, str]:
     if fmt == "unknown":
         return [], fmt, "unsupported_format"
 
-    rows = load_rows_by_format(path, fmt)
+    rows = load_rows_by_format(path, fmt, only_codes=TARGET_PROCEDURES)
     if not rows:
-        return [], fmt, "empty_or_unreadable"
+        return [], fmt, "no_standard_codes" if fmt == "csv" else "empty_or_unreadable"
 
     normalized = normalize_price_rows(rows)
     if not normalized:
         return [], fmt, "no_standard_codes"
 
     extracted = [r for r in normalized if r["cpt_code"] in TARGET_PROCEDURES]
-    if not extracted:
-        extracted = normalized[:200]
     return extracted, fmt, "parsed"  # payer-level rows; callers summarize for the SEO table
 
 
@@ -1261,13 +1299,11 @@ def refresh_facility_transparency(
                 if ext not in (".csv", ".xlsx", ".json"):
                     ext = ".csv"
                 try:
-                    with urlopen(str(file_url), timeout=20) as resp:
-                        body = resp.read()
-                    if body:
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-                            tmp.write(body)
-                            temp_download = tmp.name
-                            local_path = temp_download
+                    with urlopen(str(file_url), timeout=20) as resp, tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+                        shutil.copyfileobj(resp, tmp, length=1024 * 1024)
+                        temp_download = tmp.name
+                    if os.path.getsize(temp_download) > 0:
+                        local_path = temp_download
                 except (TimeoutError, URLError, OSError):
                     _update_parse_result(
                         db,

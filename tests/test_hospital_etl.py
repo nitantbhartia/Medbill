@@ -868,3 +868,41 @@ def test_regrade_runs_once():
     _db.init_db()
     assert apply_opps_benchmark_once() is True
     assert apply_opps_benchmark_once() is False
+
+
+RUTHERFORD_SAMPLE = os.path.join(os.path.dirname(__file__), "test_data", "rutherford_cms_sample.csv")
+
+
+def test_cms_file_with_cpt_in_second_code_column_gets_true_gross_charge():
+    rows, fmt, status = hospital_etl.parse_transparency_file(RUTHERFORD_SAMPLE)
+    by_code = {r["cpt_code"]: r for r in hospital_etl.summarize_by_code(rows)}
+
+    assert (fmt, status) == ("csv", "parsed")
+    assert by_code["99285"]["gross_charge"] == 3200.0
+    assert by_code["10060"]["gross_charge"] == 2155.7
+    assert by_code["10060"]["max_negotiated_rate"] == 394.86
+
+
+def test_hospital_without_gross_charge_gets_none_not_a_negotiated_rate():
+    rows, _, _ = hospital_etl.parse_transparency_file(RUTHERFORD_SAMPLE)
+    hip = {r["cpt_code"]: r for r in hospital_etl.summarize_by_code(rows)}["27130"]
+
+    assert hip["gross_charge"] is None
+    assert hip["max_negotiated_rate"] == 23491.0
+
+
+def test_internal_charge_master_codes_are_not_read_as_cpt():
+    rows, _, _ = hospital_etl.parse_transparency_file(RUTHERFORD_SAMPLE)
+
+    assert "33000073" not in {r["cpt_code"] for r in rows}
+
+
+def test_file_with_no_target_procedures_reports_no_standard_codes():
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as tmp:
+        tmp.write("description,code,gross_charge\nFLU SHOT,90686,45.00\n")
+    try:
+        rows, fmt, status = hospital_etl.parse_transparency_file(tmp.name)
+    finally:
+        os.remove(tmp.name)
+
+    assert (rows, fmt, status) == ([], "csv", "no_standard_codes")
