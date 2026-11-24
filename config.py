@@ -272,6 +272,7 @@ GFE_FIELD_MAX_CHARS = 200
 
 # MCP endpoint (/mcp) for AI assistants such as ChatGPT and Claude
 MCP_PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
+MCP_MAX_PRICE_ROWS = 10
 MCP_SERVER_VERSION = "1.0.0"
 MCP_LINK_TAG = "utm_source=ai_assistant&utm_medium=mcp"
 

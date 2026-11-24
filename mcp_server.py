@@ -11,6 +11,7 @@ import json
 import config
 import payment
 from itemized_request import build_request_letter, find_billing_contacts, validate_letter_request
+from db import get_db
 from tools_engine import _hospital_by_name, _lookup_cpt
 
 
@@ -70,6 +71,7 @@ def find_hospital_billing_office(query: str) -> dict:
     for contact in contacts:
         metrics = _hospital_by_name(contact["name"]) or {}
         hospitals.append({
+            "facility_id": contact["facility_id"],
             "name": contact["name"],
             "address": ", ".join(p for p in (contact.get("address"), contact.get("city"), f"{contact.get('state')} {contact.get('zip') or ''}".strip()) if p),
             "main_phone": contact.get("phone"),
@@ -80,6 +82,37 @@ def find_hospital_billing_office(query: str) -> dict:
             "request_itemized_bill": _link(f"/itemized-bill?facility={contact['facility_id']}"),
         })
     return {"hospitals": hospitals, "count": len(hospitals)}
+
+
+def get_hospital_prices(facility_id: str, billing_code: str = "") -> dict:
+    code = billing_code.strip().upper()
+    query = """
+        SELECT cpt_code, description, gross_charge, cash_price, medicare_rate, markup_vs_medicare
+        FROM hospital_prices
+        WHERE facility_id = ? AND gross_charge IS NOT NULL AND medicare_rate IS NOT NULL
+          AND data_year = (SELECT MAX(data_year) FROM hospital_prices WHERE facility_id = ? AND gross_charge IS NOT NULL)
+    """
+    params = [facility_id.strip(), facility_id.strip()]
+    if code:
+        query += " AND cpt_code = ?"
+        params.append(code)
+    query += " ORDER BY markup_vs_medicare DESC LIMIT ?"
+    with get_db() as db:
+        rows = db.execute(query, (*params, config.MCP_MAX_PRICE_ROWS)).fetchall()
+    if not rows:
+        return {"found": False, "message": "No list-price data loaded for this hospital" + (f" and code {code}." if code else " yet."),
+                "check_whole_bill": _link("/scan")}
+    return {
+        "found": True,
+        "facility_id": facility_id.strip(),
+        "prices": [
+            {"billing_code": r["cpt_code"], "description": r["description"], "list_price": r["gross_charge"],
+             "cash_price": r["cash_price"], "medicare_hospital_rate": r["medicare_rate"],
+             "list_times_medicare": round(r["markup_vs_medicare"], 1)}
+            for r in rows
+        ],
+        "note": "List price is not what most insured patients pay. The cash price is the hospital's posted self-pay price.",
+    }
 
 
 def write_itemized_bill_request(**fields) -> dict:
@@ -133,6 +166,18 @@ TOOLS = {
             "type": "object",
             "properties": {"query": {"type": "string", "description": "Hospital name or city"}},
             "required": ["query"],
+        },
+    },
+    "get_hospital_prices": {
+        "handler": get_hospital_prices,
+        "description": "A hospital's own posted list price and cash price next to Medicare's hospital rate, for its highest-markup procedures or one billing code. Get facility_id from find_hospital_billing_office.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "facility_id": {"type": "string", "description": "facility_id returned by find_hospital_billing_office"},
+                "billing_code": {"type": "string", "description": "Optional CPT code, e.g. 74176; leave out for the highest-markup procedures"},
+            },
+            "required": ["facility_id"],
         },
     },
     "write_itemized_bill_request": {

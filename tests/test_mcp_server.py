@@ -47,7 +47,7 @@ def test_notification_is_accepted_without_body():
 def test_tools_are_listed_read_only():
     tools = rpc("tools/list").json()["result"]["tools"]
     names = {t["name"] for t in tools}
-    assert names == {"check_hospital_charge", "find_hospital_billing_office", "write_itemized_bill_request", "get_dispute_price"}
+    assert names == {"check_hospital_charge", "find_hospital_billing_office", "get_hospital_prices", "write_itemized_bill_request", "get_dispute_price"}
     assert all(t["annotations"]["readOnlyHint"] for t in tools)
 
 
@@ -104,3 +104,24 @@ def test_ai_page_shows_connector_url_and_every_tool():
     for name in ("check_hospital_charge", "find_hospital_billing_office", "write_itemized_bill_request", "get_dispute_price"):
         assert name in html
     assert "/ai</loc>" in client.get("/sitemap-core.xml").text
+
+
+def test_hospital_prices_shows_list_cash_and_medicare_for_real_scan_rows():
+    from db import get_db
+    upsert_hospital_row({"facility_id": "440053", "name": "Saint Thomas Rutherford Hospital", "city": "Murfreesboro", "state": "TN",
+                         "zip": "37129", "slug": "saint-thomas-rutherford-hospital-murfreesboro"})
+    rows = [("72148", "MRI lower back without contrast", 3339.60, 1001.88, 243.77, 13.7),
+            ("99282", "ER visit level 2", 1910.00, 573.00, 156.87, 12.2)]
+    with get_db() as db:
+        for code, description, gross, cash, medicare, markup in rows:
+            db.execute("INSERT INTO hospital_prices (facility_id, cpt_code, description, gross_charge, cash_price, medicare_rate, markup_vs_medicare, data_year) "
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", ("440053", code, description, gross, cash, medicare, markup, 2026))
+    top = call("get_hospital_prices", {"facility_id": "440053"})["structuredContent"]
+    assert [p["billing_code"] for p in top["prices"]] == ["72148", "99282"]
+    one = call("get_hospital_prices", {"facility_id": "440053", "billing_code": "99282"})["structuredContent"]["prices"][0]
+    assert (one["list_price"], one["cash_price"], one["medicare_hospital_rate"], one["list_times_medicare"]) == (1910.0, 573.0, 156.87, 12.2)
+
+
+def test_hospital_prices_without_data_says_so():
+    data = call("get_hospital_prices", {"facility_id": "999999"})["structuredContent"]
+    assert data["found"] is False
