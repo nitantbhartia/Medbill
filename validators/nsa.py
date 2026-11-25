@@ -16,7 +16,12 @@ def check_no_surprises_act(bill_data: dict) -> dict | None:
 
     total_charged = bill_data.get("total_charged", 1) or 1
     total_patient_owes = bill_data.get("total_patient_owes", 0) or 0
-    high_patient_responsibility = total_patient_owes > total_charged * 0.5
+    has_insurance = bool(bill_data.get("insurer_name")) or any(
+        (item.get("insurance_paid") or 0) > 0 or (item.get("insurance_adjustment") or 0) > 0
+        for item in line_items
+    )
+    # Self-pay bills owe everything by definition, so a high share says nothing about surprise billing.
+    high_patient_responsibility = has_insurance and total_patient_owes > total_charged * 0.5
 
     out_of_network = any(
         "out of network" in ((item.get("description") or "").lower())

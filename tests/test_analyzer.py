@@ -51,7 +51,7 @@ class TestAnalyzeBill:
         assert len(markups) >= 1
 
     def test_nsa_detected_for_emergency_high_oop(self):
-        result = analyze_bill(SAMPLE_BILL_EMERGENCY_HIGH_OOP, "33021")
+        result = analyze_bill({**SAMPLE_BILL_EMERGENCY_HIGH_OOP, "insurer_name": "Aetna"}, "33021")
         nsa = [f for f in result["findings"] if f["type"] == "no_surprises_act"]
         assert len(nsa) >= 1
 

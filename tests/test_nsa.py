@@ -6,7 +6,7 @@ from tests.conftest import SAMPLE_BILL_EMERGENCY_HIGH_OOP
 
 class TestNoSurprisesAct:
     def test_emergency_high_oop_flagged(self):
-        result = check_no_surprises_act(SAMPLE_BILL_EMERGENCY_HIGH_OOP)
+        result = check_no_surprises_act({**SAMPLE_BILL_EMERGENCY_HIGH_OOP, "insurer_name": "Aetna"})
         assert result is not None
         assert result["type"] == "no_surprises_act"
         assert result["severity"] == "high"
@@ -55,3 +55,26 @@ class TestNoSurprisesAct:
             ],
         }
         assert check_no_surprises_act(bill) is None
+
+    def test_self_pay_rutherford_bill_not_flagged(self):
+        bill = {
+            "provider_name": "Saint Thomas Rutherford Hospital",
+            "total_charged": 6609.40,
+            "total_patient_owes": 6609.40,
+            "line_items": [
+                {"cpt_code": "74176", "description": "CT abdomen and pelvis without contrast", "charged_amount": 4699.40},
+                {"cpt_code": "99282", "description": "Emergency department visit, level 2", "charged_amount": 1910.00},
+            ],
+        }
+        assert check_no_surprises_act(bill) is None
+
+    def test_insured_emergency_bill_with_payments_flagged(self):
+        bill = {
+            "total_charged": 6609.40,
+            "total_patient_owes": 5200.00,
+            "line_items": [
+                {"cpt_code": "99282", "description": "Emergency department visit, level 2",
+                 "charged_amount": 1910.00, "insurance_paid": 150.00, "insurance_adjustment": 300.00},
+            ],
+        }
+        assert check_no_surprises_act(bill) is not None
