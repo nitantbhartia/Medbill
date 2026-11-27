@@ -599,9 +599,10 @@ def startup():
         except Exception:
             logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
     def _load_san_diego_prices():
-        from price_file_loader import load_san_diego_prices_once
+        from price_file_loader import load_san_diego_prices_once, refresh_san_diego_page_text_once
         try:
             load_san_diego_prices_once()
+            refresh_san_diego_page_text_once()
         except Exception:
             logging.exception("San Diego price load failed; it is recorded as attempted and will not rerun")
     if config.ENV == "production":

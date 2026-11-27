@@ -28,12 +28,18 @@ from hospital_etl import (
     summarize_by_code,
     upsert_facility_procedure_price,
 )
-from hospital_seo import log_refresh, recompute_billing_metrics, recompute_facility_billing_metrics
+from hospital_seo import (
+    generate_and_save_hospital_content,
+    log_refresh,
+    recompute_billing_metrics,
+    recompute_facility_billing_metrics,
+)
 
 log = logging.getLogger(__name__)
 
 SAN_DIEGO_LOAD_SOURCE = "san_diego_price_files_v2"  # v1 loaded nothing: every file had several charge lines for 99285
 DATABASE_COPY_SUFFIX = ".before-san_diego_price_files_v1"
+PAGE_TEXT_SOURCE = "san_diego_page_text_v1"
 UPDATED_ON_FORMATS = ("%m/%d/%Y", "%Y-%m-%d")
 LISTED_LOAD_SOURCE = "listed_price_files"
 _load_running = threading.Lock()
@@ -185,6 +191,7 @@ def load_listed_hospitals(targets: list[dict]) -> list[dict]:
         if loaded:
             recompute_billing_metrics(only_facility_ids=loaded)
             recompute_facility_billing_metrics()
+            generate_and_save_hospital_content(only_facility_ids=loaded)
         log_refresh(LISTED_LOAD_SOURCE, len(loaded), "success" if loaded else "failed", json.dumps(results))
         log.warning("Price load finished: %s", json.dumps(results))
         return results
@@ -250,6 +257,7 @@ def load_san_diego_prices_once() -> list[dict] | None:
     loaded = {r["facility_id"] for r in results if r["status"] == "loaded"}
     if loaded:
         recompute_billing_metrics(only_facility_ids=loaded)
+        generate_and_save_hospital_content(only_facility_ids=loaded)
         with get_db() as db:
             grades = {row["facility_id"]: dict(row) for row in db.execute(
                 "SELECT facility_id, billing_grade, avg_markup_vs_medicare, procedures_compared FROM billing_metrics")
@@ -259,3 +267,16 @@ def load_san_diego_prices_once() -> list[dict] | None:
     log.warning("San Diego price load finished: %s", json.dumps(results))
     log_location_mismatches()
     return results
+
+
+def refresh_san_diego_page_text_once() -> int | None:
+    """The v2 load graded the hospitals but left their stored page text saying they could not be graded.
+    One-off catch-up for that run; returns None if already done."""
+    with get_db() as db:
+        done = db.execute("SELECT 1 FROM data_refresh_log WHERE source = ? LIMIT 1", (PAGE_TEXT_SOURCE,)).fetchone()
+    if done:
+        return None
+    saved = generate_and_save_hospital_content(only_facility_ids={entry[0] for entry in config.SAN_DIEGO_PRICE_FILES})
+    log_refresh(PAGE_TEXT_SOURCE, saved, "success")
+    log.warning("Page text regenerated for %s San Diego hospitals", saved)
+    return saved
