@@ -2124,7 +2124,7 @@ def generate_deterministic_tips(hospital: dict, financials: dict, comparison: di
     return "\n\n".join((para1, para2, para3))
 
 
-def generate_and_save_hospital_content(limit: int | None = None) -> int:
+def generate_and_save_hospital_content(limit: int | None = None, only_facility_ids: set[str] | None = None) -> int:
     with get_db() as db:
         query = (
             """
@@ -2142,6 +2142,8 @@ def generate_and_save_hospital_content(limit: int | None = None) -> int:
             rows = db.execute(query, (limit,)).fetchall()
         else:
             rows = db.execute(query).fetchall()
+        if only_facility_ids is not None:
+            rows = [row for row in rows if row["facility_id"] in only_facility_ids]
 
         saved = 0
         for row in rows:
