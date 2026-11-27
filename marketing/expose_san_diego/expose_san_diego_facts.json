@@ -1,0 +1,77 @@
+{
+  "CITY": "San Diego",
+  "MILES": 5,
+  "MILES_WORDING": "about 5 miles apart",
+  "MILES_EXACT": 4.78,
+  "HOSP_A_NAME": "Kaiser Foundation Hospital - San Diego",
+  "PRICE_A": 6316.0,
+  "PRICE_A_DISPLAY": "$6,316",
+  "MULT_A": 8.1,
+  "GRADE_A": "D",
+  "HOSP_B_NAME": "Scripps Mercy Hospital",
+  "PRICE_B": 7874.25,
+  "PRICE_B_DISPLAY": "$7,874.25",
+  "MULT_B": 10.1,
+  "GRADE_B": "F",
+  "RATIO": 1,
+  "RATIO_EXACT": 1.2467,
+  "PERCENT_MORE": 25,
+  "GAP_WORDING": "25% more",
+  "GRADES_SHOWN": false,
+  "notes": [
+    "No San Diego hospital with a 99285 list price is graded A or B (all eight are D or F), so the pair is the lowest and highest list price and grade words are left out of the script and visuals.",
+    "RATIO rounds to 1, so the video says '25% more' and the opening graphic reads '25% PRICE DIFFERENCE'.",
+    "Kaiser San Marcos also lists $6,316 and Scripps Memorial La Jolla also lists $7,874.25; the two hospitals inside the city of San Diego were used.",
+    "Hospital names are the CMS Hospital General Information names (CMS prints them in capitals).",
+    "The Scripps file also lists 'HC ER Level V Trauma' at $23,622.75 under 99285; the plain visit line is used.",
+    "v2: the hook is HOSP_B's multiple rounded to a whole number (10.1 shown as 10x); the cards still show 10.1x and 8.1x.",
+    "v2: captions use the short names 'Scripps Mercy' and 'Kaiser San Diego' from the revised script; the cards carry the full CMS names.",
+    "v2: the spoken price in the revised script drops the cents ($7,874); the caption and card show $7,874.25.",
+    "light v1: on-screen numbers are rounded for a calmer read: $7,874.25 shown as $7,874, 10.1x as 10x, 8.1x as 8x. Spoken lines round further ($7,874.25 as 'nearly seventy-nine hundred', $6,316 as 'sixty-three hundred')."
+  ],
+  "medicare": {
+    "cpt_code": "99285",
+    "zip_code": "92103",
+    "medicare_rate": 171.35,
+    "opps_rate": 608.43,
+    "total_medicare": 779.78
+  },
+  "cms_addresses": {
+    "HOSP_A": "4647 ZION AVE, SAN DIEGO, CA 92120 (CCN 050515)",
+    "HOSP_B": "4077 5TH AVE, SAN DIEGO, CA 92103 (CCN 050077)"
+  },
+  "coordinates": {
+    "HOSP_A": [
+      32.7929151825,
+      -117.095433072406
+    ],
+    "HOSP_B": [
+      32.751296369512,
+      -117.161066498781
+    ],
+    "geocoder": "US Census Geocoder, benchmark Public_AR_Current"
+  },
+  "file_lines": {
+    "HOSP_A": "FACILITY USE-EMERGENCY ROOM, LEVEL 5 (file last updated 2026-04-01)",
+    "HOSP_B": "HC ER Level V (file last updated 2026-03-30)"
+  },
+  "checked_in_production": "2026-11-27T09:31Z, POST https://billkarma.app/mcp tools get_hospital_prices and find_hospital_billing_office",
+  "sources": {
+    "PRICE_A": "https://healthy.kaiserpermanente.org/content/dam/kporg/final/documents/health-plan-documents/coverage-information/machine-readable/941105628-san-diego-zion-medical-center-standard-charges-scal-en.csv",
+    "PRICE_A_index": "https://healthy.kaiserpermanente.org/cms-hpt.txt",
+    "PRICE_B": "https://apps.scripps.org/pricetransparency/951684089_Scripps-Mercy-Hospital-San-Diego_standardcharges.csv",
+    "PRICE_B_index": "https://www.scripps.org/cms-hpt.txt",
+    "MULT": "https://billkarma.app/api/calculator/cost?cpt_code=99285&zip_code=92103",
+    "GRADES": "https://billkarma.app/data/hospital-billing-grades.csv",
+    "NAMES_AND_ADDRESSES": "https://data.cms.gov/provider-data/dataset/xubh-q36u",
+    "MILES": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
+  },
+  "HOOK_MULT": 10,
+  "HOOK_WORDING": "10x MEDICARE",
+  "MULT_A_WORDING": "over 8 times Medicare",
+  "PRICE_B_ROUNDED_DISPLAY": "$7,874",
+  "PRICE_B_SPOKEN": "nearly seventy-nine hundred dollars",
+  "PRICE_A_SPOKEN": "sixty-three hundred",
+  "MULT_A_ROUNDED": 8,
+  "MULT_B_ROUNDED": 10
+}
