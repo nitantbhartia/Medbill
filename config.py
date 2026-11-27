@@ -574,6 +574,9 @@ SAN_DIEGO_PRICE_FILES = (
     ("050222", "SHARP CHULA VISTA", "https://downloads.ctfassets.net/pxcfulgsd9e2/D4fRN51N03oyjM0c54C1U/cbd502f0357445b1fc46bdeaac647efc/95-2367304_sharp-chula-vista-medical-center_standardcharges.csv"),
 )
 ER_VISIT_CODES = ("99281", "99282", "99283", "99284", "99285")
+# Hospitals file several charge lines under one ER visit code (seen in the Scripps and Sharp files: "HC ER Level V Trauma",
+# "HC ER TYPE CRITICAL LT 30MIN", "HC ER LWBS W/TESTS PROVIDED"). Lines with these words are not the plain visit charge.
+ER_SPECIAL_LINE_WORDS = ("TRAUMA", "CRITICAL", "LWBS")
 ER_GRADE_CODE = "99285"  # a hospital's file is only loaded if it lists a gross charge for this code
 PRICE_FILE_MAX_BYTES = 3 * 1024**3
 PRICE_FILE_TIMEOUT_SECONDS = 120

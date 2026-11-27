@@ -30,7 +30,8 @@ from hospital_seo import log_refresh, recompute_billing_metrics
 
 log = logging.getLogger(__name__)
 
-SAN_DIEGO_LOAD_SOURCE = "san_diego_price_files_v1"
+SAN_DIEGO_LOAD_SOURCE = "san_diego_price_files_v2"  # v1 loaded nothing: every file had several charge lines for 99285
+DATABASE_COPY_SUFFIX = ".before-san_diego_price_files_v1"
 UPDATED_ON_FORMATS = ("%m/%d/%Y", "%Y-%m-%d")
 
 
@@ -67,17 +68,22 @@ def _is_hospital_list_price_row(row: dict) -> bool:
 def read_list_prices(path: str) -> list[dict]:
     """One row per tracked code with the file's gross charge and discounted cash price.
 
-    ER visit codes are read only from base hospital rows, and a code whose rows disagree on the gross charge is
-    left out rather than guessed. Raises ValueError when that leaves no gross charge for the Level 5 visit."""
+    ER visit codes are read only from base hospital rows. Where a code has several charge lines, the trauma,
+    critical-care and left-without-being-seen lines are set aside; if the rest still disagree on the gross charge,
+    the code is left out rather than guessed. Raises ValueError when that leaves no gross charge for the Level 5 visit."""
     rows = load_csv_rows(path, only_codes=TARGET_PROCEDURES)
     er_rows = [r for r in normalize_price_rows([r for r in rows if _is_hospital_list_price_row(r)]) if r["cpt_code"] in config.ER_VISIT_CODES]
     other_rows = [r for r in normalize_price_rows(rows) if r["cpt_code"] in TARGET_PROCEDURES and r["cpt_code"] not in config.ER_VISIT_CODES]
 
     for code in config.ER_VISIT_CODES:
-        charges = sorted({(r["gross_charge"], r["description"]) for r in er_rows if r["cpt_code"] == code and r["gross_charge"]})
-        if len({charge for charge, _ in charges}) > 1:
-            log.warning("%s lists %s with more than one gross charge, not loading that code: %s", path, code, charges)
-            er_rows = [r for r in er_rows if r["cpt_code"] != code]
+        lines = [r for r in er_rows if r["cpt_code"] == code and r["gross_charge"]]
+        if len({r["gross_charge"] for r in lines}) > 1:
+            lines = [r for r in lines if not any(word in (r["description"] or "").upper() for word in config.ER_SPECIAL_LINE_WORDS)]
+        if len({r["gross_charge"] for r in lines}) > 1:
+            log.warning("%s lists %s with more than one plain visit charge, not loading that code: %s",
+                        path, code, sorted({(r["gross_charge"], r["description"]) for r in lines}))
+            lines = []
+        er_rows = [r for r in er_rows if r["cpt_code"] != code] + lines
     if not any(r["cpt_code"] == config.ER_GRADE_CODE and r["gross_charge"] for r in er_rows):
         raise ValueError(f"no single gross charge for {config.ER_GRADE_CODE} in the file")
     return [price for price in summarize_by_code(er_rows + other_rows) if price["cpt_modifier"] is None]
@@ -129,7 +135,9 @@ def backup_database() -> str | None:
     if shutil.disk_usage(os.path.dirname(config.DB_PATH) or ".").free < 2 * os.path.getsize(config.DB_PATH):
         log.error("Not enough free disk to copy %s before the price load; loading without a copy", config.DB_PATH)
         return None
-    target = f"{config.DB_PATH}.before-{SAN_DIEGO_LOAD_SOURCE}"
+    target = config.DB_PATH + DATABASE_COPY_SUFFIX
+    if os.path.exists(target):  # the v1 attempt made this copy and then loaded nothing
+        return target
     source, copy = sqlite3.connect(config.DB_PATH), sqlite3.connect(target)
     try:
         source.backup(copy)
@@ -152,9 +160,10 @@ def log_location_mismatches() -> None:
     except (KeyError, csv.Error, ValueError) as error:
         log.error("CMS hospital directory not in the expected layout, locations not checked: %r", error)
         return
-    mismatches.sort(key=lambda m: m["billing_grade"] not in config.GRADED_LETTERS)  # graded hospitals first: they are in the public CSV
-    log.warning("Hospitals whose city/state differ from the CMS record: %s (logging the first %s)", len(mismatches), config.LOCATION_MISMATCH_LOG_LIMIT)
-    for mismatch in mismatches[:config.LOCATION_MISMATCH_LOG_LIMIT]:
+    wrong_place = [m for m in mismatches if m["cms_city"]]
+    log.warning("Hospital locations checked against CMS: %s saved under a different city/state, %s graded hospitals with no CMS record",
+                len(wrong_place), len(mismatches) - len(wrong_place))
+    for mismatch in wrong_place[:config.LOCATION_MISMATCH_LOG_LIMIT]:
         log.warning("Location differs from CMS: %s", json.dumps(mismatch))
 
 

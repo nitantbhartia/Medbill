@@ -76,12 +76,35 @@ def test_hospital_without_a_level_5_gross_charge_is_skipped(tmp_path):
         price_file_loader.read_list_prices(path)
 
 
-def test_two_different_level_5_charges_are_not_guessed_between(tmp_path):
+def test_two_plain_level_5_charges_are_not_guessed_between(tmp_path):
     path = write_file(tmp_path, "HC ED VISIT LEVEL 5,99285,CPT,,outpatient,facility,4211.00,2105.50\n"
-                                "HC ED VISIT LEVEL 5 TRAUMA,99285,CPT,,outpatient,facility,6890.00,3445.00\n")
+                                "HC ED VISIT LEVEL 5 EXTENDED,99285,CPT,,outpatient,facility,6890.00,3445.00\n")
 
     with pytest.raises(ValueError, match="99285"):
         price_file_loader.read_list_prices(path)
+
+
+def test_trauma_critical_and_lwbs_lines_are_not_the_visit_charge(tmp_path):
+    # Charge lines and gross charges as published in Sharp Memorial Hospital's file (cash prices here are illustrative).
+    path = write_file(tmp_path, "HC ER LWBS W/TESTS PROVIDED,99281,CPT,,outpatient,facility,500.00,250.00\n"
+                                "HC ER TYPE I MINIMAL,99281,CPT,,outpatient,facility,999.00,499.50\n"
+                                "HC EMERGENCY DEPARTMENT LEVEL 4 VISIT HIGH/URGENT SEVERITY,99284,CPT,,outpatient,facility,5200.00,2600.00\n"
+                                "HC ER TRAUMA LVL IV,99284,CPT,,outpatient,facility,10400.00,5200.00\n"
+                                "HC EMERGENCY DEPARTMENT LEVEL 5 VISIT HIGH SEVERITY&THREAT FUNC,99285,CPT,,outpatient,facility,7600.00,3800.00\n"
+                                "HC ER TYPE CRITICAL LT 30MIN,99285,CPT,,outpatient,facility,9500.00,4750.00\n"
+                                "HC ER TRAUMA LVL V ADVANCED,99285,CPT,,outpatient,facility,15200.00,7600.00\n")
+
+    prices = {p["cpt_code"]: p["gross_charge"] for p in price_file_loader.read_list_prices(path)}
+
+    assert prices == {"99281": 999.0, "99284": 5200.0, "99285": 7600.0}
+
+
+def test_a_lone_trauma_line_is_still_the_only_published_charge(tmp_path):
+    path = write_file(tmp_path, "HC ER LEVEL V TRAUMA,99285,CPT,,outpatient,facility,23622.75,11811.38\n")
+
+    prices = price_file_loader.read_list_prices(path)
+
+    assert [(p["cpt_code"], p["gross_charge"]) for p in prices] == [("99285", 23622.75)]
 
 
 def test_physician_inpatient_and_modifier_rows_are_not_the_er_list_price(tmp_path):
