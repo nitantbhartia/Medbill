@@ -186,6 +186,24 @@ def test_regrade_of_one_hospital_leaves_other_grades_alone():
     assert grades == {"440053": "B", "050100": "D"}
 
 
+def test_page_text_catch_up_rewrites_only_the_san_diego_hospitals_and_runs_once(monkeypatch):
+    upsert_hospital_row(RUTHERFORD)
+    upsert_hospital_row({"facility_id": "050100", "name": "SHARP MEMORIAL HOSPITAL", "city": "SAN DIEGO", "state": "CA", "zip": "92123"})
+    stale = "SHARP MEMORIAL HOSPITAL does not have enough pricing data in their published file for BillKarma to compute a billing grade."
+    with get_db() as db:
+        db.execute("INSERT INTO billing_metrics (facility_id, billing_grade, avg_markup_vs_medicare, procedures_compared) VALUES ('050100', 'F', 10.21, 31)")
+        db.executemany("INSERT INTO hospital_content (facility_id, dispute_tips) VALUES (?, ?)", [("050100", stale), ("440053", "kept as written")])
+    monkeypatch.setattr(config, "SAN_DIEGO_PRICE_FILES", (("050100", "SHARP MEMORIAL", RUTHERFORD_URL),))
+
+    assert price_file_loader.refresh_san_diego_page_text_once() == 1
+    assert price_file_loader.refresh_san_diego_page_text_once() is None
+
+    with get_db() as db:
+        tips = {r["facility_id"]: r["dispute_tips"] for r in db.execute("SELECT facility_id, dispute_tips FROM hospital_content")}
+    assert "enough pricing data" not in tips["050100"] and "10.2x" in tips["050100"]
+    assert tips["440053"] == "kept as written"
+
+
 def test_hospital_city_and_state_match_its_cms_record():
     load_cms_general(CMS_GENERAL)
 
