@@ -1623,9 +1623,12 @@ def recompute_benchmarks() -> int:
     return inserted
 
 
-def recompute_billing_metrics() -> int:
+def recompute_billing_metrics(only_facility_ids: set[str] | None = None) -> int:
+    """Grade every hospital, or just the given ones; state rank and national percentile are always refreshed for all."""
     with get_db() as db:
         facilities = db.execute("SELECT facility_id, state FROM hospitals").fetchall()
+        if only_facility_ids is not None:
+            facilities = [f for f in facilities if f["facility_id"] in only_facility_ids]
         transparency = {
             row["facility_id"]: {
                 "parse_status": row["parse_status"],

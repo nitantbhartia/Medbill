@@ -378,6 +378,8 @@ def _run_migrations(db):
             "facility_type": "TEXT",
             "medicare_benchmark_type": "TEXT",
             "medicare_benchmark_rate": "REAL",
+            "source_url": "TEXT",
+            "source_updated_on": "DATE",
         },
     )
     db.execute(

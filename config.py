@@ -563,3 +563,19 @@ MEDICAID_RETRO_MONTHS_EXPANSION_ADULT = 1  # P.L. 119-21 sec. 71112
 MEDICAID_RETRO_MONTHS_OTHER = 2  # P.L. 119-21 sec. 71112
 MEDICAID_RETRO_LAW_URL = "https://www.congress.gov/bill/119th-congress/house-bill/1/text"
 MEDICAID_RETRO_CMS_BULLETIN_URL = "https://www.medicaid.gov/federal-policy-guidance/downloads/cib11182025.pdf"
+
+# San Diego County hospitals' standard-charges files, as listed in each system's /cms-hpt.txt on 2026-11-27.
+# Each entry: CMS certification number, a phrase the CMS hospital name must contain, the file URL.
+SAN_DIEGO_PRICE_FILES = (
+    ("050077", "SCRIPPS MERCY", "https://apps.scripps.org/pricetransparency/951684089_Scripps-Mercy-Hospital-San-Diego_standardcharges.csv"),
+    ("050324", "LA JOLLA", "https://apps.scripps.org/pricetransparency/951684089_Scripps-Memorial-Hospital-La-Jolla_standardcharges.csv"),
+    ("050100", "SHARP MEMORIAL", "https://downloads.ctfassets.net/pxcfulgsd9e2/7kOO19WgXRFqOFfWyPsSCE/1dd67ee60fbf2a34d729812c39abb1fe/95-3782169_sharp-memorial-hospital_standardcharges.csv"),
+    ("050026", "GROSSMONT", "https://downloads.ctfassets.net/pxcfulgsd9e2/pDe4LFVvP8fh5nOJd8Zji/71b0885eb86902c17aee42e048ea796b/33-0449527_grossmont-hospital-corporation_standardcharges.csv"),
+    ("050222", "SHARP CHULA VISTA", "https://downloads.ctfassets.net/pxcfulgsd9e2/D4fRN51N03oyjM0c54C1U/cbd502f0357445b1fc46bdeaac647efc/95-2367304_sharp-chula-vista-medical-center_standardcharges.csv"),
+)
+ER_VISIT_CODES = ("99281", "99282", "99283", "99284", "99285")
+ER_GRADE_CODE = "99285"  # a hospital's file is only loaded if it lists a gross charge for this code
+PRICE_FILE_MAX_BYTES = 3 * 1024**3
+PRICE_FILE_TIMEOUT_SECONDS = 120
+PRICE_FILE_USER_AGENT = "BillKarma data loader (billkarma.app)"
+LOCATION_MISMATCH_LOG_LIMIT = 40
