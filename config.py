@@ -563,3 +563,17 @@ MEDICAID_RETRO_MONTHS_EXPANSION_ADULT = 1  # P.L. 119-21 sec. 71112
 MEDICAID_RETRO_MONTHS_OTHER = 2  # P.L. 119-21 sec. 71112
 MEDICAID_RETRO_LAW_URL = "https://www.congress.gov/bill/119th-congress/house-bill/1/text"
 MEDICAID_RETRO_CMS_BULLETIN_URL = "https://www.medicaid.gov/federal-policy-guidance/downloads/cib11182025.pdf"
+
+# Hospital price file loads (mrf_loader.py)
+ER_VISIT_CODES = ("99281", "99282", "99283", "99284", "99285")
+ER_LEVEL_5_CODE = "99285"
+MRF_SOCKET_TIMEOUT_SECONDS = 120
+MRF_SNIFF_BYTES = 64  # enough of the file's start to tell CSV from JSON, a zip or an error page
+CMS_HPT_MAX_BYTES = 1_000_000  # cms-hpt.txt is a few kilobytes; anything larger is not that file
+PRICE_LOAD_MAX_TARGETS = 25  # hospitals per POST /ops/load-hospital-prices
+DB_BACKUP_FREE_SPACE_FACTOR = 1.5  # free disk needed, as a multiple of the database size, to copy it before a load
+
+# Hospital locations (hospital_locations.py)
+NPI_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/api/"
+NPI_REGISTRY_TIMEOUT_SECONDS = 20
+NPI_REGISTRY_PAUSE_SECONDS = 0.1  # between lookups, to stay polite to the registry

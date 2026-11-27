@@ -13,7 +13,7 @@ from urllib.error import URLError
 from urllib.parse import urlparse
 from urllib.request import urlopen
 from datetime import date
-from typing import Iterable
+from typing import Iterable, Iterator
 
 import code_lookup
 import payer_rates
@@ -167,26 +167,31 @@ def billing_code(row: dict, fallback_column: str | None = None) -> str | None:
 
 
 def load_csv_rows(path: str, only_codes: set[str] | None = None) -> list[dict]:
-    """CMS CSVs start with two hospital-info lines before the real header. Streams the file and, when
-    only_codes is given, keeps just those procedures so a 350 MB file does not have to fit in memory."""
-    rows = []
     with open(path, newline="", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
+        return list(read_csv_rows(f, only_codes))
+
+
+def read_csv_rows(lines: Iterable[str], only_codes: set[str] | None = None, preamble: dict | None = None) -> Iterator[dict]:
+    """CMS CSVs start with two hospital-info lines before the real header; they are copied into preamble.
+    Yields one row at a time and, when only_codes is given, just those procedures, so a 600 MB file
+    (or a download still in progress) never has to fit in memory."""
+    reader = csv.reader(lines)
+    header = next(reader, None)
+    if header and header[0].strip().lower() == "hospital_name":
+        info = next(reader, None) or []
+        if preamble is not None:
+            preamble.update(zip((h.strip().lower() for h in header), info))
         header = next(reader, None)
-        if header and header[0].strip().lower() == "hospital_name":
-            next(reader, None)
-            header = next(reader, None)
-        if not header:
-            return []
-        code_column = auto_map_columns(header).get("code")
-        for values in reader:
-            row = dict(zip(header, values))
-            if only_codes is not None:
-                code = split_cpt_modifier(billing_code(row, code_column) or "")[0]
-                if code not in only_codes:
-                    continue
-            rows.append(row)
-    return rows
+    if not header:
+        return
+    code_column = auto_map_columns(header).get("code")
+    for values in reader:
+        row = dict(zip(header, values))
+        if only_codes is not None:
+            code = split_cpt_modifier(billing_code(row, code_column) or "")[0]
+            if code not in only_codes:
+                continue
+        yield row
 
 
 def load_json_rows(path: str) -> list[dict]:
@@ -313,7 +318,11 @@ def normalize_price_rows(rows: list[dict]) -> list[dict]:
 
 
 def summarize_by_code(rows: list[dict]) -> list[dict]:
-    """The avg/min/max table the SEO pages use: one row per code, across payers."""
+    """The avg/min/max table the SEO pages use: one row per code, across payers.
+
+    A hospital can list several charge items under one code (a level 5 ER visit and its trauma
+    version, say). The list price is the lowest-priced item, so it is never overstated and does not
+    depend on the order of the file."""
     grouped: dict[tuple, list[dict]] = {}
     for row in rows:
         grouped.setdefault((row["cpt_code"], row["cpt_modifier"]), []).append(row)
@@ -321,11 +330,12 @@ def summarize_by_code(rows: list[dict]) -> list[dict]:
     for group in grouped.values():
         rates = [r["avg_negotiated_rate"] for r in group if r["avg_negotiated_rate"] is not None]
         first_row = group[0]
+        listed = min((r for r in group if r["gross_charge"]), key=lambda r: r["gross_charge"], default=None)
         summaries.append({
             "cpt_code": first_row["cpt_code"], "cpt_modifier": first_row["cpt_modifier"],
-            "description": next((r["description"] for r in group if r["description"]), None),
-            "gross_charge": next((r["gross_charge"] for r in group if r["gross_charge"] is not None), None),
-            "cash_price": next((r["cash_price"] for r in group if r["cash_price"] is not None), None),
+            "description": (listed or {}).get("description") or next((r["description"] for r in group if r["description"]), None),
+            "gross_charge": listed["gross_charge"] if listed else None,
+            "cash_price": (listed or {}).get("cash_price") or next((r["cash_price"] for r in group if r["cash_price"] is not None), None),
             "avg_negotiated_rate": round(sum(rates) / len(rates), 2) if rates else None,
             "min_negotiated_rate": min(rates) if rates else None,
             "max_negotiated_rate": max(rates) if rates else None,
@@ -552,8 +562,9 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 facility_id, cpt_code, description, gross_charge, cash_price,
                 min_negotiated_rate, max_negotiated_rate, avg_negotiated_rate,
                 medicare_rate, markup_vs_medicare, data_year,
-                facility_type, medicare_benchmark_type, medicare_benchmark_rate
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                facility_type, medicare_benchmark_type, medicare_benchmark_rate,
+                source_url, source_updated
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(facility_id, cpt_code, data_year) DO UPDATE SET
                 description=excluded.description,
                 gross_charge=excluded.gross_charge,
@@ -565,7 +576,9 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 markup_vs_medicare=excluded.markup_vs_medicare,
                 facility_type='hospital',
                 medicare_benchmark_type='opps',
-                medicare_benchmark_rate=excluded.medicare_rate
+                medicare_benchmark_rate=excluded.medicare_rate,
+                source_url=excluded.source_url,
+                source_updated=excluded.source_updated
             """,
             (
                 facility_id,
@@ -582,6 +595,8 @@ def upsert_hospital_price(facility_id: str, row: dict, data_year: int | None = N
                 "hospital",
                 "opps",
                 medicare,
+                row.get("source_url"),
+                row.get("source_updated"),
             ),
         )
         # Backward-compatible mirror.
