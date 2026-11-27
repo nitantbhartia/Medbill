@@ -598,8 +598,15 @@ def startup():
             apply_opps_benchmark_once()
         except Exception:
             logging.exception("OPPS re-benchmark failed; it will retry on the next deploy")
+    def _load_san_diego_prices():
+        from price_file_loader import load_san_diego_prices_once
+        try:
+            load_san_diego_prices_once()
+        except Exception:
+            logging.exception("San Diego price load failed; it is recorded as attempted and will not rerun")
     if config.ENV == "production":
         threading.Thread(target=_regrade, daemon=True).start()
+        threading.Thread(target=_load_san_diego_prices, daemon=True).start()
         from daily_jobs import start_daily_jobs
         start_daily_jobs()
 
