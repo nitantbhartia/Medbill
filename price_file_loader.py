@@ -6,12 +6,14 @@ cannot be read or does not give one clear gross charge for the Level 5 ER visit.
 from __future__ import annotations
 
 import csv
+import http.client
 import json
 import logging
 import os
 import shutil
 import sqlite3
 import tempfile
+import threading
 from datetime import date, datetime
 from urllib.request import Request, urlopen, urlretrieve
 
@@ -26,7 +28,12 @@ from hospital_etl import (
     summarize_by_code,
     upsert_facility_procedure_price,
 )
-from hospital_seo import generate_and_save_hospital_content, log_refresh, recompute_billing_metrics
+from hospital_seo import (
+    generate_and_save_hospital_content,
+    log_refresh,
+    recompute_billing_metrics,
+    recompute_facility_billing_metrics,
+)
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +41,8 @@ SAN_DIEGO_LOAD_SOURCE = "san_diego_price_files_v2"  # v1 loaded nothing: every f
 DATABASE_COPY_SUFFIX = ".before-san_diego_price_files_v1"
 PAGE_TEXT_SOURCE = "san_diego_page_text_v1"
 UPDATED_ON_FORMATS = ("%m/%d/%Y", "%Y-%m-%d")
+LISTED_LOAD_SOURCE = "listed_price_files"
+_load_running = threading.Lock()
 
 
 def download_price_file(url: str, path: str) -> None:
@@ -43,6 +52,9 @@ def download_price_file(url: str, path: str) -> None:
             out.write(chunk)
             if out.tell() > config.PRICE_FILE_MAX_BYTES:
                 raise ValueError("file is larger than the download limit")
+        owed = getattr(response, "length", 0)  # http.client reports a connection closed early as a normal end of file
+        if owed:
+            raise ValueError(f"download ended {owed} bytes short")
 
 
 def file_updated_on(path: str) -> str:
@@ -122,11 +134,72 @@ def fetch_and_load(facility_id: str, name_phrase: str, source_url: str) -> dict:
         path = os.path.join(folder, "standardcharges.csv")
         try:
             download_price_file(source_url, path)
-        except (OSError, ValueError) as error:
+        except (OSError, ValueError, http.client.HTTPException) as error:
             log.error("Price file download failed for hospital %s (%s): %s", facility_id, source_url, error)
             return {"facility_id": facility_id, "status": "skipped", "reason": f"download failed: {error}"}
         result = load_price_file(facility_id, path, source_url)
     return {**result, "name": hospital["name"], "city": hospital["city"], "state": hospital["state"]}
+
+
+def parse_cms_hpt(text: str) -> dict[str, str]:
+    """cms-hpt.txt lists a block per hospital location. Returns {location name, lower case: its first mrf-url}."""
+    files: dict[str, str] = {}
+    location = None
+    for line in text.splitlines():
+        key, separator, value = line.partition(":")
+        key = key.strip().lower()
+        if separator and key == "location-name":
+            location = value.strip().lower()
+        elif separator and key == "mrf-url" and location:
+            files.setdefault(location, value.strip())
+    return files
+
+
+def listed_price_file(site: str, location_name: str) -> str | None:
+    """The price file a hospital website's cms-hpt.txt lists for one location, or None if it is not listed."""
+    request = Request(site.rstrip("/") + "/cms-hpt.txt", headers={"User-Agent": config.PRICE_FILE_USER_AGENT})
+    with urlopen(request, timeout=config.PRICE_FILE_TIMEOUT_SECONDS) as response:
+        text = response.read(config.CMS_HPT_MAX_BYTES).decode("utf-8-sig", errors="replace")
+    return parse_cms_hpt(text).get(location_name.strip().lower())
+
+
+def load_listed_hospital(target: dict) -> dict:
+    """Find one hospital's file through cms-hpt.txt and load it. target: facility_id, name_phrase, site, location_name."""
+    try:
+        source_url = listed_price_file(target["site"], target["location_name"])
+    except (OSError, ValueError, http.client.HTTPException) as error:
+        log.error("cms-hpt.txt not read for hospital %s (%s): %s", target["facility_id"], target["site"], error)
+        return {"facility_id": target["facility_id"], "status": "skipped", "reason": f"cms-hpt.txt not read: {error}"}
+    if not source_url:
+        return {"facility_id": target["facility_id"], "status": "skipped", "reason": f"{target['location_name']!r} is not listed in cms-hpt.txt"}
+    return {**fetch_and_load(target["facility_id"], target["name_phrase"].upper(), source_url), "source_url": source_url}
+
+
+def load_listed_hospitals(targets: list[dict]) -> list[dict]:
+    """One-off started from POST /ops/load-hospital-prices; it can be run again. Loads each hospital, then regrades
+    the ones it loaded with the existing grading logic. Only one load runs at a time."""
+    if not _load_running.acquire(blocking=False):
+        log.warning("Price load not started: another one is running")
+        return []
+    try:
+        log.warning("Price load starting for %s hospitals; database copy: %s", len(targets), backup_database())
+        results = []
+        for target in targets:
+            results.append(load_listed_hospital(target))
+            log.warning("Price file: %s", json.dumps(results[-1]))
+        loaded = {r["facility_id"] for r in results if r["status"] == "loaded"}
+        if loaded:
+            recompute_billing_metrics(only_facility_ids=loaded)
+            recompute_facility_billing_metrics()
+            generate_and_save_hospital_content(only_facility_ids=loaded)
+        log_refresh(LISTED_LOAD_SOURCE, len(loaded), "success" if loaded else "failed", json.dumps(results))
+        log.warning("Price load finished: %s", json.dumps(results))
+        return results
+    except Exception:
+        log.exception("Price load stopped on an unexpected error; hospitals loaded so far are kept")
+        raise
+    finally:
+        _load_running.release()
 
 
 def backup_database() -> str | None:

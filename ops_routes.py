@@ -3,6 +3,7 @@
 import logging
 import os
 import secrets
+import threading
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
@@ -12,7 +13,9 @@ import appeals
 import code_lookup
 import config
 import dispute_service
+import hospital_locations
 import household
+import price_file_loader
 import referrals
 import traffic
 from access_control import is_admin_request
@@ -24,6 +27,7 @@ templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
 
 ADMIN_COOKIE_NAME = "bk_admin"
+PRICE_LOAD_TARGET_KEYS = ("facility_id", "name_phrase", "site", "location_name")
 
 
 def _require_ops(request: Request) -> None:
@@ -83,6 +87,30 @@ async def ops_load_chargemaster(request: Request):
     if not all(isinstance(row, dict) and all(isinstance(row.get(key), str) and row[key].strip() for key in ("facility_name", "description", "code")) for row in rows):
         raise HTTPException(400, "Every row needs facility_name, description and code as text")
     return {"status": "ok", "data": code_lookup.load_chargemaster(rows, config.HCAI_CHARGEMASTER_PAGE)}
+
+
+@router.post("/ops/load-hospital-prices")
+async def ops_load_hospital_prices(request: Request):
+    """Start a one-off load of hospitals' published price files, each found through the cms-hpt.txt on its website:
+    [{facility_id, name_phrase, site, location_name}]. It runs in the background; results go to the log and data_refresh_log."""
+    _require_ops(request)
+    targets = await request.json()
+    if not isinstance(targets, list) or not 0 < len(targets) <= config.PRICE_LOAD_MAX_TARGETS:
+        raise HTTPException(400, "Send a list of 1 to %d hospitals" % config.PRICE_LOAD_MAX_TARGETS)
+    if not all(isinstance(t, dict) and all(isinstance(t.get(key), str) and t[key].strip() for key in PRICE_LOAD_TARGET_KEYS) for t in targets):
+        raise HTTPException(400, "Every hospital needs %s as text" % ", ".join(PRICE_LOAD_TARGET_KEYS))
+    if not all(t["site"].startswith("https://") for t in targets):
+        raise HTTPException(400, "site must be the hospital website root, starting with https://")
+    threading.Thread(target=price_file_loader.load_listed_hospitals, args=(targets,), daemon=True, name="price-load").start()
+    return {"status": "ok", "data": {"started": len(targets)}}
+
+
+@router.post("/ops/repair-hospital-locations")
+async def ops_repair_hospital_locations(request: Request):
+    """Start a one-off check of every hospital's city and state against its CMS record, fixing the ones that disagree."""
+    _require_ops(request)
+    threading.Thread(target=hospital_locations.run_location_repair, daemon=True, name="location-repair").start()
+    return {"status": "ok", "data": {"started": True}}
 
 
 @router.get("/ops/partners", response_class=HTMLResponse)

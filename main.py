@@ -2124,6 +2124,10 @@ async def hospital_profile_page(request: Request, state_slug: str, city_slug: st
 
     profile = get_hospital_profile(state_slug, city_slug, canonical_slug or hospital_slug)
     if not profile:
+        from hospital_locations import moved_profile_path
+        moved_to = moved_profile_path(hospital_slug)
+        if moved_to:
+            return RedirectResponse(url=moved_to, status_code=301)
         return templates.TemplateResponse("error.html", {"request": request, "message": "Hospital not found"}, status_code=404)
     canonical_url = f"{config.APP_URL.rstrip('/')}/hospitals/{state_slug}/{city_slug}/{canonical_slug or hospital_slug}/"
 

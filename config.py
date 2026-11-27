@@ -582,3 +582,10 @@ PRICE_FILE_MAX_BYTES = 3 * 1024**3
 PRICE_FILE_TIMEOUT_SECONDS = 120
 PRICE_FILE_USER_AGENT = "BillKarma data loader (billkarma.app)"
 LOCATION_MISMATCH_LOG_LIMIT = 40
+CMS_HPT_MAX_BYTES = 1_000_000  # cms-hpt.txt is a few kilobytes; anything larger is not that file
+PRICE_LOAD_MAX_TARGETS = 25  # hospitals per POST /ops/load-hospital-prices
+
+# Hospital locations (hospital_locations.py)
+NPI_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/api/"
+NPI_REGISTRY_TIMEOUT_SECONDS = 20
+NPI_REGISTRY_PAUSE_SECONDS = 0.1  # between lookups, to stay polite to the registry
