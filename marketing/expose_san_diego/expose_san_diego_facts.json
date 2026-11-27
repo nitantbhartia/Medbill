@@ -26,7 +26,8 @@
     "The Scripps file also lists 'HC ER Level V Trauma' at $23,622.75 under 99285; the plain visit line is used.",
     "v2: the hook is HOSP_B's multiple rounded to a whole number (10.1 shown as 10x); the cards still show 10.1x and 8.1x.",
     "v2: captions use the short names 'Scripps Mercy' and 'Kaiser San Diego' from the revised script; the cards carry the full CMS names.",
-    "v2: the spoken price in the revised script drops the cents ($7,874); the caption and card show $7,874.25."
+    "v2: the spoken price in the revised script drops the cents ($7,874); the caption and card show $7,874.25.",
+    "light v1: on-screen numbers are rounded for a calmer read: $7,874.25 shown as $7,874, 10.1x as 10x, 8.1x as 8x. Spoken lines round further ($7,874.25 as 'nearly seventy-nine hundred', $6,316 as 'sixty-three hundred')."
   ],
   "medicare": {
     "cpt_code": "99285",
@@ -67,5 +68,10 @@
   },
   "HOOK_MULT": 10,
   "HOOK_WORDING": "10x MEDICARE",
-  "MULT_A_WORDING": "over 8 times Medicare"
+  "MULT_A_WORDING": "over 8 times Medicare",
+  "PRICE_B_ROUNDED_DISPLAY": "$7,874",
+  "PRICE_B_SPOKEN": "nearly seventy-nine hundred dollars",
+  "PRICE_A_SPOKEN": "sixty-three hundred",
+  "MULT_A_ROUNDED": 8,
+  "MULT_B_ROUNDED": 10
 }
