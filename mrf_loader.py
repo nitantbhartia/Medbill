@@ -6,6 +6,7 @@ read while it downloads, so a 600 MB file never sits in memory or on disk."""
 from __future__ import annotations
 
 import csv
+import http.client
 import io
 import json
 import logging
@@ -62,14 +63,14 @@ def parse_cms_hpt(text: str) -> list[dict]:
         if key == "location-name":
             entries.append({})
         if entries:
-            entries[-1][key] = value.strip()
+            entries[-1].setdefault(key, value.strip())
     return [entry for entry in entries if entry.get("mrf-url")]
 
 
 def find_price_file(site: str, location_name: str) -> dict | None:
     """The cms-hpt.txt entry for one hospital location, or None when the site does not list it."""
     with _open(site.rstrip("/") + "/cms-hpt.txt") as response:
-        text = response.read(config.CMS_HPT_MAX_BYTES).decode("utf-8", errors="replace")
+        text = response.read(config.CMS_HPT_MAX_BYTES).decode("utf-8-sig", errors="replace")
     wanted = location_name.strip().lower()
     return next((e for e in parse_cms_hpt(text) if e.get("location-name", "").lower() == wanted), None)
 
@@ -130,9 +131,13 @@ def load_hospital_prices(facility_id: str, site: str, location_name: str, data_y
         result["source_url"] = url
         with _open(url) as response:
             payer_rows, preamble, status = read_price_csv(response)
-    except (URLError, OSError) as exc:
+            # http.client reports a connection closed early as a normal end of file; the bytes still owed give it away.
+            cut_short = bool(getattr(response, "length", 0))
+    except (URLError, OSError, ValueError, http.client.HTTPException) as exc:
         log.error("Price file download failed for %s (%s): %s", facility_id, location_name, exc)
         return {**result, "status": "download_failed", "error": str(exc)}
+    if status == "parsed" and cut_short:
+        return {**result, "status": "download_incomplete"}
     if status != "parsed":
         return {**result, "status": status}
 
@@ -179,6 +184,7 @@ def backup_database() -> str | None:
 def run_price_load(targets: list[dict]) -> list[dict]:
     """Load each target hospital, then regrade with the existing grading logic. One load runs at a time."""
     if not _load_running.acquire(blocking=False):
+        log.warning("Price load not started: another one is running")
         return []
     try:
         return _load_and_regrade(targets)

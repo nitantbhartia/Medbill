@@ -187,3 +187,24 @@ def test_kaiser_wide_file_with_capitalised_modifiers_column():
 
     assert (status, mrf_loader.file_date(preamble["last_updated_on"])) == ("parsed", "2026-04-01")
     assert (level5["description"], level5["gross_charge"], level5["cash_price"]) == ("FACILITY USE-EMERGENCY ROOM, LEVEL 5", 6316.0, 3284.32)
+
+
+class CutShortDownload(io.BytesIO):
+    """What http.client hands back when the server closes the connection early: a clean end of file, with bytes still owed."""
+    length = 578_000_000
+
+
+def test_download_cut_short_after_the_er_rows_loads_nothing(monkeypatch, scripps_mercy):
+    with open(SCRIPPS_SAMPLE, "rb") as f:
+        partial_file = f.read()
+    monkeypatch.setattr(mrf_loader, "_open", lambda url: io.BytesIO(SCRIPPS_HPT.encode()) if url.endswith("/cms-hpt.txt") else CutShortDownload(partial_file))
+
+    assert load_scripps()["status"] == "download_incomplete"
+    with get_db() as db:
+        assert db.execute("SELECT COUNT(*) FROM hospital_prices WHERE facility_id = '050077'").fetchone()[0] == 0
+
+
+def test_cms_hpt_with_a_byte_order_mark_and_two_files_per_location():
+    entries = mrf_loader.parse_cms_hpt(b"\xef\xbb\xbflocation-name: Sharp Memorial Hospital\nmrf-url: https://example.org/a.csv\nmrf-url: https://example.org/a.json\n".decode("utf-8-sig"))
+
+    assert entries == [{"location-name": "Sharp Memorial Hospital", "mrf-url": "https://example.org/a.csv"}]
