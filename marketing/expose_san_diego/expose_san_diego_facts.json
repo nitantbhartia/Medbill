@@ -23,7 +23,10 @@
     "RATIO rounds to 1, so the video says '25% more' and the opening graphic reads '25% PRICE DIFFERENCE'.",
     "Kaiser San Marcos also lists $6,316 and Scripps Memorial La Jolla also lists $7,874.25; the two hospitals inside the city of San Diego were used.",
     "Hospital names are the CMS Hospital General Information names (CMS prints them in capitals).",
-    "The Scripps file also lists 'HC ER Level V Trauma' at $23,622.75 under 99285; the plain visit line is used."
+    "The Scripps file also lists 'HC ER Level V Trauma' at $23,622.75 under 99285; the plain visit line is used.",
+    "v2: the hook is HOSP_B's multiple rounded to a whole number (10.1 shown as 10x); the cards still show 10.1x and 8.1x.",
+    "v2: captions use the short names 'Scripps Mercy' and 'Kaiser San Diego' from the revised script; the cards carry the full CMS names.",
+    "v2: the spoken price in the revised script drops the cents ($7,874); the caption and card show $7,874.25."
   ],
   "medicare": {
     "cpt_code": "99285",
@@ -61,5 +64,8 @@
     "GRADES": "https://billkarma.app/data/hospital-billing-grades.csv",
     "NAMES_AND_ADDRESSES": "https://data.cms.gov/provider-data/dataset/xubh-q36u",
     "MILES": "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
-  }
+  },
+  "HOOK_MULT": 10,
+  "HOOK_WORDING": "10x MEDICARE",
+  "MULT_A_WORDING": "over 8 times Medicare"
 }

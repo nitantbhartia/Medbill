@@ -2,7 +2,7 @@
 
 Every number drawn comes from expose_san_diego_facts.json. Usage:
     python3 render.py stills   # five full-size stills in out/
-    python3 render.py video    # out/billkarma_expose_san_diego_v1.mp4 and a contact sheet
+    python3 render.py video    # out/billkarma_expose_san_diego_v2.mp4 and a contact sheet
     python3 render.py sound    # rebuild the sound over frames already encoded
 Marketing only: nothing in the deployed app imports this folder.
 """
@@ -22,16 +22,16 @@ OUT = os.path.join(HERE, "out")
 FACTS = json.load(open(os.path.join(HERE, "expose_san_diego_facts.json")))
 
 W, H, FPS, SPEED = 1080, 1920, 30, 1.1
-END = 15.2  # seconds of finished video; scene times below are finished-video seconds
+END = 14.8  # seconds of finished video; scene times below are finished-video seconds
 SAFE_RIGHT = int(W * 0.79)  # cards, numbers and badges stay left of this
 SAFE_BOTTOM = H - 380
 LEFT = 64
 CONTENT_W = SAFE_RIGHT - LEFT
-SCENES = {"hook": 0.0, "code": 2.8, "high": 6.6, "low": 9.2, "ask": 11.4}
+SCENES = {"hook": 0.0, "code": 2.8, "high": 6.2, "low": 9.0, "ask": 11.8}
 
 SLATE, PANEL, PANEL_EDGE = (18, 24, 32), (28, 36, 47), (52, 64, 80)
 INK, MUTED, FAINT = (240, 243, 247), (150, 162, 178), (74, 86, 102)
-YELLOW, RED, GREEN = (255, 212, 59), (240, 82, 72), (64, 192, 124)
+YELLOW, RED, AMBER = (255, 212, 59), (240, 82, 72), (245, 158, 11)  # amber, not green: 8.1x Medicare is not a bargain
 
 INTER = "/usr/share/fonts/opentype/inter/Inter-{}.otf"
 MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono{}.ttf"
@@ -54,22 +54,23 @@ MILES = FACTS["MILES"]
 NAME_A, NAME_B = FACTS["HOSP_A_NAME"].upper(), FACTS["HOSP_B_NAME"].upper()
 PRICE_A, PRICE_B = FACTS["PRICE_A_DISPLAY"], FACTS["PRICE_B_DISPLAY"]
 MULT_A, MULT_B = f"{FACTS['MULT_A']}x", f"{FACTS['MULT_B']}x"
-GAP = f"{FACTS['PERCENT_MORE']}%" if FACTS["RATIO"] == 1 else f"{FACTS['RATIO']}x"
+HOOK = f"{FACTS['HOOK_MULT']}x"
 CODE = FACTS["medicare"]["cpt_code"]
 DISCLOSURE = "Public hospital pricing data · published list prices · Not legal advice"  # no voice in this cut
 CARD_NOTE = "List prices. Insured patients usually pay less."
 
 # (start, end, text): captions follow the script timings; words with digits are drawn yellow.
 CAPTIONS = [
-    (0.0, 1.5, f"If you live in {FACTS['CITY']},"),
-    (1.5, 2.8, "look at this before your next ER bill."),
-    (2.8, 5.0, f"I pulled the published price files for two hospitals about {MILES} miles apart."),
-    (5.0, 6.6, "Same Level 5 ER code."),
-    (6.6, 8.0, f"{FACTS['HOSP_B_NAME']} lists it at {PRICE_B}."),
-    (8.0, 9.2, f"That's {FACTS['MULT_B']} times the Medicare rate."),
-    (9.2, 11.4, f"Down the road, {FACTS['HOSP_A_NAME']} lists {PRICE_A}."),
-    (11.4, 13.0, "Every hospital has to publish these prices."),
-    (13.0, 15.2, "Drop your city below and I'll pull your local ERs next."),
+    (0.0, 1.3, f"If you live in {FACTS['CITY']},"),
+    (1.3, 2.8, "look at what one ER visit costs here."),
+    (2.8, 4.9, f"I pulled the published price files for two hospitals about {MILES} miles apart."),
+    (4.9, 6.2, "Same Level 5 ER code."),
+    (6.2, 7.8, f"Scripps Mercy lists it at {PRICE_B}."),
+    (7.8, 9.0, f"{FACTS['HOOK_MULT']} times Medicare."),
+    (9.0, 10.5, f"About {MILES} miles away, Kaiser San Diego still lists {PRICE_A}."),
+    (10.5, 11.8, f"Over {int(FACTS['MULT_A'])} times Medicare."),
+    (11.8, 13.2, "Every hospital has to publish these prices."),
+    (13.2, 14.8, "Drop your city below and I'll pull your local ERs next."),
 ]
 
 
@@ -173,15 +174,15 @@ def draw_hook(t):
     rise = ease_out(prog(t, 0.05, 0.5))
     y = 286 + (1 - rise) * 40
     d.text((LEFT, y), f"{CITY} ER", font=font(TITLE, "ExtraBold"), fill=INK + (int(255 * rise),))
-    d.text((LEFT, y + 78), "PRICE GAP", font=font(TITLE, "ExtraBold"), fill=INK + (int(255 * rise),))
+    d.text((LEFT, y + 78), "PRICES", font=font(TITLE, "ExtraBold"), fill=INK + (int(255 * rise),))
     pop = ease_back(prog(t, 0.55, 0.45)) if t >= 0.55 else 0
     if pop > 0:
         big = font(int(HERO * (0.6 + 0.4 * pop)), "Black")
-        d.text((LEFT - 6, 604), GAP, font=big, fill=RED, anchor="ls")
-        gx = LEFT + text_w(d, GAP, font(HERO, "Black")) + 18
-        d.text((gx, 546), "PRICE", font=font(BODY, "ExtraBold"), fill=INK, anchor="ls")
-        d.text((gx, 594), "DIFFERENCE", font=font(BODY, "ExtraBold"), fill=INK, anchor="ls")
-        gap_right = gx + text_w(d, "DIFFERENCE", font(BODY, "ExtraBold"))
+        d.text((LEFT - 6, 604), HOOK, font=big, fill=RED, anchor="ls")
+        gx = LEFT + text_w(d, HOOK, font(HERO, "Black")) + 18
+        d.text((gx, 546), "THE MEDICARE", font=font(BODY, "ExtraBold"), fill=INK, anchor="ls")
+        d.text((gx, 594), "RATE", font=font(BODY, "ExtraBold"), fill=INK, anchor="ls")
+        gap_right = gx + text_w(d, "THE MEDICARE", font(BODY, "ExtraBold"))
         marker_line(d, LEFT, gap_right, 634, ease_out(prog(t, 1.05, 0.5)), RED + (235,))
     fade = 1 - ease_out(prog(t, SCENES["code"], 0.45))
     if fade < 1:
@@ -260,9 +261,9 @@ def draw_cards(t, dim=False):
     d.text((LEFT, 334), f"{CITY} · LEVEL 5 ER VISIT", font=font(FINE, "SemiBold"), fill=MUTED + (int(255 * head * (0.4 if dim else 1)),))
     share_a = FACTS["PRICE_A"] / FACTS["PRICE_B"]
     draw_card(img, CARDS_TOP, NAME_B, PRICE_B, MULT_B, 1.0, RED, prog(t, SCENES["high"] + 0.1, 0.35), prog(t, SCENES["high"] + 0.45, 0.9), dim)
-    draw_card(img, CARDS_TOP + CARD_H + CARD_GAP, NAME_A, PRICE_A, MULT_A, share_a, GREEN,
+    draw_card(img, CARDS_TOP + CARD_H + CARD_GAP, NAME_A, PRICE_A, MULT_A, share_a, AMBER,
               prog(t, SCENES["low"] + 0.1, 0.4), prog(t, SCENES["low"] + 0.5, 0.8), dim)
-    note = ease_out(prog(t, SCENES["high"] + 0.5, 0.4)) * (0.45 if dim else 1)
+    note = ease_out(prog(t, SCENES["high"] + 0.5, 0.4)) * (0 if dim else 1)  # gone once the ask is up
     ImageDraw.Draw(img).text((LEFT, CARDS_TOP + 2 * CARD_H + CARD_GAP + 26), CARD_NOTE, font=font(FINE, "Medium"), fill=INK + (int(230 * note),))
     return img
 
@@ -430,7 +431,7 @@ def build_audio(path):
 def render_video(reuse_frames=False):
     os.makedirs(OUT, exist_ok=True)
     raw, wav = os.path.join(OUT, "silent_prespeed.mp4"), os.path.join(OUT, "mix.wav")
-    final, partial = os.path.join(OUT, "billkarma_expose_san_diego_v1.mp4"), os.path.join(OUT, "partial.mp4")
+    final, partial = os.path.join(OUT, "billkarma_expose_san_diego_v2.mp4"), os.path.join(OUT, "partial.mp4")
     frames = 0 if reuse_frames else math.ceil(END * SPEED * FPS)
     if not reuse_frames:
         encoder = subprocess.Popen(
@@ -453,7 +454,7 @@ def render_video(reuse_frames=False):
 
 def contact_sheet(video):
     """Ten frames pulled from the finished file, two rows of five."""
-    times = [0.4, 1.6, 3.4, 5.4, 6.9, 8.4, 9.6, 10.8, 12.2, 14.6]
+    times = [0.4, 1.6, 3.4, 5.4, 6.6, 8.4, 9.5, 11.2, 12.4, 14.4]
     thumbs = []
     for i, t in enumerate(times):
         path = os.path.join(OUT, f"sheet_{i}.png")
@@ -473,7 +474,7 @@ def contact_sheet(video):
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     if sys.argv[1:] == ["stills"]:
-        for t in (1.9, 5.6, 8.9, 11.1, 14.0):
+        for t in (1.9, 5.6, 8.6, 11.3, 13.9):
             frame(t).save(os.path.join(OUT, f"still_{t:04.1f}.png"))
     elif sys.argv[1:] in (["video"], ["sound"]):  # "sound" rebuilds the mix over frames already encoded
         print(contact_sheet(render_video(reuse_frames=sys.argv[1] == "sound")))
