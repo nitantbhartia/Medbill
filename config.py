@@ -564,14 +564,26 @@ MEDICAID_RETRO_MONTHS_OTHER = 2  # P.L. 119-21 sec. 71112
 MEDICAID_RETRO_LAW_URL = "https://www.congress.gov/bill/119th-congress/house-bill/1/text"
 MEDICAID_RETRO_CMS_BULLETIN_URL = "https://www.medicaid.gov/federal-policy-guidance/downloads/cib11182025.pdf"
 
-# Hospital price file loads (mrf_loader.py)
+# San Diego County hospitals' standard-charges files, as listed in each system's /cms-hpt.txt on 2026-11-27.
+# Each entry: CMS certification number, a phrase the CMS hospital name must contain, the file URL.
+SAN_DIEGO_PRICE_FILES = (
+    ("050077", "SCRIPPS MERCY", "https://apps.scripps.org/pricetransparency/951684089_Scripps-Mercy-Hospital-San-Diego_standardcharges.csv"),
+    ("050324", "LA JOLLA", "https://apps.scripps.org/pricetransparency/951684089_Scripps-Memorial-Hospital-La-Jolla_standardcharges.csv"),
+    ("050100", "SHARP MEMORIAL", "https://downloads.ctfassets.net/pxcfulgsd9e2/7kOO19WgXRFqOFfWyPsSCE/1dd67ee60fbf2a34d729812c39abb1fe/95-3782169_sharp-memorial-hospital_standardcharges.csv"),
+    ("050026", "GROSSMONT", "https://downloads.ctfassets.net/pxcfulgsd9e2/pDe4LFVvP8fh5nOJd8Zji/71b0885eb86902c17aee42e048ea796b/33-0449527_grossmont-hospital-corporation_standardcharges.csv"),
+    ("050222", "SHARP CHULA VISTA", "https://downloads.ctfassets.net/pxcfulgsd9e2/D4fRN51N03oyjM0c54C1U/cbd502f0357445b1fc46bdeaac647efc/95-2367304_sharp-chula-vista-medical-center_standardcharges.csv"),
+)
 ER_VISIT_CODES = ("99281", "99282", "99283", "99284", "99285")
-ER_LEVEL_5_CODE = "99285"
-MRF_SOCKET_TIMEOUT_SECONDS = 120
-MRF_SNIFF_BYTES = 64  # enough of the file's start to tell CSV from JSON, a zip or an error page
+# Hospitals file several charge lines under one ER visit code (seen in the Scripps and Sharp files: "HC ER Level V Trauma",
+# "HC ER TYPE CRITICAL LT 30MIN", "HC ER LWBS W/TESTS PROVIDED"). Lines with these words are not the plain visit charge.
+ER_SPECIAL_LINE_WORDS = ("TRAUMA", "CRITICAL", "LWBS")
+ER_GRADE_CODE = "99285"  # a hospital's file is only loaded if it lists a gross charge for this code
+PRICE_FILE_MAX_BYTES = 3 * 1024**3
+PRICE_FILE_TIMEOUT_SECONDS = 120
+PRICE_FILE_USER_AGENT = "BillKarma data loader (billkarma.app)"
+LOCATION_MISMATCH_LOG_LIMIT = 40
 CMS_HPT_MAX_BYTES = 1_000_000  # cms-hpt.txt is a few kilobytes; anything larger is not that file
 PRICE_LOAD_MAX_TARGETS = 25  # hospitals per POST /ops/load-hospital-prices
-DB_BACKUP_FREE_SPACE_FACTOR = 1.5  # free disk needed, as a multiple of the database size, to copy it before a load
 
 # Hospital locations (hospital_locations.py)
 NPI_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/api/"

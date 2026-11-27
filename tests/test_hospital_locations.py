@@ -9,7 +9,7 @@ from db import get_db
 from hospital_etl import load_cms_general
 from hospital_seo import upsert_hospital_row
 
-CMS_SAMPLE = os.path.join(os.path.dirname(__file__), "test_data", "cms_hospital_general_sample.csv")
+CMS_SAMPLE = os.path.join(os.path.dirname(__file__), "test_data", "cms_hospital_general_cut.csv")
 # What CMS's NPI registry returns for NPI 1316536253 (addresses only).
 SOUTH_OVERLAND_PARK_NPI = {"results": [{"addresses": [
     {"address_purpose": "LOCATION", "address_1": "7820 W 165TH ST", "city": "OVERLAND PARK", "state": "KS", "postal_code": "662232925"},

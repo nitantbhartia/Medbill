@@ -90,7 +90,7 @@ def get_hospital_prices(facility_id: str, billing_code: str = "") -> dict:
         SELECT cpt_code,
                COALESCE(description, (SELECT o.description FROM hospital_opps_rates o
                                       WHERE o.cpt_code = hospital_prices.cpt_code ORDER BY o.effective_year DESC LIMIT 1)) AS description,
-               gross_charge, cash_price, medicare_rate, markup_vs_medicare, source_url, source_updated
+               gross_charge, cash_price, medicare_rate, markup_vs_medicare, source_url, source_updated_on
         FROM hospital_prices
         WHERE facility_id = ? AND gross_charge IS NOT NULL AND medicare_rate IS NOT NULL
           AND data_year = (SELECT MAX(data_year) FROM hospital_prices WHERE facility_id = ? AND gross_charge IS NOT NULL)
@@ -112,7 +112,7 @@ def get_hospital_prices(facility_id: str, billing_code: str = "") -> dict:
             {"billing_code": r["cpt_code"], "description": r["description"], "list_price": r["gross_charge"],
              "cash_price": r["cash_price"], "medicare_hospital_rate": r["medicare_rate"],
              "list_times_medicare": round(r["markup_vs_medicare"], 1),
-             "source_file": r["source_url"], "source_file_updated": r["source_updated"]}
+             "source_file": r["source_url"], "source_file_updated": r["source_updated_on"]}
             for r in rows
         ],
         "note": "List price is not what most insured patients pay. The cash price is the hospital's posted self-pay price.",

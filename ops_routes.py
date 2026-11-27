@@ -15,7 +15,7 @@ import config
 import dispute_service
 import hospital_locations
 import household
-import mrf_loader
+import price_file_loader
 import referrals
 import traffic
 from access_control import is_admin_request
@@ -27,6 +27,7 @@ templates = Jinja2Templates(directory="templates")
 templates.env.globals["config"] = config
 
 ADMIN_COOKIE_NAME = "bk_admin"
+PRICE_LOAD_TARGET_KEYS = ("facility_id", "name_phrase", "site", "location_name")
 
 
 def _require_ops(request: Request) -> None:
@@ -90,19 +91,17 @@ async def ops_load_chargemaster(request: Request):
 
 @router.post("/ops/load-hospital-prices")
 async def ops_load_hospital_prices(request: Request):
-    """Start a one-off load of hospitals' published price files: [{facility_id, site, location_name}].
-    It runs in the background; each hospital's result goes to the log and to data_refresh_log."""
+    """Start a one-off load of hospitals' published price files, each found through the cms-hpt.txt on its website:
+    [{facility_id, name_phrase, site, location_name}]. It runs in the background; results go to the log and data_refresh_log."""
     _require_ops(request)
     targets = await request.json()
     if not isinstance(targets, list) or not 0 < len(targets) <= config.PRICE_LOAD_MAX_TARGETS:
         raise HTTPException(400, "Send a list of 1 to %d hospitals" % config.PRICE_LOAD_MAX_TARGETS)
-    if not all(isinstance(t, dict) and all(isinstance(t.get(key), str) and t[key].strip() for key in ("facility_id", "site", "location_name")) for t in targets):
-        raise HTTPException(400, "Every hospital needs facility_id, site and location_name as text")
+    if not all(isinstance(t, dict) and all(isinstance(t.get(key), str) and t[key].strip() for key in PRICE_LOAD_TARGET_KEYS) for t in targets):
+        raise HTTPException(400, "Every hospital needs %s as text" % ", ".join(PRICE_LOAD_TARGET_KEYS))
     if not all(t["site"].startswith("https://") for t in targets):
         raise HTTPException(400, "site must be the hospital website root, starting with https://")
-    if mrf_loader.load_is_running():
-        raise HTTPException(409, "A price load is already running")
-    threading.Thread(target=mrf_loader.run_price_load, args=(targets,), daemon=True, name="price-load").start()
+    threading.Thread(target=price_file_loader.load_listed_hospitals, args=(targets,), daemon=True, name="price-load").start()
     return {"status": "ok", "data": {"started": len(targets)}}
 
 

@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import csv
 import json
 from datetime import date
 from typing import Any
 
+import config
 from db import get_db
+from hospital_seo import normalize_facility_id
 from procedure_pages import get_providers_near_zip_for_cpt
 
 _ALL_PRICES_CTE = """
@@ -245,4 +248,29 @@ def save_quality_run(
         )
         row = db.execute("SELECT last_insert_rowid() AS id").fetchone()
         return int(row["id"])
+
+
+def hospitals_off_cms_location(cms_general_csv: str) -> list[dict]:
+    """Hospitals whose city or state is not the one on their own CMS record (Hospital General Information,
+    keyed by CMS certification number), plus graded hospitals that have no CMS record to check against."""
+    with open(cms_general_csv, newline="", encoding="utf-8-sig") as f:
+        cms = {normalize_facility_id(row["Facility ID"]): (row["City/Town"].strip().upper(), row["State"].strip().upper())
+               for row in csv.DictReader(f)}
+    with get_db() as db:
+        hospitals = db.execute(
+            """
+            SELECT h.facility_id, h.name, h.city, h.state, m.billing_grade
+            FROM hospitals h LEFT JOIN billing_metrics m ON m.facility_id = h.facility_id
+            ORDER BY h.facility_id
+            """
+        ).fetchall()
+    off = []
+    for h in hospitals:
+        on_file = ((h["city"] or "").strip().upper(), (h["state"] or "").strip().upper())
+        record = cms.get(h["facility_id"])
+        graded = h["billing_grade"] in config.GRADED_LETTERS
+        if (record and record != on_file) or (record is None and graded):
+            off.append({"facility_id": h["facility_id"], "name": h["name"], "city": h["city"], "state": h["state"], "billing_grade": h["billing_grade"],
+                        "cms_city": record[0] if record else None, "cms_state": record[1] if record else None})
+    return off
 
